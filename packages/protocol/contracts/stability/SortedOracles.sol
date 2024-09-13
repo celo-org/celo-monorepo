@@ -12,6 +12,7 @@ import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../common/linkedlists/SortedLinkedListWithMedian.sol";
+import "../../contracts-0.8/common/interfaces/IOracle.sol";
 
 /**
  * @title   SortedOracles
@@ -35,7 +36,7 @@ import "../common/linkedlists/SortedLinkedListWithMedian.sol";
  *          "token" are actually referring to the rateFeedId.
  *
  */
-contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initializable {
+contract SortedOracles is ISortedOracles, IOracle, ICeloVersionedContract, Ownable, Initializable {
   using SafeMath for uint256;
   using AddressSortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
   using FixidityLib for FixidityLib.Fraction;
@@ -88,17 +89,6 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   }
 
   /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 3, 0);
-  }
-
-  /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
@@ -114,17 +104,6 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   }
 
   /**
-   * @notice Sets the report expiry parameter.
-   * @param _reportExpirySeconds The number of seconds before a report is considered expired.
-   */
-  function setReportExpiry(uint256 _reportExpirySeconds) public onlyOwner {
-    require(_reportExpirySeconds > 0, "report expiry seconds must be > 0");
-    require(_reportExpirySeconds != reportExpirySeconds, "reportExpirySeconds hasn't changed");
-    reportExpirySeconds = _reportExpirySeconds;
-    emit ReportExpirySet(_reportExpirySeconds);
-  }
-
-  /**
    * @notice Sets the report expiry parameter for a rateFeedId.
    * @param _token The token for which the report expiry is being set.
    * @param _reportExpirySeconds The number of seconds before a report is considered expired.
@@ -137,16 +116,6 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
     );
     tokenReportExpirySeconds[_token] = _reportExpirySeconds;
     emit TokenReportExpirySet(_token, _reportExpirySeconds);
-  }
-
-  /**
-   * @notice Sets the address of the BreakerBox.
-   * @param newBreakerBox The new BreakerBox address.
-   */
-  function setBreakerBox(IBreakerBox newBreakerBox) public onlyOwner {
-    require(address(newBreakerBox) != address(0), "BreakerBox address must be set");
-    breakerBox = newBreakerBox;
-    emit BreakerBoxUpdated(address(newBreakerBox));
   }
 
   /**
@@ -210,24 +179,6 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   }
 
   /**
-   * @notice Check if last report is expired.
-   * @param token The token for which the expired report is to be checked.
-   * @return bool A bool indicating if the last report is expired.
-   * @return address Oracle address of the last report.
-   */
-  function isOldestReportExpired(address token) public view returns (bool, address) {
-    // solhint-disable-next-line reason-string
-    require(token != address(0));
-    address oldest = timestamps[token].getTail();
-    uint256 timestamp = timestamps[token].getValue(oldest);
-    // solhint-disable-next-line not-rely-on-time
-    if (now.sub(timestamp) >= getTokenReportExpirySeconds(token)) {
-      return (true, oldest);
-    }
-    return (false, oldest);
-  }
-
-  /**
    * @notice Sets the equivalent token for a token.
    * @param token The address of the token.
    * @param equivalentToken The address of the equivalent token.
@@ -250,15 +201,6 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   }
 
   /**
-   * @notice Gets the equivalent token for a token.
-   * @param token The address of the token.
-   * @return The address of the equivalent token.
-   */
-  function getEquivalentToken(address token) external view returns (address) {
-    return (equivalentTokens[token].token);
-  }
-
-  /**
    * @notice Updates an oracle value and the median.
    * @param token The token for which the rate is being reported.
    * @param value The number of stable asset that equate to one unit of collateral asset, for the
@@ -267,10 +209,12 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @param greaterKey The element which should be just right of the new oracle value.
    * @dev Note that only one of `lesserKey` or `greaterKey` needs to be correct to reduce friction.
    */
-  function report(address token, uint256 value, address lesserKey, address greaterKey)
-    external
-    onlyOracle(token)
-  {
+  function report(
+    address token,
+    uint256 value,
+    address lesserKey,
+    address greaterKey
+  ) external onlyOracle(token) {
     uint256 originalMedian = rates[token].getMedianValue();
     if (rates[token].contains(msg.sender)) {
       rates[token].update(msg.sender, value, lesserKey, greaterKey);
@@ -308,77 +252,12 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   }
 
   /**
-   * @notice Returns the number of rates that are currently stored for a specifed rateFeedId.
-   * @dev Does not take the equivalentTokens mapping into account.
-   * For that, the underlying token should be queried.
-   * @param token The token for which the number of rates is being retrieved.
-   * @return uint256 The number of reported oracle rates stored for the given rateFeedId.
+   * @notice Gets the equivalent token for a token.
+   * @param token The address of the token.
+   * @return The address of the equivalent token.
    */
-  function numRates(address token) public view returns (uint256) {
-    return rates[token].getNumElements();
-  }
-
-  /**
-   * @notice Returns the median of the currently stored rates for a specified rateFeedId.
-   * @dev Does not take the equivalentTokens mapping into account.
-   * @param token The token for which the median value is being retrieved.
-   * @return uint256 The median exchange rate for rateFeedId (fixidity).
-   * @return uint256 denominator
-   */
-  function medianRateWithoutEquivalentMapping(address token)
-    public
-    view
-    returns (uint256, uint256)
-  {
-    return (rates[token].getMedianValue(), numRates(token) == 0 ? 0 : FIXED1_UINT);
-  }
-
-  /**
-   * @notice Returns the median of the currently stored rates for a specified rateFeedId.
-   * @dev Please note that this function respects the equivalentToken mapping, and so may
-   * return the median identified as an equivalent to the supplied rateFeedId.
-   * @param token The token for which the median value is being retrieved.
-   * @return uint256 The median exchange rate for rateFeedId (fixidity).
-   * @return uint256 denominator
-   */
-  function medianRate(address token) external view returns (uint256, uint256) {
-    EquivalentToken storage equivalentToken = equivalentTokens[token];
-    if (equivalentToken.token != address(0)) {
-      (uint256 equivalentMedianRate, uint256 denominator) = medianRateWithoutEquivalentMapping(
-        equivalentToken.token
-      );
-      return (equivalentMedianRate, denominator);
-    }
-
-    return medianRateWithoutEquivalentMapping(token);
-  }
-
-  /**
-   * @notice Gets all elements from the doubly linked list.
-   * @dev Does not take the equivalentTokens mapping into account.
-   * For that, the underlying token should be queried.
-   * @param token The token for which the rates are being retrieved.
-   * @return keys Keys of an unpacked list of elements from largest to smallest.
-   * @return values Values of an unpacked list of elements from largest to smallest.
-   * @return relations Relations of an unpacked list of elements from largest to smallest.
-   */
-  function getRates(address token)
-    external
-    view
-    returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
-  {
-    return rates[token].getElements();
-  }
-
-  /**
-   * @notice Returns the number of timestamps.
-   * @dev Does not take the equivalentTokens mapping into account.
-   * For that, the underlying token should be queried.
-   * @param token The token for which the number of timestamps is being retrieved.
-   * @return uint256 The number of oracle report timestamps for the specified rateFeedId.
-   */
-  function numTimestamps(address token) public view returns (uint256) {
-    return timestamps[token].getNumElements();
+  function getEquivalentToken(address token) external view returns (address) {
+    return (equivalentTokens[token].token);
   }
 
   /**
@@ -401,24 +280,14 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @return values Values of an unpacked list of elements from largest to smallest.
    * @return relations Relations of an unpacked list of elements from largest to smallest.
    */
-  function getTimestamps(address token)
+  function getTimestamps(
+    address token
+  )
     external
     view
     returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
   {
     return timestamps[token].getElements();
-  }
-
-  /**
-   * @notice Checks if a report exists for a specified rateFeedId from a given oracle.
-   * @dev Does not take the equivalentTokens mapping into account.
-   * For that, the underlying token should be queried.
-   * @param token The token for which the report should be checked.
-   * @param oracle The oracle whose report should be checked.
-   * @return bool True if a report exists, false otherwise.
-   */
-  function reportExists(address token, address oracle) internal view returns (bool) {
-    return rates[token].contains(oracle) && timestamps[token].contains(oracle);
   }
 
   /**
@@ -430,6 +299,142 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    */
   function getOracles(address token) external view returns (address[] memory) {
     return oracles[token];
+  }
+
+  /**
+   * @notice Gets all elements from the doubly linked list.
+   * @dev Does not take the equivalentTokens mapping into account.
+   * For that, the underlying token should be queried.
+   * @param token The token for which the rates are being retrieved.
+   * @return keys Keys of an unpacked list of elements from largest to smallest.
+   * @return values Values of an unpacked list of elements from largest to smallest.
+   * @return relations Relations of an unpacked list of elements from largest to smallest.
+   */
+  function getRates(
+    address token
+  )
+    external
+    view
+    returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
+  {
+    return rates[token].getElements();
+  }
+
+  /**
+   * @notice Returns the exchange rate for a specified token.
+   * @param token The token for which the exchange rate is being retrieved.
+   * @return uint256 The exchange rate for the specified token.
+   * @return uint256 The denominator for the exchange rate.
+   */
+  function getExchangeRate(
+    address token
+  ) external view returns (uint256 numerator, uint256 denominator) {
+    (numerator, denominator) = medianRate(token);
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 4, 0);
+  }
+
+  /**
+   * @notice Sets the report expiry parameter.
+   * @param _reportExpirySeconds The number of seconds before a report is considered expired.
+   */
+  function setReportExpiry(uint256 _reportExpirySeconds) public onlyOwner {
+    require(_reportExpirySeconds > 0, "report expiry seconds must be > 0");
+    require(_reportExpirySeconds != reportExpirySeconds, "reportExpirySeconds hasn't changed");
+    reportExpirySeconds = _reportExpirySeconds;
+    emit ReportExpirySet(_reportExpirySeconds);
+  }
+
+  /**
+   * @notice Sets the address of the BreakerBox.
+   * @param newBreakerBox The new BreakerBox address.
+   */
+  function setBreakerBox(IBreakerBox newBreakerBox) public onlyOwner {
+    require(address(newBreakerBox) != address(0), "BreakerBox address must be set");
+    breakerBox = newBreakerBox;
+    emit BreakerBoxUpdated(address(newBreakerBox));
+  }
+
+  /**
+   * @notice Returns the median of the currently stored rates for a specified rateFeedId.
+   * @dev Please note that this function respects the equivalentToken mapping, and so may
+   * return the median identified as an equivalent to the supplied rateFeedId.
+   * @param token The token for which the median value is being retrieved.
+   * @return uint256 The median exchange rate for rateFeedId (fixidity).
+   * @return uint256 denominator
+   */
+  function medianRate(address token) public view returns (uint256, uint256) {
+    EquivalentToken storage equivalentToken = equivalentTokens[token];
+    if (equivalentToken.token != address(0)) {
+      (uint256 equivalentMedianRate, uint256 denominator) = medianRateWithoutEquivalentMapping(
+        equivalentToken.token
+      );
+      return (equivalentMedianRate, denominator);
+    }
+
+    return medianRateWithoutEquivalentMapping(token);
+  }
+
+  /**
+   * @notice Returns the number of rates that are currently stored for a specifed rateFeedId.
+   * @dev Does not take the equivalentTokens mapping into account.
+   * For that, the underlying token should be queried.
+   * @param token The token for which the number of rates is being retrieved.
+   * @return uint256 The number of reported oracle rates stored for the given rateFeedId.
+   */
+  function numRates(address token) public view returns (uint256) {
+    return rates[token].getNumElements();
+  }
+
+  /**
+   * @notice Check if last report is expired.
+   * @param token The token for which the expired report is to be checked.
+   * @return bool A bool indicating if the last report is expired.
+   * @return address Oracle address of the last report.
+   */
+  function isOldestReportExpired(address token) public view returns (bool, address) {
+    // solhint-disable-next-line reason-string
+    require(token != address(0));
+    address oldest = timestamps[token].getTail();
+    uint256 timestamp = timestamps[token].getValue(oldest);
+    // solhint-disable-next-line not-rely-on-time
+    if (now.sub(timestamp) >= getTokenReportExpirySeconds(token)) {
+      return (true, oldest);
+    }
+    return (false, oldest);
+  }
+
+  /**
+   * @notice Returns the median of the currently stored rates for a specified rateFeedId.
+   * @dev Does not take the equivalentTokens mapping into account.
+   * @param token The token for which the median value is being retrieved.
+   * @return uint256 The median exchange rate for rateFeedId (fixidity).
+   * @return uint256 denominator
+   */
+  function medianRateWithoutEquivalentMapping(
+    address token
+  ) public view returns (uint256, uint256) {
+    return (rates[token].getMedianValue(), numRates(token) == 0 ? 0 : FIXED1_UINT);
+  }
+
+  /**
+   * @notice Returns the number of timestamps.
+   * @dev Does not take the equivalentTokens mapping into account.
+   * For that, the underlying token should be queried.
+   * @param token The token for which the number of timestamps is being retrieved.
+   * @return uint256 The number of oracle report timestamps for the specified rateFeedId.
+   */
+  function numTimestamps(address token) public view returns (uint256) {
+    return timestamps[token].getNumElements();
   }
 
   /**
@@ -445,6 +450,18 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
     }
 
     return tokenReportExpirySeconds[token];
+  }
+
+  /**
+   * @notice Checks if a report exists for a specified rateFeedId from a given oracle.
+   * @dev Does not take the equivalentTokens mapping into account.
+   * For that, the underlying token should be queried.
+   * @param token The token for which the report should be checked.
+   * @param oracle The oracle whose report should be checked.
+   * @return bool True if a report exists, false otherwise.
+   */
+  function reportExists(address token, address oracle) internal view returns (bool) {
+    return rates[token].contains(oracle) && timestamps[token].contains(oracle);
   }
 
   /**

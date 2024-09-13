@@ -10,18 +10,6 @@ import "../Attestations.sol";
 contract AttestationsTest is Attestations(true) {
   address[] private __testValidators;
 
-  function __setValidators(address[] memory validators) public {
-    __testValidators = validators;
-  }
-
-  function numberValidatorsInCurrentSet() public view returns (uint256) {
-    return __testValidators.length;
-  }
-
-  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
-    return __testValidators[index];
-  }
-
   // some deprecated functions are mocked here to ensure that the tests for
   // revoke and withdraw can still run
 
@@ -115,7 +103,8 @@ contract AttestationsTest is Attestations(true) {
   function complete(bytes32 identifier, uint8 v, bytes32 r, bytes32 s) external {
     address issuer = validateAttestationCode(identifier, msg.sender, v, r, s);
 
-    Attestation storage attestation = identifiers[identifier].attestations[msg.sender]
+    Attestation storage attestation = identifiers[identifier]
+      .attestations[msg.sender]
       .issuedAttestations[issuer];
 
     address token = attestation.attestationRequestFeeToken;
@@ -143,14 +132,27 @@ contract AttestationsTest is Attestations(true) {
     emit AttestationCompleted(identifier, msg.sender, issuer);
   }
 
+  function __setValidators(address[] memory validators) public {
+    __testValidators = validators;
+  }
+
+  function numberValidatorsInCurrentSet() public view returns (uint256) {
+    return __testValidators.length;
+  }
+
+  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
+    return __testValidators[index];
+  }
+
   /**
    * @notice Adds additional attestations given the current randomness.
    * @param identifier The hash of the identifier to be attested.
    */
   function addIncompleteAttestations(bytes32 identifier) internal {
     AttestedAddress storage state = identifiers[identifier].attestations[msg.sender];
-    UnselectedRequest storage unselectedRequest = identifiers[identifier].unselectedRequests[msg
-      .sender];
+    UnselectedRequest storage unselectedRequest = identifiers[identifier].unselectedRequests[
+      msg.sender
+    ];
 
     bytes32 seed = getRandom().getBlockRandomness(
       uint256(unselectedRequest.blockNumber).add(selectIssuersWaitBlocks)

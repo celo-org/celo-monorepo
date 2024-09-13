@@ -48,12 +48,13 @@ contract FederatedAttestations is
   mapping(bytes32 => bool) public revokedAttestations;
 
   bytes32 public eip712DomainSeparator;
-  bytes32 public constant EIP712_OWNERSHIP_ATTESTATION_TYPEHASH = keccak256(
-    abi.encodePacked(
-      "OwnershipAttestation(bytes32 identifier,address issuer,",
-      "address account,address signer,uint64 issuedOn)"
-    )
-  );
+  bytes32 public constant EIP712_OWNERSHIP_ATTESTATION_TYPEHASH =
+    keccak256(
+      abi.encodePacked(
+        "OwnershipAttestation(bytes32 identifier,address issuer,",
+        "address account,address signer,uint64 issuedOn)"
+      )
+    );
 
   // Changing any of these constraints will require re-benchmarking
   // and checking assumptions for batch revocation.
@@ -86,14 +87,6 @@ contract FederatedAttestations is
   constructor(bool test) public Initializable(test) {}
 
   /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
-  }
-
-  /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    */
   function initialize() external initializer {
@@ -105,13 +98,15 @@ contract FederatedAttestations is
    * @notice Registers an attestation directly from the issuer
    * @param identifier Hash of the identifier to be attested
    * @param account Address of the account being mapped to the identifier
-   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time
    * @dev Attestation signer and issuer in storage is set to msg.sender
    * @dev Throws if an attestation with the same (identifier, issuer, account) already exists
    */
-  function registerAttestationAsIssuer(bytes32 identifier, address account, uint64 issuedOn)
-    external
-  {
+  function registerAttestationAsIssuer(
+    bytes32 identifier,
+    address account,
+    uint64 issuedOn
+  ) external {
     _registerAttestation(identifier, msg.sender, account, msg.sender, issuedOn);
   }
 
@@ -120,7 +115,7 @@ contract FederatedAttestations is
    * @param identifier Hash of the identifier to be attested
    * @param issuer Address of the attestation issuer
    * @param account Address of the account being mapped to the identifier
-   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time
    * @param signer Address of the signer of the attestation
    * @param v The recovery id of the incoming ECDSA signature
    * @param r Output value r of the ECDSA signature
@@ -142,7 +137,7 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Revokes an attestation 
+   * @notice Revokes an attestation
    * @param identifier Hash of the identifier to be revoked
    * @param issuer Address of the attestation issuer
    * @param account Address of the account mapped to the identifier
@@ -186,20 +181,23 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Returns info about attestations for `identifier` produced by 
+   * @notice Returns info about attestations for `identifier` produced by
    *    signers of `trustedIssuers`
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
    * @return countsPerIssuer Array of number of attestations returned per issuer
-   *          For m (== sum([0])) found attestations: 
-   * @return accounts Array of m accounts 
+   *          For m (== sum([0])) found attestations:
+   * @return accounts Array of m accounts
    * @return signers Array of m signers
    * @return issuedOns Array of m issuedOns
    * @return publishedOns Array of m publishedOns
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-  function lookupAttestations(bytes32 identifier, address[] calldata trustedIssuers)
+  function lookupAttestations(
+    bytes32 identifier,
+    address[] calldata trustedIssuers
+  )
     external
     view
     returns (
@@ -243,11 +241,10 @@ contract FederatedAttestations is
    * @dev Adds identifier info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-  function lookupIdentifiers(address account, address[] calldata trustedIssuers)
-    external
-    view
-    returns (uint256[] memory countsPerIssuer, bytes32[] memory identifiers)
-  {
+  function lookupIdentifiers(
+    address account,
+    address[] calldata trustedIssuers
+  ) external view returns (uint256[] memory countsPerIssuer, bytes32[] memory identifiers) {
     uint256 totalIdentifiers;
     (totalIdentifiers, countsPerIssuer) = getNumIdentifiers(account, trustedIssuers);
 
@@ -267,11 +264,19 @@ contract FederatedAttestations is
   }
 
   /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 0, 0);
+  }
+
+  /**
    * @notice Validates the given attestation and signature
    * @param identifier Hash of the identifier to be attested
    * @param issuer Address of the attestation issuer
    * @param account Address of the account being mapped to the identifier
-   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time
    * @param signer Address of the signer of the attestation
    * @param v The recovery id of the incoming ECDSA signature
    * @param r Output value r of the ECDSA signature
@@ -357,11 +362,10 @@ contract FederatedAttestations is
    * @return totalAttestations Sum total of attestations found
    * @return countsPerIssuer Array of number of attestations found per issuer
    */
-  function getNumAttestations(bytes32 identifier, address[] memory trustedIssuers)
-    internal
-    view
-    returns (uint256 totalAttestations, uint256[] memory countsPerIssuer)
-  {
+  function getNumAttestations(
+    bytes32 identifier,
+    address[] memory trustedIssuers
+  ) internal view returns (uint256 totalAttestations, uint256[] memory countsPerIssuer) {
     totalAttestations = 0;
     uint256 numAttestationsForIssuer;
     countsPerIssuer = new uint256[](trustedIssuers.length);
@@ -383,11 +387,10 @@ contract FederatedAttestations is
    * @return totalIdentifiers Sum total of identifiers found
    * @return countsPerIssuer Array of number of identifiers found per issuer
    */
-  function getNumIdentifiers(address account, address[] memory trustedIssuers)
-    internal
-    view
-    returns (uint256 totalIdentifiers, uint256[] memory countsPerIssuer)
-  {
+  function getNumIdentifiers(
+    address account,
+    address[] memory trustedIssuers
+  ) internal view returns (uint256 totalIdentifiers, uint256[] memory countsPerIssuer) {
     totalIdentifiers = 0;
     uint256 numIdentifiersForIssuer;
     countsPerIssuer = new uint256[](trustedIssuers.length);
@@ -405,7 +408,7 @@ contract FederatedAttestations is
    * @param identifier Hash of the identifier to be attested
    * @param issuer Address of the attestation issuer
    * @param account Address of the account being mapped to the identifier
-   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time
    * @param signer Address of the signer of the attestation
    */
   function _registerAttestation(

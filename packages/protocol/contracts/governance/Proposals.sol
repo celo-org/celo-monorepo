@@ -14,9 +14,21 @@ library Proposals {
   using SafeMath for uint256;
   using BytesLib for bytes;
 
-  enum Stage { None, Queued, Approval, Referendum, Execution, Expiration }
+  enum Stage {
+    None,
+    Queued,
+    Approval,
+    Referendum,
+    Execution,
+    Expiration
+  }
 
-  enum VoteValue { None, Abstain, No, Yes }
+  enum VoteValue {
+    None,
+    Abstain,
+    No,
+    Yes
+  }
 
   struct StageDurations {
     uint256 approval;
@@ -87,53 +99,6 @@ library Proposals {
     }
   }
 
-  function setDescriptionUrl(Proposal storage proposal, string memory descriptionUrl) internal {
-    require(bytes(descriptionUrl).length != 0, "Description url must have non-zero length");
-    proposal.descriptionUrl = descriptionUrl;
-  }
-
-  /**
-   * @notice Constructs a proposal for use in memory.
-   * @param values The values of CELO to be sent in the proposed transactions.
-   * @param destinations The destination addresses of the proposed transactions.
-   * @param data The concatenated data to be included in the proposed transactions.
-   * @param dataLengths The lengths of each transaction's data.
-   * @param proposer The proposer.
-   * @param deposit The proposal deposit.
-   */
-  function makeMem(
-    uint256[] memory values,
-    address[] memory destinations,
-    bytes memory data,
-    uint256[] memory dataLengths,
-    address proposer,
-    uint256 deposit
-  ) internal view returns (Proposal memory) {
-    require(
-      values.length == destinations.length && destinations.length == dataLengths.length,
-      "Array length mismatch"
-    );
-    uint256 transactionCount = values.length;
-
-    Proposal memory proposal;
-    proposal.proposer = proposer;
-    proposal.deposit = deposit;
-    // solhint-disable-next-line not-rely-on-time
-    proposal.timestamp = now;
-
-    uint256 dataPosition = 0;
-    proposal.transactions = new Transaction[](transactionCount);
-    for (uint256 i = 0; i < transactionCount; i = i.add(1)) {
-      proposal.transactions[i] = Transaction(
-        values[i],
-        destinations[i],
-        data.slice(dataPosition, dataLengths[i])
-      );
-      dataPosition = dataPosition.add(dataLengths[i]);
-    }
-    return proposal;
-  }
-
   /**
    * @notice Adds or changes a vote on a proposal.
    * @param proposal The proposal struct.
@@ -171,6 +136,28 @@ library Proposals {
    */
   function execute(Proposal storage proposal) public {
     executeTransactions(proposal.transactions);
+  }
+
+  /**
+   * @notice Returns a specified transaction in a proposal.
+   * @param proposal The proposal struct.
+   * @param index The index of the specified transaction in the proposal's transaction list.
+   * @return Transaction value.
+   * @return Transaction destination.
+   * @return Transaction data.
+   */
+  function getTransaction(
+    Proposal storage proposal,
+    uint256 index
+  ) public view returns (uint256, address, bytes memory) {
+    require(index < proposal.transactions.length, "getTransaction: bad index");
+    Transaction storage transaction = proposal.transactions[index];
+    return (transaction.value, transaction.destination, transaction.data);
+  }
+
+  function setDescriptionUrl(Proposal storage proposal, string memory descriptionUrl) internal {
+    require(bytes(descriptionUrl).length != 0, "Description url must have non-zero length");
+    proposal.descriptionUrl = descriptionUrl;
   }
 
   /**
@@ -225,36 +212,58 @@ library Proposals {
   }
 
   /**
+   * @notice Constructs a proposal for use in memory.
+   * @param values The values of CELO to be sent in the proposed transactions.
+   * @param destinations The destination addresses of the proposed transactions.
+   * @param data The concatenated data to be included in the proposed transactions.
+   * @param dataLengths The lengths of each transaction's data.
+   * @param proposer The proposer.
+   * @param deposit The proposal deposit.
+   */
+  function makeMem(
+    uint256[] memory values,
+    address[] memory destinations,
+    bytes memory data,
+    uint256[] memory dataLengths,
+    address proposer,
+    uint256 deposit
+  ) internal view returns (Proposal memory) {
+    require(
+      values.length == destinations.length && destinations.length == dataLengths.length,
+      "Array length mismatch"
+    );
+    uint256 transactionCount = values.length;
+
+    Proposal memory proposal;
+    proposal.proposer = proposer;
+    proposal.deposit = deposit;
+    // solhint-disable-next-line not-rely-on-time
+    proposal.timestamp = now;
+
+    uint256 dataPosition = 0;
+    proposal.transactions = new Transaction[](transactionCount);
+    for (uint256 i = 0; i < transactionCount; i = i.add(1)) {
+      proposal.transactions[i] = Transaction(
+        values[i],
+        destinations[i],
+        data.slice(dataPosition, dataLengths[i])
+      );
+      dataPosition = dataPosition.add(dataLengths[i]);
+    }
+    return proposal;
+  }
+
+  /**
    * @notice Returns the number of votes cast on the proposal over the total number
    *   of votes in the network as a fraction.
    * @param proposal The proposal struct.
    * @return The participation of the proposal.
    */
-  function getParticipation(Proposal storage proposal)
-    internal
-    view
-    returns (FixidityLib.Fraction memory)
-  {
+  function getParticipation(
+    Proposal storage proposal
+  ) internal view returns (FixidityLib.Fraction memory) {
     uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
     return FixidityLib.newFixedFraction(totalVotes, proposal.networkWeight);
-  }
-
-  /**
-   * @notice Returns a specified transaction in a proposal.
-   * @param proposal The proposal struct.
-   * @param index The index of the specified transaction in the proposal's transaction list.
-   * @return Transaction value.
-   * @return Transaction destination.
-   * @return Transaction data.
-   */
-  function getTransaction(Proposal storage proposal, uint256 index)
-    public
-    view
-    returns (uint256, address, bytes memory)
-  {
-    require(index < proposal.transactions.length, "getTransaction: bad index");
-    Transaction storage transaction = proposal.transactions[index];
-    return (transaction.value, transaction.destination, transaction.data);
   }
 
   /**
@@ -267,11 +276,9 @@ library Proposals {
    * @return description Description url.
    * @return networkWeight Network weight.
    */
-  function unpack(Proposal storage proposal)
-    internal
-    view
-    returns (address, uint256, uint256, uint256, string storage, uint256, bool)
-  {
+  function unpack(
+    Proposal storage proposal
+  ) internal view returns (address, uint256, uint256, uint256, string storage, uint256, bool) {
     return (
       proposal.proposer,
       proposal.deposit,
@@ -290,11 +297,9 @@ library Proposals {
    * @return The no vote totals.
    * @return The abstain vote totals.
    */
-  function getVoteTotals(Proposal storage proposal)
-    internal
-    view
-    returns (uint256, uint256, uint256)
-  {
+  function getVoteTotals(
+    Proposal storage proposal
+  ) internal view returns (uint256, uint256, uint256) {
     return (proposal.votes.yes, proposal.votes.no, proposal.votes.abstain);
   }
 
@@ -325,10 +330,12 @@ library Proposals {
    * @param dataLength The length of the data to be included in the function call.
    * @param data The data to be included in the function call.
    */
-  function externalCall(address destination, uint256 value, uint256 dataLength, bytes memory data)
-    private
-    returns (bool)
-  {
+  function externalCall(
+    address destination,
+    uint256 value,
+    uint256 dataLength,
+    bytes memory data
+  ) private returns (bool) {
     bool result;
 
     if (dataLength > 0) require(Address.isContract(destination), "Invalid contract address");

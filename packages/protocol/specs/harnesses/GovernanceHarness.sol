@@ -47,11 +47,9 @@ contract GovernanceHarness is Governance {
     return proposalId;
   }
 
-  function getProposalSlim(uint256 proposalId)
-    external
-    view
-    returns (address, uint256, uint256, uint256)
-  {
+  function getProposalSlim(
+    uint256 proposalId
+  ) external view returns (address, uint256, uint256, uint256) {
     Proposals.Proposal storage proposal = proposals[proposalId];
     return (proposal.proposer, proposal.deposit, proposal.timestamp, proposal.transactions.length);
   }

@@ -6,7 +6,7 @@
  * an environment.
  */
 
-import { ContractPackage, MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from "../contractPackages"
+import { ContractPackage, MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from "../contractPackages";
 
 export const celoRegistryAddress = '0x000000000000000000000000000000000000ce10'
 
@@ -28,12 +28,14 @@ export enum CeloContractName {
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
+  FeeCurrencyDirectory = 'FeeCurrencyDirectory',
   GoldToken = 'GoldToken',
   Governance = 'Governance',
   GovernanceSlasher = 'GovernanceSlasher',
   GovernanceApproverMultiSig = 'GovernanceApproverMultiSig',
   GrandaMento = 'GrandaMento',
   LockedGold = 'LockedGold',
+  MintGoldSchedule = 'MintGoldSchedule',
   OdisPayments = 'OdisPayments',
   Random = 'Random',
   Reserve = 'Reserve',
@@ -52,10 +54,10 @@ export const usesRegistry = [
   CeloContractName.StableToken,
 ]
 
-export const hasEntryInRegistry: ContractPackage[]= [
+export const hasEntryInRegistry: ContractPackage[] = [
   {
     name: "default",
-    contracts:[
+    contracts: [
       CeloContractName.Accounts,
       CeloContractName.Attestations,
       CeloContractName.BlockchainParameters,
@@ -78,7 +80,7 @@ export const hasEntryInRegistry: ContractPackage[]= [
   {
     ...MENTO_PACKAGE,
     // not all Mentro contracts are supposed to be in the Registry
-    contracts:[
+    contracts: [
       CeloContractName.Exchange,
       CeloContractName.GrandaMento,
       CeloContractName.Reserve,

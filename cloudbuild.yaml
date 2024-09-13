@@ -4,7 +4,7 @@
 steps:
 
 - id: "docker:celotool"
-  name: gcr.io/kaniko-project/executor:v0.16.0
+  name: gcr.io/kaniko-project/executor:v1.23.1
   args: [
     "--dockerfile=dockerfiles/celotool/Dockerfile",
     "--cache=true",
@@ -13,7 +13,7 @@ steps:
   waitFor: ['-']
 
 - id: "docker:cli"
-  name: gcr.io/kaniko-project/executor:v0.16.0
+  name: gcr.io/kaniko-project/executor:v1.23.1
   args: [
     "--dockerfile=dockerfiles/cli/Dockerfile",
     "--cache=true",

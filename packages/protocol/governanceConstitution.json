@@ -1,0 +1,124 @@
+{
+  "Accounts": {
+    "default": 600000000000000000000000
+  },
+  "BlockchainParameters": {
+    "default": 900000000000000000000000,
+    "setBlockGasLimit": 800000000000000000000000,
+    "setIntrinsicGasForAlternativeFeeCurrency": 800000000000000000000000
+  },
+  "DoubleSigningSlasher": {
+    "default": 700000000000000000000000,
+    "setSlashingIncentives": 700000000000000000000000
+  },
+  "DowntimeSlasher": {
+    "default": 700000000000000000000000,
+    "setSlashingIncentives": 700000000000000000000000,
+    "setSlashableDowntime": 700000000000000000000000
+  },
+  "Election": {
+    "default": 800000000000000000000000,
+    "setRegistry": 900000000000000000000000,
+    "setElectableValidators": 800000000000000000000000,
+    "setMaxNumGroupsVotedFor": 800000000000000000000000,
+    "setElectabilityThreshold": 800000000000000000000000
+  },
+  "EpochRewards": {
+    "default": 800000000000000000000000,
+    "setRegistry": 900000000000000000000000,
+    "setCommunityRewardFraction": 800000000000000000000000,
+    "setTargetVotingGoldFraction": 800000000000000000000000,
+    "setTargetValidatorEpochPayment": 800000000000000000000000,
+    "setRewardsMultiplierParameters": 800000000000000000000000,
+    "setTargetVotingYieldParameters": 800000000000000000000000
+  },
+  "Escrow": {
+    "default": 600000000000000000000000,
+    "addDefaultTrustedIssuer": 600000000000000000000000,
+    "removeDefaultTrustedIssuer": 600000000000000000000000
+  },
+  "FederatedAttestations": {
+    "default": 600000000000000000000000
+  },
+  "FeeCurrencyWhitelist": {
+    "default": 800000000000000000000000,
+    "addToken": 800000000000000000000000
+  },
+  "Freezer": {
+    "default": 600000000000000000000000,
+    "freeze": 600000000000000000000000,
+    "unfreeze": 600000000000000000000000
+  },
+  "GasPriceMinimum": {
+    "default": 700000000000000000000000,
+    "setRegistry": 900000000000000000000000,
+    "setAdjustmentSpeed": 700000000000000000000000,
+    "setTargetDensity": 700000000000000000000000,
+    "setGasPriceMinimumFloor": 700000000000000000000000
+  },
+  "GoldToken": {
+    "default": 900000000000000000000000,
+    "transfer": 600000000000000000000000,
+    "transferWithComment": 600000000000000000000000,
+    "approve": 600000000000000000000000
+  },
+  "Governance": {
+    "default": 900000000000000000000000,
+    "setRegistry": 900000000000000000000000,
+    "setApprover": 900000000000000000000000,
+    "setConcurrentProposals": 900000000000000000000000,
+    "setMinDeposit": 900000000000000000000000,
+    "setQueueExpiry": 900000000000000000000000,
+    "setDequeueFrequency": 900000000000000000000000,
+    "setReferendumStageDuration": 900000000000000000000000,
+    "setExecutionStageDuration": 900000000000000000000000,
+    "setParticipationBaseline": 900000000000000000000000,
+    "setParticipationFloor": 900000000000000000000000,
+    "setBaselineUpdateFactor": 900000000000000000000000,
+    "setBaselineQuorumFactor": 900000000000000000000000,
+    "setConstitution": 900000000000000000000000
+  },
+  "GovernanceSlasher": {
+    "default": 700000000000000000000000,
+    "approveSlashing": 700000000000000000000000
+  },
+  "LockedGold": {
+    "default": 900000000000000000000000,
+    "setRegistry": 900000000000000000000000,
+    "setUnlockingPeriod": 800000000000000000000000,
+    "addSlasher": 900000000000000000000000,
+    "removeSlasher": 800000000000000000000000
+  },
+  "OdisPayments": {
+    "default": 600000000000000000000000
+  },
+  "proxy": {
+    "_transferOwnership": 900000000000000000000000,
+    "_setAndInitializeImplementation": 900000000000000000000000,
+    "_setImplementation": 900000000000000000000000
+  },
+  "Random": {
+    "default": 700000000000000000000000,
+    "setRandomnessBlockRetentionWindow": 700000000000000000000000
+  },
+  "Registry": {
+    "default": 900000000000000000000000,
+    "setAddressFor": 900000000000000000000000
+  },
+  "SortedOracles": {
+    "default": 700000000000000000000000,
+    "setReportExpiry": 700000000000000000000000,
+    "addOracle": 800000000000000000000000,
+    "removeOracle": 700000000000000000000000
+  },
+  "Validators": {
+    "default": 700000000000000000000000,
+    "setRegistry": 900000000000000000000000,
+    "setMaxGroupSize": 700000000000000000000000,
+    "setMembershipHistoryLength": 700000000000000000000000,
+    "setGroupLockedGoldRequirements": 800000000000000000000000,
+    "setValidatorLockedGoldRequirements": 800000000000000000000000,
+    "setSlashingMultiplierResetPeriod": 700000000000000000000000,
+    "setValidatorScoreParameters": 700000000000000000000000
+  }
+}

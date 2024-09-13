@@ -4,6 +4,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "./SlasherUtil.sol";
+import "../../contracts-0.8/common/IsL2Check.sol";
 
 contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
   using SafeMath for uint256;
@@ -13,17 +14,6 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
   event DoubleSigningSlashPerformed(address indexed validator, uint256 indexed blockNumber);
-
-  /**
-  * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-  */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
-  }
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -37,28 +27,78 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
    * @param _penalty Penalty for the slashed signer.
    * @param _reward Reward that the observer gets.
    */
-  function initialize(address registryAddress, uint256 _penalty, uint256 _reward)
-    external
-    initializer
-  {
+  function initialize(
+    address registryAddress,
+    uint256 _penalty,
+    uint256 _reward
+  ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setSlashingIncentives(_penalty, _reward);
   }
 
   /**
-   * @notice Counts the number of set bits (Hamming weight).
-   * @param v Bitmap.
-   * @return Number of set bits.
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
-  function countSetBits(uint256 v) internal pure returns (uint256) {
-    uint256 res = 0;
-    uint256 acc = v;
-    for (uint256 i = 0; i < 256; i = i.add(1)) {
-      if (acc & 1 == 1) res = res.add(1);
-      acc = acc >> 1;
-    }
-    return res;
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 2, 0);
+  }
+
+  /**
+   * @notice Requires that `eval` returns true and that this evidence has not
+   * already been used to slash `signer`.
+   * If so, fetches the `account` associated with `signer` and the group that
+   * `signer` was a member of during the corresponding epoch.
+   * Then, calls `LockedGold.slash` on both the validator and group accounts.
+   * Calls `Validators.removeSlashedMember` to remove the validator from its
+   * current group if it is a member of one.
+   * Finally, stores that hash(signer, blockNumber) has been slashed.
+   * @param signer The signer to be slashed.
+   * @param index Validator index at the block.
+   * @param headerA First double signed block header.
+   * @param headerB Second double signed block header.
+   * @param groupMembershipHistoryIndex Group membership index from where the group should be found.
+   * @param validatorElectionLessers Lesser pointers for validator slashing.
+   * @param validatorElectionGreaters Greater pointers for validator slashing.
+   * @param validatorElectionIndices Vote indices for validator slashing.
+   * @param groupElectionLessers Lesser pointers for group slashing.
+   * @param groupElectionGreaters Greater pointers for group slashing.
+   * @param groupElectionIndices Vote indices for group slashing.
+   */
+  function slash(
+    address signer,
+    uint256 index,
+    bytes memory headerA,
+    bytes memory headerB,
+    uint256 groupMembershipHistoryIndex,
+    address[] memory validatorElectionLessers,
+    address[] memory validatorElectionGreaters,
+    uint256[] memory validatorElectionIndices,
+    address[] memory groupElectionLessers,
+    address[] memory groupElectionGreaters,
+    uint256[] memory groupElectionIndices
+  ) public onlyL1 {
+    checkIfAlreadySlashed(signer, headerA);
+    checkIfAlreadySlashed(signer, headerB);
+    uint256 blockNumber = checkForDoubleSigning(signer, index, headerA, headerB);
+    address validator = getAccounts().signerToAccount(signer);
+    performSlashing(
+      validator,
+      msg.sender,
+      blockNumber,
+      groupMembershipHistoryIndex,
+      validatorElectionLessers,
+      validatorElectionGreaters,
+      validatorElectionIndices,
+      groupElectionLessers,
+      groupElectionGreaters,
+      groupElectionIndices
+    );
+    emit DoubleSigningSlashPerformed(validator, blockNumber);
   }
 
   /**
@@ -110,55 +150,17 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
   }
 
   /**
-   * @notice Requires that `eval` returns true and that this evidence has not
-   * already been used to slash `signer`.
-   * If so, fetches the `account` associated with `signer` and the group that
-   * `signer` was a member of during the corresponding epoch.
-   * Then, calls `LockedGold.slash` on both the validator and group accounts.
-   * Calls `Validators.removeSlashedMember` to remove the validator from its
-   * current group if it is a member of one.
-   * Finally, stores that hash(signer, blockNumber) has been slashed.
-   * @param signer The signer to be slashed.
-   * @param index Validator index at the block.
-   * @param headerA First double signed block header.
-   * @param headerB Second double signed block header.
-   * @param groupMembershipHistoryIndex Group membership index from where the group should be found.
-   * @param validatorElectionLessers Lesser pointers for validator slashing.
-   * @param validatorElectionGreaters Greater pointers for validator slashing.
-   * @param validatorElectionIndices Vote indices for validator slashing.
-   * @param groupElectionLessers Lesser pointers for group slashing.
-   * @param groupElectionGreaters Greater pointers for group slashing.
-   * @param groupElectionIndices Vote indices for group slashing.
+   * @notice Counts the number of set bits (Hamming weight).
+   * @param v Bitmap.
+   * @return Number of set bits.
    */
-  function slash(
-    address signer,
-    uint256 index,
-    bytes memory headerA,
-    bytes memory headerB,
-    uint256 groupMembershipHistoryIndex,
-    address[] memory validatorElectionLessers,
-    address[] memory validatorElectionGreaters,
-    uint256[] memory validatorElectionIndices,
-    address[] memory groupElectionLessers,
-    address[] memory groupElectionGreaters,
-    uint256[] memory groupElectionIndices
-  ) public {
-    checkIfAlreadySlashed(signer, headerA);
-    checkIfAlreadySlashed(signer, headerB);
-    uint256 blockNumber = checkForDoubleSigning(signer, index, headerA, headerB);
-    address validator = getAccounts().signerToAccount(signer);
-    performSlashing(
-      validator,
-      msg.sender,
-      blockNumber,
-      groupMembershipHistoryIndex,
-      validatorElectionLessers,
-      validatorElectionGreaters,
-      validatorElectionIndices,
-      groupElectionLessers,
-      groupElectionGreaters,
-      groupElectionIndices
-    );
-    emit DoubleSigningSlashPerformed(validator, blockNumber);
+  function countSetBits(uint256 v) internal pure returns (uint256) {
+    uint256 res = 0;
+    uint256 acc = v;
+    for (uint256 i = 0; i < 256; i = i.add(1)) {
+      if (acc & 1 == 1) res = res.add(1);
+      acc = acc >> 1;
+    }
+    return res;
   }
 }

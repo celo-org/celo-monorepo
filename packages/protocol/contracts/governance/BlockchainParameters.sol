@@ -5,10 +5,12 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingPrecompiles.sol";
 
+import "../../contracts-0.8/common/IsL2Check.sol";
+
 /**
  * @title Contract for storing blockchain parameters that can be set by governance.
  */
-contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
+contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles, IsL2Check {
   using SafeMath for uint256;
 
   // obsolete
@@ -48,10 +50,11 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    * @param gasLimit Block gas limit.
    * @param lookbackWindow Lookback window for measuring validator uptime.
    */
-  function initialize(uint256 _gasForNonGoldCurrencies, uint256 gasLimit, uint256 lookbackWindow)
-    external
-    initializer
-  {
+  function initialize(
+    uint256 _gasForNonGoldCurrencies,
+    uint256 gasLimit,
+    uint256 lookbackWindow
+  ) external initializer {
     _transferOwnership(msg.sender);
     setBlockGasLimit(gasLimit);
     setIntrinsicGasForAlternativeFeeCurrency(_gasForNonGoldCurrencies);
@@ -66,14 +69,14 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 3, 0, 0);
+    return (1, 3, 1, 0);
   }
 
   /**
    * @notice Sets the block gas limit.
    * @param gasLimit New block gas limit.
    */
-  function setBlockGasLimit(uint256 gasLimit) public onlyOwner {
+  function setBlockGasLimit(uint256 gasLimit) public onlyOwner onlyL1 {
     blockGasLimit = gasLimit;
     emit BlockGasLimitSet(gasLimit);
   }
@@ -82,7 +85,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    * @notice Sets the intrinsic gas for non-gold gas currencies.
    * @param gas Intrinsic gas for non-gold gas currencies.
    */
-  function setIntrinsicGasForAlternativeFeeCurrency(uint256 gas) public onlyOwner {
+  function setIntrinsicGasForAlternativeFeeCurrency(uint256 gas) public onlyOwner onlyL1 {
     intrinsicGasForAlternativeFeeCurrency = gas;
     emit IntrinsicGasForAlternativeFeeCurrencySet(gas);
   }
@@ -91,7 +94,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    * @notice Sets the uptime lookback window.
    * @param window New window.
    */
-  function setUptimeLookbackWindow(uint256 window) public onlyOwner {
+  function setUptimeLookbackWindow(uint256 window) public onlyL1 onlyOwner {
     require(window >= 3 && window <= 720, "UptimeLookbackWindow must be within safe range");
     require(
       window <= getEpochSize().sub(2),
@@ -118,12 +121,11 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   /**
    * @notice Gets the uptime lookback window.
    */
-  function _getUptimeLookbackWindow() internal view returns (uint256 lookbackWindow) {
+  function _getUptimeLookbackWindow() internal view onlyL1 returns (uint256 lookbackWindow) {
     if (getEpochNumber() >= uptimeLookbackWindow.nextValueActivationEpoch) {
       return uptimeLookbackWindow.nextValue;
     } else {
       return uptimeLookbackWindow.oldValue;
     }
   }
-
 }

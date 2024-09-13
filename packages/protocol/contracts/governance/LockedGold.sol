@@ -22,6 +22,7 @@ contract LockedGold is
   Initializable,
   UsingRegistry
 {
+  // TODO add initializer
   using SafeMath for uint256;
   using Address for address payable; // prettier-ignore
   using FixidityLib for FixidityLib.Fraction;
@@ -64,18 +65,6 @@ contract LockedGold is
   mapping(bytes32 => bool) internal slashingMap;
   bytes32[] public slashingWhitelist;
 
-  modifier onlySlasher {
-    require(
-      registry.isOneOf(slashingWhitelist, msg.sender),
-      "Caller is not a whitelisted slasher."
-    );
-    _;
-  }
-
-  function isSlasher(address slasher) external view returns (bool) {
-    return (registry.isOneOf(slashingWhitelist, slasher));
-  }
-
   uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
 
@@ -114,15 +103,12 @@ contract LockedGold is
   );
   event MaxDelegateesCountSet(uint256 value);
 
-  /**
-  * @notice Returns the storage, major, minor, and patch version of the contract.
-  * @return Storage version of the contract.
-  * @return Major version of the contract.
-  * @return Minor version of the contract.
-  * @return Patch version of the contract.
-  */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 5, 0);
+  modifier onlySlasher() {
+    require(
+      registry.isOneOf(slashingWhitelist, msg.sender),
+      "Caller is not a whitelisted slasher."
+    );
+    _;
   }
 
   /**
@@ -144,25 +130,6 @@ contract LockedGold is
   }
 
   /**
-   * @notice Sets the duration in seconds users must wait before withdrawing gold after unlocking.
-   * @param value The unlocking period in seconds.
-   */
-  function setUnlockingPeriod(uint256 value) public onlyOwner {
-    require(value != unlockingPeriod, "Unlocking period not changed");
-    unlockingPeriod = value;
-    emit UnlockingPeriodSet(value);
-  }
-
-  /**
-   * @notice Sets max delegatees count.
-   * @param value The max delegatees count.
-   */
-  function setMaxDelegateesCount(uint256 value) public onlyOwner {
-    maxDelegateesCount = value;
-    emit MaxDelegateesCountSet(value);
-  }
-
-  /**
    * @notice Locks gold to be used for voting.
    */
   function lock() external payable nonReentrant {
@@ -181,10 +148,10 @@ contract LockedGold is
    * @param value The amount by which to increment.
    * @dev Can only be called by the registered Election smart contract.
    */
-  function incrementNonvotingAccountBalance(address account, uint256 value)
-    external
-    onlyRegisteredContract(ELECTION_REGISTRY_ID)
-  {
+  function incrementNonvotingAccountBalance(
+    address account,
+    uint256 value
+  ) external onlyRegisteredContract(ELECTION_REGISTRY_ID) {
     _incrementNonvotingAccountBalance(account, value);
   }
 
@@ -194,31 +161,11 @@ contract LockedGold is
    * @param value The amount by which to decrement.
    * @dev Can only be called by the registered "Election" smart contract.
    */
-  function decrementNonvotingAccountBalance(address account, uint256 value)
-    external
-    onlyRegisteredContract(ELECTION_REGISTRY_ID)
-  {
+  function decrementNonvotingAccountBalance(
+    address account,
+    uint256 value
+  ) external onlyRegisteredContract(ELECTION_REGISTRY_ID) {
     _decrementNonvotingAccountBalance(account, value);
-  }
-
-  /**
-   * @notice Increments the non-voting balance for an account.
-   * @param account The account whose non-voting balance should be incremented.
-   * @param value The amount by which to increment.
-   */
-  function _incrementNonvotingAccountBalance(address account, uint256 value) private {
-    balances[account].nonvoting = balances[account].nonvoting.add(value);
-    totalNonvoting = totalNonvoting.add(value);
-  }
-
-  /**
-   * @notice Decrements the non-voting balance for an account.
-   * @param account The account whose non-voting balance should be decremented.
-   * @param value The amount by which to decrement.
-   */
-  function _decrementNonvotingAccountBalance(address account, uint256 value) private {
-    balances[account].nonvoting = balances[account].nonvoting.sub(value);
-    totalNonvoting = totalNonvoting.sub(value);
   }
 
   /**
@@ -307,23 +254,6 @@ contract LockedGold is
   }
 
   /**
-   * @notice Returns the total amount of locked gold in the system. Note that this does not include
-   *   gold that has been unlocked but not yet withdrawn.
-   * @return The total amount of locked gold in the system.
-   */
-  function getTotalLockedGold() external view returns (uint256) {
-    return totalNonvoting.add(getElection().getTotalVotes());
-  }
-
-  /**
-   * @notice Returns the total amount of locked gold not being used to vote in elections.
-   * @return The total amount of locked gold not being used to vote in elections.
-   */
-  function getNonvotingLockedGold() external view returns (uint256) {
-    return totalNonvoting;
-  }
-
-  /**
    * Delegates CELO to delegatee.
    * @param delegatee The delegatee account.
    * @param delegateFraction Fraction of total CELO that will be delegated from delegatee. Fixidity fraction
@@ -348,8 +278,9 @@ contract LockedGold is
     delegated.delegatees.add(delegateeAccount);
     require(delegated.delegatees.length() <= maxDelegateesCount, "Too many delegatees");
 
-    DelegatedInfo storage currentDelegateeInfo = delegated
-      .delegateesWithPercentagesAndAmount[delegateeAccount];
+    DelegatedInfo storage currentDelegateeInfo = delegated.delegateesWithPercentagesAndAmount[
+      delegateeAccount
+    ];
 
     require(
       FixidityLib.gte(percentageToDelegate, currentDelegateeInfo.percentage),
@@ -446,8 +377,9 @@ contract LockedGold is
     address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
     _updateDelegatedAmount(delegatorAccount, delegateeAccount);
 
-    DelegatedInfo storage currentDelegateeInfo = delegated
-      .delegateesWithPercentagesAndAmount[delegateeAccount];
+    DelegatedInfo storage currentDelegateeInfo = delegated.delegateesWithPercentagesAndAmount[
+      delegateeAccount
+    ];
 
     require(
       FixidityLib.gte(currentDelegateeInfo.percentage, percentageToRevoke),
@@ -481,350 +413,6 @@ contract LockedGold is
       FixidityLib.unwrap(percentageToRevoke),
       amountToRevoke
     );
-  }
-
-  /**
-   * Revokes amount during unlocking. It will revoke votes from voted proposals if necessary.
-   * @param delegator The delegator account.
-   * @param amountToRevoke The amount to revoke.
-   */
-  function revokeFromDelegatedWhenUnlocking(address delegator, uint256 amountToRevoke) private {
-    address[] memory delegatees = getDelegateesOfDelegator(delegator);
-
-    Delegated storage delegated = delegatorInfo[delegator];
-
-    for (uint256 i = 0; i < delegatees.length; i = i.add(1)) {
-      DelegatedInfo storage currentDelegateeInfo = delegated
-        .delegateesWithPercentagesAndAmount[delegatees[i]];
-      (uint256 expected, uint256 real) = _getDelegatorDelegateeExpectedAndRealAmount(
-        delegator,
-        delegatees[i]
-      );
-      uint256 delegateeAmountToRevoke = FixidityLib
-        .newFixed(amountToRevoke)
-        .multiply(currentDelegateeInfo.percentage)
-        .fromFixed();
-      delegateeAmountToRevoke = delegateeAmountToRevoke.sub(expected.sub(real));
-      _decreaseDelegateeVotingPower(delegatees[i], delegateeAmountToRevoke, currentDelegateeInfo);
-      emit DelegatedCeloRevoked(delegator, delegatees[i], 0, delegateeAmountToRevoke);
-    }
-  }
-
-  /**
-   * Decreases delegatee voting power when removing or unlocking delegated votes.
-   * @param delegatee The delegatee.
-   * @param amountToRevoke Amount to revoke.
-   * @param delegateeInfo Delegatee info.
-   */
-  function _decreaseDelegateeVotingPower(
-    address delegatee,
-    uint256 amountToRevoke,
-    DelegatedInfo storage delegateeInfo
-  ) private {
-    uint256 delegateeTotalVotingPower = getAccountTotalGovernanceVotingPower(delegatee);
-    uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(delegatee);
-    uint256 unusedReferendumVotes = delegateeTotalVotingPower.sub(totalReferendumVotes);
-    if (unusedReferendumVotes < amountToRevoke) {
-      getGovernance().removeVotesWhenRevokingDelegatedVotes(
-        delegatee,
-        delegateeTotalVotingPower.sub(amountToRevoke)
-      );
-    }
-    delegateeInfo.currentAmount = delegateeInfo.currentAmount.sub(amountToRevoke);
-    totalDelegatedCelo[delegatee] = totalDelegatedCelo[delegatee].sub(amountToRevoke);
-  }
-
-  /**
-   * Updates real delegated amount to all delegator's delegatees.
-   * There might be discrepancy because of validator rewards or extra locked gold.
-   * @param delegator The delegator address.
-   */
-  function updateDelegatedAmount(address delegator) public {
-    address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
-    _updateDelegatedAmount(delegatorAccount);
-  }
-
-  /**
-    * @notice Returns the number of pending withdrawals for the specified account.
-    * @param account The address of the account.
-    * @return The count of pending withdrawals.
-    */
-  function getTotalPendingWithdrawalsCount(address account) public view returns (uint256) {
-    return balances[account].pendingWithdrawals.length;
-  }
-
-  function _updateDelegatedAmount(address delegator) private {
-    address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
-    EnumerableSet.AddressSet storage delegatees = delegatorInfo[delegatorAccount].delegatees;
-    for (uint256 i = 0; i < delegatees.length(); i = i.add(1)) {
-      _updateDelegatedAmount(delegatorAccount, delegatees.get(i));
-    }
-  }
-
-  /**
-   * Updates real delegated amount to delegatee.
-   * There might be discrepancy because of validator rewards or extra locked gold.
-   * Voting power will always be smaller or equal to what it is supposed to be.
-   * @param delegator The delegator address.
-   * @param delegatee The delegatee address.
-   */
-  function updateDelegatedAmount(address delegator, address delegatee) public returns (uint256) {
-    address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
-    address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
-
-    return _updateDelegatedAmount(delegatorAccount, delegateeAccount);
-  }
-
-  /**
-   * @notice Returns the pending withdrawals from unlocked CELO for an account in a given range.
-   * @param account The address of the account.
-   * @param from The start index of the pending withdrawals.
-   * @param to The end index of the pending withdrawals.
-   * @return The value for each pending withdrawal.
-   * @return The timestamp for each pending withdrawal.
-   */
-  function getPendingWithdrawalsInBatch(address account, uint256 from, uint256 to)
-    public
-    view
-    returns (uint256[] memory, uint256[] memory)
-  {
-    uint256 pendingWithdrawalsLength = getTotalPendingWithdrawalsCount(account);
-
-    if (pendingWithdrawalsLength == 0) {
-      return (new uint256[](0), new uint256[](0));
-    }
-    require(from <= to, "Invalid range");
-    uint256 _to = Math.min(to, pendingWithdrawalsLength - 1);
-    uint256 length = _to - from + 1;
-    uint256[] memory values = new uint256[](length);
-    uint256[] memory timestamps = new uint256[](length);
-    for (uint256 i = from; i <= _to; i = i.add(1)) {
-      PendingWithdrawal memory pendingWithdrawal = balances[account].pendingWithdrawals[i];
-      values[i - from] = pendingWithdrawal.value;
-      timestamps[i - from] = pendingWithdrawal.timestamp;
-    }
-    return (values, timestamps);
-  }
-
-  /**
-   * Updates real delegated amount to delegatee.
-   * There might be discrepancy because of validator rewards or extra locked gold.
-   * Voting power will always be smaller or equal to what it is supposed to be.
-   * @param delegator The delegator address.
-   * @param delegatee The delegatee address.
-   */
-  function _updateDelegatedAmount(address delegator, address delegatee) internal returns (uint256) {
-    Delegated storage delegated = delegatorInfo[delegator];
-    require(
-      FixidityLib.unwrap(delegated.totalDelegatedCeloFraction) != 0,
-      "delegator is not delegating"
-    );
-    DelegatedInfo storage currentDelegateeInfo = delegated
-      .delegateesWithPercentagesAndAmount[delegatee];
-    require(
-      FixidityLib.unwrap(currentDelegateeInfo.percentage) != 0,
-      "delegator is not delegating for delegatee"
-    );
-
-    (uint256 expected, uint256 real) = getDelegatorDelegateeExpectedAndRealAmount(
-      delegator,
-      delegatee
-    );
-
-    currentDelegateeInfo.currentAmount = expected;
-    totalDelegatedCelo[delegatee] = totalDelegatedCelo[delegatee].sub(real).add(expected);
-
-    return expected;
-  }
-
-  /**
-   * Returns how many percents of CELO is account delegating.
-   * @param account The account address.
-   */
-  function getAccountTotalDelegatedFraction(address account) public view returns (uint256) {
-    Delegated storage delegated = delegatorInfo[account];
-    return FixidityLib.unwrap(delegated.totalDelegatedCeloFraction);
-  }
-
-  /**
-   * @notice Returns the total amount of locked gold for an account.
-   * @param account The account.
-   * @return The total amount of locked gold for an account.
-   */
-  function getAccountTotalLockedGold(address account) public view returns (uint256) {
-    uint256 total = balances[account].nonvoting;
-    return total.add(getElection().getTotalVotesByAccount(account));
-  }
-
-  /**
-   * @notice Returns the total amount of locked gold + delegated gold for an account.
-   * @param account The account.
-   * @return The total amount of locked gold + delegated gold for an account.
-   */
-  function getAccountTotalGovernanceVotingPower(address account) public view returns (uint256) {
-    FixidityLib.Fraction memory availableUndelegatedPercents = FixidityLib.fixed1().subtract(
-      FixidityLib.wrap(getAccountTotalDelegatedFraction(account))
-    );
-    uint256 totalLockedGold = getAccountTotalLockedGold(account);
-
-    uint256 availableForVoting = FixidityLib
-      .newFixed(totalLockedGold)
-      .multiply(availableUndelegatedPercents)
-      .fromFixed();
-
-    return availableForVoting.add(totalDelegatedCelo[account]);
-  }
-
-  /**
- * Return percentage and amount that delegator assigned to delegateee.
- * Please note that amount doesn't have to be up to date. 
- * In such case please use `updateDelegatedBalance`.
- * @param delegator The delegator address.
- * @param delegatee The delegatee address.
- * @return fraction The fraction that is delegator asigning to delegatee.
- * @return currentAmount The current actual Celo amount that is assigned to delegatee.
- */
-  function getDelegatorDelegateeInfo(address delegator, address delegatee)
-    external
-    view
-    returns (uint256 fraction, uint256 currentAmount)
-  {
-    DelegatedInfo storage currentDelegateeInfo = delegatorInfo[delegator]
-      .delegateesWithPercentagesAndAmount[delegatee];
-
-    fraction = FixidityLib.unwrap(currentDelegateeInfo.percentage);
-    currentAmount = currentDelegateeInfo.currentAmount;
-  }
-
-  /**
-   * Returns expected vs real delegated amount. 
-   * If there is a discrepancy it can be fixed by calling `updateDelegatedAmount` function.
-   * @param delegator The delegator address.
-   * @param delegatee The delegatee address.
-   * @return expected The expected amount.
-   * @return real The real amount. 
-   */
-  function getDelegatorDelegateeExpectedAndRealAmount(address delegator, address delegatee)
-    public
-    view
-    returns (uint256 expected, uint256 real)
-  {
-    address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
-    address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
-
-    (expected, real) = _getDelegatorDelegateeExpectedAndRealAmount(
-      delegatorAccount,
-      delegateeAccount
-    );
-  }
-
-  /**
-   * Returns expected vs real delegated amount. 
-   * If there is a discrepancy it can be fixed by calling `updateDelegatedAmount` function.
-   * @param delegator The delegator address.
-   * @param delegatee The delegatee address.
-   * @return expected The expected amount.
-   * @return real The real amount. 
-   */
-  function _getDelegatorDelegateeExpectedAndRealAmount(address delegator, address delegatee)
-    private
-    view
-    returns (uint256 expected, uint256 real)
-  {
-    DelegatedInfo storage currentDelegateeInfo = delegatorInfo[delegator]
-      .delegateesWithPercentagesAndAmount[delegatee];
-
-    uint256 amountToDelegate = FixidityLib
-      .newFixed(getAccountTotalLockedGold(delegator))
-      .multiply(currentDelegateeInfo.percentage)
-      .fromFixed();
-
-    expected = amountToDelegate;
-    real = currentDelegateeInfo.currentAmount;
-  }
-
-  /**
-   * Retuns all delegatees of delegator
-   * @param delegator The delegator address.
-   */
-  function getDelegateesOfDelegator(address delegator) public view returns (address[] memory) {
-    address[] memory values = delegatorInfo[delegator].delegatees.enumerate();
-    return values;
-  }
-
-  /**
-   * @notice Returns the total amount of non-voting locked gold for an account.
-   * @param account The account.
-   * @return The total amount of non-voting locked gold for an account.
-   */
-  function getAccountNonvotingLockedGold(address account) external view returns (uint256) {
-    return balances[account].nonvoting;
-  }
-
-  /**
-   * @notice Returns the pending withdrawals from unlocked CELO for an account.
-   * @param account The address of the account.
-   * @return The value for each pending withdrawal.
-   * @return The timestamp for each pending withdrawal.
-   */
-  function getPendingWithdrawals(address account)
-    external
-    view
-    returns (uint256[] memory, uint256[] memory)
-  {
-    return
-      getPendingWithdrawalsInBatch(account, 0, balances[account].pendingWithdrawals.length - 1);
-  }
-
-  /**
-   * @notice Returns the pending withdrawal at a given index for a given account.
-   * @param account The address of the account.
-   * @param index The index of the pending withdrawal.
-   * @return The value of the pending withdrawal.
-   * @return The timestamp of the pending withdrawal.
-   */
-  function getPendingWithdrawal(address account, uint256 index)
-    external
-    view
-    returns (uint256, uint256)
-  {
-    require(
-      getAccounts().isAccount(account),
-      "Unknown account: only registered accounts have pending withdrawals"
-    );
-    require(index < balances[account].pendingWithdrawals.length, "Bad pending withdrawal index");
-    PendingWithdrawal memory pendingWithdrawal = (balances[account].pendingWithdrawals[index]);
-
-    return (pendingWithdrawal.value, pendingWithdrawal.timestamp);
-  }
-
-  /**
-   * @notice Returns the total amount to withdraw from unlocked gold for an account.
-   * @param account The address of the account.
-   * @return Total amount to withdraw.
-   */
-  function getTotalPendingWithdrawals(address account) external view returns (uint256) {
-    uint256 pendingWithdrawalSum = 0;
-    PendingWithdrawal[] memory withdrawals = balances[account].pendingWithdrawals;
-    for (uint256 i = 0; i < withdrawals.length; i = i.add(1)) {
-      pendingWithdrawalSum = pendingWithdrawalSum.add(withdrawals[i].value);
-    }
-    return pendingWithdrawalSum;
-  }
-
-  function getSlashingWhitelist() external view returns (bytes32[] memory) {
-    return slashingWhitelist;
-  }
-
-  /**
-   * @notice Deletes a pending withdrawal.
-   * @param list The list of pending withdrawals from which to delete.
-   * @param index The index of the pending withdrawal to delete.
-   */
-  function deletePendingWithdrawal(PendingWithdrawal[] storage list, uint256 index) private {
-    uint256 lastIndex = list.length.sub(1);
-    list[index] = list[lastIndex];
-    list.length = lastIndex;
   }
 
   /**
@@ -912,5 +500,416 @@ contract LockedGold is
     require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
     communityFundPayable.sendValue(maxSlash.sub(reward));
     emit AccountSlashed(account, maxSlash, reporter, reward);
+  }
+
+  /**
+   * @notice Returns the total amount of locked gold in the system. Note that this does not include
+   *   gold that has been unlocked but not yet withdrawn.
+   * @return The total amount of locked gold in the system.
+   */
+  function getTotalLockedGold() external view returns (uint256) {
+    return totalNonvoting.add(getElection().getTotalVotes());
+  }
+
+  /**
+   * @notice Returns the total amount of locked gold not being used to vote in elections.
+   * @return The total amount of locked gold not being used to vote in elections.
+   */
+  function getNonvotingLockedGold() external view returns (uint256) {
+    return totalNonvoting;
+  }
+
+  function isSlasher(address slasher) external view returns (bool) {
+    return (registry.isOneOf(slashingWhitelist, slasher));
+  }
+
+  /**
+   * Return percentage and amount that delegator assigned to delegateee.
+   * Please note that amount doesn't have to be up to date.
+   * In such case please use `updateDelegatedBalance`.
+   * @param delegator The delegator address.
+   * @param delegatee The delegatee address.
+   * @return fraction The fraction that is delegator asigning to delegatee.
+   * @return currentAmount The current actual Celo amount that is assigned to delegatee.
+   */
+  function getDelegatorDelegateeInfo(
+    address delegator,
+    address delegatee
+  ) external view returns (uint256 fraction, uint256 currentAmount) {
+    DelegatedInfo storage currentDelegateeInfo = delegatorInfo[delegator]
+      .delegateesWithPercentagesAndAmount[delegatee];
+
+    fraction = FixidityLib.unwrap(currentDelegateeInfo.percentage);
+    currentAmount = currentDelegateeInfo.currentAmount;
+  }
+
+  /**
+   * @notice Returns the total amount of non-voting locked gold for an account.
+   * @param account The account.
+   * @return The total amount of non-voting locked gold for an account.
+   */
+  function getAccountNonvotingLockedGold(address account) external view returns (uint256) {
+    return balances[account].nonvoting;
+  }
+
+  /**
+   * @notice Returns the total amount to withdraw from unlocked gold for an account.
+   * @param account The address of the account.
+   * @return Total amount to withdraw.
+   */
+  function getTotalPendingWithdrawals(address account) external view returns (uint256) {
+    uint256 pendingWithdrawalSum = 0;
+    PendingWithdrawal[] memory withdrawals = balances[account].pendingWithdrawals;
+    for (uint256 i = 0; i < withdrawals.length; i = i.add(1)) {
+      pendingWithdrawalSum = pendingWithdrawalSum.add(withdrawals[i].value);
+    }
+    return pendingWithdrawalSum;
+  }
+
+  function getSlashingWhitelist() external view returns (bytes32[] memory) {
+    return slashingWhitelist;
+  }
+
+  /**
+   * @notice Returns the pending withdrawals from unlocked CELO for an account.
+   * @param account The address of the account.
+   * @return The value for each pending withdrawal.
+   * @return The timestamp for each pending withdrawal.
+   */
+  function getPendingWithdrawals(
+    address account
+  ) external view returns (uint256[] memory, uint256[] memory) {
+    return
+      getPendingWithdrawalsInBatch(account, 0, balances[account].pendingWithdrawals.length - 1);
+  }
+
+  /**
+   * @notice Returns the pending withdrawal at a given index for a given account.
+   * @param account The address of the account.
+   * @param index The index of the pending withdrawal.
+   * @return The value of the pending withdrawal.
+   * @return The timestamp of the pending withdrawal.
+   */
+  function getPendingWithdrawal(
+    address account,
+    uint256 index
+  ) external view returns (uint256, uint256) {
+    require(
+      getAccounts().isAccount(account),
+      "Unknown account: only registered accounts have pending withdrawals"
+    );
+    require(index < balances[account].pendingWithdrawals.length, "Bad pending withdrawal index");
+    PendingWithdrawal memory pendingWithdrawal = (balances[account].pendingWithdrawals[index]);
+
+    return (pendingWithdrawal.value, pendingWithdrawal.timestamp);
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 5, 0);
+  }
+
+  /**
+   * @notice Sets the duration in seconds users must wait before withdrawing gold after unlocking.
+   * @param value The unlocking period in seconds.
+   */
+  function setUnlockingPeriod(uint256 value) public onlyOwner {
+    require(value != unlockingPeriod, "Unlocking period not changed");
+    unlockingPeriod = value;
+    emit UnlockingPeriodSet(value);
+  }
+
+  /**
+   * @notice Sets max delegatees count.
+   * @param value The max delegatees count.
+   */
+  function setMaxDelegateesCount(uint256 value) public onlyOwner {
+    maxDelegateesCount = value;
+    emit MaxDelegateesCountSet(value);
+  }
+
+  /**
+   * Updates real delegated amount to delegatee.
+   * There might be discrepancy because of validator rewards or extra locked gold.
+   * Voting power will always be smaller or equal to what it is supposed to be.
+   * @param delegator The delegator address.
+   * @param delegatee The delegatee address.
+   */
+  function updateDelegatedAmount(address delegator, address delegatee) public returns (uint256) {
+    address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
+    address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
+
+    return _updateDelegatedAmount(delegatorAccount, delegateeAccount);
+  }
+
+  /**
+   * Updates real delegated amount to all delegator's delegatees.
+   * There might be discrepancy because of validator rewards or extra locked gold.
+   * @param delegator The delegator address.
+   */
+  function updateDelegatedAmount(address delegator) public {
+    address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
+    _updateDelegatedAmount(delegatorAccount);
+  }
+
+  /**
+   * @notice Returns the number of pending withdrawals for the specified account.
+   * @param account The address of the account.
+   * @return The count of pending withdrawals.
+   */
+  function getTotalPendingWithdrawalsCount(address account) public view returns (uint256) {
+    return balances[account].pendingWithdrawals.length;
+  }
+
+  /**
+   * Retuns all delegatees of delegator
+   * @param delegator The delegator address.
+   */
+  function getDelegateesOfDelegator(address delegator) public view returns (address[] memory) {
+    address[] memory values = delegatorInfo[delegator].delegatees.enumerate();
+    return values;
+  }
+
+  /**
+   * @notice Returns the pending withdrawals from unlocked CELO for an account in a given range.
+   * @param account The address of the account.
+   * @param from The start index of the pending withdrawals.
+   * @param to The end index of the pending withdrawals.
+   * @return The value for each pending withdrawal.
+   * @return The timestamp for each pending withdrawal.
+   */
+  function getPendingWithdrawalsInBatch(
+    address account,
+    uint256 from,
+    uint256 to
+  ) public view returns (uint256[] memory, uint256[] memory) {
+    uint256 pendingWithdrawalsLength = getTotalPendingWithdrawalsCount(account);
+
+    if (pendingWithdrawalsLength == 0) {
+      return (new uint256[](0), new uint256[](0));
+    }
+    require(from <= to, "Invalid range");
+    uint256 _to = Math.min(to, pendingWithdrawalsLength - 1);
+    uint256 length = _to - from + 1;
+    uint256[] memory values = new uint256[](length);
+    uint256[] memory timestamps = new uint256[](length);
+    for (uint256 i = from; i <= _to; i = i.add(1)) {
+      PendingWithdrawal memory pendingWithdrawal = balances[account].pendingWithdrawals[i];
+      values[i - from] = pendingWithdrawal.value;
+      timestamps[i - from] = pendingWithdrawal.timestamp;
+    }
+    return (values, timestamps);
+  }
+
+  /**
+   * Returns how many percents of CELO is account delegating.
+   * @param account The account address.
+   */
+  function getAccountTotalDelegatedFraction(address account) public view returns (uint256) {
+    Delegated storage delegated = delegatorInfo[account];
+    return FixidityLib.unwrap(delegated.totalDelegatedCeloFraction);
+  }
+
+  /**
+   * @notice Returns the total amount of locked gold for an account.
+   * @param account The account.
+   * @return The total amount of locked gold for an account.
+   */
+  function getAccountTotalLockedGold(address account) public view returns (uint256) {
+    uint256 total = balances[account].nonvoting;
+    return total.add(getElection().getTotalVotesByAccount(account));
+  }
+
+  /**
+   * @notice Returns the total amount of locked gold + delegated gold for an account.
+   * @param account The account.
+   * @return The total amount of locked gold + delegated gold for an account.
+   */
+  function getAccountTotalGovernanceVotingPower(address account) public view returns (uint256) {
+    FixidityLib.Fraction memory availableUndelegatedPercents = FixidityLib.fixed1().subtract(
+      FixidityLib.wrap(getAccountTotalDelegatedFraction(account))
+    );
+    uint256 totalLockedGold = getAccountTotalLockedGold(account);
+
+    uint256 availableForVoting = FixidityLib
+      .newFixed(totalLockedGold)
+      .multiply(availableUndelegatedPercents)
+      .fromFixed();
+
+    return availableForVoting.add(totalDelegatedCelo[account]);
+  }
+
+  /**
+   * Returns expected vs real delegated amount.
+   * If there is a discrepancy it can be fixed by calling `updateDelegatedAmount` function.
+   * @param delegator The delegator address.
+   * @param delegatee The delegatee address.
+   * @return expected The expected amount.
+   * @return real The real amount.
+   */
+  function getDelegatorDelegateeExpectedAndRealAmount(
+    address delegator,
+    address delegatee
+  ) public view returns (uint256 expected, uint256 real) {
+    address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
+    address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
+
+    (expected, real) = _getDelegatorDelegateeExpectedAndRealAmount(
+      delegatorAccount,
+      delegateeAccount
+    );
+  }
+
+  /**
+   * Updates real delegated amount to delegatee.
+   * There might be discrepancy because of validator rewards or extra locked gold.
+   * Voting power will always be smaller or equal to what it is supposed to be.
+   * @param delegator The delegator address.
+   * @param delegatee The delegatee address.
+   */
+  function _updateDelegatedAmount(address delegator, address delegatee) internal returns (uint256) {
+    Delegated storage delegated = delegatorInfo[delegator];
+    require(
+      FixidityLib.unwrap(delegated.totalDelegatedCeloFraction) != 0,
+      "delegator is not delegating"
+    );
+    DelegatedInfo storage currentDelegateeInfo = delegated.delegateesWithPercentagesAndAmount[
+      delegatee
+    ];
+    require(
+      FixidityLib.unwrap(currentDelegateeInfo.percentage) != 0,
+      "delegator is not delegating for delegatee"
+    );
+
+    (uint256 expected, uint256 real) = getDelegatorDelegateeExpectedAndRealAmount(
+      delegator,
+      delegatee
+    );
+
+    currentDelegateeInfo.currentAmount = expected;
+    totalDelegatedCelo[delegatee] = totalDelegatedCelo[delegatee].sub(real).add(expected);
+
+    return expected;
+  }
+
+  /**
+   * @notice Increments the non-voting balance for an account.
+   * @param account The account whose non-voting balance should be incremented.
+   * @param value The amount by which to increment.
+   */
+  function _incrementNonvotingAccountBalance(address account, uint256 value) private {
+    balances[account].nonvoting = balances[account].nonvoting.add(value);
+    totalNonvoting = totalNonvoting.add(value);
+  }
+
+  /**
+   * @notice Decrements the non-voting balance for an account.
+   * @param account The account whose non-voting balance should be decremented.
+   * @param value The amount by which to decrement.
+   */
+  function _decrementNonvotingAccountBalance(address account, uint256 value) private {
+    balances[account].nonvoting = balances[account].nonvoting.sub(value);
+    totalNonvoting = totalNonvoting.sub(value);
+  }
+
+  /**
+   * Revokes amount during unlocking. It will revoke votes from voted proposals if necessary.
+   * @param delegator The delegator account.
+   * @param amountToRevoke The amount to revoke.
+   */
+  function revokeFromDelegatedWhenUnlocking(address delegator, uint256 amountToRevoke) private {
+    address[] memory delegatees = getDelegateesOfDelegator(delegator);
+
+    Delegated storage delegated = delegatorInfo[delegator];
+
+    for (uint256 i = 0; i < delegatees.length; i = i.add(1)) {
+      DelegatedInfo storage currentDelegateeInfo = delegated.delegateesWithPercentagesAndAmount[
+        delegatees[i]
+      ];
+      (uint256 expected, uint256 real) = _getDelegatorDelegateeExpectedAndRealAmount(
+        delegator,
+        delegatees[i]
+      );
+      uint256 delegateeAmountToRevoke = FixidityLib
+        .newFixed(amountToRevoke)
+        .multiply(currentDelegateeInfo.percentage)
+        .fromFixed();
+      delegateeAmountToRevoke = delegateeAmountToRevoke.sub(expected.sub(real));
+      _decreaseDelegateeVotingPower(delegatees[i], delegateeAmountToRevoke, currentDelegateeInfo);
+      emit DelegatedCeloRevoked(delegator, delegatees[i], 0, delegateeAmountToRevoke);
+    }
+  }
+
+  /**
+   * Decreases delegatee voting power when removing or unlocking delegated votes.
+   * @param delegatee The delegatee.
+   * @param amountToRevoke Amount to revoke.
+   * @param delegateeInfo Delegatee info.
+   */
+  function _decreaseDelegateeVotingPower(
+    address delegatee,
+    uint256 amountToRevoke,
+    DelegatedInfo storage delegateeInfo
+  ) private {
+    uint256 delegateeTotalVotingPower = getAccountTotalGovernanceVotingPower(delegatee);
+    uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(delegatee);
+    uint256 unusedReferendumVotes = delegateeTotalVotingPower.sub(totalReferendumVotes);
+    if (unusedReferendumVotes < amountToRevoke) {
+      getGovernance().removeVotesWhenRevokingDelegatedVotes(
+        delegatee,
+        delegateeTotalVotingPower.sub(amountToRevoke)
+      );
+    }
+    delegateeInfo.currentAmount = delegateeInfo.currentAmount.sub(amountToRevoke);
+    totalDelegatedCelo[delegatee] = totalDelegatedCelo[delegatee].sub(amountToRevoke);
+  }
+
+  function _updateDelegatedAmount(address delegator) private {
+    address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
+    EnumerableSet.AddressSet storage delegatees = delegatorInfo[delegatorAccount].delegatees;
+    for (uint256 i = 0; i < delegatees.length(); i = i.add(1)) {
+      _updateDelegatedAmount(delegatorAccount, delegatees.get(i));
+    }
+  }
+
+  /**
+   * @notice Deletes a pending withdrawal.
+   * @param list The list of pending withdrawals from which to delete.
+   * @param index The index of the pending withdrawal to delete.
+   */
+  function deletePendingWithdrawal(PendingWithdrawal[] storage list, uint256 index) private {
+    uint256 lastIndex = list.length.sub(1);
+    list[index] = list[lastIndex];
+    list.length = lastIndex;
+  }
+
+  /**
+   * Returns expected vs real delegated amount.
+   * If there is a discrepancy it can be fixed by calling `updateDelegatedAmount` function.
+   * @param delegator The delegator address.
+   * @param delegatee The delegatee address.
+   * @return expected The expected amount.
+   * @return real The real amount.
+   */
+  function _getDelegatorDelegateeExpectedAndRealAmount(
+    address delegator,
+    address delegatee
+  ) private view returns (uint256 expected, uint256 real) {
+    DelegatedInfo storage currentDelegateeInfo = delegatorInfo[delegator]
+      .delegateesWithPercentagesAndAmount[delegatee];
+
+    uint256 amountToDelegate = FixidityLib
+      .newFixed(getAccountTotalLockedGold(delegator))
+      .multiply(currentDelegateeInfo.percentage)
+      .fromFixed();
+
+    expected = amountToDelegate;
+    real = currentDelegateeInfo.currentAmount;
   }
 }

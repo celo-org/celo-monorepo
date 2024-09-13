@@ -15,7 +15,8 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
 
   bytes32 public DOMAIN_SEPARATOR;
   // keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
-  bytes32 public constant PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
+  bytes32 public constant PERMIT_TYPEHASH =
+    0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
   mapping(address => uint256) public nonces;
 
   event Approval(address indexed owner, address indexed spender, uint256 value);
@@ -37,29 +38,6 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
         address(this)
       )
     );
-  }
-
-  function _mint(address to, uint256 value) internal {
-    totalSupply = totalSupply.add(value);
-    balanceOf[to] = balanceOf[to].add(value);
-    emit Transfer(address(0), to, value);
-  }
-
-  function _burn(address from, uint256 value) internal {
-    balanceOf[from] = balanceOf[from].sub(value);
-    totalSupply = totalSupply.sub(value);
-    emit Transfer(from, address(0), value);
-  }
-
-  function _approve(address owner, address spender, uint256 value) private {
-    allowance[owner][spender] = value;
-    emit Approval(owner, spender, value);
-  }
-
-  function _transfer(address from, address to, uint256 value) private {
-    balanceOf[from] = balanceOf[from].sub(value);
-    balanceOf[to] = balanceOf[to].add(value);
-    emit Transfer(from, to, value);
   }
 
   function approve(address spender, uint256 value) external returns (bool) {
@@ -103,5 +81,28 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
       "UniswapV2: INVALID_SIGNATURE"
     );
     _approve(owner, spender, value);
+  }
+
+  function _mint(address to, uint256 value) internal {
+    totalSupply = totalSupply.add(value);
+    balanceOf[to] = balanceOf[to].add(value);
+    emit Transfer(address(0), to, value);
+  }
+
+  function _burn(address from, uint256 value) internal {
+    balanceOf[from] = balanceOf[from].sub(value);
+    totalSupply = totalSupply.sub(value);
+    emit Transfer(from, address(0), value);
+  }
+
+  function _approve(address owner, address spender, uint256 value) private {
+    allowance[owner][spender] = value;
+    emit Approval(owner, spender, value);
+  }
+
+  function _transfer(address from, address to, uint256 value) private {
+    balanceOf[from] = balanceOf[from].sub(value);
+    balanceOf[to] = balanceOf[to].add(value);
+    emit Transfer(from, to, value);
   }
 }

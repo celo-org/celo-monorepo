@@ -20,14 +20,14 @@ library FixidityLib {
     uint256 value;
   }
 
+  uint256 private constant FIXED1_UINT = 1000000000000000000000000;
+
   /**
    * @notice Number of positions that the comma is shifted to the right.
    */
   function digits() internal pure returns (uint8) {
     return 24;
   }
-
-  uint256 private constant FIXED1_UINT = 1000000000000000000000000;
 
   /**
    * @notice This is 1 in the fixed point units used in this library.
@@ -103,11 +103,10 @@ library FixidityLib {
    * Test newFixedFraction(1,1) returns fixed1()
    * Test newFixedFraction(1,fixed1()) returns 1
    */
-  function newFixedFraction(uint256 numerator, uint256 denominator)
-    internal
-    pure
-    returns (Fraction memory)
-  {
+  function newFixedFraction(
+    uint256 numerator,
+    uint256 denominator
+  ) internal pure returns (Fraction memory) {
     Fraction memory convertedNumerator = newFixed(numerator);
     Fraction memory convertedDenominator = newFixed(denominator);
     return divide(convertedNumerator, convertedDenominator);

@@ -34,16 +34,23 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
   }
 
   /**
-    * @notice Allows owner to set the minimum number of reports required.
-    * @param newMininumReports The new update minimum number of reports required.
-    */
-  function setMinimumReports(address tokenAddress, uint256 newMininumReports) public onlyOwner {
-    _setMinimumReports(tokenAddress, newMininumReports);
+  * @notice Allows owner to transfer tokens of this contract. It's meant for governance to 
+    trigger use cases not contemplated in this contract.
+    @param token The address of the token to transfer.
+    @param amount The amount of tokens to transfer.
+    @param to The address of the recipient to transfer the tokens to.
+    @return A boolean indicating whether the transfer was successful or not.
+  */
+  function transfer(address token, uint256 amount, address to) external onlyOwner returns (bool) {
+    return IERC20(token).transfer(to, amount);
   }
 
-  function _setMinimumReports(address tokenAddress, uint256 newMininumReports) internal {
-    minimumReports[tokenAddress] = newMininumReports;
-    emit MinimumReportsSet(tokenAddress, newMininumReports);
+  /**
+   * @notice Allows owner to set the minimum number of reports required.
+   * @param newMininumReports The new update minimum number of reports required.
+   */
+  function setMinimumReports(address tokenAddress, uint256 newMininumReports) public onlyOwner {
+    _setMinimumReports(tokenAddress, newMininumReports);
   }
 
   /**
@@ -76,15 +83,8 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
         .fromFixed();
   }
 
-  /**
-  * @notice Allows owner to transfer tokens of this contract. It's meant for governance to 
-    trigger use cases not contemplated in this contract.
-    @param token The address of the token to transfer.
-    @param amount The amount of tokens to transfer.
-    @param to The address of the recipient to transfer the tokens to.
-    @return A boolean indicating whether the transfer was successful or not.
-  */
-  function transfer(address token, uint256 amount, address to) external onlyOwner returns (bool) {
-    return IERC20(token).transfer(to, amount);
+  function _setMinimumReports(address tokenAddress, uint256 newMininumReports) internal {
+    minimumReports[tokenAddress] = newMininumReports;
+    emit MinimumReportsSet(tokenAddress, newMininumReports);
   }
 }

@@ -21,11 +21,11 @@ contract CIP20Test {
     return input.sha2_512();
   }
 
-  function blake2sWithConfig(bytes32 config, bytes calldata key, bytes calldata preimage)
-    external
-    view
-    returns (bytes memory)
-  {
+  function blake2sWithConfig(
+    bytes32 config,
+    bytes calldata key,
+    bytes calldata preimage
+  ) external view returns (bytes memory) {
     return CIP20Lib.blake2sWithConfig(config, key, preimage);
   }
 

@@ -29,7 +29,11 @@ contract Attestations is
   using SafeMath for uint256;
   using SafeCast for uint256;
 
-  enum AttestationStatus { None, Incomplete, Complete }
+  enum AttestationStatus {
+    None,
+    Incomplete,
+    Complete
+  }
 
   struct Attestation {
     AttestationStatus status;
@@ -172,17 +176,6 @@ contract Attestations is
   }
 
   /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 3, 0, 0);
-  }
-
-  /**
    * @notice Revokes an account for an identifier.
    * @param identifier The identifier for which to revoke.
    * @param index The index of the account in the accounts array.
@@ -225,11 +218,10 @@ contract Attestations is
    * @return number Number of unselected requests.
    * @return address Address of the token with which this attestation request was paid for.
    */
-  function getUnselectedRequest(bytes32 identifier, address account)
-    external
-    view
-    returns (uint32, uint32, address)
-  {
+  function getUnselectedRequest(
+    bytes32 identifier,
+    address account
+  ) external view returns (uint32, uint32, address) {
     return (
       identifiers[identifier].unselectedRequests[account].blockNumber,
       identifiers[identifier].unselectedRequests[account].attestationsRequested,
@@ -243,11 +235,10 @@ contract Attestations is
    * @param account Address of the account.
    * @return Addresses of the selected attestation issuers.
    */
-  function getAttestationIssuers(bytes32 identifier, address account)
-    external
-    view
-    returns (address[] memory)
-  {
+  function getAttestationIssuers(
+    bytes32 identifier,
+    address account
+  ) external view returns (address[] memory) {
     return identifiers[identifier].attestations[account].selectedIssuers;
   }
 
@@ -258,11 +249,10 @@ contract Attestations is
    * @return completed Number of completed attestations.
    * @return requested Number of total requested attestations.
    */
-  function getAttestationStats(bytes32 identifier, address account)
-    external
-    view
-    returns (uint32, uint32)
-  {
+  function getAttestationStats(
+    bytes32 identifier,
+    address account
+  ) external view returns (uint32, uint32) {
     return (
       identifiers[identifier].attestations[account].completed,
       identifiers[identifier].attestations[account].requested
@@ -278,11 +268,9 @@ contract Attestations is
    * @return [3] Array of sum([0]) numbers indicating the total number of requested
                  attestations for each account.
    */
-  function batchGetAttestationStats(bytes32[] calldata identifiersToLookup)
-    external
-    view
-    returns (uint256[] memory, address[] memory, uint64[] memory, uint64[] memory)
-  {
+  function batchGetAttestationStats(
+    bytes32[] calldata identifiersToLookup
+  ) external view returns (uint256[] memory, address[] memory, uint64[] memory, uint64[] memory) {
     require(identifiersToLookup.length > 0, "You have to pass at least one identifier");
 
     uint256[] memory matches;
@@ -301,7 +289,8 @@ contract Attestations is
         completed[currentIndex] = identifiers[identifiersToLookup[i]]
           .attestations[addrs[matchIndex]]
           .completed;
-        total[currentIndex] = identifiers[identifiersToLookup[i]].attestations[addrs[matchIndex]]
+        total[currentIndex] = identifiers[identifiersToLookup[i]]
+          .attestations[addrs[matchIndex]]
           .requested;
         currentIndex = currentIndex.add(1);
       }
@@ -319,35 +308,34 @@ contract Attestations is
    * @return block Block number of request/completion the attestation.
    * @return address Address of the token with which this attestation request was paid for.
    */
-  function getAttestationState(bytes32 identifier, address account, address issuer)
-    external
-    view
-    returns (uint8, uint32, address)
-  {
-    Attestation storage attestation = identifiers[identifier].attestations[account]
+  function getAttestationState(
+    bytes32 identifier,
+    address account,
+    address issuer
+  ) external view returns (uint8, uint32, address) {
+    Attestation storage attestation = identifiers[identifier]
+      .attestations[account]
       .issuedAttestations[issuer];
     return (
       uint8(attestation.status),
       attestation.blockNumber,
       attestation.attestationRequestFeeToken
     );
-
   }
 
   /**
-    * @notice Returns the state of all attestations that are completable
-    * @param identifier Hash of the identifier.
-    * @param account Address of the account.
-    * @return Block number of request/completion the attestation.
-    * @return Address of the issuer.
-    * @return The length of each metadataURL string for each issuer.
-    * @return All strings concatenated.
-    */
-  function getCompletableAttestations(bytes32 identifier, address account)
-    external
-    view
-    returns (uint32[] memory, address[] memory, uint256[] memory, bytes memory)
-  {
+   * @notice Returns the state of all attestations that are completable
+   * @param identifier Hash of the identifier.
+   * @param account Address of the account.
+   * @return Block number of request/completion the attestation.
+   * @return Address of the issuer.
+   * @return The length of each metadataURL string for each issuer.
+   * @return All strings concatenated.
+   */
+  function getCompletableAttestations(
+    bytes32 identifier,
+    address account
+  ) external view returns (uint32[] memory, address[] memory, uint256[] memory, bytes memory) {
     AttestedAddress storage state = identifiers[identifier].attestations[account];
     address[] storage issuers = state.selectedIssuers;
 
@@ -383,6 +371,49 @@ contract Attestations is
    */
   function getAttestationRequestFee(address token) external view returns (uint256) {
     return attestationRequestFees[token];
+  }
+
+  /**
+   * @notice Query 'maxAttestations'
+   * @return Maximum number of attestations that can be requested.
+   */
+  function getMaxAttestations() external view returns (uint256) {
+    return maxAttestations;
+  }
+
+  function lookupAccountsForIdentifier(
+    bytes32 identifier
+  ) external view returns (address[] memory) {
+    return identifiers[identifier].accounts;
+  }
+
+  /**
+   * @notice Require that a given identifier/address pair has
+   * requested a specific number of attestations.
+   * @param identifier Hash of the identifier.
+   * @param account Address of the account.
+   * @param expected Number of expected attestations
+   * @dev It can be used when batching meta-transactions to validate
+   * attestation are requested as expected in untrusted scenarios
+   */
+  function requireNAttestationsRequested(
+    bytes32 identifier,
+    address account,
+    uint32 expected
+  ) external view {
+    uint256 requested = identifiers[identifier].attestations[account].requested;
+    require(requested == expected, "requested attestations does not match expected");
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 3, 0, 0);
   }
 
   /**
@@ -429,17 +460,9 @@ contract Attestations is
   }
 
   /**
-   * @notice Query 'maxAttestations'
-   * @return Maximum number of attestations that can be requested.
-   */
-  function getMaxAttestations() external view returns (uint256) {
-    return maxAttestations;
-  }
-
-  /**
    * @notice Validates the given attestation code.
    * @param identifier The hash of the identifier to be attested.
-   * @param account Address of the account. 
+   * @param account Address of the account.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
@@ -458,7 +481,8 @@ contract Attestations is
     address signer = Signatures.getSignerOfMessageHash(codehash, v, r, s);
     address issuer = getAccounts().attestationSignerToAccount(signer);
 
-    Attestation storage attestation = identifiers[identifier].attestations[account]
+    Attestation storage attestation = identifiers[identifier]
+      .attestations[account]
       .issuedAttestations[issuer];
 
     require(
@@ -470,31 +494,6 @@ contract Attestations is
     return issuer;
   }
 
-  function lookupAccountsForIdentifier(bytes32 identifier)
-    external
-    view
-    returns (address[] memory)
-  {
-    return identifiers[identifier].accounts;
-  }
-
-  /**
-   * @notice Require that a given identifier/address pair has
-   * requested a specific number of attestations.
-   * @param identifier Hash of the identifier.
-   * @param account Address of the account.
-   * @param expected Number of expected attestations
-   * @dev It can be used when batching meta-transactions to validate
-   * attestation are requested as expected in untrusted scenarios
-   */
-  function requireNAttestationsRequested(bytes32 identifier, address account, uint32 expected)
-    external
-    view
-  {
-    uint256 requested = identifiers[identifier].attestations[account].requested;
-    require(requested == expected, "requested attestations does not match expected");
-  }
-
   /**
    * @notice Helper function for batchGetAttestationStats to calculate the
              total number of addresses that have >0 complete attestations for the identifiers.
@@ -502,11 +501,9 @@ contract Attestations is
    * @return Array of numbers that indicate the number of matching addresses per identifier.
    * @return Array of addresses preallocated for total number of matches.
    */
-  function batchlookupAccountsForIdentifier(bytes32[] memory identifiersToLookup)
-    internal
-    view
-    returns (uint256[] memory, address[] memory)
-  {
+  function batchlookupAccountsForIdentifier(
+    bytes32[] memory identifiersToLookup
+  ) internal view returns (uint256[] memory, address[] memory) {
     require(identifiersToLookup.length > 0, "You have to pass at least one identifier");
     uint256 totalAddresses = 0;
     uint256[] memory matches = new uint256[](identifiersToLookup.length);
@@ -530,11 +527,9 @@ contract Attestations is
       !isAttestationExpired(attestation.blockNumber));
   }
 
-  function isAttestationRequestSelectable(uint256 attestationRequestBlock)
-    internal
-    view
-    returns (bool)
-  {
+  function isAttestationRequestSelectable(
+    uint256 attestationRequestBlock
+  ) internal view returns (bool) {
     return block.number < attestationRequestBlock.add(getRandom().randomnessBlockRetentionWindow());
   }
 }

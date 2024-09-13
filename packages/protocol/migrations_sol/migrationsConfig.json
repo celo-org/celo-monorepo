@@ -1,0 +1,165 @@
+{
+  "goldToken": {"frozen":false},
+  "sortedOracles": {
+    "reportExpirySeconds": 300
+  },
+  "gasPriceMinimum": {
+    "minimumFloor": 100000000,
+    "targetDensity": 500000000000000000000000,
+    "adjustmentSpeed": 500000000000000000000000,
+    "baseFeeOpCodeActivationBlock": 0
+  },
+  "reserve": {
+    "tobinTaxStalenessThreshold": 3153600000,
+    "tobinTax": 0,
+    "tobinTaxReserveRatio": 0,
+    "spendingRatio": 50000000000000000000000,
+    "frozenGold": null,
+    "frozenDays": null,
+    "spenders": [],
+    "otherAddresses": [
+      "0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB",
+      "0x298FbD6dad2Fc2cB56d7E37d8aCad8Bf07324f67"
+    ],
+    "assetAllocationSymbols_": ["cGLD", "BTC", "ETH", "DAI", "They are don't by converting string to hex, and then `cast to-bytes32`"],
+    "assetAllocationSymbols": ["0x63474c4400000000000000000000000000000000000000000000000000000000", "0x4254430000000000000000000000000000000000000000000000000000000000", "0x4554480000000000000000000000000000000000000000000000000000000000", "0x4441490000000000000000000000000000000000000000000000000000000000"],
+    "assetAllocationWeights": [500000000000000000000000, 300000000000000000000000, 150000000000000000000000, 50000000000000000000000],
+    "initialBalance": 5000000000000000000000000
+  },
+  "stableTokens": {
+    "names": ["Celo Dollar", "Celo Euro", "Celo Brazilian Real"],
+    "symbols": ["cUSD", "cEUR", "cREAL"],
+    "contractSufixs": ["", "EUR", "BRL"],
+    "decimals": 18,
+    "celoPrice": 1,
+    "inflationRate": 1,
+    "inflationPeriod": 47304000,
+    "initialBalance": 5000000000000000000000000,
+    "frozen": false
+  },
+  "exchange": {
+    "spread": 5000000000000000000000,
+    "reserveFraction": 10000000000000000000000, 
+    "updateFrequency": 300,
+    "minimumReports": 1,
+    "frozen": false
+  },
+  "lockedGold": {
+    "unlockingPeriod": 21600,
+    "unlockingPeriod_helper": "6 * HOUR"
+  },
+  "validators": {
+    "groupLockedGoldRequirements": {
+      "value": 10000000000000000000000,
+      "duration": 15552000,
+      "duration_help": "180 * DAY"
+    },
+    "validatorLockedGoldRequirements": {
+      "value": 10000000000000000000000,
+      "duration": 5184000,
+      "duration_help": "60 * DAY"
+    },
+    "validatorScoreParameters": {
+      "exponent": 10,
+      "adjustmentSpeed": 100000000000000000000000
+    },
+    "membershipHistoryLength": 60,
+    "commissionUpdateDelay": 51840, 
+    "commissionUpdateDelay_help": "(3 * DAY) / 5", 
+
+    "maxGroupSize": 5,
+    "slashingMultiplierResetPeriod": 2592000,
+    "slashingPenaltyResetPeriod_help": "30 * DAY",
+    "downtimeGracePeriod": 0,
+    "validatorKeys": [],
+    "attestationKeys": [],
+    "groupName": "cLabs",
+    "commission": 100000000000000000000000,
+    "votesRatioOfLastVsFirstGroup": 2000000000000000000000000,
+    "valKeys": ["0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d","0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a"],
+    "ecdsaPubKeys": [
+                      "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", 
+                      "0x9d9031e97dd78ff8c15aa86939de9b1e791066a0224e331bc962a2099a7b1f0464b8bbafe1535f2301c72c2cb3535b172da30b02686ab0393d348614f157fbdb"]
+  },
+  "election": {
+    "minElectableValidators": 1,
+    "maxElectableValidators": 100,
+    "maxNumGroupsVotedFor": 10,
+    "electabilityThreshold": 1000000000000000000000
+  },
+  "epochRewards": {
+    "targetVotingYieldParameters": {
+      "initial": 0,
+      "max": 500000000000000000000, 
+      "max_helper": "(x + 1) ^ 365 = 1.20",
+      "adjustmentFactor": 0, 
+      "adjustmentFactor_helper": "Change to 1 / 3650 once Mainnet activated."
+    },
+    "rewardsMultiplierParameters": {
+      "max": 2,
+      "adjustmentFactors": {
+        "underspend": 500000000000000000000000,
+        "overspend": 5000000000000000000000000
+      }
+    },
+    "targetVotingGoldFraction": 500000000000000000000000,
+    "maxValidatorEpochPayment": 205479452054794520547,
+    "maxValidatorEpochPayment_helper": "(75,000 / 365) * 10 ^ 18",
+    "communityRewardFraction": 250000000000000000000000,
+    "carbonOffsettingPartner": "0x0000000000000000000000000000000000000000",
+    "carbonOffsettingFraction": 1000000000000000000000,
+    "frozen": false
+  },
+  "random": {
+    "randomnessBlockRetentionWindow": "720",
+    "randomnessBlockRetentionWindow_helper": "HOUR / 5"
+  },
+  "blockchainParameters": {
+    "gasForNonGoldCurrencies": 50000,
+    "deploymentBlockGasLimit": 20000000,
+    "gasLimit": 13000000,
+    "lookbackWindow": 12
+  },
+  "doubleSigningSlasher": {
+    "reward": 1000000000000000000000,
+    "penalty": 9000000000000000000000
+  },
+  "downtimeSlasher": {
+    "reward": 10000000000000000000,
+    "penalty": 100000000000000000000,
+    "slashableDowntime": 60
+  },
+  "governanceApproverMultiSig": {
+    "required": 1,
+    "internalRequired": 1,
+    "governanceApproverMultiSig": true
+  },
+  "reserveSpenderMultiSig": {
+    "required": 1,
+    "internalRequired": 1
+  },
+  "feeHandler": {
+    "beneficiary": "0x2A486910DBC72cACcbb8d0e1439C96b03B2A4699",
+    "burnFraction": 800000000000000000000000
+  },
+  "governance": {
+    "concurrentProposals": 3,
+    "dequeueFrequency": 14400,
+    "queueExpiry": 2419200,
+    "queueExpiry_helper": "4 * WEEK",
+    "dequeueFrequency_helper":"4 * HOUR",
+    "approvalStageDuration": 14400,
+    "approvalStageDuration_helper": "4 * HOUR",
+    "referendumStageDuration": 86400,
+    "referendumStageDuration_hlper": "DAY",
+    "executionStageDuration": 604800,
+    "executionStageDuration_hlper": "WEEK",
+    "participationBaseline": 5000000000000000000000,
+    "minDeposit": 100000000000000000000,
+    "participationFloor": 10000000000000000000000,
+    "baselineUpdateFactor": 200000000000000000000000,
+    "baselineQuorumFactor": 1000000000000000000000000,
+    "skipSetConstitution": false,
+    "skipTransferOwnership": false
+  }
+}

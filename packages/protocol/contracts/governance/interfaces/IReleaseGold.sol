@@ -27,14 +27,6 @@ interface IReleaseGold {
   function revokeActive(address, uint256, address, address, uint256) external;
   function revokePending(address, uint256, address, address, uint256) external;
 
-  // view functions
-  function getTotalBalance() external view returns (uint256);
-  function getRemainingTotalBalance() external view returns (uint256);
-  function getRemainingUnlockedBalance() external view returns (uint256);
-  function getRemainingLockedBalance() external view returns (uint256);
-  function getCurrentReleasedTotalAmount() external view returns (uint256);
-  function isRevoked() external view returns (bool);
-
   // only beneficiary
   function setCanExpire(bool) external;
   function withdraw(uint256) external;
@@ -56,4 +48,12 @@ interface IReleaseGold {
   function refundAndFinalize() external;
   function revoke() external;
   function expire() external;
+
+  // view functions
+  function getTotalBalance() external view returns (uint256);
+  function getRemainingTotalBalance() external view returns (uint256);
+  function getRemainingUnlockedBalance() external view returns (uint256);
+  function getRemainingLockedBalance() external view returns (uint256);
+  function getCurrentReleasedTotalAmount() external view returns (uint256);
+  function isRevoked() external view returns (bool);
 }

@@ -1,9 +1,11 @@
 pragma solidity ^0.5.13;
 
+import "../../../contracts-0.8/common/IsL2Check.sol";
+
 /**
  * @title Holds a list of addresses of validators
  */
-contract MockElection {
+contract MockElection is IsL2Check {
   mapping(address => bool) public isIneligible;
   mapping(address => bool) public isEligible;
   mapping(address => bool) public allowedToVoteOverMaxNumberOfGroups;
@@ -15,20 +17,8 @@ contract MockElection {
     isIneligible[account] = true;
   }
 
-  function markGroupEligible(address account, address, address) external {
+  function markGroupEligible(address account, address, address) external onlyL1 {
     isEligible[account] = true;
-  }
-
-  function getTotalVotes() external view returns (uint256) {
-    return total;
-  }
-
-  function getActiveVotes() external view returns (uint256) {
-    return active;
-  }
-
-  function getTotalVotesByAccount(address) external view returns (uint256) {
-    return 0;
   }
 
   function setActiveVotes(uint256 value) external {
@@ -43,15 +33,11 @@ contract MockElection {
     electedValidators = _electedValidators;
   }
 
-  function electValidatorSigners() external view returns (address[] memory) {
-    return electedValidators;
-  }
-
-  function vote(address, uint256, address, address) external returns (bool) {
+  function vote(address, uint256, address, address) external onlyL1 returns (bool) {
     return true;
   }
 
-  function activate(address) external returns (bool) {
+  function activate(address) external onlyL1 returns (bool) {
     return true;
   }
 
@@ -67,10 +53,6 @@ contract MockElection {
     return true;
   }
 
-  function setAllowedToVoteOverMaxNumberOfGroups(address account, bool flag) public {
-    allowedToVoteOverMaxNumberOfGroups[account] = flag;
-  }
-
   function forceDecrementVotes(
     address,
     uint256 value,
@@ -80,5 +62,25 @@ contract MockElection {
   ) external returns (uint256) {
     this.setActiveVotes(this.getActiveVotes() - value);
     return value;
+  }
+
+  function getTotalVotes() external view returns (uint256) {
+    return total;
+  }
+
+  function getActiveVotes() external view returns (uint256) {
+    return active;
+  }
+
+  function getTotalVotesByAccount(address) external view returns (uint256) {
+    return 0;
+  }
+
+  function electValidatorSigners() external view returns (address[] memory) {
+    return electedValidators;
+  }
+
+  function setAllowedToVoteOverMaxNumberOfGroups(address account, bool flag) public onlyL1 {
+    allowedToVoteOverMaxNumberOfGroups[account] = flag;
   }
 }

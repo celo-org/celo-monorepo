@@ -55,7 +55,7 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm, IFeeCurrencyAdapter {
       _decimals < _expectedDecimals,
       "Decimals of adapted token must be < expected decimals."
     );
-    digitDifference = uint96(10**(_expectedDecimals - _decimals));
+    digitDifference = uint96(10 ** (_expectedDecimals - _decimals));
     expectedDecimals = _expectedDecimals;
   }
 
@@ -134,10 +134,10 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm, IFeeCurrencyAdapter {
   }
 
   /**
-     * @notice Gets the balance of the specified address with correct digits.
-     * @param account The address to query the balance of.
-     * @return The balance of the specified address.
-     */
+   * @notice Gets the balance of the specified address with correct digits.
+   * @param account The address to query the balance of.
+   * @return The balance of the specified address.
+   */
   function balanceOf(address account) external view returns (uint256) {
     return upscale(adaptedToken.balanceOf(account));
   }
@@ -158,6 +158,10 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm, IFeeCurrencyAdapter {
     return expectedDecimals;
   }
 
+  function _setAdaptedToken(address _adaptedToken) internal virtual {
+    adaptedToken = IFeeCurrency(_adaptedToken);
+  }
+
   function upscale(uint256 value) internal view returns (uint256) {
     return value * digitDifference;
   }
@@ -170,13 +174,9 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm, IFeeCurrencyAdapter {
    * WBTC (currently not supported by Celo chain as fee currency) has 8 decimals and in such case user can pay up to 0.00000001 WBTC more than expected.
    * Considering the current price of WBTC, it's less than 0.0005 USD. Even when WBTC price would be 1 mil USD, it's still would be only 0.01 USD.
    * In general it is a very small amount and it is acceptable to round up in favor of the protocol.
-   * @param value The value to downscale. 
+   * @param value The value to downscale.
    */
   function downscale(uint256 value) internal view returns (uint256) {
     return (value + digitDifference - 1) / digitDifference;
-  }
-
-  function _setAdaptedToken(address _adaptedToken) internal virtual {
-    adaptedToken = IFeeCurrency(_adaptedToken);
   }
 }

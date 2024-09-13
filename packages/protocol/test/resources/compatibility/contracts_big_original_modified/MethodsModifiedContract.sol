@@ -12,10 +12,10 @@ contract MethodsModifiedContract {
     return i + s + 1;
   }
 
-  function someMethod3(uint256 s, string memory arg)
-    public
-    returns (uint256, string memory, uint256)
-  {
+  function someMethod3(
+    uint256 s,
+    string memory arg
+  ) public returns (uint256, string memory, uint256) {
     string memory res = string(abi.encodePacked(arg, a));
     a = arg;
     return (s + 1, res, i);
@@ -25,5 +25,4 @@ contract MethodsModifiedContract {
     i = s;
     return s + 1;
   }
-
 }

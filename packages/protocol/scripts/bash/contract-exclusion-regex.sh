@@ -15,7 +15,7 @@ fi
 
 if [ $VERSION_NUMBER -gt 8 ]
   then
-  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|^Ownable|Initializable|BLS12_377Passthrough|BLS12_381Passthrough]UniswapV2ERC20"
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|^Ownable|Initializable|BLS12_377Passthrough|BLS12_381Passthrough]UniswapV2ERC20|ReentrancyGuard"
 fi
 
 # In CR9 the SortedOracles contract was deployed by Mento team, in CR10 we redeployed it ourselves

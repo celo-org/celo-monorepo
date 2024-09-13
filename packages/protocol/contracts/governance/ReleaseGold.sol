@@ -164,38 +164,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    */
   constructor(bool test) public Initializable(test) {}
 
-  function isFunded() public view returns (bool) {
-    // grants which have already released are considered funded for backwards compatibility
-    return
-      getCurrentReleasedTotalAmount() > 0 ||
-      address(this).balance >=
-      releaseSchedule.amountReleasedPerPeriod.mul(releaseSchedule.numReleasePeriods);
-  }
-
-  function() external payable {}
-
-  /**
-   * @notice Wrapper function for stable token transfer function.
-   */
-  function transfer(address to, uint256 value) external onlyWhenInProperState {
-    IERC20(registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID)).transfer(to, value);
-  }
-
-  /**
-   * @notice Wrapper function for any ERC-20 transfer function.
-   * @dev Protects against celo balance changes.
-   */
-  function genericTransfer(address erc20, address to, uint256 value)
-    external
-    onlyWhenInProperState
-  {
-    require(
-      erc20 != registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
-      "Transfer must not target celo balance"
-    );
-    SafeERC20.safeTransfer(IERC20(erc20), to, value);
-  }
-
   /**
    * @notice A constructor for initialising a new instance of a Releasing Schedule contract.
    * @param releaseStartTime The time (in Unix time) at which point releasing starts.
@@ -281,12 +249,29 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     emit ReleaseGoldInstanceCreated(beneficiary, address(this));
   }
 
+  function() external payable {}
+
   /**
-   * @notice Returns if the release schedule has been revoked or not.
-   * @return True if instance revoked.
+   * @notice Wrapper function for stable token transfer function.
    */
-  function isRevoked() public view returns (bool) {
-    return revocationInfo.revokeTime > 0;
+  function transfer(address to, uint256 value) external onlyWhenInProperState {
+    IERC20(registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID)).transfer(to, value);
+  }
+
+  /**
+   * @notice Wrapper function for any ERC-20 transfer function.
+   * @dev Protects against celo balance changes.
+   */
+  function genericTransfer(
+    address erc20,
+    address to,
+    uint256 value
+  ) external onlyWhenInProperState {
+    require(
+      erc20 != registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
+      "Transfer must not target celo balance"
+    );
+    SafeERC20.safeTransfer(IERC20(erc20), to, value);
   }
 
   /**
@@ -341,16 +326,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    */
   function setBeneficiary(address payable newBeneficiary) external onlyOwner {
     _setBeneficiary(newBeneficiary);
-  }
-
-  /**
-   * @notice Sets the beneficiary of the instance
-   * @param newBeneficiary The address of the new beneficiary
-   */
-  function _setBeneficiary(address payable newBeneficiary) private {
-    require(newBeneficiary != address(0x0), "Can't set the beneficiary to the zero address");
-    beneficiary = newBeneficiary;
-    emit BeneficiarySet(newBeneficiary);
   }
 
   /**
@@ -424,6 +399,311 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   /**
+   * @notice A wrapper function for the authorize vote signer account method.
+   * @param signer The address of the signing key to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev The v,r and s signature should be signed by the authorized signer
+   *      key, with the ReleaseGold contract address as the message.
+   */
+  function authorizeVoteSigner(
+    address payable signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external nonReentrant onlyCanVote onlyWhenInProperState {
+    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+    if (getAccounts().getVoteSigner(address(this)) == address(this)) {
+      fundSigner(signer);
+    }
+    getAccounts().authorizeVoteSigner(signer, v, r, s);
+  }
+
+  /**
+   * @notice A wrapper function for the authorize validator signer account method.
+   * @param signer The address of the signing key to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev The v,r and s signature should be signed by the authorized signer
+   *      key, with the ReleaseGold contract address as the message.
+   */
+  function authorizeValidatorSigner(
+    address payable signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external nonReentrant onlyCanValidate onlyWhenInProperState {
+    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
+      fundSigner(signer);
+    }
+    getAccounts().authorizeValidatorSigner(signer, v, r, s);
+  }
+
+  /**
+   * @notice A wrapper function for the authorize validator signer with public key account method.
+   * @param signer The address of the signing key to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
+   * @dev The v,r and s signature should be signed by the authorized signer
+   *      key, with the ReleaseGold contract address as the message.
+   * @dev Function is deprecated on L2.
+   */
+  function authorizeValidatorSignerWithPublicKey(
+    address payable signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s,
+    bytes calldata ecdsaPublicKey
+  ) external nonReentrant onlyCanValidate onlyWhenInProperState {
+    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
+      fundSigner(signer);
+    }
+    getAccounts().authorizeValidatorSignerWithPublicKey(signer, v, r, s, ecdsaPublicKey);
+  }
+
+  /**
+   * @notice A wrapper function for the authorize validator signer with keys account method.
+   * @param signer The address of the signing key to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
+   *   proof of possession. 96 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 48 bytes.
+   * @dev The v,r and s signature should be signed by the authorized signer
+   *      key, with the ReleaseGold contract address as the message.
+   * @dev Function is deprecated on L2.
+   */
+  function authorizeValidatorSignerWithKeys(
+    address payable signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s,
+    bytes calldata ecdsaPublicKey,
+    bytes calldata blsPublicKey,
+    bytes calldata blsPop
+  ) external nonReentrant onlyCanValidate onlyWhenInProperState {
+    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
+      fundSigner(signer);
+    }
+    getAccounts().authorizeValidatorSignerWithKeys(
+      signer,
+      v,
+      r,
+      s,
+      ecdsaPublicKey,
+      blsPublicKey,
+      blsPop
+    );
+  }
+
+  /**
+   * @notice A wrapper function for the authorize attestation signer account method.
+   * @param signer The address of the signing key to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev The v,r and s signature should be signed by the authorized signer
+   *      key, with the ReleaseGold contract address as the message.
+   */
+  function authorizeAttestationSigner(
+    address payable signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external nonReentrant onlyCanValidate onlyWhenInProperState {
+    getAccounts().authorizeAttestationSigner(signer, v, r, s);
+  }
+
+  /**
+   * @notice A convenience wrapper setter for the name, dataEncryptionKey
+   *         and wallet address for an account.
+   * @param name A string to set as the name of the account.
+   * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
+   * @param walletAddress The wallet address to set for the account.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev Wallet address can be zero. This means that the owner of the wallet
+   *      does not want to be paid directly without interaction, and instead wants users to
+   *      contact them, using the data encryption key, and arrange a payment.
+   * @dev v, r, s constitute `signer`'s signature on `msg.sender` (unless the wallet address
+   *      is 0x0 or msg.sender).
+   */
+  function setAccount(
+    string calldata name,
+    bytes calldata dataEncryptionKey,
+    address walletAddress,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external onlyBeneficiaryAndNotRevoked {
+    getAccounts().setAccount(name, dataEncryptionKey, walletAddress, v, r, s);
+  }
+
+  /**
+   * @notice A wrapper setter function for creating an account.
+   */
+  function createAccount() external onlyCanVote onlyBeneficiaryAndNotRevoked {
+    require(getAccounts().createAccount(), "Account creation failed");
+  }
+
+  /**
+   * @notice A wrapper setter function for the name of an account.
+   * @param name A string to set as the name of the account.
+   */
+  function setAccountName(string calldata name) external onlyBeneficiaryAndNotRevoked {
+    getAccounts().setName(name);
+  }
+
+  /**
+   * @notice A wrapper setter function for the wallet address of an account.
+   * @param walletAddress The wallet address to set for the account.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev Wallet address can be zero. This means that the owner of the wallet
+   *      does not want to be paid directly without interaction, and instead wants users to
+   *      contact them, using the data encryption key, and arrange a payment.
+   * @dev v, r, s constitute `signer`'s signature on `msg.sender` (unless the wallet address
+   *      is 0x0 or msg.sender).
+   */
+  function setAccountWalletAddress(
+    address walletAddress,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external onlyBeneficiaryAndNotRevoked {
+    getAccounts().setWalletAddress(walletAddress, v, r, s);
+  }
+
+  /**
+   * @notice A wrapper setter function for the for the data encryption key
+   *         and version of an account.
+   * @param dataEncryptionKey Secp256k1 public key for data encryption.
+   *                          Preferably compressed.
+   */
+  function setAccountDataEncryptionKey(
+    bytes calldata dataEncryptionKey
+  ) external onlyBeneficiaryAndNotRevoked {
+    getAccounts().setAccountDataEncryptionKey(dataEncryptionKey);
+  }
+
+  /**
+   * @notice A wrapper setter function for the metadata of an account.
+   * @param metadataURL The URL to access the metadata..
+   */
+  function setAccountMetadataURL(
+    string calldata metadataURL
+  ) external onlyBeneficiaryAndNotRevoked {
+    getAccounts().setMetadataURL(metadataURL);
+  }
+
+  /**
+   * @notice Revokes `value` active votes for `group`.
+   * @param group The validator group to revoke votes from.
+   * @param value The number of votes to revoke.
+   * @param lesser The group receiving fewer votes than the group for which the vote was revoked,
+   *               or 0 if that group has the fewest votes of any validator group.
+   * @param greater The group receiving more votes than the group for which the vote was revoked,
+   *               or 0 if that group has the most votes of any validator group.
+   * @param index The index of the group in the account's voting list.
+   * @dev Fails if the account has not voted on a validator group.
+   */
+  function revokeActive(
+    address group,
+    uint256 value,
+    address lesser,
+    address greater,
+    uint256 index
+  ) external nonReentrant onlyWhenInProperState {
+    getElection().revokeActive(group, value, lesser, greater, index);
+  }
+
+  /**
+   * @notice A wrapper function for the lock gold method.
+   * @param value The value of gold to be locked.
+   */
+  function lockGold(uint256 value) external nonReentrant onlyBeneficiaryAndNotRevoked {
+    getLockedGold().lock.gas(gasleft()).value(value)();
+  }
+
+  /**
+   * @notice A wrapper function for the unlock gold method function.
+   * @param value The value of gold to be unlocked for the release schedule instance.
+   */
+  function unlockGold(uint256 value) external nonReentrant onlyWhenInProperState {
+    getLockedGold().unlock(value);
+  }
+
+  /**
+   * @notice A wrapper function for the relock locked gold method function.
+   * @param index The index of the pending locked gold withdrawal.
+   * @param value The value of gold to be relocked for the release schedule instance.
+   */
+  function relockGold(
+    uint256 index,
+    uint256 value
+  ) external nonReentrant onlyBeneficiaryAndNotRevoked {
+    getLockedGold().relock(index, value);
+  }
+
+  /**
+   * @notice A wrapper function for the withdraw locked gold method function.
+   * @param index The index of the pending locked gold withdrawal.
+   * @dev The amount shall be withdrawn back to the release schedule instance.
+   */
+  function withdrawLockedGold(uint256 index) external nonReentrant onlyWhenInProperState {
+    getLockedGold().withdraw(index);
+  }
+
+  /**
+   * @notice Revokes `value` pending votes for `group`.
+   * @param group The validator group to revoke votes from.
+   * @param value The number of votes to revoke.
+   * @param lesser The group receiving fewer votes than the group for which the vote was revoked,
+   *               or 0 if that group has the fewest votes of any validator group.
+   * @param greater The group receiving more votes than the group for which the vote was revoked,
+   *                or 0 if that group has the most votes of any validator group.
+   * @param index The index of the group in the account's voting list.
+   * @dev Fails if the account has not voted on a validator group.
+   */
+  function revokePending(
+    address group,
+    uint256 value,
+    address lesser,
+    address greater,
+    uint256 index
+  ) external nonReentrant onlyWhenInProperState {
+    getElection().revokePending(group, value, lesser, greater, index);
+  }
+
+  function isFunded() public view returns (bool) {
+    // grants which have already released are considered funded for backwards compatibility
+    return
+      getCurrentReleasedTotalAmount() > 0 ||
+      address(this).balance >=
+      releaseSchedule.amountReleasedPerPeriod.mul(releaseSchedule.numReleasePeriods);
+  }
+
+  /**
+   * @notice Returns if the release schedule has been revoked or not.
+   * @return True if instance revoked.
+   */
+  function isRevoked() public view returns (bool) {
+    return revocationInfo.revokeTime > 0;
+  }
+
+  /**
    * @notice Calculates the total balance of the release schedule instance including withdrawals.
    * @return The total released instance gold balance.
    * @dev The returned amount may vary over time due to locked gold rewards.
@@ -491,41 +771,14 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   /**
-   * @notice A wrapper function for the lock gold method.
-   * @param value The value of gold to be locked.
+   * @return The currently withdrawable release amount.
    */
-  function lockGold(uint256 value) external nonReentrant onlyBeneficiaryAndNotRevoked {
-    getLockedGold().lock.gas(gasleft()).value(value)();
-  }
-
-  /**
-   * @notice A wrapper function for the unlock gold method function.
-   * @param value The value of gold to be unlocked for the release schedule instance.
-   */
-  function unlockGold(uint256 value) external nonReentrant onlyWhenInProperState {
-    getLockedGold().unlock(value);
-  }
-
-  /**
-   * @notice A wrapper function for the relock locked gold method function.
-   * @param index The index of the pending locked gold withdrawal.
-   * @param value The value of gold to be relocked for the release schedule instance.
-   */
-  function relockGold(uint256 index, uint256 value)
-    external
-    nonReentrant
-    onlyBeneficiaryAndNotRevoked
-  {
-    getLockedGold().relock(index, value);
-  }
-
-  /**
-   * @notice A wrapper function for the withdraw locked gold method function.
-   * @param index The index of the pending locked gold withdrawal.
-   * @dev The amount shall be withdrawn back to the release schedule instance.
-   */
-  function withdrawLockedGold(uint256 index) external nonReentrant onlyWhenInProperState {
-    getLockedGold().withdraw(index);
+  function getWithdrawableAmount() public view returns (uint256) {
+    return
+      Math.min(
+        Math.min(maxDistribution, getCurrentReleasedTotalAmount()).sub(totalWithdrawn),
+        getRemainingUnlockedBalance()
+      );
   }
 
   /**
@@ -542,263 +795,12 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   /**
-   * @notice A wrapper function for the authorize vote signer account method.
-   * @param signer The address of the signing key to authorize.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev The v,r and s signature should be signed by the authorized signer
-   *      key, with the ReleaseGold contract address as the message.
+   * @notice Sets the beneficiary of the instance
+   * @param newBeneficiary The address of the new beneficiary
    */
-  function authorizeVoteSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
-    external
-    nonReentrant
-    onlyCanVote
-    onlyWhenInProperState
-  {
-    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
-    if (getAccounts().getVoteSigner(address(this)) == address(this)) {
-      fundSigner(signer);
-    }
-    getAccounts().authorizeVoteSigner(signer, v, r, s);
-  }
-
-  /**
-   * @notice A wrapper function for the authorize validator signer account method.
-   * @param signer The address of the signing key to authorize.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev The v,r and s signature should be signed by the authorized signer
-   *      key, with the ReleaseGold contract address as the message.
-   */
-  function authorizeValidatorSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
-    external
-    nonReentrant
-    onlyCanValidate
-    onlyWhenInProperState
-  {
-    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
-    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
-      fundSigner(signer);
-    }
-    getAccounts().authorizeValidatorSigner(signer, v, r, s);
-  }
-
-  /**
-   * @notice A wrapper function for the authorize validator signer with public key account method.
-   * @param signer The address of the signing key to authorize.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
-   * @dev The v,r and s signature should be signed by the authorized signer
-   *      key, with the ReleaseGold contract address as the message.
-   */
-  function authorizeValidatorSignerWithPublicKey(
-    address payable signer,
-    uint8 v,
-    bytes32 r,
-    bytes32 s,
-    bytes calldata ecdsaPublicKey
-  ) external nonReentrant onlyCanValidate onlyWhenInProperState {
-    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
-    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
-      fundSigner(signer);
-    }
-    getAccounts().authorizeValidatorSignerWithPublicKey(signer, v, r, s, ecdsaPublicKey);
-  }
-
-  /**
-   * @notice A wrapper function for the authorize validator signer with keys account method.
-   * @param signer The address of the signing key to authorize.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
-   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
-   *   proof of possession. 96 bytes.
-   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
-   *   account address. 48 bytes.
-   * @dev The v,r and s signature should be signed by the authorized signer
-   *      key, with the ReleaseGold contract address as the message.
-   */
-  function authorizeValidatorSignerWithKeys(
-    address payable signer,
-    uint8 v,
-    bytes32 r,
-    bytes32 s,
-    bytes calldata ecdsaPublicKey,
-    bytes calldata blsPublicKey,
-    bytes calldata blsPop
-  ) external nonReentrant onlyCanValidate onlyWhenInProperState {
-    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
-    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
-      fundSigner(signer);
-    }
-    getAccounts().authorizeValidatorSignerWithKeys(
-      signer,
-      v,
-      r,
-      s,
-      ecdsaPublicKey,
-      blsPublicKey,
-      blsPop
-    );
-  }
-
-  /**
-   * @notice A wrapper function for the authorize attestation signer account method.
-   * @param signer The address of the signing key to authorize.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev The v,r and s signature should be signed by the authorized signer
-   *      key, with the ReleaseGold contract address as the message.
-   */
-  function authorizeAttestationSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
-    external
-    nonReentrant
-    onlyCanValidate
-    onlyWhenInProperState
-  {
-    getAccounts().authorizeAttestationSigner(signer, v, r, s);
-  }
-
-  /**
-   * @notice A convenience wrapper setter for the name, dataEncryptionKey
-   *         and wallet address for an account.
-   * @param name A string to set as the name of the account.
-   * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
-   * @param walletAddress The wallet address to set for the account.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev Wallet address can be zero. This means that the owner of the wallet
-   *      does not want to be paid directly without interaction, and instead wants users to
-   *      contact them, using the data encryption key, and arrange a payment.
-   * @dev v, r, s constitute `signer`'s signature on `msg.sender` (unless the wallet address
-   *      is 0x0 or msg.sender).
-   */
-  function setAccount(
-    string calldata name,
-    bytes calldata dataEncryptionKey,
-    address walletAddress,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  ) external onlyBeneficiaryAndNotRevoked {
-    getAccounts().setAccount(name, dataEncryptionKey, walletAddress, v, r, s);
-  }
-
-  /**
-   * @notice A wrapper setter function for creating an account.
-   */
-  function createAccount() external onlyCanVote onlyBeneficiaryAndNotRevoked {
-    require(getAccounts().createAccount(), "Account creation failed");
-  }
-
-  /**
-   * @notice A wrapper setter function for the name of an account.
-   * @param name A string to set as the name of the account.
-   */
-  function setAccountName(string calldata name) external onlyBeneficiaryAndNotRevoked {
-    getAccounts().setName(name);
-  }
-
-  /**
-   * @notice A wrapper setter function for the wallet address of an account.
-   * @param walletAddress The wallet address to set for the account.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev Wallet address can be zero. This means that the owner of the wallet
-   *      does not want to be paid directly without interaction, and instead wants users to
-   *      contact them, using the data encryption key, and arrange a payment.
-   * @dev v, r, s constitute `signer`'s signature on `msg.sender` (unless the wallet address
-   *      is 0x0 or msg.sender).
-   */
-  function setAccountWalletAddress(address walletAddress, uint8 v, bytes32 r, bytes32 s)
-    external
-    onlyBeneficiaryAndNotRevoked
-  {
-    getAccounts().setWalletAddress(walletAddress, v, r, s);
-  }
-
-  /**
-   * @notice A wrapper setter function for the for the data encryption key
-   *         and version of an account.
-   * @param dataEncryptionKey Secp256k1 public key for data encryption.
-   *                          Preferably compressed.
-   */
-  function setAccountDataEncryptionKey(bytes calldata dataEncryptionKey)
-    external
-    onlyBeneficiaryAndNotRevoked
-  {
-    getAccounts().setAccountDataEncryptionKey(dataEncryptionKey);
-  }
-
-  /**
-   * @notice A wrapper setter function for the metadata of an account.
-   * @param metadataURL The URL to access the metadata..
-   */
-  function setAccountMetadataURL(string calldata metadataURL)
-    external
-    onlyBeneficiaryAndNotRevoked
-  {
-    getAccounts().setMetadataURL(metadataURL);
-  }
-
-  /**
-   * @notice Revokes `value` active votes for `group`.
-   * @param group The validator group to revoke votes from.
-   * @param value The number of votes to revoke.
-   * @param lesser The group receiving fewer votes than the group for which the vote was revoked,
-   *               or 0 if that group has the fewest votes of any validator group.
-   * @param greater The group receiving more votes than the group for which the vote was revoked,
-   *               or 0 if that group has the most votes of any validator group.
-   * @param index The index of the group in the account's voting list.
-   * @dev Fails if the account has not voted on a validator group.
-   */
-  function revokeActive(
-    address group,
-    uint256 value,
-    address lesser,
-    address greater,
-    uint256 index
-  ) external nonReentrant onlyWhenInProperState {
-    getElection().revokeActive(group, value, lesser, greater, index);
-  }
-
-  /**
-   * @notice Revokes `value` pending votes for `group`.
-   * @param group The validator group to revoke votes from.
-   * @param value The number of votes to revoke.
-   * @param lesser The group receiving fewer votes than the group for which the vote was revoked,
-   *               or 0 if that group has the fewest votes of any validator group.
-   * @param greater The group receiving more votes than the group for which the vote was revoked,
-   *                or 0 if that group has the most votes of any validator group.
-   * @param index The index of the group in the account's voting list.
-   * @dev Fails if the account has not voted on a validator group.
-   */
-  function revokePending(
-    address group,
-    uint256 value,
-    address lesser,
-    address greater,
-    uint256 index
-  ) external nonReentrant onlyWhenInProperState {
-    getElection().revokePending(group, value, lesser, greater, index);
-  }
-
-  /**
-   * @return The currently withdrawable release amount.
-  */
-  function getWithdrawableAmount() public view returns (uint256) {
-    return
-      Math.min(
-        Math.min(maxDistribution, getCurrentReleasedTotalAmount()).sub(totalWithdrawn),
-        getRemainingUnlockedBalance()
-      );
+  function _setBeneficiary(address payable newBeneficiary) private {
+    require(newBeneficiary != address(0x0), "Can't set the beneficiary to the zero address");
+    beneficiary = newBeneficiary;
+    emit BeneficiarySet(newBeneficiary);
   }
 }

@@ -33,11 +33,11 @@ contract MockReserve {
     return true;
   }
 
-  function burnToken(address) external pure returns (bool) {
-    return true;
-  }
-
   function getUnfrozenReserveGoldBalance() external view returns (uint256) {
     return address(this).balance;
+  }
+
+  function burnToken(address) external pure returns (bool) {
+    return true;
   }
 }

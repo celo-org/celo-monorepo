@@ -6,7 +6,11 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
  * @title A mock Attestations for testing.
  */
 contract MockAttestations {
-  enum AttestationStatus { None, Incomplete, Complete }
+  enum AttestationStatus {
+    None,
+    Incomplete,
+    Complete
+  }
 
   struct Attestation {
     AttestationStatus status;
@@ -39,26 +43,23 @@ contract MockAttestations {
     identifiers[identifier].attestations[msg.sender].requested++;
   }
 
-  function getMaxAttestations() external pure returns (uint256) {
-    return 20;
-  }
-
-  function getAttestationStats(bytes32 identifier, address account)
-    external
-    view
-    returns (uint64, uint64)
-  {
+  function getAttestationStats(
+    bytes32 identifier,
+    address account
+  ) external view returns (uint64, uint64) {
     return (
       identifiers[identifier].attestations[account].completed,
       identifiers[identifier].attestations[account].requested
     );
   }
 
-  function lookupAccountsForIdentifier(bytes32 identifier)
-    external
-    view
-    returns (address[] memory)
-  {
+  function lookupAccountsForIdentifier(
+    bytes32 identifier
+  ) external view returns (address[] memory) {
     return identifiers[identifier].accounts;
+  }
+
+  function getMaxAttestations() external pure returns (uint256) {
+    return 20;
   }
 }

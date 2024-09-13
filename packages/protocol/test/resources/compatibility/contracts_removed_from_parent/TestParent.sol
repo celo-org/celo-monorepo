@@ -11,5 +11,4 @@ contract TestParent is Ownable {
   address private q;
 
   // TestLibrary.Thing libraryThing;
-
 }

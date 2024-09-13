@@ -8,7 +8,9 @@ import "./UsingRegistry.sol";
 import "./CalledByVm.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
+import "./interfaces/ICeloVersionedContract.sol";
+import "./interfaces/IMintGoldSchedule.sol";
+import "../../contracts-0.8/common/IsL2Check.sol";
 
 contract GoldToken is
   Initializable,
@@ -16,7 +18,8 @@ contract GoldToken is
   UsingRegistry,
   IERC20,
   ICeloToken,
-  ICeloVersionedContract
+  ICeloVersionedContract,
+  IsL2Check
 {
   using SafeMath for uint256;
 
@@ -34,28 +37,30 @@ contract GoldToken is
   // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address
   address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
 
+  IMintGoldSchedule public goldTokenMintingSchedule;
+
   event Transfer(address indexed from, address indexed to, uint256 value);
 
   event TransferComment(string comment);
 
   event Approval(address indexed owner, address indexed spender, uint256 value);
 
+  event SetGoldTokenMintingScheduleAddress(address indexed newScheduleAddress);
+
+  modifier onlySchedule() {
+    if (isL2()) {
+      require(msg.sender == address(goldTokenMintingSchedule), "Only MintGoldSchedule can call.");
+    } else {
+      require(msg.sender == address(0), "Only VM can call.");
+    }
+    _;
+  }
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
   constructor(bool test) public Initializable(test) {}
-
-  /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 0);
-  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -65,6 +70,23 @@ contract GoldToken is
     totalSupply_ = 0;
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
+  }
+
+  /**
+   * @notice Used set the address of the MintGoldSchedule contract.
+   * @param goldTokenMintingScheduleAddress The address of the MintGoldSchedule contract.
+   */
+  function setGoldTokenMintingScheduleAddress(
+    address goldTokenMintingScheduleAddress
+  ) external onlyOwner {
+    require(
+      goldTokenMintingScheduleAddress != address(0) ||
+        goldTokenMintingScheduleAddress != address(goldTokenMintingSchedule),
+      "Invalid address."
+    );
+    goldTokenMintingSchedule = IMintGoldSchedule(goldTokenMintingScheduleAddress);
+
+    emit SetGoldTokenMintingScheduleAddress(goldTokenMintingScheduleAddress);
   }
 
   /**
@@ -85,10 +107,11 @@ contract GoldToken is
    * @param comment The transfer comment
    * @return True if the transaction succeeds.
    */
-  function transferWithComment(address to, uint256 value, string calldata comment)
-    external
-    returns (bool)
-  {
+  function transferWithComment(
+    address to,
+    uint256 value,
+    string calldata comment
+  ) external returns (bool) {
     bool succeeded = _transferWithCheck(to, value);
     emit TransferComment(comment);
     return succeeded;
@@ -176,7 +199,7 @@ contract GoldToken is
    * @param to The account for which to mint tokens.
    * @param value The amount of CELO to mint.
    */
-  function mint(address to, uint256 value) external onlyVm returns (bool) {
+  function mint(address to, uint256 value) external onlySchedule returns (bool) {
     if (value == 0) {
       return true;
     }
@@ -190,6 +213,16 @@ contract GoldToken is
 
     emit Transfer(address(0), to, value);
     return true;
+  }
+
+  /**
+   * @notice Increases the variable for total amount of CELO in existence.
+   * @param amount The amount to increase counter by
+   * @dev This function will be deprecated in L2. The onlyway to increase
+   * the supply is with the mint function.
+   */
+  function increaseSupply(uint256 amount) external onlyL1 onlyVm {
+    totalSupply_ = totalSupply_.add(amount);
   }
 
   /**
@@ -229,20 +262,23 @@ contract GoldToken is
 
   /**
    * @notice Gets the amount of owner's CELO allowed to be spent by spender.
-   * @param owner The owner of the CELO.
+   * @param _owner The owner of the CELO.
    * @param spender The spender of the CELO.
    * @return The amount of CELO owner is allowing spender to spend.
    */
-  function allowance(address owner, address spender) external view returns (uint256) {
-    return allowed[owner][spender];
+  function allowance(address _owner, address spender) external view returns (uint256) {
+    return allowed[_owner][spender];
   }
 
   /**
-   * @notice Increases the variable for total amount of CELO in existence.
-   * @param amount The amount to increase counter by
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
-  function increaseSupply(uint256 amount) external onlyVm {
-    totalSupply_ = totalSupply_.add(amount);
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 3, 0);
   }
 
   /**
@@ -255,11 +291,11 @@ contract GoldToken is
 
   /**
    * @notice Gets the balance of the specified address.
-   * @param owner The address to query the balance of.
+   * @param _owner The address to query the balance of.
    * @return The balance of the specified address.
    */
-  function balanceOf(address owner) public view returns (uint256) {
-    return owner.balance;
+  function balanceOf(address _owner) public view returns (uint256) {
+    return _owner.balance;
   }
 
   /**

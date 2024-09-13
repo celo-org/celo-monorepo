@@ -39,31 +39,6 @@ contract FeeCurrencyWhitelist is
   }
 
   /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
-  }
-
-  /**
-   * @notice Removes a Mento token as enabled fee token. Tokens added with addToken should be 
-   * removed with this function.
-   * @param tokenAddress The address of the token to remove.
-   * @param index The index of the token in the whitelist array.
-   */
-  function removeToken(address tokenAddress, uint256 index) public onlyOwner {
-    require(whitelist[index] == tokenAddress, "Index does not match");
-    uint256 length = whitelist.length;
-    whitelist[index] = whitelist[length - 1];
-    whitelist.pop();
-    emit FeeCurrencyWhitelistRemoved(tokenAddress);
-  }
-
-  /**
    * @dev Add a token to the whitelist
    * @param tokenAddress The address of the token to add.
    */
@@ -77,5 +52,30 @@ contract FeeCurrencyWhitelist is
    */
   function getWhitelist() external view returns (address[] memory) {
     return whitelist;
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
+
+  /**
+   * @notice Removes a Mento token as enabled fee token. Tokens added with addToken should be
+   * removed with this function.
+   * @param tokenAddress The address of the token to remove.
+   * @param index The index of the token in the whitelist array.
+   */
+  function removeToken(address tokenAddress, uint256 index) public onlyOwner {
+    require(whitelist[index] == tokenAddress, "Index does not match");
+    uint256 length = whitelist.length;
+    whitelist[index] = whitelist[length - 1];
+    whitelist.pop();
+    emit FeeCurrencyWhitelistRemoved(tokenAddress);
   }
 }

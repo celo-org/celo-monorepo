@@ -23,6 +23,7 @@ describe('utils', () => {
       const nextVersion = determineNextVersion(
         'core-contracts.v11.2.3.post-audit',
         'release/core-contracts/11.0.0',
+        '@celo/contracts',
         'alpha'
       )
 
@@ -33,6 +34,7 @@ describe('utils', () => {
       const nextVersion = determineNextVersion(
         'core-contracts.v11.2.3.pre-audit',
         'release/core-contracts/11.0.0',
+        '@celo/contracts',
         'alpha'
       )
 
@@ -42,7 +44,12 @@ describe('utils', () => {
     it('determines for release git branch when major version matches', () => {
       execSyncMock.mockReturnValue('11.2.3')
 
-      const nextVersion = determineNextVersion('', 'release/core-contracts/11.2.3', 'alpha')
+      const nextVersion = determineNextVersion(
+        '',
+        'release/core-contracts/11.2.3',
+        '@celo/contracts',
+        'alpha'
+      )
 
       expect(execSyncMock).toHaveBeenCalledTimes(1)
       expect(execSyncMock).toHaveBeenNthCalledWith(
@@ -56,7 +63,12 @@ describe('utils', () => {
     it("determines for release git branch when major version doesn't match", () => {
       execSyncMock.mockReturnValue('11.2.3')
 
-      const nextVersion = determineNextVersion('', 'release/core-contracts/12.0.0', 'alpha')
+      const nextVersion = determineNextVersion(
+        '',
+        'release/core-contracts/12.0.0',
+        '@celo/contracts',
+        'alpha'
+      )
 
       expect(execSyncMock).toHaveBeenCalledTimes(1)
       expect(execSyncMock).toHaveBeenNthCalledWith(
@@ -72,7 +84,12 @@ describe('utils', () => {
         return '10.2.4-alpha.0'
       })
 
-      const nextVersion = determineNextVersion('', 'dev/some-branch-name', 'alpha')
+      const nextVersion = determineNextVersion(
+        '',
+        'dev/some-branch-name',
+        '@celo/contracts',
+        'alpha'
+      )
 
       expect(execSyncMock).toHaveBeenCalledTimes(1)
       expect(execSyncMock).toHaveBeenNthCalledWith(
@@ -92,7 +109,12 @@ describe('utils', () => {
           return '10.1.2-canary.2'
         })
 
-      const nextVersion = determineNextVersion('', 'dev/some-branch-name', 'alpha')
+      const nextVersion = determineNextVersion(
+        '',
+        'dev/some-branch-name',
+        '@celo/contracts',
+        'alpha'
+      )
 
       expect(execSyncMock).toHaveBeenCalledTimes(2)
       expect(execSyncMock).toHaveBeenNthCalledWith(
@@ -110,13 +132,18 @@ describe('utils', () => {
     })
 
     it("doesn't determine anything when wrong tag is provided", () => {
-      const nextVersion = determineNextVersion('', '', 'tag-with-dashes-at-the-end-')
+      const nextVersion = determineNextVersion(
+        '',
+        '',
+        '@celo/contracts',
+        'tag-with-dashes-at-the-end-'
+      )
 
       expect(nextVersion).toBeNull()
     })
 
     it("doesn't determine anything when nothing is provided", () => {
-      const nextVersion = determineNextVersion('', '', '')
+      const nextVersion = determineNextVersion('', '', '', '')
 
       expect(nextVersion).toBeNull()
     })
