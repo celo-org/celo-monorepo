@@ -41,6 +41,7 @@ interface IValidators {
     bytes calldata,
     bytes calldata
   ) external returns (bool);
+  function mintStableToEpochManager(uint256 amount) external;
 
   // only VM
   function updateValidatorScoreFromSigner(address, uint256) external;
@@ -49,9 +50,6 @@ interface IValidators {
   // only slasher
   function forceDeaffiliateIfValidator(address) external;
   function halveSlashingMultiplier(address) external;
-
-  // only EpochManager
-  function mintStableToken(address beneficiary, uint256 amount) external;
 
   // view functions
   function maxGroupSize() external view returns (uint256);

@@ -4,14 +4,14 @@ pragma solidity >=0.8.7 <0.8.20;
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
-import "../../contracts/common/interfaces/IRegistry.sol";
-import "../../contracts/common/interfaces/IRegistryInitializer.sol";
-import "../../contracts/common/Initializable.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts/common/interfaces/IRegistryInitializer.sol";
+import "@celo-contracts/common/Initializable.sol";
 
 /**
  * @title Routes identifiers to addresses.
  */
-contract Registry08 is IRegistry, IRegistryInitializer, Ownable, Initializable {
+contract MockRegistry is IRegistry, IRegistryInitializer, Ownable, Initializable {
   using SafeMath for uint256;
 
   mapping(bytes32 => address) public registry;

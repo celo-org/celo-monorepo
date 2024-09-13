@@ -10,6 +10,7 @@ import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.s
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@test-sol/utils/ECDSAHelper08.sol";
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
+import "forge-std/console.sol";
 
 contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
   address epochManagerOwner;
@@ -17,7 +18,12 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
   address[] firstElected;
 
   uint256 epochDuration;
+
+  address[] groups;
+  address[] validatorsArray;
+
   uint256[] groupScore = [5e23, 7e23, 1e24];
+  uint256[] validatorScore = [1e23, 1e23, 1e23, 1e23, 1e23, 1e23];
 
   struct VoterWithPK {
     address voter;
@@ -123,6 +129,26 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
     activateValidators();
     whenL2(vm);
 
+
+    validatorsArray = getValidators().getRegisteredValidators();
+    groups = getValidators().getRegisteredValidatorGroups();
+
+    address scoreManagerOwner = scoreManager.owner();
+
+    vm.startPrank(scoreManagerOwner);
+    scoreManager.setGroupScore(groups[0], groupScore[0]);
+    scoreManager.setGroupScore(groups[1], groupScore[1]);
+    scoreManager.setGroupScore(groups[2], groupScore[2]);
+
+    scoreManager.setValidatorScore(validatorsArray[0], validatorScore[0]);
+    scoreManager.setValidatorScore(validatorsArray[1], validatorScore[1]);
+    scoreManager.setValidatorScore(validatorsArray[2], validatorScore[2]);
+    scoreManager.setValidatorScore(validatorsArray[3], validatorScore[3]);
+    scoreManager.setValidatorScore(validatorsArray[4], validatorScore[4]);
+    scoreManager.setValidatorScore(validatorsArray[5], validatorScore[5]);
+
+    vm.stopPrank();
+
     vm.prank(epochManagerEnabler);
     epochManager.initializeSystem(1, 1, firstElected);
   }
@@ -169,10 +195,10 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
 contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
   using EnumerableSet for EnumerableSet.AddressSet;
 
-  address[] groups;
   EnumerableSet.AddressSet internal originalyElected;
 
   function setUp() public override {
+    console.log("ininininininini E2E_EpochManager_FinishNextEpochProcess");
     super.setUp();
     activateValidators();
     whenL2(vm);
@@ -180,17 +206,27 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     vm.prank(epochManagerEnabler);
     epochManager.initializeSystem(1, 1, firstElected);
 
-    timeTravel(vm, epochDuration + 1);
-    epochManager.startNextEpochProcess();
-
+    validatorsArray = getValidators().getRegisteredValidators();
     groups = getValidators().getRegisteredValidatorGroups();
 
     address scoreManagerOwner = scoreManager.owner();
+
     vm.startPrank(scoreManagerOwner);
     scoreManager.setGroupScore(groups[0], groupScore[0]);
     scoreManager.setGroupScore(groups[1], groupScore[1]);
     scoreManager.setGroupScore(groups[2], groupScore[2]);
+
+    scoreManager.setValidatorScore(validatorsArray[0], validatorScore[0]);
+    scoreManager.setValidatorScore(validatorsArray[1], validatorScore[1]);
+    scoreManager.setValidatorScore(validatorsArray[2], validatorScore[2]);
+    scoreManager.setValidatorScore(validatorsArray[3], validatorScore[3]);
+    scoreManager.setValidatorScore(validatorsArray[4], validatorScore[4]);
+    scoreManager.setValidatorScore(validatorsArray[5], validatorScore[5]);
+
     vm.stopPrank();
+
+    timeTravel(vm, epochDuration + 1);
+    epochManager.startNextEpochProcess();
   }
 
   function test_shouldFinishNextEpochProcessing() public {

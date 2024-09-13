@@ -3430,6 +3430,33 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
   }
 }
 
+contract ValidatorsTest_MintStableToEpochManager is ValidatorsTest {
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("This method is not supported in L1.");
+    validators.mintStableToEpochManager(5);
+  }
+
+  function test_Reverts_WhenCalledByOtherThanEpochManager() public {
+    _whenL2();
+    vm.expectRevert("only registered contract");
+    validators.mintStableToEpochManager(5);
+  }
+  function test_Reverts_WhenMintAmountIsZero() public {
+    _whenL2();
+    vm.expectRevert("mint amount is zero.");
+    vm.prank(address(epochManager));
+    validators.mintStableToEpochManager(0);
+  }
+
+  function test_ShouldMintStableToEpochManager() public {
+    _whenL2();
+    vm.prank(address(epochManager));
+    validators.mintStableToEpochManager(5);
+
+    assertEq(stableToken.balanceOf(address(epochManager)), 5);
+  }
+}
+
 contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
   function setUp() public {
     super.setUp();

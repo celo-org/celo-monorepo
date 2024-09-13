@@ -344,7 +344,7 @@ contract EpochManager is
       totalRewards += validatorReward;
     }
     // Mint all cUSD required for payment and the corresponding CELO
-    getValidators().mintStableToken(address(this), totalRewards);
+    validators.mintStableToEpochManager(totalRewards);
     // this should have a setter for the oracle.
 
     (uint256 numerator, uint256 denominator) = IOracle(address(getSortedOracles())).getExchangeRate(

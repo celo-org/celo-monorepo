@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.5.13 <0.8.20;
+pragma solidity >=0.8.0 <0.8.20;
 
 import "celo-foundry-8/Test.sol";
 
@@ -218,14 +218,11 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     epochManager.initializeSystem(100, block.number, firstElected);
   }
 
-  // XXX(soloseng): fails because EpochManager is not yet permissioned by stableToken to mint
   function test_SetsCurrentRewardBlock() public {
     _MockL2Migration(validatorsList);
 
     blockTravel(vm, 43200);
     timeTravel(vm, DAY);
-
-    uint256 _currentEpoch = epochManager.getCurrentEpochNumber();
 
     epochManager.startNextEpochProcess();
 
@@ -244,7 +241,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     vm.prank(address(0));
     celoToken.mint(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
 
-    deployCodeTo("Registry08.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+    whenL2(vm);
 
     vm.prank(address(epochManagerEnabler));
 

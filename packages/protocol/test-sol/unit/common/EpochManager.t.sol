@@ -72,7 +72,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     communityRewardFund = actor("communityRewardFund");
     nonOwner = actor("nonOwner");
 
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    deployCodeTo("MockRegistry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
     deployCodeTo("ScoreManager.sol", abi.encode(false), scoreManagerAddress);
 
@@ -95,6 +95,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     celoToken.setBalanceOf(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
 
     celoUnreleasedTreasure.setRegistry(REGISTRY_ADDRESS);
+    validators.setRegistry(REGISTRY_ADDRESS);
 
     sortedOracles.setMedianRate(address(stableToken), stableAmountForRate);
 
@@ -111,6 +112,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
   }
 
   function initializeEpochManagerSystem() public {
+    deployCodeTo("MockRegistry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
     vm.prank(epochManagerEnabler);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 

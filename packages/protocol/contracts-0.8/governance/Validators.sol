@@ -217,17 +217,6 @@ contract Validators is
   }
 
   /**
-   * @notice Mints stable token to the beneficiary.
-   * @dev Callable only by epoch manager.
-   * @param beneficiary The address to mint the stable token to.
-   * @param amount The amount of stable token to mint.
-   */
-  function mintStableToken(address beneficiary, uint256 amount) external onlyEpochManager {
-    IStableToken stableToken = IStableToken(getStableToken());
-    stableToken.mint(beneficiary, amount);
-  }
-
-  /**
    * @notice Updates a validator's score based on its uptime for the epoch.
    * @param signer The validator signer of the validator account whose score needs updating.
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
@@ -663,6 +652,19 @@ contract Validators is
     group.slashInfo.lastSlashed = block.timestamp;
   }
 
+  function mintStableToEpochManager(
+    uint256 amount
+  ) external onlyL2 nonReentrant onlyRegisteredContract(EPOCH_MANAGER_REGISTRY_ID) {
+    require(amount > 0, "mint amount is zero.");
+    require(
+      IStableToken(getStableToken()).mint(
+        registry.getAddressForOrDie(EPOCH_MANAGER_REGISTRY_ID),
+        amount
+      ),
+      "mint failed to epoch manager"
+    );
+  }
+
   /**
    * @notice Returns the validator BLS key.
    * @param signer The account that registered the validator or its authorized signing address.
@@ -902,7 +904,7 @@ contract Validators is
     address account,
     uint256 score,
     uint256 maxPayment
-  ) external view returns (uint256) {
+  ) external view virtual returns (uint256) {
     require(isValidator(account), "Not a validator");
     FixidityLib.Fraction memory scoreFraction = FixidityLib.wrap(score);
     require(scoreFraction.lte(FixidityLib.fixed1()), "Score must be <= 1");
