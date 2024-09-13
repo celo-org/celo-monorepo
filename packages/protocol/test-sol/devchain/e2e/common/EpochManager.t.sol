@@ -61,18 +61,16 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
       addressToPrivateKeys[account] = valKeys[i];
     }
 
-    
-
     address[] memory registeredValidators = getValidators().getRegisteredValidators();
-     travelEpochL1(vm);
-      travelEpochL1(vm);
-      travelEpochL1(vm);
-      travelEpochL1(vm);
+    travelEpochL1(vm);
+    travelEpochL1(vm);
+    travelEpochL1(vm);
+    travelEpochL1(vm);
     for (uint256 i = 0; i < registeredValidators.length; i++) {
       (, , address validatorGroup, , ) = getValidators().getValidator(registeredValidators[i]);
-     if (getElection().getPendingVotesForGroup(validatorGroup) == 0) {
-      continue;
-     }
+      if (getElection().getPendingVotesForGroup(validatorGroup) == 0) {
+        continue;
+      }
       vm.startPrank(validatorGroup);
       election.activate(validatorGroup);
       vm.stopPrank();
@@ -200,13 +198,18 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
     GroupWithVotes[] memory groupWithVotes = new GroupWithVotes[](groups.length);
 
-   (,,uint256 totalRewardsVote,,) = epochManager.getEpochProcessingState();
+    (, , uint256 totalRewardsVote, , ) = epochManager.getEpochProcessingState();
 
-    (address[] memory groupsEligible, uint256[] memory values) = election.getTotalVotesForEligibleValidatorGroups();
+    (address[] memory groupsEligible, uint256[] memory values) = election
+      .getTotalVotesForEligibleValidatorGroups();
 
     for (uint256 i = 0; i < groupsEligible.length; i++) {
       groupActiveBalances[i] = election.getActiveVotesForGroup(groupsEligible[i]);
-      groupWithVotes[i] = GroupWithVotes(groupsEligible[i], values[i] + election.getGroupEpochRewards(groupsEligible[i], totalRewardsVote, groupScore[i]));
+      groupWithVotes[i] = GroupWithVotes(
+        groupsEligible[i],
+        values[i] +
+          election.getGroupEpochRewards(groupsEligible[i], totalRewardsVote, groupScore[i])
+      );
     }
 
     sort(groupWithVotes);
@@ -241,18 +244,18 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     }
   }
 
-   // Bubble sort algorithm since it is a small array
-    function sort(GroupWithVotes[] memory items) public {
-      uint length = items.length;
-      for (uint i = 0; i < length; i++) {
-          for (uint j = 0; j < length - 1; j++) {
-              if (items[j].votes > items[j + 1].votes) {
-                  // Swap
-                  GroupWithVotes memory temp = items[j];
-                  items[j] = items[j + 1];
-                  items[j + 1] = temp;
-              }
-          }
+  // Bubble sort algorithm since it is a small array
+  function sort(GroupWithVotes[] memory items) public {
+    uint length = items.length;
+    for (uint i = 0; i < length; i++) {
+      for (uint j = 0; j < length - 1; j++) {
+        if (items[j].votes > items[j + 1].votes) {
+          // Swap
+          GroupWithVotes memory temp = items[j];
+          items[j] = items[j + 1];
+          items[j + 1] = temp;
+        }
       }
     }
+  }
 }

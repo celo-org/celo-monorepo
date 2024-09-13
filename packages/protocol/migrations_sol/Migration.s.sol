@@ -1134,7 +1134,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function getValidatorKeyIndex(
-    uint256 groupCount, 
+    uint256 groupCount,
     uint256 groupIndex,
     uint256 validatorIndex,
     uint256 membersInAGroup
@@ -1158,7 +1158,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     vm.stopBroadcast();
   }
 
-    function _generateEcdsaPubKeyWithSigner(
+  function _generateEcdsaPubKeyWithSigner(
     address _validator,
     uint256 _signerPk
   ) internal returns (bytes memory ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) {
@@ -1169,7 +1169,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
   }
 
-   function addressToPublicKey(
+  function addressToPublicKey(
     bytes32 message,
     uint8 _v,
     bytes32 _r,
@@ -1261,8 +1261,13 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
       address groupAddress = groups[groupIndex];
       console.log("Registering members for group: ", groupAddress);
-       for (uint256 validatorIndex = 0; validatorIndex < maxGroupSize; validatorIndex++) {
-        uint256 validatorKeyIndex = getValidatorKeyIndex(groupCount, groupIndex, validatorIndex, maxGroupSize);
+      for (uint256 validatorIndex = 0; validatorIndex < maxGroupSize; validatorIndex++) {
+        uint256 validatorKeyIndex = getValidatorKeyIndex(
+          groupCount,
+          groupIndex,
+          validatorIndex,
+          maxGroupSize
+        );
         console.log("Registering validator #: ", validatorIndex);
         address validator = registerValidator(
           validatorIndex,
@@ -1282,12 +1287,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         } else {
           getValidators().addMember(validator);
         }
-         getElection().vote(
-            groupAddress,
-            validatorLockedGoldRequirements,
-            address(0),
-            greater
-          );
+        getElection().vote(groupAddress, validatorLockedGoldRequirements, address(0), greater);
 
         vm.stopBroadcast();
       }

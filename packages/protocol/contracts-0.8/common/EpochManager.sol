@@ -225,7 +225,12 @@ contract EpochManager is
       ProcessedGroup storage processedGroup = processedGroups[groups[i]];
       // checks that group is actually from elected group
       require(processedGroup.processed, "group not processed");
-      getElection().distributeEpochRewards(groups[i], processedGroup.epochRewards, lessers[i], greaters[i]);
+      getElection().distributeEpochRewards(
+        groups[i],
+        processedGroup.epochRewards,
+        lessers[i],
+        greaters[i]
+      );
 
       // by doing this, we avoid processing a group twice
       delete processedGroups[groups[i]];

@@ -153,7 +153,7 @@ contract Election is
   );
   event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
 
- modifier onlyVmOrPermitted(address permittedAddress) {
+  modifier onlyVmOrPermitted(address permittedAddress) {
     if (isL2()) require(msg.sender == permittedAddress, "Only permitted address can call");
     else {
       require(msg.sender == address(0), "Only VM can call");
