@@ -1,6 +1,9 @@
 name: Protocol Foundry tests
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 jobs:
   check:
     defaults:
