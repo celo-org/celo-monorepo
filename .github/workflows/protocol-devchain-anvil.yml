@@ -17,12 +17,17 @@ on:
         required: true
         type: string
 
+
+
 env:
   # Increment these to force cache rebuilding
   FOUNDRY_CACHE_KEY: 1
   # Supported Foundry version defined at celo-org (GitHub organisation) level, for consistency across workflows.
   SUPPORTED_FOUNDRY_VERSION: ${{ vars.SUPPORTED_FOUNDRY_VERSION }}
   ANVIL_PORT: 8546
+
+permissions:
+  contents: read
 
 jobs:
   build:
