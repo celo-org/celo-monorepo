@@ -129,7 +129,6 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
     activateValidators();
     whenL2(vm);
 
-
     validatorsArray = getValidators().getRegisteredValidators();
     groups = getValidators().getRegisteredValidatorGroups();
 
