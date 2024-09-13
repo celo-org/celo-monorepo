@@ -236,7 +236,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     }
 
     for (uint256 i = 0; i < groupsEligible.length; i++) {
-      // assertEq(election.getActiveVotesForGroup(groupsEligible[i]), groupWithVotes[i].votes); TODO: This doesn't work since the vote proportion changes during updating of previous groups. Are we ok with this?
+      assertEq(election.getActiveVotesForGroup(groupsEligible[i]), groupWithVotes[i].votes);
       assertGt(election.getActiveVotesForGroup(groupsEligible[i]), groupActiveBalances[i]);
     }
   }
