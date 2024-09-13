@@ -16,6 +16,9 @@ on:
         description: 'NPM TAG e.g. alpha, pre-merge (default: canary) '
         required: true
         type: string
+permissions:
+  contents: read
+
 jobs:
   publish:
     runs-on: ['self-hosted', 'org', 'npm-publish']
@@ -25,19 +28,24 @@ jobs:
       pull-requests: write
       repository-projects: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           submodules: recursive
       - name: Akeyless Get Secrets
         id: get_auth_token
-        uses: docker://us-west1-docker.pkg.dev/devopsre/akeyless-public/akeyless-action:latest
+        uses: docker://us-west1-docker.pkg.dev/devopsre/akeyless-public/akeyless-action:latest@sha256:87467fdd034c6897a32ff1478fb9368a8aacb0d49bbeb8cac87e3cdbcf0a88f3
         with:
           api-url: https://api.gateway.akeyless.celo-networks-dev.org
           access-id: p-kf9vjzruht6l
           static-secrets: '{"/static-secrets/NPM/npm-publish-token":"NPM_TOKEN"}'
 
       # Setup .npmrc file to publish to npm
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
         with:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'

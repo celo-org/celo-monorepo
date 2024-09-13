@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:18@sha256:ca07c02d13baf021ff5aadb3b48bcd1fcdd454826266ac313ce858676e8c1548
 LABEL org.opencontainers.image.authors="devops@clabs.co"
 
 WORKDIR /celo-monorepo
