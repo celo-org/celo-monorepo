@@ -109,15 +109,6 @@ contract EpochManager is
     epochManagerEnabler = _epochManagerEnabler;
   }
 
-  /**
-   * @notice Sets the address of the Epoch Manager Enabler.
-   * @param _epochManagerEnabler The address of the Epoch Manager Enabler.
-   */
-  function setEpochMangerEnabler(address _epochManagerEnabler) external onlyOwner {
-    require(_epochManagerEnabler != address(0), "EpochManagerEnabler address is required");
-    epochManagerEnabler = _epochManagerEnabler;
-  }
-
   // DESIGNDESICION(XXX): we assume that the first epoch on the L2 starts as soon as the system is initialized
   // to minimize amount of "limbo blocks" the network should stop relatively close to an epoch number (but wigh enough time)
   // to have time to call the function EpochInitializer.migrateEpochAndValidators()

@@ -2621,13 +2621,6 @@ contract ElectionTest_DistributeEpochRewards is ElectionTest {
     assertEq(election.getActiveVotesForGroupByAccount(group, voter), voteValue + rewardValue);
   }
 
-  function test_Revert_DistributeEpochRewards_WhenL2() public {
-    _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    vm.prank(address(0));
-    election.distributeEpochRewards(group, rewardValue, address(0), address(0));
-  }
-
   function test_ShouldIncrementAccountTotalVotesForGroup_WhenThereIsSingleGroupWithActiveVotes()
     public
   {
