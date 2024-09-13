@@ -16,6 +16,10 @@ on:
         description: 'NPM TAG e.g. alpha, pre-merge (default: canary) '
         required: true
         type: string
+
+permissions:
+  contents: read
+
 jobs:
   publish:
     runs-on: ['self-hosted', 'org', 'npm-publish']
