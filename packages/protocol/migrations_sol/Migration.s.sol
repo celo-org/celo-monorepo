@@ -1127,27 +1127,19 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     (bytes memory ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(accountAddress, validatorKey);
     getValidators().registerValidator(ecdsaPubKey, newBlsPublicKey, newBlsPop);
     getValidators().affiliate(groupToAffiliate);
-    console.log("Done registering validatora");
+    console.log("Done registering validators");
 
     vm.stopBroadcast();
     return accountAddress;
   }
 
   function getValidatorKeyIndex(
+    uint256 groupCount, 
     uint256 groupIndex,
     uint256 validatorIndex,
     uint256 membersInAGroup
   ) public returns (uint256) {
-    return groupIndex * membersInAGroup + validatorIndex + 1;
-  }
-
-  function getValidatorKeyFromGroupGroup(
-    uint256[] memory keys,
-    uint256 groupIndex,
-    uint256 validatorIndex,
-    uint256 membersInAGroup
-  ) public returns (uint256) {
-    return keys[getValidatorKeyIndex(groupIndex, validatorIndex, membersInAGroup)];
+    return groupCount + groupIndex * membersInAGroup + validatorIndex;
   }
 
   function registerValidatorGroup(
@@ -1243,48 +1235,62 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       );
     }
 
-    uint256 validatorGroup0Key = valKeys[0];
+    uint256 groupCount = 3;
+    console.log("groupCount", groupCount);
 
-    address groupAddress = registerValidatorGroup(
-      validatorGroup0Key,
-      maxGroupSize * validatorLockedGoldRequirements,
-      commission,
-      json
-    );
+    address[] memory groups = new address[](groupCount);
 
-    console.log("  * Registering ${group.valKeys.length} validators ...");
+    // register 3 validator groups
+    for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
+      address groupAddress = registerValidatorGroup(
+        valKeys[groupIndex],
+        maxGroupSize * validatorLockedGoldRequirements,
+        commission,
+        json
+      );
+      groups[groupIndex] = groupAddress;
+      console.log("registered group: ", groupAddress);
+    }
+
+    console.log("  * Registering validators ... Count: ", valKeys.length - groupCount);
     // Split the validator keys into groups that will fit within the max group size.
-    uint256 amountOfGroups = Math.ceilDiv(valKeys.length, maxGroupSize);
+    // uint256 amountOfGroups = Math.ceilDiv(valKeys.length - groupCount, maxGroupSize);
+    // console.log("Amount of groups: ", amountOfGroups);
 
     // TODO change name of variable amount of groups for amount in group
-    for (uint256 validatorIndex = 0; validatorIndex < amountOfGroups; validatorIndex++) {
-      console.log("Validator key index", getValidatorKeyIndex(0, validatorIndex, maxGroupSize));
-      console.log("Registering validator #: ", validatorIndex);
-      address validator = registerValidator(
-        validatorIndex,
-        getValidatorKeyFromGroupGroup(valKeys, 0, validatorIndex, maxGroupSize),
-        validatorLockedGoldRequirements,
-        groupAddress
-      );
-      // TODO start broadcast
-      console.log("Adding to group...");
-
-      vm.startBroadcast(validatorGroup0Key);
-      if (validatorIndex == 0) {
-        getValidators().addFirstMember(validator, address(0), address(0));
-        console.log("Making group vote for itself");
-        getElection().vote(
-          groupAddress,
-          getLockedGold().getAccountNonvotingLockedGold(groupAddress),
-          address(0),
-          address(0)
+    for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
+      address groupAddress = groups[groupIndex];
+      console.log("Registering members for group: ", groupAddress);
+       for (uint256 validatorIndex = 0; validatorIndex < maxGroupSize; validatorIndex++) {
+        uint256 validatorKeyIndex = getValidatorKeyIndex(groupCount, groupIndex, validatorIndex, maxGroupSize);
+        console.log("Registering validator #: ", validatorIndex);
+        address validator = registerValidator(
+          validatorIndex,
+          valKeys[validatorKeyIndex],
+          validatorLockedGoldRequirements,
+          groupAddress
         );
-      } else {
-        // unimplemented
-        console.log("WARNING: case not implemented");
-      }
+        // TODO start broadcast
+        console.log("Adding to group...");
 
-      vm.stopBroadcast();
+        vm.startBroadcast(groups[groupIndex]);
+        address greater = groupIndex == 0 ? address(0) : groups[groupIndex - 1];
+
+        if (validatorIndex == 0) {
+          getValidators().addFirstMember(validator, address(0), greater);
+          console.log("Making group vote for itself");
+        } else {
+          getValidators().addMember(validator);
+        }
+         getElection().vote(
+            groupAddress,
+            validatorLockedGoldRequirements,
+            address(0),
+            greater
+          );
+
+        vm.stopBroadcast();
+      }
     }
   }
 }

@@ -530,7 +530,7 @@ contract Validators is
   }
 
   /**
-   * @notice Adds the first member to a group's list of members and marks it eligible for election.
+   * @notice Adds the first member to a group's list of members and marks the group eligible for election.
    * @param validator The validator to add to the group
    * @param lesser The address of the group that has received fewer votes than this group.
    * @param greater The address of the group that has received more votes than this group.

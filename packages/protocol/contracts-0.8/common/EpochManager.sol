@@ -207,7 +207,9 @@ contract EpochManager is
 
     require(epochProcessing.toProcessGroups == groups.length, "number of groups does not match");
 
-    for (uint i = 0; i < groups.length; i++) {
+    // since we are adding values it makes sense to start from the end
+    for (uint ii = groups.length; ii > 0; ii--) {
+      uint256 i = ii - 1;
       // checks that group is actually from elected group
       require(processedGroups[groups[i]], "group not processed");
       // by doing this, we avoid processing a group twice
