@@ -1,0 +1,66 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: daily
+
+  - package-ecosystem: docker
+    directory: /dockerfiles/all-monorepo
+    schedule:
+      interval: daily
+
+  - package-ecosystem: docker
+    directory: /dockerfiles/celotool
+    schedule:
+      interval: daily
+
+  - package-ecosystem: docker
+    directory: /dockerfiles/cloudbuild
+    schedule:
+      interval: daily
+
+  - package-ecosystem: docker
+    directory: /dockerfiles/metadata-crawler
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /packages/celotool
+    schedule:
+      interval: daily
+
+  - package-ecosystem: pip
+    directory: /packages/celotool
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /packages/env-tests
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /packages/metadata-crawler
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /packages/protocol/abis
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /packages/protocol/contracts
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /packages/protocol
+    schedule:
+      interval: daily

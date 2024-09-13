@@ -7,6 +7,9 @@ on:
     - cron: 0 0 1 * *
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   generate-protocol-devchain:
     name: Generate protocol devchain used in celo-monorepo.yml workflow
@@ -21,13 +24,18 @@ jobs:
           - tag: core-contracts.v11
             node-version: 18
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           ref: ${{ matrix.tag }}
           fetch-depth: 0
           submodules: recursive
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install yarn dependencies
@@ -45,7 +53,7 @@ jobs:
           yarn --cwd packages/protocol devchain generate-tar devchain/devchain.tar.gz --release_gold_contracts $GRANTS_FILE
           mv packages/protocol/build/contracts* devchain/
       - name: Upload devchain as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: devchain-${{ matrix.tag }}
           path: devchain
