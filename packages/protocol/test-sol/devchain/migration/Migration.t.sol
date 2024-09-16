@@ -13,10 +13,13 @@ import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts/common/interfaces/IAccounts.sol";
 import "@celo-contracts/common/interfaces/IEpochManager.sol";
 import "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
+import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
+import "@celo-contracts/governance/interfaces/IElection.sol";
 
 import "@celo-contracts/governance/interfaces/IValidators.sol";
 
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
+import "@celo-contracts-8/common/interfaces/IScoreManager.sol";
 
 contract IntegrationTest is Test, TestConstants, Utils08 {
   IRegistry registry = IRegistry(REGISTRY_ADDRESS);
@@ -142,6 +145,9 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   IValidators validatorsContract;
   IEpochManager epochManager;
   IEpochManagerEnabler epochManagerEnabler;
+  IScoreManager scoreManager;
+  IElection election;
+  ICeloUnreleasedTreasure celoUnreleasedTreasure;
 
   address reserveAddress;
   address unreleasedTreasury;
@@ -151,6 +157,10 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   uint256 firstEpochBlock = 100;
   address[] firstElected;
   address[] validatorsList;
+  address[] groupList;
+
+  uint256[] groupScore = [5e23, 7e23, 1e24];
+  uint256[] validatorScore = [1e23, 1e23, 1e23, 1e23, 1e23, 1e23];
 
   function setUp() public override {
     super.setUp();
@@ -159,6 +169,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     validatorsContract = IValidators(registry.getAddressForStringOrDie("Validators"));
 
     validatorsList = validatorsContract.getRegisteredValidators();
+    groupList = validatorsContract.getRegisteredValidatorGroups();
 
     unreleasedTreasury = registry.getAddressForStringOrDie("CeloUnreleasedTreasure");
     reserveAddress = registry.getAddressForStringOrDie("Reserve");
@@ -177,6 +188,47 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     epochManagerEnabler = IEpochManagerEnabler(
       registry.getAddressForStringOrDie("EpochManagerEnabler")
     );
+    scoreManager = IScoreManager(registry.getAddressForStringOrDie("ScoreManager"));
+    election = IElection(registry.getAddressForStringOrDie("Election"));
+    celoUnreleasedTreasure = ICeloUnreleasedTreasure(
+      registry.getAddressForStringOrDie("CeloUnreleasedTreasure")
+    );
+
+    address scoreManagerOwner = scoreManager.owner();
+    vm.startPrank(scoreManagerOwner);
+
+    scoreManager.setGroupScore(groupList[0], groupScore[0]);
+    scoreManager.setGroupScore(groupList[1], groupScore[1]);
+    scoreManager.setGroupScore(groupList[2], groupScore[2]);
+
+    scoreManager.setValidatorScore(validatorsList[0], validatorScore[0]);
+    scoreManager.setValidatorScore(validatorsList[1], validatorScore[1]);
+    scoreManager.setValidatorScore(validatorsList[2], validatorScore[2]);
+    scoreManager.setValidatorScore(validatorsList[3], validatorScore[3]);
+    scoreManager.setValidatorScore(validatorsList[4], validatorScore[4]);
+    scoreManager.setValidatorScore(validatorsList[5], validatorScore[5]);
+
+    vm.stopPrank();
+
+    activateValidators();
+    vm.deal(address(celoUnreleasedTreasure), 100_000_000 ether);
+  }
+
+   function activateValidators() public {
+    address[] memory registeredValidators = validatorsContract.getRegisteredValidators();
+    travelEpochL1(vm);
+    travelEpochL1(vm);
+    travelEpochL1(vm);
+    travelEpochL1(vm);
+    for (uint256 i = 0; i < registeredValidators.length; i++) {
+      (, , address validatorGroup, , ) = validatorsContract.getValidator(registeredValidators[i]);
+      if (election.getPendingVotesForGroup(validatorGroup) == 0) {
+        continue;
+      }
+      vm.startPrank(validatorGroup);
+      election.activate(validatorGroup);
+      vm.stopPrank();
+    }
   }
 
   function test_IsSetupCorrect() public {
@@ -228,7 +280,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
 
     (, , , uint256 _currentRewardsBlock) = epochManager.getCurrentEpoch();
 
-    assertEq(_currentRewardsBlock, block.number - 1);
+    assertEq(_currentRewardsBlock, block.number);
   }
 
   function _MockL2Migration(address[] memory _validatorsList) internal {
