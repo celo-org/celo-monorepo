@@ -4,9 +4,9 @@ pragma solidity >=0.8.7 <0.8.20;
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
-import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts/common/interfaces/IRegistryInitializer.sol";
-import "@celo-contracts/common/Initializable.sol";
+import "../../../contracts/common/interfaces/IRegistry.sol";
+import "../../../contracts/common/interfaces/IRegistryInitializer.sol";
+import "../../../contracts/common/Initializable.sol";
 
 /**
  * @title Routes identifiers to addresses.

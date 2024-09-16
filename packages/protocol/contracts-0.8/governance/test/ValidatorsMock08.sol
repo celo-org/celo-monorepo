@@ -4,8 +4,6 @@ pragma solidity >=0.8.7 <0.8.20;
 import "../Validators.sol";
 import "../../../contracts/common/FixidityLib.sol";
 
-import "forge-std-8/console2.sol";
-
 /**
  * @title A wrapper around Validators that exposes onlyVm functions for testing.
  */
