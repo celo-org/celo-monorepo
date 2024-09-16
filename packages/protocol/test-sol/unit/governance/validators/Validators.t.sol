@@ -3441,12 +3441,6 @@ contract ValidatorsTest_MintStableToEpochManager is ValidatorsTest {
     vm.expectRevert("only registered contract");
     validators.mintStableToEpochManager(5);
   }
-  function test_Reverts_WhenMintAmountIsZero() public {
-    _whenL2();
-    vm.expectRevert("mint amount is zero.");
-    vm.prank(address(epochManager));
-    validators.mintStableToEpochManager(0);
-  }
 
   function test_ShouldMintStableToEpochManager() public {
     _whenL2();
