@@ -214,7 +214,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     vm.deal(address(celoUnreleasedTreasure), 100_000_000 ether);
   }
 
-   function activateValidators() public {
+  function activateValidators() public {
     address[] memory registeredValidators = validatorsContract.getRegisteredValidators();
     travelEpochL1(vm);
     travelEpochL1(vm);
