@@ -1261,8 +1261,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     console.log("  * Registering validators ... Count: ", valKeys.length - groupCount);
     // Split the validator keys into groups that will fit within the max group size.
-    // uint256 amountOfGroups = Math.ceilDiv(valKeys.length - groupCount, maxGroupSize);
-    // console.log("Amount of groups: ", amountOfGroups);
 
     // TODO change name of variable amount of groups for amount in group
     for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {

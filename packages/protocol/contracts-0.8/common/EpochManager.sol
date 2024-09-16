@@ -33,7 +33,7 @@ contract EpochManager is
   }
 
   struct EpochProcessState {
-    EpochProcessStatus status; // TODO maybe a enum for future updates
+    EpochProcessStatus status;
     uint256 perValidatorReward; // The per validator epoch reward.
     uint256 totalRewardsVoter; // The total rewards to voters.
     uint256 totalRewardsCommunity; // The total community reward.
@@ -181,7 +181,6 @@ contract EpochManager is
     // TODO complete this function
     require(isOnEpochProcess(), "Epoch process is not started");
     // finalize epoch
-    // TODO last block should be the block before and timestamp from previous block
     epochs[currentEpochNumber].lastBlock = block.number - 1;
     // start new epoch
     currentEpochNumber++;

@@ -647,6 +647,10 @@ contract Validators is
     group.slashInfo.lastSlashed = block.timestamp;
   }
 
+  /**
+   * @notice Allows the EpochManager contract to mint stable token for itself.
+   * @param amount The amount to be minted.
+   */
   function mintStableToEpochManager(
     uint256 amount
   ) external onlyL2 nonReentrant onlyRegisteredContract(EPOCH_MANAGER_REGISTRY_ID) {
