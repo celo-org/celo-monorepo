@@ -4,23 +4,17 @@ pragma solidity >=0.8.7 <0.8.20;
 import "../Validators.sol";
 import "../../../contracts/common/FixidityLib.sol";
 
-import "forge-std-8/console2.sol";
-
 /**
  * @title A wrapper around Validators that exposes onlyVm functions for testing.
  */
 contract ValidatorsMock08 is Validators(true) {
-  function updateValidatorScoreFromSigner(address signer, uint256 uptime) external override {
-    // console2.log("### update Validator Score From Signer");
-  }
+  function updateValidatorScoreFromSigner(address signer, uint256 uptime) external override {}
 
   function distributeEpochPaymentsFromSigner(
     address signer,
     uint256 maxPayment
   ) external override returns (uint256) {
-    // console2.log("### distributeEpochPaymentsFromSigner");
     return 0;
-    // return _distributeEpochPaymentsFromSigner(signer, maxPayment);
   }
 
   function computeEpochReward(
