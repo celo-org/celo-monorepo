@@ -11,6 +11,7 @@ import "../../contracts/governance/interfaces/IEpochRewards.sol";
 
 contract EpochManagerEnabler is Initializable, UsingPrecompiles, UsingRegistry {
   uint256 public lastKnownEpochNumber;
+  uint256 public lastKnownFirstBlockOfEpoch;
   address[] public lastKnownElectedAccounts;
 
   /**
@@ -33,10 +34,11 @@ contract EpochManagerEnabler is Initializable, UsingPrecompiles, UsingRegistry {
    */
   function initEpochManager() external onlyL2 {
     require(lastKnownEpochNumber != 0, "lastKnownEpochNumber not set.");
+    require(lastKnownFirstBlockOfEpoch != 0, "lastKnownFirstBlockOfEpoch not set.");
     require(lastKnownElectedAccounts.length > 0, "lastKnownElectedAccounts not set.");
     getEpochManager().initializeSystem(
       lastKnownEpochNumber,
-      _getFirstBlockOfEpoch(lastKnownEpochNumber),
+      lastKnownFirstBlockOfEpoch,
       lastKnownElectedAccounts
     );
   }
@@ -48,8 +50,8 @@ contract EpochManagerEnabler is Initializable, UsingPrecompiles, UsingRegistry {
     lastKnownEpochNumber = getEpochNumber();
 
     uint256 numberElectedValidators = numberValidatorsInCurrentSet();
-
     lastKnownElectedAccounts = new address[](numberElectedValidators);
+    lastKnownFirstBlockOfEpoch = _getFirstBlockOfEpoch(lastKnownEpochNumber);
 
     for (uint256 i = 0; i < numberElectedValidators; i++) {
       // TODO: document how much gas this takes for 110 signers

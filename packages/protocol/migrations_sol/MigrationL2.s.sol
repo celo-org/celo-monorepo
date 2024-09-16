@@ -8,6 +8,7 @@ import "forge-std/console.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts-8/common/UsingRegistry.sol";
+import "../../contracts/common/interfaces/IEpochManagerEnabler.sol";
 
 contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
   using FixidityLib for FixidityLib.Fraction;
@@ -36,13 +37,12 @@ contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
   }
 
   function initializeEpochManagerSystem() public {
-    console.log("Initialize Epoch Manager System");
+    console.log("Initializing EpochManager system");
     address[] memory firstElected = getValidators().getRegisteredValidators();
     IEpochManager epochManager = getEpochManager();
-    address epochManagerEnabler = epochManager.epochManagerEnabler();
-    vm.stopBroadcast();
-    vm.prank(epochManagerEnabler);
-    epochManager.initializeSystem(1, 1, firstElected);
-    vm.startBroadcast(DEPLOYER_ACCOUNT);
+    address epochManagerEnablerAddress = epochManager.epochManagerEnabler();
+
+    IEpochManagerEnabler epochManagerEnabler = IEpochManagerEnabler(epochManagerEnablerAddress);
+    epochManagerEnabler.initEpochManager();
   }
 }

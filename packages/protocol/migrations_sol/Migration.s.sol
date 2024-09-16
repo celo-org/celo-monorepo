@@ -27,6 +27,7 @@ import "@celo-contracts/common/interfaces/IFeeHandler.sol";
 import "@celo-contracts/common/interfaces/IFeeHandlerInitializer.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import "@celo-contracts/common/interfaces/IAccounts.sol";
+import "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
 import "@celo-contracts/governance/interfaces/ILockedGoldInitializer.sol";
 import "@celo-contracts/governance/interfaces/IValidatorsInitializer.sol";
 import "@celo-contracts/governance/interfaces/IElectionInitializer.sol";
@@ -249,6 +250,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // Functions with broadcast with different addresses
     // Validators needs to lock, which can be only used by the msg.sender
     electValidators(json);
+
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
+
+    captureEpochManagerEnablerValidators();
+
+    vm.stopBroadcast();
   }
 
   /**
@@ -944,6 +951,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       abi.encodeWithSelector(IEpochManagerEnablerInitializer.initialize.selector, REGISTRY_ADDRESS)
     );
   }
+
   function migrateScoreManager() public {
     deployProxiedContract(
       "ScoreManager",
@@ -1292,5 +1300,17 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         vm.stopBroadcast();
       }
     }
+  }
+
+  function captureEpochManagerEnablerValidators() public {
+    address numberValidatorsInCurrentSetPrecompileAddress = 0x00000000000000000000000000000000000000f9;
+    numberValidatorsInCurrentSetPrecompileAddress.call(abi.encodeWithSignature("setNumberOfValidators()"));
+
+    address validatorSignerAddressFromCurrentSetPrecompileAddress = 0x00000000000000000000000000000000000000fa;
+    validatorSignerAddressFromCurrentSetPrecompileAddress.call(abi.encodeWithSignature("setValidators()"));
+
+    address epochManagerEnabler = registry.getAddressForString("EpochManagerEnabler");
+    IEpochManagerEnabler epochManagerEnablerContract = IEpochManagerEnabler(epochManagerEnabler);
+    epochManagerEnablerContract.captureEpochAndValidators();
   }
 }
