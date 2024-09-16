@@ -650,12 +650,8 @@ contract Validators is
   function mintStableToEpochManager(
     uint256 amount
   ) external onlyL2 nonReentrant onlyRegisteredContract(EPOCH_MANAGER_REGISTRY_ID) {
-    require(amount > 0, "mint amount is zero.");
     require(
-      IStableToken(getStableToken()).mint(
-        registry.getAddressForOrDie(EPOCH_MANAGER_REGISTRY_ID),
-        amount
-      ),
+      IStableToken(getStableToken()).mint(msg.sender, amount),
       "mint failed to epoch manager"
     );
   }

@@ -2,7 +2,7 @@ pragma solidity >=0.8.0 <0.9.0;
 // solhint-disable no-unused-vars
 
 /**
- * @title A mock StableToken for testing.
+ * @title A mock StableToken for testing. This contract can be deprecated once GoldToken gets migrated to 0.8
  */
 contract MockCeloToken08 {
   uint256 public totalSupply_;

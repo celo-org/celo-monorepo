@@ -3452,7 +3452,6 @@ contract ValidatorsTest_MintStableToEpochManager is ValidatorsTest {
     _whenL2();
     vm.prank(address(epochManager));
     validators.mintStableToEpochManager(5);
-
     assertEq(stableToken.balanceOf(address(epochManager)), 5);
   }
 }
