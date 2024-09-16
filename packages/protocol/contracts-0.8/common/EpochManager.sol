@@ -276,7 +276,7 @@ contract EpochManager is
   }
 
   function systemAlreadyInitialized() public view returns (bool) {
-    return initialized;
+    return initialized && elected.length > 0;
   }
 
   function allocateValidatorsRewards() internal {
