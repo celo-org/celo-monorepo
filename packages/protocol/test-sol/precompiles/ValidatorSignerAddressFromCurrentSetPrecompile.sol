@@ -29,7 +29,7 @@ contract ValidatorSignerAddressFromCurrentSetPrecompile {
     return uint256(getBytes32FromBytes(bs, start));
   }
 
-  function setValidators() external{
+  function setValidators() external {
     IRegistry registry = IRegistry(registryAddress);
     address validatorsAddress = registry.getAddressForString("Validators");
     IValidators validatorsContract = IValidators(validatorsAddress);
@@ -53,5 +53,4 @@ contract ValidatorSignerAddressFromCurrentSetPrecompile {
     }
     return x;
   }
-
 }

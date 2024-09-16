@@ -18,7 +18,7 @@ contract NumberValidatorsInCurrentSetPrecompile {
     return abi.encodePacked(NumberOfValidators);
   }
 
-    function setNumberOfValidators() external{
+  function setNumberOfValidators() external {
     IRegistry registry = IRegistry(registryAddress);
     address validatorsAddress = registry.getAddressForString("Validators");
     IValidators validatorsContract = IValidators(validatorsAddress);

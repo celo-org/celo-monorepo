@@ -1304,10 +1304,14 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function captureEpochManagerEnablerValidators() public {
     address numberValidatorsInCurrentSetPrecompileAddress = 0x00000000000000000000000000000000000000f9;
-    numberValidatorsInCurrentSetPrecompileAddress.call(abi.encodeWithSignature("setNumberOfValidators()"));
+    numberValidatorsInCurrentSetPrecompileAddress.call(
+      abi.encodeWithSignature("setNumberOfValidators()")
+    );
 
     address validatorSignerAddressFromCurrentSetPrecompileAddress = 0x00000000000000000000000000000000000000fa;
-    validatorSignerAddressFromCurrentSetPrecompileAddress.call(abi.encodeWithSignature("setValidators()"));
+    validatorSignerAddressFromCurrentSetPrecompileAddress.call(
+      abi.encodeWithSignature("setValidators()")
+    );
 
     address epochManagerEnabler = registry.getAddressForString("EpochManagerEnabler");
     IEpochManagerEnabler epochManagerEnablerContract = IEpochManagerEnabler(epochManagerEnabler);
