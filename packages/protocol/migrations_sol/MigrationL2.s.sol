@@ -3,6 +3,9 @@ pragma solidity >=0.8.7 <0.8.20;
 import { Script } from "forge-std-8/Script.sol";
 import { MigrationsConstants } from "@migrations-sol/constants.sol";
 
+// Foundry imports
+import "forge-std/console.sol";
+
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts-8/common/UsingRegistry.sol";
 
@@ -18,6 +21,8 @@ contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
     setupUsingRegistry();
     dealToCeloUnreleasedTreasure();
 
+    initializeEpochManagerSystem();
+
     vm.stopBroadcast();
   }
 
@@ -28,5 +33,16 @@ contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
 
   function dealToCeloUnreleasedTreasure() public {
     vm.deal(address(getCeloUnreleasedTreasure()), 1_000_000 ether);
+  }
+
+  function initializeEpochManagerSystem() public {
+    console.log("Initialize Epoch Manager System");
+    address[] memory firstElected = getValidators().getRegisteredValidators();
+    IEpochManager epochManager = getEpochManager();
+    address epochManagerEnabler = epochManager.epochManagerEnabler();
+    vm.stopBroadcast();
+    vm.prank(epochManagerEnabler);
+    epochManager.initializeSystem(1, 1, firstElected);
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
   }
 }
