@@ -10,7 +10,6 @@ import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.s
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@test-sol/utils/ECDSAHelper08.sol";
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
-import "forge-std/console.sol";
 
 contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
   address epochManagerOwner;
@@ -197,7 +196,6 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
   EnumerableSet.AddressSet internal originalyElected;
 
   function setUp() public override {
-    console.log("ininininininini E2E_EpochManager_FinishNextEpochProcess");
     super.setUp();
     activateValidators();
     whenL2(vm);
