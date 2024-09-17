@@ -7,7 +7,7 @@ import "@celo-contracts/common/FixidityLib.sol";
 /**
  * @title A wrapper around Validators that exposes onlyVm functions for testing.
  */
-contract ValidatorsMock08 is Validators(true) {
+contract ValidatorsMock is Validators(true) {
   function updateValidatorScoreFromSigner(address signer, uint256 uptime) external override {}
 
   function distributeEpochPaymentsFromSigner(

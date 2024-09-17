@@ -18,7 +18,7 @@ import "@celo-contracts/stability/test/MockSortedOracles.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 
 import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
-import { ValidatorsMock08 } from "@test-sol/unit/governance/mock/ValidatorsMock08.sol";
+import { ValidatorsMock } from "@test-sol/unit/governance/mock/ValidatorsMock.sol";
 import { MockCeloUnreleasedTreasure } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasure.sol";
 
 contract EpochManagerTest is Test, TestConstants, Utils08 {
@@ -27,7 +27,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
   MockStableToken08 stableToken;
   EpochRewardsMock08 epochRewards;
-  ValidatorsMock08 validators;
+  ValidatorsMock validators;
 
   address epochManagerEnabler;
   address carbonOffsettingPartner;
@@ -55,7 +55,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     epochManager = new EpochManager(true);
     sortedOracles = new MockSortedOracles();
     epochRewards = new EpochRewardsMock08();
-    validators = new ValidatorsMock08();
+    validators = new ValidatorsMock();
     stableToken = new MockStableToken08();
     celoToken = new MockCeloToken08();
     celoUnreleasedTreasure = new MockCeloUnreleasedTreasure();
