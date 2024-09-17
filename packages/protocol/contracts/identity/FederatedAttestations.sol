@@ -1,13 +1,5 @@
 pragma solidity ^0.5.13;
 
-// RPC_URL="https://rpc.sepolia.mantle.xyz"
-// DEPLOYED_CONTRACT_ADDRESS="0x8751845c21C4681C37a23a40467B6150f248f9B8"
-// forge create FederatedAttestations --constructor-args false --from 0x2C302520E6B344d8396BF3011862046287ef88c7 --private-key 780f3eb0c27a899480b859d36237eba28315750b549eb0cc553cee5cdd92e904 --rpc-url $RPC_URL --etherscan-api-key <your_etherscan_api_key> --verify
-// cast send $DEPLOYED_CONTRACT_ADDRESS "initialize()" --from 0x2C302520E6B344d8396BF3011862046287ef88c7 --private-key 780f3eb0c27a899480b859d36237eba28315750b549eb0cc553cee5cdd92e904 --rpc-url $RPC_URL
-// cast call $DEPLOYED_CONTRACT_ADDRESS "initialized()(bool)" --rpc-url $RPC_URL
-// cast send $DEPLOYED_CONTRACT_ADDRESS "registerAttestationAsIssuer(bytes32 identifier, address account, uint64 issuedOn)" 0x1234000000000000000000000000000000000000000000000000000000000000 0x2C302520E6B344d8396BF3011862046287ef88c7 1725659872 --from 0x2C302520E6B344d8396BF3011862046287ef88c7 --private-key 780f3eb0c27a899480b859d36237eba28315750b549eb0cc553cee5cdd92e904 --rpc-url $RPC_URL
-// cast call $DEPLOYED_CONTRACT_ADDRESS "lookupAttestations(bytes32 identifier, address[] calldata trustedIssuers) returns (uint256[] memory countsPerIssuer, address[] memory accounts, address[] memory signers, uint64[] memory issuedOns,uint64[] memory publishedOns)" 0x1234000000000000000000000000000000000000000000000000000000000000 "[0x2C302520E6B344d8396BF3011862046287ef88c7]" --rpc-url $RPC_URL
-
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
@@ -19,7 +11,7 @@ import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistryV2.sol";
-// import "../common/Signatures.sol";
+import "../common/Signatures.sol";
 
 /**
  * @title Contract mapping identifiers to accounts
@@ -302,21 +294,20 @@ contract FederatedAttestations is
     bytes32 r,
     bytes32 s
   ) public view {
-    revert("unimplemented");
     // attestationSignerToAccount instead of isSigner allows the issuer to act as its own signer
-    // require(
-    //   getAccounts().attestationSignerToAccount(signer) == issuer,
-    //   "Signer is not a currently authorized AttestationSigner for the issuer"
-    // );
-    // bytes32 structHash = getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn);
-    // address guessedSigner = Signatures.getSignerOfTypedDataHash(
-    //   eip712DomainSeparator,
-    //   structHash,
-    //   v,
-    //   r,
-    //   s
-    // );
-    // require(guessedSigner == signer, "Signature is invalid");
+    require(
+      getAccounts().attestationSignerToAccount(signer) == issuer,
+      "Signer is not a currently authorized AttestationSigner for the issuer"
+    );
+    bytes32 structHash = getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn);
+    address guessedSigner = Signatures.getSignerOfTypedDataHash(
+      eip712DomainSeparator,
+      structHash,
+      v,
+      r,
+      s
+    );
+    require(guessedSigner == signer, "Signature is invalid");
   }
 
   function getUniqueAttestationHash(
