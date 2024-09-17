@@ -8,9 +8,7 @@ import "./UsingRegistry.sol";
 import "../common/IsL2Check.sol";
 
 import "../../contracts/common/Initializable.sol";
-import "../../contracts/common/interfaces/ICeloToken.sol";
 import "./interfaces/ICeloUnreleasedTreasureInitializer.sol";
-import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
 /**
  * @title Contract for unreleased Celo tokens.
@@ -49,8 +47,7 @@ contract CeloUnreleasedTreasure is UsingRegistry, ReentrancyGuard, Initializable
    */
   function release(address to, uint256 amount) external onlyEpochManager {
     require(address(this).balance >= amount, "Insufficient balance.");
-    IERC20 celoToken = IERC20(address(getCeloToken()));
-    celoToken.transfer(to, amount);
+    require(getCeloToken().transfer(to, amount), "CELO transfer failed.");
     emit Released(to, amount);
   }
 
