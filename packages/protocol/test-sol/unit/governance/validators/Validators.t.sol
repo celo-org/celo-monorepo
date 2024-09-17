@@ -3135,7 +3135,7 @@ contract ValidatorsTest_GetTopGroupValidators is ValidatorsTest {
     _registerValidatorGroupWithMembersHavingSigners(group, 5);
   }
 
-  function test_ShouldReturnTheSigner() public {
+  function test_ShouldReturnTheSigner_whenL1() public {
     address[] memory _validatorSigner = validators.getTopGroupValidators(group, 3);
     assertEq(_validatorSigner[0], accounts.getValidatorSigner(validator));
     assertEq(_validatorSigner[1], accounts.getValidatorSigner(vm.addr(1)));
