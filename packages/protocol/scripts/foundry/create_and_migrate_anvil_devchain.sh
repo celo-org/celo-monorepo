@@ -26,6 +26,10 @@ source $PWD/scripts/foundry/start_anvil.sh
 source $PWD/scripts/foundry/deploy_libraries.sh
 echo "Library flags are: $LIBRARY_FLAGS"
 
+# Before running the migration script, check that the scripts compile
+# This will avoid having to wait for the whole chain to start just to realize theres a compilation error at the end
+forge build --contracts $PWD/test-sol/devchain
+
 # Build all contracts with deployed libraries
 # Including contracts that depend on libraries. This step replaces the library placeholder
 # in the bytecode with the address of the actually deployed library.
@@ -59,6 +63,39 @@ forge script \
   $NON_INTERACTIVE \
   $LIBRARY_FLAGS \
   --rpc-url $ANVIL_RPC_URL || echo "Migration script failed"
+
+# Set the supply for Celo:
+# This supply is just an approximation, but it's importat that this number is non-zero.
+
+# Get CeloToken contract address
+CELO_ADDRESS=$(
+  cast call \
+  $REGISTRY_ADDRESS \
+  "getAddressForStringOrDie(string calldata identifier)(address)" \
+  "CeloToken" \
+  --rpc-url $ANVIL_RPC_URL
+)
+
+# interpersonate the VM, this can't be done from the migration script
+cast rpc anvil_impersonateAccount $CELO_VM_ADDRESS --rpc-url $ANVIL_RPC_URL
+
+# set the balance of the vm address so that it can send a tx
+cast rpc anvil_setBalance $CELO_VM_ADDRESS $ETHER_IN_WEI --rpc-url $ANVIL_RPC_URL
+
+# increase the supply (it is harcoded as bash overflows)
+# ideally this number should come from the amount of address funded when Anvil loads
+# 540001000000000000000000 = (60e3 * 9 + 1) * 10^18 60K per account * 9 accounts + 1 for the VM (gas)
+INITIAL_SUPPLY="540001000000000000000000"
+cast send \
+--from $CELO_VM_ADDRESS \
+--unlocked $CELO_ADDRESS "increaseSupply(uint256)" $INITIAL_SUPPLY \
+--rpc-url $ANVIL_RPC_URL
+
+# stop impersonating the VM address
+cast rpc \
+anvil_stopImpersonatingAccount \
+$CELO_VM_ADDRESS \
+--rpc-url $ANVIL_RPC_URL
 
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
