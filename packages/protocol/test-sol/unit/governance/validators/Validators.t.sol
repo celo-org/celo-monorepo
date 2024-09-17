@@ -267,7 +267,7 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
 
     for (uint256 i = 0; i < _numMembers; i++) {
       if (i == 0) {
-        _registerValidatorWithSignerHelper_2(validator, signer, signerPk);
+        _registerValidatorWithSignerHelper(validator, signer, signerPk);
 
         vm.prank(validator);
         validators.affiliate(_group);
@@ -282,7 +282,7 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
 
         vm.prank(_validator1);
         accounts.createAccount();
-        _registerValidatorWithSignerHelper_2(_validator1, _signer1, _signer1Pk);
+        _registerValidatorWithSignerHelper(_validator1, _signer1, _signer1Pk);
         vm.prank(_validator1);
         validators.affiliate(_group);
 
@@ -312,26 +312,7 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
   }
 
-  function _registerValidatorWithSignerHelper() internal returns (bytes memory) {
-    lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
-
-    (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
-      validator,
-      signerPk
-    );
-
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
-
-    vm.prank(validator);
-    accounts.authorizeValidatorSigner(signer, v, r, s);
-
-    vm.prank(validator);
-    validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
-    validatorRegistrationEpochNumber = IPrecompiles(address(validators)).getEpochNumber();
-    return _ecdsaPubKey;
-  }
-
-  function _registerValidatorWithSignerHelper_2(
+  function _registerValidatorWithSignerHelper(
     address _validator,
     address _signer,
     uint256 _signerPk
@@ -750,7 +731,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
   }
 
   function test_ShouldMarkAccountAsValidator_WhenAccountHasAuthorizedValidatorSigner() public {
-    _registerValidatorWithSignerHelper();
+    _registerValidatorWithSignerHelper(validator, signer, signerPk);
 
     assertTrue(validators.isValidator(validator));
   }
@@ -778,34 +759,38 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
   function test_ShouldAddAccountToValidatorList_WhenAccountHasAuthorizedValidatorSigner() public {
     address[] memory ExpectedRegisteredValidators = new address[](1);
     ExpectedRegisteredValidators[0] = validator;
-    _registerValidatorWithSignerHelper();
+    _registerValidatorWithSignerHelper(validator, signer, signerPk);
     assertEq(validators.getRegisteredValidators().length, ExpectedRegisteredValidators.length);
     assertEq(validators.getRegisteredValidators()[0], ExpectedRegisteredValidators[0]);
   }
 
   function test_ShouldSetValidatorEcdsaPublicKey_WhenAccountHasAuthorizedValidatorSigner() public {
-    bytes memory _registeredEcdsaPubKey = _registerValidatorWithSignerHelper();
+    bytes memory _registeredEcdsaPubKey = _registerValidatorWithSignerHelper(
+      validator,
+      signer,
+      signerPk
+    );
     (bytes memory actualEcdsaPubKey, , , , ) = validators.getValidator(validator);
 
     assertEq(actualEcdsaPubKey, _registeredEcdsaPubKey);
   }
 
   function test_ShouldSetValidatorBlsPublicKey_WhenAccountHasAuthorizedValidatorSigner() public {
-    _registerValidatorWithSignerHelper();
+    _registerValidatorWithSignerHelper(validator, signer, signerPk);
     (, bytes memory actualBlsPubKey, , , ) = validators.getValidator(validator);
 
     assertEq(actualBlsPubKey, blsPublicKey);
   }
 
   function test_ShouldSetValidatorSigner_WhenAccountHasAuthorizedValidatorSigner() public {
-    _registerValidatorWithSignerHelper();
+    _registerValidatorWithSignerHelper(validator, signer, signerPk);
     (, , , , address ActualSigner) = validators.getValidator(validator);
 
     assertEq(ActualSigner, signer);
   }
 
   function test_ShouldSetLockGoldRequirements_WhenAccountHasAuthorizedValidatorSigner() public {
-    _registerValidatorWithSignerHelper();
+    _registerValidatorWithSignerHelper(validator, signer, signerPk);
     uint256 _lockedGoldReq = validators.getAccountLockedGoldRequirement(validator);
 
     assertEq(_lockedGoldReq, originalValidatorLockedGoldRequirements.value);
@@ -814,7 +799,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
   function test_ShouldSetValidatorMembershipHistory_WhenAccountHasAuthorizedValidatorSigner()
     public
   {
-    _registerValidatorWithSignerHelper();
+    _registerValidatorWithSignerHelper(validator, signer, signerPk);
     (uint256[] memory _epoch, address[] memory _membershipGroups, , ) = validators
       .getMembershipHistory(validator);
 
@@ -864,7 +849,11 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
   }
 
   function test_Reverts_WhenAccountAlreadyRegisteredAsValidator() public {
-    bytes memory _registeredEcdsaPubKey = _registerValidatorWithSignerHelper();
+    bytes memory _registeredEcdsaPubKey = _registerValidatorWithSignerHelper(
+      validator,
+      signer,
+      signerPk
+    );
     vm.expectRevert("Already registered");
     vm.prank(validator);
     validators.registerValidator(_registeredEcdsaPubKey, blsPublicKey, blsPop);
