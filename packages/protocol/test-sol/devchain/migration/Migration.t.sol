@@ -6,6 +6,7 @@ import "celo-foundry-8/Test.sol";
 import { Utils08 } from "@test-sol/utils08.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 import { MigrationsConstants } from "@migrations-sol/constants.sol";
+import { FeeCurrencyDirectory } from "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
@@ -13,18 +14,20 @@ import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts/common/interfaces/IAccounts.sol";
 import "@celo-contracts/common/interfaces/IEpochManager.sol";
 import "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
-import "@celo-contracts/common/interfaces/IScoreManager.sol";
-import "@celo-contracts/governance/interfaces/IValidators.sol";
+import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
 import "@celo-contracts/governance/interfaces/IElection.sol";
 
+import "@celo-contracts/governance/interfaces/IValidators.sol";
+
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
+import "@celo-contracts-8/common/interfaces/IScoreManager.sol";
 
 contract IntegrationTest is Test, TestConstants, Utils08 {
   IRegistry registry = IRegistry(REGISTRY_ADDRESS);
 
   uint256 constant RESERVE_BALANCE = 69411663406170917420347916; // current as of 08/20/24
 
-  function setUp() public virtual {}
+  // function setUp() public virtual {}
 
   /**
    * @notice Removes CBOR encoded metadata from the tail of the deployedBytecode.
@@ -141,10 +144,11 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   ICeloToken celoToken;
   IAccounts accountsContract;
   IValidators validatorsContract;
-  IElection electionContract;
-  IScoreManager scoreManagerContract;
   IEpochManager epochManager;
   IEpochManagerEnabler epochManagerEnabler;
+  IScoreManager scoreManager;
+  IElection election;
+  ICeloUnreleasedTreasure celoUnreleasedTreasure;
 
   address reserveAddress;
   address unreleasedTreasury;
@@ -154,24 +158,23 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   uint256 firstEpochBlock = 100;
   address[] firstElected;
   address[] validatorsList;
-
-  address[] groups;
+  address[] groupList;
 
   uint256[] groupScore = [5e23, 7e23, 1e24];
   uint256[] validatorScore = [1e23, 1e23, 1e23, 1e23, 1e23, 1e23];
 
-  function setUp() public override {
-    super.setUp();
+  function setUp() public {
     randomAddress = actor("randomAddress");
 
     validatorsContract = IValidators(registry.getAddressForStringOrDie("Validators"));
-    electionContract = IElection(registry.getAddressForStringOrDie("Election"));
-    scoreManagerContract = IScoreManager(registry.getAddressForStringOrDie("ScoreManager"));
+
+    election = IElection(registry.getAddressForStringOrDie("Election"));
+    scoreManager = IScoreManager(registry.getAddressForStringOrDie("ScoreManager"));
     unreleasedTreasury = registry.getAddressForStringOrDie("CeloUnreleasedTreasure");
     reserveAddress = registry.getAddressForStringOrDie("Reserve");
 
     validatorsList = validatorsContract.getRegisteredValidators();
-    groups = validatorsContract.getRegisteredValidatorGroups();
+    groupList = validatorsContract.getRegisteredValidatorGroups();
 
     // mint to the reserve
     celoToken = ICeloToken(registry.getAddressForStringOrDie("GoldToken"));
@@ -187,6 +190,30 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     epochManagerEnabler = IEpochManagerEnabler(
       registry.getAddressForStringOrDie("EpochManagerEnabler")
     );
+    scoreManager = IScoreManager(registry.getAddressForStringOrDie("ScoreManager"));
+    election = IElection(registry.getAddressForStringOrDie("Election"));
+    celoUnreleasedTreasure = ICeloUnreleasedTreasure(
+      registry.getAddressForStringOrDie("CeloUnreleasedTreasure")
+    );
+
+    address scoreManagerOwner = scoreManager.owner();
+    vm.startPrank(scoreManagerOwner);
+
+    scoreManager.setGroupScore(groupList[0], groupScore[0]);
+    scoreManager.setGroupScore(groupList[1], groupScore[1]);
+    scoreManager.setGroupScore(groupList[2], groupScore[2]);
+
+    scoreManager.setValidatorScore(validatorsList[0], validatorScore[0]);
+    scoreManager.setValidatorScore(validatorsList[1], validatorScore[1]);
+    scoreManager.setValidatorScore(validatorsList[2], validatorScore[2]);
+    scoreManager.setValidatorScore(validatorsList[3], validatorScore[3]);
+    scoreManager.setValidatorScore(validatorsList[4], validatorScore[4]);
+    scoreManager.setValidatorScore(validatorsList[5], validatorScore[5]);
+
+    vm.stopPrank();
+
+    activateValidators();
+    vm.deal(address(celoUnreleasedTreasure), 100_000_000 ether);
   }
 
   function activateValidators() public {
@@ -197,11 +224,11 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     travelEpochL1(vm);
     for (uint256 i = 0; i < registeredValidators.length; i++) {
       (, , address validatorGroup, , ) = validatorsContract.getValidator(registeredValidators[i]);
-      if (electionContract.getPendingVotesForGroup(validatorGroup) == 0) {
+      if (election.getPendingVotesForGroup(validatorGroup) == 0) {
         continue;
       }
       vm.startPrank(validatorGroup);
-      electionContract.activate(validatorGroup);
+      election.activate(validatorGroup);
       vm.stopPrank();
     }
   }
@@ -280,18 +307,18 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   }
 
   function _setValidatorL2Score() internal {
-    address scoreManagerOwner = scoreManagerContract.owner();
+    address scoreManagerOwner = scoreManager.owner();
     vm.startPrank(scoreManagerOwner);
-    scoreManagerContract.setGroupScore(groups[0], groupScore[0]);
-    scoreManagerContract.setGroupScore(groups[1], groupScore[1]);
-    scoreManagerContract.setGroupScore(groups[2], groupScore[2]);
+    scoreManager.setGroupScore(groupList[0], groupScore[0]);
+    scoreManager.setGroupScore(groupList[1], groupScore[1]);
+    scoreManager.setGroupScore(groupList[2], groupScore[2]);
 
-    scoreManagerContract.setValidatorScore(validatorsList[0], validatorScore[0]);
-    scoreManagerContract.setValidatorScore(validatorsList[1], validatorScore[1]);
-    scoreManagerContract.setValidatorScore(validatorsList[2], validatorScore[2]);
-    scoreManagerContract.setValidatorScore(validatorsList[3], validatorScore[3]);
-    scoreManagerContract.setValidatorScore(validatorsList[4], validatorScore[4]);
-    scoreManagerContract.setValidatorScore(validatorsList[5], validatorScore[5]);
+    scoreManager.setValidatorScore(validatorsList[0], validatorScore[0]);
+    scoreManager.setValidatorScore(validatorsList[1], validatorScore[1]);
+    scoreManager.setValidatorScore(validatorsList[2], validatorScore[2]);
+    scoreManager.setValidatorScore(validatorsList[3], validatorScore[3]);
+    scoreManager.setValidatorScore(validatorsList[4], validatorScore[4]);
+    scoreManager.setValidatorScore(validatorsList[5], validatorScore[5]);
 
     vm.stopPrank();
   }

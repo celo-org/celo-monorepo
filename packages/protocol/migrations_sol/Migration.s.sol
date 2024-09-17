@@ -1131,10 +1131,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       bytes16(0x05050505050505050505050505050506),
       bytes16(0x06060606060606060606060606060607)
     );
+
     (bytes memory ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(accountAddress, validatorKey);
     getValidators().registerValidator(ecdsaPubKey, newBlsPublicKey, newBlsPop);
     getValidators().affiliate(groupToAffiliate);
-    console.log("Done registering validatora");
+    console.log("Done registering validators");
 
     vm.stopBroadcast();
     return accountAddress;

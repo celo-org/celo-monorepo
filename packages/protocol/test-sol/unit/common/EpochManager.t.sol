@@ -18,7 +18,7 @@ import "@celo-contracts/stability/test/MockSortedOracles.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 
 import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
-import { ValidatorsMock08 } from "@celo-contracts-8/governance/test/ValidatorsMock08.sol";
+import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
 import { MockCeloUnreleasedTreasure } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasure.sol";
 
 contract EpochManagerTest is Test, TestConstants, Utils08 {
@@ -27,13 +27,14 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
   MockStableToken08 stableToken;
   EpochRewardsMock08 epochRewards;
-  ValidatorsMock08 validators;
+  ValidatorsMock validators;
 
   address epochManagerEnabler;
   address carbonOffsettingPartner;
   address communityRewardFund;
   address reserveAddress;
   address scoreManagerAddress;
+  address nonOwner;
 
   uint256 firstEpochNumber = 100;
   uint256 firstEpochBlock = 100;
@@ -54,7 +55,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     epochManager = new EpochManager(true);
     sortedOracles = new MockSortedOracles();
     epochRewards = new EpochRewardsMock08();
-    validators = new ValidatorsMock08();
+    validators = new ValidatorsMock();
     stableToken = new MockStableToken08();
     celoToken = new MockCeloToken08();
     celoUnreleasedTreasure = new MockCeloUnreleasedTreasure();
@@ -69,9 +70,9 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     epochManagerEnabler = actor("epochManagerEnabler");
     carbonOffsettingPartner = actor("carbonOffsettingPartner");
     communityRewardFund = actor("communityRewardFund");
+    nonOwner = actor("nonOwner");
 
     deployCodeTo("MockRegistry.sol", abi.encode(false), REGISTRY_ADDRESS);
-
     deployCodeTo("ScoreManager.sol", abi.encode(false), scoreManagerAddress);
 
     registry = IRegistry(REGISTRY_ADDRESS);

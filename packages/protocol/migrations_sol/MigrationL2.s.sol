@@ -3,8 +3,12 @@ pragma solidity >=0.8.7 <0.8.20;
 import { Script } from "forge-std-8/Script.sol";
 import { MigrationsConstants } from "@migrations-sol/constants.sol";
 
+// Foundry imports
+import "forge-std/console.sol";
+
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts-8/common/UsingRegistry.sol";
+import "../../contracts/common/interfaces/IEpochManagerEnabler.sol";
 
 contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
   using FixidityLib for FixidityLib.Fraction;
@@ -16,7 +20,9 @@ contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
     vm.startBroadcast(DEPLOYER_ACCOUNT);
 
     setupUsingRegistry();
-    activateCeloUnreleasedTreasure();
+    dealToCeloUnreleasedTreasure();
+
+    initializeEpochManagerSystem();
 
     vm.stopBroadcast();
   }
@@ -26,17 +32,17 @@ contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
     setRegistry(REGISTRY_ADDRESS);
   }
 
-  function activateCeloUnreleasedTreasure() public {
-    uint256 l2StartTime = 1721909903 - 5; // Arbitrarily 5 seconds before last black
-    uint256 communityRewardFraction = getEpochRewards().getCommunityRewardFraction();
-    address carbonOffsettingPartner = 0x22579CA45eE22E2E16dDF72D955D6cf4c767B0eF;
-    uint256 carbonOffsettingFraction = getEpochRewards().getCarbonOffsettingFraction();
+  function dealToCeloUnreleasedTreasure() public {
+    vm.deal(address(getCeloUnreleasedTreasure()), 1_000_000 ether);
+  }
 
-    getCeloUnreleasedTreasure().activate(
-      l2StartTime,
-      communityRewardFraction,
-      carbonOffsettingPartner,
-      carbonOffsettingFraction
-    );
+  function initializeEpochManagerSystem() public {
+    console.log("Initializing EpochManager system");
+    address[] memory firstElected = getValidators().getRegisteredValidators();
+    IEpochManager epochManager = getEpochManager();
+    address epochManagerEnablerAddress = epochManager.epochManagerEnabler();
+
+    IEpochManagerEnabler epochManagerEnabler = IEpochManagerEnabler(epochManagerEnablerAddress);
+    epochManagerEnabler.initEpochManager();
   }
 }
