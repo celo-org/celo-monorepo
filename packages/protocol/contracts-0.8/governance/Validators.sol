@@ -166,11 +166,6 @@ contract Validators is
     _;
   }
 
-  modifier onlyEpochManager() {
-    require(msg.sender == address(getEpochManager()), "Only epoch manager can call");
-    _;
-  }
-
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
