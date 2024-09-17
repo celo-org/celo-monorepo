@@ -18,7 +18,7 @@ import "@celo-contracts/stability/test/MockSortedOracles.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 
 import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
-import { ValidatorsMock } from "@test-sol/unit/governance/mock/ValidatorsMock.sol";
+import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
 import { MockCeloUnreleasedTreasure } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasure.sol";
 
 contract EpochManagerTest is Test, TestConstants, Utils08 {
