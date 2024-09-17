@@ -5,9 +5,9 @@ import "celo-foundry-8/Test.sol";
 import "forge-std/console.sol";
 
 // here only to forge compile of  ValidatorsMock
-import "./ValidatorsMock.sol";
+import "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
 
-contract DowntimeSlasherMock is Test {
+contract CompileValidatorMock is Test {
   function test_nop() public {
     console.log("nop");
   }
