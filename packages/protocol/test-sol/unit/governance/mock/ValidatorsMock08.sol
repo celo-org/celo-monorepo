@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.8.20;
 
-import "../Validators.sol";
-import "../../../contracts/common/FixidityLib.sol";
+import "@celo-contracts-8/governance/Validators.sol";
+import "@celo-contracts/common/FixidityLib.sol";
 
 /**
  * @title A wrapper around Validators that exposes onlyVm functions for testing.
