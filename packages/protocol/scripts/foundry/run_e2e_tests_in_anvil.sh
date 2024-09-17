@@ -8,11 +8,12 @@ source $PWD/scripts/foundry/constants.sh
 echo "Generating and running devchain before running e2e tests..."
 source $PWD/scripts/foundry/create_and_migrate_anvil_devchain.sh
 
+
 # Run e2e tests
 echo "Running e2e tests..."
-forge test \
+time FOUNDRY_PROFILE=devchain forge test \
 -vvv \
---match-path "*test-sol/e2e/*" \
+--match-path "*test-sol/devchain/e2e/*" \
 --fork-url $ANVIL_RPC_URL
 
 # Stop devchain

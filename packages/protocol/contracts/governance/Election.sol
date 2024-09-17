@@ -957,7 +957,7 @@ contract Election is
     uint256 value,
     address lesser,
     address greater
-  ) internal onlyL1 {
+  ) internal {
     if (votes.total.eligible.contains(group)) {
       uint256 newVoteTotal = votes.total.eligible.getValue(group).add(value);
       votes.total.eligible.update(group, newVoteTotal, lesser, greater);

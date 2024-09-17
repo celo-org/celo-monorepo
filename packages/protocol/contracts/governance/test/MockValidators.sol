@@ -4,6 +4,9 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "../../../contracts-0.8/common/IsL2Check.sol";
 
+// Mocks Validators, compatible with 0.5
+// For forge tests, can be avoided with calls to deployCodeTo
+
 /**
  * @title Holds a list of addresses of validators
  */

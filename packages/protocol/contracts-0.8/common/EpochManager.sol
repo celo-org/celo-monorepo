@@ -46,6 +46,11 @@ contract EpochManager is
     uint256 toProcessGroups;
   }
 
+  struct ProcessedGroup {
+    bool processed;
+    uint256 epochRewards;
+  }
+
   // the length of an epoch in seconds
   uint256 public epochDuration;
 
@@ -53,9 +58,7 @@ contract EpochManager is
   uint256 private currentEpochNumber;
   address[] public elected;
 
-  // TODO this should be able to get deleted easily
-  // maybe even having it in a stadalone contract
-  mapping(address => bool) public processedGroups;
+  mapping(address => ProcessedGroup) public processedGroups;
 
   EpochProcessState public epochProcessing;
   mapping(uint256 => Epoch) private epochs;
@@ -197,9 +200,9 @@ contract EpochManager is
     address[] calldata lessers,
     address[] calldata greaters
   ) external nonReentrant {
-    // TODO complete this function
     require(isOnEpochProcess(), "Epoch process is not started");
     // finalize epoch
+    // last block should be the block before and timestamp from previous block
     epochs[currentEpochNumber].lastBlock = block.number - 1;
     // start new epoch
     currentEpochNumber++;
@@ -208,27 +211,36 @@ contract EpochManager is
 
     for (uint i = 0; i < elected.length; i++) {
       address group = getValidators().getValidatorsGroup(elected[i]);
-      if (!processedGroups[group]) {
+      if (!processedGroups[group].processed) {
         epochProcessing.toProcessGroups++;
-        processedGroups[group] = true;
+        uint256 groupScore = getScoreReader().getGroupScore(group);
+        // We need to precompute epoch rewards for each group since computation depends on total active votes for all groups.
+        uint256 epochRewards = getElection().getGroupEpochRewards(
+          group,
+          epochProcessing.totalRewardsVoter,
+          groupScore
+        );
+        processedGroups[group] = ProcessedGroup(true, epochRewards);
       }
     }
 
     require(epochProcessing.toProcessGroups == groups.length, "number of groups does not match");
 
-    for (uint i = 0; i < groups.length; i++) {
+    // since we are adding values it makes sense to start from the end
+    for (uint ii = groups.length; ii > 0; ii--) {
+      uint256 i = ii - 1;
+      ProcessedGroup storage processedGroup = processedGroups[groups[i]];
       // checks that group is actually from elected group
-      require(processedGroups[groups[i]], "group not processed");
+      require(processedGroup.processed, "group not processed");
+      getElection().distributeEpochRewards(
+        groups[i],
+        processedGroup.epochRewards,
+        lessers[i],
+        greaters[i]
+      );
+
       // by doing this, we avoid processing a group twice
       delete processedGroups[groups[i]];
-      // TODO what happens to uptime?
-      uint256 groupScore = getScoreReader().getGroupScore(groups[i]);
-      uint256 epochRewards = getElection().getGroupEpochRewards(
-        groups[i],
-        epochProcessing.totalRewardsVoter,
-        groupScore
-      );
-      getElection().distributeEpochRewards(groups[i], epochRewards, lessers[i], greaters[i]);
     }
     getCeloUnreleasedTreasure().release(
       registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID),
@@ -239,7 +251,7 @@ contract EpochManager is
       epochProcessing.totalRewardsCarbonFund
     );
     // run elections
-    elected = getElection().electNValidatorSigners(10, 20);
+    elected = getElection().electValidatorSigners();
     // TODO check how to nullify stuct
     epochProcessing.status = EpochProcessStatus.NotStarted;
   }
