@@ -34,7 +34,6 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
   address communityRewardFund;
   address reserveAddress;
   address scoreManagerAddress;
-  address nonOwner;
 
   uint256 firstEpochNumber = 100;
   uint256 firstEpochBlock = 100;
@@ -70,7 +69,6 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     epochManagerEnabler = actor("epochManagerEnabler");
     carbonOffsettingPartner = actor("carbonOffsettingPartner");
     communityRewardFund = actor("communityRewardFund");
-    nonOwner = actor("nonOwner");
 
     deployCodeTo("MockRegistry.sol", abi.encode(false), REGISTRY_ADDRESS);
     deployCodeTo("ScoreManager.sol", abi.encode(false), scoreManagerAddress);

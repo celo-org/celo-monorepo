@@ -190,30 +190,6 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     epochManagerEnabler = IEpochManagerEnabler(
       registry.getAddressForStringOrDie("EpochManagerEnabler")
     );
-    scoreManager = IScoreManager(registry.getAddressForStringOrDie("ScoreManager"));
-    election = IElection(registry.getAddressForStringOrDie("Election"));
-    celoUnreleasedTreasure = ICeloUnreleasedTreasure(
-      registry.getAddressForStringOrDie("CeloUnreleasedTreasure")
-    );
-
-    address scoreManagerOwner = scoreManager.owner();
-    vm.startPrank(scoreManagerOwner);
-
-    scoreManager.setGroupScore(groupList[0], groupScore[0]);
-    scoreManager.setGroupScore(groupList[1], groupScore[1]);
-    scoreManager.setGroupScore(groupList[2], groupScore[2]);
-
-    scoreManager.setValidatorScore(validatorsList[0], validatorScore[0]);
-    scoreManager.setValidatorScore(validatorsList[1], validatorScore[1]);
-    scoreManager.setValidatorScore(validatorsList[2], validatorScore[2]);
-    scoreManager.setValidatorScore(validatorsList[3], validatorScore[3]);
-    scoreManager.setValidatorScore(validatorsList[4], validatorScore[4]);
-    scoreManager.setValidatorScore(validatorsList[5], validatorScore[5]);
-
-    vm.stopPrank();
-
-    activateValidators();
-    vm.deal(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
   }
 
   function activateValidators() public {
