@@ -98,7 +98,7 @@ contract E2E_EpochManager_InitializeSystem is E2E_EpochManager {
   }
 
   function test_shouldRevert_WhenCalledByNonEnabler() public {
-    vm.expectRevert("msg.sender is not Initializer");
+    vm.expectRevert("msg.sender is not Enabler");
     epochManager.initializeSystem(1, 1, firstElected);
   }
 

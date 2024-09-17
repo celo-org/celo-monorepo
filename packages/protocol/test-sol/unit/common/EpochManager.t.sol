@@ -79,6 +79,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     scoreManager = ScoreManager(scoreManagerAddress);
 
     registry.setAddressFor(EpochManagerContract, address(epochManager));
+    registry.setAddressFor(EpochManagerEnablerContract, epochManagerEnabler);
     registry.setAddressFor(SortedOraclesContract, address(sortedOracles));
     registry.setAddressFor(GovernanceContract, communityRewardFund);
     registry.setAddressFor(EpochRewardsContract, address(epochRewards));
@@ -137,7 +138,7 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
       uint256 _startTimestamp,
       uint256 _currentRewardsBlock
     ) = epochManager.getCurrentEpoch();
-    assertEq(epochManager.epochManagerEnabler(), address(0));
+    assertGt(epochManager.getElected().length, 0);
     assertEq(epochManager.firstKnownEpoch(), firstEpochNumber);
     assertEq(_firstEpochBlock, firstEpochBlock);
     assertEq(_lastEpochBlock, 0);
@@ -149,13 +150,13 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
   function test_Reverts_processCannotBeStartedAgain() public virtual {
     vm.prank(epochManagerEnabler);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
-    vm.prank(address(0));
+    vm.prank(epochManagerEnabler);
     vm.expectRevert("Epoch system already initialized");
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
   }
 
   function test_Reverts_WhenSystemInitializedByOtherContract() public virtual {
-    vm.expectRevert("msg.sender is not Initializer");
+    vm.expectRevert("msg.sender is not Enabler");
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
   }
 }

@@ -233,18 +233,6 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     }
   }
 
-  function test_IsSetupCorrect() public {
-    assertEq(
-      registry.getAddressForStringOrDie("EpochManagerEnabler"),
-      epochManager.epochManagerEnabler()
-    );
-    assertEq(
-      registry.getAddressForStringOrDie("EpochManagerEnabler"),
-      address(epochManagerEnabler)
-    );
-    assertEq(address(epochManagerEnabler), epochManager.epochManagerEnabler());
-  }
-
   function test_Reverts_whenSystemNotInitialized() public {
     vm.expectRevert("Epoch system not initialized");
     epochManager.startNextEpochProcess();
