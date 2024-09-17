@@ -196,7 +196,7 @@ contract EpochManager is
         epochProcessing.toProcessGroups++;
         uint256 groupScore = getScoreReader().getGroupScore(group);
         // We need to precompute epoch rewards for each group since computation depends on total active votes for all groups.
-        uint256 epochRewards = getElection().getGroupEpochRewards(
+        uint256 epochRewards = getElection().getGroupEpochRewardsScore(
           group,
           epochProcessing.totalRewardsVoter,
           groupScore
