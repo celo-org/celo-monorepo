@@ -6,9 +6,13 @@ import "../common/UsingPrecompiles.sol";
 
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/interfaces/IEpochManagerEnabler.sol";
 import "../../contracts/governance/interfaces/IEpochRewards.sol";
 
-contract EpochManagerInitializer is Initializable, UsingPrecompiles, UsingRegistry {
+contract EpochManagerEnabler is Initializable, UsingPrecompiles, UsingRegistry {
+  uint256 public lastKnownEpochNumber;
+  address[] public lastKnownElectedAccounts;
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -27,22 +31,33 @@ contract EpochManagerInitializer is Initializable, UsingPrecompiles, UsingRegist
   /**
    * @notice initializes the epochManager contract during L2 transition.
    */
-  function initEpochManager() external onlyOwner {
-    uint256 currentEpoch = getEpochNumber();
+  function initEpochManager() external onlyL2 {
+    require(lastKnownEpochNumber != 0, "lastKnownEpochNumber not set.");
+    require(lastKnownElectedAccounts.length > 0, "lastKnownElectedAccounts not set.");
+    getEpochManager().initializeSystem(
+      lastKnownEpochNumber,
+      _getFirstBlockOfEpoch(lastKnownEpochNumber),
+      lastKnownElectedAccounts
+    );
+  }
+
+  /**
+   * @notice Stores the last known epochNumber and the related elected validator accounts.
+   */
+  function captureEpochAndValidators() external onlyL1 {
+    lastKnownEpochNumber = getEpochNumber();
 
     uint256 numberElectedValidators = numberValidatorsInCurrentSet();
 
-    address[] memory electedValidatorAddresses = new address[](numberElectedValidators);
+    lastKnownElectedAccounts = new address[](numberElectedValidators);
 
     for (uint256 i = 0; i < numberElectedValidators; i++) {
-      address validatorAddress = validatorSignerAddressFromCurrentSet(i);
-      electedValidatorAddresses[i] = validatorAddress;
+      // TODO: document how much gas this takes for 110 signers
+      address validatorAccountAddress = getAccounts().validatorSignerToAccount(
+        validatorSignerAddressFromCurrentSet(i)
+      );
+      lastKnownElectedAccounts[i] = validatorAccountAddress;
     }
-    getEpochManager().initializeSystem(
-      currentEpoch,
-      _getFirstBlockOfEpoch(currentEpoch),
-      electedValidatorAddresses
-    );
   }
 
   function getFirstBlockOfEpoch(uint256 currentEpoch) external view returns (uint256) {

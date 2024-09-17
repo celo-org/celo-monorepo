@@ -153,6 +153,14 @@ contract Election is
   );
   event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
 
+  modifier onlyVmOrPermitted(address permittedAddress) {
+    if (isL2()) require(msg.sender == permittedAddress, "Only permitted address can call");
+    else {
+      require(msg.sender == address(0), "Only VM can call");
+    }
+    _;
+  }
+
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
@@ -340,7 +348,7 @@ contract Election is
     uint256 value,
     address lesser,
     address greater
-  ) external onlyVm onlyL1 {
+  ) external onlyVmOrPermitted(registry.getAddressFor(EPOCH_MANAGER_REGISTRY_ID)) {
     _distributeEpochRewards(group, value, lesser, greater);
   }
 

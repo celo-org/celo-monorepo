@@ -5,7 +5,7 @@ pragma experimental ABIEncoderV2;
 import "celo-foundry-8/Test.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts-8/common/interfaces/ICeloToken.sol";
+import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts/governance/interfaces/IGovernance.sol";
 import { CeloUnreleasedTreasure } from "@celo-contracts-8/common/CeloUnreleasedTreasure.sol";
 import "@celo-contracts-8/common/IsL2Check.sol";
@@ -25,6 +25,7 @@ contract CeloUnreleasedTreasureTest is Test, TestConstants, IsL2Check {
   address owner = address(this);
 
   address celoTokenAddress = actor("celoTokenAddress");
+  address epochManagerAddress = actor("epochManagerAddress");
 
   address celoDistributionOwner = actor("celoDistributionOwner");
   address communityRewardFund = actor("communityRewardFund");
@@ -63,20 +64,20 @@ contract CeloUnreleasedTreasureTest is Test, TestConstants, IsL2Check {
 
     deployCodeTo("GoldToken.sol", abi.encode(false), celoTokenAddress);
     celoToken = ICeloToken(celoTokenAddress);
-    celoToken.setRegistry(REGISTRY_ADDRESS);
     // Using a mock contract, as foundry does not allow for library linking when using deployCodeTo
     governance = new MockGovernance();
 
     registry.setAddressFor("CeloToken", address(celoToken));
 
     registry.setAddressFor("Governance", address(governance));
+    registry.setAddressFor("EpochManager", address(epochManagerAddress));
 
     vm.deal(address(0), CELO_SUPPLY_CAP);
-    assertEq(celoToken.totalSupply(), 0, "starting total supply not zero.");
+    assertEq(celoToken.allocatedSupply(), 0, "starting total supply not zero.");
     // Mint L1 supply
     vm.prank(address(0));
     celoToken.mint(randomAddress, L1_MINTED_CELO_SUPPLY);
-    assertEq(celoToken.totalSupply(), L1_MINTED_CELO_SUPPLY, "total supply incorrect.");
+    assertEq(celoToken.allocatedSupply(), L1_MINTED_CELO_SUPPLY, "total supply incorrect.");
   }
 
   function newCeloUnreleasedTreasure() internal returns (CeloUnreleasedTreasure) {
@@ -130,5 +131,28 @@ contract CeloUnreleasedTreasureTest_initialize is CeloUnreleasedTreasureTest {
 
     vm.expectRevert();
     payableAddress.transfer(1 ether);
+  }
+}
+
+contract CeloUnreleasedTreasureTest_release is CeloUnreleasedTreasureTest {
+  function setUp() public override {
+    super.setUp();
+    newCeloUnreleasedTreasure();
+  }
+
+  function test_ShouldTransferToRecepientAddress() public {
+    uint256 _balanceBefore = randomAddress.balance;
+    vm.prank(epochManagerAddress);
+
+    celoUnreleasedTreasure.release(randomAddress, 4);
+    uint256 _balanceAfter = randomAddress.balance;
+    assertGt(_balanceAfter, _balanceBefore);
+  }
+
+  function test_Reverts_WhenCalledByOtherThanEpochManager() public {
+    vm.prank(randomAddress);
+
+    vm.expectRevert("Only the EpochManager contract can call this function.");
+    celoUnreleasedTreasure.release(randomAddress, 4);
   }
 }

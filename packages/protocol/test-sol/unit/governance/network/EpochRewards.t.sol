@@ -758,7 +758,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     epochRewards.updateTargetVotingYield();
   }
 }
-
+// TODO(soloseng): add L2 test case that uses the result from epochManager
 contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAndTheActualRemainingSupplyIs10pMoreThanTheTargetRemainingSupplyAfterRewards_calculateTargetEpochRewards is
   EpochRewardsTest
 {

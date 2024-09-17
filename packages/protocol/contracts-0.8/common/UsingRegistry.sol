@@ -12,6 +12,9 @@ import "../../contracts/common/interfaces/IAccounts.sol";
 import "../../contracts/common/interfaces/IEpochManager.sol";
 import "../../contracts/common/interfaces/IFreezer.sol";
 import "../../contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
+import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+import "../../contracts/common/interfaces/IFeeHandlerSeller.sol";
+import "../../contracts/common/interfaces/IEpochManager.sol";
 import "../../contracts/governance/interfaces/IGovernance.sol";
 import "../../contracts/governance/interfaces/ILockedGold.sol";
 import "../../contracts/governance/interfaces/ILockedCelo.sol";
@@ -19,12 +22,8 @@ import "../../contracts/governance/interfaces/IValidators.sol";
 import "../../contracts/governance/interfaces/IElection.sol";
 import "../../contracts/governance/interfaces/IEpochRewards.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
-import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
-import "./interfaces/IScoreReader.sol";
 
-import "../../contracts/governance/interfaces/IElection.sol";
-import "../../contracts/common/interfaces/IFeeHandlerSeller.sol";
-import "../../contracts/governance/interfaces/IEpochRewards.sol";
+import "./interfaces/IScoreReader.sol";
 
 contract UsingRegistry is Ownable {
   // solhint-disable state-visibility

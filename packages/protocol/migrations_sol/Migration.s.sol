@@ -27,6 +27,7 @@ import "@celo-contracts/common/interfaces/IFeeHandler.sol";
 import "@celo-contracts/common/interfaces/IFeeHandlerInitializer.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import "@celo-contracts/common/interfaces/IAccounts.sol";
+import "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
 import "@celo-contracts/governance/interfaces/ILockedGoldInitializer.sol";
 import "@celo-contracts/governance/interfaces/IValidatorsInitializer.sol";
 import "@celo-contracts/governance/interfaces/IElectionInitializer.sol";
@@ -50,8 +51,13 @@ import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectoryInitializer.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
 import "@celo-contracts-8/common/interfaces/ICeloUnreleasedTreasureInitializer.sol";
+import "@celo-contracts-8/common/interfaces/IEpochManagerEnablerInitializer.sol";
+import "@celo-contracts-8/common/interfaces/IEpochManagerInitializer.sol";
+import "@celo-contracts-8/common/interfaces/IScoreManagerInitializer.sol";
 import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/UsingRegistry.sol";
+
+import "@test-sol/utils/SECP256K1.sol";
 
 contract ForceTx {
   // event to trigger so a tx can be processed
@@ -234,6 +240,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateFeeHandler(json);
     migrateOdisPayments();
     migrateCeloUnreleasedTreasure();
+    migrateEpochManagerEnabler();
+    migrateEpochManager(json);
+    migrateScoreManager();
     migrateGovernance(json);
 
     vm.stopBroadcast();
@@ -241,6 +250,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // Functions with broadcast with different addresses
     // Validators needs to lock, which can be only used by the msg.sender
     electValidators(json);
+
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
+
+    captureEpochManagerEnablerValidators();
+
+    vm.stopBroadcast();
   }
 
   /**
@@ -930,6 +945,42 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     );
   }
 
+  function migrateEpochManagerEnabler() public {
+    deployProxiedContract(
+      "EpochManagerEnabler",
+      abi.encodeWithSelector(IEpochManagerEnablerInitializer.initialize.selector, REGISTRY_ADDRESS)
+    );
+  }
+
+  function migrateScoreManager() public {
+    deployProxiedContract(
+      "ScoreManager",
+      abi.encodeWithSelector(IScoreManagerInitializer.initialize.selector)
+    );
+  }
+
+  function migrateEpochManager(string memory json) public {
+    address carbonOffsettingPartner = abi.decode(
+      json.parseRaw(".epochManager.carbonOffsettingPartner"),
+      (address)
+    );
+    address newEpochDuration = abi.decode(
+      json.parseRaw(".epochManager.newEpochDuration"),
+      (address)
+    );
+
+    deployProxiedContract(
+      "EpochManager",
+      abi.encodeWithSelector(
+        IEpochManagerInitializer.initialize.selector,
+        REGISTRY_ADDRESS,
+        newEpochDuration,
+        carbonOffsettingPartner,
+        registry.getAddressForString("EpochManagerEnabler")
+      )
+    );
+  }
+
   function migrateGovernance(string memory json) public {
     bool useApprover = abi.decode(json.parseRaw(".governanceApproverMultiSig.required"), (bool));
 
@@ -1060,14 +1111,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function registerValidator(
     uint256 validatorIndex,
-    bytes memory ecdsaPubKey,
     uint256 validatorKey,
     uint256 amountToLock,
     address groupToAffiliate
   ) public returns (address) {
     vm.startBroadcast(validatorKey);
     lockGold(amountToLock);
-    bytes memory _ecdsaPubKey = ecdsaPubKey;
     address accountAddress = (new ForceTx()).identity();
 
     // these blobs are not checked in the contract
@@ -1082,6 +1131,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       bytes16(0x05050505050505050505050505050506),
       bytes16(0x06060606060606060606060606060607)
     );
+    (bytes memory ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(accountAddress, validatorKey);
     getValidators().registerValidator(ecdsaPubKey, newBlsPublicKey, newBlsPop);
     getValidators().affiliate(groupToAffiliate);
     console.log("Done registering validatora");
@@ -1091,20 +1141,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function getValidatorKeyIndex(
+    uint256 groupCount,
     uint256 groupIndex,
     uint256 validatorIndex,
     uint256 membersInAGroup
   ) public returns (uint256) {
-    return groupIndex * membersInAGroup + validatorIndex + 1;
-  }
-
-  function getValidatorKeyFromGroupGroup(
-    uint256[] memory keys,
-    uint256 groupIndex,
-    uint256 validatorIndex,
-    uint256 membersInAGroup
-  ) public returns (uint256) {
-    return keys[getValidatorKeyIndex(groupIndex, validatorIndex, membersInAGroup)];
+    return groupCount + groupIndex * membersInAGroup + validatorIndex;
   }
 
   function registerValidatorGroup(
@@ -1123,6 +1165,57 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     vm.stopBroadcast();
   }
 
+  function _generateEcdsaPubKeyWithSigner(
+    address _validator,
+    uint256 _signerPk
+  ) internal returns (bytes memory ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) {
+    (v, r, s) = getParsedSignatureOfAddress(_validator, _signerPk);
+
+    bytes32 addressHash = keccak256(abi.encodePacked(_validator));
+
+    ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
+  }
+
+  function addressToPublicKey(
+    bytes32 message,
+    uint8 _v,
+    bytes32 _r,
+    bytes32 _s
+  ) public returns (bytes memory) {
+    address SECP256K1Address = actor("SECP256K1Address");
+    deployCodeTo("SECP256K1.sol:SECP256K1", SECP256K1Address);
+    ISECP256K1 sECP256K1 = ISECP256K1(SECP256K1Address);
+
+    string memory header = "\x19Ethereum Signed Message:\n32";
+    bytes32 _message = keccak256(abi.encodePacked(header, message));
+    (uint256 x, uint256 y) = sECP256K1.recover(
+      uint256(_message),
+      _v - 27,
+      uint256(_r),
+      uint256(_s)
+    );
+    return abi.encodePacked(x, y);
+  }
+
+  function actor(string memory name) internal returns (address) {
+    return vm.addr(uint256(keccak256(abi.encodePacked(name))));
+  }
+
+  function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32) {
+    // 32 is the length in bytes of hash,
+    // enforced by the type signature above
+    return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
+  }
+
+  function getParsedSignatureOfAddress(
+    address _address,
+    uint256 privateKey
+  ) public pure returns (uint8, bytes32, bytes32) {
+    bytes32 addressHash = keccak256(abi.encodePacked(_address));
+    bytes32 prefixedHash = toEthSignedMessageHash(addressHash);
+    return vm.sign(privateKey, prefixedHash);
+  }
+
   function electValidators(string memory json) public {
     console.log("Electing validators: ");
 
@@ -1137,7 +1230,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       json.parseRaw(".validators.validatorLockedGoldRequirements.value"),
       (uint256)
     );
-    bytes[] memory ecdsaPubKeys = abi.decode(json.parseRaw(".validators.ecdsaPubKeys"), (bytes[]));
     // attestationKeys not migrated
 
     if (valKeys.length == 0) {
@@ -1150,52 +1242,76 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       );
     }
 
-    uint256 validatorGroup0Key = valKeys[0];
+    uint256 groupCount = 3;
+    console.log("groupCount", groupCount);
 
-    address groupAddress = registerValidatorGroup(
-      validatorGroup0Key,
-      maxGroupSize * validatorLockedGoldRequirements,
-      commission,
-      json
-    );
+    address[] memory groups = new address[](groupCount);
 
-    console.log("  * Registering ${group.valKeys.length} validators ...");
+    // register 3 validator groups
+    for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
+      address groupAddress = registerValidatorGroup(
+        valKeys[groupIndex],
+        maxGroupSize * validatorLockedGoldRequirements,
+        commission,
+        json
+      );
+      groups[groupIndex] = groupAddress;
+      console.log("registered group: ", groupAddress);
+    }
+
+    console.log("  * Registering validators ... Count: ", valKeys.length - groupCount);
     // Split the validator keys into groups that will fit within the max group size.
-    uint256 amountOfGroups = Math.ceilDiv(valKeys.length, maxGroupSize);
 
     // TODO change name of variable amount of groups for amount in group
-    for (uint256 validatorIndex = 0; validatorIndex < amountOfGroups; validatorIndex++) {
-      console.log("Validator key index", getValidatorKeyIndex(0, validatorIndex, maxGroupSize));
-      console.log("Registering validator #: ", validatorIndex);
-      bytes memory ecdsaPubKey = ecdsaPubKeys[
-        getValidatorKeyIndex(0, validatorIndex, maxGroupSize)
-      ];
-      address validator = registerValidator(
-        validatorIndex,
-        ecdsaPubKey,
-        getValidatorKeyFromGroupGroup(valKeys, 0, validatorIndex, maxGroupSize),
-        validatorLockedGoldRequirements,
-        groupAddress
-      );
-      // TODO start broadcast
-      console.log("Adding to group...");
-
-      vm.startBroadcast(validatorGroup0Key);
-      if (validatorIndex == 0) {
-        getValidators().addFirstMember(validator, address(0), address(0));
-        console.log("Making group vote for itself");
-        getElection().vote(
-          groupAddress,
-          getLockedGold().getAccountNonvotingLockedGold(groupAddress),
-          address(0),
-          address(0)
+    for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
+      address groupAddress = groups[groupIndex];
+      console.log("Registering members for group: ", groupAddress);
+      for (uint256 validatorIndex = 0; validatorIndex < maxGroupSize; validatorIndex++) {
+        uint256 validatorKeyIndex = getValidatorKeyIndex(
+          groupCount,
+          groupIndex,
+          validatorIndex,
+          maxGroupSize
         );
-      } else {
-        // unimplemented
-        console.log("WARNING: case not implemented");
-      }
+        console.log("Registering validator #: ", validatorIndex);
+        address validator = registerValidator(
+          validatorIndex,
+          valKeys[validatorKeyIndex],
+          validatorLockedGoldRequirements,
+          groupAddress
+        );
+        // TODO start broadcast
+        console.log("Adding to group...");
 
-      vm.stopBroadcast();
+        vm.startBroadcast(groups[groupIndex]);
+        address greater = groupIndex == 0 ? address(0) : groups[groupIndex - 1];
+
+        if (validatorIndex == 0) {
+          getValidators().addFirstMember(validator, address(0), greater);
+          console.log("Making group vote for itself");
+        } else {
+          getValidators().addMember(validator);
+        }
+        getElection().vote(groupAddress, validatorLockedGoldRequirements, address(0), greater);
+
+        vm.stopBroadcast();
+      }
     }
+  }
+
+  function captureEpochManagerEnablerValidators() public {
+    address numberValidatorsInCurrentSetPrecompileAddress = 0x00000000000000000000000000000000000000f9;
+    numberValidatorsInCurrentSetPrecompileAddress.call(
+      abi.encodeWithSignature("setNumberOfValidators()")
+    );
+
+    address validatorSignerAddressFromCurrentSetPrecompileAddress = 0x00000000000000000000000000000000000000fa;
+    validatorSignerAddressFromCurrentSetPrecompileAddress.call(
+      abi.encodeWithSignature("setValidators()")
+    );
+
+    address epochManagerEnabler = registry.getAddressForString("EpochManagerEnabler");
+    IEpochManagerEnabler epochManagerEnablerContract = IEpochManagerEnabler(epochManagerEnabler);
+    epochManagerEnablerContract.captureEpochAndValidators();
   }
 }

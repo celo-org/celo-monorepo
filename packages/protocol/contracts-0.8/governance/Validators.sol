@@ -648,6 +648,19 @@ contract Validators is
   }
 
   /**
+   * @notice Allows the EpochManager contract to mint stable token for itself.
+   * @param amount The amount to be minted.
+   */
+  function mintStableToEpochManager(
+    uint256 amount
+  ) external onlyL2 nonReentrant onlyRegisteredContract(EPOCH_MANAGER_REGISTRY_ID) {
+    require(
+      IStableToken(getStableToken()).mint(msg.sender, amount),
+      "mint failed to epoch manager"
+    );
+  }
+
+  /**
    * @notice Returns the validator BLS key.
    * @param signer The account that registered the validator or its authorized signing address.
    * @return blsPublicKey The validator BLS key.
@@ -886,7 +899,7 @@ contract Validators is
     address account,
     uint256 score,
     uint256 maxPayment
-  ) external view returns (uint256) {
+  ) external view virtual returns (uint256) {
     require(isValidator(account), "Not a validator");
     FixidityLib.Fraction memory scoreFraction = FixidityLib.wrap(score);
     require(scoreFraction.lte(FixidityLib.fixed1()), "Score must be <= 1");
