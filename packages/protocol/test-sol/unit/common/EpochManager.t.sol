@@ -34,7 +34,6 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
   address communityRewardFund;
   address reserveAddress;
   address scoreManagerAddress;
-  address nonOwner;
 
   uint256 firstEpochNumber = 100;
   uint256 firstEpochBlock = 100;
@@ -70,7 +69,6 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     epochManagerEnabler = actor("epochManagerEnabler");
     carbonOffsettingPartner = actor("carbonOffsettingPartner");
     communityRewardFund = actor("communityRewardFund");
-    nonOwner = actor("nonOwner");
 
     deployCodeTo("MockRegistry.sol", abi.encode(false), REGISTRY_ADDRESS);
     deployCodeTo("ScoreManager.sol", abi.encode(false), scoreManagerAddress);
@@ -79,6 +77,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     scoreManager = ScoreManager(scoreManagerAddress);
 
     registry.setAddressFor(EpochManagerContract, address(epochManager));
+    registry.setAddressFor(EpochManagerEnablerContract, epochManagerEnabler);
     registry.setAddressFor(SortedOraclesContract, address(sortedOracles));
     registry.setAddressFor(GovernanceContract, communityRewardFund);
     registry.setAddressFor(EpochRewardsContract, address(epochRewards));
@@ -100,12 +99,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
     scoreManager.setValidatorScore(actor("validator1"), 1);
 
-    epochManager.initialize(
-      REGISTRY_ADDRESS,
-      epochDuration,
-      carbonOffsettingPartner,
-      epochManagerEnabler
-    );
+    epochManager.initialize(REGISTRY_ADDRESS, 10);
 
     blockTravel(vm, firstEpochBlock);
   }
@@ -123,14 +117,12 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 contract EpochManagerTest_initialize is EpochManagerTest {
   function test_initialize() public virtual {
     assertEq(address(epochManager.registry()), REGISTRY_ADDRESS);
-    assertEq(epochManager.epochDuration(), epochDuration);
-    assertEq(epochManager.carbonOffsettingPartner(), carbonOffsettingPartner);
-    assertEq(epochManager.epochManagerEnabler(), epochManagerEnabler);
+    assertEq(epochManager.epochDuration(), 10);
   }
 
   function test_Reverts_WhenAlreadyInitialized() public virtual {
     vm.expectRevert("contract already initialized");
-    epochManager.initialize(REGISTRY_ADDRESS, 10, carbonOffsettingPartner, epochManagerEnabler);
+    epochManager.initialize(REGISTRY_ADDRESS, 10);
   }
 }
 
@@ -144,7 +136,7 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
       uint256 _startTimestamp,
       uint256 _currentRewardsBlock
     ) = epochManager.getCurrentEpoch();
-    assertEq(epochManager.epochManagerEnabler(), address(0));
+    assertGt(epochManager.getElected().length, 0);
     assertEq(epochManager.firstKnownEpoch(), firstEpochNumber);
     assertEq(_firstEpochBlock, firstEpochBlock);
     assertEq(_lastEpochBlock, 0);
@@ -156,13 +148,13 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
   function test_Reverts_processCannotBeStartedAgain() public virtual {
     vm.prank(epochManagerEnabler);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
-    vm.prank(address(0));
+    vm.prank(epochManagerEnabler);
     vm.expectRevert("Epoch system already initialized");
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
   }
 
   function test_Reverts_WhenSystemInitializedByOtherContract() public virtual {
-    vm.expectRevert("msg.sender is not Initializer");
+    vm.expectRevert("msg.sender is not Enabler");
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
   }
 }

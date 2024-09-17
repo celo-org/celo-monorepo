@@ -11,4 +11,5 @@ interface IEpochRewards {
   function getCarbonOffsettingFraction() external view returns (uint256);
   function getTargetVotingGoldFraction() external view returns (uint256);
   function getRewardsMultiplier() external view returns (uint256);
+  function carbonOffsettingPartner() external view returns (address);
 }
