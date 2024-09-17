@@ -193,10 +193,11 @@ contract EpochRewardsTest_setTargetVotingGoldFraction is EpochRewardsTest {
     epochRewards.setTargetVotingGoldFraction(targetVotingGoldFraction);
   }
 
-  function test_Reverts_WhenCalledOnL2() public {
+  function test_Emits_WhenCalledOnL2() public {
     _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    epochRewards.setTargetVotingGoldFraction(targetVotingGoldFraction);
+    vm.expectEmit(true, true, true, true);
+    emit TargetVotingGoldFractionSet(newFraction);
+    epochRewards.setTargetVotingGoldFraction(newFraction);
   }
 }
 
@@ -238,10 +239,11 @@ contract EpochRewardsTest_setCommunityRewardFraction is EpochRewardsTest {
     epochRewards.setCommunityRewardFraction(communityRewardFraction);
   }
 
-  function test_Reverts_WhenCalledOnL2() public {
+  function test_Emits_WhenCalledOnL2() public {
     _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    epochRewards.setCommunityRewardFraction(communityRewardFraction);
+    vm.expectEmit(true, true, true, true);
+    emit CommunityRewardFractionSet(newFraction);
+    epochRewards.setCommunityRewardFraction(newFraction);
   }
 }
 
@@ -274,10 +276,11 @@ contract EpochRewardsTest_setTargetValidatorEpochPayment is EpochRewardsTest {
     epochRewards.setTargetValidatorEpochPayment(targetValidatorEpochPayment);
   }
 
-  function test_Reverts_WhenCalledOnL2() public {
+  function test_Emits_WhenCalledOnL2() public {
     _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    epochRewards.setTargetValidatorEpochPayment(targetValidatorEpochPayment);
+    vm.expectEmit(true, true, true, true);
+    emit TargetValidatorEpochPaymentSet(newPayment);
+    epochRewards.setTargetValidatorEpochPayment(newPayment);
   }
 }
 
@@ -332,12 +335,17 @@ contract EpochRewardsTest_setRewardsMultiplierParameters is EpochRewardsTest {
     );
   }
 
-  function test_Reverts_WhenCalledOnL2() public {
+  function test_Emits_WhenCalledOnL2() public {
     _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
+    vm.expectEmit(true, true, true, true);
+    emit RewardsMultiplierParametersSet(
+      rewardsMultiplierMax,
+      newRewardsMultiplierAdjustmentsUnderspend,
+      rewardsMultiplierAdjustmentsOverspend
+    );
     epochRewards.setRewardsMultiplierParameters(
       rewardsMultiplierMax,
-      rewardsMultiplierAdjustmentsUnderspend,
+      newRewardsMultiplierAdjustmentsUnderspend,
       rewardsMultiplierAdjustmentsOverspend
     );
   }
@@ -388,9 +396,13 @@ contract EpochRewardsTest_setTargetVotingYieldParameters is EpochRewardsTest {
     );
   }
 
-  function test_Reverts_WhenCalledOnL2() public {
+  function test_Emits_WhenCalledOnL2() public {
     _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
+    vm.expectEmit(true, true, true, true);
+    emit TargetVotingYieldParametersSet(
+      newTargetVotingYieldParamsMax,
+      newTargetVotingYieldParamsAdjustmentFactor
+    );
     epochRewards.setTargetVotingYieldParameters(
       newTargetVotingYieldParamsMax,
       newTargetVotingYieldParamsAdjustmentFactor
@@ -420,9 +432,10 @@ contract EpochRewardsTest_setTargetVotingYield is EpochRewardsTest {
     epochRewards.setTargetVotingYield(newTargetVotingYieldParamsInitial);
   }
 
-  function test_Reverts_WhenCalledOnL2() public {
+  function test_Emits_WhenCalledOnL2() public {
     _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
+    vm.expectEmit(true, true, true, true);
+    emit TargetVotingYieldSet(newTargetVotingYieldParamsInitial);
     epochRewards.setTargetVotingYield(newTargetVotingYieldParamsInitial);
   }
 }
@@ -446,7 +459,6 @@ contract EpochRewardsTest_getTargetVoterRewards is EpochRewardsTest {
 }
 
 contract EpochRewardsTest_getTargetTotalEpochPaymentsInGold is EpochRewardsTest {
-  // TODO(soloseng): add L2 test case that uses EpochManager
   function test_ShouldgetTargetTotalEpochPaymentsInGold_WhenExchangeRateIsSet() public {
     uint256 numberValidators = 100;
     epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
@@ -457,7 +469,6 @@ contract EpochRewardsTest_getTargetTotalEpochPaymentsInGold is EpochRewardsTest 
 }
 
 contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
-  // TODO(soloseng): add L2 test case using EpochManager
   uint256 constant timeDelta = YEAR * 10;
   uint256 expectedTargetTotalSupply;
   uint256 expectedTargetRemainingSupply;
@@ -504,7 +515,6 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
 }
 
 contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
-  //TODO(soloseng): add L2 test case that uses epochManager
   uint256 constant totalSupply = 6000000 ether;
   uint256 constant reserveBalance = 1000000 ether;
   uint256 constant floatingSupply = totalSupply - reserveBalance;
@@ -761,7 +771,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     epochRewards.updateTargetVotingYield();
   }
 }
-// TODO(soloseng): add L2 test case that uses the result from epochManager
+
 contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAndTheActualRemainingSupplyIs10pMoreThanTheTargetRemainingSupplyAfterRewards_calculateTargetEpochRewards is
   EpochRewardsTest
 {

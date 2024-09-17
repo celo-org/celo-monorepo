@@ -54,8 +54,8 @@ contract UsingRegistry is Ownable {
   bytes32 constant CELO_UNRELEASED_TREASURE_REGISTRY_ID =
     keccak256(abi.encodePacked("CeloUnreleasedTreasure"));
   bytes32 constant EPOCH_REWARDS_REGISTRY_ID = keccak256(abi.encodePacked("EpochRewards"));
-  bytes32 constant EPOCH_MANAGER_INITIALIZER_REGISTRY_ID =
-    keccak256(abi.encodePacked("EpochManagerInitializer"));
+  bytes32 constant EPOCH_MANAGER_ENABLER_REGISTRY_ID =
+    keccak256(abi.encodePacked("EpochManagerEnabler"));
   bytes32 constant EPOCH_MANAGER_REGISTRY_ID = keccak256(abi.encodePacked("EpochManager"));
   // solhint-enable state-visibility
 

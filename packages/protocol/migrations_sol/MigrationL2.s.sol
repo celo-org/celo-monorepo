@@ -40,7 +40,9 @@ contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
     console.log("Initializing EpochManager system");
     address[] memory firstElected = getValidators().getRegisteredValidators();
     IEpochManager epochManager = getEpochManager();
-    address epochManagerEnablerAddress = epochManager.epochManagerEnabler();
+    address epochManagerEnablerAddress = registry.getAddressForOrDie(
+      EPOCH_MANAGER_ENABLER_REGISTRY_ID
+    );
 
     IEpochManagerEnabler epochManagerEnabler = IEpochManagerEnabler(epochManagerEnablerAddress);
     epochManagerEnabler.initEpochManager();

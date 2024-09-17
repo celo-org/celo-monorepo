@@ -41,7 +41,7 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
     uint256 totalVotes = election.getTotalVotes();
 
     epochManagerOwner = Ownable(address(epochManager)).owner();
-    epochManagerEnabler = epochManager.epochManagerEnabler();
+    epochManagerEnabler = registry.getAddressForOrDie(EPOCH_MANAGER_ENABLER_REGISTRY_ID);
     firstElected = getValidators().getRegisteredValidators();
 
     epochDuration = epochManager.epochDuration();
@@ -98,7 +98,7 @@ contract E2E_EpochManager_InitializeSystem is E2E_EpochManager {
   }
 
   function test_shouldRevert_WhenCalledByNonEnabler() public {
-    vm.expectRevert("msg.sender is not Initializer");
+    vm.expectRevert("msg.sender is not Enabler");
     epochManager.initializeSystem(1, 1, firstElected);
   }
 

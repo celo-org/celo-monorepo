@@ -8,6 +8,7 @@ import "../../../contracts/governance/interfaces/IEpochRewards.sol";
  */
 contract EpochRewardsMock08 is IEpochRewards {
   uint256 private numValidatorsInCurrentSet;
+  address public carbonOffsettingPartner;
 
   function setNumberValidatorsInCurrentSet(uint256 value) external {
     numValidatorsInCurrentSet = value;
