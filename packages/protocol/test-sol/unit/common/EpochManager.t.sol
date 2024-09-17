@@ -90,7 +90,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     uint256 res = scoreManager.getValidatorScore(actor("validator1"));
     uint256 res2 = epochRewards.getCommunityRewardFraction();
 
-    epochManager.initialize(REGISTRY_ADDRESS, 10, carbonOffsettingPartner, epochManagerInitializer);
+    epochManager.initialize(REGISTRY_ADDRESS, 10);
 
     blockTravel(vm, firstEpochBlock);
   }
@@ -100,12 +100,11 @@ contract EpochManagerTest_initialize is EpochManagerTest {
   function test_initialize() public virtual {
     assertEq(address(epochManager.registry()), REGISTRY_ADDRESS);
     assertEq(epochManager.epochDuration(), 10);
-    assertEq(epochManager.carbonOffsettingPartner(), carbonOffsettingPartner);
   }
 
   function test_Reverts_WhenAlreadyInitialized() public virtual {
     vm.expectRevert("contract already initialized");
-    epochManager.initialize(REGISTRY_ADDRESS, 10, carbonOffsettingPartner, epochManagerInitializer);
+    epochManager.initialize(REGISTRY_ADDRESS, 10);
   }
 }
 
