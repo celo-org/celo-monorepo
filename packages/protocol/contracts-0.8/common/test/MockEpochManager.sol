@@ -22,7 +22,7 @@ contract MockEpochManager is IEpochManager {
   uint256 public firstKnownEpoch;
   uint256 private currentEpochNumber;
   address[] public elected;
-  address public epochManagerInitializer;
+  address public epochManagerEnabler;
   bool initialized;
   mapping(uint256 => Epoch) private epochs;
 
@@ -45,7 +45,7 @@ contract MockEpochManager is IEpochManager {
     elected = firstElected;
 
     initialized = true;
-    epochManagerInitializer = address(0);
+    epochManagerEnabler = address(0);
   }
 
   function startNextEpochProcess() external {}
@@ -55,16 +55,10 @@ contract MockEpochManager is IEpochManager {
     address[] calldata greaters
   ) external {}
 
-  function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256, uint256) {
+  function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256) {
     Epoch storage _epoch = epochs[currentEpochNumber];
 
-    return (
-      _epoch.firstBlock,
-      _epoch.lastBlock,
-      _epoch.startTimestamp,
-      _epoch.endTimestamp,
-      _epoch.rewardsBlock
-    );
+    return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
   }
 
   function getCurrentEpochNumber() external view returns (uint256) {
@@ -72,5 +66,13 @@ contract MockEpochManager is IEpochManager {
   }
   function getElected() external view returns (address[] memory) {
     return elected;
+  }
+
+  function getEpochProcessingState()
+    external
+    view
+    returns (uint256, uint256, uint256, uint256, uint256)
+  {
+    return (0, 0, 0, 0, 0);
   }
 }

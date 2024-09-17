@@ -11,6 +11,7 @@ import "../common/UsingRegistry.sol";
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/IEpochManager.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/interfaces/IEpochManager.sol";
 
 contract EpochManager is
   Initializable,
@@ -23,7 +24,6 @@ contract EpochManager is
     uint256 firstBlock;
     uint256 lastBlock;
     uint256 startTimestamp;
-    uint256 endTimestamp;
     uint256 rewardsBlock;
   }
 
@@ -33,7 +33,7 @@ contract EpochManager is
   }
 
   struct EpochProcessState {
-    EpochProcessStatus status; // TODO maybe a enum for future updates
+    EpochProcessStatus status;
     uint256 perValidatorReward; // The per validator epoch reward.
     uint256 totalRewardsVoter; // The total rewards to voters.
     uint256 totalRewardsCommunity; // The total community reward.
@@ -43,6 +43,11 @@ contract EpochManager is
     uint256 toProcessGroups;
   }
 
+  struct ProcessedGroup {
+    bool processed;
+    uint256 epochRewards;
+  }
+
   // the length of an epoch in seconds
   uint256 public epochDuration;
 
@@ -50,9 +55,7 @@ contract EpochManager is
   uint256 private currentEpochNumber;
   address[] public elected;
 
-  // TODO this should be able to get deleted easily
-  // maybe even having it in a stadalone contract
-  mapping(address => bool) public processedGroups;
+  mapping(address => ProcessedGroup) public processedGroups;
 
   EpochProcessState public epochProcessing;
   mapping(uint256 => Epoch) private epochs;
@@ -70,10 +73,10 @@ contract EpochManager is
    */
   event EpochProcessingEnded(uint256 indexed epochNumber);
 
-  modifier onlyEpochManagerInitializer() {
+  modifier onlyEpochManagerEnabler() {
     require(
-      msg.sender == registry.getAddressForOrDie(EPOCH_MANAGER_INITIALIZER_REGISTRY_ID),
-      "msg.sender is not Initializer"
+      msg.sender == registry.getAddressForOrDie(EPOCH_MANAGER_ENABLER_REGISTRY_ID),
+      "msg.sender is not Enabler"
     );
     _;
   }
@@ -102,7 +105,16 @@ contract EpochManager is
     uint256 firstEpochNumber,
     uint256 firstEpochBlock,
     address[] memory firstElected
-  ) external onlyEpochManagerInitializer {
+  ) external onlyEpochManagerEnabler {
+    require(
+      address(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID)).balance > 0,
+      "CeloUnreleasedTreasury not yet funded."
+    );
+    require(
+      getCeloToken().balanceOf(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID)) >
+        0,
+      "CeloUnreleasedTreasury not yet funded."
+    );
     require(!systemAlreadyInitialized(), "Epoch system already initialized");
     require(firstEpochNumber > 0, "First epoch number must be greater than 0");
     require(firstEpochBlock > 0, "First epoch block must be greater than 0");
@@ -159,11 +171,9 @@ contract EpochManager is
     address[] calldata lessers,
     address[] calldata greaters
   ) external nonReentrant {
-    // TODO complete this function
     require(isOnEpochProcess(), "Epoch process is not started");
     // finalize epoch
-    // TODO last block should be the block before and timestamp from previous block
-    epochs[currentEpochNumber].endTimestamp = block.timestamp;
+    // last block should be the block before and timestamp from previous block
     epochs[currentEpochNumber].lastBlock = block.number - 1;
     // start new epoch
     currentEpochNumber++;
@@ -172,27 +182,36 @@ contract EpochManager is
 
     for (uint i = 0; i < elected.length; i++) {
       address group = getValidators().getValidatorsGroup(elected[i]);
-      if (!processedGroups[group]) {
+      if (!processedGroups[group].processed) {
         epochProcessing.toProcessGroups++;
-        processedGroups[group] = true;
+        uint256 groupScore = getScoreReader().getGroupScore(group);
+        // We need to precompute epoch rewards for each group since computation depends on total active votes for all groups.
+        uint256 epochRewards = getElection().getGroupEpochRewards(
+          group,
+          epochProcessing.totalRewardsVoter,
+          groupScore
+        );
+        processedGroups[group] = ProcessedGroup(true, epochRewards);
       }
     }
 
     require(epochProcessing.toProcessGroups == groups.length, "number of groups does not match");
 
-    for (uint i = 0; i < groups.length; i++) {
+    // since we are adding values it makes sense to start from the end
+    for (uint ii = groups.length; ii > 0; ii--) {
+      uint256 i = ii - 1;
+      ProcessedGroup storage processedGroup = processedGroups[groups[i]];
       // checks that group is actually from elected group
-      require(processedGroups[groups[i]], "group not processed");
+      require(processedGroup.processed, "group not processed");
+      getElection().distributeEpochRewards(
+        groups[i],
+        processedGroup.epochRewards,
+        lessers[i],
+        greaters[i]
+      );
+
       // by doing this, we avoid processing a group twice
       delete processedGroups[groups[i]];
-      // TODO what happens to uptime?
-      uint256 groupScore = getScoreReader().getGroupScore(groups[i]);
-      uint256 epochRewards = getElection().getGroupEpochRewards(
-        groups[i],
-        epochProcessing.totalRewardsVoter,
-        groupScore
-      );
-      getElection().distributeEpochRewards(groups[i], epochRewards, lessers[i], greaters[i]);
     }
     getCeloUnreleasedTreasure().release(
       registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID),
@@ -203,28 +222,36 @@ contract EpochManager is
       epochProcessing.totalRewardsCarbonFund
     );
     // run elections
-    elected = getElection().electNValidatorSigners(10, 20);
+    elected = getElection().electValidatorSigners();
     // TODO check how to nullify stuct
     epochProcessing.status = EpochProcessStatus.NotStarted;
   }
 
   /// returns the current epoch Info
-  function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256, uint256) {
+  function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256) {
     Epoch storage _epoch = epochs[currentEpochNumber];
-
-    return (
-      _epoch.firstBlock,
-      _epoch.lastBlock,
-      _epoch.startTimestamp,
-      _epoch.endTimestamp,
-      _epoch.rewardsBlock
-    );
+    return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
   }
 
   /// returns the current epoch number.
   function getCurrentEpochNumber() external view returns (uint256) {
     require(systemAlreadyInitialized(), "EpochManager system not yet initialized.");
     return currentEpochNumber;
+  }
+
+  /// returns epoch processing state
+  function getEpochProcessingState()
+    external
+    view
+    returns (uint256, uint256, uint256, uint256, uint256)
+  {
+    return (
+      uint256(epochProcessing.status),
+      epochProcessing.perValidatorReward,
+      epochProcessing.totalRewardsVoter,
+      epochProcessing.totalRewardsCommunity,
+      epochProcessing.totalRewardsCarbonFund
+    );
   }
 
   function getElected() external view returns (address[] memory) {
@@ -280,7 +307,6 @@ contract EpochManager is
   }
 
   function allocateValidatorsRewards() internal {
-    // TODO complete this function
     uint256 totalRewards = 0;
     IScoreReader scoreReader = getScoreReader();
     IValidators validators = getValidators();
@@ -296,7 +322,7 @@ contract EpochManager is
       totalRewards += validatorReward;
     }
     // Mint all cUSD required for payment and the corresponding CELO
-    IStableToken(getStableToken()).mint(address(this), totalRewards);
+    validators.mintStableToEpochManager(totalRewards);
     // this should have a setter for the oracle.
 
     (uint256 numerator, uint256 denominator) = IOracle(address(getSortedOracles())).getExchangeRate(
@@ -304,7 +330,6 @@ contract EpochManager is
     );
 
     uint256 CELOequivalent = (numerator * totalRewards) / denominator;
-    // this is not a mint anymore
     getCeloUnreleasedTreasure().release(
       registry.getAddressForOrDie(RESERVE_REGISTRY_ID),
       CELOequivalent

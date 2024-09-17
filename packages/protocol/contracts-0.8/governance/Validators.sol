@@ -166,6 +166,11 @@ contract Validators is
     _;
   }
 
+  modifier onlyEpochManager() {
+    require(msg.sender == address(getEpochManager()), "Only epoch manager can call");
+    _;
+  }
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -514,7 +519,7 @@ contract Validators is
   }
 
   /**
-   * @notice Adds the first member to a group's list of members and marks it eligible for election.
+   * @notice Adds the first member to a group's list of members and marks the group eligible for election.
    * @param validator The validator to add to the group
    * @param lesser The address of the group that has received fewer votes than this group.
    * @param greater The address of the group that has received more votes than this group.
@@ -645,6 +650,19 @@ contract Validators is
     ValidatorGroup storage group = groups[account];
     group.slashInfo.multiplier = FixidityLib.wrap(group.slashInfo.multiplier.unwrap().div(2));
     group.slashInfo.lastSlashed = block.timestamp;
+  }
+
+  /**
+   * @notice Allows the EpochManager contract to mint stable token for itself.
+   * @param amount The amount to be minted.
+   */
+  function mintStableToEpochManager(
+    uint256 amount
+  ) external onlyL2 nonReentrant onlyRegisteredContract(EPOCH_MANAGER_REGISTRY_ID) {
+    require(
+      IStableToken(getStableToken()).mint(msg.sender, amount),
+      "mint failed to epoch manager"
+    );
   }
 
   /**
@@ -886,7 +904,7 @@ contract Validators is
     address account,
     uint256 score,
     uint256 maxPayment
-  ) external view returns (uint256) {
+  ) external view virtual returns (uint256) {
     require(isValidator(account), "Not a validator");
     FixidityLib.Fraction memory scoreFraction = FixidityLib.wrap(score);
     require(scoreFraction.lte(FixidityLib.fixed1()), "Score must be <= 1");

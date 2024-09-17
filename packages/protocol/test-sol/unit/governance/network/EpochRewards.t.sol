@@ -459,6 +459,7 @@ contract EpochRewardsTest_getTargetVoterRewards is EpochRewardsTest {
 }
 
 contract EpochRewardsTest_getTargetTotalEpochPaymentsInGold is EpochRewardsTest {
+  // TODO(soloseng): add L2 test case that uses EpochManager
   function test_ShouldgetTargetTotalEpochPaymentsInGold_WhenExchangeRateIsSet() public {
     uint256 numberValidators = 100;
     epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
@@ -469,6 +470,7 @@ contract EpochRewardsTest_getTargetTotalEpochPaymentsInGold is EpochRewardsTest 
 }
 
 contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
+  // TODO(soloseng): add L2 test case using EpochManager
   uint256 constant timeDelta = YEAR * 10;
   uint256 expectedTargetTotalSupply;
   uint256 expectedTargetRemainingSupply;
@@ -515,6 +517,7 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
 }
 
 contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
+  //TODO(soloseng): add L2 test case that uses epochManager
   uint256 constant totalSupply = 6000000 ether;
   uint256 constant reserveBalance = 1000000 ether;
   uint256 constant floatingSupply = totalSupply - reserveBalance;
@@ -771,7 +774,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     epochRewards.updateTargetVotingYield();
   }
 }
-
+// TODO(soloseng): add L2 test case that uses the result from epochManager
 contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAndTheActualRemainingSupplyIs10pMoreThanTheTargetRemainingSupplyAfterRewards_calculateTargetEpochRewards is
   EpochRewardsTest
 {

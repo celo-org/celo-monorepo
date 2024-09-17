@@ -3,10 +3,16 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "@celo-contracts-8/common/UsingRegistry.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
+import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.sol";
+import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
+import { IScoreManager } from "@celo-contracts-8/common/interfaces/IScoreManager.sol";
+import { IValidators } from "@celo-contracts/governance/interfaces/IValidators.sol";
+import { IElection } from "@celo-contracts/governance/interfaces/IElection.sol";
 
 // All core contracts that are expected to be in the Registry on the devchain
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
+import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";
 
@@ -17,6 +23,12 @@ contract Devchain is UsingRegistry, TestConstants {
   // All core contracts that are expected to be in the Registry on the devchain
   ISortedOracles sortedOracles;
   FeeCurrencyDirectory feeCurrencyDirectory;
+  IEpochManager epochManager;
+  ICeloUnreleasedTreasure celoUnreleasedTreasure;
+  IValidators validators;
+  IAccounts accounts;
+  IScoreManager scoreManager;
+  IElection election;
 
   constructor() {
     // The following line is required by UsingRegistry.sol
@@ -27,6 +39,13 @@ contract Devchain is UsingRegistry, TestConstants {
     feeCurrencyDirectory = FeeCurrencyDirectory(
       devchainRegistry.getAddressForStringOrDie("FeeCurrencyDirectory")
     ); // FeeCurrencyDirectory is not in UsingRegistry.sol
+
+    epochManager = getEpochManager();
+    celoUnreleasedTreasure = getCeloUnreleasedTreasure();
+    validators = getValidators();
+    accounts = getAccounts();
+    scoreManager = IScoreManager(address(getScoreReader()));
+    election = getElection();
 
     // TODO: Add missing core contracts below (see list in migrations_sol/constants.sol)
     // TODO: Consider asserting that all contracts we expect are available in the Devchain class
