@@ -43,17 +43,17 @@ contract EpochManager is
     uint256 toProcessGroups;
   }
 
+  struct ProcessedGroup {
+    bool processed;
+    uint256 epochRewards;
+  }
+
   // the length of an epoch in seconds
   uint256 public epochDuration;
 
   uint256 public firstKnownEpoch;
   uint256 private currentEpochNumber;
   address[] public elected;
-
-  struct ProcessedGroup {
-    bool processed;
-    uint256 epochRewards;
-  }
 
   mapping(address => ProcessedGroup) public processedGroups;
 

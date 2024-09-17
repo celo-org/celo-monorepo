@@ -34,15 +34,6 @@ contract MockCeloToken08 {
     return _transfer(from, to, amount);
   }
 
-  function _transfer(address from, address to, uint256 amount) internal returns (bool) {
-    if (balances[from] < amount) {
-      return false;
-    }
-    balances[from] -= amount;
-    balances[to] += amount;
-    return true;
-  }
-
   function setBalanceOf(address a, uint256 value) external {
     balances[a] = value;
   }
@@ -53,5 +44,14 @@ contract MockCeloToken08 {
 
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
+  }
+
+  function _transfer(address from, address to, uint256 amount) internal returns (bool) {
+    if (balances[from] < amount) {
+      return false;
+    }
+    balances[from] -= amount;
+    balances[to] += amount;
+    return true;
   }
 }
