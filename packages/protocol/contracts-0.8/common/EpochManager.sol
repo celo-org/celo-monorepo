@@ -55,8 +55,6 @@ contract EpochManager is
     uint256 epochRewards;
   }
 
-  // TODO this should be able to get deleted easily
-  // maybe even having it in a stadalone contract
   mapping(address => ProcessedGroup) public processedGroups;
 
   EpochProcessState public epochProcessing;
@@ -183,7 +181,6 @@ contract EpochManager is
     address[] calldata lessers,
     address[] calldata greaters
   ) external nonReentrant {
-    // TODO complete this function
     require(isOnEpochProcess(), "Epoch process is not started");
     // finalize epoch
     // TODO last block should be the block before and timestamp from previous block
