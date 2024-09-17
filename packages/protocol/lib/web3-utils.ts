@@ -207,6 +207,12 @@ export async function _setInitialProxyImplementation<
   return receipt.tx
 }
 
+export const getProxiedContract = async (contractName: string, contractPackage: ContractPackage) => {
+  const artifactsObject = ArtifactsSingleton.getInstance(contractPackage, artifacts)
+  /* eslint-disable-next-line */
+  return await getDeployedProxiedContract(contractName, artifactsObject)
+}
+
 export async function getDeployedProxiedContract<ContractInstance extends Truffle.ContractInstance>(
   contractName: string,
   customArtifacts: any

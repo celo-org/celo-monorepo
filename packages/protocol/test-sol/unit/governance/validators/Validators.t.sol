@@ -2919,6 +2919,7 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
       )
       .unwrap();
 
+    vm.prank(address(0));
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
 
     (, , , uint256 _actualScore, ) = validators.getValidator(validator);
@@ -2927,6 +2928,7 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
   }
 
   function test_ShouldUpdateValidatorScore_WhenValidatorHasNonZeroScore() public {
+    vm.prank(address(0));
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
 
     uint256 _expectedScore = FixidityLib
@@ -2949,6 +2951,7 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
       )
       .unwrap();
 
+    vm.prank(address(0));
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
     (, , , uint256 _actualScore, ) = validators.getValidator(validator);
 
@@ -2957,6 +2960,7 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
 
   function test_Reverts_WhenUptimeGreaterThan1() public {
     uptime = FixidityLib.add(FixidityLib.fixed1(), FixidityLib.newFixedFraction(1, 10));
+    vm.prank(address(0));
     vm.expectRevert("Uptime cannot be larger than one");
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
   }
@@ -3310,26 +3314,31 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       )
     );
 
+    vm.prank(address(0));
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
   }
 
   function test_Reverts_WhenValidatorAndGroupMeetBalanceRequirements_WhenL2() public {
     _whenL2();
+    vm.prank(address(0));
     vm.expectRevert("This method is no longer supported in L2.");
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
   }
 
   function test_ShouldPayValidator_WhenValidatorAndGroupMeetBalanceRequirements() public {
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(validator), expectedValidatorPayment);
   }
 
   function test_ShouldPayGroup_WhenValidatorAndGroupMeetBalanceRequirements() public {
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(group), expectedGroupPayment);
   }
 
   function test_ShouldPayDelegatee_WhenValidatorAndGroupMeetBalanceRequirements() public {
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(paymentDelegatee), expectedDelegatedPayment);
   }
@@ -3337,7 +3346,8 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
   function test_ShouldReturnTheExpectedTotalPayment_WhenValidatorAndGroupMeetBalanceRequirements()
     public
   {
-    validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
+    // validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
+    vm.prank(address(0));
     assertEq(
       validators.distributeEpochPaymentsFromSigner(validator, maxPayment),
       expectedTotalPayment
@@ -3353,6 +3363,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
     vm.prank(validator);
     accounts.deletePaymentDelegation();
 
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(validator), expectedValidatorPayment);
   }
@@ -3366,7 +3377,8 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
     vm.prank(validator);
     accounts.deletePaymentDelegation();
 
-    validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
+    // validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
+    vm.prank(address(0));
     assertEq(
       validators.distributeEpochPaymentsFromSigner(validator, maxPayment),
       expectedTotalPayment
@@ -3382,6 +3394,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
     vm.prank(validator);
     accounts.deletePaymentDelegation();
 
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(group), expectedGroupPayment);
   }
@@ -3389,6 +3402,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
   function test_shouldPayValidatorOnlyHalf_WhenSlashingMultiplierIsHalved() public {
     vm.prank(paymentDelegatee);
     validators.halveSlashingMultiplier(group);
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
 
     assertEq(stableToken.balanceOf(validator), halfExpectedValidatorPayment);
@@ -3397,6 +3411,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
   function test_shouldPayGroupOnlyHalf_WhenSlashingMultiplierIsHalved() public {
     vm.prank(paymentDelegatee);
     validators.halveSlashingMultiplier(group);
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
 
     assertEq(stableToken.balanceOf(group), halfExpectedGroupPayment);
@@ -3405,6 +3420,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
   function test_shouldPayDelegateeOnlyHalf_WhenSlashingMultiplierIsHalved() public {
     vm.prank(paymentDelegatee);
     validators.halveSlashingMultiplier(group);
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
 
     assertEq(stableToken.balanceOf(paymentDelegatee), halfExpectedDelegatedPayment);
@@ -3413,8 +3429,8 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
   function test_shouldReturnHalfExpectedTotalPayment_WhenSlashingMultiplierIsHalved() public {
     vm.prank(paymentDelegatee);
     validators.halveSlashingMultiplier(group);
-    validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
 
+    vm.prank(address(0));
     assertEq(
       validators.distributeEpochPaymentsFromSigner(validator, maxPayment),
       halfExpectedTotalPayment
@@ -3427,6 +3443,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       originalValidatorLockedGoldRequirements.value.sub(11)
     );
 
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(validator), 0);
   }
@@ -3437,6 +3454,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       originalValidatorLockedGoldRequirements.value.sub(11)
     );
 
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(group), 0);
   }
@@ -3447,6 +3465,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       originalValidatorLockedGoldRequirements.value.sub(11)
     );
 
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(paymentDelegatee), 0);
   }
@@ -3457,6 +3476,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       originalValidatorLockedGoldRequirements.value.sub(11)
     );
 
+    vm.prank(address(0));
     assertEq(validators.distributeEpochPaymentsFromSigner(validator, maxPayment), 0);
   }
 
@@ -3466,6 +3486,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       originalGroupLockedGoldRequirements.value.sub(11)
     );
 
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(validator), 0);
   }
@@ -3476,6 +3497,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       originalGroupLockedGoldRequirements.value.sub(11)
     );
 
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(group), 0);
   }
@@ -3486,6 +3508,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       originalGroupLockedGoldRequirements.value.sub(11)
     );
 
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(paymentDelegatee), 0);
   }
@@ -3496,7 +3519,33 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       originalGroupLockedGoldRequirements.value.sub(11)
     );
 
+    vm.prank(address(0));
     assertEq(validators.distributeEpochPaymentsFromSigner(validator, maxPayment), 0);
+  }
+}
+
+contract ValidatorsTest_MintStableToEpochManager is ValidatorsTest {
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("This method is not supported in L1.");
+    validators.mintStableToEpochManager(5);
+  }
+
+  function test_Reverts_WhenCalledByOtherThanEpochManager() public {
+    _whenL2();
+    vm.expectRevert("only registered contract");
+    validators.mintStableToEpochManager(5);
+  }
+  function test_WhenMintAmountIsZero() public {
+    _whenL2();
+    vm.prank(address(epochManager));
+    validators.mintStableToEpochManager(0);
+  }
+
+  function test_ShouldMintStableToEpochManager() public {
+    _whenL2();
+    vm.prank(address(epochManager));
+    validators.mintStableToEpochManager(5);
+    assertEq(stableToken.balanceOf(address(epochManager)), 5);
   }
 }
 

@@ -16,10 +16,8 @@ contract ScoreManager is Initializable, Ownable {
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
-   * @param registryAddress The address of the registry core smart contract.
-   * @param newEpochDuration The duration of an epoch in seconds.
    */
-  function initialize(address registryAddress, uint256 newEpochDuration) external initializer {
+  function initialize() external initializer {
     _transferOwnership(msg.sender);
   }
 

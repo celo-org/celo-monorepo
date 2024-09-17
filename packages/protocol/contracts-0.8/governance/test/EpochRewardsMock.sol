@@ -2,7 +2,7 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 import "../../../contracts/governance/interfaces/IEpochRewards.sol";
-// import "forge-std-8/console2.sol";
+
 /**
  * @title A wrapper around EpochRewards that exposes internal functions for testing.
  */
@@ -14,9 +14,7 @@ contract EpochRewardsMock08 is IEpochRewards {
   }
 
   // TODO: (soloseng) implement mock
-  function updateTargetVotingYield() external {
-    // console2.log("### Updating Target Voting Yield");
-  }
+  function updateTargetVotingYield() external {}
 
   function getRewardsMultiplier(
     uint256 targetGoldTotalSupplyIncrease
@@ -33,8 +31,7 @@ contract EpochRewardsMock08 is IEpochRewards {
     view
     returns (uint256, uint256, uint256, uint256)
   {
-    // console2.log("### calculating Target Epoch Rewards");
-    return (1, 1, 1, 1);
+    return (5, 5, 5, 5);
   }
   function getTargetVotingYieldParameters() external view returns (uint256, uint256, uint256) {
     return (0, 0, 0);
