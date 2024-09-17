@@ -213,7 +213,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     vm.stopPrank();
 
     activateValidators();
-    vm.deal(address(celoUnreleasedTreasure), 100_000_000 ether);
+    vm.deal(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
   }
 
   function activateValidators() public {
@@ -255,7 +255,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   function test_Reverts_whenAlreadyInitialized() public {
     _MockL2Migration(validatorsList);
 
-    vm.prank(address(0));
+    vm.prank(address(epochManagerEnabler));
     vm.expectRevert("Epoch system already initialized");
     epochManager.initializeSystem(100, block.number, firstElected);
   }
