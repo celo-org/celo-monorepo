@@ -33,7 +33,7 @@ contract EpochManager is
   }
 
   struct EpochProcessState {
-    EpochProcessStatus status; // TODO maybe a enum for future updates
+    EpochProcessStatus status;
     uint256 perValidatorReward; // The per validator epoch reward.
     uint256 totalRewardsVoter; // The total rewards to voters.
     uint256 totalRewardsCommunity; // The total community reward.

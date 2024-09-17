@@ -27,7 +27,7 @@ contract IntegrationTest is Test, TestConstants, Utils08 {
 
   uint256 constant RESERVE_BALANCE = 69411663406170917420347916; // current as of 08/20/24
 
-  function setUp() public virtual {}
+  // function setUp() public virtual {}
 
   /**
    * @notice Removes CBOR encoded metadata from the tail of the deployedBytecode.
@@ -163,17 +163,18 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   uint256[] groupScore = [5e23, 7e23, 1e24];
   uint256[] validatorScore = [1e23, 1e23, 1e23, 1e23, 1e23, 1e23];
 
-  function setUp() public override {
-    super.setUp();
+  function setUp() public {
     randomAddress = actor("randomAddress");
 
     validatorsContract = IValidators(registry.getAddressForStringOrDie("Validators"));
 
-    validatorsList = validatorsContract.getRegisteredValidators();
-    groupList = validatorsContract.getRegisteredValidatorGroups();
-
+    election = IElection(registry.getAddressForStringOrDie("Election"));
+    scoreManager = IScoreManager(registry.getAddressForStringOrDie("ScoreManager"));
     unreleasedTreasury = registry.getAddressForStringOrDie("CeloUnreleasedTreasure");
     reserveAddress = registry.getAddressForStringOrDie("Reserve");
+
+    validatorsList = validatorsContract.getRegisteredValidators();
+    groupList = validatorsContract.getRegisteredValidatorGroups();
 
     // mint to the reserve
     celoToken = ICeloToken(registry.getAddressForStringOrDie("GoldToken"));
@@ -291,13 +292,34 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
 
     uint256 l1EpochNumber = IPrecompiles(address(validatorsContract)).getEpochNumber();
 
+    activateValidators();
+    vm.deal(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
+
     vm.prank(address(0));
     celoToken.mint(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
 
     whenL2(vm);
+    _setValidatorL2Score();
 
     vm.prank(address(epochManagerEnabler));
 
     epochManager.initializeSystem(l1EpochNumber, block.number, firstElected);
+  }
+
+  function _setValidatorL2Score() internal {
+    address scoreManagerOwner = scoreManager.owner();
+    vm.startPrank(scoreManagerOwner);
+    scoreManager.setGroupScore(groupList[0], groupScore[0]);
+    scoreManager.setGroupScore(groupList[1], groupScore[1]);
+    scoreManager.setGroupScore(groupList[2], groupScore[2]);
+
+    scoreManager.setValidatorScore(validatorsList[0], validatorScore[0]);
+    scoreManager.setValidatorScore(validatorsList[1], validatorScore[1]);
+    scoreManager.setValidatorScore(validatorsList[2], validatorScore[2]);
+    scoreManager.setValidatorScore(validatorsList[3], validatorScore[3]);
+    scoreManager.setValidatorScore(validatorsList[4], validatorScore[4]);
+    scoreManager.setValidatorScore(validatorsList[5], validatorScore[5]);
+
+    vm.stopPrank();
   }
 }

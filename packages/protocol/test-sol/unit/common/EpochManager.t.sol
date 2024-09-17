@@ -73,7 +73,6 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     nonOwner = actor("nonOwner");
 
     deployCodeTo("MockRegistry.sol", abi.encode(false), REGISTRY_ADDRESS);
-
     deployCodeTo("ScoreManager.sol", abi.encode(false), scoreManagerAddress);
 
     registry = IRegistry(REGISTRY_ADDRESS);

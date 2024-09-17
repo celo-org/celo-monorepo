@@ -5,7 +5,6 @@ interface IEpochManager {
   function initializeSystem(
     uint256 firstEpochNumber,
     uint256 firstEpochBlock,
-    // uint256 firstEpochTimestamp, // TODO: do we need END timestamp?
     address[] calldata firstElected
   ) external;
   function startNextEpochProcess() external;

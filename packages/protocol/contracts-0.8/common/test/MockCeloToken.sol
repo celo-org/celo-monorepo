@@ -2,7 +2,7 @@ pragma solidity >=0.8.0 <0.9.0;
 // solhint-disable no-unused-vars
 
 /**
- * @title A mock StableToken for testing.
+ * @title A mock StableToken for testing. This contract can be deprecated once GoldToken gets migrated to 0.8
  */
 contract MockCeloToken08 {
   uint256 public totalSupply_;
@@ -34,6 +34,15 @@ contract MockCeloToken08 {
     return _transfer(from, to, amount);
   }
 
+  function _transfer(address from, address to, uint256 amount) internal returns (bool) {
+    if (balances[from] < amount) {
+      return false;
+    }
+    balances[from] -= amount;
+    balances[to] += amount;
+    return true;
+  }
+
   function setBalanceOf(address a, uint256 value) external {
     balances[a] = value;
   }
@@ -44,17 +53,5 @@ contract MockCeloToken08 {
 
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
-  }
-  function allocatedSupply() public pure returns (uint256) {
-    return CELO_SUPPLY_CAP - L2_INITIAL_STASH_BALANCE;
-  }
-
-  function _transfer(address from, address to, uint256 amount) internal returns (bool) {
-    if (balances[from] < amount) {
-      return false;
-    }
-    balances[from] -= amount;
-    balances[to] += amount;
-    return true;
   }
 }
