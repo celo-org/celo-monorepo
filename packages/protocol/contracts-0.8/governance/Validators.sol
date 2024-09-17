@@ -652,19 +652,6 @@ contract Validators is
     group.slashInfo.lastSlashed = block.timestamp;
   }
 
-  function mintStableToEpochManager(
-    uint256 amount
-  ) external onlyL2 nonReentrant onlyRegisteredContract(EPOCH_MANAGER_REGISTRY_ID) {
-    require(amount > 0, "mint amount is zero.");
-    require(
-      IStableToken(getStableToken()).mint(
-        registry.getAddressForOrDie(EPOCH_MANAGER_REGISTRY_ID),
-        amount
-      ),
-      "mint failed to epoch manager"
-    );
-  }
-
   /**
    * @notice Allows the EpochManager contract to mint stable token for itself.
    * @param amount The amount to be minted.
