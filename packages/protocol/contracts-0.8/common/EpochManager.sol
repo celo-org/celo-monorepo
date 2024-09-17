@@ -374,8 +374,12 @@ contract EpochManager is
     FixidityLib.Fraction memory remainingPayment = FixidityLib.newFixed(
       totalPayment.fromFixed() - groupPayment
     );
-    (address beneficiary, uint256 fraction) = getAccounts().getPaymentDelegation(validator);
-    uint256 delegatedPayment = remainingPayment.multiply(FixidityLib.wrap(fraction)).fromFixed();
+    (address beneficiary, uint256 delegatedFraction) = getAccounts().getPaymentDelegation(
+      validator
+    );
+    uint256 delegatedPayment = remainingPayment
+      .multiply(FixidityLib.wrap(delegatedFraction))
+      .fromFixed();
     uint256 validatorPayment = remainingPayment.fromFixed() - delegatedPayment;
 
     IStableToken stableToken = IStableToken(getStableToken());
