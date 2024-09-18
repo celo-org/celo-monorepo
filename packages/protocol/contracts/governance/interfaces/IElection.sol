@@ -49,7 +49,7 @@ interface IElection {
     uint256,
     uint256[] calldata
   ) external view returns (uint256);
-  function getGroupEpochRewards(
+  function getGroupEpochRewardsBasedOnScore(
     address group,
     uint256 totalEpochRewards,
     uint256 groupScore
