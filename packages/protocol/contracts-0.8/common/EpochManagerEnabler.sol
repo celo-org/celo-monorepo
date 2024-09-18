@@ -67,6 +67,13 @@ contract EpochManagerEnabler is Initializable, UsingPrecompiles, UsingRegistry {
   }
 
   /**
+   * @return a list of know elected validator accounts.
+   */
+  function getlastKnownElectedAccounts() external view returns (address[] memory) {
+    return lastKnownElectedAccounts;
+  }
+
+  /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return Storage version of the contract.
    * @return Major version of the contract.
