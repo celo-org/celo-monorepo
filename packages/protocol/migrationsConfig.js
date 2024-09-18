@@ -79,7 +79,6 @@ const DefaultConfig = {
   },
   epochManager: {
     newEpochDuration: 100,
-    carbonOffsettingPartner: '0x0000000000000000000000000000000000000000',
   },
   exchange: {
     spread: 5 / 1000,

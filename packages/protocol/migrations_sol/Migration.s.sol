@@ -960,10 +960,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateEpochManager(string memory json) public {
-    address carbonOffsettingPartner = abi.decode(
-      json.parseRaw(".epochManager.carbonOffsettingPartner"),
-      (address)
-    );
     address newEpochDuration = abi.decode(
       json.parseRaw(".epochManager.newEpochDuration"),
       (address)
@@ -974,9 +970,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       abi.encodeWithSelector(
         IEpochManagerInitializer.initialize.selector,
         REGISTRY_ADDRESS,
-        newEpochDuration,
-        carbonOffsettingPartner,
-        registry.getAddressForString("EpochManagerEnabler")
+        newEpochDuration
       )
     );
   }

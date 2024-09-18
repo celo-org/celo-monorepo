@@ -16,7 +16,6 @@ interface IEpochManager {
   function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256);
   function getCurrentEpochNumber() external view returns (uint256);
   function getElected() external view returns (address[] memory);
-  function epochManagerEnabler() external view returns (address);
   function epochDuration() external view returns (uint256);
   function firstKnownEpoch() external view returns (uint256);
   function getEpochProcessingState()
