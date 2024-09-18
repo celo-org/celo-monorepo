@@ -37,7 +37,7 @@ contract MockElection is IsL2Check {
     return true;
   }
 
-  function activate(address) external onlyL1 returns (bool) {
+  function activate(address) external returns (bool) {
     return true;
   }
 
