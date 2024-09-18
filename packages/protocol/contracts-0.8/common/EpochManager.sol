@@ -205,7 +205,7 @@ contract EpochManager is
         epochProcessing.toProcessGroups++;
         uint256 groupScore = getScoreReader().getGroupScore(group);
         // We need to precompute epoch rewards for each group since computation depends on total active votes for all groups.
-        uint256 epochRewards = getElection().getGroupEpochRewards(
+        uint256 epochRewards = getElection().getGroupEpochRewardsBasedOnScore(
           group,
           epochProcessing.totalRewardsVoter,
           groupScore
@@ -229,7 +229,7 @@ contract EpochManager is
         greaters[i]
       );
 
-      // by doing this, we avoid processing a group twice
+      epochProcessing.toProcessGroups = 0;
       delete processedGroups[groups[i]];
     }
     getCeloUnreleasedTreasure().release(
@@ -340,6 +340,10 @@ contract EpochManager is
       validatorPendingPayments[elected[i]] += validatorReward;
       totalRewards += validatorReward;
     }
+    if (totalRewards == 0) {
+      return;
+    }
+
     // Mint all cUSD required for payment and the corresponding CELO
     validators.mintStableToEpochManager(totalRewards);
     // this should have a setter for the oracle.

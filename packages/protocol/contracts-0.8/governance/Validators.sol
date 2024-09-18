@@ -284,7 +284,7 @@ contract Validators is
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient Locked Gold.
    */
-  function registerValidator(
+  function registerValidatorNoBls(
     bytes calldata ecdsaPublicKey
   ) external nonReentrant onlyL2 returns (bool) {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
