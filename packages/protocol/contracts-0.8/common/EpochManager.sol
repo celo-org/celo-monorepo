@@ -61,9 +61,6 @@ contract EpochManager is
   mapping(uint256 => Epoch) private epochs;
   mapping(address => uint256) public validatorPendingPayments;
 
-  address public carbonOffsettingPartner;
-  address public epochManagerEnabler;
-
   /**
    * @notice Event emited when epochProcessing has begun.
    * @param epochNumber The epoch number that is being processed.
@@ -77,7 +74,10 @@ contract EpochManager is
   event EpochProcessingEnded(uint256 indexed epochNumber);
 
   modifier onlyEpochManagerEnabler() {
-    require(msg.sender == epochManagerEnabler, "msg.sender is not Initializer");
+    require(
+      msg.sender == registry.getAddressForOrDie(EPOCH_MANAGER_ENABLER_REGISTRY_ID),
+      "msg.sender is not Enabler"
+    );
     _;
   }
 
@@ -92,19 +92,10 @@ contract EpochManager is
    * @param registryAddress The address of the registry core smart contract.
    * @param newEpochDuration The duration of an epoch in seconds.
    */
-  function initialize(
-    address registryAddress,
-    uint256 newEpochDuration,
-    address _carbonOffsettingPartner,
-    address _epochManagerEnabler
-  ) external initializer {
-    require(_carbonOffsettingPartner != address(0), "carbonOffsettingPartner address is required");
-    require(_epochManagerEnabler != address(0), "EpochManagerEnabler address is required");
+  function initialize(address registryAddress, uint256 newEpochDuration) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setEpochDuration(newEpochDuration);
-    carbonOffsettingPartner = _carbonOffsettingPartner;
-    epochManagerEnabler = _epochManagerEnabler;
   }
 
   // DESIGNDESICION(XXX): we assume that the first epoch on the L2 starts as soon as the system is initialized
@@ -140,7 +131,6 @@ contract EpochManager is
     _currentEpoch.startTimestamp = block.timestamp;
 
     elected = firstElected;
-    epochManagerEnabler = address(0);
   }
 
   // TODO maybe "freezeEpochRewards" "prepareForNextEpoch"
@@ -228,7 +218,7 @@ contract EpochManager is
       epochProcessing.totalRewardsCommunity
     );
     getCeloUnreleasedTreasure().release(
-      carbonOffsettingPartner,
+      getEpochRewards().carbonOffsettingPartner(),
       epochProcessing.totalRewardsCarbonFund
     );
     // run elections
@@ -313,7 +303,7 @@ contract EpochManager is
   }
 
   function systemAlreadyInitialized() public view returns (bool) {
-    return initialized && epochManagerEnabler == address(0);
+    return initialized && elected.length > 0;
   }
 
   function allocateValidatorsRewards() internal {

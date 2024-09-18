@@ -190,30 +190,6 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     epochManagerEnabler = IEpochManagerEnabler(
       registry.getAddressForStringOrDie("EpochManagerEnabler")
     );
-    scoreManager = IScoreManager(registry.getAddressForStringOrDie("ScoreManager"));
-    election = IElection(registry.getAddressForStringOrDie("Election"));
-    celoUnreleasedTreasure = ICeloUnreleasedTreasure(
-      registry.getAddressForStringOrDie("CeloUnreleasedTreasure")
-    );
-
-    address scoreManagerOwner = scoreManager.owner();
-    vm.startPrank(scoreManagerOwner);
-
-    scoreManager.setGroupScore(groupList[0], groupScore[0]);
-    scoreManager.setGroupScore(groupList[1], groupScore[1]);
-    scoreManager.setGroupScore(groupList[2], groupScore[2]);
-
-    scoreManager.setValidatorScore(validatorsList[0], validatorScore[0]);
-    scoreManager.setValidatorScore(validatorsList[1], validatorScore[1]);
-    scoreManager.setValidatorScore(validatorsList[2], validatorScore[2]);
-    scoreManager.setValidatorScore(validatorsList[3], validatorScore[3]);
-    scoreManager.setValidatorScore(validatorsList[4], validatorScore[4]);
-    scoreManager.setValidatorScore(validatorsList[5], validatorScore[5]);
-
-    vm.stopPrank();
-
-    activateValidators();
-    vm.deal(address(celoUnreleasedTreasure), 100_000_000 ether);
   }
 
   function activateValidators() public {
@@ -231,18 +207,6 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
       election.activate(validatorGroup);
       vm.stopPrank();
     }
-  }
-
-  function test_IsSetupCorrect() public {
-    assertEq(
-      registry.getAddressForStringOrDie("EpochManagerEnabler"),
-      epochManager.epochManagerEnabler()
-    );
-    assertEq(
-      registry.getAddressForStringOrDie("EpochManagerEnabler"),
-      address(epochManagerEnabler)
-    );
-    assertEq(address(epochManagerEnabler), epochManager.epochManagerEnabler());
   }
 
   function test_Reverts_whenSystemNotInitialized() public {
@@ -267,7 +231,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   function test_Reverts_whenAlreadyInitialized() public {
     _MockL2Migration(validatorsList);
 
-    vm.prank(address(0));
+    vm.prank(address(epochManagerEnabler));
     vm.expectRevert("Epoch system already initialized");
     epochManager.initializeSystem(100, block.number, firstElected);
   }

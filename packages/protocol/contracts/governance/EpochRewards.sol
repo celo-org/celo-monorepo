@@ -286,7 +286,7 @@ contract EpochRewards is
    * @param value The percentage of the total reward to be sent to the community funds.
    * @return True upon success.
    */
-  function setCommunityRewardFraction(uint256 value) public onlyOwner onlyL1 returns (bool) {
+  function setCommunityRewardFraction(uint256 value) public onlyOwner returns (bool) {
     require(
       value != communityRewardFraction.unwrap() && value < FixidityLib.fixed1().unwrap(),
       "Value must be different from existing community reward fraction and less than 1"
@@ -302,10 +302,7 @@ contract EpochRewards is
    * @param value The percentage of the total reward to be sent to the carbon offsetting partner.
    * @return True upon success.
    */
-  function setCarbonOffsettingFund(
-    address partner,
-    uint256 value
-  ) public onlyOwner onlyL1 returns (bool) {
+  function setCarbonOffsettingFund(address partner, uint256 value) public onlyOwner returns (bool) {
     require(
       partner != carbonOffsettingPartner || value != carbonOffsettingFraction.unwrap(),
       "Partner and value must be different from existing carbon offsetting fund"
@@ -322,7 +319,7 @@ contract EpochRewards is
    * @param value The percentage of floating Gold voting to target.
    * @return True upon success.
    */
-  function setTargetVotingGoldFraction(uint256 value) public onlyOwner onlyL1 returns (bool) {
+  function setTargetVotingGoldFraction(uint256 value) public onlyOwner returns (bool) {
     require(value != targetVotingGoldFraction.unwrap(), "Target voting gold fraction unchanged");
     require(
       value < FixidityLib.fixed1().unwrap(),
@@ -338,7 +335,7 @@ contract EpochRewards is
    * @param value The value in Celo Dollars.
    * @return True upon success.
    */
-  function setTargetValidatorEpochPayment(uint256 value) public onlyOwner onlyL1 returns (bool) {
+  function setTargetValidatorEpochPayment(uint256 value) public onlyOwner returns (bool) {
     require(value != targetValidatorEpochPayment, "Target validator epoch payment unchanged");
     targetValidatorEpochPayment = value;
     emit TargetValidatorEpochPaymentSet(value);
@@ -358,7 +355,7 @@ contract EpochRewards is
     uint256 max,
     uint256 underspendAdjustmentFactor,
     uint256 overspendAdjustmentFactor
-  ) public onlyOwner onlyL1 returns (bool) {
+  ) public onlyOwner returns (bool) {
     require(
       max != rewardsMultiplierParams.max.unwrap() ||
         overspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.overspend.unwrap() ||
@@ -385,7 +382,7 @@ contract EpochRewards is
   function setTargetVotingYieldParameters(
     uint256 max,
     uint256 adjustmentFactor
-  ) public onlyOwner onlyL1 returns (bool) {
+  ) public onlyOwner returns (bool) {
     require(
       max != targetVotingYieldParams.max.unwrap() ||
         adjustmentFactor != targetVotingYieldParams.adjustmentFactor.unwrap(),
@@ -407,7 +404,7 @@ contract EpochRewards is
    * @param targetVotingYield The relative target block reward for voters.
    * @return True upon success.
    */
-  function setTargetVotingYield(uint256 targetVotingYield) public onlyOwner onlyL1 returns (bool) {
+  function setTargetVotingYield(uint256 targetVotingYield) public onlyOwner returns (bool) {
     FixidityLib.Fraction memory target = FixidityLib.wrap(targetVotingYield);
     require(
       target.lte(targetVotingYieldParams.max),
