@@ -3148,7 +3148,7 @@ contract ValidatorsTest_GetTopGroupValidators is ValidatorsTest {
 
     assertEq(validatorAccount[0], validator);
     assertEq(validatorAccount[1], vm.addr(1));
-    assertNotEq(validatorAccount[0], accounts.getValidatorSigner(validator));
+    assertFalse(validatorAccount[0] == accounts.getValidatorSigner(validator));
   }
 }
 
