@@ -1487,6 +1487,7 @@ contract Validators is
     Validator storage validator,
     address validatorAccount
   ) private returns (bool) {
+    _sendValidatorPayment(validatorAccount);
     address affiliation = validator.affiliation;
     ValidatorGroup storage group = groups[affiliation];
     if (group.members.contains(validatorAccount)) {
@@ -1507,5 +1508,9 @@ contract Validators is
     } else {
       return getEpochNumber();
     }
+  }
+
+  function _sendValidatorPayment(address validator) private {
+    getEpochManager().sendValidatorPayment(validator);
   }
 }

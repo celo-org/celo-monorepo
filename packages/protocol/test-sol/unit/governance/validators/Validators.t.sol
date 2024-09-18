@@ -138,6 +138,8 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     uint256 groupPayment
   );
 
+  event SendValidatorPaymentCalled(address validator);
+
   function setUp() public {
     owner = address(this);
     group = actor("group");
@@ -1380,6 +1382,13 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
 
     assertTrue(election.isIneligible(group));
   }
+
+  function test_ShouldSendValidatorPayment_WhenUnclaimed_WhenL2() public {
+    vm.expectEmit(true, true, true, true);
+    emit SendValidatorPaymentCalled(validator);
+    vm.prank(validator);
+    validators.affiliate(group);
+  }
 }
 
 contract ValidatorsTest_Deaffiliate is ValidatorsTest {
@@ -1504,6 +1513,13 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
     vm.prank(validator);
     validators.deaffiliate();
     assertTrue(election.isIneligible(group));
+  }
+
+  function test_ShouldSendValidatorPayment_WhenUnclaimed_WhenL2() public {
+    vm.expectEmit(true, true, true, true);
+    emit SendValidatorPaymentCalled(validator);
+    vm.prank(validator);
+    validators.deaffiliate();
   }
 }
 
@@ -3501,6 +3517,13 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
 
   function test_Reverts_WhenSenderNotApprovedAddress() public {
     vm.expectRevert("Only registered slasher can call");
+    validators.forceDeaffiliateIfValidator(validator);
+  }
+
+  function test_ShouldSendValidatorPayment_WhenUnclaimed_WhenL2() public {
+    vm.expectEmit(true, true, true, true);
+    emit SendValidatorPaymentCalled(validator);
+    vm.prank(paymentDelegatee);
     validators.forceDeaffiliateIfValidator(validator);
   }
 }

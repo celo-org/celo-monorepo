@@ -22,4 +22,6 @@ interface IEpochManager {
     external
     view
     returns (uint256, uint256, uint256, uint256, uint256);
+
+  function sendValidatorPayment(address) external;
 }
