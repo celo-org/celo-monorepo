@@ -2203,7 +2203,7 @@ contract ElectionTest_RevokeActive is ElectionTest {
   }
 }
 
-contract ElectionTest_ElectionValidatorSigners is ElectionTest {
+contract ElectionTest_ElectValidatorSigners is ElectionTest {
   struct MemberWithVotes {
     address member;
     uint256 votes;
@@ -2262,6 +2262,13 @@ contract ElectionTest_ElectionValidatorSigners is ElectionTest {
 
   function setRandomness() public {
     random.addTestRandomness(block.number + 1, hash);
+  }
+
+  function test_Reverts_WhenL2() public {
+    WhenThereIsALargeNumberOfGroups();
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    address[] memory elected = election.electValidatorSigners();
   }
 
   function WhenThereIsALargeNumberOfGroups() public {
@@ -2425,6 +2432,277 @@ contract ElectionTest_ElectionValidatorSigners is ElectionTest {
     setRandomness();
     vm.expectRevert("Not enough elected validators");
     election.electValidatorSigners();
+  }
+
+  // Helper function to sort an array of uint256
+  function sort(uint256[] memory data) internal pure returns (uint256[] memory) {
+    uint256 length = data.length;
+    for (uint256 i = 0; i < length; i++) {
+      for (uint256 j = i + 1; j < length; j++) {
+        if (data[i] > data[j]) {
+          uint256 temp = data[i];
+          data[i] = data[j];
+          data[j] = temp;
+        }
+      }
+    }
+    return data;
+  }
+
+  function sortMembersWithVotesDesc(
+    MemberWithVotes[] memory data
+  ) internal pure returns (MemberWithVotes[] memory) {
+    uint256 length = data.length;
+    for (uint256 i = 0; i < length; i++) {
+      for (uint256 j = i + 1; j < length; j++) {
+        if (data[i].votes < data[j].votes) {
+          MemberWithVotes memory temp = data[i];
+          data[i] = data[j];
+          data[j] = temp;
+        }
+      }
+    }
+    return data;
+  }
+}
+
+contract ElectionTest_ElectValidators is ElectionTest {
+  struct MemberWithVotes {
+    address member;
+    uint256 votes;
+  }
+
+  address group1 = address(this);
+  address group2 = account1;
+  address group3 = account2;
+
+  address validator1 = account3;
+  address validator2 = account4;
+  address validator3 = account5;
+  address validator4 = account6;
+  address validator5 = account7;
+  address validator6 = account8;
+  address validator7 = account9;
+
+  address[] group1Members = new address[](4);
+  address[] group2Members = new address[](2);
+  address[] group3Members = new address[](1);
+
+  bytes32 hash = 0xa5b9d60f32436310afebcfda832817a68921beb782fabf7915cc0460b443116a;
+
+  // If voterN votes for groupN:
+  //   group1 gets 20 votes per member
+  //   group2 gets 25 votes per member
+  //   group3 gets 30 votes per member
+  // We cannot make any guarantee with respect to their ordering.
+  address voter1 = address(this);
+  address voter2 = account1;
+  address voter3 = account2;
+
+  uint256 voter1Weight = 80;
+  uint256 voter2Weight = 50;
+  uint256 voter3Weight = 30;
+
+  uint256 totalLockedGold = voter1Weight + voter2Weight + voter3Weight;
+
+  mapping(address => uint256) votesConsideredForElection;
+
+  MemberWithVotes[] membersWithVotes;
+
+  function setUp() public {
+    super.setUp();
+
+    group1Members[0] = validator1;
+    group1Members[1] = validator2;
+    group1Members[2] = validator3;
+    group1Members[3] = validator4;
+
+    group2Members[0] = validator5;
+    group2Members[1] = validator6;
+
+    group3Members[0] = validator7;
+
+    // _whenL2();
+  }
+
+  function setRandomness() public {
+    random.addTestRandomness(block.number + 1, hash);
+  }
+
+  function test_Reverts_WhenL1() public {
+    WhenThereIsALargeNumberOfGroups();
+
+    vm.expectRevert("This method is not supported in L1.");
+    address[] memory elected = election.electValidators();
+  }
+
+  function WhenThereIsALargeNumberOfGroups() public {
+    lockedGold.setTotalLockedGold(1e25);
+    validators.setNumRegisteredValidators(400);
+    lockedGold.incrementNonvotingAccountBalance(voter1, 1e25);
+    election.setElectabilityThreshold(0);
+    election.setElectableValidators(10, 100);
+
+    election.setMaxNumGroupsVotedFor(200);
+
+    address prev = address(0);
+    uint256[] memory randomVotes = new uint256[](100);
+    for (uint256 i = 0; i < 100; i++) {
+      randomVotes[i] = uint256(keccak256(abi.encodePacked(i))) % 1e14;
+    }
+    randomVotes = sort(randomVotes);
+    for (uint256 i = 0; i < 100; i++) {
+      address group = actor(string(abi.encodePacked("group", i)));
+      address[] memory members = new address[](4);
+      for (uint256 j = 0; j < 4; j++) {
+        members[j] = actor(string(abi.encodePacked("group", i, "member", j)));
+        // If there are already n elected members in a group, the votes for the next member
+        // are total votes of group divided by n+1
+        votesConsideredForElection[members[j]] = randomVotes[i] / (j + 1);
+        membersWithVotes.push(MemberWithVotes(members[j], votesConsideredForElection[members[j]]));
+      }
+      validators.setMembers(group, members);
+      registry.setAddressFor("Validators", address(this));
+      election.markGroupEligible(group, address(0), prev);
+      registry.setAddressFor("Validators", address(validators));
+      vm.prank(voter1);
+      election.vote(group, randomVotes[i], prev, address(0));
+      prev = group;
+    }
+  }
+
+  function test_ShouldElectCorrectValidators_WhenThereIsALargeNumberOfGroups() public {
+    _whenL2();
+    WhenThereIsALargeNumberOfGroups();
+    address[] memory elected = election.electValidators();
+    MemberWithVotes[] memory sortedMembersWithVotes = sortMembersWithVotesDesc(membersWithVotes);
+    MemberWithVotes[] memory electedUnsorted = new MemberWithVotes[](100);
+
+    for (uint256 i = 0; i < 100; i++) {
+      electedUnsorted[i] = MemberWithVotes(elected[i], votesConsideredForElection[elected[i]]);
+    }
+    MemberWithVotes[] memory electedSorted = sortMembersWithVotesDesc(electedUnsorted);
+
+    for (uint256 i = 0; i < 100; i++) {
+      assertEq(electedSorted[i].member, sortedMembersWithVotes[i].member);
+      assertEq(electedSorted[i].votes, sortedMembersWithVotes[i].votes);
+    }
+  }
+
+  function WhenThereAreSomeGroups() public {
+    validators.setMembers(group1, group1Members);
+    validators.setMembers(group2, group2Members);
+    validators.setMembers(group3, group3Members);
+
+    registry.setAddressFor("Validators", address(this));
+    election.markGroupEligible(group1, address(0), address(0));
+    election.markGroupEligible(group2, address(0), group1);
+    election.markGroupEligible(group3, address(0), group2);
+    registry.setAddressFor("Validators", address(validators));
+
+    lockedGold.incrementNonvotingAccountBalance(address(voter1), voter1Weight);
+    lockedGold.incrementNonvotingAccountBalance(address(voter2), voter2Weight);
+    lockedGold.incrementNonvotingAccountBalance(address(voter3), voter3Weight);
+
+    lockedGold.setTotalLockedGold(totalLockedGold);
+    validators.setNumRegisteredValidators(7);
+  }
+
+  function test_ShouldReturnThatGroupsMemberLIst_WhenASingleGroupHasMoreOrEqualToMinElectableValidatorsAsMembersAndReceivedVotes()
+    public
+  {
+    _whenL2();
+    WhenThereAreSomeGroups();
+    vm.prank(voter1);
+    election.vote(group1, voter1Weight, group2, address(0));
+    setRandomness();
+    arraysEqual(election.electValidators(), group1Members);
+  }
+
+  function test_ShouldReturnMaxElectableValidatorsElectedValidators_WhenGroupWithMoreThenMaxElectableValidatorsMembersReceivesVotes()
+    public
+  {
+    _whenL2();
+    WhenThereAreSomeGroups();
+    vm.prank(voter1);
+    election.vote(group1, voter1Weight, group2, address(0));
+    vm.prank(voter2);
+    election.vote(group2, voter2Weight, address(0), group1);
+    vm.prank(voter3);
+    election.vote(group3, voter3Weight, address(0), group2);
+
+    setRandomness();
+    address[] memory expected = new address[](6);
+    expected[0] = validator1;
+    expected[1] = validator2;
+    expected[2] = validator3;
+    expected[3] = validator5;
+    expected[4] = validator6;
+    expected[5] = validator7;
+    arraysEqual(election.electValidators(), expected);
+  }
+
+  function test_ShouldElectOnlyNMembersFromThatGroup_WhenAGroupReceivesEnoughVotesForMoreThanNSeatsButOnlyHasNMembers()
+    public
+  {
+    _whenL2();
+    WhenThereAreSomeGroups();
+    uint256 increment = 80;
+    uint256 votes = 80;
+    lockedGold.incrementNonvotingAccountBalance(address(voter3), increment);
+    lockedGold.setTotalLockedGold(totalLockedGold + increment);
+    vm.prank(voter3);
+    election.vote(group3, votes, group2, address(0));
+    vm.prank(voter1);
+    election.vote(group1, voter1Weight, address(0), group3);
+    vm.prank(voter2);
+    election.vote(group2, voter2Weight, address(0), group1);
+    setRandomness();
+
+    address[] memory expected = new address[](6);
+    expected[0] = validator1;
+    expected[1] = validator2;
+    expected[2] = validator3;
+    expected[3] = validator5;
+    expected[4] = validator6;
+    expected[5] = validator7;
+    arraysEqual(election.electValidators(), expected);
+  }
+
+  function test_ShouldNotElectAnyMembersFromThatGroup_WhenAGroupDoesNotReceiveElectabilityThresholdVotes()
+    public
+  {
+    _whenL2();
+    WhenThereAreSomeGroups();
+    uint256 thresholdExcludingGroup3 = (voter3Weight + 1) / totalLockedGold;
+    election.setElectabilityThreshold(thresholdExcludingGroup3);
+    vm.prank(voter1);
+    election.vote(group1, voter1Weight, group2, address(0));
+    vm.prank(voter2);
+    election.vote(group2, voter2Weight, address(0), group1);
+    vm.prank(voter3);
+    election.vote(group3, voter3Weight, address(0), group2);
+
+    address[] memory expected = new address[](6);
+    expected[0] = validator1;
+    expected[1] = validator2;
+    expected[2] = validator3;
+    expected[3] = validator4;
+    expected[4] = validator5;
+    expected[5] = validator6;
+    arraysEqual(election.electValidators(), expected);
+  }
+
+  function test_ShouldRevert_WhenThereAnoNotEnoughElectableValidators() public {
+    _whenL2();
+    WhenThereAreSomeGroups();
+    vm.prank(voter2);
+    election.vote(group2, voter2Weight, group1, address(0));
+    vm.prank(voter3);
+    election.vote(group3, voter3Weight, address(0), group2);
+    setRandomness();
+    vm.expectRevert("Not enough elected validators");
+    election.electValidators();
   }
 
   // Helper function to sort an array of uint256
