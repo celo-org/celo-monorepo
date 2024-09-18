@@ -371,6 +371,7 @@ contract EpochManager is
     FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(
       validatorPendingPayments[signer]
     );
+    validatorPendingPayments[signer] = 0;
 
     IValidators validators = getValidators();
     address group = validators.getValidatorsGroup(validator);
