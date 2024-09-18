@@ -380,4 +380,15 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
     assertEq(beneficiaryBalanceAfter, 0);
     assertEq(epochManagerBalanceAfter, epochManagerBalanceBefore);
   }
+
+  function test_doesntAllowDoubleSending() public {
+    epochManager.sendValidatorPayment(validator1);
+    epochManager.sendValidatorPayment(validator1);
+
+    uint256 validatorBalanceAfter = stableToken.balanceOf(validator1);
+    uint256 epochManagerBalanceAfter = stableToken.balanceOf(address(epochManager));
+
+    assertEq(validatorBalanceAfter, paymentAmount);
+    assertEq(epochManagerBalanceAfter, epochManagerBalanceBefore - paymentAmount);
+  }
 }
