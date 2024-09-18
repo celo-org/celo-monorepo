@@ -310,7 +310,7 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     accounts.authorizeValidatorSigner(signer, v, r, s);
 
     vm.prank(validator);
-    validators.registerValidator(_ecdsaPubKey);
+    validators.registerValidatorNoBls(_ecdsaPubKey);
     validatorRegistrationEpochNumber = epochManager.getCurrentEpochNumber();
     return _ecdsaPubKey;
   }
@@ -859,7 +859,7 @@ contract ValidatorsTest_RegisterValidator_NoBls is ValidatorsTest {
 
     vm.expectRevert("Cannot vote for more than max number of groups");
     vm.prank(validator);
-    validators.registerValidator(pubKey);
+    validators.registerValidatorNoBls(pubKey);
   }
 
   function test_Reverts_WhenDelagatingCELO() public {
@@ -872,7 +872,7 @@ contract ValidatorsTest_RegisterValidator_NoBls is ValidatorsTest {
 
     vm.expectRevert("Cannot delegate governance power");
     vm.prank(validator);
-    validators.registerValidator(pubKey);
+    validators.registerValidatorNoBls(pubKey);
   }
 
   function test_ShouldMarkAccountAsValidator_WhenAccountHasAuthorizedValidatorSigner() public {
@@ -897,7 +897,7 @@ contract ValidatorsTest_RegisterValidator_NoBls is ValidatorsTest {
 
     vm.expectRevert("This method is not supported in L1.");
     vm.prank(validator);
-    validators.registerValidator(_ecdsaPubKey);
+    validators.registerValidatorNoBls(_ecdsaPubKey);
     validatorRegistrationEpochNumber = IPrecompiles(address(validators)).getEpochNumber();
   }
 
@@ -973,7 +973,7 @@ contract ValidatorsTest_RegisterValidator_NoBls is ValidatorsTest {
     emit ValidatorBlsPublicKeyUpdated(validator, blsPublicKey);
 
     vm.prank(validator);
-    validators.registerValidator(_ecdsaPubKey);
+    validators.registerValidatorNoBls(_ecdsaPubKey);
   }
 
   function test_Emits_ValidatorRegisteredEvent() public {
@@ -990,7 +990,7 @@ contract ValidatorsTest_RegisterValidator_NoBls is ValidatorsTest {
     emit ValidatorRegistered(validator);
 
     vm.prank(validator);
-    validators.registerValidator(_ecdsaPubKey);
+    validators.registerValidatorNoBls(_ecdsaPubKey);
   }
 
   function test_Reverts_WhenAccountAlreadyRegisteredAsValidator() public {
@@ -998,7 +998,7 @@ contract ValidatorsTest_RegisterValidator_NoBls is ValidatorsTest {
     bytes memory _registeredEcdsaPubKey = _registerValidatorWithSignerHelper_noBls();
     vm.prank(validator);
     vm.expectRevert("Already registered");
-    validators.registerValidator(_registeredEcdsaPubKey);
+    validators.registerValidatorNoBls(_registeredEcdsaPubKey);
   }
 
   function test_Reverts_WhenAccountAlreadyRegisteredAsValidatorGroup() public {
@@ -1006,7 +1006,7 @@ contract ValidatorsTest_RegisterValidator_NoBls is ValidatorsTest {
     _registerValidatorGroupHelper(validator, 1);
     vm.prank(validator);
     vm.expectRevert("Already registered");
-    validators.registerValidator(
+    validators.registerValidatorNoBls(
       abi.encodePacked(bytes32(0x0101010101010101010101010101010101010101010101010101010101010101))
     );
   }
@@ -1019,7 +1019,7 @@ contract ValidatorsTest_RegisterValidator_NoBls is ValidatorsTest {
     );
     vm.expectRevert("Deposit too small");
     vm.prank(validator);
-    validators.registerValidator(
+    validators.registerValidatorNoBls(
       abi.encodePacked(bytes32(0x0101010101010101010101010101010101010101010101010101010101010101))
     );
   }
