@@ -279,7 +279,22 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
       assertEq(election.getActiveVotesForGroup(groupsEligible[i]), groupWithVotes[i].votes);
       assertGt(election.getActiveVotesForGroup(groupsEligible[i]), groupActiveBalances[i]);
     }
+
+    timeTravel(vm, epochDuration + 1);
+    epochManager.startNextEpochProcess();
+    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+
+    assertEq(currentEpoch + 2, epochManager.getCurrentEpochNumber());
+
+     address[] memory newlyElected2 = epochManager.getElected();
+
+    for (uint256 i = 0; i < currentlyElected.length; i++) {
+      assertEq(originalyElected.contains(newlyElected2[i]), true);
+    }
   }
+
+  // TODO: add test when new groups are elected
+  // TODO: add test when groups are removed
 
   // Bubble sort algorithm since it is a small array
   function sort(GroupWithVotes[] memory items) public {
