@@ -210,7 +210,7 @@ contract EpochManager is
         greaters[i]
       );
 
-      // by doing this, we avoid processing a group twice
+      epochProcessing.toProcessGroups = 0;
       delete processedGroups[groups[i]];
     }
     getCeloUnreleasedTreasure().release(
