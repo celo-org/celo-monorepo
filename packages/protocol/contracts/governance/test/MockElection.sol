@@ -76,7 +76,10 @@ contract MockElection is IsL2Check {
     return 0;
   }
 
-  function electValidatorSigners() external view returns (address[] memory) {
+  function electValidatorSigners() external view onlyL1 returns (address[] memory) {
+    return electedValidators;
+  }
+  function electValidators() external view onlyL2 returns (address[] memory) {
     return electedValidators;
   }
 
