@@ -128,11 +128,6 @@ contract EpochManager is
       address(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID)).balance > 0,
       "CeloUnreleasedTreasury not yet funded."
     );
-    require(
-      getCeloToken().balanceOf(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID)) >
-        0,
-      "CeloUnreleasedTreasury not yet funded."
-    );
     require(!systemAlreadyInitialized(), "Epoch system already initialized");
     require(firstEpochNumber > 0, "First epoch number must be greater than 0");
     require(firstEpochBlock > 0, "First epoch block must be greater than 0");
