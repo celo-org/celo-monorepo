@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.5.13 <0.8.20;
+pragma solidity >=0.8.0 <0.8.20;
 
 import "celo-foundry-8/Test.sol";
 import "@celo-contracts-8/common/EpochManager.sol";
@@ -37,7 +37,6 @@ contract EpochManagerEnablerTest is Test, TestConstants, Utils08 {
     epochManager = new EpochManager(true);
     epochManagerEnabler = new EpochManagerEnablerMock();
 
-    // celoToken = new MockCeloToken08();
     celoUnreleasedTreasure = new MockCeloUnreleasedTreasure();
 
     accountsAddress = actor("accountsAddress");
@@ -56,9 +55,7 @@ contract EpochManagerEnablerTest is Test, TestConstants, Utils08 {
 
     registry.setAddressFor(CeloUnreleasedTreasureContract, address(celoUnreleasedTreasure));
 
-    // celoToken.setTotalSupply(CELO_SUPPLY_CAP);
     vm.deal(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
-    // celoToken.setBalanceOf(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
 
     epochManagerEnabler.initialize(REGISTRY_ADDRESS);
     epochManager.initialize(REGISTRY_ADDRESS, epochDuration);
