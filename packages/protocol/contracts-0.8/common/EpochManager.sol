@@ -11,8 +11,8 @@ import "../common/UsingRegistry.sol";
 import "../../contracts/common/FixidityLib.sol";
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/IEpochManager.sol";
-import "../../contracts/common/interfaces/IEpochManagerInitializer.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "./interfaces/IEpochManagerInitializer.sol";
 
 contract EpochManager is
   Initializable,

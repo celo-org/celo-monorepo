@@ -6,9 +6,9 @@ import "../common/UsingPrecompiles.sol";
 
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
-import "../../contracts/common/interfaces/IEpochManagerEnabler.sol";
-import "../../contracts/common/interfaces/IEpochManagerEnablerInitializer";
 import "../../contracts/governance/interfaces/IEpochRewards.sol";
+import "../../contracts/common/interfaces/IEpochManagerEnabler.sol";
+import "./interfaces/IEpochManagerEnablerInitializer.sol";
 
 contract EpochManagerEnabler is
   Initializable,
