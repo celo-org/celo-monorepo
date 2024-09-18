@@ -11,6 +11,7 @@ import "../common/UsingRegistry.sol";
 import "../../contracts/common/FixidityLib.sol";
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/IEpochManager.sol";
+import "../../contracts/common/interfaces/IEpochManagerInitializer.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
 contract EpochManager is
@@ -18,7 +19,8 @@ contract EpochManager is
   UsingRegistry,
   IEpochManager,
   ReentrancyGuard,
-  ICeloVersionedContract
+  ICeloVersionedContract,
+  IEpochManagerInitializer
 {
   using FixidityLib for FixidityLib.Fraction;
 

@@ -7,9 +7,16 @@ import "../common/UsingPrecompiles.sol";
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "../../contracts/common/interfaces/IEpochManagerEnabler.sol";
+import "../../contracts/common/interfaces/IEpochManagerEnablerInitializer";
 import "../../contracts/governance/interfaces/IEpochRewards.sol";
 
-contract EpochManagerEnabler is Initializable, UsingPrecompiles, UsingRegistry {
+contract EpochManagerEnabler is
+  Initializable,
+  UsingPrecompiles,
+  UsingRegistry,
+  IEpochManagerEnabler,
+  IEpochManagerEnablerInitializer
+{
   uint256 public lastKnownEpochNumber;
   uint256 public lastKnownFirstBlockOfEpoch;
   address[] public lastKnownElectedAccounts;
