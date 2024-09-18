@@ -290,7 +290,7 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
 
     stableToken.mint(address(epochManager), paymentAmount * 2);
     epochManagerBalanceBefore = stableToken.balanceOf(address(epochManager));
-    epochManager._setPaymentAllocation(signer1, paymentAmount);
+    epochManager._setPaymentAllocation(validator1, paymentAmount);
   }
 
   function test_sendsCUsdFromEpochManagerToValidator() public {
