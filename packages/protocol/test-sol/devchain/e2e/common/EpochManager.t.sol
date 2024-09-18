@@ -286,7 +286,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
     assertEq(currentEpoch + 2, epochManager.getCurrentEpochNumber());
 
-     address[] memory newlyElected2 = epochManager.getElected();
+    address[] memory newlyElected2 = epochManager.getElected();
 
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       assertEq(originalyElected.contains(newlyElected2[i]), true);
