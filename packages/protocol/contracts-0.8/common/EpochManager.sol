@@ -8,10 +8,10 @@ import "./interfaces/IOracle.sol";
 import "./interfaces/IStableToken.sol";
 import "../common/UsingRegistry.sol";
 
+import "../../contracts/common/FixidityLib.sol";
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/IEpochManager.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
-import "../../contracts/common/interfaces/IEpochManager.sol";
 
 contract EpochManager is
   Initializable,
@@ -20,6 +20,8 @@ contract EpochManager is
   ReentrancyGuard,
   ICeloVersionedContract
 {
+  using FixidityLib for FixidityLib.Fraction;
+
   struct Epoch {
     uint256 firstBlock;
     uint256 lastBlock;
@@ -72,6 +74,22 @@ contract EpochManager is
    * @param epochNumber The epoch number that is finished being processed.
    */
   event EpochProcessingEnded(uint256 indexed epochNumber);
+
+  /**
+   * @notice Emitted when an epoch payment is sent.
+   * @param validator Address of the validator.
+   * @param validatorPayment Amount of cUSD sent to the validator.
+   * @param group Address of the validator's group.
+   * @param groupPayment Amount of cUSD sent to the group.
+   */
+  event ValidatorEpochPaymentDistributed(
+    address indexed validator,
+    uint256 validatorPayment,
+    address indexed group,
+    uint256 groupPayment,
+    address indexed beneficiary,
+    uint256 delegatedPayment
+  );
 
   modifier onlyEpochManagerEnabler() {
     require(
@@ -186,7 +204,7 @@ contract EpochManager is
         epochProcessing.toProcessGroups++;
         uint256 groupScore = getScoreReader().getGroupScore(group);
         // We need to precompute epoch rewards for each group since computation depends on total active votes for all groups.
-        uint256 epochRewards = getElection().getGroupEpochRewards(
+        uint256 epochRewards = getElection().getGroupEpochRewardsBasedOnScore(
           group,
           epochProcessing.totalRewardsVoter,
           groupScore
@@ -210,7 +228,7 @@ contract EpochManager is
         greaters[i]
       );
 
-      // by doing this, we avoid processing a group twice
+      epochProcessing.toProcessGroups = 0;
       delete processedGroups[groups[i]];
     }
     getCeloUnreleasedTreasure().release(
@@ -321,6 +339,10 @@ contract EpochManager is
       validatorPendingPayments[elected[i]] += validatorReward;
       totalRewards += validatorReward;
     }
+    if (totalRewards == 0) {
+      return;
+    }
+
     // Mint all cUSD required for payment and the corresponding CELO
     validators.mintStableToEpochManager(totalRewards);
     // this should have a setter for the oracle.
@@ -333,6 +355,60 @@ contract EpochManager is
     getCeloUnreleasedTreasure().release(
       registry.getAddressForOrDie(RESERVE_REGISTRY_ID),
       CELOequivalent
+    );
+  }
+
+  /**
+   * @notice Sends the allocated epoch payment to a validator, their group, and
+   *   delegation beneficiary.
+   * @param validator Account of the validator.
+   */
+  function sendValidatorPayment(address validator) external {
+    IAccounts accounts = IAccounts(getAccounts());
+    address signer = accounts.getValidatorSigner(validator);
+
+    FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(
+      validatorPendingPayments[signer]
+    );
+    validatorPendingPayments[signer] = 0;
+
+    IValidators validators = getValidators();
+    address group = validators.getValidatorsGroup(validator);
+    (, uint256 commissionUnwrapped, , , , , ) = validators.getValidatorGroup(group);
+
+    uint256 groupPayment = totalPayment.multiply(FixidityLib.wrap(commissionUnwrapped)).fromFixed();
+    FixidityLib.Fraction memory remainingPayment = FixidityLib.newFixed(
+      totalPayment.fromFixed() - groupPayment
+    );
+    (address beneficiary, uint256 delegatedFraction) = getAccounts().getPaymentDelegation(
+      validator
+    );
+    uint256 delegatedPayment = remainingPayment
+      .multiply(FixidityLib.wrap(delegatedFraction))
+      .fromFixed();
+    uint256 validatorPayment = remainingPayment.fromFixed() - delegatedPayment;
+
+    IStableToken stableToken = IStableToken(getStableToken());
+
+    if (validatorPayment > 0) {
+      require(stableToken.transfer(validator, validatorPayment), "transfer failed to validator");
+    }
+
+    if (groupPayment > 0) {
+      require(stableToken.transfer(group, groupPayment), "transfer failed to validator group");
+    }
+
+    if (delegatedPayment > 0) {
+      require(stableToken.transfer(beneficiary, delegatedPayment), "transfer failed to delegatee");
+    }
+
+    emit ValidatorEpochPaymentDistributed(
+      validator,
+      validatorPayment,
+      group,
+      groupPayment,
+      beneficiary,
+      delegatedPayment
     );
   }
 }

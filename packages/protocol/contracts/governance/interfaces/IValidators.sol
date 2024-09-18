@@ -7,7 +7,7 @@ interface IValidators {
     bytes calldata,
     bytes calldata
   ) external returns (bool);
-  function registerValidator(bytes calldata ecdsaPublicKey) external returns (bool);
+  function registerValidatorNoBls(bytes calldata ecdsaPublicKey) external returns (bool);
   function deregisterValidator(uint256) external returns (bool);
   function affiliate(address) external returns (bool);
   function deaffiliate() external returns (bool);
