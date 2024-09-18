@@ -241,7 +241,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
       groupWithVotes[i] = GroupWithVotes(
         groupsEligible[i],
         values[i] +
-          election.getGroupEpochRewardsScore(groupsEligible[i], totalRewardsVote, groupScore[i])
+          election.getGroupEpochRewardsBasedOnScore(groupsEligible[i], totalRewardsVote, groupScore[i])
       );
     }
 

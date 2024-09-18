@@ -18,7 +18,7 @@ cast rpc anvil_setCode \
   --rpc-url $ANVIL_RPC_URL
 
 # Fetch address of Celo distribution 
-CELO_DISTRIBUTION_SCHEDULE_ADDRESS=$(
+CELO_UNRELEASED_TREASURE_ADDRESS=$(
   cast call \
     $REGISTRY_ADDRESS \
     "getAddressForStringOrDie(string calldata identifier)(address)" \
@@ -31,10 +31,10 @@ CELO_DISTRIBUTION_SCHEDULE_ADDRESS=$(
 # implement the receive function nor does it allow ERC20 transfers. This is the only way I 
 # managed to give the CeloUnreleasedTreasure a balance.
 echo "Setting CeloUnreleasedTreasure balance..."
-HEX_CELO_DISTRIBUTION_SCHEDULE_INITIAL_BALANCE=$(cast to-hex $CELO_DISTRIBUTION_SCHEDULE_INITIAL_BALANCE"000000000000000000")
+HEX_CELO_UNRELEASED_TREASURE_INITIAL_BALANCE=$(cast to-hex $CELO_UNRELEASED_TREASURE_INITIAL_BALANCE"000000000000000000")
 cast rpc \
   anvil_setBalance \
-  $CELO_DISTRIBUTION_SCHEDULE_ADDRESS $HEX_CELO_DISTRIBUTION_SCHEDULE_INITIAL_BALANCE \
+  $CELO_UNRELEASED_TREASURE_ADDRESS $HEX_CELO_UNRELEASED_TREASURE_INITIAL_BALANCE \
   --rpc-url $ANVIL_RPC_URL
 
 # Run L2 migrations
