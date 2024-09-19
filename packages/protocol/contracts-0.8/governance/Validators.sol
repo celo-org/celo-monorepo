@@ -722,6 +722,7 @@ contract Validators is
     address[] memory topAccounts = groups[account].members.headN(n);
     address[] memory topValidators = new address[](n);
 
+    // TODO remove this if
     if (isL2()) {
       return topAccounts;
     } else {
@@ -730,6 +731,15 @@ contract Validators is
       }
       return topValidators;
     }
+  }
+
+  function getTopGroupValidatorsAccounts(
+    address account,
+    uint256 n
+  ) external view returns (address[] memory) {
+    address[] memory topAccounts = groups[account].members.headN(n);
+    address[] memory topValidators = new address[](n);
+    return topAccounts;
   }
 
   /**
