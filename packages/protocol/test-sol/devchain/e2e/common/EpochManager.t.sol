@@ -382,13 +382,18 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
   function getLessersAndGreaters(
     address[] memory groups
-  ) private returns (address[] memory lessers, address[] memory greaters, GroupWithVotes[] memory groupWithVotes) {
+  )
+    private
+    returns (
+      address[] memory lessers,
+      address[] memory greaters,
+      GroupWithVotes[] memory groupWithVotes
+    )
+  {
     (, , uint256 maxTotalRewards, , ) = epochManager.getEpochProcessingState();
     uint256 totalRewards = 0;
 
     (, groupWithVotes) = getGroupsWithVotes();
-
-    logGroupWithVotes(groupWithVotes);
 
     lessers = new address[](groups.length);
     greaters = new address[](groups.length);
@@ -427,13 +432,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
       lessers[i] = lesser;
       greaters[i] = greater;
-
-      logGroupWithVotes(groupWithVotes);
     }
-  }
-
-  function logGroupWithVotes(GroupWithVotes[] memory groupWithVotes) private {
-    for (uint256 i = 0; i < groupWithVotes.length; i++) {}
   }
 
   function registerValidatorGroup(
