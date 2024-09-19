@@ -2,11 +2,8 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 import "celo-foundry-8/Test.sol";
-
 import "@celo-contracts-8/common/EpochManagerEnabler.sol";
-
 import "@celo-contracts/stability/test/MockSortedOracles.sol";
-
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 
 import { EPOCH_SIZEPRE_COMPILE_ADDRESS, EpochSizePrecompile } from "@test-sol/precompiles/EpochSizePrecompile.sol";
