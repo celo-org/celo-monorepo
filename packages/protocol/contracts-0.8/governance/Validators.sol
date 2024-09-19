@@ -577,7 +577,6 @@ contract Validators is
    *   payments made to its members. Must be in the range [0, 1.0].
    */
   function setNextCommissionUpdate(uint256 commission) external {
-    allowOnlyL1();
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
@@ -593,7 +592,6 @@ contract Validators is
    * @notice Updates a validator group's commission based on the previously queued update
    */
   function updateCommission() external {
-    allowOnlyL1();
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];

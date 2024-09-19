@@ -2481,13 +2481,6 @@ contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
     assertEq(_commission, commission.unwrap());
   }
 
-  function test_Reverts_SetValidatorGroupCommission_WhenL2() public {
-    _whenL2();
-    vm.prank(group);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.setNextCommissionUpdate(newCommission);
-  }
-
   function test_ShouldSetValidatorGroupNextCommission() public {
     vm.prank(group);
     validators.setNextCommissionUpdate(newCommission);
@@ -2543,13 +2536,6 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
     (, uint256 _commission, , , , , ) = validators.getValidatorGroup(group);
 
     assertEq(_commission, newCommission);
-  }
-
-  function test_Reverts_SetValidatorGroupCommission_WhenL2() public {
-    _whenL2();
-    vm.prank(group);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.setNextCommissionUpdate(newCommission);
   }
 
   function test_Emits_ValidatorGroupCommissionUpdated() public {
