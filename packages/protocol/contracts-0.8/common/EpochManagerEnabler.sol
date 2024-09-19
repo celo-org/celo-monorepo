@@ -21,6 +21,10 @@ contract EpochManagerEnabler is
   uint256 public lastKnownFirstBlockOfEpoch;
   address[] public lastKnownElectedAccounts;
 
+  event LastKnownEpochNumberSet(uint256 lastKnownEpochNumber);
+  event LastKnownFirstBlockOfEpochSet(uint256 lastKnownFirstBlockOfEpoch);
+  event LastKnownElectedAccountsSet();
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -55,11 +59,13 @@ contract EpochManagerEnabler is
    */
   function captureEpochAndValidators() external onlyL1 {
     lastKnownEpochNumber = getEpochNumber();
+    emit LastKnownEpochNumberSet(lastKnownEpochNumber);
 
     uint256 numberElectedValidators = numberValidatorsInCurrentSet();
     lastKnownElectedAccounts = new address[](numberElectedValidators);
-    lastKnownFirstBlockOfEpoch = _getFirstBlockOfEpoch(lastKnownEpochNumber);
+    _setFirstBlockOfEpoch();
 
+    // TODO add emit
     for (uint256 i = 0; i < numberElectedValidators; i++) {
       // TODO: document how much gas this takes for 110 signers
       address validatorAccountAddress = getAccounts().validatorSignerToAccount(
@@ -67,10 +73,7 @@ contract EpochManagerEnabler is
       );
       lastKnownElectedAccounts[i] = validatorAccountAddress;
     }
-  }
-
-  function getFirstBlockOfEpoch(uint256 currentEpoch) external view returns (uint256) {
-    return _getFirstBlockOfEpoch(currentEpoch);
+    emit LastKnownElectedAccountsSet();
   }
 
   /**
@@ -84,14 +87,10 @@ contract EpochManagerEnabler is
     return (1, 1, 0, 0);
   }
 
-  function _getFirstBlockOfEpoch(uint256 currentEpoch) internal view returns (uint256) {
-    uint256 blockToCheck = block.number - 1;
-    uint256 blockEpochNumber = getEpochNumberOfBlock(blockToCheck);
-
-    while (blockEpochNumber == currentEpoch) {
-      blockToCheck--;
-      blockEpochNumber = getEpochNumberOfBlock(blockToCheck);
-    }
-    return blockToCheck;
+  function _setFirstBlockOfEpoch() internal onlyL1 {
+    uint256 blocksSinceEpochBlock = block.number % getEpochSize();
+    uint256 epochBlock = block.number - blocksSinceEpochBlock;
+    lastKnownFirstBlockOfEpoch = epochBlock;
+    emit LastKnownFirstBlockOfEpochSet(lastKnownFirstBlockOfEpoch);
   }
 }
