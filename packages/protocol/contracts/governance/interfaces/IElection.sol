@@ -29,9 +29,9 @@ interface IElection {
 
   // view functions
   function electValidatorSigners() external view returns (address[] memory);
-  function electNValidatorSigners(uint256, uint256) external view returns (address[] memory);
   function electValidators() external view returns (address[] memory);
-  function electNValidatorAccounts(uint256, uint256) external view returns (address[] memory);
+  function electNValidatorSigners(uint256, uint256) external view returns (address[] memory);
+  function electNValidator(uint256, uint256) external view returns (address[] memory);
   function getElectableValidators() external view returns (uint256, uint256);
   function getElectabilityThreshold() external view returns (uint256);
   function getNumVotesReceivable(address) external view returns (uint256);
