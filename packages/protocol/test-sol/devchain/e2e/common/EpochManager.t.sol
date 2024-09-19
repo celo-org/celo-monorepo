@@ -226,13 +226,20 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     epochManager.startNextEpochProcess();
   }
 
+  function assertGroupWithVotes(GroupWithVotes[] memory groupWithVotes) internal {
+    for (uint256 i = 0; i < groupWithVotes.length; i++) {
+      uint256 expected = election.getTotalVotesForGroup(groupWithVotes[i].group);
+      assertEq(election.getTotalVotesForGroup(groupWithVotes[i].group), groupWithVotes[i].votes);
+    }
+  }
+
   function test_shouldFinishNextEpochProcessing() public {
     address[] memory lessers;
     address[] memory greaters;
     address[] memory groupsEligible;
     GroupWithVotes[] memory groupWithVotes;
     uint256[] memory groupActiveBalances;
-    (lessers, greaters) = getLessersAndGreaters(groups);
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
 
     uint256 currentEpoch = epochManager.getCurrentEpochNumber();
     address[] memory currentlyElected = epochManager.getElected();
@@ -261,8 +268,9 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     timeTravel(vm, epochDuration / 2);
     blockTravel(vm, 100);
 
-    (lessers, greaters) = getLessersAndGreaters(groups);
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
     epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
 
     assertEq(currentEpoch + 2, epochManager.getCurrentEpochNumber());
 
@@ -281,8 +289,9 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     timeTravel(vm, epochDuration / 2);
     blockTravel(vm, 100);
 
-    (lessers, greaters) = getLessersAndGreaters(groups);
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
     epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
 
     groups.push(newValidatorGroup);
     validatorsArray.push(newValidator);
@@ -292,8 +301,9 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
     timeTravel(vm, epochDuration + 1);
     epochManager.startNextEpochProcess();
-    (lessers, greaters) = getLessersAndGreaters(groups);
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
     epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
 
     assertEq(epochManager.getElected().length, validatorsArray.length);
 
@@ -303,8 +313,9 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
     timeTravel(vm, epochDuration + 1);
     epochManager.startNextEpochProcess();
-    (lessers, greaters) = getLessersAndGreaters(groups);
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
     epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
 
     assertEq(epochManager.getElected().length, validatorsArray.length - 1);
   }
@@ -371,11 +382,10 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
   function getLessersAndGreaters(
     address[] memory groups
-  ) private returns (address[] memory lessers, address[] memory greaters) {
+  ) private returns (address[] memory lessers, address[] memory greaters, GroupWithVotes[] memory groupWithVotes) {
     (, , uint256 maxTotalRewards, , ) = epochManager.getEpochProcessingState();
     uint256 totalRewards = 0;
 
-    GroupWithVotes[] memory groupWithVotes;
     (, groupWithVotes) = getGroupsWithVotes();
 
     logGroupWithVotes(groupWithVotes);
