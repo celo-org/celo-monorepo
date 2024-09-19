@@ -1498,6 +1498,17 @@ contract Validators is
     return true;
   }
 
+  function _sendValidatorPaymentIfNecessary(address validator) private {
+    getEpochManager().sendValidatorPayment(validator);
+  }
+
+  function _sendValidatorPaymentsIfNecessary(ValidatorGroup storage group) private {
+    address[] memory members = group.members.getKeys();
+    for (uint256 i = 0; i < members.length; i++) {
+      _sendValidatorPaymentIfNecessary(members[i]);
+    }
+  }
+
   /**
    * @notice Returns the epoch number.
    * @return Current epoch number.
@@ -1507,17 +1518,6 @@ contract Validators is
       return getEpochManager().getCurrentEpochNumber();
     } else {
       return getEpochNumber();
-    }
-  }
-
-  function _sendValidatorPaymentIfNecessary(address validator) private {
-    getEpochManager().sendValidatorPayment(validator);
-  }
-
-  function _sendValidatorPaymentsIfNecessary(ValidatorGroup storage group) private {
-    address[] memory members = group.members.getKeys();
-    for (uint256 i = 0; i < members.length; i++) {
-      _sendValidatorPaymentIfNecessary(members[i]);
     }
   }
 }
