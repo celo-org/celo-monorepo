@@ -2596,16 +2596,10 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
   }
 
   function test_ShouldSendMultipleValidatorPayments_WhenUnclaimed_WhenL2() public {
-    vm.startPrank(group);
+    vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
+    vm.prank(group);
     validators.addMember(otherValidator);
-    vm.stopPrank();
-
-    address[] memory members = validators.getTopGroupValidators(group, 2);
-    for (uint i = 0; i < members.length; i++) {
-      console2.log("member", i);
-      console2.log(members[i]);
-    }
     vm.prank(group);
     validators.setNextCommissionUpdate(newCommission);
     blockTravel(commissionUpdateDelay);
