@@ -2521,7 +2521,21 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
-    _registerValidatorGroupHelper(group, 1);
+    _registerValidatorGroupHelper(group, 2);
+
+    _registerValidatorHelper(validator, validatorPk);
+    _registerValidatorHelper(otherValidator, otherValidatorPk);
+
+    vm.prank(validator);
+    validators.affiliate(group);
+    (, , address _affiliation1, , ) = validators.getValidator(validator);
+
+    vm.prank(otherValidator);
+    validators.affiliate(group);
+    (, , address _affiliation2, , ) = validators.getValidator(otherValidator);
+
+    require(_affiliation1 == group, "Affiliation failed.");
+    require(_affiliation2 == group, "Affiliation failed.");
   }
 
   function test_ShouldSetValidatorGroupCommission() public {
@@ -2577,6 +2591,29 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
 
     vm.expectRevert("No commission update queued");
 
+    vm.prank(group);
+    validators.updateCommission();
+  }
+
+  function test_ShouldSendMultipleValidatorPayments_WhenUnclaimed_WhenL2() public {
+    vm.startPrank(group);
+    validators.addFirstMember(validator, address(0), address(0));
+    validators.addMember(otherValidator);
+    vm.stopPrank();
+
+    address[] memory members = validators.getTopGroupValidators(group, 2);
+    for (uint i = 0; i < members.length; i++) {
+      console2.log("member", i);
+      console2.log(members[i]);
+    }
+    vm.prank(group);
+    validators.setNextCommissionUpdate(newCommission);
+    blockTravel(commissionUpdateDelay);
+
+    vm.expectEmit(true, true, true, true);
+    emit SendValidatorPaymentCalled(validator);
+    vm.expectEmit(true, true, true, true);
+    emit SendValidatorPaymentCalled(otherValidator);
     vm.prank(group);
     validators.updateCommission();
   }
