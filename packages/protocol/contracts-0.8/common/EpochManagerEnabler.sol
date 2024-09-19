@@ -65,7 +65,6 @@ contract EpochManagerEnabler is
     lastKnownElectedAccounts = new address[](numberElectedValidators);
     _setFirstBlockOfEpoch();
 
-    // TODO add emit
     for (uint256 i = 0; i < numberElectedValidators; i++) {
       // TODO: document how much gas this takes for 110 signers
       address validatorAccountAddress = getAccounts().validatorSignerToAccount(
