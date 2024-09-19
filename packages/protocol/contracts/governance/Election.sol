@@ -590,7 +590,7 @@ contract Election is
    * @return The amount of rewards that voters for `group` are due at the end of an epoch.
    * @dev Eligible groups that have received their maximum number of votes cannot receive more.
    */
-  function getGroupEpochRewards(
+  function getGroupEpochRewardsBasedOnScore(
     address group,
     uint256 totalEpochRewards,
     uint256 groupScore
