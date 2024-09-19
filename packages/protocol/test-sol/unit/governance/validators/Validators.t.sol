@@ -1383,7 +1383,7 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
     assertTrue(election.isIneligible(group));
   }
 
-  function test_ShouldSendValidatorPayment_WhenUnclaimed_WhenL2() public {
+  function test_ShouldSendValidatorPayment() public {
     vm.expectEmit(true, true, true, true);
     emit SendValidatorPaymentCalled(validator);
     vm.prank(validator);
@@ -1515,7 +1515,7 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
     assertTrue(election.isIneligible(group));
   }
 
-  function test_ShouldSendValidatorPayment_WhenUnclaimed_WhenL2() public {
+  function test_ShouldSendValidatorPayment() public {
     vm.expectEmit(true, true, true, true);
     emit SendValidatorPaymentCalled(validator);
     vm.prank(validator);
@@ -2595,7 +2595,7 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
     validators.updateCommission();
   }
 
-  function test_ShouldSendMultipleValidatorPayments_WhenUnclaimed_WhenL2() public {
+  function test_ShouldSendMultipleValidatorPayments() public {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
     vm.prank(group);
@@ -3537,7 +3537,7 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
     validators.forceDeaffiliateIfValidator(validator);
   }
 
-  function test_ShouldSendValidatorPayment_WhenUnclaimed_WhenL2() public {
+  function test_ShouldSendValidatorPayment() public {
     vm.expectEmit(true, true, true, true);
     emit SendValidatorPaymentCalled(validator);
     vm.prank(paymentDelegatee);
