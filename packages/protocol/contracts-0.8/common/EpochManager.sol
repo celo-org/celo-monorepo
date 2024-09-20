@@ -12,13 +12,15 @@ import "../../contracts/common/FixidityLib.sol";
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/IEpochManager.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "./interfaces/IEpochManagerInitializer.sol";
 
 contract EpochManager is
   Initializable,
   UsingRegistry,
   IEpochManager,
   ReentrancyGuard,
-  ICeloVersionedContract
+  ICeloVersionedContract,
+  IEpochManagerInitializer
 {
   using FixidityLib for FixidityLib.Fraction;
 
@@ -245,6 +247,60 @@ contract EpochManager is
     epochProcessing.status = EpochProcessStatus.NotStarted;
   }
 
+  /**
+   * @notice Sends the allocated epoch payment to a validator, their group, and
+   *   delegation beneficiary.
+   * @param validator Account of the validator.
+   */
+  function sendValidatorPayment(address validator) external {
+    IAccounts accounts = IAccounts(getAccounts());
+    address signer = accounts.getValidatorSigner(validator);
+
+    FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(
+      validatorPendingPayments[signer]
+    );
+    validatorPendingPayments[signer] = 0;
+
+    IValidators validators = getValidators();
+    address group = validators.getValidatorsGroup(validator);
+    (, uint256 commissionUnwrapped, , , , , ) = validators.getValidatorGroup(group);
+
+    uint256 groupPayment = totalPayment.multiply(FixidityLib.wrap(commissionUnwrapped)).fromFixed();
+    FixidityLib.Fraction memory remainingPayment = FixidityLib.newFixed(
+      totalPayment.fromFixed() - groupPayment
+    );
+    (address beneficiary, uint256 delegatedFraction) = getAccounts().getPaymentDelegation(
+      validator
+    );
+    uint256 delegatedPayment = remainingPayment
+      .multiply(FixidityLib.wrap(delegatedFraction))
+      .fromFixed();
+    uint256 validatorPayment = remainingPayment.fromFixed() - delegatedPayment;
+
+    IStableToken stableToken = IStableToken(getStableToken());
+
+    if (validatorPayment > 0) {
+      require(stableToken.transfer(validator, validatorPayment), "transfer failed to validator");
+    }
+
+    if (groupPayment > 0) {
+      require(stableToken.transfer(group, groupPayment), "transfer failed to validator group");
+    }
+
+    if (delegatedPayment > 0) {
+      require(stableToken.transfer(beneficiary, delegatedPayment), "transfer failed to delegatee");
+    }
+
+    emit ValidatorEpochPaymentDistributed(
+      validator,
+      validatorPayment,
+      group,
+      groupPayment,
+      beneficiary,
+      delegatedPayment
+    );
+  }
+
   /// returns the current epoch Info
   function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256) {
     Epoch storage _epoch = epochs[currentEpochNumber];
@@ -272,6 +328,10 @@ contract EpochManager is
     );
   }
 
+  function isBlocked() external view returns (bool) {
+    return isOnEpochProcess();
+  }
+
   function getElected() external view returns (address[] memory) {
     return elected;
   }
@@ -286,10 +346,6 @@ contract EpochManager is
     require(epoch >= firstKnownEpoch, "Epoch not known");
     require(epoch < currentEpochNumber, "Epoch not finished yet");
     return epochs[epoch].lastBlock;
-  }
-
-  function isBlocked() external view returns (bool) {
-    return isOnEpochProcess();
   }
 
   /**
@@ -355,60 +411,6 @@ contract EpochManager is
     getCeloUnreleasedTreasure().release(
       registry.getAddressForOrDie(RESERVE_REGISTRY_ID),
       CELOequivalent
-    );
-  }
-
-  /**
-   * @notice Sends the allocated epoch payment to a validator, their group, and
-   *   delegation beneficiary.
-   * @param validator Account of the validator.
-   */
-  function sendValidatorPayment(address validator) external {
-    IAccounts accounts = IAccounts(getAccounts());
-    address signer = accounts.getValidatorSigner(validator);
-
-    FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(
-      validatorPendingPayments[signer]
-    );
-    validatorPendingPayments[signer] = 0;
-
-    IValidators validators = getValidators();
-    address group = validators.getValidatorsGroup(validator);
-    (, uint256 commissionUnwrapped, , , , , ) = validators.getValidatorGroup(group);
-
-    uint256 groupPayment = totalPayment.multiply(FixidityLib.wrap(commissionUnwrapped)).fromFixed();
-    FixidityLib.Fraction memory remainingPayment = FixidityLib.newFixed(
-      totalPayment.fromFixed() - groupPayment
-    );
-    (address beneficiary, uint256 delegatedFraction) = getAccounts().getPaymentDelegation(
-      validator
-    );
-    uint256 delegatedPayment = remainingPayment
-      .multiply(FixidityLib.wrap(delegatedFraction))
-      .fromFixed();
-    uint256 validatorPayment = remainingPayment.fromFixed() - delegatedPayment;
-
-    IStableToken stableToken = IStableToken(getStableToken());
-
-    if (validatorPayment > 0) {
-      require(stableToken.transfer(validator, validatorPayment), "transfer failed to validator");
-    }
-
-    if (groupPayment > 0) {
-      require(stableToken.transfer(group, groupPayment), "transfer failed to validator group");
-    }
-
-    if (delegatedPayment > 0) {
-      require(stableToken.transfer(beneficiary, delegatedPayment), "transfer failed to delegatee");
-    }
-
-    emit ValidatorEpochPaymentDistributed(
-      validator,
-      validatorPayment,
-      group,
-      groupPayment,
-      beneficiary,
-      delegatedPayment
     );
   }
 }

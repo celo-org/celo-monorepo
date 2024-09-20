@@ -16,16 +16,12 @@ contract MockAccounts {
   mapping(address => PaymentDelegation) delegations;
   mapping(address => address) accountToSigner;
 
-  function setPaymentDelegationFor(
-    address validator,
-    address beneficiary,
-    uint256 fraction
-  ) public {
-    delegations[validator] = PaymentDelegation(beneficiary, FixidityLib.wrap(fraction));
+  function setValidatorSigner(address account, address signer) external {
+    accountToSigner[account] = signer;
   }
 
-  function deletePaymentDelegationFor(address validator) public {
-    delete delegations[validator];
+  function getValidatorSigner(address account) external returns (address) {
+    return accountToSigner[account];
   }
 
   function getPaymentDelegation(address account) external view returns (address, uint256) {
@@ -33,11 +29,14 @@ contract MockAccounts {
     return (delegation.beneficiary, delegation.fraction.unwrap());
   }
 
-  function setValidatorSigner(address account, address signer) external {
-    accountToSigner[account] = signer;
+  function setPaymentDelegationFor(
+    address validator,
+    address beneficiary,
+    uint256 fraction
+  ) public {
+    delegations[validator] = PaymentDelegation(beneficiary, FixidityLib.wrap(fraction));
   }
-
-  function getValidatorSigner(address account) external returns (address) {
-    return accountToSigner[account];
+  function deletePaymentDelegationFor(address validator) public {
+    delete delegations[validator];
   }
 }
