@@ -490,16 +490,17 @@ contract Election is
    *   method.
    * @return The list of elected validator signers.
    */
-  function electValidatorSigners() external view onlyL1 returns (address[] memory) {
+  function electValidatorSigners() external view returns (address[] memory) {
     return electNValidatorSigners(electableValidators.min, electableValidators.max);
   }
+
   /**
    * @notice Returns a list of elected validators with seats allocated to groups via the D'Hondt
    *   method.
    * @return The list of elected validators.
    */
-  function electValidatorAccounts() external view onlyL2 returns (address[] memory) {
-    return electNValidator(electableValidators.min, electableValidators.max);
+  function electValidatorAccounts() external view returns (address[] memory) {
+    return electNValidatorAccounts(electableValidators.min, electableValidators.max);
   }
 
   /**
@@ -800,20 +801,13 @@ contract Election is
   function electNValidatorSigners(
     uint256 minElectableValidators,
     uint256 maxElectableValidators
-  )
-    public
-    view
-    returns (
-      // TODO add tests this only works on L1 and L2
-      address[] memory
-    )
-  {
+  ) public view returns (address[] memory) {
     bool accounts = false;
     return
       _electNValidatorSignerOrAccount(minElectableValidators, maxElectableValidators, accounts);
   }
 
-  function electNValidator(
+  function electNValidatorAccounts(
     uint256 minElectableValidators,
     uint256 maxElectableValidators
   ) public view returns (address[] memory) {
