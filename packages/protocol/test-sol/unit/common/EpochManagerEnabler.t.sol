@@ -143,3 +143,17 @@ contract EpochManagerEnablerTest_captureEpochAndValidators is EpochManagerEnable
     assertEq(epochManagerEnabler.lastKnownFirstBlockOfEpoch(), 17280 * 3);
   }
 }
+
+contract EpochManagerEnablerTest_getFirstBlockOfEpoch is EpochManagerEnablerTest {
+  function test_blockIsEpockBlock() public {
+    vm.roll(27803520);
+    epochManagerEnabler.setFirstBlockOfEpoch();
+    assertEq(epochManagerEnabler.lastKnownFirstBlockOfEpoch(), 27803520);
+  }
+
+  function test_blockIsNotEpochBlock() public {
+    vm.roll(27817229);
+    epochManagerEnabler.setFirstBlockOfEpoch();
+    assertEq(epochManagerEnabler.lastKnownFirstBlockOfEpoch(), 27803520);
+  }
+}

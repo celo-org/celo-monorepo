@@ -6,13 +6,24 @@ import "../common/UsingPrecompiles.sol";
 
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
-import "../../contracts/common/interfaces/IEpochManagerEnabler.sol";
 import "../../contracts/governance/interfaces/IEpochRewards.sol";
+import "../../contracts/common/interfaces/IEpochManagerEnabler.sol";
+import "./interfaces/IEpochManagerEnablerInitializer.sol";
 
-contract EpochManagerEnabler is Initializable, UsingPrecompiles, UsingRegistry {
+contract EpochManagerEnabler is
+  Initializable,
+  UsingPrecompiles,
+  UsingRegistry,
+  IEpochManagerEnabler,
+  IEpochManagerEnablerInitializer
+{
   uint256 public lastKnownEpochNumber;
   uint256 public lastKnownFirstBlockOfEpoch;
   address[] public lastKnownElectedAccounts;
+
+  event LastKnownEpochNumberSet(uint256 lastKnownEpochNumber);
+  event LastKnownFirstBlockOfEpochSet(uint256 lastKnownFirstBlockOfEpoch);
+  event LastKnownElectedAccountsSet();
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -48,10 +59,11 @@ contract EpochManagerEnabler is Initializable, UsingPrecompiles, UsingRegistry {
    */
   function captureEpochAndValidators() external onlyL1 {
     lastKnownEpochNumber = getEpochNumber();
+    emit LastKnownEpochNumberSet(lastKnownEpochNumber);
 
     uint256 numberElectedValidators = numberValidatorsInCurrentSet();
     lastKnownElectedAccounts = new address[](numberElectedValidators);
-    lastKnownFirstBlockOfEpoch = _getFirstBlockOfEpoch(lastKnownEpochNumber);
+    _setFirstBlockOfEpoch();
 
     for (uint256 i = 0; i < numberElectedValidators; i++) {
       // TODO: document how much gas this takes for 110 signers
@@ -60,10 +72,7 @@ contract EpochManagerEnabler is Initializable, UsingPrecompiles, UsingRegistry {
       );
       lastKnownElectedAccounts[i] = validatorAccountAddress;
     }
-  }
-
-  function getFirstBlockOfEpoch(uint256 currentEpoch) external view returns (uint256) {
-    return _getFirstBlockOfEpoch(currentEpoch);
+    emit LastKnownElectedAccountsSet();
   }
 
   /**
@@ -84,14 +93,10 @@ contract EpochManagerEnabler is Initializable, UsingPrecompiles, UsingRegistry {
     return (1, 1, 0, 0);
   }
 
-  function _getFirstBlockOfEpoch(uint256 currentEpoch) internal view returns (uint256) {
-    uint256 blockToCheck = block.number - 1;
-    uint256 blockEpochNumber = getEpochNumberOfBlock(blockToCheck);
-
-    while (blockEpochNumber == currentEpoch) {
-      blockToCheck--;
-      blockEpochNumber = getEpochNumberOfBlock(blockToCheck);
-    }
-    return blockToCheck;
+  function _setFirstBlockOfEpoch() internal onlyL1 {
+    uint256 blocksSinceEpochBlock = block.number % getEpochSize();
+    uint256 epochBlock = block.number - blocksSinceEpochBlock;
+    lastKnownFirstBlockOfEpoch = epochBlock;
+    emit LastKnownFirstBlockOfEpochSet(lastKnownFirstBlockOfEpoch);
   }
 }
