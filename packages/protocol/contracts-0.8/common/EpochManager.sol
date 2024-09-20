@@ -198,6 +198,8 @@ contract EpochManager is
     epochs[currentEpochNumber].firstBlock = block.number;
     epochs[currentEpochNumber].startTimestamp = block.timestamp;
 
+    epochProcessing.toProcessGroups = 0;
+
     for (uint i = 0; i < elected.length; i++) {
       address group = getValidators().getValidatorsGroup(elected[i]);
       if (!processedGroups[group].processed) {
@@ -226,7 +228,6 @@ contract EpochManager is
         greaters[i]
       );
 
-      epochProcessing.toProcessGroups = 0;
       delete processedGroups[groups[i]];
     }
     getCeloUnreleasedTreasure().release(
