@@ -97,8 +97,6 @@ contract EpochManagerEnablerTest_initialize is EpochManagerEnablerTest {
 
 contract EpochManagerEnablerTest_initEpochManager is EpochManagerEnablerTest {
   function test_CanBeCalledByAnyone() public {
-    travelEpochL1(vm);
-    travelEpochL1(vm);
     epochManagerEnabler.captureEpochAndValidators();
 
     whenL2(vm);
@@ -125,38 +123,33 @@ contract EpochManagerEnablerTest_initEpochManager is EpochManagerEnablerTest {
 
 contract EpochManagerEnablerTest_captureEpochAndValidators is EpochManagerEnablerTest {
   function test_Reverts_whenL2() public {
-    travelEpochL1(vm);
     whenL2(vm);
     vm.expectRevert("This method is no longer supported in L2.");
     epochManagerEnabler.captureEpochAndValidators();
   }
 
   function test_shouldSetLastKnownElectedAccounts() public {
-    travelEpochL1(vm);
     epochManagerEnabler.captureEpochAndValidators();
 
     assertEq(epochManagerEnabler.getlastKnownElectedAccounts().length, numberValidators);
   }
 
   function test_shouldSetLastKnownEpochNumber() public {
-    travelEpochL1(vm);
     epochManagerEnabler.captureEpochAndValidators();
 
-    assertEq(epochManagerEnabler.lastKnownEpochNumber(), 4);
+    assertEq(epochManagerEnabler.lastKnownEpochNumber(), 3);
   }
 
   function test_shouldSetLastKnownFirstBlockOfEpoch() public {
-    travelEpochL1(vm);
     epochManagerEnabler.captureEpochAndValidators();
 
-    assertEq(epochManagerEnabler.lastKnownFirstBlockOfEpoch(), 17280 * 3);
+    assertEq(epochManagerEnabler.lastKnownFirstBlockOfEpoch(), 17280 * 2);
   }
 
   function test_Emits_LastKnownEpochNumberSet() public {
     vm.expectEmit(true, true, true, true);
-    emit LastKnownEpochNumberSet(4);
+    emit LastKnownEpochNumberSet(3);
 
-    travelEpochL1(vm);
     epochManagerEnabler.captureEpochAndValidators();
   }
 
@@ -164,15 +157,13 @@ contract EpochManagerEnablerTest_captureEpochAndValidators is EpochManagerEnable
     vm.expectEmit(true, true, true, true);
     emit LastKnownElectedAccountsSet();
 
-    travelEpochL1(vm);
     epochManagerEnabler.captureEpochAndValidators();
   }
 
   function test_Emits_LastKnownFirstBlockOfEpochSet() public {
     vm.expectEmit(true, true, true, true);
-    emit LastKnownFirstBlockOfEpochSet(51840);
+    emit LastKnownFirstBlockOfEpochSet(34560);
 
-    travelEpochL1(vm);
     epochManagerEnabler.captureEpochAndValidators();
   }
 }
