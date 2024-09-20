@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.8.20;
 
+import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts8/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "./interfaces/IOracle.sol";
-import "./interfaces/IStableToken.sol";
 import "../common/UsingRegistry.sol";
 
 import "../../contracts/common/FixidityLib.sol";
@@ -277,7 +277,7 @@ contract EpochManager is
       .fromFixed();
     uint256 validatorPayment = remainingPayment.fromFixed() - delegatedPayment;
 
-    IStableToken stableToken = IStableToken(getStableToken());
+    IERC20 stableToken = IERC20(getStableToken());
 
     if (validatorPayment > 0) {
       require(stableToken.transfer(validator, validatorPayment), "transfer failed to validator");
