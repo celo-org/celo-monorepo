@@ -8,6 +8,10 @@ import "../../contracts-0.8/common/EpochManagerEnabler.sol";
 contract EpochManagerEnablerMock is EpochManagerEnabler(true) {
   address[] validatorSet;
 
+  function setFirstBlockOfEpoch() external {
+    return _setFirstBlockOfEpoch();
+  }
+
   function addValidator(address validator) external {
     validatorSet.push(validator);
   }

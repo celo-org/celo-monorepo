@@ -18,11 +18,13 @@ import "@celo-contracts/common/interfaces/IRegistry.sol";
 import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
 import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
 import { MockCeloUnreleasedTreasure } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasure.sol";
+import "@celo-contracts-8/common/test/MockCeloToken.sol";
 
 contract EpochManagerEnablerTest is Test, TestConstants, Utils08 {
   EpochManager epochManager;
   EpochManagerEnablerMock epochManagerEnabler;
   MockCeloUnreleasedTreasure celoUnreleasedTreasure;
+  MockCeloToken08 celoToken;
 
   IRegistry registry;
   IAccounts accounts;
@@ -33,9 +35,15 @@ contract EpochManagerEnablerTest is Test, TestConstants, Utils08 {
   uint256 epochDuration = DAY;
   uint256 numberValidators = 100;
 
+  event LastKnownEpochNumberSet(uint256 lastKnownEpochNumber);
+  event LastKnownFirstBlockOfEpochSet(uint256 lastKnownFirstBlockOfEpoch);
+  event LastKnownElectedAccountsSet();
+
   function setUp() public virtual {
+    ph.setEpochSize(17280);
     epochManager = new EpochManager(true);
     epochManagerEnabler = new EpochManagerEnablerMock();
+    celoToken = new MockCeloToken08();
 
     celoUnreleasedTreasure = new MockCeloUnreleasedTreasure();
 
@@ -52,10 +60,11 @@ contract EpochManagerEnablerTest is Test, TestConstants, Utils08 {
     registry.setAddressFor(EpochManagerContract, address(epochManager));
     registry.setAddressFor(EpochManagerEnablerContract, address(epochManagerEnabler));
     registry.setAddressFor(AccountsContract, address(accounts));
-
+    registry.setAddressFor(CeloTokenContract, address(celoToken));
     registry.setAddressFor(CeloUnreleasedTreasureContract, address(celoUnreleasedTreasure));
 
-    vm.deal(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
+    celoToken.setTotalSupply(CELO_SUPPLY_CAP);
+    celoToken.setBalanceOf(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
 
     epochManagerEnabler.initialize(REGISTRY_ADDRESS);
     epochManager.initialize(REGISTRY_ADDRESS, epochDuration);
@@ -141,6 +150,30 @@ contract EpochManagerEnablerTest_captureEpochAndValidators is EpochManagerEnable
     epochManagerEnabler.captureEpochAndValidators();
 
     assertEq(epochManagerEnabler.lastKnownFirstBlockOfEpoch(), 17280 * 3);
+  }
+
+  function test_Emits_LastKnownEpochNumberSet() public {
+    vm.expectEmit(true, true, true, true);
+    emit LastKnownEpochNumberSet(4);
+
+    travelEpochL1(vm);
+    epochManagerEnabler.captureEpochAndValidators();
+  }
+
+  function test_Emits_LastKnownElectedAccountsSet() public {
+    vm.expectEmit(true, true, true, true);
+    emit LastKnownElectedAccountsSet();
+
+    travelEpochL1(vm);
+    epochManagerEnabler.captureEpochAndValidators();
+  }
+
+  function test_Emits_LastKnownFirstBlockOfEpochSet() public {
+    vm.expectEmit(true, true, true, true);
+    emit LastKnownFirstBlockOfEpochSet(51840);
+
+    travelEpochL1(vm);
+    epochManagerEnabler.captureEpochAndValidators();
   }
 }
 
