@@ -2289,7 +2289,7 @@ contract ElectionTest_ElectValidatorsAbstract is ElectionTest {
       }
       validators.setMembers(group, members);
       vm.prank(address(validators));
-      election.markGroupEligible(group, address(0), prev); // TODO change to vm.prank
+      election.markGroupEligible(group, address(0), prev);
       vm.prank(voter1);
       election.vote(group, randomVotes[i], prev, address(0));
       prev = group;
