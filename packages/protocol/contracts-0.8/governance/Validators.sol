@@ -18,6 +18,8 @@ import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "../../contracts/common/libraries/ReentrancyGuard.sol";
 import "../common/interfaces/IStableToken.sol";
 
+import { console } from "forge-std/console.sol";
+
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
  */
@@ -727,6 +729,7 @@ contract Validators is
       return topAccounts;
     } else {
       for (uint256 i = 0; i < n; i = i.add(1)) {
+        // todo move out of loop
         topValidators[i] = getAccounts().getValidatorSigner(topAccounts[i]);
       }
       return topValidators;
@@ -737,8 +740,8 @@ contract Validators is
     address account,
     uint256 n
   ) external view returns (address[] memory) {
+    console.log("Hello from getTopGroupValidatorsAccounts");
     address[] memory topAccounts = groups[account].members.headN(n);
-    address[] memory topValidators = new address[](n);
     return topAccounts;
   }
 

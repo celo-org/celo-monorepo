@@ -240,7 +240,7 @@ contract EpochManager is
       epochProcessing.totalRewardsCarbonFund
     );
     // run elections
-    elected = getElection().electValidators();
+    elected = getElection().electValidatorAccounts();
     // TODO check how to nullify stuct
     epochProcessing.status = EpochProcessStatus.NotStarted;
   }

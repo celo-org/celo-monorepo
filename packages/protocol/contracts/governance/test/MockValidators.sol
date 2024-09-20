@@ -10,6 +10,7 @@ import "../../../contracts-0.8/common/IsL2Check.sol";
 /**
  * @title Holds a list of addresses of validators
  */
+// TODO add IValidators interface
 contract MockValidators is IsL2Check {
   using SafeMath for uint256;
 
@@ -90,16 +91,20 @@ contract MockValidators is IsL2Check {
     allowOnlyL1();
   }
 
-  function getTopGroupValidators(
-    address group,
-    uint256 n
-  ) external view returns (address[] memory) {
+  function getTopGroupValidators(address group, uint256 n) public view returns (address[] memory) {
     require(n <= members[group].length);
     address[] memory validators = new address[](n);
     for (uint256 i = 0; i < n; i = i.add(1)) {
       validators[i] = members[group][i];
     }
     return validators;
+  }
+
+  function getTopGroupValidatorsAccounts(
+    address group,
+    uint256 n
+  ) external view returns (address[] memory) {
+    return getTopGroupValidators(group, n);
   }
 
   function getValidatorGroup(

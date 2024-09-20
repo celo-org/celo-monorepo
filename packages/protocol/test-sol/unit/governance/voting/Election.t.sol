@@ -2278,6 +2278,9 @@ contract ElectionTest_ElectValidatorSigners is ElectionTest {
     election.setElectabilityThreshold(0);
     election.setElectableValidators(10, 100);
 
+    // (uint256 min, uint256 max) = election.getElectableValidators();
+    // console.log("getElectableValidators", min, max);
+
     election.setMaxNumGroupsVotedFor(200);
 
     address prev = address(0);
@@ -2298,7 +2301,7 @@ contract ElectionTest_ElectValidatorSigners is ElectionTest {
       }
       validators.setMembers(group, members);
       registry.setAddressFor("Validators", address(this));
-      election.markGroupEligible(group, address(0), prev);
+      election.markGroupEligible(group, address(0), prev); // TODO change to vm.prank
       registry.setAddressFor("Validators", address(validators));
       vm.prank(voter1);
       election.vote(group, randomVotes[i], prev, address(0));
@@ -2306,17 +2309,21 @@ contract ElectionTest_ElectValidatorSigners is ElectionTest {
     }
   }
 
-  function test_ShouldElectCorrectValidators_WhenThereIsALargeNumberOfGroups() public {
+  function test_ShouldElectCorrectValidators_WhenThereIsALargeNumberOfGroupsSig() public {
     WhenThereIsALargeNumberOfGroups();
     address[] memory elected = election.electValidatorSigners();
+    console.log("hola");
     MemberWithVotes[] memory sortedMembersWithVotes = sortMembersWithVotesDesc(membersWithVotes);
+    console.log("hola2");
     MemberWithVotes[] memory electedUnsorted = new MemberWithVotes[](100);
+    console.log("hola3", elected.length);
 
     for (uint256 i = 0; i < 100; i++) {
       electedUnsorted[i] = MemberWithVotes(elected[i], votesConsideredForElection[elected[i]]);
     }
+    console.log("hola5");
     MemberWithVotes[] memory electedSorted = sortMembersWithVotesDesc(electedUnsorted);
-
+    console.log("hola6");
     for (uint256 i = 0; i < 100; i++) {
       assertEq(electedSorted[i].member, sortedMembersWithVotes[i].member);
       assertEq(electedSorted[i].votes, sortedMembersWithVotes[i].votes);
@@ -2533,7 +2540,7 @@ contract ElectionTest_ElectValidators is ElectionTest {
     WhenThereIsALargeNumberOfGroups();
 
     vm.expectRevert("This method is not supported in L1.");
-    address[] memory elected = election.electValidators();
+    address[] memory elected = election.electValidatorAccounts();
   }
 
   function WhenThereIsALargeNumberOfGroups() public {
@@ -2562,9 +2569,11 @@ contract ElectionTest_ElectValidators is ElectionTest {
         membersWithVotes.push(MemberWithVotes(members[j], votesConsideredForElection[members[j]]));
       }
       validators.setMembers(group, members);
-      registry.setAddressFor("Validators", address(this));
+      registry.setAddressFor("Validators", address(this)); // ?????
+
       election.markGroupEligible(group, address(0), prev);
       registry.setAddressFor("Validators", address(validators));
+
       vm.prank(voter1);
       election.vote(group, randomVotes[i], prev, address(0));
       prev = group;
@@ -2574,7 +2583,7 @@ contract ElectionTest_ElectValidators is ElectionTest {
   function test_ShouldElectCorrectValidators_WhenThereIsALargeNumberOfGroups() public {
     _whenL2();
     WhenThereIsALargeNumberOfGroups();
-    address[] memory elected = election.electValidators();
+    address[] memory elected = election.electValidatorAccounts();
     MemberWithVotes[] memory sortedMembersWithVotes = sortMembersWithVotesDesc(membersWithVotes);
     MemberWithVotes[] memory electedUnsorted = new MemberWithVotes[](100);
 
@@ -2616,7 +2625,7 @@ contract ElectionTest_ElectValidators is ElectionTest {
     vm.prank(voter1);
     election.vote(group1, voter1Weight, group2, address(0));
     setRandomness();
-    arraysEqual(election.electValidators(), group1Members);
+    arraysEqual(election.electValidatorAccounts(), group1Members);
   }
 
   function test_ShouldReturnMaxElectableValidatorsElectedValidators_WhenGroupWithMoreThenMaxElectableValidatorsMembersReceivesVotes()
@@ -2639,7 +2648,7 @@ contract ElectionTest_ElectValidators is ElectionTest {
     expected[3] = validator5;
     expected[4] = validator6;
     expected[5] = validator7;
-    arraysEqual(election.electValidators(), expected);
+    arraysEqual(election.electValidatorAccounts(), expected);
   }
 
   function test_ShouldElectOnlyNMembersFromThatGroup_WhenAGroupReceivesEnoughVotesForMoreThanNSeatsButOnlyHasNMembers()
@@ -2666,7 +2675,7 @@ contract ElectionTest_ElectValidators is ElectionTest {
     expected[3] = validator5;
     expected[4] = validator6;
     expected[5] = validator7;
-    arraysEqual(election.electValidators(), expected);
+    arraysEqual(election.electValidatorAccounts(), expected);
   }
 
   function test_ShouldNotElectAnyMembersFromThatGroup_WhenAGroupDoesNotReceiveElectabilityThresholdVotes()
@@ -2690,7 +2699,7 @@ contract ElectionTest_ElectValidators is ElectionTest {
     expected[3] = validator4;
     expected[4] = validator5;
     expected[5] = validator6;
-    arraysEqual(election.electValidators(), expected);
+    arraysEqual(election.electValidatorAccounts(), expected);
   }
 
   function test_ShouldRevert_WhenThereAnoNotEnoughElectableValidators() public {
@@ -2702,7 +2711,7 @@ contract ElectionTest_ElectValidators is ElectionTest {
     election.vote(group3, voter3Weight, address(0), group2);
     setRandomness();
     vm.expectRevert("Not enough elected validators");
-    election.electValidators();
+    election.electValidatorAccounts();
   }
 
   // Helper function to sort an array of uint256
