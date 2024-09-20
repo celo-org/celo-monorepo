@@ -893,7 +893,6 @@ contract Election is
       // We use the validating delegate if one is set.
       address[] memory electedGroupValidators;
       if (accounts) {
-        // TODO move get validators outside of loop
         electedGroupValidators = validators.getTopGroupValidatorsAccounts(
           electionGroups[i],
           numMembersElected[i]
