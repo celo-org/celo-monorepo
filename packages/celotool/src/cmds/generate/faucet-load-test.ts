@@ -1,3 +1,4 @@
+import { StrongAddress } from '@celo/base'
 import { newKit } from '@celo/contractkit'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { convertToContractDecimals } from 'src/lib/contract-utils'
@@ -65,7 +66,7 @@ export const handler = async (argv: CeloEnvArgv & FaucetLoadTest) => {
     const kit = newKit('http://localhost:8545')
     const account = (await kit.web3.eth.getAccounts())[0]
     console.info(`Using account: ${account}`)
-    kit.defaultAccount = account
+    kit.defaultAccount = account as StrongAddress
 
     const [goldToken, stableToken] = await Promise.all([
       kit.contracts.getGoldToken(),
