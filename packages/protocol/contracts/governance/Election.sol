@@ -817,9 +817,9 @@ contract Election is
   }
 
   /**
-   * @notice Returns a list of elected validator signers with seats allocated to groups via the D'Hondt
+   * @notice Returns a list of elected validator with seats allocated to groups via the D'Hondt
    *   method.
-   * @return The list of elected validator signers.
+   * @return The list of elected validator signers or accounts depending on input.
    * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
    */
   function _electNValidatorSignerOrAccount(
