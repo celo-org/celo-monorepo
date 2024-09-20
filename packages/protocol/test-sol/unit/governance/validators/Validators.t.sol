@@ -3142,9 +3142,10 @@ contract ValidatorsTest_GetTopGroupValidators is ValidatorsTest {
     assertFalse(_validatorSigner[0] == validator);
   }
 
+  // TODO move to other contract
   function test_ShouldReturnTheAccount_WhenL2() public {
     _whenL2();
-    address[] memory validatorAccount = validators.getTopGroupValidators(group, 3);
+    address[] memory validatorAccount = validators.getTopGroupValidatorsAccounts(group, 3);
 
     assertEq(validatorAccount[0], validator);
     assertEq(validatorAccount[1], vm.addr(1));

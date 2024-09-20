@@ -18,7 +18,7 @@ import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "../../contracts/common/libraries/ReentrancyGuard.sol";
 import "../common/interfaces/IStableToken.sol";
 
-import { console } from "forge-std/console.sol";
+import "../../contracts/common/interfaces/IAccounts.sol";
 
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
@@ -714,7 +714,7 @@ contract Validators is
    * @notice Returns the top n group members for a particular group.
    * @param account The address of the validator group.
    * @param n The number of members to return.
-   * @return The top n group members for a particular group.
+   * @return The signers of the top n group members for a particular group.
    * @dev Returns the account instead of signer on L2.
    */
   function getTopGroupValidators(
@@ -724,23 +724,18 @@ contract Validators is
     address[] memory topAccounts = groups[account].members.headN(n);
     address[] memory topValidators = new address[](n);
 
-    // TODO remove this if
-    if (isL2()) {
-      return topAccounts;
-    } else {
-      for (uint256 i = 0; i < n; i = i.add(1)) {
-        // todo move out of loop
-        topValidators[i] = getAccounts().getValidatorSigner(topAccounts[i]);
-      }
-      return topValidators;
+    IAccounts accounts = getAccounts();
+
+    for (uint256 i = 0; i < n; i = i.add(1)) {
+      topValidators[i] = accounts.getValidatorSigner(topAccounts[i]);
     }
+    return topValidators;
   }
 
   function getTopGroupValidatorsAccounts(
     address account,
     uint256 n
   ) external view returns (address[] memory) {
-    console.log("Hello from getTopGroupValidatorsAccounts");
     address[] memory topAccounts = groups[account].members.headN(n);
     return topAccounts;
   }

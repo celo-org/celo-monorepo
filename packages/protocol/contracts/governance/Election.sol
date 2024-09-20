@@ -17,8 +17,6 @@ import "../common/libraries/Heap.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 import "../common/Blockable.sol";
 
-import { console } from "forge-std/console.sol";
-
 contract Election is
   IElection,
   ICeloVersionedContract,
@@ -805,13 +803,14 @@ contract Election is
   )
     public
     view
-    // TODO REMOVE THIS onlyL1
-    onlyL1
-    returns (address[] memory)
+    returns (
+      // TODO add tests this only works on L1 and L2
+      address[] memory
+    )
   {
     bool accounts = false;
-    console.log("electNValidatorSigners.maxElectableValidators", maxElectableValidators);
-    return _electNValidator(minElectableValidators, maxElectableValidators, accounts);
+    return
+      _electNValidatorSignerOrAccount(minElectableValidators, maxElectableValidators, accounts);
   }
 
   function electNValidator(
@@ -819,7 +818,8 @@ contract Election is
     uint256 maxElectableValidators
   ) public view returns (address[] memory) {
     bool accounts = true;
-    return _electNValidator(minElectableValidators, maxElectableValidators, accounts);
+    return
+      _electNValidatorSignerOrAccount(minElectableValidators, maxElectableValidators, accounts);
   }
 
   /**
@@ -828,7 +828,7 @@ contract Election is
    * @return The list of elected validator signers.
    * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
    */
-  function _electNValidator(
+  function _electNValidatorSignerOrAccount(
     uint256 minElectableValidators,
     uint256 maxElectableValidators,
     bool accounts // accounts or signers
@@ -844,7 +844,7 @@ contract Election is
       requiredVotes,
       maxElectableValidators
     );
-    console.log("maxElectableValidators", maxElectableValidators);
+
     address[] memory electionGroups = votes.total.eligible.headN(numElectionGroups);
     uint256[] memory numMembers = getValidators().getGroupsNumMembers(electionGroups);
     // Holds the number of members elected for each of the eligible validator groups.
@@ -862,7 +862,6 @@ contract Election is
       );
     }
 
-    console.log("electionGroups", electionGroups.length);
     // Assign a number of seats to each validator group.
     while (totalNumMembersElected < maxElectableValidators && electionGroups.length > 0) {
       uint256 groupIndex = keys[0];
@@ -888,32 +887,28 @@ contract Election is
     address[] memory electedValidators = new address[](totalNumMembersElected);
     totalNumMembersElected = 0;
 
-    console.log("- 0", electionGroups.length);
+    IValidators validators = getValidators();
+
     for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
       // We use the validating delegate if one is set.
       address[] memory electedGroupValidators;
       if (accounts) {
         // TODO move get validators outside of loop
-        electedGroupValidators = getValidators().getTopGroupValidatorsAccounts(
+        electedGroupValidators = validators.getTopGroupValidatorsAccounts(
           electionGroups[i],
           numMembersElected[i]
         );
       } else {
-        electedGroupValidators = getValidators().getTopGroupValidators(
+        electedGroupValidators = validators.getTopGroupValidators(
           electionGroups[i],
           numMembersElected[i]
         );
       }
-      console.log("1", electedGroupValidators.length);
       for (uint256 j = 0; j < electedGroupValidators.length; j = j.add(1)) {
-        // console.log("2", j);
         electedValidators[totalNumMembersElected] = electedGroupValidators[j];
-        // console.log("3");
         totalNumMembersElected = totalNumMembersElected.add(1);
-        // console.log("4");
       }
     }
-    // console.log("5");
     return electedValidators;
   }
 

@@ -2269,9 +2269,6 @@ contract ElectionTest_ElectValidatorSigners is ElectionTest {
     election.setElectabilityThreshold(0);
     election.setElectableValidators(10, 100);
 
-    // (uint256 min, uint256 max) = election.getElectableValidators();
-    // console.log("getElectableValidators", min, max);
-
     election.setMaxNumGroupsVotedFor(200);
 
     address prev = address(0);
@@ -2302,18 +2299,17 @@ contract ElectionTest_ElectValidatorSigners is ElectionTest {
   function test_ShouldElectCorrectValidators_WhenThereIsALargeNumberOfGroupsSig() public {
     WhenThereIsALargeNumberOfGroups();
     address[] memory elected = election.electValidatorSigners();
-    console.log("hola");
+
     MemberWithVotes[] memory sortedMembersWithVotes = sortMembersWithVotesDesc(membersWithVotes);
-    console.log("hola2");
+
     MemberWithVotes[] memory electedUnsorted = new MemberWithVotes[](100);
-    console.log("hola3", elected.length);
 
     for (uint256 i = 0; i < 100; i++) {
       electedUnsorted[i] = MemberWithVotes(elected[i], votesConsideredForElection[elected[i]]);
     }
-    console.log("hola5");
+
     MemberWithVotes[] memory electedSorted = sortMembersWithVotesDesc(electedUnsorted);
-    console.log("hola6");
+
     for (uint256 i = 0; i < 100; i++) {
       assertEq(electedSorted[i].member, sortedMembersWithVotes[i].member);
       assertEq(electedSorted[i].votes, sortedMembersWithVotes[i].votes);
