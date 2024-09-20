@@ -127,10 +127,6 @@ contract EpochManager is
     address[] memory firstElected
   ) external onlyEpochManagerEnabler {
     require(
-      address(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID)).balance > 0,
-      "CeloUnreleasedTreasury not yet funded."
-    );
-    require(
       getCeloToken().balanceOf(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID)) >
         0,
       "CeloUnreleasedTreasury not yet funded."
