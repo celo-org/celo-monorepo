@@ -2321,12 +2321,11 @@ contract ElectionTest_ElectValidatorSigners is ElectionTest {
     validators.setMembers(group2, group2Members);
     validators.setMembers(group3, group3Members);
 
-    vm.prank(address(validators));
+    vm.startPrank(address(validators));
     election.markGroupEligible(group1, address(0), address(0));
-    vm.prank(address(validators));
     election.markGroupEligible(group2, address(0), group1);
-    vm.prank(address(validators));
     election.markGroupEligible(group3, address(0), group2);
+    vm.stopPrank();
 
     lockedGold.incrementNonvotingAccountBalance(address(voter1), voter1Weight);
     lockedGold.incrementNonvotingAccountBalance(address(voter2), voter2Weight);
