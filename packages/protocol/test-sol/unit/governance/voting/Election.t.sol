@@ -104,9 +104,9 @@ contract ElectionTest is Utils, TestConstants {
     bool vote
   ) public {
     validators.setMembers(newGroup, members);
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(newGroup, oldGroup, address(0));
-    registry.setAddressFor("Validators", address(validators));
+
     if (vote) {
       election.vote(newGroup, 1, oldGroup, address(0));
     }
@@ -582,9 +582,8 @@ contract ElectionTest_Vote_WhenGroupEligible is ElectionTest {
     members[0] = account9;
     validators.setMembers(group, members);
 
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group, address(0), address(0));
-    registry.setAddressFor("Validators", address(validators));
   }
 
   function test_ShouldRevert_WhenTheVoterDoesNotHaveSufficientNonVotingBalance() public {
@@ -781,9 +780,8 @@ contract ElectionTest_Vote_WhenGroupEligible_L2 is ElectionTest {
     members[0] = account9;
     validators.setMembers(group, members);
 
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group, address(0), address(0));
-    registry.setAddressFor("Validators", address(validators));
   }
 
   function test_ShouldRevert_WhenTheVoterDoesNotHaveSufficientNonVotingBalance() public {
@@ -974,9 +972,8 @@ contract ElectionTest_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes is Electio
     members[0] = account9;
     validators.setMembers(group, members);
 
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group, address(0), address(0));
-    registry.setAddressFor("Validators", address(validators));
 
     lockedGold.setTotalLockedGold(value);
     validators.setNumRegisteredValidators(1);
@@ -1151,9 +1148,8 @@ contract ElectionTest_Activate is ElectionTest {
     members[0] = account9;
     validators.setMembers(group, members);
 
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group, address(0), address(0));
-    registry.setAddressFor("Validators", address(validators));
 
     lockedGold.setTotalLockedGold(value);
     validators.setMembers(group, members);
@@ -1316,9 +1312,8 @@ contract ElectionTest_Activate_L2 is ElectionTest {
     members[0] = account9;
     validators.setMembers(group, members);
 
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group, address(0), address(0));
-    registry.setAddressFor("Validators", address(validators));
 
     lockedGold.setTotalLockedGold(value);
     validators.setMembers(group, members);
@@ -1472,9 +1467,8 @@ contract ElectionTest_ActivateForAccount is ElectionTest {
     members[0] = account9;
     validators.setMembers(group, members);
 
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group, address(0), address(0));
-    registry.setAddressFor("Validators", address(validators));
 
     lockedGold.setTotalLockedGold(value);
     validators.setMembers(group, members);
@@ -1627,9 +1621,8 @@ contract ElectionTest_ActivateForAccount_L2 is ElectionTest {
     members[0] = account9;
     validators.setMembers(group, members);
 
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group, address(0), address(0));
-    registry.setAddressFor("Validators", address(validators));
 
     lockedGold.setTotalLockedGold(value);
     validators.setMembers(group, members);
@@ -1783,9 +1776,8 @@ contract ElectionTest_RevokePending is ElectionTest {
     members[0] = account9;
     validators.setMembers(group, members);
 
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group, address(0), address(0));
-    registry.setAddressFor("Validators", address(validators));
 
     lockedGold.setTotalLockedGold(value);
     validators.setMembers(group, members);
@@ -1954,9 +1946,8 @@ contract ElectionTest_RevokeActive is ElectionTest {
     members[0] = account9;
     validators.setMembers(group, members);
 
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group, address(0), address(0));
-    registry.setAddressFor("Validators", address(validators));
 
     lockedGold.setTotalLockedGold(voteValue0 + voteValue1);
     validators.setNumRegisteredValidators(1);
@@ -1985,7 +1976,7 @@ contract ElectionTest_RevokeActive is ElectionTest {
   }
 
   function WhenTheValidatorGroupHasVotesButIsIneligible() public {
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupIneligible(group);
     election.revokeActive(group, revokedValue, address(0), address(0), 0);
   }
@@ -2041,7 +2032,7 @@ contract ElectionTest_RevokeActive is ElectionTest {
   function test_ShouldEmitValidatorGroupActiveVoteRevokedEvent_WhenTheValidatorGroupHasVotesButIsIneligible()
     public
   {
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupIneligible(group);
     vm.expectEmit(true, true, true, false);
     emit ValidatorGroupActiveVoteRevoked(
@@ -2118,7 +2109,7 @@ contract ElectionTest_RevokeActive is ElectionTest {
   function test_ShouldEmitValidatorGroupActiveVoteRevokedEvent_WhenRevokedValueIsLessThanTheActiveVotesButGroupIsEligible()
     public
   {
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupIneligible(group);
     vm.expectEmit(true, true, true, false);
     emit ValidatorGroupActiveVoteRevoked(
@@ -2300,9 +2291,8 @@ contract ElectionTest_ElectValidatorSigners is ElectionTest {
         membersWithVotes.push(MemberWithVotes(members[j], votesConsideredForElection[members[j]]));
       }
       validators.setMembers(group, members);
-      registry.setAddressFor("Validators", address(this));
+      vm.prank(address(validators));
       election.markGroupEligible(group, address(0), prev); // TODO change to vm.prank
-      registry.setAddressFor("Validators", address(validators));
       vm.prank(voter1);
       election.vote(group, randomVotes[i], prev, address(0));
       prev = group;
@@ -2335,11 +2325,12 @@ contract ElectionTest_ElectValidatorSigners is ElectionTest {
     validators.setMembers(group2, group2Members);
     validators.setMembers(group3, group3Members);
 
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group1, address(0), address(0));
+    vm.prank(address(validators));
     election.markGroupEligible(group2, address(0), group1);
+    vm.prank(address(validators));
     election.markGroupEligible(group3, address(0), group2);
-    registry.setAddressFor("Validators", address(validators));
 
     lockedGold.incrementNonvotingAccountBalance(address(voter1), voter1Weight);
     lockedGold.incrementNonvotingAccountBalance(address(voter2), voter2Weight);
@@ -2569,10 +2560,8 @@ contract ElectionTest_ElectValidators is ElectionTest {
         membersWithVotes.push(MemberWithVotes(members[j], votesConsideredForElection[members[j]]));
       }
       validators.setMembers(group, members);
-      registry.setAddressFor("Validators", address(this)); // ?????
-
+      vm.prank(address(validators));
       election.markGroupEligible(group, address(0), prev);
-      registry.setAddressFor("Validators", address(validators));
 
       vm.prank(voter1);
       election.vote(group, randomVotes[i], prev, address(0));
@@ -2603,11 +2592,11 @@ contract ElectionTest_ElectValidators is ElectionTest {
     validators.setMembers(group2, group2Members);
     validators.setMembers(group3, group3Members);
 
-    registry.setAddressFor("Validators", address(this));
+    vm.startPrank(address(validators));
     election.markGroupEligible(group1, address(0), address(0));
     election.markGroupEligible(group2, address(0), group1);
     election.markGroupEligible(group3, address(0), group2);
-    registry.setAddressFor("Validators", address(validators));
+    vm.stopPrank();
 
     lockedGold.incrementNonvotingAccountBalance(address(voter1), voter1Weight);
     lockedGold.incrementNonvotingAccountBalance(address(voter2), voter2Weight);
@@ -2763,8 +2752,9 @@ contract ElectionTest_GetGroupEpochRewards is ElectionTest {
   function setUp() public {
     super.setUp();
 
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group1, address(0), address(0));
+    vm.prank(address(validators));
     election.markGroupEligible(group2, address(0), group1);
     registry.setAddressFor("Validators", address(validators));
     lockedGold.setTotalLockedGold(voteValue1 + voteValue2);
@@ -2883,9 +2873,8 @@ contract ElectionTest_DistributeEpochRewards is ElectionTest {
   function setUp() public {
     super.setUp();
 
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group, address(0), address(0));
-    registry.setAddressFor("Validators", address(validators));
     lockedGold.setTotalLockedGold(voteValue);
 
     address[] memory membersGroup = new address[](1);
@@ -2931,9 +2920,8 @@ contract ElectionTest_DistributeEpochRewards is ElectionTest {
   }
 
   function WhenThereAreTwoGroupsWithActiveVotes() public {
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group2, address(0), group);
-    registry.setAddressFor("Validators", address(validators));
     lockedGold.setTotalLockedGold(voteValue + voteValue2);
 
     validators.setNumRegisteredValidators(2);
@@ -3048,9 +3036,8 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
 
     validators.setMembers(group, membersGroup);
 
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group, address(0), address(0));
-    registry.setAddressFor("Validators", address(validators));
     lockedGold.setTotalLockedGold(value);
     validators.setNumRegisteredValidators(1);
     lockedGold.incrementNonvotingAccountBalance(voter, value);
@@ -3148,10 +3135,11 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
     membersGroup2[0] = account9;
     validators.setMembers(group2, membersGroup2);
 
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group, address(0), address(0));
+    vm.prank(address(validators));
     election.markGroupEligible(group2, group, address(0));
-    registry.setAddressFor("Validators", address(validators));
+
     lockedGold.setTotalLockedGold(value);
     validators.setNumRegisteredValidators(2);
     lockedGold.incrementNonvotingAccountBalance(voter, value);
@@ -3221,10 +3209,11 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
     membersGroup2[0] = account9;
     validators.setMembers(group2, membersGroup2);
 
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group, address(0), address(0));
+    vm.prank(address(validators));
     election.markGroupEligible(group2, group, address(0));
-    registry.setAddressFor("Validators", address(validators));
+
     lockedGold.setTotalLockedGold(value + value2);
     validators.setNumRegisteredValidators(2);
     lockedGold.incrementNonvotingAccountBalance(voter, value + value2);
@@ -3476,9 +3465,8 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
     address[] memory members = new address[](1);
     members[0] = account9;
     validators.setMembers(group, members);
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group, address(0), address(0));
-    registry.setAddressFor("Validators", address(validators));
     lockedGold.setTotalLockedGold(voterStartBalance * accountsArray.length);
     validators.setNumRegisteredValidators(1);
     for (uint256 i = 0; i < accountsArray.length; i++) {
@@ -3678,9 +3666,8 @@ contract ElectionTest_HasActivatablePendingVotes is ElectionTest {
     members[0] = account9;
     validators.setMembers(group, members);
 
-    registry.setAddressFor("Validators", address(this));
+    vm.prank(address(validators));
     election.markGroupEligible(group, address(0), address(0));
-    registry.setAddressFor("Validators", address(validators));
 
     lockedGold.setTotalLockedGold(value);
     validators.setMembers(group, members);
