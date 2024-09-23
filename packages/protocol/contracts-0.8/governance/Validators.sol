@@ -18,6 +18,8 @@ import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "../../contracts/common/libraries/ReentrancyGuard.sol";
 import "../common/interfaces/IStableToken.sol";
 
+import "../../contracts/common/interfaces/IAccounts.sol";
+
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
  */
@@ -712,7 +714,8 @@ contract Validators is
    * @notice Returns the top n group members for a particular group.
    * @param account The address of the validator group.
    * @param n The number of members to return.
-   * @return The top n group members for a particular group.
+   * @return The signers of the top n group members for a particular group.
+   * @dev Returns the account instead of signer on L2.
    */
   function getTopGroupValidators(
     address account,
@@ -720,10 +723,21 @@ contract Validators is
   ) external view returns (address[] memory) {
     address[] memory topAccounts = groups[account].members.headN(n);
     address[] memory topValidators = new address[](n);
+
+    IAccounts accounts = getAccounts();
+
     for (uint256 i = 0; i < n; i = i.add(1)) {
-      topValidators[i] = getAccounts().getValidatorSigner(topAccounts[i]);
+      topValidators[i] = accounts.getValidatorSigner(topAccounts[i]);
     }
     return topValidators;
+  }
+
+  function getTopGroupValidatorsAccounts(
+    address account,
+    uint256 n
+  ) external view returns (address[] memory) {
+    address[] memory topAccounts = groups[account].members.headN(n);
+    return topAccounts;
   }
 
   /**
@@ -890,7 +904,7 @@ contract Validators is
 
   /**
    * @notice Computes epoch payments to the account
-   * @param account The validator signer of the validator to distribute the epoch payment to.
+   * @param account The validator account of the validator to distribute the epoch payment to.
    * @param maxPayment The maximum payment to the validator. Actual payment is based on score and
    *   group commission.
    * @return The total payment paid to the validator and their group.

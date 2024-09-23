@@ -238,7 +238,7 @@ contract EpochManager is
       epochProcessing.totalRewardsCarbonFund
     );
     // run elections
-    elected = getElection().electValidatorSigners();
+    elected = getElection().electValidatorAccounts();
     // TODO check how to nullify stuct
     epochProcessing.status = EpochProcessStatus.NotStarted;
   }
@@ -248,14 +248,11 @@ contract EpochManager is
    *   delegation beneficiary.
    * @param validator Account of the validator.
    */
-  function sendValidatorPayment(address validator) external nonReentrant {
-    IAccounts accounts = IAccounts(getAccounts());
-    address signer = accounts.getValidatorSigner(validator);
-
+  function sendValidatorPayment(address validator) external {
     FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(
-      validatorPendingPayments[signer]
+      validatorPendingPayments[validator]
     );
-    validatorPendingPayments[signer] = 0;
+    validatorPendingPayments[validator] = 0;
 
     IValidators validators = getValidators();
     address group = validators.getValidatorsGroup(validator);
@@ -376,6 +373,9 @@ contract EpochManager is
     return initialized && elected.length > 0;
   }
 
+  /**
+   * @notice Allocates rewards to elected validator accounts.
+   */
   function allocateValidatorsRewards() internal {
     uint256 totalRewards = 0;
     IScoreReader scoreReader = getScoreReader();
