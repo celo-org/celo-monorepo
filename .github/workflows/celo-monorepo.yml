@@ -40,6 +40,9 @@ env:
 #  with:
 #    limit-access-to-actor: true
 
+permissions:
+  contents: read
+
 jobs:
   install-dependencies:
     name: Install dependencies
