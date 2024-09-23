@@ -15,8 +15,6 @@ time FOUNDRY_PROFILE=devchain forge test \
 --match-path "test-sol/devchain/migration/*" \
 --fork-url $ANVIL_RPC_URL
 
-exit 1
-
 # Stop devchain
 echo "Stopping devchain..."
 source $PWD/scripts/foundry/stop_anvil.sh
