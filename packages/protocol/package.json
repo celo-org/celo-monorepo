@@ -76,7 +76,7 @@
     "@openzeppelin/contracts8": "npm:@openzeppelin/contracts@^4.4.2",
     "@openzeppelin/upgrades": "^2.8.0",
     "@summa-tx/memview.sol": "^1.1.0",
-    "@truffle/artifactor": "4.0.180",
+    "@truffle/artifactor": "4.0.199",
     "@truffle/contract": "4.6.10",
     "@truffle/resolver": "9.0.53",
     "bignumber.js": "9.1.0",
