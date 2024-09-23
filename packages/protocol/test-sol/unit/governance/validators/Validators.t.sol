@@ -3135,18 +3135,36 @@ contract ValidatorsTest_GetTopGroupValidators is ValidatorsTest {
     _registerValidatorGroupWithMembersHavingSigners(group, 5);
   }
 
-  function test_ShouldReturnTheSigner_whenL1() public {
+  function test_ShouldReturnTheSigner() public {
     address[] memory _validatorSigner = validators.getTopGroupValidators(group, 3);
     assertEq(_validatorSigner[0], accounts.getValidatorSigner(validator));
     assertEq(_validatorSigner[1], accounts.getValidatorSigner(vm.addr(1)));
     assertFalse(_validatorSigner[0] == validator);
   }
 
-  // TODO move to other contract
+  function test_ShouldReturnTheSigner_WhenL2() public {
+    _whenL2();
+    test_ShouldReturnTheSigner();
+  }
+}
+
+contract ValidatorsTest_GetTopGroupValidatorsAccounts is ValidatorsTest {
+  function setUp() public {
+    super.setUp();
+
+    _registerValidatorGroupWithMembersHavingSigners(group, 5);
+  }
+
   function test_ShouldReturnTheAccount_WhenL2() public {
     _whenL2();
     address[] memory validatorAccount = validators.getTopGroupValidatorsAccounts(group, 3);
+    assertEq(validatorAccount[0], validator);
+    assertEq(validatorAccount[1], vm.addr(1));
+    assertFalse(validatorAccount[0] == accounts.getValidatorSigner(validator));
+  }
 
+  function test_ShouldReturnTheAccount() public {
+    address[] memory validatorAccount = validators.getTopGroupValidatorsAccounts(group, 3);
     assertEq(validatorAccount[0], validator);
     assertEq(validatorAccount[1], vm.addr(1));
     assertFalse(validatorAccount[0] == accounts.getValidatorSigner(validator));
