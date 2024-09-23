@@ -12,6 +12,16 @@ import "@test-sol/utils/ECDSAHelper08.sol";
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
 
 contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
+  struct VoterWithPK {
+    address voter;
+    uint256 privateKey;
+  }
+
+  struct GroupWithVotes {
+    address group;
+    uint256 votes;
+  }
+
   address epochManagerOwner;
   address epochManagerEnabler;
   address[] firstElected;
@@ -23,16 +33,6 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
 
   uint256[] groupScore = [5e23, 7e23, 1e24];
   uint256[] validatorScore = [1e23, 1e23, 1e23, 1e23, 1e23, 1e23];
-
-  struct VoterWithPK {
-    address voter;
-    uint256 privateKey;
-  }
-
-  struct GroupWithVotes {
-    address group;
-    uint256 votes;
-  }
 
   mapping(address => uint256) addressToPrivateKeys;
   mapping(address => VoterWithPK) validatorToVoter;

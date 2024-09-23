@@ -10,10 +10,12 @@ source $PWD/scripts/foundry/create_and_migrate_anvil_devchain.sh
 
 # Run integration tests
 echo "Running integration tests..."
-forge test \
+time FOUNDRY_PROFILE=devchain forge test \
 -vvv \
---match-contract RegistryIntegrationTest \
+--match-path "test-sol/devchain/migration/*" \
 --fork-url $ANVIL_RPC_URL
+
+exit 1
 
 # Stop devchain
 echo "Stopping devchain..."

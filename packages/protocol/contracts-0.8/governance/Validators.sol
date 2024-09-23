@@ -598,7 +598,7 @@ contract Validators is
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
 
-    _sendValidatorPaymentsIfNecessary(group);
+    _sendValidatorGroupPaymentsIfNecessary(group);
 
     require(group.nextCommissionBlock != 0, "No commission update queued");
     require(group.nextCommissionBlock <= block.number, "Can't apply commission update yet");
@@ -1513,10 +1513,12 @@ contract Validators is
   }
 
   function _sendValidatorPaymentIfNecessary(address validator) private {
-    getEpochManager().sendValidatorPayment(validator);
+    if (isL2()) {
+      getEpochManager().sendValidatorPayment(validator);
+    }
   }
 
-  function _sendValidatorPaymentsIfNecessary(ValidatorGroup storage group) private {
+  function _sendValidatorGroupPaymentsIfNecessary(ValidatorGroup storage group) private {
     address[] memory members = group.members.getKeys();
     for (uint256 i = 0; i < members.length; i++) {
       _sendValidatorPaymentIfNecessary(members[i]);
