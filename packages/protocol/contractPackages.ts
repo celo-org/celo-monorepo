@@ -51,7 +51,7 @@ export const SOLIDITY_08_PACKAGE = {
   contracts: [
     'GasPriceMinimum',
     'FeeCurrencyDirectory',
-    'CeloUnreleasedTreasure',
+    'CeloUnreleasedTreasury',
     'Validators',
     'EpochManager',
     'EpochManagerEnabler',
@@ -61,7 +61,7 @@ export const SOLIDITY_08_PACKAGE = {
     'GasPriceMinimumProxy',
     'FeeCurrencyDirectoryProxy',
     'MentoFeeCurrencyAdapterV1',
-    'CeloUnreleasedTreasureProxy',
+    'CeloUnreleasedTreasuryProxy',
     'ValidatorsProxy',
     'EpochManagerProxy',
     'EpochManagerEnablerProxy',

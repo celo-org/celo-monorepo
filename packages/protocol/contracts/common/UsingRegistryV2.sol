@@ -8,7 +8,7 @@ import "./interfaces/IEpochManager.sol";
 import "./interfaces/IFeeCurrencyWhitelist.sol";
 import "./interfaces/IFreezer.sol";
 import "./interfaces/IRegistry.sol";
-import "./interfaces/ICeloUnreleasedTreasure.sol";
+import "./interfaces/ICeloUnreleasedTreasury.sol";
 
 import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/IEpochRewards.sol";
@@ -61,8 +61,8 @@ contract UsingRegistryV2 {
   bytes32 internal constant STABLE_REAL_TOKEN_REGISTRY_ID =
     keccak256(abi.encodePacked("StableTokenBRL"));
   bytes32 internal constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
-  bytes32 internal constant CELO_UNRELEASED_TREASURE_REGISTRY_ID =
-    keccak256(abi.encodePacked("CeloUnreleasedTreasure"));
+  bytes32 internal constant CELO_UNRELEASED_TREASURY_REGISTRY_ID =
+    keccak256(abi.encodePacked("CeloUnreleasedTreasury"));
 
   bytes32 internal constant CELO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("CeloToken"));
   bytes32 internal constant LOCKED_CELO_REGISTRY_ID = keccak256(abi.encodePacked("LockedCelo"));
@@ -182,10 +182,10 @@ contract UsingRegistryV2 {
     return IValidators(registryContract.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
   }
 
-  function getCeloUnreleasedTreasure() internal view returns (ICeloUnreleasedTreasure) {
+  function getCeloUnreleasedTreasury() internal view returns (ICeloUnreleasedTreasury) {
     return
-      ICeloUnreleasedTreasure(
-        registryContract.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID)
+      ICeloUnreleasedTreasury(
+        registryContract.getAddressForOrDie(CELO_UNRELEASED_TREASURY_REGISTRY_ID)
       );
   }
 

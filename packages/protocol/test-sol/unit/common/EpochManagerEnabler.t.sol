@@ -6,8 +6,8 @@ import "@celo-contracts-8/common/EpochManager.sol";
 
 import { EpochManagerEnablerMock } from "@test-sol/mocks/EpochManagerEnablerMock.sol";
 
-import { CeloUnreleasedTreasure } from "@celo-contracts-8/common/CeloUnreleasedTreasure.sol";
-import { ICeloUnreleasedTreasure } from "@celo-contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
+import { CeloUnreleasedTreasury } from "@celo-contracts-8/common/CeloUnreleasedTreasury.sol";
+import { ICeloUnreleasedTreasury } from "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";
@@ -17,13 +17,13 @@ import "@celo-contracts/common/interfaces/IRegistry.sol";
 
 import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
 import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
-import { MockCeloUnreleasedTreasure } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasure.sol";
+import { MockCeloUnreleasedTreasury } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasury.sol";
 import "@celo-contracts-8/common/test/MockCeloToken.sol";
 
 contract EpochManagerEnablerTest is Test, TestConstants, Utils08 {
   EpochManager epochManager;
   EpochManagerEnablerMock epochManagerEnabler;
-  MockCeloUnreleasedTreasure celoUnreleasedTreasure;
+  MockCeloUnreleasedTreasury celoUnreleasedTreasury;
   MockCeloToken08 celoToken;
 
   IRegistry registry;
@@ -45,7 +45,7 @@ contract EpochManagerEnablerTest is Test, TestConstants, Utils08 {
     epochManagerEnabler = new EpochManagerEnablerMock();
     celoToken = new MockCeloToken08();
 
-    celoUnreleasedTreasure = new MockCeloUnreleasedTreasure();
+    celoUnreleasedTreasury = new MockCeloUnreleasedTreasury();
 
     accountsAddress = actor("accountsAddress");
 
@@ -61,10 +61,10 @@ contract EpochManagerEnablerTest is Test, TestConstants, Utils08 {
     registry.setAddressFor(EpochManagerEnablerContract, address(epochManagerEnabler));
     registry.setAddressFor(AccountsContract, address(accounts));
     registry.setAddressFor(CeloTokenContract, address(celoToken));
-    registry.setAddressFor(CeloUnreleasedTreasureContract, address(celoUnreleasedTreasure));
+    registry.setAddressFor(CeloUnreleasedTreasuryContract, address(celoUnreleasedTreasury));
 
     celoToken.setTotalSupply(CELO_SUPPLY_CAP);
-    celoToken.setBalanceOf(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
+    celoToken.setBalanceOf(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
 
     epochManagerEnabler.initialize(REGISTRY_ADDRESS);
     epochManager.initialize(REGISTRY_ADDRESS, epochDuration);

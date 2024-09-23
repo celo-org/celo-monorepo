@@ -8,12 +8,12 @@ import "./UsingRegistry.sol";
 import "../common/IsL2Check.sol";
 
 import "../../contracts/common/Initializable.sol";
-import "./interfaces/ICeloUnreleasedTreasureInitializer.sol";
+import "./interfaces/ICeloUnreleasedTreasuryInitializer.sol";
 
 /**
  * @title Contract for unreleased Celo tokens.
  */
-contract CeloUnreleasedTreasure is UsingRegistry, ReentrancyGuard, Initializable, IsL2Check {
+contract CeloUnreleasedTreasury is UsingRegistry, ReentrancyGuard, Initializable, IsL2Check {
   event Released(address indexed to, uint256 amount);
 
   modifier onlyEpochManager() {
@@ -31,7 +31,7 @@ contract CeloUnreleasedTreasure is UsingRegistry, ReentrancyGuard, Initializable
   constructor(bool test) public Initializable(test) {}
 
   /**
-   * @notice A constructor for initialising a new instance of a CeloUnreleasedTreasure contract.
+   * @notice A constructor for initialising a new instance of a CeloUnreleasedTreasury contract.
    * @param registryAddress The address of the registry core smart contract.
    
    */

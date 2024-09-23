@@ -7,20 +7,20 @@ import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts/governance/interfaces/IGovernance.sol";
-import { CeloUnreleasedTreasure } from "@celo-contracts-8/common/CeloUnreleasedTreasure.sol";
+import { CeloUnreleasedTreasury } from "@celo-contracts-8/common/CeloUnreleasedTreasury.sol";
 import "@celo-contracts-8/common/IsL2Check.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
 import "@test-sol/unit/governance/mock/MockGovernance.sol";
 
-contract CeloUnreleasedTreasureTest is Test, TestConstants, IsL2Check {
+contract CeloUnreleasedTreasuryTest is Test, TestConstants, IsL2Check {
   using FixidityLib for FixidityLib.Fraction;
 
   IRegistry registry;
   ICeloToken celoToken;
   MockGovernance governance;
 
-  CeloUnreleasedTreasure celoUnreleasedTreasure;
+  CeloUnreleasedTreasury celoUnreleasedTreasury;
 
   address owner = address(this);
 
@@ -80,51 +80,51 @@ contract CeloUnreleasedTreasureTest is Test, TestConstants, IsL2Check {
     assertEq(celoToken.allocatedSupply(), L1_MINTED_CELO_SUPPLY, "total supply incorrect.");
   }
 
-  function newCeloUnreleasedTreasure() internal returns (CeloUnreleasedTreasure) {
+  function newCeloUnreleasedTreasury() internal returns (CeloUnreleasedTreasury) {
     vm.warp(block.timestamp + l2StartTime);
     vm.prank(celoDistributionOwner);
-    celoUnreleasedTreasure = new CeloUnreleasedTreasure(true);
-    registry.setAddressFor("CeloUnreleasedTreasure", address(celoUnreleasedTreasure));
+    celoUnreleasedTreasury = new CeloUnreleasedTreasury(true);
+    registry.setAddressFor("CeloUnreleasedTreasury", address(celoUnreleasedTreasury));
 
-    vm.deal(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
+    vm.deal(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
 
     vm.prank(celoDistributionOwner);
-    celoUnreleasedTreasure.initialize(REGISTRY_ADDRESS);
+    celoUnreleasedTreasury.initialize(REGISTRY_ADDRESS);
   }
 }
 
-contract CeloUnreleasedTreasureTest_initialize is CeloUnreleasedTreasureTest {
+contract CeloUnreleasedTreasuryTest_initialize is CeloUnreleasedTreasuryTest {
   function setUp() public override {
     super.setUp();
     vm.warp(block.timestamp + l2StartTime);
 
     vm.prank(celoDistributionOwner);
-    celoUnreleasedTreasure = new CeloUnreleasedTreasure(true);
-    registry.setAddressFor("CeloUnreleasedTreasure", address(celoUnreleasedTreasure));
+    celoUnreleasedTreasury = new CeloUnreleasedTreasury(true);
+    registry.setAddressFor("CeloUnreleasedTreasury", address(celoUnreleasedTreasury));
     vm.prank(celoDistributionOwner);
-    celoUnreleasedTreasure.initialize(REGISTRY_ADDRESS);
+    celoUnreleasedTreasury.initialize(REGISTRY_ADDRESS);
   }
 
-  function test_ShouldSetAnOwnerToCeloUnreleasedTreasureInstance() public {
-    assertEq(celoUnreleasedTreasure.owner(), celoDistributionOwner);
+  function test_ShouldSetAnOwnerToCeloUnreleasedTreasuryInstance() public {
+    assertEq(celoUnreleasedTreasury.owner(), celoDistributionOwner);
   }
 
-  function test_ShouldSetRegistryAddressToCeloUnreleasedTreasureInstance() public {
-    assertEq(address(celoUnreleasedTreasure.registry()), REGISTRY_ADDRESS);
+  function test_ShouldSetRegistryAddressToCeloUnreleasedTreasuryInstance() public {
+    assertEq(address(celoUnreleasedTreasury.registry()), REGISTRY_ADDRESS);
   }
 
   function test_Reverts_WhenRegistryIsTheNullAddress() public {
-    celoUnreleasedTreasure = new CeloUnreleasedTreasure(true);
-    registry.setAddressFor("CeloUnreleasedTreasure", address(celoUnreleasedTreasure));
+    celoUnreleasedTreasury = new CeloUnreleasedTreasury(true);
+    registry.setAddressFor("CeloUnreleasedTreasury", address(celoUnreleasedTreasury));
     vm.expectRevert("Cannot register the null address");
-    celoUnreleasedTreasure.initialize(address(0));
+    celoUnreleasedTreasury.initialize(address(0));
   }
 
   function test_Reverts_WhenReceivingNativeTokens() public {
-    (bool success, ) = address(celoUnreleasedTreasure).call{ value: 1 ether }("");
+    (bool success, ) = address(celoUnreleasedTreasury).call{ value: 1 ether }("");
     assertFalse(success);
 
-    address payable payableAddress = payable((address(celoUnreleasedTreasure)));
+    address payable payableAddress = payable((address(celoUnreleasedTreasury)));
 
     bool success2 = payableAddress.send(1 ether);
     assertFalse(success2);
@@ -134,17 +134,17 @@ contract CeloUnreleasedTreasureTest_initialize is CeloUnreleasedTreasureTest {
   }
 }
 
-contract CeloUnreleasedTreasureTest_release is CeloUnreleasedTreasureTest {
+contract CeloUnreleasedTreasuryTest_release is CeloUnreleasedTreasuryTest {
   function setUp() public override {
     super.setUp();
-    newCeloUnreleasedTreasure();
+    newCeloUnreleasedTreasury();
   }
 
   function test_ShouldTransferToRecepientAddress() public {
     uint256 _balanceBefore = randomAddress.balance;
     vm.prank(epochManagerAddress);
 
-    celoUnreleasedTreasure.release(randomAddress, 4);
+    celoUnreleasedTreasury.release(randomAddress, 4);
     uint256 _balanceAfter = randomAddress.balance;
     assertGt(_balanceAfter, _balanceBefore);
   }
@@ -153,6 +153,6 @@ contract CeloUnreleasedTreasureTest_release is CeloUnreleasedTreasureTest {
     vm.prank(randomAddress);
 
     vm.expectRevert("Only the EpochManager contract can call this function.");
-    celoUnreleasedTreasure.release(randomAddress, 4);
+    celoUnreleasedTreasury.release(randomAddress, 4);
   }
 }

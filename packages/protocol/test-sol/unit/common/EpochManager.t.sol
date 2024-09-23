@@ -7,8 +7,8 @@ import "@celo-contracts-8/stability/test/MockStableToken.sol";
 import "@celo-contracts-8/common/test/MockCeloToken.sol";
 import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts-8/common/ScoreManager.sol";
-import { CeloUnreleasedTreasure } from "@celo-contracts-8/common/CeloUnreleasedTreasure.sol";
-import { ICeloUnreleasedTreasure } from "@celo-contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
+import { CeloUnreleasedTreasury } from "@celo-contracts-8/common/CeloUnreleasedTreasury.sol";
+import { ICeloUnreleasedTreasury } from "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";
 import { Utils08 } from "@test-sol/utils08.sol";
@@ -23,7 +23,7 @@ import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewar
 
 import { MockAccounts } from "@celo-contracts-8/common/mocks/MockAccounts.sol";
 import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
-import { MockCeloUnreleasedTreasure } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasure.sol";
+import { MockCeloUnreleasedTreasury } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasury.sol";
 
 contract EpochManagerTest is Test, TestConstants, Utils08 {
   EpochManager_WithMocks epochManager;
@@ -46,7 +46,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
   IRegistry registry;
   MockCeloToken08 celoToken;
-  MockCeloUnreleasedTreasure celoUnreleasedTreasure;
+  MockCeloUnreleasedTreasury celoUnreleasedTreasury;
   ScoreManager scoreManager;
 
   uint256 celoAmountForRate = 1e24;
@@ -70,7 +70,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     validators = new ValidatorsMock();
     stableToken = new MockStableToken08();
     celoToken = new MockCeloToken08();
-    celoUnreleasedTreasure = new MockCeloUnreleasedTreasure();
+    celoUnreleasedTreasury = new MockCeloUnreleasedTreasury();
 
     firstElected.push(actor("validator1"));
     firstElected.push(actor("validator2"));
@@ -97,15 +97,15 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     registry.setAddressFor(ValidatorsContract, address(validators));
     registry.setAddressFor(ScoreManagerContract, address(scoreManager));
     registry.setAddressFor(StableTokenContract, address(stableToken));
-    registry.setAddressFor(CeloUnreleasedTreasureContract, address(celoUnreleasedTreasure));
+    registry.setAddressFor(CeloUnreleasedTreasuryContract, address(celoUnreleasedTreasury));
     registry.setAddressFor(CeloTokenContract, address(celoToken));
     registry.setAddressFor(ReserveContract, reserveAddress);
 
     celoToken.setTotalSupply(CELO_SUPPLY_CAP);
-    vm.deal(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
-    celoToken.setBalanceOf(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
+    vm.deal(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
+    celoToken.setBalanceOf(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
 
-    celoUnreleasedTreasure.setRegistry(REGISTRY_ADDRESS);
+    celoUnreleasedTreasury.setRegistry(REGISTRY_ADDRESS);
     validators.setRegistry(REGISTRY_ADDRESS);
 
     sortedOracles.setMedianRate(address(stableToken), stableAmountForRate);

@@ -132,7 +132,7 @@ contract EpochManager is
     address[] memory firstElected
   ) external onlyEpochManagerEnabler {
     require(
-      getCeloToken().balanceOf(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID)) >
+      getCeloToken().balanceOf(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURY_REGISTRY_ID)) >
         0,
       "CeloUnreleasedTreasury not yet funded."
     );
@@ -232,11 +232,11 @@ contract EpochManager is
 
       delete processedGroups[groups[i]];
     }
-    getCeloUnreleasedTreasure().release(
+    getCeloUnreleasedTreasury().release(
       registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID),
       epochProcessing.totalRewardsCommunity
     );
-    getCeloUnreleasedTreasure().release(
+    getCeloUnreleasedTreasury().release(
       getEpochRewards().carbonOffsettingPartner(),
       epochProcessing.totalRewardsCarbonFund
     );
@@ -406,7 +406,7 @@ contract EpochManager is
     );
 
     uint256 CELOequivalent = (numerator * totalRewards) / denominator;
-    getCeloUnreleasedTreasure().release(
+    getCeloUnreleasedTreasury().release(
       registry.getAddressForOrDie(RESERVE_REGISTRY_ID),
       CELOequivalent
     );

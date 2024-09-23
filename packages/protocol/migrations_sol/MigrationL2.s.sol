@@ -20,7 +20,7 @@ contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
     vm.startBroadcast(DEPLOYER_ACCOUNT);
 
     setupUsingRegistry();
-    dealToCeloUnreleasedTreasure();
+    dealToCeloUnreleasedTreasury();
 
     initializeEpochManagerSystem();
 
@@ -32,8 +32,8 @@ contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
     setRegistry(REGISTRY_ADDRESS);
   }
 
-  function dealToCeloUnreleasedTreasure() public {
-    vm.deal(address(getCeloUnreleasedTreasure()), 1_000_000 ether);
+  function dealToCeloUnreleasedTreasury() public {
+    vm.deal(address(getCeloUnreleasedTreasury()), L2_INITIAL_STASH_BALANCE);
   }
 
   function initializeEpochManagerSystem() public {

@@ -21,6 +21,6 @@ import { Exchange } from "@mento-core/contracts/Exchange.sol";
 
 import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.sol";
 import { IValidators } from "@celo-contracts/governance/interfaces/IValidators.sol";
-import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
+import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 
 contract Import05 {}
