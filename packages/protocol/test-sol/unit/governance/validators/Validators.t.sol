@@ -1255,13 +1255,6 @@ contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirement
     assertEq(affiliation, group);
   }
 
-  function test_Reverts_WhenL2_WhenAffiliatingWithRegisteredValidatorGroup() public {
-    _whenL2();
-    vm.prank(validator);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.affiliate(group);
-  }
-
   function test_Emits_ValidatorAffiliatedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit ValidatorAffiliated(validator, group);
@@ -1332,13 +1325,6 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
     validators.affiliate(otherGroup);
     (, , address affiliation, , ) = validators.getValidator(validator);
     assertEq(affiliation, otherGroup);
-  }
-
-  function test_ShouldRevert_WhenL2_WhenValidatorNotMemberOfThatValidatorGroup() public {
-    _whenL2();
-    vm.prank(validator);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.affiliate(otherGroup);
   }
 
   function test_Emits_ValidatorDeaffiliatedEvent_WhenValidatorNotMemberOfThatValidatorGroup()
@@ -2132,16 +2118,6 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
     vm.prank(group);
     vm.expectRevert("This method is no longer supported in L2.");
     validators.addFirstMember(validator, address(0), address(0));
-  }
-
-  function test_Reverts_AddMemberToTheList_WhenL2() public {
-    _whenL2();
-    address[] memory expectedMembersList = new address[](1);
-    expectedMembersList[0] = validator;
-
-    vm.prank(group);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.addMember(validator);
   }
 
   function test_ShouldUpdateGroupSizeHistory() public {
