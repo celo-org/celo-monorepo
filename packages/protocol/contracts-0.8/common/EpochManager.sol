@@ -270,7 +270,7 @@ contract EpochManager is
       .fromFixed();
     uint256 validatorPayment = remainingPayment.fromFixed() - delegatedPayment;
 
-    IStableToken stableToken = IStableToken(getStableToken());
+    IERC20 stableToken = IERC20(getStableToken());
 
     if (validatorPayment > 0) {
       require(stableToken.transfer(validator, validatorPayment), "transfer failed to validator");
