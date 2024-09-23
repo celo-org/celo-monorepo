@@ -15,7 +15,7 @@ contract GoldTokenTest is Test, TestConstants, IsL2Check {
   address receiver;
   address sender;
   address celoTokenOwner;
-  address celoTokenDistributionSchedule;
+  address celoUnreleasedTreasury;
 
   event Transfer(address indexed from, address indexed to, uint256 value);
   event TransferComment(string comment);
@@ -30,12 +30,12 @@ contract GoldTokenTest is Test, TestConstants, IsL2Check {
     registry = IRegistry(REGISTRY_ADDRESS);
 
     celoTokenOwner = actor("celoTokenOwner");
-    celoTokenDistributionSchedule = actor("celoTokenDistributionSchedule");
+    celoUnreleasedTreasury = actor("celoUnreleasedTreasury");
     vm.prank(celoTokenOwner);
     celoToken = new GoldToken(true);
     vm.prank(celoTokenOwner);
     celoToken.setRegistry(REGISTRY_ADDRESS);
-    registry.setAddressFor("CeloUnreleasedTreasury", celoTokenDistributionSchedule);
+    registry.setAddressFor("CeloUnreleasedTreasury", celoUnreleasedTreasury);
     receiver = actor("receiver");
     sender = actor("sender");
     vm.deal(receiver, ONE_CELOTOKEN);
@@ -126,6 +126,12 @@ contract GoldTokenTest_transfer is GoldTokenTest {
     vm.expectRevert();
     celoToken.transfer(address(0), ONE_CELOTOKEN);
   }
+
+  function test_Reverts_whenTransferingToCeloUnreleasedTreasury() public {
+    vm.prank(sender);
+    vm.expectRevert("transfer attempted to reserved CeloUnreleasedTreasury address");
+    celoToken.transfer(celoUnreleasedTreasury, ONE_CELOTOKEN);
+  }
 }
 
 contract GoldTokenTest_transferFrom is GoldTokenTest {
@@ -148,6 +154,13 @@ contract GoldTokenTest_transferFrom is GoldTokenTest {
     vm.prank(receiver);
     vm.expectRevert();
     celoToken.transferFrom(sender, address(0), ONE_CELOTOKEN);
+  }
+
+  function test_Reverts_whenTransferingToCeloUnreleasedTreasury() public {
+    vm.prank(receiver);
+    vm.expectRevert("transfer attempted to reserved CeloUnreleasedTreasury address");
+
+    celoToken.transferFrom(sender, celoUnreleasedTreasury, ONE_CELOTOKEN);
   }
 
   function test_Reverts_WhenTransferMoreThanSenderHas() public {
@@ -198,7 +211,7 @@ contract GoldTokenTest_mint is GoldTokenTest {
     vm.expectRevert("Only VM can call");
     celoToken.mint(receiver, ONE_CELOTOKEN);
 
-    vm.prank(celoTokenDistributionSchedule);
+    vm.prank(celoUnreleasedTreasury);
     vm.expectRevert("Only VM can call");
     celoToken.mint(receiver, ONE_CELOTOKEN);
   }
@@ -220,7 +233,7 @@ contract GoldTokenTest_mint is GoldTokenTest {
 
   function test_Reverts_whenL2() public _whenL2 {
     vm.expectRevert("This method is no longer supported in L2.");
-    vm.prank(celoTokenDistributionSchedule);
+    vm.prank(celoUnreleasedTreasury);
     celoToken.mint(receiver, ONE_CELOTOKEN);
     vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(address(0));
