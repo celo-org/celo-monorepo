@@ -11,7 +11,6 @@ import "../../../contracts-0.8/common/IsL2Check.sol";
 /**
  * @title Holds a list of addresses of validators
  */
-// TODO add IValidators interface
 contract MockValidators is IValidators, IsL2Check {
   using SafeMath for uint256;
 
