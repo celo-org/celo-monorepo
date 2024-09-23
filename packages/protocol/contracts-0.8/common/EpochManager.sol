@@ -1,24 +1,26 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.8.20;
 
+import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts8/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "./interfaces/IOracle.sol";
-import "./interfaces/IStableToken.sol";
 import "../common/UsingRegistry.sol";
 
 import "../../contracts/common/FixidityLib.sol";
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/IEpochManager.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "./interfaces/IEpochManagerInitializer.sol";
 
 contract EpochManager is
   Initializable,
   UsingRegistry,
   IEpochManager,
   ReentrancyGuard,
-  ICeloVersionedContract
+  ICeloVersionedContract,
+  IEpochManagerInitializer
 {
   using FixidityLib for FixidityLib.Fraction;
 
@@ -124,10 +126,6 @@ contract EpochManager is
     uint256 firstEpochBlock,
     address[] memory firstElected
   ) external onlyEpochManagerEnabler {
-    require(
-      address(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID)).balance > 0,
-      "CeloUnreleasedTreasury not yet funded."
-    );
     require(
       getCeloToken().balanceOf(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID)) >
         0,
@@ -240,7 +238,7 @@ contract EpochManager is
       epochProcessing.totalRewardsCarbonFund
     );
     // run elections
-    elected = getElection().electValidatorSigners();
+    elected = getElection().electValidatorAccounts();
     // TODO check how to nullify stuct
     epochProcessing.status = EpochProcessStatus.NotStarted;
   }
@@ -251,13 +249,10 @@ contract EpochManager is
    * @param validator Account of the validator.
    */
   function sendValidatorPayment(address validator) external {
-    IAccounts accounts = IAccounts(getAccounts());
-    address signer = accounts.getValidatorSigner(validator);
-
     FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(
-      validatorPendingPayments[signer]
+      validatorPendingPayments[validator]
     );
-    validatorPendingPayments[signer] = 0;
+    validatorPendingPayments[validator] = 0;
 
     IValidators validators = getValidators();
     address group = validators.getValidatorsGroup(validator);
@@ -326,6 +321,10 @@ contract EpochManager is
     );
   }
 
+  function isBlocked() external view returns (bool) {
+    return isOnEpochProcess();
+  }
+
   function getElected() external view returns (address[] memory) {
     return elected;
   }
@@ -340,10 +339,6 @@ contract EpochManager is
     require(epoch >= firstKnownEpoch, "Epoch not known");
     require(epoch < currentEpochNumber, "Epoch not finished yet");
     return epochs[epoch].lastBlock;
-  }
-
-  function isBlocked() external view returns (bool) {
-    return isOnEpochProcess();
   }
 
   /**
@@ -378,6 +373,9 @@ contract EpochManager is
     return initialized && elected.length > 0;
   }
 
+  /**
+   * @notice Allocates rewards to elected validator accounts.
+   */
   function allocateValidatorsRewards() internal {
     uint256 totalRewards = 0;
     IScoreReader scoreReader = getScoreReader();
