@@ -1429,7 +1429,16 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
     assertTrue(election.isIneligible(group));
   }
 
-  function test_ShouldSendValidatorPayment() public {
+  function test_ShouldNotTryToSendValidatorPayment() public {
+    vm.prank(validator);
+    validators.affiliate(group);
+    Vm.Log[] memory entries = vm.getRecordedLogs();
+    assertEq(entries.length, 0);
+  }
+
+  function test_ShouldSendValidatorPayment_WhenL2() public {
+    _whenL2();
+    // assertTrue(validators.isL2());
     vm.expectEmit(true, true, true, true);
     emit SendValidatorPaymentCalled(validator);
     vm.prank(validator);
