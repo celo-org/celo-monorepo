@@ -1,13 +1,13 @@
 pragma solidity >=0.8.0 <0.9.0;
 // solhint-disable no-unused-vars
 
-import "../../../contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
+import "../../../contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 import "../UsingRegistry.sol";
 
 /**
- * @title A mock CeloUnreleasedTreasure for testing.
+ * @title A mock CeloUnreleasedTreasury for testing.
  */
-contract MockCeloUnreleasedTreasure is ICeloUnreleasedTreasure, UsingRegistry {
+contract MockCeloUnreleasedTreasury is ICeloUnreleasedTreasury, UsingRegistry {
   function release(address to, uint256 amount) external {
     require(address(this).balance >= amount, "Insufficient balance.");
     require(getCeloToken().transfer(to, amount), "CELO transfer failed.");

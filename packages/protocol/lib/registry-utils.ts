@@ -40,7 +40,7 @@ export enum CeloContractName {
   GrandaMento = 'GrandaMento',
   LockedGold = 'LockedGold',
   LockedCelo = 'LockedCelo',
-  CeloUnreleasedTreasure = 'CeloUnreleasedTreasure',
+  CeloUnreleasedTreasury = 'CeloUnreleasedTreasury',
   OdisPayments = 'OdisPayments',
   Random = 'Random',
   Reserve = 'Reserve',

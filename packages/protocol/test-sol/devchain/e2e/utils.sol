@@ -13,7 +13,7 @@ import { ILockedCelo } from "@celo-contracts/governance/interfaces/ILockedCelo.s
 // All core contracts that are expected to be in the Registry on the devchain
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
-import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
+import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";
 
@@ -25,7 +25,7 @@ contract Devchain is UsingRegistry, TestConstants {
   ISortedOracles sortedOracles;
   FeeCurrencyDirectory feeCurrencyDirectory;
   IEpochManager epochManager;
-  ICeloUnreleasedTreasure celoUnreleasedTreasure;
+  ICeloUnreleasedTreasury celoUnreleasedTreasury;
   IValidators validators;
   IAccounts accounts;
   IScoreManager scoreManager;
@@ -43,7 +43,7 @@ contract Devchain is UsingRegistry, TestConstants {
     ); // FeeCurrencyDirectory is not in UsingRegistry.sol
 
     epochManager = getEpochManager();
-    celoUnreleasedTreasure = getCeloUnreleasedTreasure();
+    celoUnreleasedTreasury = getCeloUnreleasedTreasury();
     validators = getValidators();
     accounts = getAccounts();
     scoreManager = IScoreManager(address(getScoreReader()));

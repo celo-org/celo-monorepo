@@ -35,7 +35,7 @@ contract GoldTokenTest is Test, TestConstants, IsL2Check {
     celoToken = new GoldToken(true);
     vm.prank(celoTokenOwner);
     celoToken.setRegistry(REGISTRY_ADDRESS);
-    registry.setAddressFor("CeloUnreleasedTreasure", celoTokenDistributionSchedule);
+    registry.setAddressFor("CeloUnreleasedTreasury", celoTokenDistributionSchedule);
     receiver = actor("receiver");
     sender = actor("sender");
     vm.deal(receiver, ONE_CELOTOKEN);
@@ -249,11 +249,11 @@ contract CeloTokenMockTest is Test, TestConstants {
   GoldTokenMock mockCeloToken;
   uint256 ONE_CELOTOKEN = 1000000000000000000;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
-  address celoUnreleasedTreasure;
+  address celoUnreleasedTreasury;
 
   modifier _whenL2() {
     deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
-    vm.deal(celoUnreleasedTreasure, L2_INITIAL_STASH_BALANCE);
+    vm.deal(celoUnreleasedTreasury, L2_INITIAL_STASH_BALANCE);
     _;
   }
 
@@ -264,8 +264,8 @@ contract CeloTokenMockTest is Test, TestConstants {
     mockCeloToken = new GoldTokenMock();
     mockCeloToken.setRegistry(REGISTRY_ADDRESS);
     mockCeloToken.setTotalSupply(L1_MINTED_CELO_SUPPLY);
-    celoUnreleasedTreasure = actor("CeloUnreleasedTreasure");
-    registry.setAddressFor("CeloUnreleasedTreasure", celoUnreleasedTreasure);
+    celoUnreleasedTreasury = actor("CeloUnreleasedTreasury");
+    registry.setAddressFor("CeloUnreleasedTreasury", celoUnreleasedTreasury);
   }
 }
 
@@ -304,7 +304,7 @@ contract GoldTokenTest_AllocatedSupply is CeloTokenMockTest {
   }
 
   function test_ShouldReturn_WhenWithdrawn_WhenInL2() public _whenL2 {
-    deal(address(celoUnreleasedTreasure), ONE_CELOTOKEN);
+    deal(address(celoUnreleasedTreasury), ONE_CELOTOKEN);
     assertEq(mockCeloToken.allocatedSupply(), mockCeloToken.totalSupply() - ONE_CELOTOKEN);
   }
 }

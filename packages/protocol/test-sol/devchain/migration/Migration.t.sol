@@ -14,7 +14,7 @@ import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts/common/interfaces/IAccounts.sol";
 import "@celo-contracts/common/interfaces/IEpochManager.sol";
 import "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
-import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
+import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 import "@celo-contracts/governance/interfaces/IElection.sol";
 
 import "@celo-contracts/governance/interfaces/IValidators.sol";
@@ -148,7 +148,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   IEpochManagerEnabler epochManagerEnabler;
   IScoreManager scoreManager;
   IElection election;
-  ICeloUnreleasedTreasure celoUnreleasedTreasure;
+  ICeloUnreleasedTreasury celoUnreleasedTreasury;
 
   address reserveAddress;
   address unreleasedTreasury;
@@ -170,7 +170,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
 
     election = IElection(registry.getAddressForStringOrDie("Election"));
     scoreManager = IScoreManager(registry.getAddressForStringOrDie("ScoreManager"));
-    unreleasedTreasury = registry.getAddressForStringOrDie("CeloUnreleasedTreasure");
+    unreleasedTreasury = registry.getAddressForStringOrDie("CeloUnreleasedTreasury");
     reserveAddress = registry.getAddressForStringOrDie("Reserve");
 
     validatorsList = validatorsContract.getRegisteredValidators();
