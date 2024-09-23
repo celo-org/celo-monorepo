@@ -1415,7 +1415,7 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
     assertTrue(election.isIneligible(group));
   }
 
-  function test_ShouldNotTryToSendValidatorPayment() public {
+  function test_ShouldNotTryToSendValidatorPayment_WhenL1() public {
     vm.prank(validator);
     validators.affiliate(group);
     Vm.Log[] memory entries = vm.getRecordedLogs();
@@ -1424,7 +1424,6 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
 
   function test_ShouldSendValidatorPayment_WhenL2() public {
     _whenL2();
-    // assertTrue(validators.isL2());
     vm.expectEmit(true, true, true, true);
     emit SendValidatorPaymentCalled(validator);
     vm.prank(validator);
@@ -1556,7 +1555,15 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
     assertTrue(election.isIneligible(group));
   }
 
-  function test_ShouldSendValidatorPayment() public {
+  function test_ShouldNotTryToSendValidatorPayment_WhenL1() public {
+    vm.prank(validator);
+    validators.affiliate(group);
+    Vm.Log[] memory entries = vm.getRecordedLogs();
+    assertEq(entries.length, 0);
+  }
+
+  function test_ShouldSendValidatorPayment_WhenL2() public {
+    _whenL2();
     vm.expectEmit(true, true, true, true);
     emit SendValidatorPaymentCalled(validator);
     vm.prank(validator);
@@ -2626,7 +2633,14 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
     validators.updateCommission();
   }
 
-  function test_ShouldSendMultipleValidatorPayments() public {
+  function test_ShouldNotTryTodSendMultipleValidatorPayments_WhenL1() public {
+    vm.prank(validator);
+    validators.affiliate(group);
+    Vm.Log[] memory entries = vm.getRecordedLogs();
+    assertEq(entries.length, 0);
+  }
+
+  function test_ShouldSendMultipleValidatorPayments_WhenL2() public {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
     vm.prank(group);
@@ -2635,6 +2649,7 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
     validators.setNextCommissionUpdate(newCommission);
     blockTravel(commissionUpdateDelay);
 
+    _whenL2();
     vm.expectEmit(true, true, true, true);
     emit SendValidatorPaymentCalled(validator);
     vm.expectEmit(true, true, true, true);
@@ -3611,7 +3626,15 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
     validators.forceDeaffiliateIfValidator(validator);
   }
 
-  function test_ShouldSendValidatorPayment() public {
+  function test_ShouldNotTryToSendValidatorPayment_WhenL1() public {
+    vm.prank(validator);
+    validators.affiliate(group);
+    Vm.Log[] memory entries = vm.getRecordedLogs();
+    assertEq(entries.length, 0);
+  }
+
+  function test_ShouldSendValidatorPayment_WhenL2() public {
+    _whenL2();
     vm.expectEmit(true, true, true, true);
     emit SendValidatorPaymentCalled(validator);
     vm.prank(paymentDelegatee);

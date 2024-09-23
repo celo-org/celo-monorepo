@@ -288,6 +288,9 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
     members[1] = validator2;
     mockValidators.setMembers(group, members);
 
+    vm.prank(epochManagerEnabler);
+    epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
+
     stableToken.mint(address(epochManager), paymentAmount * 2);
     epochManagerBalanceBefore = stableToken.balanceOf(address(epochManager));
     epochManager._setPaymentAllocation(validator1, paymentAmount);

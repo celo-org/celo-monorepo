@@ -19,7 +19,6 @@ import "../../contracts/common/libraries/ReentrancyGuard.sol";
 import "../common/interfaces/IStableToken.sol";
 
 import "../../contracts/common/interfaces/IAccounts.sol";
-import { console } from "forge-std/console.sol";
 
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
@@ -1511,7 +1510,6 @@ contract Validators is
   }
 
   function _sendValidatorPaymentIfNecessary(address validator) private {
-    console.log("Is L2?", isL2());
     if (isL2()) {
       getEpochManager().sendValidatorPayment(validator);
     }
