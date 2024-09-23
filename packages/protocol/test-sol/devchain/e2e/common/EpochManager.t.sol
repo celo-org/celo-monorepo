@@ -45,8 +45,8 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
     firstElected = getValidators().getRegisteredValidators();
 
     epochDuration = epochManager.epochDuration();
-    // TODO(soloseng) update number.
-    vm.deal(address(celoUnreleasedTreasury), 800_000_000 ether); // 80% of the total supply to the treasury - whis will be yet distributed
+
+    vm.deal(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE); // 80% of the total supply to the treasury - whis will be yet distributed
   }
 
   function activateValidators() public {

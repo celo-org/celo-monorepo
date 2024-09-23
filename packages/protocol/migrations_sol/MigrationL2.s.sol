@@ -33,8 +33,7 @@ contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
   }
 
   function dealToCeloUnreleasedTreasury() public {
-    // TODO(soloseng) update number.
-    vm.deal(address(getCeloUnreleasedTreasury()), 1_000_000 ether);
+    vm.deal(address(getCeloUnreleasedTreasury()), L2_INITIAL_STASH_BALANCE);
   }
 
   function initializeEpochManagerSystem() public {
