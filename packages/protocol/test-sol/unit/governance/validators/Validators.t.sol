@@ -138,6 +138,8 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     uint256 groupPayment
   );
 
+  event SendValidatorPaymentCalled(address validator);
+
   function setUp() public {
     owner = address(this);
     group = actor("group");
@@ -1412,6 +1414,21 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
 
     assertTrue(election.isIneligible(group));
   }
+
+  function test_ShouldNotTryToSendValidatorPayment_WhenL1() public {
+    vm.prank(validator);
+    validators.affiliate(group);
+    Vm.Log[] memory entries = vm.getRecordedLogs();
+    assertEq(entries.length, 0);
+  }
+
+  function test_ShouldSendValidatorPayment_WhenL2() public {
+    _whenL2();
+    vm.expectEmit(true, true, true, true);
+    emit SendValidatorPaymentCalled(validator);
+    vm.prank(validator);
+    validators.affiliate(group);
+  }
 }
 
 contract ValidatorsTest_Deaffiliate is ValidatorsTest {
@@ -1536,6 +1553,21 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
     vm.prank(validator);
     validators.deaffiliate();
     assertTrue(election.isIneligible(group));
+  }
+
+  function test_ShouldNotTryToSendValidatorPayment_WhenL1() public {
+    vm.prank(validator);
+    validators.affiliate(group);
+    Vm.Log[] memory entries = vm.getRecordedLogs();
+    assertEq(entries.length, 0);
+  }
+
+  function test_ShouldSendValidatorPayment_WhenL2() public {
+    _whenL2();
+    vm.expectEmit(true, true, true, true);
+    emit SendValidatorPaymentCalled(validator);
+    vm.prank(validator);
+    validators.deaffiliate();
   }
 }
 
@@ -2487,13 +2519,6 @@ contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
     assertEq(_commission, commission.unwrap());
   }
 
-  function test_Reverts_SetValidatorGroupCommission_WhenL2() public {
-    _whenL2();
-    vm.prank(group);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.setNextCommissionUpdate(newCommission);
-  }
-
   function test_ShouldSetValidatorGroupNextCommission() public {
     vm.prank(group);
     validators.setNextCommissionUpdate(newCommission);
@@ -2534,7 +2559,21 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
-    _registerValidatorGroupHelper(group, 1);
+    _registerValidatorGroupHelper(group, 2);
+
+    _registerValidatorHelper(validator, validatorPk);
+    _registerValidatorHelper(otherValidator, otherValidatorPk);
+
+    vm.prank(validator);
+    validators.affiliate(group);
+    (, , address _affiliation1, , ) = validators.getValidator(validator);
+
+    vm.prank(otherValidator);
+    validators.affiliate(group);
+    (, , address _affiliation2, , ) = validators.getValidator(otherValidator);
+
+    require(_affiliation1 == group, "Affiliation failed.");
+    require(_affiliation2 == group, "Affiliation failed.");
   }
 
   function test_ShouldSetValidatorGroupCommission() public {
@@ -2549,13 +2588,6 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
     (, uint256 _commission, , , , , ) = validators.getValidatorGroup(group);
 
     assertEq(_commission, newCommission);
-  }
-
-  function test_Reverts_SetValidatorGroupCommission_WhenL2() public {
-    _whenL2();
-    vm.prank(group);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.setNextCommissionUpdate(newCommission);
   }
 
   function test_Emits_ValidatorGroupCommissionUpdated() public {
@@ -2597,6 +2629,31 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
 
     vm.expectRevert("No commission update queued");
 
+    vm.prank(group);
+    validators.updateCommission();
+  }
+
+  function test_ShouldNotTryTodSendMultipleValidatorPayments_WhenL1() public {
+    vm.prank(validator);
+    validators.affiliate(group);
+    Vm.Log[] memory entries = vm.getRecordedLogs();
+    assertEq(entries.length, 0);
+  }
+
+  function test_ShouldSendMultipleValidatorPayments_WhenL2() public {
+    vm.prank(group);
+    validators.addFirstMember(validator, address(0), address(0));
+    vm.prank(group);
+    validators.addMember(otherValidator);
+    vm.prank(group);
+    validators.setNextCommissionUpdate(newCommission);
+    blockTravel(commissionUpdateDelay);
+
+    _whenL2();
+    vm.expectEmit(true, true, true, true);
+    emit SendValidatorPaymentCalled(validator);
+    vm.expectEmit(true, true, true, true);
+    emit SendValidatorPaymentCalled(otherValidator);
     vm.prank(group);
     validators.updateCommission();
   }
@@ -3566,6 +3623,21 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
 
   function test_Reverts_WhenSenderNotApprovedAddress() public {
     vm.expectRevert("Only registered slasher can call");
+    validators.forceDeaffiliateIfValidator(validator);
+  }
+
+  function test_ShouldNotTryToSendValidatorPayment_WhenL1() public {
+    vm.prank(validator);
+    validators.affiliate(group);
+    Vm.Log[] memory entries = vm.getRecordedLogs();
+    assertEq(entries.length, 0);
+  }
+
+  function test_ShouldSendValidatorPayment_WhenL2() public {
+    _whenL2();
+    vm.expectEmit(true, true, true, true);
+    emit SendValidatorPaymentCalled(validator);
+    vm.prank(paymentDelegatee);
     validators.forceDeaffiliateIfValidator(validator);
   }
 }

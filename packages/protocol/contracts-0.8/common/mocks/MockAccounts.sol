@@ -36,6 +36,7 @@ contract MockAccounts {
   ) public {
     delegations[validator] = PaymentDelegation(beneficiary, FixidityLib.wrap(fraction));
   }
+
   function deletePaymentDelegationFor(address validator) public {
     delete delegations[validator];
   }

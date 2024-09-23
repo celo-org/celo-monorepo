@@ -107,6 +107,11 @@ contract EpochManager is
    */
   constructor(bool test) public Initializable(test) {}
 
+  modifier onlySystemAlreadyInitialized() {
+    require(systemAlreadyInitialized(), "Epoch system not initialized");
+    _;
+  }
+
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
@@ -154,8 +159,7 @@ contract EpochManager is
   /// start next epoch process.
   /// it freezes the epochrewards at the time of execution,
   /// and starts the distribution of the rewards.
-  function startNextEpochProcess() external nonReentrant {
-    require(systemAlreadyInitialized(), "Epoch system not initialized");
+  function startNextEpochProcess() external nonReentrant onlySystemAlreadyInitialized {
     require(isTimeForNextEpoch(), "Epoch is not ready to start");
     require(!isOnEpochProcess(), "Epoch process is already started");
     epochProcessing.status = EpochProcessStatus.Started;
@@ -247,7 +251,7 @@ contract EpochManager is
    *   delegation beneficiary.
    * @param validator Account of the validator.
    */
-  function sendValidatorPayment(address validator) external {
+  function sendValidatorPayment(address validator) external onlySystemAlreadyInitialized {
     FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(
       validatorPendingPayments[validator]
     );
@@ -300,8 +304,7 @@ contract EpochManager is
   }
 
   /// returns the current epoch number.
-  function getCurrentEpochNumber() external view returns (uint256) {
-    require(systemAlreadyInitialized(), "EpochManager system not yet initialized.");
+  function getCurrentEpochNumber() external view onlySystemAlreadyInitialized returns (uint256) {
     return currentEpochNumber;
   }
 

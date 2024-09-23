@@ -26,6 +26,8 @@ contract MockEpochManager is IEpochManager {
   bool initialized;
   mapping(uint256 => Epoch) private epochs;
 
+  event SendValidatorPaymentCalled(address validator);
+
   function setCurrentEpochNumber(uint256 _newEpochNumber) external {
     currentEpochNumber = _newEpochNumber;
   }
@@ -74,5 +76,9 @@ contract MockEpochManager is IEpochManager {
     returns (uint256, uint256, uint256, uint256, uint256)
   {
     return (0, 0, 0, 0, 0);
+  }
+
+  function sendValidatorPayment(address validator) public {
+    emit SendValidatorPaymentCalled(validator);
   }
 }

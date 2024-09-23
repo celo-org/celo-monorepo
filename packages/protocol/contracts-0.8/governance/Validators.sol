@@ -576,7 +576,6 @@ contract Validators is
    *   payments made to its members. Must be in the range [0, 1.0].
    */
   function setNextCommissionUpdate(uint256 commission) external {
-    allowOnlyL1();
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
@@ -592,10 +591,11 @@ contract Validators is
    * @notice Updates a validator group's commission based on the previously queued update
    */
   function updateCommission() external {
-    allowOnlyL1();
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
+
+    _sendValidatorGroupPaymentsIfNecessary(group);
 
     require(group.nextCommissionBlock != 0, "No commission update queued");
     require(group.nextCommissionBlock <= block.number, "Can't apply commission update yet");
@@ -1498,6 +1498,7 @@ contract Validators is
     Validator storage validator,
     address validatorAccount
   ) private returns (bool) {
+    _sendValidatorPaymentIfNecessary(validatorAccount);
     address affiliation = validator.affiliation;
     ValidatorGroup storage group = groups[affiliation];
     if (group.members.contains(validatorAccount)) {
@@ -1506,6 +1507,19 @@ contract Validators is
     validator.affiliation = address(0);
     emit ValidatorDeaffiliated(validatorAccount, affiliation);
     return true;
+  }
+
+  function _sendValidatorPaymentIfNecessary(address validator) private {
+    if (isL2()) {
+      getEpochManager().sendValidatorPayment(validator);
+    }
+  }
+
+  function _sendValidatorGroupPaymentsIfNecessary(ValidatorGroup storage group) private {
+    address[] memory members = group.members.getKeys();
+    for (uint256 i = 0; i < members.length; i++) {
+      _sendValidatorPaymentIfNecessary(members[i]);
+    }
   }
 
   /**
