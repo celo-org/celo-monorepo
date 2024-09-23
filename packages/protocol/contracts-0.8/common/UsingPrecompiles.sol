@@ -89,7 +89,9 @@ contract UsingPrecompiles is IsL2Check {
    * @param index Index of requested validator in the validator set.
    * @return Address of validator at the requested index.
    */
-  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
+  function validatorSignerAddressFromCurrentSet(
+    uint256 index
+  ) public view virtual returns (address) {
     bytes memory out;
     bool success;
     (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, uint256(block.number)));
@@ -118,7 +120,7 @@ contract UsingPrecompiles is IsL2Check {
    * @notice Gets the size of the current elected validator set.
    * @return Size of the current elected validator set.
    */
-  function numberValidatorsInCurrentSet() public view returns (uint256) {
+  function numberValidatorsInCurrentSet() public view virtual returns (uint256) {
     bytes memory out;
     bool success;
     (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(uint256(block.number)));
@@ -131,7 +133,7 @@ contract UsingPrecompiles is IsL2Check {
    * @param blockNumber Block number to retrieve the validator set from.
    * @return Size of the validator set.
    */
-  function numberValidatorsInSet(uint256 blockNumber) public view returns (uint256) {
+  function numberValidatorsInSet(uint256 blockNumber) public view virtual returns (uint256) {
     bytes memory out;
     bool success;
     (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(blockNumber));

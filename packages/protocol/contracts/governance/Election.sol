@@ -486,12 +486,21 @@ contract Election is
   }
 
   /**
+   * @notice Returns a list of elected validator signers with seats allocated to groups via the D'Hondt
+   *   method.
+   * @return The list of elected validator signers.
+   */
+  function electValidatorSigners() external view returns (address[] memory) {
+    return electNValidatorSigners(electableValidators.min, electableValidators.max);
+  }
+
+  /**
    * @notice Returns a list of elected validators with seats allocated to groups via the D'Hondt
    *   method.
    * @return The list of elected validators.
    */
-  function electValidatorSigners() external view returns (address[] memory) {
-    return electNValidatorSigners(electableValidators.min, electableValidators.max);
+  function electValidatorAccounts() external view returns (address[] memory) {
+    return electNValidatorAccounts(electableValidators.min, electableValidators.max);
   }
 
   /**
@@ -789,16 +798,35 @@ contract Election is
     return votes.active.total;
   }
 
-  /**
-   * @notice Returns a list of elected validators with seats allocated to groups via the D'Hondt
-   *   method.
-   * @return The list of elected validators.
-   * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
-   */
   function electNValidatorSigners(
     uint256 minElectableValidators,
     uint256 maxElectableValidators
   ) public view returns (address[] memory) {
+    bool accounts = false;
+    return
+      _electNValidatorSignerOrAccount(minElectableValidators, maxElectableValidators, accounts);
+  }
+
+  function electNValidatorAccounts(
+    uint256 minElectableValidators,
+    uint256 maxElectableValidators
+  ) public view returns (address[] memory) {
+    bool accounts = true;
+    return
+      _electNValidatorSignerOrAccount(minElectableValidators, maxElectableValidators, accounts);
+  }
+
+  /**
+   * @notice Returns a list of elected validator with seats allocated to groups via the D'Hondt
+   *   method.
+   * @return The list of elected validator signers or accounts depending on input.
+   * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
+   */
+  function _electNValidatorSignerOrAccount(
+    uint256 minElectableValidators,
+    uint256 maxElectableValidators,
+    bool accounts // accounts or signers
+  ) internal view returns (address[] memory) {
     // Groups must have at least `electabilityThreshold` proportion of the total votes to be
     // considered for the election.
     uint256 requiredVotes = electabilityThreshold
@@ -810,6 +838,7 @@ contract Election is
       requiredVotes,
       maxElectableValidators
     );
+
     address[] memory electionGroups = votes.total.eligible.headN(numElectionGroups);
     uint256[] memory numMembers = getValidators().getGroupsNumMembers(electionGroups);
     // Holds the number of members elected for each of the eligible validator groups.
@@ -851,12 +880,23 @@ contract Election is
     // Grab the top validators from each group that won seats.
     address[] memory electedValidators = new address[](totalNumMembersElected);
     totalNumMembersElected = 0;
+
+    IValidators validators = getValidators();
+
     for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
       // We use the validating delegate if one is set.
-      address[] memory electedGroupValidators = getValidators().getTopGroupValidators(
-        electionGroups[i],
-        numMembersElected[i]
-      );
+      address[] memory electedGroupValidators;
+      if (accounts) {
+        electedGroupValidators = validators.getTopGroupValidatorsAccounts(
+          electionGroups[i],
+          numMembersElected[i]
+        );
+      } else {
+        electedGroupValidators = validators.getTopGroupValidators(
+          electionGroups[i],
+          numMembersElected[i]
+        );
+      }
       for (uint256 j = 0; j < electedGroupValidators.length; j = j.add(1)) {
         electedValidators[totalNumMembersElected] = electedGroupValidators[j];
         totalNumMembersElected = totalNumMembersElected.add(1);
