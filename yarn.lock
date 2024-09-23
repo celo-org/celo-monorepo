@@ -916,12 +916,12 @@
     inquirer "^7.0.5"
 
 "@celo/network-utils@^5.0.5":
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/@celo/network-utils/-/network-utils-5.0.5.tgz#5d096b435cd93ea1083951966b4f349bdb82b3d4"
-  integrity sha512-9+0Pr3OLSS3O1baxbUSW+HfCWcctPEfwuccvuVqdLiXqcuP5Usx8IDi3XAkEQcvGQ1RS097FqZqM6t8u+Npqgw==
+  version "5.0.6"
+  resolved "https://registry.yarnpkg.com/@celo/network-utils/-/network-utils-5.0.6.tgz#50f2006c04e76939464bfaabe7a236c7fbff6291"
+  integrity sha512-F4IuC73HOVu4VDmT8sf2+UEVbRhmsIvRl/YYwGtcQcoMZlRL+TPxfSjhy3HWtAERldyLfhmXc0Lu6H9Bkem1Dg==
   dependencies:
     "@types/debug" "^4.1.5"
-    cross-fetch "3.0.6"
+    cross-fetch "3.1.5"
     debug "^4.1.1"
 
 "@celo/typechain-target-web3-v1-celo@^1.0.0":
@@ -8134,7 +8134,7 @@ cross-fetch@3.0.6:
   dependencies:
     node-fetch "2.6.1"
 
-cross-fetch@^3.1.4:
+cross-fetch@3.1.5, cross-fetch@^3.1.4:
   version "3.1.5"
   resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-3.1.5.tgz#e1389f44d9e7ba767907f7af8454787952ab534f"
   integrity sha512-lvb1SBsI0Z7GDwmuid+mU3kWVBwTVUbe7S0H52yaaAdQOXq2YktTCZdlAcNKFzE6QtRz0snpw9bNiPeOIkkQvw==
