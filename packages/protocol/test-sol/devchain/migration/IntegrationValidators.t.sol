@@ -6,8 +6,7 @@ import { Devchain } from "@test-sol/devchain/e2e/utils.sol";
 
 contract IntegrationsValidators is Test, Devchain {
   function test_deaffiliateWorskWithEpochManager() public {
-    // address of an allowed validator
-    vm.prank(address(0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65));
+    vm.prank(election.electValidatorAccounts()[0]);
     validators.deaffiliate();
   }
 }
