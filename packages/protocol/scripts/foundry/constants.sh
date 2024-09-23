@@ -59,7 +59,8 @@ export LIBRARY_DEPENDENCIES_PATH=(
     "lib/openzeppelin-contracts/contracts/math/SafeMath.sol"
     "lib/openzeppelin-contracts8/contracts/utils/math/SafeMath.sol"
     "lib/openzeppelin-contracts/contracts/math/Math.sol"
-    "lib/openzeppelin-contracts/contracts/cryptography/ECDSA.sol"   
+    "lib/openzeppelin-contracts/contracts/cryptography/ECDSA.sol"
     "lib/openzeppelin-contracts/contracts/utils/Address.sol"
     "lib/solidity-bytes-utils/contracts/BytesLib.sol"
+    "lib/celo-foundry/lib/forge-std/src/console.sol"
 )

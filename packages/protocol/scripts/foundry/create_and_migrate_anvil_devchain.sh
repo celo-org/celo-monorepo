@@ -60,6 +60,21 @@ forge script \
   $LIBRARY_FLAGS \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
 
+CELO_EPOCH_REWARDS_ADDRESS=$(
+  cast call \
+    $REGISTRY_ADDRESS \
+    "getAddressForStringOrDie(string calldata identifier)(address)" \
+    "EpochRewards" \
+    --rpc-url $ANVIL_RPC_URL
+)
+
+echo "Setting storage of EpochRewards start time to same value as on mainnet"
+# Storage slot of start time is 2 and the value is 1587587214 which is identical to mainnet
+cast rpc \
+anvil_setStorageAt \
+$CELO_EPOCH_REWARDS_ADDRESS 2 "0x000000000000000000000000000000000000000000000000000000005ea0a88e" \
+--rpc-url $ANVIL_RPC_URL
+
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
 echo "Migration script total elapsed time: $ELAPSED_TIME seconds"

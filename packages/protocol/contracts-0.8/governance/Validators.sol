@@ -346,7 +346,6 @@ contract Validators is
    * @dev De-affiliates with the previously affiliated group if present.
    */
   function affiliate(address group) external nonReentrant returns (bool) {
-    allowOnlyL1();
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidator(account), "Not a validator");
     require(isValidatorGroup(group), "Not a validator group");
@@ -510,7 +509,6 @@ contract Validators is
    * @dev Fails if the group has zero members.
    */
   function addMember(address validator) external nonReentrant returns (bool) {
-    allowOnlyL1();
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(groups[account].members.numElements > 0, "Validator group empty");
     return _addMember(account, validator, address(0), address(0));
@@ -530,7 +528,6 @@ contract Validators is
     address lesser,
     address greater
   ) external nonReentrant returns (bool) {
-    allowOnlyL1();
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(groups[account].members.numElements == 0, "Validator group not empty");
     return _addMember(account, validator, lesser, greater);

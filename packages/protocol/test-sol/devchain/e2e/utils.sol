@@ -8,6 +8,7 @@ import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
 import { IScoreManager } from "@celo-contracts-8/common/interfaces/IScoreManager.sol";
 import { IValidators } from "@celo-contracts/governance/interfaces/IValidators.sol";
 import { IElection } from "@celo-contracts/governance/interfaces/IElection.sol";
+import { ILockedCelo } from "@celo-contracts/governance/interfaces/ILockedCelo.sol";
 
 // All core contracts that are expected to be in the Registry on the devchain
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
@@ -29,6 +30,7 @@ contract Devchain is UsingRegistry, TestConstants {
   IAccounts accounts;
   IScoreManager scoreManager;
   IElection election;
+  ILockedCelo lockedCelo;
 
   constructor() {
     // The following line is required by UsingRegistry.sol
@@ -46,6 +48,7 @@ contract Devchain is UsingRegistry, TestConstants {
     accounts = getAccounts();
     scoreManager = IScoreManager(address(getScoreReader()));
     election = getElection();
+    lockedCelo = getLockedCelo();
 
     // TODO: Add missing core contracts below (see list in migrations_sol/constants.sol)
     // TODO: Consider asserting that all contracts we expect are available in the Devchain class

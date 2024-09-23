@@ -31,8 +31,8 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
   address[] groups;
   address[] validatorsArray;
 
-  uint256[] groupScore = [5e23, 7e23, 1e24];
-  uint256[] validatorScore = [1e23, 1e23, 1e23, 1e23, 1e23, 1e23];
+  uint256[] groupScore = [5e23, 7e23, 1e24, 4e23];
+  uint256[] validatorScore = [1e23, 1e23, 1e23, 1e23, 1e23, 1e23, 1e23];
 
   mapping(address => uint256) addressToPrivateKeys;
   mapping(address => VoterWithPK) validatorToVoter;
@@ -226,44 +226,30 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     epochManager.startNextEpochProcess();
   }
 
+  function assertGroupWithVotes(GroupWithVotes[] memory groupWithVotes) internal {
+    for (uint256 i = 0; i < groupWithVotes.length; i++) {
+      uint256 expected = election.getTotalVotesForGroup(groupWithVotes[i].group);
+      assertEq(election.getTotalVotesForGroup(groupWithVotes[i].group), groupWithVotes[i].votes);
+    }
+  }
+
   function test_shouldFinishNextEpochProcessing() public {
-    uint256[] memory groupActiveBalances = new uint256[](groups.length);
-
-    GroupWithVotes[] memory groupWithVotes = new GroupWithVotes[](groups.length);
-
-    (, , uint256 totalRewardsVote, , ) = epochManager.getEpochProcessingState();
-
-    (address[] memory groupsEligible, uint256[] memory values) = election
-      .getTotalVotesForEligibleValidatorGroups();
-
-    for (uint256 i = 0; i < groupsEligible.length; i++) {
-      groupActiveBalances[i] = election.getActiveVotesForGroup(groupsEligible[i]);
-      groupWithVotes[i] = GroupWithVotes(
-        groupsEligible[i],
-        values[i] +
-          election.getGroupEpochRewardsBasedOnScore(
-            groupsEligible[i],
-            totalRewardsVote,
-            groupScore[i]
-          )
-      );
-    }
-
-    sort(groupWithVotes);
-
-    address[] memory lessers = new address[](groups.length);
-    address[] memory greaters = new address[](groups.length);
-
-    for (uint256 i = 0; i < groups.length; i++) {
-      lessers[i] = i == 0 ? address(0) : groupWithVotes[i - 1].group;
-      greaters[i] = i == groups.length - 1 ? address(0) : groupWithVotes[i + 1].group;
-    }
+    address[] memory lessers;
+    address[] memory greaters;
+    address[] memory groupsEligible;
+    GroupWithVotes[] memory groupWithVotes;
+    uint256[] memory groupActiveBalances;
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
 
     uint256 currentEpoch = epochManager.getCurrentEpochNumber();
     address[] memory currentlyElected = epochManager.getElected();
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       originalyElected.add(currentlyElected[i]);
     }
+
+    // wait some time before finishing
+    timeTravel(vm, epochDuration / 2);
+    blockTravel(vm, 100);
 
     epochManager.finishNextEpochProcess(groups, lessers, greaters);
 
@@ -275,14 +261,16 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
       assertEq(originalyElected.contains(currentlyElected[i]), true);
     }
 
-    for (uint256 i = 0; i < groupsEligible.length; i++) {
-      assertEq(election.getActiveVotesForGroup(groupsEligible[i]), groupWithVotes[i].votes);
-      assertGt(election.getActiveVotesForGroup(groupsEligible[i]), groupActiveBalances[i]);
-    }
-
     timeTravel(vm, epochDuration + 1);
     epochManager.startNextEpochProcess();
+
+    // wait some time before finishing
+    timeTravel(vm, epochDuration / 2);
+    blockTravel(vm, 100);
+
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
     epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
 
     assertEq(currentEpoch + 2, epochManager.getCurrentEpochNumber());
 
@@ -291,17 +279,223 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       assertEq(originalyElected.contains(newlyElected2[i]), true);
     }
+
+    // add new validator group and validator
+    (address newValidatorGroup, address newValidator) = registerNewValidatorGroupWithValidator();
+
+    timeTravel(vm, epochDuration + 1);
+    epochManager.startNextEpochProcess();
+
+    timeTravel(vm, epochDuration / 2);
+    blockTravel(vm, 100);
+
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
+
+    groups.push(newValidatorGroup);
+    validatorsArray.push(newValidator);
+
+    assertEq(epochManager.getElected().length, validators.getRegisteredValidators().length);
+    assertEq(groups.length, validators.getRegisteredValidatorGroups().length);
+
+    timeTravel(vm, epochDuration + 1);
+    epochManager.startNextEpochProcess();
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
+
+    assertEq(epochManager.getElected().length, validatorsArray.length);
+
+    // lower the number of electable validators
+    vm.prank(election.owner());
+    election.setElectableValidators(1, validatorsArray.length - 1);
+
+    timeTravel(vm, epochDuration + 1);
+    epochManager.startNextEpochProcess();
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
+
+    assertEq(epochManager.getElected().length, validatorsArray.length - 1);
   }
 
-  // TODO: add test when new groups are elected
-  // TODO: add test when groups are removed
+  function registerNewValidatorGroupWithValidator()
+    internal
+    returns (address newValidatorGroup, address newValidator)
+  {
+    (, GroupWithVotes[] memory groupWithVotes) = getGroupsWithVotes();
+    uint256 newGroupPK = uint256(keccak256(abi.encodePacked("newGroup")));
+    uint256 newValidatorPK = uint256(keccak256(abi.encodePacked("newValidator")));
+
+    vm.deal(vm.addr(newGroupPK), 100_000_000 ether);
+    vm.deal(vm.addr(newValidatorPK), 100_000_000 ether);
+
+    (uint256 validatorLockedGoldRequirement, ) = validators.getValidatorLockedGoldRequirements();
+    (uint256 groupLockedGoldRequirement, ) = validators.getGroupLockedGoldRequirements();
+
+    newValidatorGroup = registerValidatorGroup(
+      "newGroup",
+      newGroupPK,
+      groupLockedGoldRequirement,
+      100000000000000000000000
+    );
+    newValidator = registerValidator(
+      newValidatorPK,
+      validatorLockedGoldRequirement,
+      newValidatorGroup
+    );
+    vm.prank(newValidatorGroup);
+    validators.addFirstMember(newValidator, address(0), groupWithVotes[0].group);
+    uint256 nonVotingLockedGold = lockedCelo.getAccountNonvotingLockedGold(newValidator);
+    vm.prank(newValidatorGroup);
+    election.vote(newValidatorGroup, nonVotingLockedGold, address(0), groupWithVotes[0].group);
+
+    vm.startPrank(scoreManager.owner());
+    scoreManager.setGroupScore(newValidatorGroup, groupScore[3]);
+    scoreManager.setValidatorScore(newValidator, validatorScore[6]);
+    vm.stopPrank();
+  }
+
+  function getGroupsWithVotes()
+    internal
+    returns (address[] memory groupsInOrder, GroupWithVotes[] memory groupWithVotes)
+  {
+    uint256[] memory votesTotal;
+    (groupsInOrder, votesTotal) = election.getTotalVotesForEligibleValidatorGroups();
+
+    groupWithVotes = new GroupWithVotes[](groupsInOrder.length);
+    for (uint256 i = 0; i < groupsInOrder.length; i++) {
+      groupWithVotes[i] = GroupWithVotes(groupsInOrder[i], votesTotal[i]);
+    }
+  }
+
+  function getValidatorGroupsFromElected() internal returns (address[] memory) {
+    address[] memory elected = epochManager.getElected();
+    address[] memory validatorGroups = new address[](elected.length);
+    for (uint256 i = 0; i < elected.length; i++) {
+      (, , address group, , ) = validators.getValidator(elected[i]);
+      validatorGroups[i] = group;
+    }
+    return validatorGroups;
+  }
+
+  function getLessersAndGreaters(
+    address[] memory groups
+  )
+    private
+    returns (
+      address[] memory lessers,
+      address[] memory greaters,
+      GroupWithVotes[] memory groupWithVotes
+    )
+  {
+    (, , uint256 maxTotalRewards, , ) = epochManager.getEpochProcessingState();
+    uint256 totalRewards = 0;
+
+    (, groupWithVotes) = getGroupsWithVotes();
+
+    lessers = new address[](groups.length);
+    greaters = new address[](groups.length);
+
+    uint256[] memory rewards = new uint256[](groups.length);
+
+    for (uint256 i = 0; i < groups.length; i++) {
+      uint256 groupScore = scoreManager.getGroupScore(groups[i]);
+      rewards[i] = election.getGroupEpochRewardsBasedOnScore(
+        groups[i],
+        maxTotalRewards,
+        groupScore
+      );
+    }
+    for (uint256 i = 0; i < groups.length; i++) {
+      uint256 rewards = rewards[i];
+
+      for (uint256 j = 0; j < groupWithVotes.length; j++) {
+        if (groupWithVotes[j].group == groups[i]) {
+          groupWithVotes[j].votes += rewards;
+          break;
+        }
+      }
+      sort(groupWithVotes);
+
+      address lesser = address(0);
+      address greater = address(0);
+
+      for (uint256 j = 0; j < groupWithVotes.length; j++) {
+        if (groupWithVotes[j].group == groups[i]) {
+          greater = j == 0 ? address(0) : groupWithVotes[j - 1].group;
+          lesser = j == groupWithVotes.length - 1 ? address(0) : groupWithVotes[j + 1].group;
+          break;
+        }
+      }
+
+      lessers[i] = lesser;
+      greaters[i] = greater;
+    }
+  }
+
+  function registerValidatorGroup(
+    string memory groupName,
+    uint256 privateKey,
+    uint256 amountToLock,
+    uint256 commission
+  ) public returns (address accountAddress) {
+    accountAddress = vm.addr(privateKey);
+    vm.startPrank(accountAddress);
+    lockGold(amountToLock);
+    getAccounts().setName(groupName);
+    getValidators().registerValidatorGroup(commission);
+    vm.stopPrank();
+  }
+
+  function registerValidator(
+    uint256 privateKey,
+    uint256 amountToLock,
+    address groupToAffiliate
+  ) public returns (address) {
+    address accountAddress = vm.addr(privateKey);
+    vm.startPrank(accountAddress);
+    lockGold(amountToLock);
+
+    (bytes memory ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(accountAddress, privateKey);
+    getValidators().registerValidatorNoBls(ecdsaPubKey);
+    getValidators().affiliate(groupToAffiliate);
+
+    vm.stopPrank();
+    return accountAddress;
+  }
+
+  function _generateEcdsaPubKeyWithSigner(
+    address _validator,
+    uint256 _signerPk
+  ) internal returns (bytes memory ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) {
+    (v, r, s) = getParsedSignatureOfAddress(_validator, _signerPk);
+
+    bytes32 addressHash = keccak256(abi.encodePacked(_validator));
+    ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
+  }
+
+  function getParsedSignatureOfAddress(
+    address _address,
+    uint256 privateKey
+  ) public pure returns (uint8, bytes32, bytes32) {
+    bytes32 addressHash = keccak256(abi.encodePacked(_address));
+    bytes32 prefixedHash = toEthSignedMessageHash(addressHash);
+    return vm.sign(privateKey, prefixedHash);
+  }
+
+  function lockGold(uint256 value) public {
+    getAccounts().createAccount();
+    getLockedGold().lock{ value: value }();
+  }
 
   // Bubble sort algorithm since it is a small array
   function sort(GroupWithVotes[] memory items) public {
     uint length = items.length;
     for (uint i = 0; i < length; i++) {
       for (uint j = 0; j < length - 1; j++) {
-        if (items[j].votes > items[j + 1].votes) {
+        if (items[j].votes < items[j + 1].votes) {
           // Swap
           GroupWithVotes memory temp = items[j];
           items[j] = items[j + 1];
