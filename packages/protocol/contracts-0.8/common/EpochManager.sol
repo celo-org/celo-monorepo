@@ -248,7 +248,7 @@ contract EpochManager is
    *   delegation beneficiary.
    * @param validator Account of the validator.
    */
-  function sendValidatorPayment(address validator) external {
+  function sendValidatorPayment(address validator) external nonReentrant {
     IAccounts accounts = IAccounts(getAccounts());
     address signer = accounts.getValidatorSigner(validator);
 
