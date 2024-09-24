@@ -506,10 +506,12 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
     assertEq(actual, commissionUpdateDelay, "Wrong commissionUpdateDelay.");
   }
 
-  function test_Reverts_setCommissionUpdateDelay_WhenL2() public {
+  function test_ShouldsetCommissionUpdateDelay_WhenL2() public {
     _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.setCommissionUpdateDelay(commissionUpdateDelay);
+    validators.setCommissionUpdateDelay(5);
+
+    uint256 actual = validators.getCommissionUpdateDelay();
+    assertEq(actual, 5, "Wrong commissionUpdateDelay.");
   }
 
   function test_shouldHaveSetDowntimeGracePeriod() public {
@@ -537,13 +539,14 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
     assertEq(validators.getMembershipHistoryLength(), newLength);
   }
 
-  function test_Reverts_SetTheMembershipHistoryLength_WhenL2() public {
-    _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
+  function test_Emits_MembershipHistoryLengthSet() public {
+    vm.expectEmit(true, true, true, true);
+    emit MembershipHistoryLengthSet(newLength);
     validators.setMembershipHistoryLength(newLength);
   }
 
-  function test_Emits_MembershipHistoryLengthSet() public {
+  function test_Emits_MembershipHistoryLengthSet_WhenL2() public {
+    _whenL2();
     vm.expectEmit(true, true, true, true);
     emit MembershipHistoryLengthSet(newLength);
     validators.setMembershipHistoryLength(newLength);
@@ -561,9 +564,10 @@ contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
 
   event MaxGroupSizeSet(uint256 size);
 
-  function test_Reverts_SetMaxGroupSize_WhenL2() public {
+  function test_Emits_MaxGroupSizeSet_WhenL2() public {
     _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
+    vm.expectEmit(true, true, true, true);
+    emit MaxGroupSizeSet(newSize);
     validators.setMaxGroupSize(newSize);
   }
 
@@ -2142,14 +2146,16 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
     assertEq(members, expectedMembersList);
   }
 
-  function test_Reverts_AddFirstMemberToTheList_WhenL2() public {
-    _whenL2();
+  function test_ShouldAddMemberToTheList_WhenL2() public {
     address[] memory expectedMembersList = new address[](1);
     expectedMembersList[0] = validator;
-
+    _whenL2();
     vm.prank(group);
-    vm.expectRevert("This method is no longer supported in L2.");
     validators.addFirstMember(validator, address(0), address(0));
+
+    (address[] memory members, , , , , , ) = validators.getValidatorGroup(group);
+
+    assertEq(members, expectedMembersList);
   }
 
   function test_ShouldUpdateGroupSizeHistory() public {
@@ -3635,34 +3641,8 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
 
   function test_ShouldSendValidatorPayment_WhenL2() public {
     _whenL2();
-    vm.expectEmit(true, true, true, true);
-    emit SendValidatorPaymentCalled(validator);
+    vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(paymentDelegatee);
-    validators.forceDeaffiliateIfValidator(validator);
-  }
-}
-contract ValidatorsTest_ForceDeaffiliateIfValidator_L2 is ValidatorsTest {
-  function setUp() public {
-    super.setUp();
-
-    _registerValidatorHelper(validator, validatorPk);
-    _registerValidatorGroupHelper(group, 1);
-
-    vm.prank(validator);
-    validators.affiliate(group);
-    _whenL2();
-    lockedGold.addSlasherTest(paymentDelegatee);
-  }
-
-  function test_ShouldSucceed_WhenSenderIsWhitelistedSlashingAddress() public {
-    vm.prank(paymentDelegatee);
-    validators.forceDeaffiliateIfValidator(validator);
-    (, , address affiliation, , ) = validators.getValidator(validator);
-    assertEq(affiliation, address(0));
-  }
-
-  function test_Reverts_WhenSenderNotApprovedAddress() public {
-    vm.expectRevert("Only registered slasher can call");
     validators.forceDeaffiliateIfValidator(validator);
   }
 }
@@ -3740,21 +3720,22 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
       }
     }
   }
-
-  function test_Reverts_GroupMembershipInEpoch_WhenL2() public {
+  function test_ShouldCorrectlyGetGroupAddressForExactEpochNumbers_WhenL2() public {
     _whenL2();
     for (uint256 i = 0; i < epochInfoList.length; i++) {
       address _group = epochInfoList[i].groupy;
 
       if (epochInfoList.length.sub(i) <= membershipHistoryLength) {
-        vm.expectRevert("This method is no longer supported in L2.");
-        validators.groupMembershipInEpoch(
-          validator,
-          epochInfoList[i].epochNumber,
-          uint256(1).add(i)
+        assertEq(
+          validators.groupMembershipInEpoch(
+            validator,
+            epochInfoList[i].epochNumber,
+            uint256(1).add(i)
+          ),
+          _group
         );
       } else {
-        vm.expectRevert("This method is no longer supported in L2.");
+        vm.expectRevert("index out of bounds");
         validators.groupMembershipInEpoch(
           validator,
           epochInfoList[i].epochNumber,
