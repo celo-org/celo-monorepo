@@ -12,6 +12,9 @@ import "./interfaces/ICeloUnreleasedTreasuryInitializer.sol";
 
 /**
  * @title Contract for unreleased Celo tokens.
+ * @notice This contract is not allowed to receive transfers of CELO,
+ * to avoid miscalculating the epoch rewards and to prevent any malicious actor
+ * from routing stolen fund through the epoch reward distribution.
  */
 contract CeloUnreleasedTreasury is UsingRegistry, ReentrancyGuard, Initializable, IsL2Check {
   event Released(address indexed to, uint256 amount);
