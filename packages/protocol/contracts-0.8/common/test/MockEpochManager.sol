@@ -23,7 +23,10 @@ contract MockEpochManager is IEpochManager {
   uint256 private currentEpochNumber;
   address[] public elected;
   address public epochManagerEnabler;
-  bool initialized;
+  bool systemInitialized;
+
+  bool private _isTimeForNextEpoch;
+  bool private isProcessingEpoch;
   mapping(uint256 => Epoch) private epochs;
 
   event SendValidatorPaymentCalled(address validator);
@@ -46,7 +49,7 @@ contract MockEpochManager is IEpochManager {
 
     elected = firstElected;
 
-    initialized = true;
+    systemInitialized = true;
     epochManagerEnabler = address(0);
   }
 
@@ -56,6 +59,13 @@ contract MockEpochManager is IEpochManager {
     address[] calldata lessers,
     address[] calldata greaters
   ) external {}
+
+  function setIsTimeForNextEpoch(bool _isTime) external {
+    _isTimeForNextEpoch = _isTime;
+  }
+  function setIsOnEpochProcess(bool _isProcessing) external {
+    isProcessingEpoch = _isProcessing;
+  }
 
   function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256) {
     Epoch storage _epoch = epochs[currentEpochNumber];
@@ -70,12 +80,38 @@ contract MockEpochManager is IEpochManager {
     return elected;
   }
 
+  function getFirstBlockAtEpoch(uint256 _epoch) external view returns (uint256) {
+    Epoch storage targetEpoch = epochs[_epoch];
+
+    return (targetEpoch.firstBlock);
+  }
+
+  function getLastBlockAtEpoch(uint256 _epoch) external view returns (uint256) {
+    Epoch storage targetEpoch = epochs[_epoch];
+
+    return (targetEpoch.lastBlock);
+  }
+
   function getEpochProcessingState()
     external
     view
     returns (uint256, uint256, uint256, uint256, uint256)
   {
     return (0, 0, 0, 0, 0);
+  }
+
+  function systemAlreadyInitialized() external view returns (bool) {
+    return systemInitialized;
+  }
+
+  function isBlocked() external view returns (bool) {
+    return isProcessingEpoch;
+  }
+  function isTimeForNextEpoch() external view returns (bool) {
+    return _isTimeForNextEpoch;
+  }
+  function isOnEpochProcess() external view returns (bool) {
+    return isProcessingEpoch;
   }
 
   function sendValidatorPayment(address validator) public {

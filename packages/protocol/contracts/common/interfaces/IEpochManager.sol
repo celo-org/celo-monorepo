@@ -23,4 +23,11 @@ interface IEpochManager {
     external
     view
     returns (uint256, uint256, uint256, uint256, uint256);
+
+  function systemAlreadyInitialized() external view returns (bool);
+  function isBlocked() external view returns (bool);
+  function isTimeForNextEpoch() external view returns (bool);
+  function isOnEpochProcess() external view returns (bool);
+  function getFirstBlockAtEpoch(uint256) external view returns (uint256);
+  function getLastBlockAtEpoch(uint256) external view returns (uint256);
 }
