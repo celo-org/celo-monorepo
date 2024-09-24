@@ -57,6 +57,7 @@ contract EpochManager is
 
   uint256 public firstKnownEpoch;
   uint256 private currentEpochNumber;
+  address public oracleAddress;
   address[] public elected;
 
   mapping(address => ProcessedGroup) public processedGroups;
@@ -77,6 +78,7 @@ contract EpochManager is
    */
   event EpochProcessingEnded(uint256 indexed epochNumber);
   event EpochDurationSet(uint256 indexed newEpochDuration);
+  event OracleAddressSet(address indexed newOracleAddress);
 
   /**
    * @notice Emitted when an epoch payment is sent.
@@ -121,6 +123,7 @@ contract EpochManager is
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setEpochDuration(newEpochDuration);
+    setOracleAddress(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
   }
 
   // DESIGNDESICION(XXX): we assume that the first epoch on the L2 starts as soon as the system is initialized
@@ -368,9 +371,23 @@ contract EpochManager is
    * @dev Can only be set by owner.
    */
   function setEpochDuration(uint256 newEpochDuration) public onlyOwner {
+    require(newEpochDuration > 0, "New epoch duration must be greater than zero.");
     require(!isOnEpochProcess(), "Cannot change epoch duration during processing.");
     epochDuration = newEpochDuration;
     emit EpochDurationSet(newEpochDuration);
+  }
+
+  /**
+   * @notice Sets the address of the Oracle used by this contract.
+   * @param newOracleAddress The address of the new oracle.
+   * @dev Can only be set by owner.
+   */
+  function setOracleAddress(address newOracleAddress) public onlyOwner {
+    require(newOracleAddress != address(0), "Cannot set address zero as the Oracle.");
+    require(newOracleAddress != oracleAddress, "Oracle address cannot be the same.");
+    require(!isOnEpochProcess(), "Cannot change oracle address during epoch processing.");
+    oracleAddress = newOracleAddress;
+    emit OracleAddressSet(newOracleAddress);
   }
 
   function isTimeForNextEpoch() public view returns (bool) {
@@ -409,9 +426,8 @@ contract EpochManager is
 
     // Mint all cUSD required for payment and the corresponding CELO
     validators.mintStableToEpochManager(totalRewards);
-    // this should have a setter for the oracle.
 
-    (uint256 numerator, uint256 denominator) = IOracle(address(getSortedOracles())).getExchangeRate(
+    (uint256 numerator, uint256 denominator) = IOracle(oracleAddress).getExchangeRate(
       address(getStableToken())
     );
 

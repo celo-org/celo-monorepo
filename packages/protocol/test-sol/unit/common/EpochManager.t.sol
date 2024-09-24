@@ -63,6 +63,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
   event EpochProcessingStarted(uint256 indexed epochNumber);
   event EpochDurationSet(uint256 indexed newEpochDuration);
+  event OracleAddressSet(address indexed newOracleAddress);
 
   function setUp() public virtual {
     epochManager = new EpochManager_WithMocks();
@@ -132,6 +133,7 @@ contract EpochManagerTest_initialize is EpochManagerTest {
   function test_initialize() public virtual {
     assertEq(address(epochManager.registry()), REGISTRY_ADDRESS);
     assertEq(epochManager.epochDuration(), 10);
+    assertEq(epochManager.oracleAddress(), address(sortedOracles));
   }
 
   function test_Reverts_WhenAlreadyInitialized() public virtual {
@@ -246,6 +248,7 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     assertEq(reserveBalanceAfter, reserveBalanceBefore + 4);
   }
 }
+
 contract EpochManagerTest_setEpochDuration is EpochManagerTest {
   uint256 newEpochDuration = 5 * DAY;
 
@@ -268,6 +271,52 @@ contract EpochManagerTest_setEpochDuration is EpochManagerTest {
     epochManager.startNextEpochProcess();
     vm.expectRevert("Cannot change epoch duration during processing.");
     epochManager.setEpochDuration(newEpochDuration);
+  }
+
+  function test_Reverts_WhenNewEpochDurationIsZero() public {
+    initializeEpochManagerSystem();
+
+    vm.expectRevert("New epoch duration must be greater than zero.");
+    epochManager.setEpochDuration(0);
+  }
+}
+
+contract EpochManagerTest_setOracleAddress is EpochManagerTest {
+  address newOracleAddress = actor("newOarcle");
+
+  function test_setsNewOracleAddress() public {
+    initializeEpochManagerSystem();
+    epochManager.setOracleAddress(newOracleAddress);
+    assertEq(epochManager.oracleAddress(), newOracleAddress);
+  }
+
+  function test_Emits_OracleAddressSetEvent() public {
+    initializeEpochManagerSystem();
+
+    vm.expectEmit(true, true, true, true);
+    emit OracleAddressSet(newOracleAddress);
+    epochManager.setOracleAddress(newOracleAddress);
+  }
+
+  function test_Reverts_WhenIsOnEpochProcess() public {
+    initializeEpochManagerSystem();
+    epochManager.startNextEpochProcess();
+    vm.expectRevert("Cannot change oracle address during epoch processing.");
+    epochManager.setOracleAddress(newOracleAddress);
+  }
+
+  function test_Reverts_WhenNewOracleAddressIsZero() public {
+    initializeEpochManagerSystem();
+
+    vm.expectRevert("Cannot set address zero as the Oracle.");
+    epochManager.setOracleAddress(address(0));
+  }
+
+  function test_Reverts_WhenNewOracleAddressIsunchanged() public {
+    initializeEpochManagerSystem();
+
+    vm.expectRevert("Oracle address cannot be the same.");
+    epochManager.setOracleAddress(address(sortedOracles));
   }
 }
 
