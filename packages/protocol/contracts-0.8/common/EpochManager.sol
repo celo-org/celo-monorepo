@@ -42,9 +42,6 @@ contract EpochManager is
     uint256 totalRewardsVoter; // The total rewards to voters.
     uint256 totalRewardsCommunity; // The total community reward.
     uint256 totalRewardsCarbonFund; // The total carbon offsetting partner reward.
-    // map the groups and their processed status
-    // total number of groups that need to be processed
-    uint256 toProcessGroups;
   }
 
   struct ProcessedGroup {
@@ -204,14 +201,14 @@ contract EpochManager is
     epochs[currentEpochNumber].firstBlock = block.number;
     epochs[currentEpochNumber].startTimestamp = block.timestamp;
 
-    epochProcessing.toProcessGroups = 0;
+    uint256 toProcessGroups = 0;
     IValidators validators = getValidators();
     IElection election = getElection();
     IScoreReader scoreReader = getScoreReader();
     for (uint i = 0; i < elected.length; i++) {
       address group = validators.getValidatorsGroup(elected[i]);
       if (!processedGroups[group].processed) {
-        epochProcessing.toProcessGroups++;
+        toProcessGroups++;
         uint256 groupScore = scoreReader.getGroupScore(group);
         // We need to precompute epoch rewards for each group since computation depends on total active votes for all groups.
         uint256 epochRewards = election.getGroupEpochRewardsBasedOnScore(
@@ -223,7 +220,7 @@ contract EpochManager is
       }
     }
 
-    require(epochProcessing.toProcessGroups == groups.length, "number of groups does not match");
+    require(toProcessGroups == groups.length, "number of groups does not match");
 
     for (uint i = 0; i < groups.length; i++) {
       ProcessedGroup storage processedGroup = processedGroups[groups[i]];
