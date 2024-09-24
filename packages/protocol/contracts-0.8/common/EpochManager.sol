@@ -49,6 +49,7 @@ contract EpochManager is
     uint256 epochRewards;
   }
   bool public isSystemInitialized;
+
   // the length of an epoch in seconds
   uint256 public epochDuration;
 
@@ -74,7 +75,17 @@ contract EpochManager is
    * @param epochNumber The epoch number that is finished being processed.
    */
   event EpochProcessingEnded(uint256 indexed epochNumber);
+
+  /**
+   * @notice Event emited when a new epoch duration is set.
+   * @param newEpochDuration The new epoch duration.
+   */
   event EpochDurationSet(uint256 indexed newEpochDuration);
+
+  /**
+   * @notice Event emited when a new oracle address is set.
+   * @param newOracleAddress The new oracle address.
+   */
   event OracleAddressSet(address indexed newOracleAddress);
 
   /**
@@ -100,6 +111,7 @@ contract EpochManager is
     );
     _;
   }
+
   modifier onlySystemAlreadyInitialized() {
     require(systemAlreadyInitialized(), "Epoch system not initialized");
     _;
@@ -126,6 +138,12 @@ contract EpochManager is
   // DESIGNDESICION(XXX): we assume that the first epoch on the L2 starts as soon as the system is initialized
   // to minimize amount of "limbo blocks" the network should stop relatively close to an epoch number (but wigh enough time)
   // to have time to call the function EpochInitializer.migrateEpochAndValidators()
+
+  /**
+   * @notice Initializes the EpochManager system, allowing it to start processing epoch
+   * and distributing the epoch rewards.
+   * @dev Can only be called by the EpochManagerEnabler contract.
+   */
   function initializeSystem(
     uint256 firstEpochNumber,
     uint256 firstEpochBlock,
@@ -155,11 +173,11 @@ contract EpochManager is
     elected = firstElected;
   }
 
-  // TODO maybe "freezeEpochRewards" "prepareForNextEpoch"
-
-  /// start next epoch process.
-  /// it freezes the epochrewards at the time of execution,
-  /// and starts the distribution of the rewards.
+  /**
+   * @notice Starts processing an epoch and allocates funds to the beneficiaries.
+   * @dev Epoch rewards are frozen at the time of execution.
+   * @dev Can only be called once the system is initialized.
+   */
   function startNextEpochProcess() external nonReentrant onlySystemAlreadyInitialized {
     require(isTimeForNextEpoch(), "Epoch is not ready to start");
     require(!isOnEpochProcess(), "Epoch process is already started");
@@ -187,6 +205,12 @@ contract EpochManager is
     emit EpochProcessingStarted(currentEpochNumber);
   }
 
+  /**
+   * @notice Finishes processing an epoch and releasing funds to the beneficiaries.
+   * @param groups List of validator groups to be processed.
+   * @param lessers List of validator groups that hold less votes that indexed group.
+   * @param greaters List of validator groups that hold more votes that indexed group.
+   */
   function finishNextEpochProcess(
     address[] calldata groups,
     address[] calldata lessers,
@@ -245,7 +269,6 @@ contract EpochManager is
     );
     // run elections
     elected = election.electValidatorAccounts();
-    // TODO check how to nullify stuct
     epochProcessing.status = EpochProcessStatus.NotStarted;
   }
 
@@ -253,6 +276,7 @@ contract EpochManager is
    * @notice Sends the allocated epoch payment to a validator, their group, and
    *   delegation beneficiary.
    * @param validator Account of the validator.
+   * @dev Can only be called once the system is initialized.
    */
   function sendValidatorPayment(address validator) external onlySystemAlreadyInitialized {
     FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(
@@ -300,7 +324,9 @@ contract EpochManager is
     );
   }
 
-  /// returns the current epoch Info
+  /**
+   * @return The current epoch info.
+   */
   function getCurrentEpoch()
     external
     view
@@ -311,12 +337,17 @@ contract EpochManager is
     return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
   }
 
-  /// returns the current epoch number.
+  /**
+   * @return The current epoch number.
+   * @dev Can only be called once the system is initialized.
+   */
   function getCurrentEpochNumber() external view onlySystemAlreadyInitialized returns (uint256) {
     return currentEpochNumber;
   }
 
-  /// returns epoch processing state
+  /**
+   * @return The latest epoch processing state.
+   */
   function getEpochProcessingState()
     external
     view
@@ -331,20 +362,35 @@ contract EpochManager is
     );
   }
 
+  /**
+   * @notice Used to block select functions in blockable contracts.
+   * @return Whether or not the blockable functions are blocked.
+   */
   function isBlocked() external view returns (bool) {
     return isOnEpochProcess();
   }
 
+  /**
+   * @return The list of elected validators.
+   */
   function getElected() external view returns (address[] memory) {
     return elected;
   }
 
+  /**
+   * @param epoch The epoch number of interest.
+   * @return The First block of the specified epoch.
+   */
   function getFirstBlockAtEpoch(uint256 epoch) external view returns (uint256) {
     require(epoch >= firstKnownEpoch, "Epoch not known");
     require(epoch <= currentEpochNumber, "Epoch not created yet");
     return epochs[epoch].firstBlock;
   }
 
+  /**
+   * @param epoch The epoch number of interest.
+   * @return The last block of the specified epoch.
+   */
   function getLastBlockAtEpoch(uint256 epoch) external view returns (uint256) {
     require(epoch >= firstKnownEpoch, "Epoch not known");
     require(epoch < currentEpochNumber, "Epoch not finished yet");
@@ -387,14 +433,23 @@ contract EpochManager is
     emit OracleAddressSet(newOracleAddress);
   }
 
+  /**
+   * @return Whether or not the next epoch can be processed.
+   */
   function isTimeForNextEpoch() public view returns (bool) {
     return block.timestamp >= epochs[currentEpochNumber].startTimestamp + epochDuration;
   }
 
+  /**
+   * @return Whether or not the current epoch is being processed.
+   */
   function isOnEpochProcess() public view returns (bool) {
     return epochProcessing.status == EpochProcessStatus.Started;
   }
 
+  /**
+   * @return Whether or not the EpochManager contract has been activated to start processing epochs.
+   */
   function systemAlreadyInitialized() public view returns (bool) {
     return initialized && isSystemInitialized;
   }
