@@ -6,7 +6,8 @@ import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
 contract ScoreManager is Initializable, Ownable {
-  mapping(address => uint256) public scores;
+  mapping(address => uint256) public groupScores;
+  mapping(address => uint256) public validatorsScores;
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -22,19 +23,19 @@ contract ScoreManager is Initializable, Ownable {
   }
 
   function setGroupScore(address group, uint256 score) external onlyOwner {
-    scores[group] = score;
+    groupScores[group] = score;
   }
 
   function setValidatorScore(address validator, uint256 score) external onlyOwner {
-    scores[validator] = score;
+    validatorsScores[validator] = score;
   }
 
   function getGroupScore(address group) external view returns (uint256) {
-    return scores[group];
+    return groupScores[group];
   }
 
   function getValidatorScore(address validator) external view returns (uint256) {
-    return scores[validator];
+    return validatorsScores[validator];
   }
 
   /**
