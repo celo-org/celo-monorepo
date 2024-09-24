@@ -37,7 +37,7 @@ contract MockValidators is IValidators, IsL2Check {
     bytes calldata,
     bytes calldata
   ) external returns (bool) {
-    allowOnlyL1(); // BLS key no longer supported
+    allowOnlyL1();
     return true;
   }
 
@@ -78,11 +78,11 @@ contract MockValidators is IValidators, IsL2Check {
   }
 
   function halveSlashingMultiplier(address) external {
-    allowOnlyL1(); // not used by governance slasher
+    allowOnlyL1();
   }
 
   function forceDeaffiliateIfValidator(address validator) external {
-    allowOnlyL1(); // not used by governance slasher
+    allowOnlyL1();
   }
 
   function getValidatorsGroup(address validator) external view returns (address) {
@@ -108,7 +108,7 @@ contract MockValidators is IValidators, IsL2Check {
   }
 
   function getValidatorGroupSlashingMultiplier(address) external view returns (uint256) {
-    allowOnlyL1(); // not used by governance slasher
+    allowOnlyL1();
     return FIXED1_UINT;
   }
 
@@ -283,7 +283,7 @@ contract MockValidators is IValidators, IsL2Check {
     revert("Method not implemented in mock");
   }
 
-  function distributeEpochPaymentsFromSigner(address, uint256) external returns (uint256) {
+  function distributeEpochPaymentsFromSigner(address, uint256) external onlyL1 returns (uint256) {
     revert("Method not implemented in mock");
   }
 

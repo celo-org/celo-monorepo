@@ -219,7 +219,7 @@ contract Validators is
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
    */
   function updateValidatorScoreFromSigner(address signer, uint256 uptime) external virtual onlyVm {
-    allowOnlyL1(); // no longer using signer
+    allowOnlyL1();
     _updateValidatorScoreFromSigner(signer, uptime);
   }
 
@@ -234,7 +234,7 @@ contract Validators is
     address signer,
     uint256 maxPayment
   ) external virtual onlyVm returns (uint256) {
-    allowOnlyL1(); // no longer using signer
+    allowOnlyL1();
     return _distributeEpochPaymentsFromSigner(signer, maxPayment);
   }
 
@@ -255,7 +255,7 @@ contract Validators is
     bytes calldata blsPublicKey,
     bytes calldata blsPop
   ) external nonReentrant returns (bool) {
-    allowOnlyL1(); // no longer allow to register with a bls key
+    allowOnlyL1();
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     _isRegistrationAllowed(account);
     require(!isValidator(account) && !isValidatorGroup(account), "Already registered");
@@ -385,7 +385,7 @@ contract Validators is
     bytes calldata blsPublicKey,
     bytes calldata blsPop
   ) external returns (bool) {
-    allowOnlyL1(); // no longer allow to register with a bls key
+    allowOnlyL1();
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidator(account), "Not a validator");
     Validator storage validator = validators[account];
@@ -461,7 +461,7 @@ contract Validators is
     bytes calldata blsPublicKey,
     bytes calldata blsPop
   ) external onlyRegisteredContract(ACCOUNTS_REGISTRY_ID) returns (bool) {
-    allowOnlyL1(); // no longer allow to register with a bls key
+    allowOnlyL1();
     require(isValidator(account), "Not a validator");
     Validator storage validator = validators[account];
     require(
@@ -611,7 +611,7 @@ contract Validators is
    * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
    */
   function forceDeaffiliateIfValidator(address validatorAccount) external nonReentrant onlySlasher {
-    allowOnlyL1(); //Not used by governance slasher.
+    allowOnlyL1();
     if (isValidator(validatorAccount)) {
       Validator storage validator = validators[validatorAccount];
       if (validator.affiliation != address(0)) {
@@ -640,7 +640,7 @@ contract Validators is
    * @param account The group being slashed.
    */
   function halveSlashingMultiplier(address account) external nonReentrant onlySlasher {
-    allowOnlyL1(); //Not used by governance slasher.
+    allowOnlyL1();
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     group.slashInfo.multiplier = FixidityLib.wrap(group.slashInfo.multiplier.unwrap().div(2));
@@ -989,7 +989,7 @@ contract Validators is
     uint256 exponent,
     uint256 adjustmentSpeed
   ) public onlyOwner returns (bool) {
-    allowOnlyL1(); // score handled by score manager now
+    allowOnlyL1();
     require(
       adjustmentSpeed <= FixidityLib.fixed1().unwrap(),
       "Adjustment speed cannot be larger than 1"
@@ -1052,7 +1052,7 @@ contract Validators is
    * @param value New reset period for slashing multiplier.
    */
   function setSlashingMultiplierResetPeriod(uint256 value) public nonReentrant onlyOwner {
-    allowOnlyL1(); // no used by governance slasher.
+    allowOnlyL1();
     slashingMultiplierResetPeriod = value;
   }
 
@@ -1061,7 +1061,7 @@ contract Validators is
    * @param value New downtime grace period for calculating epoch scores.
    */
   function setDowntimeGracePeriod(uint256 value) public nonReentrant onlyOwner {
-    allowOnlyL1(); // downtime no longer supported
+    allowOnlyL1();
     downtimeGracePeriod = value;
   }
 
@@ -1116,7 +1116,7 @@ contract Validators is
    * @return Fixidity representation of the epoch score between 0 and 1.
    */
   function calculateEpochScore(uint256 uptime) public view returns (uint256) {
-    allowOnlyL1(); //score set by score manager.
+    allowOnlyL1();
     require(uptime <= FixidityLib.fixed1().unwrap(), "Uptime cannot be larger than one");
     uint256 numerator;
     uint256 denominator;
