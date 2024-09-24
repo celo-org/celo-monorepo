@@ -76,6 +76,7 @@ contract EpochManager is
    * @param epochNumber The epoch number that is finished being processed.
    */
   event EpochProcessingEnded(uint256 indexed epochNumber);
+  event EpochDurationSet(uint256 indexed newEpochDuration);
 
   /**
    * @notice Emitted when an epoch payment is sent.
@@ -367,7 +368,9 @@ contract EpochManager is
    * @dev Can only be set by owner.
    */
   function setEpochDuration(uint256 newEpochDuration) public onlyOwner {
+    require(!isOnEpochProcess(), "Cannot change epoch duration during processing.");
     epochDuration = newEpochDuration;
+    emit EpochDurationSet(newEpochDuration);
   }
 
   function isTimeForNextEpoch() public view returns (bool) {

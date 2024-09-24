@@ -62,6 +62,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
   );
 
   event EpochProcessingStarted(uint256 indexed epochNumber);
+  event EpochDurationSet(uint256 indexed newEpochDuration);
 
   function setUp() public virtual {
     epochManager = new EpochManager_WithMocks();
@@ -243,6 +244,30 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     epochManager.startNextEpochProcess();
     uint256 reserveBalanceAfter = celoToken.balanceOf(reserveAddress);
     assertEq(reserveBalanceAfter, reserveBalanceBefore + 4);
+  }
+}
+contract EpochManagerTest_setEpochDuration is EpochManagerTest {
+  uint256 newEpochDuration = 5 * DAY;
+
+  function test_setsNewEpochDuration() public {
+    initializeEpochManagerSystem();
+    epochManager.setEpochDuration(newEpochDuration);
+    assertEq(epochManager.epochDuration(), newEpochDuration);
+  }
+
+  function test_Emits_EpochDurationSetEvent() public {
+    initializeEpochManagerSystem();
+
+    vm.expectEmit(true, true, true, true);
+    emit EpochDurationSet(newEpochDuration);
+    epochManager.setEpochDuration(newEpochDuration);
+  }
+
+  function test_Reverts_WhenIsOnEpochProcess() public {
+    initializeEpochManagerSystem();
+    epochManager.startNextEpochProcess();
+    vm.expectRevert("Cannot change epoch duration during processing.");
+    epochManager.setEpochDuration(newEpochDuration);
   }
 }
 
