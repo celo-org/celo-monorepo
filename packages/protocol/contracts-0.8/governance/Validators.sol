@@ -646,6 +646,8 @@ contract Validators is
     group.slashInfo.lastSlashed = block.timestamp;
   }
 
+  // TODO: Move this function's logic to `EpochManager` once Mento updates stable token
+  // to allow `EpochManager` to mint.
   /**
    * @notice Allows the EpochManager contract to mint stable token for itself.
    * @param amount The amount to be minted.
