@@ -567,7 +567,7 @@ contract Accounts is
    * be greater than 1.
    * @dev Use `deletePaymentDelegation` to unset the payment delegation.
    */
-  function setPaymentDelegation(address beneficiary, uint256 fraction) public onlyL1 {
+  function setPaymentDelegation(address beneficiary, uint256 fraction) public {
     require(isAccount(msg.sender), "Must first register address with Account.createAccount");
     require(beneficiary != address(0), "Beneficiary cannot be address 0x0");
     FixidityLib.Fraction memory f = FixidityLib.wrap(fraction);

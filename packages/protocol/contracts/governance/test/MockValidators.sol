@@ -27,7 +27,6 @@ contract MockValidators is IValidators, IsL2Check {
   uint256 private numRegisteredValidators;
 
   function updateEcdsaPublicKey(address, address, bytes calldata) external returns (bool) {
-    allowOnlyL1();
     return true;
   }
 
@@ -38,7 +37,7 @@ contract MockValidators is IValidators, IsL2Check {
     bytes calldata,
     bytes calldata
   ) external returns (bool) {
-    allowOnlyL1();
+    allowOnlyL1(); // BLS key no longer supported
     return true;
   }
 
@@ -50,12 +49,7 @@ contract MockValidators is IValidators, IsL2Check {
     isValidatorGroup[group] = true;
   }
 
-  function getValidatorsGroup(address validator) external view returns (address) {
-    return affiliations[validator];
-  }
-
   function affiliate(address group) external returns (bool) {
-    allowOnlyL1();
     affiliations[msg.sender] = group;
     return true;
   }
@@ -84,20 +78,15 @@ contract MockValidators is IValidators, IsL2Check {
   }
 
   function halveSlashingMultiplier(address) external {
-    allowOnlyL1(); // TODO remove
+    allowOnlyL1(); // not used by governance slasher
   }
 
   function forceDeaffiliateIfValidator(address validator) external {
-    allowOnlyL1(); // TODO remove
+    allowOnlyL1(); // not used by governance slasher
   }
 
-  function getTopGroupValidators(address group, uint256 n) public view returns (address[] memory) {
-    require(n <= members[group].length);
-    address[] memory validators = new address[](n);
-    for (uint256 i = 0; i < n; i = i.add(1)) {
-      validators[i] = members[group][i];
-    }
-    return validators;
+  function getValidatorsGroup(address validator) external view returns (address) {
+    return affiliations[validator];
   }
 
   function getTopGroupValidatorsAccounts(
@@ -119,7 +108,7 @@ contract MockValidators is IValidators, IsL2Check {
   }
 
   function getValidatorGroupSlashingMultiplier(address) external view returns (uint256) {
-    allowOnlyL1();
+    allowOnlyL1(); // not used by governance slasher
     return FIXED1_UINT;
   }
 
@@ -148,12 +137,20 @@ contract MockValidators is IValidators, IsL2Check {
   }
 
   function groupMembershipInEpoch(address addr, uint256, uint256) external view returns (address) {
-    allowOnlyL1();
     return affiliations[addr];
   }
 
   function getGroupNumMembers(address group) public view returns (uint256) {
     return members[group].length;
+  }
+
+  function getTopGroupValidators(address group, uint256 n) public view returns (address[] memory) {
+    require(n <= members[group].length);
+    address[] memory validators = new address[](n);
+    for (uint256 i = 0; i < n; i = i.add(1)) {
+      validators[i] = members[group][i];
+    }
+    return validators;
   }
 
   // Not implemented in mock, added here to support the interface

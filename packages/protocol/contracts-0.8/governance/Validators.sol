@@ -219,7 +219,7 @@ contract Validators is
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
    */
   function updateValidatorScoreFromSigner(address signer, uint256 uptime) external virtual onlyVm {
-    allowOnlyL1();
+    allowOnlyL1(); // no longer using signer
     _updateValidatorScoreFromSigner(signer, uptime);
   }
 
@@ -234,7 +234,7 @@ contract Validators is
     address signer,
     uint256 maxPayment
   ) external virtual onlyVm returns (uint256) {
-    allowOnlyL1();
+    allowOnlyL1(); // no longer using signer
     return _distributeEpochPaymentsFromSigner(signer, maxPayment);
   }
 
@@ -255,7 +255,7 @@ contract Validators is
     bytes calldata blsPublicKey,
     bytes calldata blsPop
   ) external nonReentrant returns (bool) {
-    allowOnlyL1();
+    allowOnlyL1(); // no longer allow to register with a bls key
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     _isRegistrationAllowed(account);
     require(!isValidator(account) && !isValidatorGroup(account), "Already registered");
@@ -385,7 +385,7 @@ contract Validators is
     bytes calldata blsPublicKey,
     bytes calldata blsPop
   ) external returns (bool) {
-    allowOnlyL1();
+    allowOnlyL1(); // no longer allow to register with a bls key
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidator(account), "Not a validator");
     Validator storage validator = validators[account];
@@ -461,7 +461,7 @@ contract Validators is
     bytes calldata blsPublicKey,
     bytes calldata blsPop
   ) external onlyRegisteredContract(ACCOUNTS_REGISTRY_ID) returns (bool) {
-    allowOnlyL1();
+    allowOnlyL1(); // no longer allow to register with a bls key
     require(isValidator(account), "Not a validator");
     Validator storage validator = validators[account];
     require(
@@ -611,6 +611,7 @@ contract Validators is
    * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
    */
   function forceDeaffiliateIfValidator(address validatorAccount) external nonReentrant onlySlasher {
+    allowOnlyL1(); //Not used by governance slasher.
     if (isValidator(validatorAccount)) {
       Validator storage validator = validators[validatorAccount];
       if (validator.affiliation != address(0)) {
@@ -639,7 +640,7 @@ contract Validators is
    * @param account The group being slashed.
    */
   function halveSlashingMultiplier(address account) external nonReentrant onlySlasher {
-    allowOnlyL1();
+    allowOnlyL1(); //Not used by governance slasher.
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     group.slashInfo.multiplier = FixidityLib.wrap(group.slashInfo.multiplier.unwrap().div(2));
@@ -827,9 +828,8 @@ contract Validators is
     uint256 epochNumber,
     uint256 index
   ) external view returns (address) {
-    allowOnlyL1();
     require(isValidator(account), "Not a validator");
-    require(epochNumber <= getEpochNumber(), "Epoch cannot be larger than current");
+    require(epochNumber <= _getEpochNumber(), "Epoch cannot be larger than current");
     MembershipHistory storage history = validators[account].membershipHistory;
     require(index < history.tail.add(history.numEntries), "index out of bounds");
     require(index >= history.tail && history.numEntries > 0, "index out of bounds");
@@ -948,7 +948,6 @@ contract Validators is
    * @param delay Number of blocks to delay the update
    */
   function setCommissionUpdateDelay(uint256 delay) public onlyOwner {
-    allowOnlyL1();
     require(delay != commissionUpdateDelay, "commission update delay not changed");
     commissionUpdateDelay = delay;
     emit CommissionUpdateDelaySet(delay);
@@ -960,7 +959,6 @@ contract Validators is
    * @return True upon success.
    */
   function setMaxGroupSize(uint256 size) public onlyOwner returns (bool) {
-    allowOnlyL1();
     require(0 < size, "Max group size cannot be zero");
     require(size != maxGroupSize, "Max group size not changed");
     maxGroupSize = size;
@@ -974,7 +972,6 @@ contract Validators is
    * @return True upon success.
    */
   function setMembershipHistoryLength(uint256 length) public onlyOwner returns (bool) {
-    allowOnlyL1();
     require(0 < length, "Membership history length cannot be zero");
     require(length != membershipHistoryLength, "Membership history length not changed");
     membershipHistoryLength = length;
@@ -992,7 +989,7 @@ contract Validators is
     uint256 exponent,
     uint256 adjustmentSpeed
   ) public onlyOwner returns (bool) {
-    allowOnlyL1();
+    allowOnlyL1(); // score handled by score manager now
     require(
       adjustmentSpeed <= FixidityLib.fixed1().unwrap(),
       "Adjustment speed cannot be larger than 1"
@@ -1055,7 +1052,7 @@ contract Validators is
    * @param value New reset period for slashing multiplier.
    */
   function setSlashingMultiplierResetPeriod(uint256 value) public nonReentrant onlyOwner {
-    allowOnlyL1();
+    allowOnlyL1(); // no used by governance slasher.
     slashingMultiplierResetPeriod = value;
   }
 
@@ -1064,7 +1061,7 @@ contract Validators is
    * @param value New downtime grace period for calculating epoch scores.
    */
   function setDowntimeGracePeriod(uint256 value) public nonReentrant onlyOwner {
-    allowOnlyL1();
+    allowOnlyL1(); // downtime no longer supported
     downtimeGracePeriod = value;
   }
 
@@ -1119,7 +1116,7 @@ contract Validators is
    * @return Fixidity representation of the epoch score between 0 and 1.
    */
   function calculateEpochScore(uint256 uptime) public view returns (uint256) {
-    allowOnlyL1();
+    allowOnlyL1(); //score set by score manager.
     require(uptime <= FixidityLib.fixed1().unwrap(), "Uptime cannot be larger than one");
     uint256 numerator;
     uint256 denominator;
