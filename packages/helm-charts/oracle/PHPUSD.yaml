@@ -1,0 +1,31 @@
+oracle:
+  currencyPair: PHPUSD
+  overrideOracleCount: 12 # At 5s block time, every client reports once per minute
+  aggregation:
+    mid:
+      maxExchangeVolumeShare: 1
+      maxPercentageDeviation: 0.01
+      maxPercentageBidAskSpread: 0.0075
+  metrics:
+    enabled: true
+    prometheusPort: 9090
+  apiRequestTimeoutMs: 5000
+  circuitBreakerPriceChangeThreshold: 0.25
+  gasPriceMultiplier: 1.5
+  priceSources: "[
+      [
+        {exchange: 'ALPHAVANTAGE', symbol: 'PHPUSD', toInvert: false}
+      ],
+      [
+        {exchange: 'XIGNITE', symbol: 'USDPHP', toInvert: true}
+      ]
+  ]"
+  # Additional sources missing adapters [
+  # [
+  #       {exchange: 'OPENEXCHANGERATES', symbol: 'PHPUSD', toInvert: false}
+  #     ],
+  minPriceSourceCount: 2
+  reportStrategy: BLOCK_BASED
+  reporter:
+    blockBased:
+      mPHPeportPriceChangeThreshold: 0.0005 # 0.05%
