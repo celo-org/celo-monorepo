@@ -409,11 +409,9 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
       );
     }
     for (uint256 i = 0; i < groups.length; i++) {
-      uint256 rewards = rewards[i];
-
       for (uint256 j = 0; j < groupWithVotes.length; j++) {
         if (groupWithVotes[j].group == groups[i]) {
-          groupWithVotes[j].votes += rewards;
+          groupWithVotes[j].votes += rewards[i];
           break;
         }
       }
