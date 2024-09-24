@@ -1433,12 +1433,7 @@ contract Validators is
    */
   function updateMembershipHistory(address account, address group) private returns (bool) {
     MembershipHistory storage history = validators[account].membershipHistory;
-    uint256 epochNumber;
-    if (isL2()) {
-      epochNumber = getEpochManager().getCurrentEpochNumber();
-    } else {
-      epochNumber = getEpochNumber();
-    }
+    uint256 epochNumber = _getEpochNumber();
 
     uint256 head = history.numEntries == 0 ? 0 : history.tail.add(history.numEntries.sub(1));
 
