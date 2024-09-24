@@ -14,6 +14,9 @@ contract ScoreManagerTest is Test, TestConstants {
   address owner;
   address nonOwner;
 
+  event GroupScoreSet(address indexed group, uint256 score);
+  event ValidatorScoreSet(address indexed validator, uint256 score);
+
   function setUp() public virtual {
     owner = address(this);
     nonOwner = actor("nonOwner");
@@ -41,8 +44,25 @@ contract ScoreManagerTest_setGroupScore is ScoreManagerTest {
     assert(scoreManager.getGroupScore(owner) == 42);
   }
 
+  function test_Reverts_WhenNotCalledByOwner() public {
+    vm.prank(nonOwner);
+    vm.expectRevert("Ownable: caller is not the owner");
+    scoreManager.setGroupScore(owner, 42);
+  }
+
+  function test_Reverts_WhenSetToMoreThan1e24() public {
+    vm.expectRevert("Score must be less than or equal to 1e24.");
+    scoreManager.setGroupScore(owner, 1e24 + 1);
+  }
+
   function test_Returns1FixidityWhenGroupScoreDoesNotExist() public {
     assert(scoreManager.getGroupScore(owner) == 1e24);
+  }
+
+  function test_EmitsGroupScoreSet() public {
+    vm.expectEmit(false, false, false, true);
+    emit GroupScoreSet(owner, 42);
+    scoreManager.setGroupScore(owner, 42);
   }
 }
 
@@ -50,6 +70,23 @@ contract ScoreManagerTest_setValidatorScore is ScoreManagerTest {
   function test_setValidatorScore() public {
     scoreManager.setValidatorScore(owner, 42);
     assert(scoreManager.getValidatorScore(owner) == 42);
+  }
+
+  function test_Reverts_WhenNotCalledByOwner() public {
+    vm.prank(nonOwner);
+    vm.expectRevert("Ownable: caller is not the owner");
+    scoreManager.setValidatorScore(owner, 42);
+  }
+
+  function test_Reverts_WhenSetToMoreThan1e24() public {
+    vm.expectRevert("Score must be less than or equal to 1e24.");
+    scoreManager.setValidatorScore(owner, 1e24 + 1);
+  }
+
+  function test_EmitsValidatorScoreSet() public {
+    vm.expectEmit(false, false, false, true);
+    emit ValidatorScoreSet(owner, 42);
+    scoreManager.setValidatorScore(owner, 42);
   }
 
   function test_Returns1FixidityWhenValidatorScoreDoesNotExist() public {

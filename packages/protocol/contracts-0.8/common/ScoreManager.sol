@@ -11,7 +11,11 @@ contract ScoreManager is Initializable, Ownable {
     bool exists;
   }
 
-  mapping(address => Score) public scores;
+  event GroupScoreSet(address indexed group, uint256 score);
+  event ValidatorScoreSet(address indexed validator, uint256 score);
+
+  mapping(address => Score) public groupScores;
+  mapping(address => Score) public validatorScores;
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -27,23 +31,29 @@ contract ScoreManager is Initializable, Ownable {
   }
 
   function setGroupScore(address group, uint256 score) external onlyOwner {
-    Score storage groupScore = scores[group];
+    require(score <= 1e24, "Score must be less than or equal to 1e24.");
+    Score storage groupScore = groupScores[group];
     if (!groupScore.exists) {
       groupScore.exists = true;
     }
     groupScore.score = score;
+
+    emit GroupScoreSet(group, score);
   }
 
   function setValidatorScore(address validator, uint256 score) external onlyOwner {
-    Score storage validatorScore = scores[validator];
+    require(score <= 1e24, "Score must be less than or equal to 1e24.");
+    Score storage validatorScore = validatorScores[validator];
     if (!validatorScore.exists) {
       validatorScore.exists = true;
     }
     validatorScore.score = score;
+
+    emit ValidatorScoreSet(validator, score);
   }
 
   function getGroupScore(address group) external view returns (uint256) {
-    Score storage groupScore = scores[group];
+    Score storage groupScore = groupScores[group];
     if (!groupScore.exists) {
       return 1e24;
     }
@@ -51,7 +61,7 @@ contract ScoreManager is Initializable, Ownable {
   }
 
   function getValidatorScore(address validator) external view returns (uint256) {
-    Score storage validatorScore = scores[validator];
+    Score storage validatorScore = validatorScores[validator];
     if (!validatorScore.exists) {
       return 1e24;
     }
