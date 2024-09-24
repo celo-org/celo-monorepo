@@ -51,7 +51,7 @@ contract EpochManager is
     bool processed;
     uint256 epochRewards;
   }
-
+  bool public isSystemInitialized;
   // the length of an epoch in seconds
   uint256 public epochDuration;
 
@@ -143,6 +143,7 @@ contract EpochManager is
       "First epoch block must be less or equal than current block"
     );
     require(firstElected.length > 0, "First elected validators must be greater than 0");
+    isSystemInitialized = true;
     firstKnownEpoch = firstEpochNumber;
     currentEpochNumber = firstEpochNumber;
 
@@ -376,7 +377,7 @@ contract EpochManager is
   }
 
   function systemAlreadyInitialized() public view returns (bool) {
-    return initialized && elected.length > 0;
+    return initialized && isSystemInitialized;
   }
 
   /**
