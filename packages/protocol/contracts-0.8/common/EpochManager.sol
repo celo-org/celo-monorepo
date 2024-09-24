@@ -222,7 +222,7 @@ contract EpochManager is
     for (uint i = 0; i < groups.length; i++) {
       ProcessedGroup storage processedGroup = processedGroups[groups[i]];
       // checks that group is actually from elected group
-      require(processedGroup.processed, "group not processed");
+      require(processedGroup.processed, "group not from current elected set");
       getElection().distributeEpochRewards(
         groups[i],
         processedGroup.epochRewards,
