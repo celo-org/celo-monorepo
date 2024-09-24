@@ -100,17 +100,16 @@ contract EpochManager is
     );
     _;
   }
+  modifier onlySystemAlreadyInitialized() {
+    require(systemAlreadyInitialized(), "Epoch system not initialized");
+    _;
+  }
 
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
   constructor(bool test) public Initializable(test) {}
-
-  modifier onlySystemAlreadyInitialized() {
-    require(systemAlreadyInitialized(), "Epoch system not initialized");
-    _;
-  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -298,7 +297,12 @@ contract EpochManager is
   }
 
   /// returns the current epoch Info
-  function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256) {
+  function getCurrentEpoch()
+    external
+    view
+    onlySystemAlreadyInitialized
+    returns (uint256, uint256, uint256, uint256)
+  {
     Epoch storage _epoch = epochs[currentEpochNumber];
     return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
   }
