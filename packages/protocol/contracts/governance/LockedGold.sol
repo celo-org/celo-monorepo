@@ -7,6 +7,7 @@ import "openzeppelin-solidity/contracts/utils/Address.sol";
 import "openzeppelin-solidity/contracts/utils/EnumerableSet.sol";
 
 import "./interfaces/ILockedGold.sol";
+import "./interfaces/ILockedGoldInitializer.sol";
 
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
@@ -14,15 +15,17 @@ import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
+import "../common/Blockable.sol";
 
 contract LockedGold is
   ILockedGold,
+  ILockedGoldInitializer,
   ICeloVersionedContract,
   ReentrancyGuard,
   Initializable,
-  UsingRegistry
+  UsingRegistry,
+  Blockable
 {
-  // TODO add initializer
   using SafeMath for uint256;
   using Address for address payable; // prettier-ignore
   using FixidityLib for FixidityLib.Fraction;
@@ -469,7 +472,7 @@ contract LockedGold is
     address[] calldata lessers,
     address[] calldata greaters,
     uint256[] calldata indices
-  ) external onlySlasher {
+  ) external onlySlasher onlyWhenNotBlocked {
     uint256 maxSlash = Math.min(penalty, getAccountTotalLockedGold(account));
     require(maxSlash >= reward, "reward cannot exceed penalty.");
     // `reporter` receives the reward in locked CELO, so it must be given to an account
@@ -500,6 +503,13 @@ contract LockedGold is
     require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
     communityFundPayable.sendValue(maxSlash.sub(reward));
     emit AccountSlashed(account, maxSlash, reporter, reward);
+  }
+
+  /// @notice Sets the address of the blocking contract.
+  /// @param _blockedBy The address of the contract that will determine if this contract is blocked.
+  /// @dev Can only be called by the owner of the contract.
+  function setBlockedByContract(address _blockedBy) external onlyOwner {
+    _setBlockedBy(_blockedBy);
   }
 
   /**

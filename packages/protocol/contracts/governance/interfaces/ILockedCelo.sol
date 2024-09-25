@@ -20,6 +20,7 @@ interface ILockedCelo {
   ) external;
   function addSlasher(string calldata slasherIdentifier) external;
 
+  function getAccountNonvotingLockedGold(address account) external view returns (uint256);
   function getAccountTotalLockedCelo(address) external view returns (uint256);
   function getTotalLockedCelo() external view returns (uint256);
   function getPendingWithdrawals(

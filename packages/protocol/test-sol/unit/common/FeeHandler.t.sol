@@ -19,6 +19,8 @@ import "@celo-contracts/uniswap/test/MockUniswapV2Factory.sol";
 import "@celo-contracts/uniswap/test/MockERC20.sol";
 import "@mento-core/test/mocks/MockSortedOracles.sol";
 import "@mento-core/test/mocks/MockReserve.sol";
+import "@celo-contracts/common/ProxyFactory.sol";
+import "@celo-contracts/governance/GovernanceApproverMultiSig.sol";
 
 contract FeeHandlerTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
@@ -51,7 +53,7 @@ contract FeeHandlerTest is Test, TestConstants {
 
   address owner = address(this);
   address user = actor("user");
-  address celoDistributionSchedule = actor("CeloDistributionSchedule");
+  address celoUnreleasedTreasury = actor("CeloUnreleasedTreasury");
 
   uint256 celoAmountForRate = 1e24;
   uint256 stableAmountForRate = 2 * celoAmountForRate;
@@ -102,7 +104,7 @@ contract FeeHandlerTest is Test, TestConstants {
     registry.setAddressFor("GoldToken", address(celoToken));
     registry.setAddressFor("CeloToken", address(celoToken));
     registry.setAddressFor("Reserve", address(mockReserve));
-    registry.setAddressFor("CeloDistributionSchedule", celoDistributionSchedule);
+    registry.setAddressFor("CeloUnreleasedTreasury", celoUnreleasedTreasury);
 
     mockReserve.setGoldToken(address(celoToken));
     mockReserve.addToken(address(stableToken));

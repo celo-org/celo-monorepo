@@ -40,12 +40,12 @@ export CARBON_OFFSETTING_FRACTION="10000000000000000000" # 0.001 in fixidity for
 export REGISTRY_STORAGE_LOCATION="0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103" # Position is bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1);
 GOLD_TOKEN_CELO_SUPPLY_CAP=1000000000 # `GoldToken.CELO_SUPPLY_CAP()`
 GOLD_TOKEN_TOTAL_SUPPLY=700000000 # Arbitrary amount chosen to be approximately equal to `GoldToken.totalSupply()` on the L1 Mainnet (695,313,643 CELO as of this commit).
-export CELO_DISTRIBUTION_SCHEDULE_INITIAL_BALANCE="$(($GOLD_TOKEN_CELO_SUPPLY_CAP - $GOLD_TOKEN_TOTAL_SUPPLY))" # During the real L2 genesis, the VM will calculate and set an appropriate balance.
+export CELO_UNRELEASED_TREASURY_INITIAL_BALANCE="$(($GOLD_TOKEN_CELO_SUPPLY_CAP - $GOLD_TOKEN_TOTAL_SUPPLY))" # During the real L2 genesis, the VM will calculate and set an appropriate balance.
 
 # Contract libraries
 export LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
                 "contracts/common/Signatures.sol:Signatures"
-                "contracts/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
+                "contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
                 "contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList"
                 "contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"
                 "contracts/governance/Proposals.sol:Proposals"
@@ -53,11 +53,14 @@ export LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWith
 export LIBRARY_DEPENDENCIES_PATH=(
     "contracts/common/FixidityLib.sol"
     "contracts/common/linkedlists/LinkedList.sol"
+    "contracts-0.8/common/linkedlists/LinkedList.sol"
     "contracts/common/linkedlists/SortedLinkedList.sol"
     "contracts/common/linkedlists/SortedLinkedListWithMedian.sol"
     "lib/openzeppelin-contracts/contracts/math/SafeMath.sol"
+    "lib/openzeppelin-contracts8/contracts/utils/math/SafeMath.sol"
     "lib/openzeppelin-contracts/contracts/math/Math.sol"
-    "lib/openzeppelin-contracts/contracts/cryptography/ECDSA.sol"   
+    "lib/openzeppelin-contracts/contracts/cryptography/ECDSA.sol"
     "lib/openzeppelin-contracts/contracts/utils/Address.sol"
     "lib/solidity-bytes-utils/contracts/BytesLib.sol"
+    "lib/celo-foundry/lib/forge-std/src/console.sol"
 )

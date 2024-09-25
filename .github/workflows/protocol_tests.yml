@@ -4,15 +4,23 @@ on:
     branches:
       - master
       - 'release/**'
+      - 'feat/l2-epoch-system'
+      - 'martinvol/**'
+      - 'pahor167/**'
+      - 'soloseng/**'
   pull_request:
     branches:
       - master
       - 'release/**'
+      - 'feat/l2-epoch-system'
+      - 'martinvol/**'
+      - 'pahor167/**'
+      - 'soloseng/**'
 
 env:
   # Increment these to force cache rebuilding
   FOUNDRY_CACHE_KEY: 2
-  # Supported Foundry version defined at celo-org (GitHub organisation) level, for consistency across workflows.
+  # Supported Foundry version defined at celo-org (GitHub organisation) level, for consistency across workflows. Please contact DevOps to update value.
   SUPPORTED_FOUNDRY_VERSION: ${{ vars.SUPPORTED_FOUNDRY_VERSION }}
 
 jobs:
@@ -54,7 +62,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: ${{ env.SUPPORTED_FOUNDRY_VERSION }}
+          version: 'nightly-fa0e0c2ca3ae75895dd19173a02faf88509c0608' # TODO: revert back to env var
 
       - name: Install forge dependencies
         run: forge install
@@ -132,7 +140,6 @@ jobs:
         run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
       
       - name: Run migration tests against local anvil devchain
-        if: success() || failure()
         run: |
           source ./scripts/foundry/constants.sh
 
@@ -141,7 +148,6 @@ jobs:
           --fork-url $ANVIL_RPC_URL
       
       - name: Run e2e tests against local anvil devchain
-        if: success() || failure()
         run: |
           source ./scripts/foundry/constants.sh
 

@@ -5,12 +5,14 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./interfaces/IAccounts.sol";
+import "./interfaces/IEpochManager.sol";
 import "./interfaces/IFeeCurrencyWhitelist.sol";
 import "./interfaces/IFreezer.sol";
 import "./interfaces/IRegistry.sol";
-import "./interfaces/ICeloDistributionSchedule.sol";
+import "./interfaces/ICeloUnreleasedTreasury.sol";
 
 import "../governance/interfaces/IElection.sol";
+import "../governance/interfaces/IEpochRewards.sol";
 import "../governance/interfaces/IGovernance.sol";
 import "../governance/interfaces/ILockedGold.sol";
 import "../governance/interfaces/ILockedCelo.sol";
@@ -49,8 +51,12 @@ contract UsingRegistry is Ownable {
 
   bytes32 constant CELO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("CeloToken"));
   bytes32 constant LOCKED_CELO_REGISTRY_ID = keccak256(abi.encodePacked("LockedCelo"));
-  bytes32 constant CELO_DISTRIBUTION_SCHEDULE_ID =
-    keccak256(abi.encodePacked("CeloDistributionSchedule"));
+  bytes32 constant CELO_UNRELEASED_TREASURY_REGISTRY_ID =
+    keccak256(abi.encodePacked("CeloUnreleasedTreasury"));
+  bytes32 constant EPOCH_REWARDS_REGISTRY_ID = keccak256(abi.encodePacked("EpochRewards"));
+  bytes32 constant EPOCH_MANAGER_ENABLER_REGISTRY_ID =
+    keccak256(abi.encodePacked("EpochManagerEnabler"));
+  bytes32 constant EPOCH_MANAGER_REGISTRY_ID = keccak256(abi.encodePacked("EpochManager"));
   // solhint-enable state-visibility
 
   IRegistry public registry;
@@ -139,7 +145,16 @@ contract UsingRegistry is Ownable {
     return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
   }
 
-  function getCeloDistributionSchedule() internal view returns (ICeloDistributionSchedule) {
-    return ICeloDistributionSchedule(registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID));
+  function getCeloUnreleasedTreasury() internal view returns (ICeloUnreleasedTreasury) {
+    return
+      ICeloUnreleasedTreasury(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURY_REGISTRY_ID));
+  }
+
+  function getEpochRewards() internal view returns (IEpochRewards) {
+    return IEpochRewards(registry.getAddressForOrDie(EPOCH_REWARDS_REGISTRY_ID));
+  }
+
+  function getEpochManager() internal view returns (IEpochManager) {
+    return IEpochManager(registry.getAddressForOrDie(EPOCH_MANAGER_REGISTRY_ID));
   }
 }
