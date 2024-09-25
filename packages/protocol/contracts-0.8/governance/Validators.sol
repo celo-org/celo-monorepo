@@ -255,7 +255,7 @@ contract Validators is
     bytes calldata blsPublicKey,
     bytes calldata blsPop
   ) external nonReentrant returns (bool) {
-    allowOnlyL1();
+    allowOnlyL1(); // For L2, use registerValidatorNoBls
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     _isRegistrationAllowed(account);
     require(!isValidator(account) && !isValidatorGroup(account), "Already registered");
@@ -1428,12 +1428,7 @@ contract Validators is
    */
   function updateMembershipHistory(address account, address group) private returns (bool) {
     MembershipHistory storage history = validators[account].membershipHistory;
-    uint256 epochNumber;
-    if (isL2()) {
-      epochNumber = getEpochManager().getCurrentEpochNumber();
-    } else {
-      epochNumber = getEpochNumber();
-    }
+    uint256 epochNumber = _getEpochNumber();
 
     uint256 head = history.numEntries == 0 ? 0 : history.tail.add(history.numEntries.sub(1));
 
