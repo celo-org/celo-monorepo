@@ -136,7 +136,7 @@ contract EpochManager is
   }
 
   // DESIGNDESICION(XXX): we assume that the first epoch on the L2 starts as soon as the system is initialized
-  // to minimize amount of "limbo blocks" the network should stop relatively close to an epoch number (but wigh enough time)
+  // to minimize amount of "limbo blocks" the network should stop relatively close to an epoch number (but with enough time)
   // to have time to call the function EpochInitializer.migrateEpochAndValidators()
 
   /**
