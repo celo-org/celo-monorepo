@@ -646,6 +646,8 @@ contract Validators is
     group.slashInfo.lastSlashed = block.timestamp;
   }
 
+  // TODO: Move this function's logic to `EpochManager` once Mento updates stable token
+  // to allow `EpochManager` to mint.
   /**
    * @notice Allows the EpochManager contract to mint stable token for itself.
    * @param amount The amount to be minted.
@@ -1431,12 +1433,7 @@ contract Validators is
    */
   function updateMembershipHistory(address account, address group) private returns (bool) {
     MembershipHistory storage history = validators[account].membershipHistory;
-    uint256 epochNumber;
-    if (isL2()) {
-      epochNumber = getEpochManager().getCurrentEpochNumber();
-    } else {
-      epochNumber = getEpochNumber();
-    }
+    uint256 epochNumber = _getEpochNumber();
 
     uint256 head = history.numEntries == 0 ? 0 : history.tail.add(history.numEntries.sub(1));
 
