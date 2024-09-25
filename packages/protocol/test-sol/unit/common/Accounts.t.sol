@@ -608,11 +608,13 @@ contract AccountsTest_setPaymentDelegation is AccountsTest {
     assertEq(realFraction, fraction);
   }
 
-  function test_Revert_SetPaymentDelegation_WhenL2() public {
+  function test_ShouldSetAnAddressAndAFraction_WhenL2() public {
     _whenL2();
     accounts.createAccount();
-    vm.expectRevert("This method is no longer supported in L2.");
     accounts.setPaymentDelegation(beneficiary, fraction);
+    (address realBeneficiary, uint256 realFraction) = accounts.getPaymentDelegation(address(this));
+    assertEq(realBeneficiary, beneficiary);
+    assertEq(realFraction, fraction);
   }
 
   function test_ShouldNotAllowFractionGreaterThan1() public {

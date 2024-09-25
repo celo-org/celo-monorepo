@@ -32,15 +32,21 @@ contract MockSortedOracles {
     return _numRates[token];
   }
 
-  function medianRate(address token) external view returns (uint256, uint256) {
-    if (numerators[token] > 0) {
-      return (numerators[token], DENOMINATOR);
-    }
-    return (0, 0);
+  function getExchangeRate(
+    address token
+  ) external view returns (uint256 numerator, uint256 denominator) {
+    (numerator, denominator) = medianRate(token);
   }
 
   function setOldestReportExpired(address token) public {
     expired[token] = true;
+  }
+
+  function medianRate(address token) public view returns (uint256, uint256) {
+    if (numerators[token] > 0) {
+      return (numerators[token], DENOMINATOR);
+    }
+    return (0, 0);
   }
 
   function isOldestReportExpired(address token) public view returns (bool, address) {

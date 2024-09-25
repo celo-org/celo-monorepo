@@ -207,13 +207,17 @@ export async function _setInitialProxyImplementation<
   return receipt.tx
 }
 
+export const getProxiedContract = async (contractName: string, contractPackage: ContractPackage) => {
+  const artifactsObject = ArtifactsSingleton.getInstance(contractPackage, artifacts)
+  /* eslint-disable-next-line */
+  return await getDeployedProxiedContract(contractName, artifactsObject)
+}
+
 export async function getDeployedProxiedContract<ContractInstance extends Truffle.ContractInstance>(
   contractName: string,
   customArtifacts: any
 ): Promise<ContractInstance> {
-
   const Contract: Truffle.Contract<ContractInstance> = customArtifacts.require(contractName)
-
   let Proxy: ProxyContract
   // this wrap avoids a lot of rewrite
   const overloadedArtifact = ArtifactsSingleton.wrap(customArtifacts)
@@ -271,10 +275,10 @@ export const makeTruffleContractForMigrationWithoutSingleton = (contractName: st
 
   const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath}/${contractName}.json`)
   const Contract = truffleContract({
+    contractName: artifact.contractName,
     abi: artifact.abi,
     unlinked_binary: artifact.bytecode,
   })
-
 
   Contract.setProvider(web3.currentProvider)
   Contract.setNetwork(network.network_id)
@@ -292,9 +296,14 @@ export const makeTruffleContractForMigrationWithoutSingleton = (contractName: st
 
 
 export const makeTruffleContractForMigration = (contractName: string, contractPath: ContractPackage, web3: Web3) => {
+  const singleton = ArtifactsSingleton.getInstance(contractPath)
+  if (singleton.contains(contractName)) {
+    return singleton.require(contractName)
+  }
+
   const network = ArtifactsSingleton.getNetwork()
   const Contract = makeTruffleContractForMigrationWithoutSingleton(contractName, network, contractPath.name, web3)
-  ArtifactsSingleton.getInstance(contractPath).addArtifact(contractName, Contract)
+  singleton.addArtifact(contractName, Contract)
   return Contract
 }
 
@@ -382,7 +391,7 @@ export async function transferOwnershipOfProxy(
 export async function transferOwnershipOfProxyAndImplementation<
   ContractInstance extends OwnableInstance
 >(contractName: string, owner: string, artifacts: any) {
-  console.info(`  Transferring ownership of ${contractName} and its Proxy to ${owner}`)
+  console.info(`Transferring ownership of ${contractName} and its Proxy to ${owner}`)
   const contract: ContractInstance = await getDeployedProxiedContract<ContractInstance>(
     contractName,
     artifacts

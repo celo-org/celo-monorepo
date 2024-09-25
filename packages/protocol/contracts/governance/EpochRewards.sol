@@ -3,12 +3,13 @@ pragma solidity ^0.5.13;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-import "../common/CalledByVm.sol";
+import "./interfaces/IEpochRewards.sol";
 import "../common/FixidityLib.sol";
 import "../common/Freezable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/interfaces/ICeloToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 /**
@@ -16,12 +17,12 @@ import "../common/interfaces/ICeloVersionedContract.sol";
  */
 contract EpochRewards is
   ICeloVersionedContract,
+  IEpochRewards,
   Ownable,
   Initializable,
   UsingPrecompiles,
   UsingRegistry,
-  Freezable,
-  CalledByVm
+  Freezable
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -84,6 +85,14 @@ contract EpochRewards is
 
   event TargetVotingYieldUpdated(uint256 fraction);
 
+  modifier onlyVmOrPermitted(address permittedAddress) {
+    if (isL2()) require(msg.sender == permittedAddress, "Only permitted address can call");
+    else {
+      require(msg.sender == address(0), "Only VM can call");
+    }
+    _;
+  }
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -143,7 +152,11 @@ contract EpochRewards is
    *   voting Gold fraction.
    * @dev Only called directly by the protocol.
    */
-  function updateTargetVotingYield() external onlyVm onlyWhenNotFrozen onlyL1 {
+  function updateTargetVotingYield()
+    external
+    onlyVmOrPermitted(registry.getAddressFor(EPOCH_MANAGER_REGISTRY_ID))
+    onlyWhenNotFrozen
+  {
     _updateTargetVotingYield();
   }
 
@@ -273,7 +286,7 @@ contract EpochRewards is
    * @param value The percentage of the total reward to be sent to the community funds.
    * @return True upon success.
    */
-  function setCommunityRewardFraction(uint256 value) public onlyOwner onlyL1 returns (bool) {
+  function setCommunityRewardFraction(uint256 value) public onlyOwner returns (bool) {
     require(
       value != communityRewardFraction.unwrap() && value < FixidityLib.fixed1().unwrap(),
       "Value must be different from existing community reward fraction and less than 1"
@@ -289,10 +302,7 @@ contract EpochRewards is
    * @param value The percentage of the total reward to be sent to the carbon offsetting partner.
    * @return True upon success.
    */
-  function setCarbonOffsettingFund(
-    address partner,
-    uint256 value
-  ) public onlyOwner onlyL1 returns (bool) {
+  function setCarbonOffsettingFund(address partner, uint256 value) public onlyOwner returns (bool) {
     require(
       partner != carbonOffsettingPartner || value != carbonOffsettingFraction.unwrap(),
       "Partner and value must be different from existing carbon offsetting fund"
@@ -309,7 +319,7 @@ contract EpochRewards is
    * @param value The percentage of floating Gold voting to target.
    * @return True upon success.
    */
-  function setTargetVotingGoldFraction(uint256 value) public onlyOwner onlyL1 returns (bool) {
+  function setTargetVotingGoldFraction(uint256 value) public onlyOwner returns (bool) {
     require(value != targetVotingGoldFraction.unwrap(), "Target voting gold fraction unchanged");
     require(
       value < FixidityLib.fixed1().unwrap(),
@@ -325,7 +335,7 @@ contract EpochRewards is
    * @param value The value in Celo Dollars.
    * @return True upon success.
    */
-  function setTargetValidatorEpochPayment(uint256 value) public onlyOwner onlyL1 returns (bool) {
+  function setTargetValidatorEpochPayment(uint256 value) public onlyOwner returns (bool) {
     require(value != targetValidatorEpochPayment, "Target validator epoch payment unchanged");
     targetValidatorEpochPayment = value;
     emit TargetValidatorEpochPaymentSet(value);
@@ -345,7 +355,7 @@ contract EpochRewards is
     uint256 max,
     uint256 underspendAdjustmentFactor,
     uint256 overspendAdjustmentFactor
-  ) public onlyOwner onlyL1 returns (bool) {
+  ) public onlyOwner returns (bool) {
     require(
       max != rewardsMultiplierParams.max.unwrap() ||
         overspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.overspend.unwrap() ||
@@ -372,7 +382,7 @@ contract EpochRewards is
   function setTargetVotingYieldParameters(
     uint256 max,
     uint256 adjustmentFactor
-  ) public onlyOwner onlyL1 returns (bool) {
+  ) public onlyOwner returns (bool) {
     require(
       max != targetVotingYieldParams.max.unwrap() ||
         adjustmentFactor != targetVotingYieldParams.adjustmentFactor.unwrap(),
@@ -394,7 +404,7 @@ contract EpochRewards is
    * @param targetVotingYield The relative target block reward for voters.
    * @return True upon success.
    */
-  function setTargetVotingYield(uint256 targetVotingYield) public onlyOwner onlyL1 returns (bool) {
+  function setTargetVotingYield(uint256 targetVotingYield) public onlyOwner returns (bool) {
     FixidityLib.Fraction memory target = FixidityLib.wrap(targetVotingYield);
     require(
       target.lte(targetVotingYieldParams.max),
@@ -441,6 +451,12 @@ contract EpochRewards is
   function getTargetTotalEpochPaymentsInGold() public view returns (uint256) {
     address stableTokenAddress = registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID);
     (uint256 numerator, uint256 denominator) = getSortedOracles().medianRate(stableTokenAddress);
+    if (isL2()) {
+      return
+        getEpochManager().getElected().length.mul(targetValidatorEpochPayment).mul(denominator).div(
+          numerator
+        );
+    }
     return
       numberValidatorsInCurrentSet().mul(targetValidatorEpochPayment).mul(denominator).div(
         numerator
@@ -452,7 +468,9 @@ contract EpochRewards is
    * @return The fraction of floating Gold being used for voting in validator elections.
    */
   function getVotingGoldFraction() public view returns (uint256) {
-    uint256 liquidGold = getCeloToken().totalSupply().sub(getReserve().getReserveGoldBalance());
+    uint256 liquidGold = ICeloToken(address(getCeloToken())).allocatedSupply().sub(
+      getReserve().getReserveGoldBalance()
+    );
     uint256 votingGold = getElection().getTotalVotes();
     return FixidityLib.newFixed(votingGold).divide(FixidityLib.newFixed(liquidGold)).unwrap();
   }
@@ -501,8 +519,8 @@ contract EpochRewards is
     uint256 targetGoldSupplyIncrease
   ) internal view returns (FixidityLib.Fraction memory) {
     uint256 targetSupply = getTargetGoldTotalSupply();
-    uint256 totalSupply = getCeloToken().totalSupply();
-    uint256 remainingSupply = GOLD_SUPPLY_CAP.sub(totalSupply.add(targetGoldSupplyIncrease));
+    uint256 allocatedSupply = ICeloToken(address(getCeloToken())).allocatedSupply();
+    uint256 remainingSupply = GOLD_SUPPLY_CAP.sub(allocatedSupply.add(targetGoldSupplyIncrease));
     uint256 targetRemainingSupply = GOLD_SUPPLY_CAP.sub(targetSupply);
     FixidityLib.Fraction memory remainingToTargetRatio = FixidityLib
       .newFixed(remainingSupply)

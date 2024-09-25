@@ -92,7 +92,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: ${{ env.SUPPORTED_FOUNDRY_VERSION }}
+          version: 'nightly-fa0e0c2ca3ae75895dd19173a02faf88509c0608'
 
       - name: Install forge dependencies
         run: forge install
