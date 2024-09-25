@@ -77,6 +77,9 @@ const DefaultConfig = {
     carbonOffsettingFraction: 1 / 1000,
     frozen: false,
   },
+  epochManager: {
+    newEpochDuration: 100,
+  },
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1 / 100,
@@ -164,6 +167,9 @@ const DefaultConfig = {
     signatories: [network.from],
     numRequiredConfirmations: 1,
     numInternalRequiredConfirmations: 1,
+  },
+  scoreManager: {
+    newEpochDuration: 100,
   },
   stableToken: {
     decimals: 18,
@@ -581,7 +587,7 @@ NetworkConfigs.mainnet = NetworkConfigs.rc1
 
 const linkedLibraries = {
   Proposals: ['Governance'],
-  AddressLinkedList: ['Validators', 'ValidatorsMock'],
+  AddressLinkedList: ['Validators'],
   AddressSortedLinkedList: ['Election', 'ElectionTest'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListMock'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianMock'],

@@ -1,4 +1,7 @@
 {
-  "FeeCurrencyDirectory": [],
-  "CeloDistributionSchedule": ["0x000000000000000000000000000000000000ce10"]
+  "CeloUnreleasedTreasury": ["0x000000000000000000000000000000000000ce10"],
+  "EpochManager": ["0x000000000000000000000000000000000000ce10", 86400],
+  "EpochManagerEnabler": ["0x000000000000000000000000000000000000ce10"],
+  "ScoreManager": [],
+  "FeeCurrencyDirectory": []
 }

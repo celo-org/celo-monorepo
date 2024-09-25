@@ -48,7 +48,7 @@ contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
   address refundAddress = actor("refundAddress");
   address newBeneficiary = actor("newBeneficiary");
   address randomAddress = actor("randomAddress");
-  address celoDistributionSchedule = actor("CeloDistributionSchedule");
+  address celoUnreleasedTreasury = actor("CeloUnreleasedTreasury");
 
   uint256 constant TOTAL_AMOUNT = 1 ether * 10;
 
@@ -125,7 +125,7 @@ contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("StableToken", address(stableToken));
-    registry.setAddressFor("CeloDistributionSchedule", celoDistributionSchedule);
+    registry.setAddressFor("CeloUnreleasedTreasury", celoUnreleasedTreasury);
 
     lockedGold.initialize(REGISTRY_ADDRESS, UNLOCKING_PERIOD);
     goldToken.initialize(REGISTRY_ADDRESS);
@@ -1115,9 +1115,8 @@ contract ReleaseGoldTest_AuthorizeWithPublicKeys is ReleaseGoldTest {
     assertEq(accounts.validatorSignerToAccount(authorized), address(releaseGold));
   }
 
-  function test_Reverts_WhenAuthorizeValidatorSignerWithPublicKeyCalledOnL2() public {
+  function test_ShouldSetTheAuthorizedKeys_WhenUsingECDSAPublickKey_WhenL2() public {
     _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(beneficiary);
     releaseGold.authorizeValidatorSignerWithPublicKey(
       address(uint160(authorized)),
@@ -1126,6 +1125,10 @@ contract ReleaseGoldTest_AuthorizeWithPublicKeys is ReleaseGoldTest {
       s,
       ecdsaPublicKey
     );
+
+    assertEq(accounts.authorizedBy(authorized), address(releaseGold));
+    assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
+    assertEq(accounts.validatorSignerToAccount(authorized), address(releaseGold));
   }
 
   function test_Reverts_WhenAuthorizeValidatorSignerWithKeysCalledOnL2() public {

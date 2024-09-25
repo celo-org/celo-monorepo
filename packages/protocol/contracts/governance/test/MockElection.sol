@@ -17,7 +17,7 @@ contract MockElection is IsL2Check {
     isIneligible[account] = true;
   }
 
-  function markGroupEligible(address account, address, address) external onlyL1 {
+  function markGroupEligible(address account, address, address) external {
     isEligible[account] = true;
   }
 
@@ -33,11 +33,11 @@ contract MockElection is IsL2Check {
     electedValidators = _electedValidators;
   }
 
-  function vote(address, uint256, address, address) external onlyL1 returns (bool) {
+  function vote(address, uint256, address, address) external returns (bool) {
     return true;
   }
 
-  function activate(address) external onlyL1 returns (bool) {
+  function activate(address) external returns (bool) {
     return true;
   }
 
@@ -76,11 +76,14 @@ contract MockElection is IsL2Check {
     return 0;
   }
 
-  function electValidatorSigners() external view returns (address[] memory) {
+  function electValidatorSigners() external view onlyL1 returns (address[] memory) {
+    return electedValidators;
+  }
+  function electValidators() external view onlyL2 returns (address[] memory) {
     return electedValidators;
   }
 
-  function setAllowedToVoteOverMaxNumberOfGroups(address account, bool flag) public onlyL1 {
+  function setAllowedToVoteOverMaxNumberOfGroups(address account, bool flag) public {
     allowedToVoteOverMaxNumberOfGroups[account] = flag;
   }
 }

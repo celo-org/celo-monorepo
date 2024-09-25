@@ -36,7 +36,7 @@ export const ProxyContracts = [
   'RegistryProxy',
   'SortedOraclesProxy',
   'UniswapFeeHandlerSellerProxy',
-  'CeloDistributionScheduleProxy',
+  'CeloUnreleasedTreasuryProxy',
 ]
 
 export const CoreContracts = [
@@ -52,11 +52,13 @@ export const CoreContracts = [
   'MultiSig',
   'Registry',
   'Freezer',
-  'CeloDistributionSchedule',
+  'CeloUnreleasedTreasury',
 
   // governance
   'Election',
   'EpochRewards',
+  'EpochManager',
+  'EpochManagerEnabler',
   'Governance',
   'GovernanceApproverMultiSig',
   'BlockchainParameters',
@@ -65,6 +67,7 @@ export const CoreContracts = [
   'LockedGold',
   'Validators',
   'ReleaseGold',
+  'ScoreManager',
 
   // identity
   'Attestations',

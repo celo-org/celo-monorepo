@@ -29,8 +29,8 @@ echo "Library flags are: $LIBRARY_FLAGS"
 # Build all contracts with deployed libraries
 # Including contracts that depend on libraries. This step replaces the library placeholder
 # in the bytecode with the address of the actually deployed library.
-echo "Compiling with libraries... "
-time forge build $LIBRARY_FLAGS
+echo "Compiling with libraries..."
+time FOUNDRY_PROFILE=devchain forge build $LIBRARY_FLAGS
 
 # Deploy precompile contracts
 source $PWD/scripts/foundry/deploy_precompiles.sh
@@ -58,11 +58,29 @@ forge script \
   $SKIP_SIMULATION \
   $NON_INTERACTIVE \
   $LIBRARY_FLAGS \
-  --rpc-url $ANVIL_RPC_URL || echo "Migration script failed"
+  --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
+
+CELO_EPOCH_REWARDS_ADDRESS=$(
+  cast call \
+    $REGISTRY_ADDRESS \
+    "getAddressForStringOrDie(string calldata identifier)(address)" \
+    "EpochRewards" \
+    --rpc-url $ANVIL_RPC_URL
+)
+
+echo "Setting storage of EpochRewards start time to same value as on mainnet"
+# Storage slot of start time is 2 and the value is 1587587214 which is identical to mainnet
+cast rpc \
+anvil_setStorageAt \
+$CELO_EPOCH_REWARDS_ADDRESS 2 "0x000000000000000000000000000000000000000000000000000000005ea0a88e" \
+--rpc-url $ANVIL_RPC_URL
 
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
-echo "Total elapsed time: $ELAPSED_TIME seconds"
+echo "Migration script total elapsed time: $ELAPSED_TIME seconds"
+
+# this helps to make sure that devchain state is actually being saved
+sleep 1
 
 if [[ "${KEEP_DEVCHAIN_FOLDER:-}" == "true" ]]; then
     cp $ANVIL_FOLDER/state.json $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME
