@@ -637,10 +637,7 @@ contract Election is
    */
   function hasActivatablePendingVotes(address account, address group) external view returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
-    if (isL2()) {
-      return pendingVote.epoch < getEpochManager().getCurrentEpochNumber() && pendingVote.value > 0;
-    }
-    return pendingVote.epoch < getEpochNumber() && pendingVote.value > 0;
+    return pendingVote.epoch < _getEpochNumber() && pendingVote.value > 0;
   }
 
   /**
@@ -1010,14 +1007,9 @@ contract Election is
 
   function _activate(address group, address account) internal onlyWhenNotBlocked returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
-    if (isL2()) {
-      require(
-        pendingVote.epoch < getEpochManager().getCurrentEpochNumber(),
-        "Pending vote epoch not passed"
-      );
-    } else {
-      require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
-    }
+
+    require(pendingVote.epoch < _getEpochNumber(), "Pending vote epoch not passed");
+
     uint256 value = pendingVote.value;
     require(value > 0, "Vote value cannot be zero");
     decrementPendingVotes(group, account, value);
@@ -1165,11 +1157,7 @@ contract Election is
 
     PendingVote storage pendingVote = groupPending.byAccount[account];
     pendingVote.value = pendingVote.value.add(value);
-    if (isL2()) {
-      pendingVote.epoch = getEpochManager().getCurrentEpochNumber();
-    } else {
-      pendingVote.epoch = getEpochNumber();
-    }
+    pendingVote.epoch = _getEpochNumber();
   }
 
   /**
@@ -1288,6 +1276,19 @@ contract Election is
     } else {
       return
         value.mul(votes.active.forGroup[group].total).div(votes.active.forGroup[group].totalUnits);
+    }
+  }
+
+  /**
+   * @notice Returns the epoch number.
+   * @return Current epoch number.
+   */
+  function _getEpochNumber() private view returns (uint256) {
+    // TODO remove this after L2 is fully implemented
+    if (isL2()) {
+      return getEpochManager().getCurrentEpochNumber();
+    } else {
+      return getEpochNumber();
     }
   }
 }

@@ -116,7 +116,7 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
     uint256 index,
     bytes memory headerA,
     bytes memory headerB
-  ) public view returns (uint256) {
+  ) public view onlyL1 returns (uint256) {
     require(hashHeader(headerA) != hashHeader(headerB), "Block hashes have to be different");
     uint256 blockNumber = getBlockNumberFromHeader(headerA);
     require(
