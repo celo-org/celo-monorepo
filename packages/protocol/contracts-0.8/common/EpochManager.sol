@@ -42,21 +42,20 @@ contract EpochManager is
     uint256 totalRewardsVoter; // The total rewards to voters.
     uint256 totalRewardsCommunity; // The total community reward.
     uint256 totalRewardsCarbonFund; // The total carbon offsetting partner reward.
-    // map the groups and their processed status
-    // total number of groups that need to be processed
-    uint256 toProcessGroups;
   }
 
   struct ProcessedGroup {
     bool processed;
     uint256 epochRewards;
   }
+  bool public isSystemInitialized;
 
   // the length of an epoch in seconds
   uint256 public epochDuration;
 
   uint256 public firstKnownEpoch;
   uint256 private currentEpochNumber;
+  address public oracleAddress;
   address[] public elected;
 
   mapping(address => ProcessedGroup) public processedGroups;
@@ -76,6 +75,18 @@ contract EpochManager is
    * @param epochNumber The epoch number that is finished being processed.
    */
   event EpochProcessingEnded(uint256 indexed epochNumber);
+
+  /**
+   * @notice Event emited when a new epoch duration is set.
+   * @param newEpochDuration The new epoch duration.
+   */
+  event EpochDurationSet(uint256 indexed newEpochDuration);
+
+  /**
+   * @notice Event emited when a new oracle address is set.
+   * @param newOracleAddress The new oracle address.
+   */
+  event OracleAddressSet(address indexed newOracleAddress);
 
   /**
    * @notice Emitted when an epoch payment is sent.
@@ -101,16 +112,16 @@ contract EpochManager is
     _;
   }
 
+  modifier onlySystemAlreadyInitialized() {
+    require(systemAlreadyInitialized(), "Epoch system not initialized");
+    _;
+  }
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
   constructor(bool test) public Initializable(test) {}
-
-  modifier onlySystemAlreadyInitialized() {
-    require(systemAlreadyInitialized(), "Epoch system not initialized");
-    _;
-  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -121,11 +132,18 @@ contract EpochManager is
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setEpochDuration(newEpochDuration);
+    setOracleAddress(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
   }
 
   // DESIGNDESICION(XXX): we assume that the first epoch on the L2 starts as soon as the system is initialized
-  // to minimize amount of "limbo blocks" the network should stop relatively close to an epoch number (but wigh enough time)
+  // to minimize amount of "limbo blocks" the network should stop relatively close to an epoch number (but with enough time)
   // to have time to call the function EpochInitializer.migrateEpochAndValidators()
+
+  /**
+   * @notice Initializes the EpochManager system, allowing it to start processing epoch
+   * and distributing the epoch rewards.
+   * @dev Can only be called by the EpochManagerEnabler contract.
+   */
   function initializeSystem(
     uint256 firstEpochNumber,
     uint256 firstEpochBlock,
@@ -144,6 +162,7 @@ contract EpochManager is
       "First epoch block must be less or equal than current block"
     );
     require(firstElected.length > 0, "First elected validators must be greater than 0");
+    isSystemInitialized = true;
     firstKnownEpoch = firstEpochNumber;
     currentEpochNumber = firstEpochNumber;
 
@@ -154,11 +173,11 @@ contract EpochManager is
     elected = firstElected;
   }
 
-  // TODO maybe "freezeEpochRewards" "prepareForNextEpoch"
-
-  /// start next epoch process.
-  /// it freezes the epochrewards at the time of execution,
-  /// and starts the distribution of the rewards.
+  /**
+   * @notice Starts processing an epoch and allocates funds to the beneficiaries.
+   * @dev Epoch rewards are frozen at the time of execution.
+   * @dev Can only be called once the system is initialized.
+   */
   function startNextEpochProcess() external nonReentrant onlySystemAlreadyInitialized {
     require(isTimeForNextEpoch(), "Epoch is not ready to start");
     require(!isOnEpochProcess(), "Epoch process is already started");
@@ -186,6 +205,12 @@ contract EpochManager is
     emit EpochProcessingStarted(currentEpochNumber);
   }
 
+  /**
+   * @notice Finishes processing an epoch and releasing funds to the beneficiaries.
+   * @param groups List of validator groups to be processed.
+   * @param lessers List of validator groups that hold less votes that indexed group.
+   * @param greaters List of validator groups that hold more votes that indexed group.
+   */
   function finishNextEpochProcess(
     address[] calldata groups,
     address[] calldata lessers,
@@ -200,30 +225,34 @@ contract EpochManager is
     epochs[currentEpochNumber].firstBlock = block.number;
     epochs[currentEpochNumber].startTimestamp = block.timestamp;
 
-    epochProcessing.toProcessGroups = 0;
+    EpochProcessState storage _epochProcessing = epochProcessing;
 
+    uint256 toProcessGroups = 0;
+    IValidators validators = getValidators();
+    IElection election = getElection();
+    IScoreReader scoreReader = getScoreReader();
     for (uint i = 0; i < elected.length; i++) {
-      address group = getValidators().getValidatorsGroup(elected[i]);
+      address group = validators.getValidatorsGroup(elected[i]);
       if (!processedGroups[group].processed) {
-        epochProcessing.toProcessGroups++;
-        uint256 groupScore = getScoreReader().getGroupScore(group);
+        toProcessGroups++;
+        uint256 groupScore = scoreReader.getGroupScore(group);
         // We need to precompute epoch rewards for each group since computation depends on total active votes for all groups.
-        uint256 epochRewards = getElection().getGroupEpochRewardsBasedOnScore(
+        uint256 epochRewards = election.getGroupEpochRewardsBasedOnScore(
           group,
-          epochProcessing.totalRewardsVoter,
+          _epochProcessing.totalRewardsVoter,
           groupScore
         );
         processedGroups[group] = ProcessedGroup(true, epochRewards);
       }
     }
 
-    require(epochProcessing.toProcessGroups == groups.length, "number of groups does not match");
+    require(toProcessGroups == groups.length, "number of groups does not match");
 
     for (uint i = 0; i < groups.length; i++) {
       ProcessedGroup storage processedGroup = processedGroups[groups[i]];
       // checks that group is actually from elected group
-      require(processedGroup.processed, "group not processed");
-      getElection().distributeEpochRewards(
+      require(processedGroup.processed, "group not from current elected set");
+      election.distributeEpochRewards(
         groups[i],
         processedGroup.epochRewards,
         lessers[i],
@@ -241,15 +270,15 @@ contract EpochManager is
       epochProcessing.totalRewardsCarbonFund
     );
     // run elections
-    elected = getElection().electValidatorAccounts();
-    // TODO check how to nullify stuct
-    epochProcessing.status = EpochProcessStatus.NotStarted;
+    elected = election.electValidatorAccounts();
+    _epochProcessing.status = EpochProcessStatus.NotStarted;
   }
 
   /**
    * @notice Sends the allocated epoch payment to a validator, their group, and
    *   delegation beneficiary.
    * @param validator Account of the validator.
+   * @dev Can only be called once the system is initialized.
    */
   function sendValidatorPayment(address validator) external onlySystemAlreadyInitialized {
     FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(
@@ -297,46 +326,74 @@ contract EpochManager is
     );
   }
 
-  /// returns the current epoch Info
-  function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256) {
+  /**
+   * @return The current epoch info.
+   */
+  function getCurrentEpoch()
+    external
+    view
+    onlySystemAlreadyInitialized
+    returns (uint256, uint256, uint256, uint256)
+  {
     Epoch storage _epoch = epochs[currentEpochNumber];
     return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
   }
 
-  /// returns the current epoch number.
+  /**
+   * @return The current epoch number.
+   * @dev Can only be called once the system is initialized.
+   */
   function getCurrentEpochNumber() external view onlySystemAlreadyInitialized returns (uint256) {
     return currentEpochNumber;
   }
 
-  /// returns epoch processing state
+  /**
+   * @return The latest epoch processing state.
+   */
   function getEpochProcessingState()
     external
     view
     returns (uint256, uint256, uint256, uint256, uint256)
   {
+    EpochProcessState storage _epochProcessing = epochProcessing;
     return (
-      uint256(epochProcessing.status),
-      epochProcessing.perValidatorReward,
-      epochProcessing.totalRewardsVoter,
-      epochProcessing.totalRewardsCommunity,
-      epochProcessing.totalRewardsCarbonFund
+      uint256(_epochProcessing.status),
+      _epochProcessing.perValidatorReward,
+      _epochProcessing.totalRewardsVoter,
+      _epochProcessing.totalRewardsCommunity,
+      _epochProcessing.totalRewardsCarbonFund
     );
   }
 
+  /**
+   * @notice Used to block select functions in blockable contracts.
+   * @return Whether or not the blockable functions are blocked.
+   */
   function isBlocked() external view returns (bool) {
     return isOnEpochProcess();
   }
 
+  /**
+   * @return The list of elected validators.
+   */
   function getElected() external view returns (address[] memory) {
     return elected;
   }
 
+  /**
+   * @param epoch The epoch number of interest.
+   * @return The First block of the specified epoch.
+   */
   function getFirstBlockAtEpoch(uint256 epoch) external view returns (uint256) {
     require(epoch >= firstKnownEpoch, "Epoch not known");
     require(epoch <= currentEpochNumber, "Epoch not created yet");
     return epochs[epoch].firstBlock;
   }
 
+  /**
+   * @param epoch The epoch number of interest.
+   * @return The last block of the specified epoch.
+   */
   function getLastBlockAtEpoch(uint256 epoch) external view returns (uint256) {
     require(epoch >= firstKnownEpoch, "Epoch not known");
     require(epoch < currentEpochNumber, "Epoch not finished yet");
@@ -360,19 +417,44 @@ contract EpochManager is
    * @dev Can only be set by owner.
    */
   function setEpochDuration(uint256 newEpochDuration) public onlyOwner {
+    require(newEpochDuration > 0, "New epoch duration must be greater than zero.");
+    require(!isOnEpochProcess(), "Cannot change epoch duration during processing.");
     epochDuration = newEpochDuration;
+    emit EpochDurationSet(newEpochDuration);
   }
 
+  /**
+   * @notice Sets the address of the Oracle used by this contract.
+   * @param newOracleAddress The address of the new oracle.
+   * @dev Can only be set by owner.
+   */
+  function setOracleAddress(address newOracleAddress) public onlyOwner {
+    require(newOracleAddress != address(0), "Cannot set address zero as the Oracle.");
+    require(newOracleAddress != oracleAddress, "Oracle address cannot be the same.");
+    require(!isOnEpochProcess(), "Cannot change oracle address during epoch processing.");
+    oracleAddress = newOracleAddress;
+    emit OracleAddressSet(newOracleAddress);
+  }
+
+  /**
+   * @return Whether or not the next epoch can be processed.
+   */
   function isTimeForNextEpoch() public view returns (bool) {
     return block.timestamp >= epochs[currentEpochNumber].startTimestamp + epochDuration;
   }
 
+  /**
+   * @return Whether or not the current epoch is being processed.
+   */
   function isOnEpochProcess() public view returns (bool) {
     return epochProcessing.status == EpochProcessStatus.Started;
   }
 
+  /**
+   * @return Whether or not the EpochManager contract has been activated to start processing epochs.
+   */
   function systemAlreadyInitialized() public view returns (bool) {
-    return initialized && elected.length > 0;
+    return initialized && isSystemInitialized;
   }
 
   /**
@@ -383,12 +465,14 @@ contract EpochManager is
     IScoreReader scoreReader = getScoreReader();
     IValidators validators = getValidators();
 
+    EpochProcessState storage _epochProcessing = epochProcessing;
+
     for (uint i = 0; i < elected.length; i++) {
       uint256 validatorScore = scoreReader.getValidatorScore(elected[i]);
       uint256 validatorReward = validators.computeEpochReward(
         elected[i],
         validatorScore,
-        epochProcessing.perValidatorReward
+        _epochProcessing.perValidatorReward
       );
       validatorPendingPayments[elected[i]] += validatorReward;
       totalRewards += validatorReward;
@@ -399,9 +483,8 @@ contract EpochManager is
 
     // Mint all cUSD required for payment and the corresponding CELO
     validators.mintStableToEpochManager(totalRewards);
-    // this should have a setter for the oracle.
 
-    (uint256 numerator, uint256 denominator) = IOracle(address(getSortedOracles())).getExchangeRate(
+    (uint256 numerator, uint256 denominator) = IOracle(oracleAddress).getExchangeRate(
       address(getStableToken())
     );
 

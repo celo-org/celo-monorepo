@@ -109,6 +109,32 @@ contract E2E_EpochManager_InitializeSystem is E2E_EpochManager {
     assertEq(epochManager.firstKnownEpoch(), 42);
     assertEq(epochManager.getCurrentEpochNumber(), 42);
 
+    assertTrue(epochManager.systemAlreadyInitialized());
+  }
+}
+contract E2E_EpochManager_GetCurrentEpoch is E2E_EpochManager {
+  function setUp() public override {
+    super.setUp();
+    whenL2(vm);
+  }
+
+  function test_Revert_WhenSystemNotInitialized() public {
+    vm.expectRevert("Epoch system not initialized");
+    (
+      uint256 firstBlock,
+      uint256 lastBlock,
+      uint256 startTimestamp,
+      uint256 rewardsBlock
+    ) = epochManager.getCurrentEpoch();
+  }
+
+  function test_ReturnExpectedValues() public {
+    vm.prank(epochManagerEnabler);
+    epochManager.initializeSystem(42, 43, firstElected);
+
+    assertEq(epochManager.firstKnownEpoch(), 42);
+    assertEq(epochManager.getCurrentEpochNumber(), 42);
+
     (
       uint256 firstBlock,
       uint256 lastBlock,
@@ -316,6 +342,19 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
     epochManager.finishNextEpochProcess(groups, lessers, greaters);
     assertGroupWithVotes(groupWithVotes);
+
+    (
+      uint256 status,
+      uint256 perValidatorReward,
+      uint256 totalRewardsVoter,
+      uint256 totalRewardsCommunity,
+      uint256 totalRewardsCarbonFund
+    ) = epochManager.getEpochProcessingState();
+
+    assertGt(perValidatorReward, 0, "perValidatorReward");
+    assertGt(totalRewardsVoter, 0, "totalRewardsVoter");
+    assertGt(totalRewardsCommunity, 0, "totalRewardsCommunity");
+    assertGt(totalRewardsCarbonFund, 0, "totalRewardsCarbonFund");
 
     assertEq(epochManager.getElected().length, validatorsArray.length - 1);
   }

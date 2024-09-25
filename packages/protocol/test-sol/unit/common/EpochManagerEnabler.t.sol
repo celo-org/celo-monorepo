@@ -31,6 +31,7 @@ contract EpochManagerEnablerTest is Test, TestConstants, Utils08 {
 
   address accountsAddress;
   address nonOwner;
+  address oracle;
 
   uint256 epochDuration = DAY;
   uint256 numberValidators = 100;
@@ -50,6 +51,7 @@ contract EpochManagerEnablerTest is Test, TestConstants, Utils08 {
     accountsAddress = actor("accountsAddress");
 
     nonOwner = actor("nonOwner");
+    oracle = actor("oracle");
 
     deployCodeTo("MockRegistry.sol", abi.encode(false), REGISTRY_ADDRESS);
     deployCodeTo("Accounts.sol", abi.encode(false), accountsAddress);
@@ -61,6 +63,7 @@ contract EpochManagerEnablerTest is Test, TestConstants, Utils08 {
     registry.setAddressFor(EpochManagerEnablerContract, address(epochManagerEnabler));
     registry.setAddressFor(AccountsContract, address(accounts));
     registry.setAddressFor(CeloTokenContract, address(celoToken));
+    registry.setAddressFor(SortedOraclesContract, oracle);
     registry.setAddressFor(CeloUnreleasedTreasuryContract, address(celoUnreleasedTreasury));
 
     celoToken.setTotalSupply(CELO_SUPPLY_CAP);
