@@ -225,6 +225,8 @@ contract EpochManager is
     epochs[currentEpochNumber].firstBlock = block.number;
     epochs[currentEpochNumber].startTimestamp = block.timestamp;
 
+    EpochProcessState storage _epochProcessing = epochProcessing;
+
     uint256 toProcessGroups = 0;
     IValidators validators = getValidators();
     IElection election = getElection();
@@ -237,7 +239,7 @@ contract EpochManager is
         // We need to precompute epoch rewards for each group since computation depends on total active votes for all groups.
         uint256 epochRewards = election.getGroupEpochRewardsBasedOnScore(
           group,
-          epochProcessing.totalRewardsVoter,
+          _epochProcessing.totalRewardsVoter,
           groupScore
         );
         processedGroups[group] = ProcessedGroup(true, epochRewards);
@@ -269,7 +271,7 @@ contract EpochManager is
     );
     // run elections
     elected = election.electValidatorAccounts();
-    epochProcessing.status = EpochProcessStatus.NotStarted;
+    _epochProcessing.status = EpochProcessStatus.NotStarted;
   }
 
   /**
@@ -353,12 +355,13 @@ contract EpochManager is
     view
     returns (uint256, uint256, uint256, uint256, uint256)
   {
+    EpochProcessState storage _epochProcessing = epochProcessing;
     return (
-      uint256(epochProcessing.status),
-      epochProcessing.perValidatorReward,
-      epochProcessing.totalRewardsVoter,
-      epochProcessing.totalRewardsCommunity,
-      epochProcessing.totalRewardsCarbonFund
+      uint256(_epochProcessing.status),
+      _epochProcessing.perValidatorReward,
+      _epochProcessing.totalRewardsVoter,
+      _epochProcessing.totalRewardsCommunity,
+      _epochProcessing.totalRewardsCarbonFund
     );
   }
 
@@ -462,12 +465,14 @@ contract EpochManager is
     IScoreReader scoreReader = getScoreReader();
     IValidators validators = getValidators();
 
+    EpochProcessState storage _epochProcessing = epochProcessing;
+
     for (uint i = 0; i < elected.length; i++) {
       uint256 validatorScore = scoreReader.getValidatorScore(elected[i]);
       uint256 validatorReward = validators.computeEpochReward(
         elected[i],
         validatorScore,
-        epochProcessing.perValidatorReward
+        _epochProcessing.perValidatorReward
       );
       validatorPendingPayments[elected[i]] += validatorReward;
       totalRewards += validatorReward;
