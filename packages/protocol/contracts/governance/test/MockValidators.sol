@@ -27,7 +27,6 @@ contract MockValidators is IValidators, IsL2Check {
   uint256 private numRegisteredValidators;
 
   function updateEcdsaPublicKey(address, address, bytes calldata) external returns (bool) {
-    allowOnlyL1();
     return true;
   }
 
@@ -50,12 +49,7 @@ contract MockValidators is IValidators, IsL2Check {
     isValidatorGroup[group] = true;
   }
 
-  function getValidatorsGroup(address validator) external view returns (address) {
-    return affiliations[validator];
-  }
-
   function affiliate(address group) external returns (bool) {
-    allowOnlyL1();
     affiliations[msg.sender] = group;
     return true;
   }
@@ -91,13 +85,8 @@ contract MockValidators is IValidators, IsL2Check {
     allowOnlyL1(); // TODO remove
   }
 
-  function getTopGroupValidators(address group, uint256 n) public view returns (address[] memory) {
-    require(n <= members[group].length);
-    address[] memory validators = new address[](n);
-    for (uint256 i = 0; i < n; i = i.add(1)) {
-      validators[i] = members[group][i];
-    }
-    return validators;
+  function getValidatorsGroup(address validator) external view returns (address) {
+    return affiliations[validator];
   }
 
   function getTopGroupValidatorsAccounts(
@@ -148,12 +137,20 @@ contract MockValidators is IValidators, IsL2Check {
   }
 
   function groupMembershipInEpoch(address addr, uint256, uint256) external view returns (address) {
-    allowOnlyL1();
     return affiliations[addr];
   }
 
   function getGroupNumMembers(address group) public view returns (uint256) {
     return members[group].length;
+  }
+
+  function getTopGroupValidators(address group, uint256 n) public view returns (address[] memory) {
+    require(n <= members[group].length);
+    address[] memory validators = new address[](n);
+    for (uint256 i = 0; i < n; i = i.add(1)) {
+      validators[i] = members[group][i];
+    }
+    return validators;
   }
 
   // Not implemented in mock, added here to support the interface
@@ -286,7 +283,7 @@ contract MockValidators is IValidators, IsL2Check {
     revert("Method not implemented in mock");
   }
 
-  function distributeEpochPaymentsFromSigner(address, uint256) external returns (uint256) {
+  function distributeEpochPaymentsFromSigner(address, uint256) external onlyL1 returns (uint256) {
     revert("Method not implemented in mock");
   }
 

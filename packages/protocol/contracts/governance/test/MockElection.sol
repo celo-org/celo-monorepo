@@ -17,7 +17,7 @@ contract MockElection is IsL2Check {
     isIneligible[account] = true;
   }
 
-  function markGroupEligible(address account, address, address) external onlyL1 {
+  function markGroupEligible(address account, address, address) external {
     isEligible[account] = true;
   }
 
@@ -33,7 +33,7 @@ contract MockElection is IsL2Check {
     electedValidators = _electedValidators;
   }
 
-  function vote(address, uint256, address, address) external onlyL1 returns (bool) {
+  function vote(address, uint256, address, address) external returns (bool) {
     return true;
   }
 

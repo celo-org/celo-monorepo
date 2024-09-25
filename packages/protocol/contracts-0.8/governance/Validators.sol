@@ -255,7 +255,7 @@ contract Validators is
     bytes calldata blsPublicKey,
     bytes calldata blsPop
   ) external nonReentrant returns (bool) {
-    allowOnlyL1();
+    allowOnlyL1(); // For L2, use registerValidatorNoBls
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     _isRegistrationAllowed(account);
     require(!isValidator(account) && !isValidatorGroup(account), "Already registered");
@@ -611,6 +611,7 @@ contract Validators is
    * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
    */
   function forceDeaffiliateIfValidator(address validatorAccount) external nonReentrant onlySlasher {
+    allowOnlyL1();
     if (isValidator(validatorAccount)) {
       Validator storage validator = validators[validatorAccount];
       if (validator.affiliation != address(0)) {
@@ -646,6 +647,8 @@ contract Validators is
     group.slashInfo.lastSlashed = block.timestamp;
   }
 
+  // TODO: Move this function's logic to `EpochManager` once Mento updates stable token
+  // to allow `EpochManager` to mint.
   /**
    * @notice Allows the EpochManager contract to mint stable token for itself.
    * @param amount The amount to be minted.
@@ -827,9 +830,8 @@ contract Validators is
     uint256 epochNumber,
     uint256 index
   ) external view returns (address) {
-    allowOnlyL1();
     require(isValidator(account), "Not a validator");
-    require(epochNumber <= getEpochNumber(), "Epoch cannot be larger than current");
+    require(epochNumber <= _getEpochNumber(), "Epoch cannot be larger than current");
     MembershipHistory storage history = validators[account].membershipHistory;
     require(index < history.tail.add(history.numEntries), "index out of bounds");
     require(index >= history.tail && history.numEntries > 0, "index out of bounds");
@@ -948,7 +950,6 @@ contract Validators is
    * @param delay Number of blocks to delay the update
    */
   function setCommissionUpdateDelay(uint256 delay) public onlyOwner {
-    allowOnlyL1();
     require(delay != commissionUpdateDelay, "commission update delay not changed");
     commissionUpdateDelay = delay;
     emit CommissionUpdateDelaySet(delay);
@@ -960,7 +961,6 @@ contract Validators is
    * @return True upon success.
    */
   function setMaxGroupSize(uint256 size) public onlyOwner returns (bool) {
-    allowOnlyL1();
     require(0 < size, "Max group size cannot be zero");
     require(size != maxGroupSize, "Max group size not changed");
     maxGroupSize = size;
@@ -974,7 +974,6 @@ contract Validators is
    * @return True upon success.
    */
   function setMembershipHistoryLength(uint256 length) public onlyOwner returns (bool) {
-    allowOnlyL1();
     require(0 < length, "Membership history length cannot be zero");
     require(length != membershipHistoryLength, "Membership history length not changed");
     membershipHistoryLength = length;
@@ -1431,12 +1430,7 @@ contract Validators is
    */
   function updateMembershipHistory(address account, address group) private returns (bool) {
     MembershipHistory storage history = validators[account].membershipHistory;
-    uint256 epochNumber;
-    if (isL2()) {
-      epochNumber = getEpochManager().getCurrentEpochNumber();
-    } else {
-      epochNumber = getEpochNumber();
-    }
+    uint256 epochNumber = _getEpochNumber();
 
     uint256 head = history.numEntries == 0 ? 0 : history.tail.add(history.numEntries.sub(1));
 
