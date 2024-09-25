@@ -50,6 +50,9 @@ forge script \
   $NON_INTERACTIVE \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
 
+# Give anvil enough time to save the state
+sleep $SLEEP_DURATION
+
 # # Save L2 state so it can published to NPM
 mv $ANVIL_FOLDER/state.json $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME
 echo "Saved anvil L2 state to $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME"
