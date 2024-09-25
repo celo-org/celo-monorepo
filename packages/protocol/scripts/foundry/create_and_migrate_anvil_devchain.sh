@@ -80,7 +80,7 @@ ELAPSED_TIME=$(($SECONDS - $START_TIME))
 echo "Migration script total elapsed time: $ELAPSED_TIME seconds"
 
 # this helps to make sure that devchain state is actually being saved
-sleep 1
+sleep $SLEEP_DURATION
 
 if [[ "${KEEP_DEVCHAIN_FOLDER:-}" == "true" ]]; then
     cp $ANVIL_FOLDER/state.json $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME

@@ -28,6 +28,7 @@ export L2_DEVCHAIN_FILE_NAME="l2-devchain.json" # Name of the file that will be 
 export TMP_FOLDER="$PWD/.tmp"
 export TEMP_DIR="$PWD/.tmp/libraries"
 export ANVIL_FOLDER="$TMP_FOLDER/devchain"
+export SLEEP_DURATION=20
 
 # Contract addresses
 export REGISTRY_ADDRESS="0x000000000000000000000000000000000000ce10"
