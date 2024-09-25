@@ -343,6 +343,19 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     epochManager.finishNextEpochProcess(groups, lessers, greaters);
     assertGroupWithVotes(groupWithVotes);
 
+    (
+      uint256 status,
+      uint256 perValidatorReward,
+      uint256 totalRewardsVoter,
+      uint256 totalRewardsCommunity,
+      uint256 totalRewardsCarbonFund
+    ) = epochManager.getEpochProcessingState();
+
+    assertGt(perValidatorReward, 0, "perValidatorReward");
+    assertGt(totalRewardsVoter, 0, "totalRewardsVoter");
+    assertGt(totalRewardsCommunity, 0, "totalRewardsCommunity");
+    assertGt(totalRewardsCarbonFund, 0, "totalRewardsCarbonFund");
+
     assertEq(epochManager.getElected().length, validatorsArray.length - 1);
   }
 
