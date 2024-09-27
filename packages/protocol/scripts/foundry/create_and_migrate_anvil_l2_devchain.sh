@@ -4,8 +4,6 @@ set -euo pipefail
 # Read environment variables and constants
 source $PWD/scripts/foundry/constants.sh
 
-export KEEP_DEVCHAIN_FOLDER=true
-
 # Generate and run L1 devchain
 echo "Generating and running L1 devchain before activating L2..."
 source $PWD/scripts/foundry/create_and_migrate_anvil_devchain.sh
@@ -50,11 +48,5 @@ forge script \
   $NON_INTERACTIVE \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
 
-# Give anvil enough time to save the state
-sleep $SLEEP_DURATION
-
 # # Save L2 state so it can published to NPM
-mv $ANVIL_FOLDER/state.json $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME
-echo "Saved anvil L2 state to $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME"
-
-rm -rf $ANVIL_FOLDER
+source $PWD/scripts/foundry/dump_and_save.sh $L2_DEVCHAIN_FILE_NAME

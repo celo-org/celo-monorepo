@@ -6,8 +6,6 @@ source $PWD/scripts/foundry/constants.sh
 
 timestamp=`date -Iseconds`
 
-mkdir -p $ANVIL_FOLDER
-echo "Anvil state will be saved to $ANVIL_FOLDER"
 
 # create package.json
 echo "{\"name\": \"@celo/devchain-anvil\",\"version\": \"1.0.0\",\"repository\": { \"url\": \"https://github.com/celo-org/celo-monorepo\", \"directory\": \"packages/protocol/migrations_sol\" },\"homepage\": \"https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/migrations_sol/README.md\",\"description\": \"Anvil based devchain that contains core smart contracts of celo\",\"author\":\"Celo\",\"license\": \"LGPL-3.0\"}" > $TMP_FOLDER/package.json
@@ -24,12 +22,9 @@ fi
 # Start anvil
 anvil \
 --port $ANVIL_PORT \
---dump-state $ANVIL_FOLDER \
---state-interval $STATE_INTERVAL \
 --gas-limit $GAS_LIMIT \
 --code-size-limit $CODE_SIZE_LIMIT \
---balance $BALANCE \
---steps-tracing &
+--balance $BALANCE &
 # For context "&" tells the shell to start a command as a background process.
 # This allows you to continue executing other commands without waiting for the background command to finish.
 
