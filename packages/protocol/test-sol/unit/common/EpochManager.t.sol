@@ -124,8 +124,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     vm.prank(epochManagerEnabler);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
-    blockTravel(vm, 43200);
-    timeTravel(vm, DAY);
+    travelEpochL2(vm);
   }
 }
 
@@ -467,5 +466,62 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
 
     assertEq(validatorBalanceAfter, paymentAmount);
     assertEq(epochManagerBalanceAfter, epochManagerBalanceBefore - paymentAmount);
+  }
+}
+
+contract EpochManagerTest_getEpochOfBlock is EpochManagerTest {
+  function test_shouldReturnTheEpochInfoOfSpecifiedEpoch() public {
+    initializeEpochManagerSystem();
+    uint256 _startingEpochNumber = epochManager.getCurrentEpochNumber();
+
+    (
+      uint256 _initialFirstBlock,
+      uint256 _initialLastBlock,
+      uint256 _initialStartTimestamp,
+      uint256 _initialRewardBlock
+    ) = epochManager.getCurrentEpoch();
+
+    (
+      uint256 _firstBlock,
+      uint256 _lastBlock,
+      uint256 _startTimestamp,
+      uint256 _rewardBlock
+    ) = epochManager.getEpochInfoOfEpoch(_startingEpochNumber);
+
+    assertEq(_initialFirstBlock, _firstBlock);
+    assertEq(_initialLastBlock, _lastBlock);
+    assertEq(_initialStartTimestamp, _startTimestamp);
+    assertEq(_initialRewardBlock, _rewardBlock);
+
+    travelEpochL2(vm);
+
+    epochManager.startNextEpochProcess();
+
+    address[] memory groups = new address[](0);
+    address[] memory lessers = new address[](0);
+    address[] memory greaters = new address[](0);
+    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+
+    uint256 newEpochNumber = _startingEpochNumber + 1;
+    assertEq(newEpochNumber, epochManager.getCurrentEpochNumber());
+
+    (
+      uint256 _firstBlockAfter2Epochs,
+      uint256 _lastBlockAfter2Epochs,
+      uint256 _startTimestampAfter2Epochs,
+      uint256 _rewardBlockAfter2Epochs
+    ) = epochManager.getEpochInfoOfEpoch(newEpochNumber);
+
+    (
+      uint256 _latestEpochFirstBlock,
+      uint256 _latestEpochLastBlock,
+      uint256 _latestEpochStartTimestamp,
+      uint256 _latestEpochRewardBlock
+    ) = epochManager.getCurrentEpoch();
+
+    assertEq(_firstBlockAfter2Epochs, _latestEpochFirstBlock);
+    assertEq(_lastBlockAfter2Epochs, _latestEpochLastBlock);
+    assertEq(_startTimestampAfter2Epochs, _latestEpochStartTimestamp);
+    assertEq(_rewardBlockAfter2Epochs, _latestEpochRewardBlock);
   }
 }

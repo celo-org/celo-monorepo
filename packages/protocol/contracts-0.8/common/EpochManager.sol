@@ -54,14 +54,14 @@ contract EpochManager is
   uint256 public epochDuration;
 
   uint256 public firstKnownEpoch;
-  uint256 private currentEpochNumber;
+  uint256 internal currentEpochNumber;
   address public oracleAddress;
   address[] public elected;
 
   mapping(address => ProcessedGroup) public processedGroups;
 
   EpochProcessState public epochProcessing;
-  mapping(uint256 => Epoch) private epochs;
+  mapping(uint256 => Epoch) internal epochs;
   mapping(address => uint256) public validatorPendingPayments;
 
   /**
@@ -215,7 +215,7 @@ contract EpochManager is
     address[] calldata groups,
     address[] calldata lessers,
     address[] calldata greaters
-  ) external nonReentrant {
+  ) external virtual nonReentrant {
     require(isOnEpochProcess(), "Epoch process is not started");
     // finalize epoch
     // last block should be the block before and timestamp from previous block
@@ -324,6 +324,18 @@ contract EpochManager is
       beneficiary,
       delegatedPayment
     );
+  }
+
+  /**
+   * @notice Returns the epoch info of a specified epoch.
+   * @param epochNumber Epoch number where epoch info is retreived.
+   * @return Epoch info.
+   */
+  function getEpochInfoOfEpoch(
+    uint256 epochNumber
+  ) external view onlySystemAlreadyInitialized returns (uint256, uint256, uint256, uint256) {
+    Epoch storage _epoch = epochs[epochNumber];
+    return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
   }
 
   /**
