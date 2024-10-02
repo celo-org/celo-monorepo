@@ -386,7 +386,7 @@ contract EpochManager is
   }
 
   /**
-   * @return The list of elected validators.
+   * @return The list of currently elected validators.
    */
   function getElected() external view returns (address[] memory) {
     return elected;
