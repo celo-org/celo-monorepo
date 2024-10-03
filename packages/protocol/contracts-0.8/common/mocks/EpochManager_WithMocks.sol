@@ -8,7 +8,7 @@ contract EpochManager_WithMocks is EpochManager(true) {
     validatorPendingPayments[validator] = amount;
   }
 
-  /// mocks finishNextEpochProcess to increment the epoch number.
+  // mocks finishNextEpochProcess to increment the epoch number.
   function finishNextEpochProcess(
     address[] calldata groups,
     address[] calldata lessers,

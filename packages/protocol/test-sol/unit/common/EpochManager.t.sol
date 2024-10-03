@@ -469,7 +469,7 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
   }
 }
 
-contract EpochManagerTest_getEpochOfBlock is EpochManagerTest {
+contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
   function test_shouldReturnTheEpochInfoOfSpecifiedEpoch() public {
     initializeEpochManagerSystem();
     uint256 _startingEpochNumber = epochManager.getCurrentEpochNumber();
@@ -486,7 +486,7 @@ contract EpochManagerTest_getEpochOfBlock is EpochManagerTest {
       uint256 _lastBlock,
       uint256 _startTimestamp,
       uint256 _rewardBlock
-    ) = epochManager.getEpochInfoOfEpoch(_startingEpochNumber);
+    ) = epochManager.getEpochByNumber(_startingEpochNumber);
 
     assertEq(_initialFirstBlock, _firstBlock);
     assertEq(_initialLastBlock, _lastBlock);
@@ -510,7 +510,7 @@ contract EpochManagerTest_getEpochOfBlock is EpochManagerTest {
       uint256 _lastBlockAfter2Epochs,
       uint256 _startTimestampAfter2Epochs,
       uint256 _rewardBlockAfter2Epochs
-    ) = epochManager.getEpochInfoOfEpoch(newEpochNumber);
+    ) = epochManager.getEpochByNumber(newEpochNumber);
 
     (
       uint256 _latestEpochFirstBlock,

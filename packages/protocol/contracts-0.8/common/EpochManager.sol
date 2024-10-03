@@ -327,19 +327,11 @@ contract EpochManager is
   }
 
   /**
-   * @notice Returns the epoch info of a specified epoch.
-   * @param epochNumber Epoch number where epoch info is retreived.
-   * @return Epoch info.
-   */
-  function getEpochInfoOfEpoch(
-    uint256 epochNumber
-  ) external view onlySystemAlreadyInitialized returns (uint256, uint256, uint256, uint256) {
-    Epoch storage _epoch = epochs[epochNumber];
-    return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
-  }
-
-  /**
-   * @return The current epoch info.
+   * @notice Returns the info of the current epoch.
+   * @return firstEpoch The first block of the epoch.
+   * @return lastBlock The first block of the epoch.
+   * @return startTimestamp The starting timestamp of the epoch.
+   * @return rewardsBlock The reward block of the epoch.
    */
   function getCurrentEpoch()
     external
@@ -347,8 +339,7 @@ contract EpochManager is
     onlySystemAlreadyInitialized
     returns (uint256, uint256, uint256, uint256)
   {
-    Epoch storage _epoch = epochs[currentEpochNumber];
-    return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
+    return getEpochByNumber(currentEpochNumber);
   }
 
   /**
@@ -467,6 +458,21 @@ contract EpochManager is
    */
   function systemAlreadyInitialized() public view returns (bool) {
     return initialized && isSystemInitialized;
+  }
+
+  /**
+   * @notice Returns the epoch info of a specified epoch.
+   * @param epochNumber Epoch number where epoch info is retreived.
+   * @return firstEpoch The first block of the epoch.
+   * @return lastBlock The first block of the epoch.
+   * @return startTimestamp The starting timestamp of the epoch.
+   * @return rewardsBlock The reward block of the epoch.
+   */
+  function getEpochByNumber(
+    uint256 epochNumber
+  ) public view onlySystemAlreadyInitialized returns (uint256, uint256, uint256, uint256) {
+    Epoch storage _epoch = epochs[epochNumber];
+    return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
   }
 
   /**
