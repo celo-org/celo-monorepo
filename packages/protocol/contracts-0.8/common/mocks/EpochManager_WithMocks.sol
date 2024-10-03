@@ -21,5 +21,8 @@ contract EpochManager_WithMocks is EpochManager(true) {
     currentEpochNumber++;
     epochs[currentEpochNumber].firstBlock = block.number;
     epochs[currentEpochNumber].startTimestamp = block.timestamp;
+
+    EpochProcessState storage _epochProcessing = epochProcessing;
+    _epochProcessing.status = EpochProcessStatus.NotStarted;
   }
 }
