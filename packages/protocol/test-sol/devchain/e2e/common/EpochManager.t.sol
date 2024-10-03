@@ -10,7 +10,7 @@ import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.s
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@test-sol/utils/ECDSAHelper08.sol";
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
-import {console} from "forge-std/console.sol";
+import { console } from "forge-std/console.sol";
 
 contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
   struct VoterWithPK {
@@ -361,14 +361,13 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     assertEq(epochManager.getElected().length, validatorsArray.length - 1);
   }
 
-
-    /**
+  /**
     * @notice Test the gas used by finishNextEpochProcess
     This test is trying to measure gas used by finishNextEpochProcess in a real life worst case. We have 126 validators and 123 groups.
     There are two main loops in the function, one for calculating rewards and the other for updating the elected validators.
     FinishNextEpochProcess is called twice, first time with going from 6 -> 110 validators which consumes approx. 6M gas and the second time with going from 110 -> 110 validators which consumes approx. 19M gas. 
      */
-    function test_shouldFinishNextEpochProcessing_GasTest() public {
+  function test_shouldFinishNextEpochProcessing_GasTest() public {
     address[] memory lessers;
     address[] memory greaters;
     address[] memory groupsEligible;
@@ -438,7 +437,6 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     console.log("finishNextEpochProcess gas used: ", gasLeftBefore1 - gasLeftAfter1);
     console.log("elected count: ", epochManager.getElected().length);
 
-
     timeTravel(vm, epochDuration + 1);
     epochManager.startNextEpochProcess();
 
@@ -453,7 +451,6 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     console.log("finishNextEpochProcess gas used 2: ", gasLeftBefore1 - gasLeftAfter1);
     console.log("elected count2: ", epochManager.getElected().length);
   }
-
 
   function getCurrentlyElectedGroups() internal returns (address[] memory) {
     address[] memory currentlyElected = epochManager.getElected();
@@ -474,10 +471,9 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     }
   }
 
-  function registerNewValidatorGroupWithValidator(uint256 index)
-    internal
-    returns (address newValidatorGroup, address newValidator)
-  {
+  function registerNewValidatorGroupWithValidator(
+    uint256 index
+  ) internal returns (address newValidatorGroup, address newValidator) {
     (, GroupWithVotes[] memory groupWithVotes) = getGroupsWithVotes();
     uint256 newGroupPK = uint256(keccak256(abi.encodePacked("newGroup", index + 1)));
     uint256 newValidatorPK = uint256(keccak256(abi.encodePacked("newValidator", index + 1)));
