@@ -10,6 +10,7 @@ import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.s
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@test-sol/utils/ECDSAHelper08.sol";
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
+import {console} from "forge-std/console.sol";
 
 contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
   struct VoterWithPK {
@@ -220,6 +221,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   EnumerableSet.AddressSet internal originalyElected;
+  EnumerableSet.AddressSet internal electedGroupsHelper;
 
   function setUp() public override {
     super.setUp();
@@ -307,7 +309,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     }
 
     // add new validator group and validator
-    (address newValidatorGroup, address newValidator) = registerNewValidatorGroupWithValidator();
+    (address newValidatorGroup, address newValidator) = registerNewValidatorGroupWithValidator(0);
 
     timeTravel(vm, epochDuration + 1);
     epochManager.startNextEpochProcess();
@@ -359,13 +361,126 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     assertEq(epochManager.getElected().length, validatorsArray.length - 1);
   }
 
-  function registerNewValidatorGroupWithValidator()
+
+    /**
+    * @notice Test the gas used by finishNextEpochProcess
+    This test is trying to measure gas used by finishNextEpochProcess in a real life worst case. We have 126 validators and 123 groups.
+    There are two main loops in the function, one for calculating rewards and the other for updating the elected validators.
+    FinishNextEpochProcess is called twice, first time with going from 6 -> 110 validators which consumes approx. 6M gas and the second time with going from 110 -> 110 validators which consumes approx. 19M gas. 
+     */
+    function test_shouldFinishNextEpochProcessing_GasTest() public {
+    address[] memory lessers;
+    address[] memory greaters;
+    address[] memory groupsEligible;
+    GroupWithVotes[] memory groupWithVotes;
+    uint256[] memory groupActiveBalances;
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+
+    uint256 currentEpoch = epochManager.getCurrentEpochNumber();
+    address[] memory currentlyElected = epochManager.getElected();
+    for (uint256 i = 0; i < currentlyElected.length; i++) {
+      originalyElected.add(currentlyElected[i]);
+    }
+
+    // wait some time before finishing
+    timeTravel(vm, epochDuration / 2);
+    blockTravel(vm, 100);
+
+    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+
+    assertEq(currentEpoch + 1, epochManager.getCurrentEpochNumber());
+
+    address[] memory newlyElected = epochManager.getElected();
+
+    for (uint256 i = 0; i < currentlyElected.length; i++) {
+      assertEq(originalyElected.contains(currentlyElected[i]), true);
+    }
+
+    timeTravel(vm, epochDuration + 1);
+    epochManager.startNextEpochProcess();
+
+    // wait some time before finishing
+    timeTravel(vm, epochDuration / 2);
+    blockTravel(vm, 100);
+
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
+
+    assertEq(currentEpoch + 2, epochManager.getCurrentEpochNumber());
+
+    address[] memory newlyElected2 = epochManager.getElected();
+
+    for (uint256 i = 0; i < currentlyElected.length; i++) {
+      assertEq(originalyElected.contains(newlyElected2[i]), true);
+    }
+
+    address[] memory newValidators = new address[](120);
+    address[] memory newGroups = new address[](newValidators.length);
+
+    for (uint256 i = 0; i < newValidators.length; i++) {
+      // add new validator group and validator
+      (address newValidatorGroup, address newValidator) = registerNewValidatorGroupWithValidator(i);
+      newValidators[i] = newValidator;
+      newGroups[i] = newValidatorGroup;
+    }
+
+    timeTravel(vm, epochDuration + 1);
+    epochManager.startNextEpochProcess();
+
+    timeTravel(vm, epochDuration / 2);
+    blockTravel(vm, 100);
+
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    uint256 gasLeftBefore1 = gasleft();
+    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    uint256 gasLeftAfter1 = gasleft();
+    console.log("finishNextEpochProcess gas used: ", gasLeftBefore1 - gasLeftAfter1);
+    console.log("elected count: ", epochManager.getElected().length);
+
+
+    timeTravel(vm, epochDuration + 1);
+    epochManager.startNextEpochProcess();
+
+    groups = getCurrentlyElectedGroups();
+
+    timeTravel(vm, epochDuration / 2);
+    blockTravel(vm, 100);
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    gasLeftBefore1 = gasleft();
+    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    gasLeftAfter1 = gasleft();
+    console.log("finishNextEpochProcess gas used 2: ", gasLeftBefore1 - gasLeftAfter1);
+    console.log("elected count2: ", epochManager.getElected().length);
+  }
+
+
+  function getCurrentlyElectedGroups() internal returns (address[] memory) {
+    address[] memory currentlyElected = epochManager.getElected();
+
+    // clearElectedGroupsHelper();
+    for (uint256 i = 0; i < currentlyElected.length; i++) {
+      (, , address group, , ) = validators.getValidator(currentlyElected[i]);
+      electedGroupsHelper.add(group);
+    }
+    return electedGroupsHelper.values();
+  }
+
+  function clearElectedGroupsHelper() internal {
+    address[] memory values = electedGroupsHelper.values();
+
+    for (uint256 i = 0; i < values.length; i++) {
+      electedGroupsHelper.remove(values[i]);
+    }
+  }
+
+  function registerNewValidatorGroupWithValidator(uint256 index)
     internal
     returns (address newValidatorGroup, address newValidator)
   {
     (, GroupWithVotes[] memory groupWithVotes) = getGroupsWithVotes();
-    uint256 newGroupPK = uint256(keccak256(abi.encodePacked("newGroup")));
-    uint256 newValidatorPK = uint256(keccak256(abi.encodePacked("newValidator")));
+    uint256 newGroupPK = uint256(keccak256(abi.encodePacked("newGroup", index + 1)));
+    uint256 newValidatorPK = uint256(keccak256(abi.encodePacked("newValidator", index + 1)));
 
     vm.deal(vm.addr(newGroupPK), 100_000_000 ether);
     vm.deal(vm.addr(newValidatorPK), 100_000_000 ether);
