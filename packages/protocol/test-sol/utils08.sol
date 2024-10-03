@@ -24,7 +24,7 @@ contract Utils08 is TestConstants {
   // XXX: this function only increases the block number and timestamp, but does not actually change epoch.
   // XXX: you must start and finish epoch processing to change epochs.
   function travelEpochL2(Vm vm) public {
-    uint256 blocksInEpoch = 43200;
+    uint256 blocksInEpoch = L2_BLOCK_IN_EPOCH;
     blockTravel(vm, blocksInEpoch);
     timeTravel(vm, DAY);
   }
