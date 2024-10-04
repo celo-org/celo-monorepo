@@ -524,6 +524,22 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
     election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
   }
 
+  function getGroupsWithLessersAndGreaters()
+    public
+    returns (address[] memory, address[] memory, address[] memory)
+  {
+    address[] memory groups = new address[](1);
+    groups[0] = group;
+
+    address[] memory lessers = new address[](1);
+    lessers[0] = address(0);
+
+    address[] memory greaters = new address[](1);
+    greaters[0] = address(0);
+
+    return (groups, lessers, greaters);
+  }
+
   function test_Reverts_WhenNotStarted() public {
     address[] memory groups = new address[](0);
 
@@ -546,29 +562,46 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
     epochManager.finishNextEpochProcess(groups, groups, groups);
   }
 
-  function test_SucceedsToFinishNextEpochProcess() public {
-    address[] memory groups = new address[](1);
-    groups[0] = group;
+  function test_TransfersToCommunityAndCarbonOffsetting() public {
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
+
     epochManager.startNextEpochProcess();
+    epochManager.finishNextEpochProcess(groups, lessers, greaters);
 
-    address[] memory lessers = new address[](1);
-    lessers[0] = address(0);
+    assertEq(celoToken.balanceOf(communityRewardFund), epochRewards.totalRewardsCommunity());
+    assertEq(celoToken.balanceOf(carbonOffsettingPartner), epochRewards.totalRewardsCarbonFund());
+  }
 
-    address[] memory greaters = new address[](1);
-    greaters[0] = address(0);
+  function test_TransfersToValidatorGroup() public {
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
+
+    epochManager.startNextEpochProcess();
+    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+
+    assertEq(election.distributedEpochRewards(group), groupEpochRewards);
+  }
+
+  function test_SetsNewlyElectedCorrectly() public {
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
+
+    epochManager.startNextEpochProcess();
 
     address[] memory newElected = new address[](2);
     newElected[0] = validator3;
     newElected[1] = validator4;
     election.setElectedValidators(newElected);
-
-    (
-      uint256 status,
-      uint256 perValidatorReward,
-      uint256 totalRewardsVoter,
-      uint256 totalRewardsCommunity,
-      uint256 totalRewardsCarbonFund
-    ) = epochManager.getEpochProcessingState();
 
     epochManager.finishNextEpochProcess(groups, lessers, greaters);
 
@@ -577,9 +610,5 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
     for (uint256 i = 0; i < newElected.length; i++) {
       assertEq(newElected[i], afterElected[i]);
     }
-
-    assertEq(celoToken.balanceOf(communityRewardFund), epochRewards.totalRewardsCommunity());
-    assertEq(celoToken.balanceOf(carbonOffsettingPartner), epochRewards.totalRewardsCarbonFund());
-    assertEq(election.distributedEpochRewards(group), groupEpochRewards);
   }
 }
