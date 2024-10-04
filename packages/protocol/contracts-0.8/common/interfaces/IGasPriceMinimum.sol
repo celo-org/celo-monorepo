@@ -1,4 +1,4 @@
-pragma solidity >=0.5.13 <0.9.0;
+pragma solidity >=0.5.13 < 0.9;
 
 // TODO add to GasPrice
 interface IGasPriceMinimum {

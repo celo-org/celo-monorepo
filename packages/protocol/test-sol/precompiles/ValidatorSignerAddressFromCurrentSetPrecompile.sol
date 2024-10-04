@@ -1,5 +1,5 @@
 // TODO move this to test folder
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9;
 
 import "forge-std/console.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";

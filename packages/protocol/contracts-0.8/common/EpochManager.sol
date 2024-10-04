@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9;
 
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts8/security/ReentrancyGuard.sol";
@@ -219,11 +219,13 @@ contract EpochManager is
     require(isOnEpochProcess(), "Epoch process is not started");
     // finalize epoch
     // last block should be the block before and timestamp from previous block
-    epochs[currentEpochNumber].lastBlock = block.number - 1;
+    uint256 currentEpoch = currentEpochNumber;
+    epochs[currentEpoch].lastBlock = block.number - 1;
     // start new epoch
-    currentEpochNumber++;
-    epochs[currentEpochNumber].firstBlock = block.number;
-    epochs[currentEpochNumber].startTimestamp = block.timestamp;
+    currentEpoch++;
+    epochs[currentEpoch].firstBlock = block.number;
+    epochs[currentEpoch].startTimestamp = block.timestamp;
+    currentEpochNumber = currentEpoch;
 
     EpochProcessState storage _epochProcessing = epochProcessing;
 

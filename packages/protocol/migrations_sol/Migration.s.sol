@@ -1,4 +1,4 @@
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9;
 
 // Note: This script should not include any cheatcode so that it can run in production
 
