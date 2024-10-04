@@ -15,6 +15,7 @@ contract MockEpochManager is IEpochManager {
     uint256 startTimestamp;
     uint256 endTimestamp;
     uint256 rewardsBlock;
+    address[] elected;
   }
 
   uint256 public epochDuration;
@@ -67,10 +68,12 @@ contract MockEpochManager is IEpochManager {
     isProcessingEpoch = _isProcessing;
   }
 
-  function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256) {
-    Epoch storage _epoch = epochs[currentEpochNumber];
-
-    return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
+  function getCurrentEpoch()
+    external
+    view
+    returns (uint256, uint256, uint256, uint256, address[] memory)
+  {
+    return getEpochByNumber(currentEpochNumber);
   }
 
   function getCurrentEpochNumber() external view returns (uint256) {
@@ -116,5 +119,18 @@ contract MockEpochManager is IEpochManager {
 
   function sendValidatorPayment(address validator) public {
     emit SendValidatorPaymentCalled(validator);
+  }
+
+  function getEpochByNumber(
+    uint256 epochNumber
+  ) public view returns (uint256, uint256, uint256, uint256, address[] memory) {
+    Epoch storage _epoch = epochs[epochNumber];
+    return (
+      _epoch.firstBlock,
+      _epoch.lastBlock,
+      _epoch.startTimestamp,
+      _epoch.rewardsBlock,
+      _epoch.elected
+    );
   }
 }

@@ -14,7 +14,13 @@ interface IEpochManager {
     address[] calldata greaters
   ) external;
   function sendValidatorPayment(address) external;
-  function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256);
+  function getCurrentEpoch()
+    external
+    view
+    returns (uint256, uint256, uint256, uint256, address[] memory);
+  function getEpochByNumber(
+    uint256 epochNumber
+  ) external view returns (uint256, uint256, uint256, uint256, address[] memory);
   function getCurrentEpochNumber() external view returns (uint256);
   function getElected() external view returns (address[] memory);
   function epochDuration() external view returns (uint256);

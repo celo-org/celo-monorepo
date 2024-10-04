@@ -29,6 +29,7 @@ contract EpochManager is
     uint256 lastBlock;
     uint256 startTimestamp;
     uint256 rewardsBlock;
+    address[] elected;
   }
 
   enum EpochProcessStatus {
@@ -169,6 +170,7 @@ contract EpochManager is
     Epoch storage _currentEpoch = epochs[currentEpochNumber];
     _currentEpoch.firstBlock = firstEpochBlock;
     _currentEpoch.startTimestamp = block.timestamp;
+    _currentEpoch.elected = firstElected;
 
     elected = firstElected;
   }
@@ -271,6 +273,7 @@ contract EpochManager is
     );
     // run elections
     elected = election.electValidatorAccounts();
+    epochs[currentEpochNumber].elected = elected;
     _epochProcessing.status = EpochProcessStatus.NotStarted;
   }
 
@@ -327,17 +330,13 @@ contract EpochManager is
   }
 
   /**
-   * @notice Returns the info of the current epoch.
-   * @return firstEpoch The first block of the epoch.
-   * @return lastBlock The first block of the epoch.
-   * @return startTimestamp The starting timestamp of the epoch.
-   * @return rewardsBlock The reward block of the epoch.
+   * @notice Returns the epoch info of the specified epoch, for current epoch.
    */
   function getCurrentEpoch()
     external
     view
     onlySystemAlreadyInitialized
-    returns (uint256, uint256, uint256, uint256)
+    returns (uint256, uint256, uint256, uint256, address[] memory)
   {
     return getEpochByNumber(currentEpochNumber);
   }
@@ -462,17 +461,29 @@ contract EpochManager is
 
   /**
    * @notice Returns the epoch info of a specified epoch.
-   * @param epochNumber Epoch number where epoch info is retreived.
-   * @return firstEpoch The first block of the epoch.
-   * @return lastBlock The first block of the epoch.
-   * @return startTimestamp The starting timestamp of the epoch.
-   * @return rewardsBlock The reward block of the epoch.
+   * @param epochNumber Epoch number where the epoch info is retreived.
+   * @return firstEpoch The first block of the given epoch.
+   * @return lastBlock The first block of the given epoch.
+   * @return startTimestamp The starting timestamp of the given epoch.
+   * @return rewardsBlock The reward block of the given epoch.
+   * @return elected The set of elected validator for the given epoch.
    */
   function getEpochByNumber(
     uint256 epochNumber
-  ) public view onlySystemAlreadyInitialized returns (uint256, uint256, uint256, uint256) {
+  )
+    public
+    view
+    onlySystemAlreadyInitialized
+    returns (uint256, uint256, uint256, uint256, address[] memory)
+  {
     Epoch storage _epoch = epochs[epochNumber];
-    return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
+    return (
+      _epoch.firstBlock,
+      _epoch.lastBlock,
+      _epoch.startTimestamp,
+      _epoch.rewardsBlock,
+      _epoch.elected
+    );
   }
 
   /**
