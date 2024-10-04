@@ -501,7 +501,7 @@ contract EpochManager is
       address[] memory elected
     )
   {
-    for (uint256 i = 0; i < totalEpochs; i++) {
+    for (uint256 i = firstKnownEpoch; i < currentEpochNumber; i++) {
       Epoch memory _epoch = epochs[i];
       if (blockNumber >= _epoch.firstBlock && blockNumber <= _epoch.lastBlock) {
         return (
