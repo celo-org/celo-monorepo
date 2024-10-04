@@ -136,11 +136,17 @@ contract UsingPrecompiles is IsL2Check, UsingRegistry {
    * @return Size of the validator set.
    */
   function numberValidatorsInSet(uint256 blockNumber) public view returns (uint256) {
-    bytes memory out;
-    bool success;
-    (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(blockNumber));
-    require(success, "error calling numberValidatorsInSet precompile");
-    return getUint256FromBytes(out, 0);
+    if (isL2()) {
+      (, , , , address[] memory elected) = getEpochManager().getEpochByNumber(blockNumber);
+
+      return elected.length;
+    } else {
+      bytes memory out;
+      bool success;
+      (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(blockNumber));
+      require(success, "error calling numberValidatorsInSet precompile");
+      return getUint256FromBytes(out, 0);
+    }
   }
 
   /**
