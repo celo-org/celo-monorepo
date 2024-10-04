@@ -478,7 +478,7 @@ contract EpochManager is
    * @notice Fills the processedGroups mapping with the groups that need to be processed.
    * @param election The Election contract.
    * @param _epochProcessing The current epoch processing state.
-   * @return The number of groups that need to be processed.
+   * @return toProcessGroups The number of groups that need to be processed.
    */
   function fillProcessedGroups(
     IElection election,
