@@ -32,9 +32,9 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
   MockStableToken08 stableToken;
   EpochRewardsMock08 epochRewards;
-  ValidatorsMock validators;
   MockElection election;
   MockAccounts accounts;
+  IMockValidators validators;
 
   address epochManagerEnabler;
   address carbonOffsettingPartner;
@@ -54,6 +54,9 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
   uint256 celoAmountForRate = 1e24;
   uint256 stableAmountForRate = 2 * celoAmountForRate;
+
+  uint256 validator1Reward = 42e18;
+  uint256 validator2Reward = 43e18;
 
   address validator1;
   uint256 validator1PK;
@@ -77,7 +80,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     epochManager = new EpochManager_WithMocks();
     sortedOracles = new MockSortedOracles();
     epochRewards = new EpochRewardsMock08();
-    validators = new ValidatorsMock();
+    validators = IMockValidators(actor("validators05"));
     stableToken = new MockStableToken08();
     celoToken = new MockCeloToken08();
     celoUnreleasedTreasury = new MockCeloUnreleasedTreasury();
@@ -100,6 +103,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
     deployCodeTo("MockRegistry.sol", abi.encode(false), REGISTRY_ADDRESS);
     deployCodeTo("ScoreManager.sol", abi.encode(false), scoreManagerAddress);
+    deployCodeTo("MockValidators.sol", abi.encode(false), address(validators));
 
     registry = IRegistry(REGISTRY_ADDRESS);
     scoreManager = ScoreManager(scoreManagerAddress);
@@ -123,7 +127,6 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     celoToken.setBalanceOf(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
 
     celoUnreleasedTreasury.setRegistry(REGISTRY_ADDRESS);
-    validators.setRegistry(REGISTRY_ADDRESS);
 
     sortedOracles.setMedianRate(address(stableToken), stableAmountForRate);
 
@@ -133,6 +136,9 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     epochRewards.setCarbonOffsettingPartner(carbonOffsettingPartner);
 
     blockTravel(vm, firstEpochBlock);
+
+    validators.setEpochRewards(validator1, validator1Reward);
+    validators.setEpochRewards(validator2, validator2Reward);
   }
 
   function initializeEpochManagerSystem() public {
@@ -252,8 +258,7 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     uint256 beforeBalance = stableToken.balanceOf(address(epochManager));
     epochManager.startNextEpochProcess();
 
-    uint256 afterBalance = stableToken.balanceOf(address(epochManager));
-    assertEq(afterBalance, 2);
+    assertEq(validators.mintedStable(), validator1Reward + validator2Reward);
   }
 
   function test_ShouldReleaseCorrectAmountToReserve() public {
@@ -261,7 +266,7 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     uint256 reserveBalanceBefore = celoToken.balanceOf(reserveAddress);
     epochManager.startNextEpochProcess();
     uint256 reserveBalanceAfter = celoToken.balanceOf(reserveAddress);
-    assertEq(reserveBalanceAfter, reserveBalanceBefore + 4);
+    assertEq(reserveBalanceAfter, stableAmountForRate * (validator1Reward + validator2Reward) / 1e24);
   }
 }
 
@@ -351,25 +356,19 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
 
   uint256 epochManagerBalanceBefore;
 
-  // TODO: unify mocks
-  IMockValidators mockValidators = IMockValidators(actor("MockValidators05"));
-
   function setUp() public override {
     super.setUp();
 
-    deployCodeTo("MockValidators.sol", abi.encode(false), address(mockValidators));
-    registry.setAddressFor(ValidatorsContract, address(mockValidators));
-
-    mockValidators.setValidatorGroup(group);
-    mockValidators.setValidator(validator1);
+    validators.setValidatorGroup(group);
+    validators.setValidator(validator1);
     accounts.setValidatorSigner(validator1, signer1);
-    mockValidators.setValidator(validator2);
+    validators.setValidator(validator2);
     accounts.setValidatorSigner(validator2, signer2);
 
     address[] memory members = new address[](3);
     members[0] = validator1;
     members[1] = validator2;
-    mockValidators.setMembers(group, members);
+    validators.setMembers(group, members);
 
     vm.prank(epochManagerEnabler);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
@@ -390,7 +389,7 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
   }
 
   function test_sendsCUsdFromEpochManagerToValidatorAndGroup() public {
-    mockValidators.setCommission(group, twentyFivePercent);
+    validators.setCommission(group, twentyFivePercent);
 
     epochManager.sendValidatorPayment(validator1);
 
@@ -418,7 +417,7 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
   }
 
   function test_sendsCUsdFromEpochManagerToValidatorAndGroupAndBeneficiary() public {
-    mockValidators.setCommission(group, fiftyPercent);
+    validators.setCommission(group, fiftyPercent);
     accounts.setPaymentDelegationFor(validator1, beneficiary, fiftyPercent);
 
     epochManager.sendValidatorPayment(validator1);
@@ -435,7 +434,7 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
   }
 
   function test_emitsAValidatorEpochPaymentDistributedEvent() public {
-    mockValidators.setCommission(group, fiftyPercent);
+    validators.setCommission(group, fiftyPercent);
     accounts.setPaymentDelegationFor(validator1, beneficiary, fiftyPercent);
 
     vm.expectEmit(true, true, true, true, address(epochManager));
@@ -451,7 +450,7 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
   }
 
   function test_doesNothingIfNotAllocated() public {
-    mockValidators.setCommission(group, fiftyPercent);
+    validators.setCommission(group, fiftyPercent);
     accounts.setPaymentDelegationFor(validator2, beneficiary, fiftyPercent);
 
     epochManager.sendValidatorPayment(validator2);
@@ -493,40 +492,32 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
 
   uint256 groupEpochRewards = 44e18;
 
-  IMockValidators mockValidators = IMockValidators(actor("MockValidators05"));
-
   function setUp() public override {
     super.setUp();
 
-    deployCodeTo("MockValidators.sol", abi.encode(false), address(mockValidators));
-    registry.setAddressFor(ValidatorsContract, address(mockValidators));
-
-    mockValidators.setValidatorGroup(group);
-    mockValidators.setValidator(validator1);
+    validators.setValidatorGroup(group);
+    validators.setValidator(validator1);
     accounts.setValidatorSigner(validator1, signer1);
-    mockValidators.setValidator(validator2);
+    validators.setValidator(validator2);
     accounts.setValidatorSigner(validator2, signer2);
 
-    mockValidators.setValidatorGroup(group2);
-    mockValidators.setValidator(validator3);
-    mockValidators.setValidator(validator4);
+    validators.setValidatorGroup(group2);
+    validators.setValidator(validator3);
+    validators.setValidator(validator4);
 
 
     address[] memory members = new address[](3);
     members[0] = validator1;
     members[1] = validator2;
-    mockValidators.setMembers(group, members);
+    validators.setMembers(group, members);
     members[0] = validator3;
     members[1] = validator4;
-    mockValidators.setMembers(group2, members);
+    validators.setMembers(group2, members);
 
     vm.prank(epochManagerEnabler);
     initializeEpochManagerSystem();
 
     elected = epochManager.getElected();
-
-    mockValidators.setEpochRewards(validator1, 42e18);
-    mockValidators.setEpochRewards(validator2, 43e18);
 
     election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
   }
