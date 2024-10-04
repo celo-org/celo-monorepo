@@ -34,6 +34,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
   EpochRewardsMock08 epochRewards;
   ValidatorsMock validators;
   MockElection election;
+  MockAccounts accounts;
 
   address epochManagerEnabler;
   address carbonOffsettingPartner;
@@ -81,6 +82,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     celoToken = new MockCeloToken08();
     celoUnreleasedTreasury = new MockCeloUnreleasedTreasury();
     election = new MockElection();
+    accounts = new MockAccounts();
 
     (validator1, validator1PK) = actorWithPK(vm, "validator1");
     (validator2, validator2PK) = actorWithPK(vm, "validator2");
@@ -114,6 +116,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     registry.setAddressFor(CeloTokenContract, address(celoToken));
     registry.setAddressFor(ReserveContract, reserveAddress);
     registry.setAddressFor(ElectionContract, address(election));
+    registry.setAddressFor(AccountsContract, address(accounts));
 
     celoToken.setTotalSupply(CELO_SUPPLY_CAP);
     vm.deal(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
@@ -351,16 +354,11 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
   // TODO: unify mocks
   IMockValidators mockValidators = IMockValidators(actor("MockValidators05"));
 
-  MockAccounts accounts;
-
   function setUp() public override {
     super.setUp();
 
     deployCodeTo("MockValidators.sol", abi.encode(false), address(mockValidators));
     registry.setAddressFor(ValidatorsContract, address(mockValidators));
-
-    accounts = new MockAccounts();
-    registry.setAddressFor(AccountsContract, address(accounts));
 
     mockValidators.setValidatorGroup(group);
     mockValidators.setValidator(validator1);
@@ -497,16 +495,11 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
 
   IMockValidators mockValidators = IMockValidators(actor("MockValidators05"));
 
-  MockAccounts accounts;
-  
   function setUp() public override {
     super.setUp();
 
     deployCodeTo("MockValidators.sol", abi.encode(false), address(mockValidators));
     registry.setAddressFor(ValidatorsContract, address(mockValidators));
-
-    accounts = new MockAccounts();
-    registry.setAddressFor(AccountsContract, address(accounts));
 
     mockValidators.setValidatorGroup(group);
     mockValidators.setValidator(validator1);
