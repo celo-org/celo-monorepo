@@ -11,13 +11,13 @@ contract ScoreManager is Initializable, Ownable {
     bool exists;
   }
 
-  event GroupScoreSet(address indexed group, uint256 score);
-  event ValidatorScoreSet(address indexed validator, uint256 score);
-
   uint256 private constant FIXED1_UINT = 1e24;
 
   mapping(address => Score) public groupScores;
   mapping(address => Score) public validatorScores;
+
+  event GroupScoreSet(address indexed group, uint256 score);
+  event ValidatorScoreSet(address indexed validator, uint256 score);
 
   /**
    * @notice Sets initialized == true on implementation contracts
