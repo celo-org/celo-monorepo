@@ -1,4 +1,4 @@
-pragma solidity >=0.5.13 < 0.9;
+pragma solidity >=0.5.13 <0.9;
 
 interface IEpochRewardsInitializer {
   function initialize(

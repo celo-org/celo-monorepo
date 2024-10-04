@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.7 < 0.9;
+pragma solidity >=0.8.7 <0.9;
 
 import "@openzeppelin/contracts8/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";

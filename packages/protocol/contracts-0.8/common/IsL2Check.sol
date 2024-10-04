@@ -1,4 +1,4 @@
-pragma solidity >=0.5.13 < 0.9;
+pragma solidity >=0.5.13 <0.9;
 
 /**
  * @title Based on predeploy returns whether this is L1 or L2.

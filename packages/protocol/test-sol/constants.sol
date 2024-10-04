@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.5.13 < 0.9;
+pragma solidity >=0.5.13 <0.9;
 
 contract TestConstants {
   // Units

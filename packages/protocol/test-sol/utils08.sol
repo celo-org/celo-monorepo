@@ -1,4 +1,4 @@
-pragma solidity >=0.5.13 < 0.9;
+pragma solidity >=0.5.13 <0.9;
 
 import "celo-foundry-8/Test.sol";
 

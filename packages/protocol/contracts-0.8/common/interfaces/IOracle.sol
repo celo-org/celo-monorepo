@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.5.13 < 0.9;
+pragma solidity >=0.5.13 <0.9;
 
 /// Possibly not final version
 interface IOracle {

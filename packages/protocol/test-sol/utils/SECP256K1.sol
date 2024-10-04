@@ -1,4 +1,4 @@
-pragma solidity >=0.5.13 < 0.9;
+pragma solidity >=0.5.13 <0.9;
 
 /// XXX: Adding this library here instead of importing as a submodule, because of a version incompatibility,
 /// causing foundry to not build the contract when testing contracts with versions < 0.8.17.
