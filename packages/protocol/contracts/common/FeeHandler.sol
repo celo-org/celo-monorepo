@@ -70,6 +70,7 @@ contract FeeHandler is
   // compiler version
   mapping(address => TokenState) private tokenStates;
 
+  // Celo not included in this list
   EnumerableSet.AddressSet private activeTokens;
 
   event SoldAndBurnedToken(address token, uint256 value);
@@ -277,6 +278,10 @@ contract FeeHandler is
     @return A boolean representing the active status of the specified token.
   */
   function getTokenActive(address tokenAddress) external view returns (bool) {
+    return _getTokenActive(tokenAddress);
+  }
+
+  function _getTokenActive(address tokenAddress) internal view returns (bool) {
     return activeTokens.contains(tokenAddress);
   }
 
@@ -384,8 +389,7 @@ contract FeeHandler is
   function _activateToken(address tokenAddress) private {
     TokenState storage tokenState = tokenStates[tokenAddress];
     require(
-      tokenState.handler != address(0) ||
-        tokenAddress == registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID),
+      tokenState.handler != address(0) || tokenAddress == getCeloTokenAddress(),
       "Handler has to be set to activate token"
     );
     activeTokens.add(tokenAddress);
@@ -412,7 +416,7 @@ contract FeeHandler is
     IERC20 token = IERC20(tokenAddress);
 
     TokenState storage tokenState = tokenStates[tokenAddress];
-    require(tokenState.handler != address(0), "Handler has to be set to sell token");
+    require(_getTokenActive(tokenAddress), "Token needs to be active to sell");
     require(
       FixidityLib.unwrap(tokenState.maxSlippage) != 0,
       "Max slippage has to be set to sell token"
@@ -443,7 +447,7 @@ contract FeeHandler is
 
     uint256 celoReceived = handler.sell(
       tokenAddress,
-      registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID),
+      getCeloTokenAddress(),
       balanceToBurn,
       FixidityLib.unwrap(tokenState.maxSlippage)
     );
@@ -461,13 +465,14 @@ contract FeeHandler is
     uint256 tokenBalance = token.balanceOf(address(this));
 
     TokenState storage tokenState = tokenStates[tokenAddress];
+
     require(
-      tokenState.handler != address(0) ||
+      _getTokenActive(tokenAddress) ||
         tokenAddress == registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID),
-      "Handler has to be set to sell token"
+      "Token needs to be active"
     );
 
-    // safty check to avoid a revert due balance
+    // safety check to avoid a revert due balance
     uint256 balanceToDistribute = Math.min(tokenBalance, tokenState.toDistribute);
 
     if (balanceToDistribute == 0) {
@@ -502,55 +507,53 @@ contract FeeHandler is
       _distribute(token);
     }
     // distribute Celo
-    _distribute(registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID));
+    _distribute(getCeloTokenAddress());
   }
 
   function _handleAll() private {
-    for (uint256 i = 0; i < EnumerableSet.length(activeTokens); i++) {
-      // calling _handle would trigger may burn Celo and distributions
-      // that can be just batched at the end
-      address token = activeTokens.get(i);
-      _sell(token);
-    }
-    _distributeAll(); // distributes Celo as well
-    _burnCelo();
+    _handle(activeTokens.values);
   }
 
-  // old handle
+  // avoid using UsingRegistry contract
+  function getCeloTokenAddress() private view returns (address) {
+    return registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID);
+  }
+
+  function _handleCelo() private {
+    _burnCelo();
+    address celoToken = getCeloTokenAddress();
+    _distribute(celoToken);
+  }
+
+  // tokenAddress can be Celo
   function _handle(address tokenAddress) private {
-    // Celo doesn't have to be exchanged for anything
-    if (tokenAddress != registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID)) {
+    address celoToken = getCeloTokenAddress();
+    if (tokenAddress != celoToken) {
       _sell(tokenAddress);
     }
-    _burnCelo();
-    _distribute(tokenAddress);
-    _distribute(registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID)); // function distribute Celo
+    _handleCelo();
   }
 
-  // // new handle
-  // function _handle(address[] tokenAddresses) private {
-  //   address celoTokeen = registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID);
-  //   // Celo doesn't have to be exchanged for anything
-  //   for (uint256 i = 0; i < tokenAddresses.length; i++) {
-  //     address token = tokenAddresses[i];
-  //     if (token != celoTokeen) {
-  //       _sell(token);
-  //     }
-  //     _distribute(tokenAddress);
-  //   }
+  // new handle
+  // tokenAddresses should not contain the Celo address
+  function _handle(address[] memory tokenAddresses) private {
+    address celoToken = getCeloTokenAddress();
+    // Celo doesn't have to be exchanged for anything
+    for (uint256 i = 0; i < tokenAddresses.length; i++) {
+      address token = tokenAddresses[i];
+      _sell(token);
+      _distribute(token);
+    }
 
-  //   _burnCelo();
-  //   _distribute(registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID)); // function distribute Celo
-  // }
+    _handleCelo();
+  }
 
   /**
    * @notice Burns all the Celo balance of this contract.
    */
   function _burnCelo() private {
-    TokenState storage tokenState = tokenStates[
-      registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID)
-    ];
-    ICeloToken celo = ICeloToken(registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID));
+    TokenState storage tokenState = tokenStates[getCeloTokenAddress()];
+    ICeloToken celo = ICeloToken(getCeloTokenAddress());
 
     uint256 balanceOfCelo = address(this).balance;
 
