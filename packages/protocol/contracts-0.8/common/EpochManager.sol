@@ -476,7 +476,7 @@ contract EpochManager is
     onlySystemAlreadyInitialized
     returns (uint256, uint256, uint256, uint256, address[] memory)
   {
-    Epoch storage _epoch = epochs[epochNumber];
+    Epoch memory _epoch = epochs[epochNumber];
     return (
       _epoch.firstBlock,
       _epoch.lastBlock,
@@ -486,6 +486,36 @@ contract EpochManager is
     );
   }
 
+  function getEpochByBlockNumber(
+    uint256 blockNumber
+  )
+    public
+    view
+    onlySystemAlreadyInitialized
+    returns (
+      uint256 epochNumber,
+      uint256 firstBlock,
+      uint256 lastBlock,
+      uint256 startTimestamp,
+      uint256 rewardsBlock,
+      address[] memory elected
+    )
+  {
+    for (uint256 i = 0; i < totalEpochs; i++) {
+      Epoch memory _epoch = epochs[i];
+      if (blockNumber >= _epoch.firstBlock && blockNumber <= _epoch.lastBlock) {
+        return (
+          i,
+          _epoch.firstBlock,
+          _epoch.lastBlock,
+          _epoch.startTimestamp,
+          _epoch.rewardsBlock,
+          _epoch.elected
+        );
+      }
+    }
+    revert("No matching epoch found for the given block number");
+  }
   /**
    * @notice Allocates rewards to elected validator accounts.
    */

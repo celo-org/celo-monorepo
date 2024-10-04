@@ -147,7 +147,7 @@ contract UsingPrecompiles is IsL2Check, UsingRegistry {
     uint256 index,
     uint256 blockNumber
   ) public view onlyL2 returns (address) {
-    (, , , , address[] memory _elected) = getEpochManager().getEpochByNumber(blockNumber);
+    (, , , , address[] memory _elected) = getEpochManager().getEpochByBlockNumber(blockNumber);
     return _elected[index];
   }
 
@@ -174,7 +174,7 @@ contract UsingPrecompiles is IsL2Check, UsingRegistry {
    */
   function numberValidatorsInSet(uint256 blockNumber) public view returns (uint256) {
     if (isL2()) {
-      (, , , , address[] memory elected) = getEpochManager().getEpochByNumber(blockNumber);
+      (, , , , address[] memory elected) = getEpochManager().getEpochByBlockNumber(blockNumber);
 
       return elected.length;
     } else {
