@@ -13,6 +13,7 @@ import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/IEpochManager.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IEpochManagerInitializer.sol";
+import { tuint256 } from "transient-goodies/TransientPrimitives.sol";
 
 contract EpochManager is
   Initializable,
@@ -44,10 +45,6 @@ contract EpochManager is
     uint256 totalRewardsCarbonFund; // The total carbon offsetting partner reward.
   }
 
-  struct ProcessedGroup {
-    bool processed;
-    uint256 epochRewards;
-  }
   bool public isSystemInitialized;
 
   // the length of an epoch in seconds
@@ -58,7 +55,7 @@ contract EpochManager is
   address public oracleAddress;
   address[] public elected;
 
-  mapping(address => ProcessedGroup) public processedGroups;
+  mapping(address => tuint256) public processedGroups;
 
   EpochProcessState public epochProcessing;
   mapping(uint256 => Epoch) private epochs;
@@ -229,39 +226,19 @@ contract EpochManager is
 
     EpochProcessState storage _epochProcessing = epochProcessing;
 
-    uint256 toProcessGroups = 0;
-    IValidators validators = getValidators();
     IElection election = getElection();
-    IScoreReader scoreReader = getScoreReader();
-    for (uint i = 0; i < elected.length; i++) {
-      address group = validators.getValidatorsGroup(elected[i]);
-      if (!processedGroups[group].processed) {
-        toProcessGroups++;
-        uint256 groupScore = scoreReader.getGroupScore(group);
-        // We need to precompute epoch rewards for each group since computation depends on total active votes for all groups.
-        uint256 epochRewards = election.getGroupEpochRewardsBasedOnScore(
-          group,
-          _epochProcessing.totalRewardsVoter,
-          groupScore
-        );
-        processedGroups[group] = ProcessedGroup(true, epochRewards);
-      }
-    }
+    uint256 toProcessGroups = fillProcessedGroups(election, _epochProcessing);
 
     require(toProcessGroups == groups.length, "number of groups does not match");
 
     for (uint i = 0; i < groups.length; i++) {
-      ProcessedGroup storage processedGroup = processedGroups[groups[i]];
+      uint256 epochRewards = processedGroups[groups[i]].get();
       // checks that group is actually from elected group
-      require(processedGroup.processed, "group not from current elected set");
-      election.distributeEpochRewards(
-        groups[i],
-        processedGroup.epochRewards,
-        lessers[i],
-        greaters[i]
-      );
-
-      delete processedGroups[groups[i]];
+      require(epochRewards > 0, "group not from current elected set");
+      if (epochRewards == type(uint256).max) {
+        continue;
+      }
+      election.distributeEpochRewards(groups[i], epochRewards, lessers[i], greaters[i]);
     }
     getCeloUnreleasedTreasury().release(
       registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID),
@@ -495,5 +472,37 @@ contract EpochManager is
       registry.getAddressForOrDie(RESERVE_REGISTRY_ID),
       CELOequivalent
     );
+  }
+
+  /**
+   * @notice Fills the processedGroups mapping with the groups that need to be processed.
+   * @param election The Election contract.
+   * @param _epochProcessing The current epoch processing state.
+   * @return The number of groups that need to be processed.
+   */
+  function fillProcessedGroups(
+    IElection election,
+    EpochProcessState storage _epochProcessing
+  ) internal returns (uint256 toProcessGroups) {
+    IScoreReader scoreReader = getScoreReader();
+    IValidators validators = getValidators();
+
+    for (uint i = 0; i < elected.length; i++) {
+      address group = validators.getValidatorsGroup(elected[i]);
+      tuint256 storage processedGroup = processedGroups[group];
+      if (processedGroup.get() == 0) {
+        toProcessGroups++;
+        uint256 groupScore = scoreReader.getGroupScore(group);
+        // We need to precompute epoch rewards for each group since computation depends on total active votes for all groups.
+        uint256 epochRewards = election.getGroupEpochRewardsBasedOnScore(
+          group,
+          _epochProcessing.totalRewardsVoter,
+          groupScore
+        );
+
+        // If the group has no votes, we set the rewards to max uint256 so we can recognize that this group should be processed
+        processedGroup.set(epochRewards == 0 ? type(uint256).max : epochRewards);
+      }
+    }
   }
 }
