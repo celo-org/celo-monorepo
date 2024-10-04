@@ -117,6 +117,18 @@ contract MockEpochManager is IEpochManager {
     return isProcessingEpoch;
   }
 
+  function getEpochByBlockNumber(
+    uint256 _blockNumber
+  ) external view returns (uint256, uint256, uint256, uint256, address[] memory) {
+    address[] memory _elected = new address[](0);
+
+    return (0, 0, 0, 0, _elected);
+  }
+
+  function getEpochNumberOfBlock(uint256 _blockNumber) external view returns (uint256) {
+    return 0;
+  }
+
   function sendValidatorPayment(address validator) public {
     emit SendValidatorPaymentCalled(validator);
   }

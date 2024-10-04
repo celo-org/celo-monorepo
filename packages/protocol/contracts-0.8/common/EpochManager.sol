@@ -403,6 +403,38 @@ contract EpochManager is
   }
 
   /**
+   * @notice Returns the epoch number of a specified blockNumber.
+   * @param _blockNumber Block number of the epoch info is retreived.
+   */
+  function getEpochNumberOfBlock(uint256 _blockNumber) external view returns (uint256) {
+    (uint256 _epochNumber, , , , , ) = _getEpochByBlockNumber(_blockNumber);
+    return _epochNumber;
+  }
+
+  /**
+   * @notice Returns the epoch info of a specified blockNumber.
+   * @param _blockNumber Block number of the epoch info is retreived.
+   * @return firstEpoch The first block of the given block number.
+   * @return lastBlock The first block of the given block number.
+   * @return startTimestamp The starting timestamp of the given block number.
+   * @return rewardsBlock The reward block of the given block number.
+   * @return elected The set of elected validator for the given block number.
+   */
+  function getEpochByBlockNumber(
+    uint256 _blockNumber
+  ) external view returns (uint256, uint256, uint256, uint256, address[] memory) {
+    (
+      ,
+      uint256 _firstBlock,
+      uint256 _lastBlock,
+      uint256 _startTimestamp,
+      uint256 _rewardsBlock,
+      address[] memory _elected
+    ) = _getEpochByBlockNumber(_blockNumber);
+    return (_firstBlock, _lastBlock, _startTimestamp, _rewardsBlock, _elected);
+  }
+
+  /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return Storage version of the contract.
    * @return Major version of the contract.
@@ -487,67 +519,6 @@ contract EpochManager is
   }
 
   /**
-   * @notice Returns the epoch info of a specified blockNumber.
-   * @param blockNumber Block number of the epoch info is retreived.
-   * @return firstEpoch The first block of the given block number.
-   * @return lastBlock The first block of the given block number.
-   * @return startTimestamp The starting timestamp of the given block number.
-   * @return rewardsBlock The reward block of the given block number.
-   * @return elected The set of elected validator for the given block number.
-   */
-  function getEpochByBlockNumber(
-    uint256 _blockNumber
-  )
-    public
-    view
-    onlySystemAlreadyInitialized
-    returns (
-      uint256 epochNumber,
-      uint256 firstBlock,
-      uint256 lastBlock,
-      uint256 startTimestamp,
-      uint256 rewardsBlock,
-      address[] memory elected
-    )
-  {
-    require(_blockNumber <= block.number(), "Invalid blockNumber. Value too high.");
-
-    (uint256 _firstBlockOfFirstEpoch, , , , ) = getEpochByNumber(firstKnownEpoch);
-
-    require(_blockNumber >= _firstBlockOfFirstEpoch, "Invalid blockNumber. Value too low.");
-
-    uint256 _firstBlockOfCurrentEpoch = epochs[currentEpochNumber].firstBlock;
-
-    if (_blockNumber > _firstBlockOfCurrentEpoch) {
-      return getCurrentEpoch();
-    }
-
-    uint256 left = firstKnownEpoch;
-    uint256 right = currentEpochNumber - 1;
-
-    while (left <= right) {
-      uint256 mid = (left + right) / 2;
-      Epoch memory _epoch = epochs[mid];
-
-      if (_blockNumber >= _epoch.firstBlock && blockNumber <= _epoch.lastBlock) {
-        return (
-          mid,
-          _epoch.firstBlock,
-          _epoch.lastBlock,
-          _epoch.startTimestamp,
-          _epoch.rewardsBlock,
-          _epoch.elected
-        );
-      } else if (blockNumber < _epoch.firstBlock) {
-        right = mid - 1;
-      } else {
-        left = mid + 1;
-      }
-    }
-
-    revert("No matching epoch found for the given block number.");
-  }
-  /**
    * @notice Allocates rewards to elected validator accounts.
    */
   function allocateValidatorsRewards() internal {
@@ -583,5 +554,74 @@ contract EpochManager is
       registry.getAddressForOrDie(RESERVE_REGISTRY_ID),
       CELOequivalent
     );
+  }
+
+  /**
+   * @notice Returns the epoch info of a specified blockNumber.
+   * @param _blockNumber Block number of the epoch info is retreived.
+   * @return firstEpoch The first block of the given block number.
+   * @return lastBlock The first block of the given block number.
+   * @return startTimestamp The starting timestamp of the given block number.
+   * @return rewardsBlock The reward block of the given block number.
+   * @return elected The set of elected validator for the given block number.
+   */
+  function _getEpochByBlockNumber(
+    uint256 _blockNumber
+  )
+    internal
+    view
+    onlySystemAlreadyInitialized
+    returns (uint256, uint256, uint256, uint256, uint256, address[] memory)
+  {
+    require(_blockNumber <= block.number, "Invalid blockNumber. Value too high.");
+
+    (uint256 _firstBlockOfFirstEpoch, , , , ) = getEpochByNumber(firstKnownEpoch);
+
+    require(_blockNumber >= _firstBlockOfFirstEpoch, "Invalid blockNumber. Value too low.");
+
+    uint256 _firstBlockOfCurrentEpoch = epochs[currentEpochNumber].firstBlock;
+
+    if (_blockNumber > _firstBlockOfCurrentEpoch) {
+      (
+        uint256 _firstBlock,
+        uint256 _lastBlock,
+        uint256 _startTimestamp,
+        uint256 _rewardsBlock,
+        address[] memory _elected
+      ) = getEpochByNumber(currentEpochNumber);
+      return (
+        currentEpochNumber,
+        _firstBlock,
+        _lastBlock,
+        _startTimestamp,
+        _rewardsBlock,
+        _elected
+      );
+    }
+
+    uint256 left = firstKnownEpoch;
+    uint256 right = currentEpochNumber - 1;
+
+    while (left <= right) {
+      uint256 mid = (left + right) / 2;
+      Epoch memory _epoch = epochs[mid];
+
+      if (_blockNumber >= _epoch.firstBlock && _blockNumber <= _epoch.lastBlock) {
+        return (
+          mid,
+          _epoch.firstBlock,
+          _epoch.lastBlock,
+          _epoch.startTimestamp,
+          _epoch.rewardsBlock,
+          _epoch.elected
+        );
+      } else if (_blockNumber < _epoch.firstBlock) {
+        right = mid - 1;
+      } else {
+        left = mid + 1;
+      }
+    }
+
+    revert("No matching epoch found for the given block number.");
   }
 }

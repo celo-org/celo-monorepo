@@ -74,8 +74,11 @@ contract UsingPrecompiles is IsL2Check, UsingRegistry {
    * @return Epoch number.
    */
   function getEpochNumberOfBlock(uint256 blockNumber) public view returns (uint256) {
-    allowOnlyL1();
-    return epochNumberOfBlock(blockNumber, getEpochSize());
+    if (isL2()) {
+      return getEpochManager().getEpochNumberOfBlock(blockNumber);
+    } else {
+      return epochNumberOfBlock(blockNumber, getEpochSize());
+    }
   }
 
   /**
