@@ -20,6 +20,7 @@ import "@celo-contracts/common/interfaces/IRegistry.sol";
 import { IMockValidators } from "@celo-contracts-8/governance/test/IMockValidators.sol";
 
 import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
+import { MockElection } from "@celo-contracts/governance/test/MockElection.sol";
 
 import { MockAccounts } from "@celo-contracts-8/common/mocks/MockAccounts.sol";
 import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
@@ -32,6 +33,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
   MockStableToken08 stableToken;
   EpochRewardsMock08 epochRewards;
   ValidatorsMock validators;
+  MockElection election;
 
   address epochManagerEnabler;
   address carbonOffsettingPartner;
@@ -51,6 +53,11 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
   uint256 celoAmountForRate = 1e24;
   uint256 stableAmountForRate = 2 * celoAmountForRate;
+
+  address validator1;
+  uint256 validator1PK;
+  address validator2;
+  uint256 validator2PK;
 
   event ValidatorEpochPaymentDistributed(
     address indexed validator,
@@ -73,9 +80,13 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     stableToken = new MockStableToken08();
     celoToken = new MockCeloToken08();
     celoUnreleasedTreasury = new MockCeloUnreleasedTreasury();
+    election = new MockElection();
 
-    firstElected.push(actor("validator1"));
-    firstElected.push(actor("validator2"));
+    (validator1, validator1PK) = actorWithPK(vm, "validator1");
+    (validator2, validator2PK) = actorWithPK(vm, "validator2");
+
+    firstElected.push(validator1);
+    firstElected.push(validator2);
 
     scoreManagerAddress = actor("scoreManagerAddress");
 
@@ -102,6 +113,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     registry.setAddressFor(CeloUnreleasedTreasuryContract, address(celoUnreleasedTreasury));
     registry.setAddressFor(CeloTokenContract, address(celoToken));
     registry.setAddressFor(ReserveContract, reserveAddress);
+    registry.setAddressFor(ElectionContract, address(election));
 
     celoToken.setTotalSupply(CELO_SUPPLY_CAP);
     vm.deal(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
@@ -115,6 +127,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     scoreManager.setValidatorScore(actor("validator1"), 1);
 
     epochManager.initialize(REGISTRY_ADDRESS, 10);
+    epochRewards.setCarbonOffsettingPartner(carbonOffsettingPartner);
 
     blockTravel(vm, firstEpochBlock);
   }
@@ -226,9 +239,9 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     ) = epochManager.getEpochProcessingState();
     assertEq(status, 1);
     assertEq(perValidatorReward, 5);
-    assertEq(totalRewardsVoter, 5);
-    assertEq(totalRewardsCommunity, 5);
-    assertEq(totalRewardsCarbonFund, 5);
+    assertEq(totalRewardsVoter, 6);
+    assertEq(totalRewardsCommunity, 7);
+    assertEq(totalRewardsCarbonFund, 8);
   }
 
   function test_ShouldMintTotalValidatorStableRewardsToEpochManager() public {
@@ -322,9 +335,7 @@ contract EpochManagerTest_setOracleAddress is EpochManagerTest {
 
 contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
   address group = actor("group");
-  address validator1 = actor("validator1");
   address signer1 = actor("signer1");
-  address validator2 = actor("validator2");
   address signer2 = actor("signer2");
   address beneficiary = actor("beneficiary");
 
@@ -467,5 +478,122 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
 
     assertEq(validatorBalanceAfter, paymentAmount);
     assertEq(epochManagerBalanceAfter, epochManagerBalanceBefore - paymentAmount);
+  }
+}
+
+contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
+  address signer1 = actor("signer1");
+  address signer2 = actor("signer2");
+
+  address validator3 = actor("validator3");
+  address validator4 = actor("validator4");
+
+  address group2 = actor("group2");
+
+  address[] elected;
+  address group = actor("group");
+
+  uint256 groupEpochRewards = 44e18;
+
+  IMockValidators mockValidators = IMockValidators(actor("MockValidators05"));
+
+  MockAccounts accounts;
+  
+  function setUp() public override {
+    super.setUp();
+
+    deployCodeTo("MockValidators.sol", abi.encode(false), address(mockValidators));
+    registry.setAddressFor(ValidatorsContract, address(mockValidators));
+
+    accounts = new MockAccounts();
+    registry.setAddressFor(AccountsContract, address(accounts));
+
+    mockValidators.setValidatorGroup(group);
+    mockValidators.setValidator(validator1);
+    accounts.setValidatorSigner(validator1, signer1);
+    mockValidators.setValidator(validator2);
+    accounts.setValidatorSigner(validator2, signer2);
+
+    mockValidators.setValidatorGroup(group2);
+    mockValidators.setValidator(validator3);
+    mockValidators.setValidator(validator4);
+
+
+    address[] memory members = new address[](3);
+    members[0] = validator1;
+    members[1] = validator2;
+    mockValidators.setMembers(group, members);
+    members[0] = validator3;
+    members[1] = validator4;
+    mockValidators.setMembers(group2, members);
+
+    vm.prank(epochManagerEnabler);
+    initializeEpochManagerSystem();
+
+    elected = epochManager.getElected();
+
+    mockValidators.setEpochRewards(validator1, 42e18);
+    mockValidators.setEpochRewards(validator2, 43e18);
+
+    election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
+  }
+
+  function test_Reverts_WhenNotStarted() public {
+    address[] memory groups = new address[](0);
+
+    vm.expectRevert("Epoch process is not started");
+    epochManager.finishNextEpochProcess(groups, groups, groups);
+  }
+
+  function test_Reverts_WhenGroupsDoNotMatch() public {
+    address[] memory groups = new address[](0);
+    epochManager.startNextEpochProcess();
+    vm.expectRevert("number of groups does not match");
+    epochManager.finishNextEpochProcess(groups, groups, groups);
+  }
+
+   function test_Reverts_WhenGroupsNotFromElected() public {
+    address[] memory groups = new address[](1);
+    groups[0] = group2;
+    epochManager.startNextEpochProcess();
+    vm.expectRevert("group not from current elected set");
+    epochManager.finishNextEpochProcess(groups, groups, groups);
+  }
+
+   function test_SucceedsToFinishNextEpochProcess() public {
+    address[] memory groups = new address[](1);
+    groups[0] = group;
+    epochManager.startNextEpochProcess();
+    
+    address[] memory lessers = new address[](1);
+    lessers[0] = address(0);
+
+    address[] memory greaters = new address[](1);
+    greaters[0] = address(0);
+
+    address[] memory newElected = new address[](2);
+    newElected[0] = validator3;
+    newElected[1] = validator4;
+    election.setElectedValidators(newElected);
+
+    (
+      uint256 status,
+      uint256 perValidatorReward,
+      uint256 totalRewardsVoter,
+      uint256 totalRewardsCommunity,
+      uint256 totalRewardsCarbonFund
+    ) = epochManager.getEpochProcessingState();
+
+    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+
+    address[] memory afterElected = epochManager.getElected();
+
+    for (uint256 i = 0; i < newElected.length; i++) {
+      assertEq(newElected[i], afterElected[i]);
+    }
+
+    assertEq(celoToken.balanceOf(communityRewardFund), epochRewards.totalRewardsCommunity());
+    assertEq(celoToken.balanceOf(carbonOffsettingPartner), epochRewards.totalRewardsCarbonFund());
+    assertEq(election.distributedEpochRewards(group), groupEpochRewards);
   }
 }
