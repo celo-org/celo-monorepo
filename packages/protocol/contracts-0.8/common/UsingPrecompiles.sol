@@ -86,18 +86,53 @@ contract UsingPrecompiles is IsL2Check, UsingRegistry {
   }
 
   /**
-   * @notice Gets a validator address from the current validator set.
+   * @notice Gets a validator signer address from the current validator set.
    * @param index Index of requested validator in the validator set.
-   * @return Address of validator at the requested index.
+   * @return Address of validator signer at the requested index.
    */
   function validatorSignerAddressFromCurrentSet(
     uint256 index
   ) public view virtual returns (address) {
-    bytes memory out;
-    bool success;
-    (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, uint256(block.number)));
-    require(success, "error calling validatorSignerAddressFromCurrentSet precompile");
-    return address(uint160(getUint256FromBytes(out, 0)));
+    if (isL2()) {
+      return getAccounts().getValidatorSigner(validatorAddressFromCurrentSet(index));
+    } else {
+      bytes memory out;
+      bool success;
+      (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, uint256(block.number)));
+      require(success, "error calling validatorSignerAddressFromCurrentSet precompile");
+      return address(uint160(getUint256FromBytes(out, 0)));
+    }
+  }
+
+  /**
+   * @notice Gets a validator address from the current validator set.
+   * @param index Index of requested validator in the validator set.
+   * @return Address of validator at the requested index.
+   */
+  function validatorAddressFromCurrentSet(uint256 index) public view onlyL2 returns (address) {
+    address[] memory _elected = getEpochManager().getElected();
+    return _elected[index];
+  }
+
+  /**
+   * @notice Gets a validator signer address from the validator set at the given block number.
+   * @param index Index of requested validator in the validator set.
+   * @param blockNumber Block number to retrieve the validator set from.
+   * @return Address of validator signer at the requested index.
+   */
+  function validatorSignerAddressFromSet(
+    uint256 index,
+    uint256 blockNumber
+  ) public view returns (address) {
+    if (isL2()) {
+      return getAccounts().getValidatorSigner(validatorAddressFromSet(index, blockNumber));
+    } else {
+      bytes memory out;
+      bool success;
+      (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, blockNumber));
+      require(success, "error calling validatorSignerAddressFromSet precompile");
+      return address(uint160(getUint256FromBytes(out, 0)));
+    }
   }
 
   /**
@@ -106,15 +141,12 @@ contract UsingPrecompiles is IsL2Check, UsingRegistry {
    * @param blockNumber Block number to retrieve the validator set from.
    * @return Address of validator at the requested index.
    */
-  function validatorSignerAddressFromSet(
+  function validatorAddressFromSet(
     uint256 index,
     uint256 blockNumber
-  ) public view returns (address) {
-    bytes memory out;
-    bool success;
-    (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, blockNumber));
-    require(success, "error calling validatorSignerAddressFromSet precompile");
-    return address(uint160(getUint256FromBytes(out, 0)));
+  ) public view onlyL2 returns (address) {
+    (, , , , address[] memory _elected) = getEpochManager().getEpochByNumber(blockNumber);
+    return _elected[index];
   }
 
   /**
