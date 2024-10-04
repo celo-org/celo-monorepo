@@ -22,6 +22,8 @@ import "@mento-core/test/mocks/MockReserve.sol";
 import "@celo-contracts/common/ProxyFactory.sol";
 import "@celo-contracts/governance/GovernanceApproverMultiSig.sol";
 
+import { console } from "forge-std/console.sol";
+
 contract FeeHandlerTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
@@ -339,6 +341,7 @@ contract FeeHandlerTest_Distribute is FeeHandlerTest {
     _;
   }
 
+  // todo change this to a function and take parameters
   modifier activateToken() {
     feeHandler.addToken(address(stableToken), address(mentoSeller));
     feeHandler.activateToken(address(stableToken));
@@ -551,6 +554,38 @@ contract FeeHandlerTest_SellMentoTokens is FeeHandlerTest {
     // selling again shouldn't do anything
     feeHandler.sell(address(stableToken));
     assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
+  }
+
+  function test_Sell_WhenOtherTokenHitLimit()
+    public
+    setBurnFraction
+    setMaxSlippage
+    addStableToken
+    fundFeeHandlerStable(3000)
+  {
+    feeHandler.setDailySellLimit(address(stableToken), 1000);
+    feeHandler.sell(address(stableToken));
+    assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
+    // selling again shouldn't do anything
+    feeHandler.sell(address(stableToken));
+    assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
+
+    // TODO test this in handle all
+    // make funtions fund more general
+    // try selling another token
+    uint256 celoAmount = 1e18;
+    celoToken.approve(address(exchangeEUR), celoAmount);
+    exchangeEUR.sell(celoAmount, 0, true);
+    uint256 stableAmount = 3000;
+    feeHandler.setMaxSplippage(address(stableTokenEUR), FIXED1);
+    console.log("Balance of StableToken", stableTokenEUR.balanceOf(address(feeHandler)));
+    stableTokenEUR.transfer(address(feeHandler), stableAmount);
+    feeHandler.addToken(address(stableTokenEUR), address(mentoSeller));
+    feeHandler.activateToken(address(stableTokenEUR));
+    feeHandler.setDailySellLimit(address(stableTokenEUR), 1000);
+    feeHandler.sell(address(stableTokenEUR));
+
+    assertEq(stableTokenEUR.balanceOf(address(feeHandler)), 2000);
   }
 
   function test_Reverts_WhenHandlerNotSet()

@@ -48,6 +48,7 @@ contract FeeHandler is
     uint256 toDistribute;
     // Historical amounts burned by this contract
     uint256 pastBurn;
+    uint256 lastLimitDay;
   }
 
   uint256 public constant FIXED1_UINT = 1000000000000000000000000; // TODO move to FIX and add check
@@ -56,7 +57,7 @@ contract FeeHandler is
   uint256 public constant MIN_BURN = 200;
 
   // last day the daily limits were updated
-  uint256 public lastLimitDay;
+  uint256 private _lastLimitDay; // deprecated
 
   FixidityLib.Fraction public burnFraction; // 80%
 
@@ -344,8 +345,8 @@ contract FeeHandler is
 
     uint256 currentDay = now / 1 days;
     // Pattern borrowed from Reserve.sol
-    if (currentDay > lastLimitDay) {
-      lastLimitDay = currentDay;
+    if (currentDay > tokenState.lastLimitDay) {
+      tokenState.lastLimitDay = currentDay;
       tokenState.currentDaySellLimit = tokenState.dailySellLimit;
     }
 
@@ -515,6 +516,7 @@ contract FeeHandler is
     _burnCelo();
   }
 
+  // old handle
   function _handle(address tokenAddress) private {
     // Celo doesn't have to be exchanged for anything
     if (tokenAddress != registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID)) {
@@ -524,6 +526,22 @@ contract FeeHandler is
     _distribute(tokenAddress);
     _distribute(registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID)); // function distribute Celo
   }
+
+  // // new handle
+  // function _handle(address[] tokenAddresses) private {
+  //   address celoTokeen = registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID);
+  //   // Celo doesn't have to be exchanged for anything
+  //   for (uint256 i = 0; i < tokenAddresses.length; i++) {
+  //     address token = tokenAddresses[i];
+  //     if (token != celoTokeen) {
+  //       _sell(token);
+  //     }
+  //     _distribute(tokenAddress);
+  //   }
+
+  //   _burnCelo();
+  //   _distribute(registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID)); // function distribute Celo
+  // }
 
   /**
    * @notice Burns all the Celo balance of this contract.
