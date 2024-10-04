@@ -20,8 +20,8 @@ contract EpochRewards is
   IEpochRewards,
   Ownable,
   Initializable,
-  UsingPrecompiles,
   UsingRegistry,
+  UsingPrecompiles,
   Freezable
 {
   using FixidityLib for FixidityLib.Fraction;

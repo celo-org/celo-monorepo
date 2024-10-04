@@ -2,9 +2,11 @@ pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
+import "../common/UsingRegistry.sol";
+import "../common/interfaces/IEpochManager.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
 
-contract UsingPrecompiles is IsL2Check {
+contract UsingPrecompiles is IsL2Check, UsingRegistry {
   using SafeMath for uint256;
 
   address constant TRANSFER = address(0xff - 2);
@@ -117,11 +119,15 @@ contract UsingPrecompiles is IsL2Check {
    * @return Size of the current elected validator set.
    */
   function numberValidatorsInCurrentSet() public view returns (uint256) {
-    bytes memory out;
-    bool success;
-    (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(uint256(block.number)));
-    require(success, "error calling numberValidatorsInCurrentSet precompile");
-    return getUint256FromBytes(out, 0);
+    if (isL2()) {
+      return getEpochManager().getElected().length;
+    } else {
+      bytes memory out;
+      bool success;
+      (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(uint256(block.number)));
+      require(success, "error calling numberValidatorsInCurrentSet precompile");
+      return getUint256FromBytes(out, 0);
+    }
   }
 
   /**

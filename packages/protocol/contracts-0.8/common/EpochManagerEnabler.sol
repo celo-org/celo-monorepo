@@ -12,8 +12,8 @@ import "./interfaces/IEpochManagerEnablerInitializer.sol";
 
 contract EpochManagerEnabler is
   Initializable,
-  UsingPrecompiles,
   UsingRegistry,
+  UsingPrecompiles,
   IEpochManagerEnabler,
   IEpochManagerEnablerInitializer
 {
