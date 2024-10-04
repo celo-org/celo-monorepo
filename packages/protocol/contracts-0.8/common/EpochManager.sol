@@ -487,7 +487,7 @@ contract EpochManager is
   }
 
   function getEpochByBlockNumber(
-    uint256 blockNumber
+    uint256 _blockNumber
   )
     public
     view
@@ -501,20 +501,42 @@ contract EpochManager is
       address[] memory elected
     )
   {
-    for (uint256 i = firstKnownEpoch; i < currentEpochNumber; i++) {
-      Epoch memory _epoch = epochs[i];
-      if (blockNumber >= _epoch.firstBlock && blockNumber <= _epoch.lastBlock) {
+    require(_blockNumber <= block.number(), "Invalid blockNumber.");
+
+    (uint256 _firstBlockOfFirstEpoch, , , , ) = getEpochByNumber(firstKnownEpoch);
+
+    require(_blockNumber >= _firstBlockOfFirstEpoch, "Invalid blockNumber.");
+
+    uint256 _firstBlockOfCurrentEpoch = epochs[currentEpochNumber].firstBlock;
+
+    if (_blockNumber > _firstBlockOfCurrentEpoch) {
+      return getCurrentEpoch();
+    }
+
+    uint256 left = firstKnownEpoch;
+    uint256 right = currentEpochNumber - 1;
+
+    while (left <= right) {
+      uint256 mid = (left + right) / 2;
+      Epoch memory _epoch = epochs[mid];
+
+      if (_blockNumber >= _epoch.firstBlock && blockNumber <= _epoch.lastBlock) {
         return (
-          i,
+          mid,
           _epoch.firstBlock,
           _epoch.lastBlock,
           _epoch.startTimestamp,
           _epoch.rewardsBlock,
           _epoch.elected
         );
+      } else if (blockNumber < _epoch.firstBlock) {
+        right = mid - 1;
+      } else {
+        left = mid + 1;
       }
     }
-    revert("No matching epoch found for the given block number");
+
+    revert("No matching epoch found for the given block number.");
   }
   /**
    * @notice Allocates rewards to elected validator accounts.
