@@ -35,5 +35,4 @@ contract Utils08 {
     vm.label(addr, name);
     return (addr, pk);
   }
-
 }

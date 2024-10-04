@@ -97,10 +97,7 @@ contract MockElection is IsL2Check {
     return groupRewardsBasedOnScore[group];
   }
 
-  function setGroupEpochRewardsBasedOnScore(
-    address group,
-    uint256 groupRewards
-  ) external {
+  function setGroupEpochRewardsBasedOnScore(address group, uint256 groupRewards) external {
     groupRewardsBasedOnScore[group] = groupRewards;
   }
 
@@ -113,7 +110,7 @@ contract MockElection is IsL2Check {
     distributedEpochRewards[group] = value;
   }
 
-   function electValidatorAccounts() external view returns (address[] memory) {
+  function electValidatorAccounts() external view returns (address[] memory) {
     return electedValidators;
-   }
+  }
 }

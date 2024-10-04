@@ -266,7 +266,10 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     uint256 reserveBalanceBefore = celoToken.balanceOf(reserveAddress);
     epochManager.startNextEpochProcess();
     uint256 reserveBalanceAfter = celoToken.balanceOf(reserveAddress);
-    assertEq(reserveBalanceAfter, stableAmountForRate * (validator1Reward + validator2Reward) / 1e24);
+    assertEq(
+      reserveBalanceAfter,
+      (stableAmountForRate * (validator1Reward + validator2Reward)) / 1e24
+    );
   }
 }
 
@@ -505,7 +508,6 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
     validators.setValidator(validator3);
     validators.setValidator(validator4);
 
-
     address[] memory members = new address[](3);
     members[0] = validator1;
     members[1] = validator2;
@@ -536,7 +538,7 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
     epochManager.finishNextEpochProcess(groups, groups, groups);
   }
 
-   function test_Reverts_WhenGroupsNotFromElected() public {
+  function test_Reverts_WhenGroupsNotFromElected() public {
     address[] memory groups = new address[](1);
     groups[0] = group2;
     epochManager.startNextEpochProcess();
@@ -544,11 +546,11 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
     epochManager.finishNextEpochProcess(groups, groups, groups);
   }
 
-   function test_SucceedsToFinishNextEpochProcess() public {
+  function test_SucceedsToFinishNextEpochProcess() public {
     address[] memory groups = new address[](1);
     groups[0] = group;
     epochManager.startNextEpochProcess();
-    
+
     address[] memory lessers = new address[](1);
     lessers[0] = address(0);
 
