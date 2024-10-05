@@ -768,19 +768,12 @@ contract FeeHandlerTest_HandleAll is FeeHandlerTestAbstract {
     setMaxSlippage(address(stableTokenEUR), FIXED1);
     feeHandler.addToken(address(stableToken), address(mentoSeller));
     feeHandler.addToken(address(stableTokenEUR), address(mentoSeller));
+    fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
+    fundFeeHandlerStable(1e18, address(stableTokenEUR), address(exchangeEUR));
   }
 
-  modifier fundFeeHandlerStable_(uint256 celoAmount, uint256 stableAmount) {
-    celoToken.approve(address(exchangeUSD), celoAmount);
-    celoToken.approve(address(exchangeEUR), celoAmount);
-    exchangeUSD.sell(celoAmount, 0, true);
-    exchangeEUR.sell(celoAmount, 0, true);
-    stableToken.transfer(address(feeHandler), stableAmount);
-    stableTokenEUR.transfer(address(feeHandler), stableAmount);
-    _;
-  }
-
-  function test_BurnsWithMento() public fundFeeHandlerStable_(1e18, 1e18) {
+  function test_BurnsWithMento() public {
+    // console.log("Balance of Stable", stableToken.balanceOf(address(feeHandler)));
     uint256 previousCeloBurn = celoToken.getBurnedAmount();
     assertEq(feeHandler.getPastBurnForToken(address(stableToken)), 0);
     assertEq(feeHandler.getPastBurnForToken(address(stableTokenEUR)), 0);
@@ -828,9 +821,27 @@ contract FeeHandlerTest_SetDailySellLimit is FeeHandlerTest {
 }
 
 contract FeeHandlerTest_SetMaxSlippage is FeeHandlerTest {
+  uint256 newMaxSlipapge;
+
+  function setUp() public {
+    super.setUp();
+    newMaxSlipapge = maxSlippage * 2;
+  }
+
   function test_Reverts_WhenCallerNotOwner() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(user);
+    feeHandler.setMaxSplippage(address(stableToken), maxSlippage);
+  }
+
+  function test_SetsMaxSlippage() public {
+    feeHandler.setMaxSplippage(address(stableToken), newMaxSlipapge);
+    assertEq(feeHandler.getTokenMaxSlippage(address(stableToken)), newMaxSlipapge);
+  }
+
+  function test_SetsMaxSlippageAndEmitsEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit MaxSlippageSet(address(stableToken), maxSlippage);
     feeHandler.setMaxSplippage(address(stableToken), maxSlippage);
   }
 }
