@@ -530,6 +530,7 @@ contract FeeHandler is
     address celoToken = getCeloTokenAddress();
     if (tokenAddress != celoToken) {
       _sell(tokenAddress);
+      _distribute(tokenAddress);
     }
     _handleCelo();
   }
