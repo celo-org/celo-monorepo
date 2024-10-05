@@ -202,6 +202,29 @@ contract FeeHandlerTest is Test, TestConstants {
   }
 }
 
+contract FeeHandlerTest_Initialize is FeeHandlerTest {
+  function test_Reverts_WhenAlreadyInitialized() public {
+    vm.expectRevert("contract already initialized");
+    feeHandler.initialize(
+      REGISTRY_ADDRESS,
+      EXAMPLE_BENEFICIARY_ADDRESS,
+      0,
+      new address[](0),
+      new address[](0),
+      new uint256[](0),
+      new uint256[](0)
+    );
+  }
+
+  function test_registryAddressSet() public {
+    assertEq(address(feeHandler.registry()), REGISTRY_ADDRESS);
+  }
+
+  function test_FeeBeneficiarySet() public {
+    assertEq(feeHandler.feeBeneficiary(), EXAMPLE_BENEFICIARY_ADDRESS);
+  }
+}
+
 contract FeeHandlerTest_SetBurnFraction is FeeHandlerTest {
   function test_Reverts_WhenCallerNotOwner() public {
     vm.prank(user);
@@ -223,7 +246,7 @@ contract FeeHandlerTest_SetBurnFraction is FeeHandlerTest {
     );
   }
 
-  function test_ShouldEmitFeeBeneficiarySet() public {
+  function test_ShouldEmitBurnFractionSet() public {
     vm.expectEmit(true, true, true, true);
     emit BurnFractionSet(FixidityLib.newFixedFraction(80, 100).unwrap());
     feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
@@ -342,7 +365,6 @@ contract FeeHandlerTest_SetFeeBeneficiary is FeeHandlerTest {
 contract FeeHandlerTestAbstract is FeeHandlerTest {
   function addAndActivateToken(address token, address handler) public {
     feeHandler.addToken(token, handler);
-    feeHandler.activateToken(token); // TODO line probaly not needed
   }
 
   function setBurnFraction(uint256 numerator, uint256 denominator) internal {
@@ -360,11 +382,6 @@ contract FeeHandlerTestAbstract is FeeHandlerTest {
 
   function setMaxSlippage(address stableTokenAddress, uint256 slippage) internal {
     feeHandler.setMaxSplippage(stableTokenAddress, slippage);
-  }
-
-  function setUpBeneficiary() public {
-    //TODO borrar
-    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
   }
 
   function fundFeeHandlerWithCelo() public {
