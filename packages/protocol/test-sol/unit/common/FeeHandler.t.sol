@@ -813,10 +813,28 @@ contract FeeHandlerTest_Transfer is FeeHandlerTest {
 }
 
 contract FeeHandlerTest_SetDailySellLimit is FeeHandlerTest {
+  uint256 newCeloAmountForRate;
+
+  function setUp() public {
+    super.setUp();
+    newCeloAmountForRate = celoAmountForRate * 2;
+  }
+
   function test_Reverts_WhenCallerNotOwner() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(user);
     feeHandler.setDailySellLimit(address(stableToken), celoAmountForRate);
+  }
+
+  function test_SetsDailySellLimit() public {
+    feeHandler.setDailySellLimit(address(stableToken), newCeloAmountForRate);
+    assertEq(feeHandler.getTokenDailySellLimit(address(stableToken)), newCeloAmountForRate);
+  }
+
+  function test_Emits_DailyLimitSet() public {
+    vm.expectEmit(true, true, true, true);
+    emit DailyLimitSet(address(stableToken), newCeloAmountForRate);
+    feeHandler.setDailySellLimit(address(stableToken), newCeloAmountForRate);
   }
 }
 
@@ -839,7 +857,7 @@ contract FeeHandlerTest_SetMaxSlippage is FeeHandlerTest {
     assertEq(feeHandler.getTokenMaxSlippage(address(stableToken)), newMaxSlipapge);
   }
 
-  function test_SetsMaxSlippageAndEmitsEvent() public {
+  function test_Emits_MaxSlippageSet() public {
     vm.expectEmit(true, true, true, true);
     emit MaxSlippageSet(address(stableToken), maxSlippage);
     feeHandler.setMaxSplippage(address(stableToken), maxSlippage);
