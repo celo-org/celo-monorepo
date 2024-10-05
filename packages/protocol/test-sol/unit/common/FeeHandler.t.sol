@@ -2,6 +2,9 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
+// Refactor this test, make it easy to generate
+// will have to support more fees
+
 import "celo-foundry/Test.sol";
 import "@celo-contracts/common/FeeHandler.sol";
 import { TestConstants } from "@test-sol/constants.sol";
@@ -367,7 +370,7 @@ contract FeeHandlerTest_Distribute is FeeHandlerTest {
   }
 
   function test_Reverts_WhenNotActive() public setUpBeneficiary {
-    vm.expectRevert("Handler has to be set to sell token");
+    vm.expectRevert("Token needs to be active");
     feeHandler.distribute(address(stableToken));
   }
 
@@ -594,7 +597,7 @@ contract FeeHandlerTest_SellMentoTokens is FeeHandlerTest {
     setMaxSlippage
     fundFeeHandlerStable(3000)
   {
-    vm.expectRevert("Handler has to be set to sell token");
+    vm.expectRevert("Token needs to be active to sell");
     feeHandler.sell(address(stableToken));
   }
 
@@ -883,7 +886,7 @@ contract FeeHandlerTest_HandleMentoTokens is FeeHandlerTest {
     setUpBeneficiary
     fundFeeHandler(1e18)
   {
-    vm.expectRevert("Handler has to be set to sell token");
+    vm.expectRevert("Token needs to be active to sell");
     feeHandler.handle(address(stableToken));
   }
 
