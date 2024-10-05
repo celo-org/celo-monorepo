@@ -55,6 +55,7 @@ contract FeeHandlerTest is Test, TestConstants {
   StableToken stableTokenEUR;
 
   address EXAMPLE_BENEFICIARY_ADDRESS = 0x2A486910DBC72cACcbb8d0e1439C96b03B2A4699;
+  address OTHER_BENEFICIARY_ADDRESS = 0x2A486910dBc72CACCBB8D0E1439c96B03b2A4610;
 
   address owner = address(this);
   address user = actor("user");
@@ -323,18 +324,18 @@ contract FeeHandlerTest_SetFeeBeneficiary is FeeHandlerTest {
   function test_Reverts_WhenCallerNotOwner() public {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
-    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
+    feeHandler.setFeeBeneficiary(OTHER_BENEFICIARY_ADDRESS);
   }
 
   function test_ShouldEmitFeeBeneficiarySet() public {
     vm.expectEmit(true, true, true, true);
-    emit FeeBeneficiarySet(EXAMPLE_BENEFICIARY_ADDRESS);
-    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
+    emit FeeBeneficiarySet(OTHER_BENEFICIARY_ADDRESS);
+    feeHandler.setFeeBeneficiary(OTHER_BENEFICIARY_ADDRESS);
   }
 
   function test_SetsAddressCorrectly() public {
-    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
-    assertEq(feeHandler.feeBeneficiary(), EXAMPLE_BENEFICIARY_ADDRESS);
+    feeHandler.setFeeBeneficiary(OTHER_BENEFICIARY_ADDRESS);
+    assertEq(feeHandler.feeBeneficiary(), OTHER_BENEFICIARY_ADDRESS);
   }
 }
 
@@ -359,6 +360,16 @@ contract FeeHandlerTestAbstract is FeeHandlerTest {
 
   function setMaxSlippage(address stableTokenAddress, uint256 slippage) internal {
     feeHandler.setMaxSplippage(stableTokenAddress, slippage);
+  }
+
+  function setUpBeneficiary() public {
+    //TODO borrar
+    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
+  }
+
+  function fundFeeHandlerWithCelo() public {
+    uint256 celoAmount = 1e18;
+    celoToken.transfer(address(feeHandler), celoAmount);
   }
 }
 
@@ -419,11 +430,6 @@ contract FeeHandlerTest_BurnCelo is FeeHandlerTestAbstract {
     setBurnFraction(80, 100);
     addAndActivateToken(address(stableToken), address(mentoSeller));
     fundFeeHandlerWithCelo();
-  }
-
-  function fundFeeHandlerWithCelo() public {
-    uint256 celoAmount = 1e18;
-    celoToken.transfer(address(feeHandler), celoAmount);
   }
 
   function test_BurnsCorrectly() public {
@@ -720,68 +726,51 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
   }
 }
 
-contract FeeHandlerTest_HandleMentoTokens is FeeHandlerTest {
-  modifier setBurnFraction() {
-    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
-    _;
+contract FeeHandlerTest_HandleMentoTokens is FeeHandlerTestAbstract {
+  function setUp() public {
+    super.setUp();
+    setBurnFraction(80, 100);
+    setMaxSlippage(address(stableToken), FIXED1);
   }
 
-  modifier setUpBeneficiary() {
-    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
-    _;
-  }
-
-  modifier fundFeeHandler(uint256 amount) {
-    celoToken.transfer(address(feeHandler), amount);
-    _;
-  }
-
-  modifier activateToken() {
-    feeHandler.activateToken(address(celoToken));
-    _;
-  }
-
-  function test_Reverts_WhenTokenNotAdded()
-    public
-    setBurnFraction
-    setUpBeneficiary
-    fundFeeHandler(1e18)
-  {
+  function test_Reverts_WhenTokenNotAdded() public {
     vm.expectRevert("Token needs to be active to sell");
     feeHandler.handle(address(stableToken));
   }
 
-  function test_HandleCelo() public setBurnFraction setUpBeneficiary fundFeeHandler(1e18) {
+  function test_HandleCelo() public {
+    fundFeeHandlerWithCelo();
     feeHandler.handle(address(celoToken));
     assertEq(celoToken.getBurnedAmount(), 8e17);
     assertEq(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
   }
+
+  function test_HandleStable() public {
+    fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
+    addAndActivateToken(address(stableToken), address(mentoSeller));
+    feeHandler.handle(address(stableToken));
+    assertEq(feeHandler.getPastBurnForToken(address(stableToken)), 8e17);
+    assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
+    // Number is not exactly 0.8/2 because of slippage in the Mento exchange
+    assertEq(
+      celoToken.balanceOf(address(0x000000000000000000000000000000000000dEaD)),
+      398482170620712919
+    );
+    assertEq(stableToken.balanceOf(address(feeHandler)), 0);
+  }
 }
 
-contract FeeHandlerTest_HandleAll is FeeHandlerTest {
-  modifier setBurnFraction() {
-    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
-    _;
-  }
-
-  modifier setUpBeneficiary() {
-    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
-    _;
-  }
-
-  modifier addTokens() {
+contract FeeHandlerTest_HandleAll is FeeHandlerTestAbstract {
+  function setUp() public {
+    super.setUp();
+    setBurnFraction(80, 100);
+    setMaxSlippage(address(stableToken), FIXED1);
+    setMaxSlippage(address(stableTokenEUR), FIXED1);
     feeHandler.addToken(address(stableToken), address(mentoSeller));
     feeHandler.addToken(address(stableTokenEUR), address(mentoSeller));
-    _;
   }
 
-  modifier setMaxSlippage() {
-    feeHandler.setMaxSplippage(address(stableToken), FIXED1);
-    feeHandler.setMaxSplippage(address(stableTokenEUR), FIXED1);
-    _;
-  }
-
-  modifier fundFeeHandlerStable(uint256 celoAmount, uint256 stableAmount) {
+  modifier fundFeeHandlerStable_(uint256 celoAmount, uint256 stableAmount) {
     celoToken.approve(address(exchangeUSD), celoAmount);
     celoToken.approve(address(exchangeEUR), celoAmount);
     exchangeUSD.sell(celoAmount, 0, true);
@@ -791,14 +780,7 @@ contract FeeHandlerTest_HandleAll is FeeHandlerTest {
     _;
   }
 
-  function test_BurnsWithMento()
-    public
-    setUpBeneficiary
-    setBurnFraction
-    setMaxSlippage
-    fundFeeHandlerStable(1e18, 1e18)
-    addTokens
-  {
+  function test_BurnsWithMento() public fundFeeHandlerStable_(1e18, 1e18) {
     uint256 previousCeloBurn = celoToken.getBurnedAmount();
     assertEq(feeHandler.getPastBurnForToken(address(stableToken)), 0);
     assertEq(feeHandler.getPastBurnForToken(address(stableTokenEUR)), 0);
