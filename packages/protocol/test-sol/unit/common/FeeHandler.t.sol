@@ -341,7 +341,7 @@ contract FeeHandlerTest_SetFeeBeneficiary is FeeHandlerTest {
 contract FeeHandlerTestAbstract is FeeHandlerTest {
   function addAndActivateToken(address token, address handler) public {
     feeHandler.addToken(token, handler);
-    feeHandler.activateToken(token);
+    feeHandler.activateToken(token); // TODO line probaly not needed
   }
 
   function setBurnFraction(uint256 numerator, uint256 denominator) internal {
@@ -567,16 +567,20 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenNotEnabled is
   }
 }
 
-contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTest {
+contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
   uint256 deadline;
 
-  modifier setMaxSlippage() {
-    feeHandler.setMaxSplippage(address(stableToken), FIXED1);
-    feeHandler.setMaxSplippage(address(tokenA), FixidityLib.newFixedFraction(99, 100).unwrap());
-    _;
+  function setUp() public {
+    super.setUp();
+    setBurnFraction(80, 100);
+    setMaxSlippage(address(stableToken), FIXED1);
+    setMaxSlippage(address(tokenA), FixidityLib.newFixedFraction(99, 100).unwrap());
+    addAndActivateToken(address(tokenA), address(uniswapFeeHandlerSeller));
+    setUpUniswap();
+    setUpOracles();
   }
 
-  modifier setUpUniswap() {
+  function setUpUniswap() public {
     uniswapFactory = new MockUniswapV2Factory(address(0));
     bytes32 initCodePairHash = uniswapFactory.INIT_CODE_PAIR_HASH();
     uniswapRouter = new MockUniswapV2Router02(
@@ -593,7 +597,6 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTest {
     );
     uniswapFeeHandlerSeller.initialize(address(registry), new address[](0), new uint256[](0));
     uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswapRouter));
-    _;
   }
 
   modifier setUpLiquidity(uint256 toMint, uint256 toTransfer) {
@@ -619,75 +622,32 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTest {
     _;
   }
 
-  modifier setUpOracles() {
+  function setUpOracles() public {
     uniswapFeeHandlerSeller.setMinimumReports(address(tokenA), 1);
     mockSortedOracles.setMedianRate(address(tokenA), celoAmountForRate);
     mockSortedOracles.setNumRates(address(tokenA), 2);
-    _;
   }
 
-  modifier addToken() {
-    feeHandler.addToken(address(tokenA), address(uniswapFeeHandlerSeller));
-    _;
-  }
-
-  modifier setBurnFraction() {
-    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
-    _;
-  }
-
-  function test_Reverts_WhenNotEnoughReports()
-    public
-    setMaxSlippage
-    setUpUniswap
-    setUpLiquidity(1e19, 5e18)
-    setUpOracles
-    addToken
-    setBurnFraction
-  {
+  function test_Reverts_WhenNotEnoughReports() public setUpLiquidity(1e19, 5e18) {
     mockSortedOracles.setNumRates(address(tokenA), 0);
     vm.expectRevert("Number of reports for token not enough");
     feeHandler.sell(address(tokenA));
     assertEq(tokenA.balanceOf(address(feeHandler)), 1e19);
   }
 
-  function test_SellWorksWithReports()
-    public
-    setMaxSlippage
-    setUpUniswap
-    setUpLiquidity(1e19, 5e18)
-    setUpOracles
-    addToken
-    setBurnFraction
-  {
+  function test_SellWorksWithReports() public setUpLiquidity(1e19, 5e18) {
     feeHandler.sell(address(tokenA));
     assertEq(tokenA.balanceOf(address(feeHandler)), 2e18);
   }
 
-  function test_Reverts_WhenOracleSlippageIsHigh()
-    public
-    setUpUniswap
-    setUpLiquidity(1e19, 5e18)
-    setUpOracles
-    addToken
-    setBurnFraction
-  {
-    feeHandler.setMaxSplippage(address(tokenA), FixidityLib.newFixedFraction(80, 100).unwrap());
+  function test_Reverts_WhenOracleSlippageIsHigh() public setUpLiquidity(1e19, 5e18) {
     mockSortedOracles.setMedianRate(address(tokenA), 300 * celoAmountForRate);
 
     vm.expectRevert("UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT");
     feeHandler.sell(address(tokenA));
   }
 
-  function test_UniswapTrade()
-    public
-    setMaxSlippage
-    setUpUniswap
-    setUpLiquidity(1e19, 5e18)
-    setUpOracles
-    addToken
-    setBurnFraction
-  {
+  function test_UniswapTrade() public setUpLiquidity(1e19, 5e18) {
     // Make sure our uniswap mock works
     uint256 balanceBeforeA = tokenA.balanceOf(user);
     uint256 balanceBeforeCelo = celoToken.balanceOf(user);
@@ -705,43 +665,20 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTest {
     assertGt(celoToken.balanceOf(user), balanceBeforeCelo);
   }
 
-  function test_SellsNonMentoTokens()
-    public
-    setMaxSlippage
-    setUpUniswap
-    setUpLiquidity(1e19, 5e18)
-    setUpOracles
-    addToken
-    setBurnFraction
-  {
+  function test_SellsNonMentoTokens() public setUpLiquidity(1e19, 5e18) {
     assertEq(tokenA.balanceOf(address(feeHandler)), 1e19);
     feeHandler.sell(address(tokenA));
     assertEq(tokenA.balanceOf(address(feeHandler)), 2e18);
   }
 
-  function test_Reverts_WhenSlippageIsTooHigh()
-    public
-    setUpUniswap
-    setUpLiquidity(1e19, 5e18)
-    setUpOracles
-    addToken
-    setBurnFraction
-  {
+  function test_Reverts_WhenSlippageIsTooHigh() public setUpLiquidity(1e19, 5e18) {
     feeHandler.setMaxSplippage(address(tokenA), maxSlippage);
     vm.expectRevert("UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT");
     feeHandler.sell(address(tokenA));
     assertEq(tokenA.balanceOf(address(feeHandler)), 1e19);
   }
 
-  function test_TriesToGetBestRateWithManyExchanges()
-    public
-    setMaxSlippage
-    setUpUniswap
-    setUpLiquidity(2e19, 5e18)
-    setUpOracles
-    addToken
-    setBurnFraction
-  {
+  function test_TriesToGetBestRateWithManyExchanges() public setUpLiquidity(2e19, 5e18) {
     // Setup second uniswap exchange
     uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswapRouter2));
     uint256 toTransfer2 = 1e19; // this is higher than toTransfer1 (5e18) set in modifier
