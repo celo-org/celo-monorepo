@@ -413,35 +413,26 @@ contract FeeHandlerTest_Distribute is FeeHandlerTestAbstract {
   }
 }
 
-contract FeeHandlerTest_BurnCelo is FeeHandlerTest {
-  modifier activateToken() {
-    feeHandler.activateToken(address(celoToken)); // celoToken doesn't need to be added before activating
-    _;
+contract FeeHandlerTest_BurnCelo is FeeHandlerTestAbstract {
+  function setUp() public {
+    super.setUp();
+    setBurnFraction(80, 100);
+    addAndActivateToken(address(stableToken), address(mentoSeller));
+    fundFeeHandlerWithCelo();
   }
 
-  modifier setBurnFraction() {
-    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
-    _;
-  }
-
-  modifier fundFeeHandler() {
+  function fundFeeHandlerWithCelo() public {
     uint256 celoAmount = 1e18;
     celoToken.transfer(address(feeHandler), celoAmount);
-    _;
   }
 
-  function test_BurnsCorrectly() public activateToken setBurnFraction fundFeeHandler {
+  function test_BurnsCorrectly() public {
     feeHandler.burnCelo();
     assertEq(celoToken.balanceOf(address(feeHandler)), 2e17);
     assertEq(celoToken.getBurnedAmount(), 8e17);
   }
 
-  function test_DoesntBurnPendingDistribution()
-    public
-    activateToken
-    setBurnFraction
-    fundFeeHandler
-  {
+  function test_DoesntBurnPendingDistribution() public {
     feeHandler.burnCelo();
     assertEq(celoToken.getBurnedAmount(), 8e17);
     // this is the amount pending distribution
@@ -453,12 +444,7 @@ contract FeeHandlerTest_BurnCelo is FeeHandlerTest {
     assertEq(celoToken.balanceOf(address(feeHandler)), 2e17);
   }
 
-  function test_DistributesCorrectlyAfterBurn()
-    public
-    activateToken
-    setBurnFraction
-    fundFeeHandler
-  {
+  function test_DistributesCorrectlyAfterBurn() public {
     feeHandler.burnCelo();
     assertEq(celoToken.balanceOf(address(feeHandler)), 2e17);
 
@@ -469,33 +455,18 @@ contract FeeHandlerTest_BurnCelo is FeeHandlerTest {
   }
 }
 
-contract FeeHandlerTest_SellMentoTokens is FeeHandlerTest {
-  modifier addStableToken() {
-    feeHandler.addToken(address(stableToken), address(mentoSeller));
-    _;
+contract FeeHandlerTest_SellMentoTokensAbstract is FeeHandlerTestAbstract {
+  function setUp() public {
+    super.setUp();
+    setBurnFraction(80, 100);
+    setMaxSlippage(address(stableToken), FIXED1);
   }
+}
 
-  modifier fundFeeHandlerStable(uint256 stableAmount) {
-    uint256 celoAmount = 1e18;
-    celoToken.approve(address(exchangeUSD), celoAmount);
-    exchangeUSD.sell(celoAmount, 0, true);
-    stableToken.transfer(address(feeHandler), stableAmount);
-    _;
-  }
-
-  modifier setBurnFraction() {
-    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
-    _;
-  }
-
-  modifier setUpBeneficiary() {
-    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
-    _;
-  }
-
-  modifier setMaxSlippage() {
-    feeHandler.setMaxSplippage(address(stableToken), FIXED1);
-    _;
+contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellMentoTokensAbstract {
+  function setUp() public {
+    super.setUp();
+    addAndActivateToken(address(stableToken), address(mentoSeller));
   }
 
   function test_Reverts_WhenFrozen() public {
@@ -504,25 +475,16 @@ contract FeeHandlerTest_SellMentoTokens is FeeHandlerTest {
     feeHandler.sell(address(stableToken));
   }
 
-  function test_WontSellWhenBalanceLow()
-    public
-    setBurnFraction
-    setMaxSlippage
-    addStableToken
-    fundFeeHandlerStable(feeHandler.MIN_BURN())
-  {
+  function test_WontSellWhenBalanceLow() public {
+    fundFeeHandlerStable(feeHandler.MIN_BURN(), address(stableToken), address(exchangeUSD));
     uint256 balanceBefore = stableToken.balanceOf(address(feeHandler));
     feeHandler.sell(address(stableToken));
     assertEq(stableToken.balanceOf(address(feeHandler)), balanceBefore);
   }
 
-  function test_ResetSellLimitDaily()
-    public
-    setBurnFraction
-    setMaxSlippage
-    addStableToken
-    fundFeeHandlerStable(3000)
-  {
+  function test_ResetSellLimitDaily() public {
+    fundFeeHandlerStable(3000, address(stableToken), address(exchangeUSD));
+
     feeHandler.setDailySellLimit(address(stableToken), 1000);
     feeHandler.sell(address(stableToken));
     assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
@@ -531,13 +493,8 @@ contract FeeHandlerTest_SellMentoTokens is FeeHandlerTest {
     assertEq(stableToken.balanceOf(address(feeHandler)), 1000);
   }
 
-  function test_DoesntSellWhenBiggerThanLimit()
-    public
-    setBurnFraction
-    setMaxSlippage
-    addStableToken
-    fundFeeHandlerStable(3000)
-  {
+  function test_DoesntSellWhenBiggerThanLimit() public {
+    fundFeeHandlerStable(3000, address(stableToken), address(exchangeUSD));
     feeHandler.setDailySellLimit(address(stableToken), 1000);
     feeHandler.sell(address(stableToken));
     assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
@@ -546,13 +503,8 @@ contract FeeHandlerTest_SellMentoTokens is FeeHandlerTest {
     assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
   }
 
-  function test_Sell_WhenOtherTokenHitLimit()
-    public
-    setBurnFraction
-    setMaxSlippage
-    addStableToken
-    fundFeeHandlerStable(3000)
-  {
+  function test_Sell_WhenOtherTokenHitLimit() public {
+    fundFeeHandlerStable(3000, address(stableToken), address(exchangeUSD));
     feeHandler.setDailySellLimit(address(stableToken), 1000);
     feeHandler.sell(address(stableToken));
     assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
@@ -578,23 +530,8 @@ contract FeeHandlerTest_SellMentoTokens is FeeHandlerTest {
     assertEq(stableTokenEUR.balanceOf(address(feeHandler)), 2000);
   }
 
-  function test_Reverts_WhenHandlerNotSet()
-    public
-    setBurnFraction
-    setMaxSlippage
-    fundFeeHandlerStable(3000)
-  {
-    vm.expectRevert("Token needs to be active to sell");
-    feeHandler.sell(address(stableToken));
-  }
-
-  function test_SellsWithMento()
-    public
-    setBurnFraction
-    setMaxSlippage
-    addStableToken
-    fundFeeHandlerStable(1e18)
-  {
+  function test_SellsWithMento() public {
+    fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
     assertEq(feeHandler.getPastBurnForToken(address(stableToken)), 0);
     uint256 expectedCeloAmount = exchangeUSD.getBuyTokenAmount(8e17, false);
     feeHandler.sell(address(stableToken));
@@ -604,29 +541,29 @@ contract FeeHandlerTest_SellMentoTokens is FeeHandlerTest {
     assertEq(feeHandler.celoToBeBurned(), expectedCeloAmount);
   }
 
-  function test_Reverts_WhenNotEnoughReports()
-    public
-    setBurnFraction
-    setMaxSlippage
-    addStableToken
-    fundFeeHandlerStable(1e18)
-  {
+  function test_Reverts_WhenNotEnoughReports() public {
+    fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
     mentoSeller.setMinimumReports(address(stableToken), 3);
     vm.expectRevert("Number of reports for token not enough");
     feeHandler.sell(address(stableToken));
   }
 
-  function test_DoesntSellBalanceToDistribute()
-    public
-    setBurnFraction
-    setMaxSlippage
-    addStableToken
-    fundFeeHandlerStable(1e18)
-  {
+  function test_DoesntSellBalanceToDistribute() public {
+    fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
     feeHandler.sell(address(stableToken));
     uint256 balanceBefore = stableToken.balanceOf(address(feeHandler));
     feeHandler.sell(address(stableToken));
     assertEq(stableToken.balanceOf(address(feeHandler)), balanceBefore);
+  }
+}
+
+contract FeeHandlerTest_SellMentoTokens_WhenTokenNotEnabled is
+  FeeHandlerTest_SellMentoTokensAbstract
+{
+  function test_() public {
+    fundFeeHandlerStable(3000, address(stableToken), address(exchangeUSD));
+    vm.expectRevert("Token needs to be active to sell");
+    feeHandler.sell(address(stableToken));
   }
 }
 
