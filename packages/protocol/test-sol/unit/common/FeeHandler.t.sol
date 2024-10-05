@@ -338,56 +338,53 @@ contract FeeHandlerTest_SetFeeBeneficiary is FeeHandlerTest {
   }
 }
 
-contract FeeHandlerTest_Distribute is FeeHandlerTest {
-  modifier setUpBeneficiary() {
+contract FeeHandlerTestAbstract is FeeHandlerTest {
+  function addAndActivateToken(address token, address handler) public {
+    feeHandler.addToken(token, handler);
+    feeHandler.activateToken(token);
+  }
+
+  function setBurnFraction(uint256 numerator, uint256 denominator) internal {
+    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(numerator, denominator).unwrap());
+  }
+
+  function fundFeeHandlerStable(
+    uint256 stableAmount,
+    address stableTokenAddress,
+    address exchangeAddress
+  ) internal {
+    vm.prank(address(exchangeAddress));
+    StableToken(stableTokenAddress).mint(address(feeHandler), stableAmount);
+  }
+
+  function setMaxSlippage(address stableTokenAddress, uint256 slippage) internal {
+    feeHandler.setMaxSplippage(stableTokenAddress, slippage);
+  }
+}
+
+contract FeeHandlerTest_Distribute is FeeHandlerTestAbstract {
+  function setUp() public {
+    super.setUp();
     feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
-    _;
+    setBurnFraction(80, 100);
+    setMaxSlippage(address(stableToken), FIXED1);
   }
 
-  // todo change this to a function and take parameters
-  modifier activateToken() {
-    feeHandler.addToken(address(stableToken), address(mentoSeller));
-    feeHandler.activateToken(address(stableToken));
-    _;
-  }
-
-  modifier fundFeeHandlerStable(uint256 stableAmount) {
-    uint256 celoAmount = 1e18;
-    celoToken.approve(address(exchangeUSD), celoAmount);
-    exchangeUSD.sell(celoAmount, 0, true);
-    stableToken.transfer(address(feeHandler), stableAmount);
-    _;
-  }
-
-  modifier setBurnFraction() {
-    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
-    _;
-  }
-
-  modifier setMaxSlippage() {
-    feeHandler.setMaxSplippage(address(stableToken), FIXED1);
-    _;
-  }
-
-  function test_Reverts_WhenNotActive() public setUpBeneficiary {
+  function test_Reverts_WhenNotActive() public {
     vm.expectRevert("Token needs to be active");
     feeHandler.distribute(address(stableToken));
   }
 
-  function test_Reverts_WhenFrozen() public setUpBeneficiary activateToken {
+  function test_Reverts_WhenFrozen() public {
+    addAndActivateToken(address(stableToken), address(mentoSeller));
     freezer.freeze(address(feeHandler));
     vm.expectRevert("can't call when contract is frozen");
     feeHandler.distribute(address(stableToken));
   }
 
-  function test_DoesntDistributeWhenToDistributeIsZero()
-    public
-    setBurnFraction
-    setMaxSlippage
-    setUpBeneficiary
-    activateToken
-    fundFeeHandlerStable(1e18)
-  {
+  function test_DoesntDistributeWhenToDistributeIsZero() public {
+    fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
+    addAndActivateToken(address(stableToken), address(mentoSeller));
     // If we uncomment this the test should fail
     // feeHandler.sell(address(stableToken));
     vm.recordLogs();
@@ -396,27 +393,17 @@ contract FeeHandlerTest_Distribute is FeeHandlerTest {
     assertEq(entries.length, 0);
   }
 
-  function test_DoesntDistributeWhenBalanceIsZero()
-    public
-    setBurnFraction
-    setMaxSlippage
-    setUpBeneficiary
-    activateToken
-  {
+  function test_DoesntDistributeWhenBalanceIsZero() public {
+    addAndActivateToken(address(stableToken), address(mentoSeller));
     vm.recordLogs();
     feeHandler.distribute(address(stableToken));
     Vm.Log[] memory entries = vm.getRecordedLogs();
     assertEq(entries.length, 0);
   }
 
-  function test_Distribute()
-    public
-    setBurnFraction
-    setMaxSlippage
-    setUpBeneficiary
-    activateToken
-    fundFeeHandlerStable(1e18)
-  {
+  function test_Distribute() public {
+    fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
+    addAndActivateToken(address(stableToken), address(mentoSeller));
     feeHandler.sell(address(stableToken));
 
     feeHandler.distribute(address(stableToken));
