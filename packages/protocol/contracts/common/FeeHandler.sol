@@ -119,13 +119,6 @@ contract FeeHandler is
     emit CarbonFractionSet(newFraction);
   }
 
-  function getCeloBurningFraction() internal returns (FixidityLib.Fraction memory) {
-    return
-      FixidityLib.fixed1().subtract(
-        FixidityLib.wrap(getTotalFractionOfOtherBeneficiariesAndCarbon())
-      );
-  }
-
   function getTotalFractionOfOtherBeneficiariesAndCarbonFixidity()
     internal
     view
@@ -138,7 +131,32 @@ contract FeeHandler is
     return getTotalFractionOfOtherBeneficiariesAndCarbonFixidity().unwrap();
   }
 
-  function setOtherBeneficiary(
+  function getOtherBeneficiariesAddresses() public view returns (address[] memory) {
+    return otherBeneficiariesAddresses.values;
+  }
+
+  function getOtherBeneficiariesInfo(
+    address beneficiary
+  ) public view returns (uint256, string memory, bool) {
+    Beneficiary storage otherBeneficiary = otherBeneficiaries[beneficiary];
+    require(otherBeneficiary.exists, "Beneficiary not found");
+    return (otherBeneficiary.fraction.unwrap(), otherBeneficiary.name, otherBeneficiary.exists);
+  }
+
+  function changeOtherBeneficiaryAllocation(address beneficiary, uint256 newFraction) external {
+    require(otherBeneficiaries[beneficiary].exists, "Beneficiary not found");
+    uint256 _totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries.unwrap() +
+      newFraction -
+      otherBeneficiaries[beneficiary].fraction.unwrap();
+    require(_totalFractionOfOtherBeneficiaries < FIXED1_UINT, "Total fraction must be less than 1");
+    totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries.add(
+      FixidityLib.wrap(newFraction).subtract(otherBeneficiaries[beneficiary].fraction)
+    );
+    otherBeneficiaries[beneficiary].fraction = FixidityLib.wrap(newFraction);
+    // TODO emit
+  }
+
+  function addOtherBeneficiary(
     address beneficiary,
     uint256 newFraction,
     uint256 newCarbonFraction, // I think this is actually not needed TODO
@@ -151,6 +169,7 @@ contract FeeHandler is
       newCarbonFraction +
       newFraction;
     // TODO check strict <
+    // TODO check this case
     require(_totalFractionOfOtherBeneficiaries < FIXED1_UINT, "Total fraction must be less than 1");
     _setCarbonFraction(newCarbonFraction);
     otherBeneficiaries[beneficiary] = Beneficiary(FixidityLib.wrap(newFraction), name, true);
@@ -159,6 +178,15 @@ contract FeeHandler is
     );
     otherBeneficiariesAddresses.add(beneficiary);
     // TODO emit
+  }
+
+  function removeOtherBeneficiary(address beneficiary) external onlyOwner {
+    require(otherBeneficiaries[beneficiary].exists, "Beneficiary not found");
+    totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries.subtract(
+      otherBeneficiaries[beneficiary].fraction
+    ); // TODO test this
+    otherBeneficiariesAddresses.remove(beneficiary);
+    delete otherBeneficiaries[beneficiary];
   }
 
   // function setBeneficiaryName(address beneficiary, uint256 name) external onlyOwner {
@@ -502,24 +530,17 @@ contract FeeHandler is
     emit TokenRemoved(tokenAddress);
   }
 
-  // TODO test this
+  // TODO test this in a public function
   function _setDistributionAmounts(
     TokenState storage tokenState,
     IERC20 token
   ) internal returns (uint256) {
-    FixidityLib.Fraction memory balanceToProcess = FixidityLib.newFixed(
-      token.balanceOf(address(this)).sub(tokenState.toDistribute)
-    );
+    uint256 balanceOfToken = token.balanceOf(address(this));
+    uint256 balanceToProcess = balanceOfToken.sub(tokenState.toDistribute);
 
-    FixidityLib.Fraction memory calculatedBurnFraction = getCeloBurningFraction();
-
-    uint256 balanceToBurn = (calculatedBurnFraction.multiply(balanceToProcess).fromFixed());
+    uint256 balanceToBurn = _setDistributeAfterBurn(tokenState, balanceToProcess);
 
     console.log("balanceToBurn", balanceToBurn);
-
-    tokenState.toDistribute = tokenState.toDistribute.add(
-      balanceToProcess.fromFixed().sub(balanceToBurn)
-    );
     console.log("tokenState.toDistribute1", tokenState.toDistribute);
 
     emit DistributionAmountSet(address(token), tokenState.toDistribute);
@@ -724,6 +745,17 @@ contract FeeHandler is
     _handleCelo();
   }
 
+  function _setDistributeAfterBurn(
+    TokenState storage tokenState,
+    uint256 balanceToProcess
+  ) internal returns (uint256) {
+    uint256 balanceToBurn = FixidityLib
+    .newFixed(balanceToProcess)
+    .multiply(getBurnFractionFixidity()).fromFixed(); //here2
+    tokenState.toDistribute = tokenState.toDistribute.add(balanceToProcess.sub(balanceToBurn));
+    return balanceToBurn;
+  }
+
   /**
    * @notice Burns all the Celo balance of this contract.
    */
@@ -734,17 +766,11 @@ contract FeeHandler is
     uint256 balanceOfCelo = address(this).balance;
 
     uint256 balanceToProcess = balanceOfCelo.sub(tokenState.toDistribute).sub(celoToBeBurned);
-    uint256 currentBalanceToBurn = FixidityLib
-      .newFixed(balanceToProcess)
-      .multiply(getBurnFractionFixidity())
-      .fromFixed();
-    uint256 totalBalanceToBurn = currentBalanceToBurn.add(celoToBeBurned);
-    celo.burn(totalBalanceToBurn);
-
+    uint256 balanceToBurn = _setDistributeAfterBurn(tokenState, balanceToProcess);
+    uint256 totalBalanceToBurn = balanceToBurn.add(celoToBeBurned);
     celoToBeBurned = 0;
-    tokenState.toDistribute = tokenState.toDistribute.add(
-      balanceToProcess.sub(currentBalanceToBurn)
-    );
+
+    celo.burn(totalBalanceToBurn);
   }
 
   /**

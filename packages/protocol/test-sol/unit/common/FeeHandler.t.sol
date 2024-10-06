@@ -256,6 +256,67 @@ contract FeeHandlerTest_Initialize is FeeHandlerTest {
 //   }
 // }
 
+contract FeeHandlerTest_AddOtherBeneficiary is FeeHandlerTest {
+  function test_addsSucsesfully() public {
+    feeHandler.addOtherBeneficiary(
+      op,
+      (20 * 1e24) / 100, // TODO use fixidity
+      (20 * 1e24) / 100,
+      "OP revenue share"
+    );
+
+    assertEq(feeHandler.getOtherBeneficiariesAddresses().length, 1);
+    (uint256 fraction, string memory name, ) = feeHandler.getOtherBeneficiariesInfo(op);
+    assertEq(fraction, (20 * 1e24) / 100);
+    assertEq(name, "OP revenue share");
+  }
+  // TODO emits
+}
+
+contract FeeHandlerTest_RemoveOtherBeneficiary is FeeHandlerTest {
+  function setUp() public {
+    super.setUp();
+    feeHandler.addOtherBeneficiary(
+      op,
+      (20 * 1e24) / 100, // TODO use fixidity
+      (20 * 1e24) / 100,
+      "OP revenue share"
+    );
+  }
+
+  function test_removedSucsesfully() public {
+    feeHandler.removeOtherBeneficiary(op);
+    assertEq(feeHandler.getOtherBeneficiariesAddresses().length, 0);
+    vm.expectRevert("Beneficiary not found");
+    feeHandler.getOtherBeneficiariesInfo(op);
+  }
+
+  // TODO emits
+}
+
+// TODO change beneficiary allocation
+contract FeeHandlerTest_changeOtherBeneficiaryAllocation is FeeHandlerTest {
+  function setUp() public {
+    super.setUp();
+    feeHandler.addOtherBeneficiary(
+      op,
+      (20 * 1e24) / 100, // TODO use fixidity
+      (20 * 1e24) / 100,
+      "OP revenue share"
+    );
+  }
+
+  function test_changedSucsesfully() public {
+    feeHandler.changeOtherBeneficiaryAllocation(op, (30 * 1e24) / 100);
+    (uint256 fraction, string memory name, ) = feeHandler.getOtherBeneficiariesInfo(op);
+    assertEq(fraction, (30 * 1e24) / 100);
+
+    // check fraction set correctly
+  }
+
+  // TODO emits
+}
+
 contract FeeHandlerTest_SetHandler is FeeHandlerTest {
   function test_Reverts_WhenCallerNotOwner() public {
     vm.prank(user);
@@ -451,7 +512,7 @@ contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstr
     fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
     addAndActivateToken(address(stableToken), address(mentoSeller));
 
-    feeHandler.setOtherBeneficiary(
+    feeHandler.addOtherBeneficiary(
       op,
       (20 * 1e24) / 100, // TODO use fixidity
       (20 * 1e24) / 100,
@@ -472,7 +533,7 @@ contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstr
 
   function test_DistributeOP_WhenOneMoreBeneficiary() public {
     address otherBeneficiary = actor("otherBeneficiary");
-    feeHandler.setOtherBeneficiary(
+    feeHandler.addOtherBeneficiary(
       otherBeneficiary,
       (30 * 1e24) / 100, // TODO use fixidity
       (20 * 1e24) / 100,
@@ -494,14 +555,14 @@ contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstr
 }
 
 // function test_HandleCelo_WhenThereAreMoreTwoOtherBeneficiaries() public {
-//   feeHandler.setOtherBeneficiary(
+//   feeHandler.addOtherBeneficiary(
 //     op,
 //     (20 * 1e24) / 100, // TODO use fixidity
 //     (20 * 1e24) / 100,
 //     "OP revenue share"
 //   );
 //   address otherBeneficiary = actor("otherBeneficiary");
-//   feeHandler.setOtherBeneficiary(
+//   feeHandler.addOtherBeneficiary(
 //     otherBeneficiary ,
 //     (30 * 1e24) / 100, // TODO use fixidity
 //     (20 * 1e24) / 100,
@@ -833,7 +894,7 @@ contract FeeHandlerTest_HandleCelo is FeeHandlerTestAbstract {
   }
 
   function test_HandleCelo_WhenThereAreMoreBeneficiaries() public {
-    feeHandler.setOtherBeneficiary(
+    feeHandler.addOtherBeneficiary(
       op,
       (20 * 1e24) / 100, // TODO use fixidity
       (20 * 1e24) / 100,
@@ -847,14 +908,14 @@ contract FeeHandlerTest_HandleCelo is FeeHandlerTestAbstract {
   }
 
   function test_HandleCelo_WhenThereAreMoreTwoOtherBeneficiaries() public {
-    feeHandler.setOtherBeneficiary(
+    feeHandler.addOtherBeneficiary(
       op,
       (20 * 1e24) / 100, // TODO use fixidity
       (20 * 1e24) / 100,
       "OP revenue share"
     );
     address otherBeneficiary = actor("otherBeneficiary");
-    feeHandler.setOtherBeneficiary(
+    feeHandler.addOtherBeneficiary(
       otherBeneficiary,
       (30 * 1e24) / 100, // TODO use fixidity
       (20 * 1e24) / 100,
