@@ -583,7 +583,17 @@ contract FeeHandler is
     FixidityLib.Fraction memory thisTokenFraction,
     FixidityLib.Fraction memory totalFractionOfOtherBeneficiariesAndCarbonFixidity,
     uint256 toDistribute
-  ) private {}
+  ) private returns (uint256) {
+    FixidityLib.Fraction memory proportionOfThisToken = thisTokenFraction.divide(
+      totalFractionOfOtherBeneficiariesAndCarbonFixidity
+    );
+
+    FixidityLib.Fraction memory toDistributeFraction = FixidityLib.newFixed(toDistribute).multiply(
+      proportionOfThisToken
+    );
+
+    return toDistributeFraction.fromFixed();
+  }
 
   function _distribute(address tokenAddress) private onlyWhenNotFrozen nonReentrant {
     require(feeBeneficiary != address(0), "Can't distribute to the zero address");
@@ -595,35 +605,36 @@ contract FeeHandler is
     FixidityLib.Fraction memory totalFractionOfOtherBeneficiariesAndCarbonFixidity = FixidityLib
       .wrap(totalFractionOfOtherBeneficiaries + carbonFraction());
 
-    FixidityLib.Fraction memory carbonFraction = FixidityLib.newFixed(carbonFraction()).divide(
-      totalFractionOfOtherBeneficiariesAndCarbonFixidity
+    uint256 carbonFundAmount = _calculateDistributeAmounts(
+      FixidityLib.newFixed(carbonFraction()),
+      totalFractionOfOtherBeneficiariesAndCarbonFixidity,
+      tokenState.toDistribute
     );
-    FixidityLib.Fraction memory toDistributeFraction = FixidityLib
-      .newFixed(tokenState.toDistribute)
-      .multiply(carbonFraction);
-
-    uint256 carbonFundAmount = (
-      totalFractionOfOtherBeneficiariesAndCarbonFixidity.multiply(toDistributeFraction)
-    ).fromFixed();
     _executePayment(tokenAddress, tokenState, feeBeneficiary, carbonFundAmount);
 
-    for (uint256 i = 0; i < EnumerableSet.length(otherBeneficiariesAddresses); i++) {
-      address beneficiary = otherBeneficiariesAddresses.get(i);
-      Beneficiary storage otherBeneficiary = otherBeneficiaries[beneficiary];
-      TokenState storage tokenStateBeneficiary = tokenStates[tokenAddress];
-      FixidityLib.Fraction memory fraction = FixidityLib.newFixed(otherBeneficiary.fraction).divide(
-        totalFractionOfOtherBeneficiariesAndCarbonFixidity
-      );
-      FixidityLib.Fraction memory toDistributeFraction = FixidityLib
-        .newFixed(tokenStateBeneficiary.toDistribute)
-        .multiply(fraction);
+    // pay carbon fund
+    // uint256 carbonFundAmount = _calculateDistributeAmounts(
+    //   carbonFraction(),
+    //   totalFractionOfOtherBeneficiariesAndCarbonFixidity,
+    //   tokenState.toDistribute
+    // );
 
-      uint256 amount = (
-        totalFractionOfOtherBeneficiariesAndCarbonFixidity.multiply(toDistributeFraction)
-      ).fromFixed();
-      _executePayment(tokenAddress, tokenStateBeneficiary, beneficiary, amount);
-    }
-    // // pay carbon fund
+    // for (uint256 i = 0; i < EnumerableSet.length(otherBeneficiariesAddresses); i++) {
+    //   address beneficiary = otherBeneficiariesAddresses.get(i);
+    //   Beneficiary storage otherBeneficiary = otherBeneficiaries[beneficiary];
+    //   TokenState storage tokenStateBeneficiary = tokenStates[tokenAddress];
+    //   FixidityLib.Fraction memory fraction = FixidityLib.newFixed(otherBeneficiary.fraction).divide(
+    //     totalFractionOfOtherBeneficiariesAndCarbonFixidity
+    //   );
+    //   FixidityLib.Fraction memory toDistributeFraction = FixidityLib
+    //     .newFixed(tokenStateBeneficiary.toDistribute)
+    //     .multiply(fraction);
+
+    //   uint256 amount = (
+    //     totalFractionOfOtherBeneficiariesAndCarbonFixidity.multiply(toDistributeFraction)
+    //   ).fromFixed();
+    //   _executePayment(tokenAddress, tokenStateBeneficiary, beneficiary, amount);
+    // }
 
     // for i in other beneficiaries:
     //   uint256 portion = balanceToDistribute * (otherBeneficiaries[i].fraction/getTotalFractionOfOtherBeneficiaries);
