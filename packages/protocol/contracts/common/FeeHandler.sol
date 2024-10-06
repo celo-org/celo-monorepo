@@ -87,6 +87,14 @@ contract FeeHandler is
     _setCarbonFraction(newFraction);
   }
 
+  function getBurnFraction() public view returns (uint256) {
+    return FIXED1_UINT - carbonFraction() - totalFractionOfOtherBeneficiaries;
+  }
+
+  function getBurnFractionFixidity() internal view returns (FixidityLib.Fraction memory) {
+    return FixidityLib.wrap(FIXED1_UINT - carbonFraction() - totalFractionOfOtherBeneficiaries);
+  }
+
   function _setCarbonFraction(uint256 newFraction) internal {
     require(newFraction < FIXED1_UINT, "Carbon fraction must be less than 1");
     burnFraction = FixidityLib.wrap(FIXED1_UINT.sub(newFraction));
@@ -724,13 +732,12 @@ contract FeeHandler is
     uint256 balanceToProcess = balanceOfCelo.sub(tokenState.toDistribute).sub(celoToBeBurned);
     uint256 currentBalanceToBurn = FixidityLib
       .newFixed(balanceToProcess)
-      .multiply(burnFraction)
+      .multiply(getBurnFractionFixidity())
       .fromFixed();
     uint256 totalBalanceToBurn = currentBalanceToBurn.add(celoToBeBurned);
     celo.burn(totalBalanceToBurn);
 
     celoToBeBurned = 0;
-    // TODO fix allocation here
     tokenState.toDistribute = tokenState.toDistribute.add(
       balanceToProcess.sub(currentBalanceToBurn)
     );

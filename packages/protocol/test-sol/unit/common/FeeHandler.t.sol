@@ -71,6 +71,7 @@ contract FeeHandlerTest is Test, TestConstants {
   uint8 decimals = 18;
   uint256 updateFrequency = 60 * 60;
   uint256 minimumReports = 2;
+  address op;
 
   event SoldAndBurnedToken(address token, uint256 value);
   event DailyLimitSet(address tokenAddress, uint256 newLimit);
@@ -84,6 +85,7 @@ contract FeeHandlerTest is Test, TestConstants {
 
   function setUp() public {
     vm.warp(YEAR); // foundry starts block.timestamp at 0, which leads to underflow errors in Uniswap contracts
+    op = actor("op");
 
     spread = FixidityLib.newFixedFraction(3, 1000).unwrap();
     reserveFraction = FixidityLib.newFixedFraction(5, 100).unwrap();
@@ -442,13 +444,12 @@ contract FeeHandlerTest_Distribute is FeeHandlerTestAbstract {
 }
 
 contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstract {
-  address op;
   function setUp() public {
     super.setUp();
     feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
     setBurnFraction(80, 100);
     setMaxSlippage(address(stableToken), FIXED1);
-    op = actor("op");
+
     feeHandler.setOtherBeneficiary(
       op,
       (20 * 1e24) / 100, // TODO use fixidity
@@ -469,7 +470,7 @@ contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstr
     assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
 
     // TOD verify OP is still the same
-    // assertEq(stableToken.balanceOf(op), 2e17);
+    assertEq(stableToken.balanceOf(op), 2e17);
   }
 }
 
@@ -775,6 +776,34 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
   }
 }
 
+contract FeeHandlerTest_HandleCelo is FeeHandlerTestAbstract {
+  function setUp() public {
+    super.setUp();
+    setBurnFraction(80, 100);
+    fundFeeHandlerWithCelo();
+  }
+
+  function test_HandleCelo() public {
+    feeHandler.handle(address(celoToken));
+    assertEq(celoToken.getBurnedAmount(), 8e17);
+    assertEq(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
+  }
+
+  function test_HandleCelo_WhenThereAreMoreBeneficiaries() public {
+    feeHandler.setOtherBeneficiary(
+      op,
+      (20 * 1e24) / 100, // TODO use fixidity
+      (20 * 1e24) / 100,
+      "OP revenue share"
+    );
+
+    feeHandler.handle(address(celoToken));
+    assertEq(celoToken.getBurnedAmount(), 6e17);
+    assertEq(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
+    assertEq(celoToken.balanceOf(op), 2e17);
+  }
+}
+
 contract FeeHandlerTest_HandleMentoTokens is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
@@ -785,13 +814,6 @@ contract FeeHandlerTest_HandleMentoTokens is FeeHandlerTestAbstract {
   function test_Reverts_WhenTokenNotAdded() public {
     vm.expectRevert("Token needs to be active to sell");
     feeHandler.handle(address(stableToken));
-  }
-
-  function test_HandleCelo() public {
-    fundFeeHandlerWithCelo();
-    feeHandler.handle(address(celoToken));
-    assertEq(celoToken.getBurnedAmount(), 8e17);
-    assertEq(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
   }
 
   function test_HandleStable() public {
