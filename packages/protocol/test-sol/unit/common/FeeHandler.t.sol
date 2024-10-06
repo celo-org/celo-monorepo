@@ -1019,7 +1019,6 @@ contract FeeHandlerTest_HandleAll is FeeHandlerTestAbstract {
   }
 
   function test_BurnsWithMento() public {
-    // console.log("Balance of Stable", stableToken.balanceOf(address(feeHandler)));
     uint256 previousCeloBurn = celoToken.getBurnedAmount();
     assertEq(feeHandler.getPastBurnForToken(address(stableToken)), 0);
     assertEq(feeHandler.getPastBurnForToken(address(stableTokenEUR)), 0);

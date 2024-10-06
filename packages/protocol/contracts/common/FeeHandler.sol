@@ -23,7 +23,7 @@ import "../stability/interfaces/ISortedOracles.sol";
 // Using the minimal required signatures in the interfaces so more contracts could be compatible
 import "../common/libraries/ReentrancyGuard.sol";
 
-import { console } from "forge-std/console.sol";
+// import { console } from "forge-std/console.sol";
 
 // An implementation of FeeHandler as described in CIP-52
 // See https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md
@@ -104,134 +104,6 @@ contract FeeHandler is
   event BeneficiaryFractionSet(address beneficiary, uint256 fraction);
   event BeneficiaryRemoved(address beneficiary);
 
-  function getCarbonFraction() public view returns (uint256) {
-    return getCarbonFractionFixidity().unwrap();
-  }
-
-  function getCarbonFractionFixidity() internal view returns (FixidityLib.Fraction memory) {
-    return FixidityLib.fixed1().subtract(inverseCarbonFraction);
-  }
-
-  function setCarbonFraction(uint256 newFraction) external onlyOwner {
-    _setCarbonFraction(newFraction);
-  }
-
-  function getBurnFraction() public view returns (uint256) {
-    console.log("getBurnFraction() carbonFraction", getCarbonFraction());
-    console.log(
-      "getBurnFraction() totalFractionOfOtherBeneficiaries",
-      totalFractionOfOtherBeneficiaries.unwrap()
-    );
-    return getBurnFractionFixidity().unwrap();
-  }
-
-  function getBurnFractionFixidity() internal view returns (FixidityLib.Fraction memory) {
-    return FixidityLib.fixed1().subtract(getTotalFractionOfOtherBeneficiariesAndCarbonFixidity());
-  }
-
-  function checkTotalBeneficiary() internal {
-    require(
-      getTotalFractionOfOtherBeneficiariesAndCarbonFixidity().lt(FixidityLib.fixed1()),
-      "Total beneficiaries fraction must be less than 1"
-    );
-  }
-
-  function _setCarbonFraction(uint256 _newFraction) internal {
-    FixidityLib.Fraction memory newFraction = FixidityLib.wrap(_newFraction);
-    require(newFraction.lt(FixidityLib.fixed1()), "New cargon fraction can't be greather than 1"); // TODO function
-    inverseCarbonFraction = FixidityLib.fixed1().subtract(newFraction);
-    checkTotalBeneficiary();
-    emit CarbonFractionSet(_newFraction);
-  }
-
-  function getTotalFractionOfOtherBeneficiariesAndCarbonFixidity()
-    internal
-    view
-    returns (FixidityLib.Fraction memory)
-  {
-    return totalFractionOfOtherBeneficiaries.add(getCarbonFractionFixidity());
-  }
-
-  function getTotalFractionOfOtherBeneficiariesAndCarbon() public view returns (uint256) {
-    return getTotalFractionOfOtherBeneficiariesAndCarbonFixidity().unwrap();
-  }
-
-  function getOtherBeneficiariesAddresses() external view returns (address[] memory) {
-    return otherBeneficiariesAddresses.values;
-  }
-
-  function getOtherBeneficiariesInfo(
-    address beneficiary
-  ) public view returns (uint256, string memory, bool) {
-    Beneficiary storage otherBeneficiary = otherBeneficiaries[beneficiary];
-    require(otherBeneficiary.exists, "Beneficiary not found");
-    return (otherBeneficiary.fraction.unwrap(), otherBeneficiary.name, otherBeneficiary.exists);
-  }
-
-  function changeOtherBeneficiaryAllocation(
-    address beneficiary,
-    uint256 _newFraction
-  ) external onlyOwner {
-    FixidityLib.Fraction memory newFraction = FixidityLib.wrap(_newFraction);
-    _setBeneficiaryFraction(beneficiary, newFraction);
-  }
-
-  function addOtherBeneficiary(
-    address beneficiary,
-    uint256 _newFraction,
-    string calldata name
-  ) external onlyOwner {
-    require(otherBeneficiaries[beneficiary].exists == false, "Beneficiary already exists");
-    FixidityLib.Fraction memory newFraction = FixidityLib.wrap(_newFraction);
-
-    otherBeneficiaries[beneficiary].exists = true;
-    _setBeneficiaryFraction(beneficiary, newFraction);
-    _setBeneficiaryName(beneficiary, name);
-    otherBeneficiariesAddresses.add(beneficiary);
-
-    emit BeneficiaryAdded(beneficiary);
-  }
-
-  function removeOtherBeneficiary(address beneficiary) external onlyOwner {
-    require(otherBeneficiaries[beneficiary].exists, "Beneficiary not found");
-    totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries.subtract(
-      otherBeneficiaries[beneficiary].fraction
-    );
-    otherBeneficiariesAddresses.remove(beneficiary);
-    delete otherBeneficiaries[beneficiary];
-    emit BeneficiaryRemoved(beneficiary);
-  }
-
-  function _setBeneficiaryFraction(
-    address beneficiaryAddress,
-    FixidityLib.Fraction memory newFraction
-  ) internal {
-    Beneficiary storage beneficiary = otherBeneficiaries[beneficiaryAddress];
-    require(beneficiary.exists, "Beneficiary not found");
-    totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries.add(newFraction);
-    checkTotalBeneficiary();
-    beneficiary.fraction = newFraction;
-    emit BeneficiaryFractionSet(beneficiaryAddress, newFraction.unwrap());
-  }
-
-  function setBeneficiaryFraction(
-    address beneficiaryAddress,
-    uint256 _newFraction
-  ) external onlyOwner {
-    FixidityLib.Fraction memory newFraction = FixidityLib.wrap(_newFraction);
-    _setBeneficiaryFraction(beneficiaryAddress, newFraction);
-  }
-
-  function setBeneficiaryName(address beneficiary, string calldata name) external onlyOwner {
-    _setBeneficiaryName(beneficiary, name);
-  }
-
-  function _setBeneficiaryName(address beneficiary, string memory name) internal {
-    require(otherBeneficiaries[beneficiary].exists, "Beneficiary not found");
-    otherBeneficiaries[beneficiary].name = name;
-    emit BeneficiaryNameSet(beneficiary, name);
-  }
-
   /**
    * @notice Sets initialized == true on implementation contracts.
    * @param test Set to true to skip implementation initialisation.
@@ -271,6 +143,56 @@ contract FeeHandler is
 
   // Without this the contract cant receive Celo as native transfer
   function() external payable {}
+
+  function setCarbonFraction(uint256 newFraction) external onlyOwner {
+    _setCarbonFraction(newFraction);
+  }
+
+  function changeOtherBeneficiaryAllocation(
+    address beneficiary,
+    uint256 _newFraction
+  ) external onlyOwner {
+    FixidityLib.Fraction memory newFraction = FixidityLib.wrap(_newFraction);
+    _setBeneficiaryFraction(beneficiary, newFraction);
+  }
+
+  function addOtherBeneficiary(
+    address beneficiary,
+    uint256 _newFraction,
+    string calldata name
+  ) external onlyOwner {
+    require(otherBeneficiaries[beneficiary].exists == false, "Beneficiary already exists");
+    FixidityLib.Fraction memory newFraction = FixidityLib.wrap(_newFraction);
+
+    otherBeneficiaries[beneficiary].exists = true;
+    _setBeneficiaryFraction(beneficiary, newFraction);
+    _setBeneficiaryName(beneficiary, name);
+    otherBeneficiariesAddresses.add(beneficiary);
+
+    emit BeneficiaryAdded(beneficiary);
+  }
+
+  function removeOtherBeneficiary(address beneficiary) external onlyOwner {
+    require(otherBeneficiaries[beneficiary].exists, "Beneficiary not found");
+    totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries.subtract(
+      otherBeneficiaries[beneficiary].fraction
+    );
+    otherBeneficiariesAddresses.remove(beneficiary);
+    delete otherBeneficiaries[beneficiary];
+    emit BeneficiaryRemoved(beneficiary);
+  }
+
+  function setBeneficiaryFraction(
+    address beneficiaryAddress,
+    uint256 _newFraction
+  ) external onlyOwner {
+    FixidityLib.Fraction memory newFraction = FixidityLib.wrap(_newFraction);
+    _setBeneficiaryFraction(beneficiaryAddress, newFraction);
+  }
+
+  function setBeneficiaryName(address beneficiary, string calldata name) external onlyOwner {
+    _setBeneficiaryName(beneficiary, name);
+  }
 
   /**
     @dev Sets the fee beneficiary address to the specified address.
@@ -424,10 +346,6 @@ contract FeeHandler is
     return _getTokenActive(tokenAddress);
   }
 
-  function _getTokenActive(address tokenAddress) internal view returns (bool) {
-    return activeTokens.contains(tokenAddress);
-  }
-
   /**
     @dev Returns the maximum slippage percentage for the specified token.
     @param tokenAddress The address of the token for which to retrieve the maximum
@@ -467,6 +385,30 @@ contract FeeHandler is
     return tokenStates[tokenAddress].toDistribute;
   }
 
+  function getCarbonFraction() external view returns (uint256) {
+    return getCarbonFractionFixidity().unwrap();
+  }
+
+  function getBurnFraction() external view returns (uint256) {
+    return getBurnFractionFixidity().unwrap();
+  }
+
+  function getOtherBeneficiariesInfo(
+    address beneficiary
+  ) external view returns (uint256, string memory, bool) {
+    Beneficiary storage otherBeneficiary = otherBeneficiaries[beneficiary];
+    require(otherBeneficiary.exists, "Beneficiary not found");
+    return (otherBeneficiary.fraction.unwrap(), otherBeneficiary.name, otherBeneficiary.exists);
+  }
+
+  function getTotalFractionOfOtherBeneficiariesAndCarbon() external view returns (uint256) {
+    return getTotalFractionOfOtherBeneficiariesAndCarbonFixidity().unwrap();
+  }
+
+  function getOtherBeneficiariesAddresses() external view returns (address[] memory) {
+    return otherBeneficiariesAddresses.values;
+  }
+
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return Storage version of the contract.
@@ -504,47 +446,6 @@ contract FeeHandler is
   function getActiveTokens() public view returns (address[] memory) {
     return activeTokens.values;
   }
-
-  function _setCarbonFeeBeneficiary(address beneficiary) private {
-    carbonFeeBeneficiary = beneficiary;
-    emit FeeBeneficiarySet(beneficiary);
-  }
-
-  function _addToken(address tokenAddress, address handlerAddress) private {
-    require(handlerAddress != address(0), "Can't set handler to zero");
-    TokenState storage tokenState = tokenStates[tokenAddress];
-    tokenState.handler = handlerAddress;
-
-    activeTokens.add(tokenAddress);
-    emit TokenAdded(tokenAddress, handlerAddress);
-  }
-
-  function _activateToken(address tokenAddress) private {
-    TokenState storage tokenState = tokenStates[tokenAddress];
-    require(
-      tokenState.handler != address(0) || tokenAddress == getCeloTokenAddress(),
-      "Handler has to be set to activate token"
-    );
-    activeTokens.add(tokenAddress);
-  }
-
-  function _deactivateToken(address tokenAddress) private {
-    activeTokens.remove(tokenAddress);
-  }
-
-  function _setHandler(address tokenAddress, address handlerAddress) private {
-    require(handlerAddress != address(0), "Can't set handler to zero, use deactivateToken");
-    TokenState storage tokenState = tokenStates[tokenAddress];
-    tokenState.handler = handlerAddress;
-  }
-
-  function _removeToken(address tokenAddress) private {
-    _deactivateToken(tokenAddress);
-    TokenState storage tokenState = tokenStates[tokenAddress];
-    tokenState.handler = address(0);
-    emit TokenRemoved(tokenAddress);
-  }
-
   // TODO to allow this function to be called publicly, it should
   // keep track of amounts to be burned, like the Celo token does
   function _setDistributionAmounts(
@@ -556,51 +457,8 @@ contract FeeHandler is
 
     uint256 balanceToBurn = _setDistributeAfterBurn(tokenState, balanceToProcess);
 
-    console.log("balanceToBurn", balanceToBurn);
-    console.log("tokenState.toDistribute1", tokenState.toDistribute);
-
     emit DistributionAmountSet(address(token), tokenState.toDistribute);
     return balanceToBurn;
-  }
-
-  function _sell(address tokenAddress) private onlyWhenNotFrozen nonReentrant {
-    IERC20 token = IERC20(tokenAddress);
-
-    TokenState storage tokenState = tokenStates[tokenAddress];
-    require(_getTokenActive(tokenAddress), "Token needs to be active to sell");
-    require(
-      FixidityLib.unwrap(tokenState.maxSlippage) != 0,
-      "Max slippage has to be set to sell token"
-    );
-
-    uint256 balanceToBurn = _setDistributionAmounts(tokenState, token);
-
-    // small numbers cause rounding errors and zero case should be skipped
-    if (balanceToBurn < MIN_BURN) {
-      return;
-    } // eso debería estar antes de quemar el storage
-
-    if (dailySellLimitHit(tokenAddress, balanceToBurn)) {
-      // in case the limit is hit, burn the max possible
-      balanceToBurn = tokenState.currentDaySellLimit;
-      emit DailyLimitHit(tokenAddress, balanceToBurn);
-    }
-
-    token.transfer(tokenState.handler, balanceToBurn);
-    IFeeHandlerSeller handler = IFeeHandlerSeller(tokenState.handler);
-
-    uint256 celoReceived = handler.sell(
-      tokenAddress,
-      getCeloTokenAddress(),
-      balanceToBurn,
-      FixidityLib.unwrap(tokenState.maxSlippage)
-    );
-
-    celoToBeBurned = celoToBeBurned.add(celoReceived);
-    tokenState.pastBurn = tokenState.pastBurn.add(balanceToBurn);
-    updateLimits(tokenAddress, balanceToBurn);
-
-    emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
   }
 
   function _executePayment(
@@ -609,7 +467,6 @@ contract FeeHandler is
     address beneficiary,
     uint256 amount
   ) internal {
-    console.log("_executePayment amount", amount);
     require(
       _getTokenActive(tokenAddress) ||
         tokenAddress == registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID),
@@ -618,8 +475,6 @@ contract FeeHandler is
 
     IERC20 token = IERC20(tokenAddress);
     uint256 balanceToDistribute = amount;
-
-    console.log("balanceToDistribute", balanceToDistribute);
 
     if (balanceToDistribute == 0) {
       // don't distribute with zero balance
@@ -656,31 +511,22 @@ contract FeeHandler is
       memory totalFractionOfOtherBeneficiariesAndCarbonFixidity = getTotalFractionOfOtherBeneficiariesAndCarbonFixidity();
 
     uint256 carbonFundAmount = _calculateDistributeAmounts(
-      FixidityLib.wrap(getCarbonFraction()),
+      getCarbonFractionFixidity(),
       totalFractionOfOtherBeneficiariesAndCarbonFixidity,
       tokenState.toDistribute
     );
-    console.log("tokenState.toDistribute carbon", tokenState.toDistribute);
 
-    console.log("carbonFundAmount", carbonFundAmount);
     _executePayment(tokenAddress, tokenState, carbonFeeBeneficiary, carbonFundAmount);
 
     for (uint256 i = 0; i < EnumerableSet.length(otherBeneficiariesAddresses); i++) {
       address beneficiary = otherBeneficiariesAddresses.get(i);
       Beneficiary storage otherBeneficiary = otherBeneficiaries[beneficiary];
 
-      console.log("Inside otherBeneficiariesAddresses loop");
-
-      // console.log("otherBeneficiary.fraction", otherBeneficiary.fraction);
-      console.log("tokenState.toDistribute", tokenState.toDistribute);
-
       uint256 amount = _calculateDistributeAmounts(
         otherBeneficiary.fraction,
         totalFractionOfOtherBeneficiariesAndCarbonFixidity,
         tokenState.toDistribute
       );
-
-      console.log("amount", amount);
 
       _executePayment(tokenAddress, tokenState, beneficiary, amount);
     }
@@ -718,11 +564,6 @@ contract FeeHandler is
     _handle(activeTokens.values);
   }
 
-  // avoid using UsingRegistry contract
-  function getCeloTokenAddress() private view returns (address) {
-    return registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID);
-  }
-
   function _handleCelo() private {
     _burnCelo();
     address celoToken = getCeloTokenAddress();
@@ -751,6 +592,11 @@ contract FeeHandler is
     }
 
     _handleCelo();
+  }
+
+  // avoid using UsingRegistry contract
+  function getCeloTokenAddress() internal view returns (address) {
+    return registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID);
   }
 
   function _setDistributeAfterBurn(
@@ -796,5 +642,138 @@ contract FeeHandler is
     }
     tokenState.currentDaySellLimit = tokenState.currentDaySellLimit.sub(amountBurned);
     emit DailySellLimitUpdated(amountBurned);
+  }
+
+  function getCarbonFractionFixidity() internal view returns (FixidityLib.Fraction memory) {
+    return FixidityLib.fixed1().subtract(inverseCarbonFraction);
+  }
+
+  function getBurnFractionFixidity() internal view returns (FixidityLib.Fraction memory) {
+    return FixidityLib.fixed1().subtract(getTotalFractionOfOtherBeneficiariesAndCarbonFixidity());
+  }
+
+  function checkTotalBeneficiary() internal {
+    require(
+      getTotalFractionOfOtherBeneficiariesAndCarbonFixidity().lt(FixidityLib.fixed1()),
+      "Total beneficiaries fraction must be less than 1"
+    );
+  }
+
+  function _setCarbonFraction(uint256 _newFraction) internal {
+    FixidityLib.Fraction memory newFraction = FixidityLib.wrap(_newFraction);
+    require(newFraction.lt(FixidityLib.fixed1()), "New cargon fraction can't be greather than 1"); // TODO function
+    inverseCarbonFraction = FixidityLib.fixed1().subtract(newFraction);
+    checkTotalBeneficiary();
+    emit CarbonFractionSet(_newFraction);
+  }
+
+  function getTotalFractionOfOtherBeneficiariesAndCarbonFixidity()
+    internal
+    view
+    returns (FixidityLib.Fraction memory)
+  {
+    return totalFractionOfOtherBeneficiaries.add(getCarbonFractionFixidity());
+  }
+
+  function _setBeneficiaryFraction(
+    address beneficiaryAddress,
+    FixidityLib.Fraction memory newFraction
+  ) internal {
+    Beneficiary storage beneficiary = otherBeneficiaries[beneficiaryAddress];
+    require(beneficiary.exists, "Beneficiary not found");
+    totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries.add(newFraction);
+    checkTotalBeneficiary();
+    beneficiary.fraction = newFraction;
+    emit BeneficiaryFractionSet(beneficiaryAddress, newFraction.unwrap());
+  }
+
+  function _setBeneficiaryName(address beneficiary, string memory name) internal {
+    require(otherBeneficiaries[beneficiary].exists, "Beneficiary not found");
+    otherBeneficiaries[beneficiary].name = name;
+    emit BeneficiaryNameSet(beneficiary, name);
+  }
+
+  function _getTokenActive(address tokenAddress) internal view returns (bool) {
+    return activeTokens.contains(tokenAddress);
+  }
+
+  function _setCarbonFeeBeneficiary(address beneficiary) private {
+    carbonFeeBeneficiary = beneficiary;
+    emit FeeBeneficiarySet(beneficiary);
+  }
+
+  function _addToken(address tokenAddress, address handlerAddress) private {
+    require(handlerAddress != address(0), "Can't set handler to zero");
+    TokenState storage tokenState = tokenStates[tokenAddress];
+    tokenState.handler = handlerAddress;
+
+    activeTokens.add(tokenAddress);
+    emit TokenAdded(tokenAddress, handlerAddress);
+  }
+
+  function _activateToken(address tokenAddress) private {
+    TokenState storage tokenState = tokenStates[tokenAddress];
+    require(
+      tokenState.handler != address(0) || tokenAddress == getCeloTokenAddress(),
+      "Handler has to be set to activate token"
+    );
+    activeTokens.add(tokenAddress);
+  }
+
+  function _deactivateToken(address tokenAddress) private {
+    activeTokens.remove(tokenAddress);
+  }
+
+  function _setHandler(address tokenAddress, address handlerAddress) private {
+    require(handlerAddress != address(0), "Can't set handler to zero, use deactivateToken");
+    TokenState storage tokenState = tokenStates[tokenAddress];
+    tokenState.handler = handlerAddress;
+  }
+
+  function _removeToken(address tokenAddress) private {
+    _deactivateToken(tokenAddress);
+    TokenState storage tokenState = tokenStates[tokenAddress];
+    tokenState.handler = address(0);
+    emit TokenRemoved(tokenAddress);
+  }
+
+  function _sell(address tokenAddress) private onlyWhenNotFrozen nonReentrant {
+    IERC20 token = IERC20(tokenAddress);
+
+    TokenState storage tokenState = tokenStates[tokenAddress];
+    require(_getTokenActive(tokenAddress), "Token needs to be active to sell");
+    require(
+      FixidityLib.unwrap(tokenState.maxSlippage) != 0,
+      "Max slippage has to be set to sell token"
+    );
+
+    uint256 balanceToBurn = _setDistributionAmounts(tokenState, token);
+
+    // small numbers cause rounding errors and zero case should be skipped
+    if (balanceToBurn < MIN_BURN) {
+      return;
+    } // eso debería estar antes de quemar el storage
+
+    if (dailySellLimitHit(tokenAddress, balanceToBurn)) {
+      // in case the limit is hit, burn the max possible
+      balanceToBurn = tokenState.currentDaySellLimit;
+      emit DailyLimitHit(tokenAddress, balanceToBurn);
+    }
+
+    token.transfer(tokenState.handler, balanceToBurn);
+    IFeeHandlerSeller handler = IFeeHandlerSeller(tokenState.handler);
+
+    uint256 celoReceived = handler.sell(
+      tokenAddress,
+      getCeloTokenAddress(),
+      balanceToBurn,
+      FixidityLib.unwrap(tokenState.maxSlippage)
+    );
+
+    celoToBeBurned = celoToBeBurned.add(celoReceived);
+    tokenState.pastBurn = tokenState.pastBurn.add(balanceToBurn);
+    updateLimits(tokenAddress, balanceToBurn);
+
+    emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
   }
 }
