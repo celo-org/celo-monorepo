@@ -70,9 +70,6 @@ contract FeeHandler is
 
   // TODO test this after changed to private
   FixidityLib.Fraction public inverseCarbonFraction; // 80% reason it's inverse it's because it used to be burnFraction and was migrated
-  // TODO change this to function
-  // TODO don't let change fractions while there's balance to be handled
-  // replace with carbonOfsetting fraction
 
   address public carbonFeeBeneficiary;
 
@@ -85,6 +82,11 @@ contract FeeHandler is
 
   // Celo not included in this list
   EnumerableSet.AddressSet private activeTokens;
+  // does not include carbon fund
+  FixidityLib.Fraction private totalFractionOfOtherBeneficiaries; // TODO this can be a function, withou the carbon fund, TODO add getter
+
+  mapping(address => Beneficiary) private otherBeneficiaries; // TODO add getter
+  EnumerableSet.AddressSet private otherBeneficiariesAddresses;
 
   function carbonFraction() public view returns (uint256) {
     return getCarbonFractionFixidity().unwrap();
@@ -102,13 +104,13 @@ contract FeeHandler is
     console.log("getBurnFraction() carbonFraction", carbonFraction());
     console.log(
       "getBurnFraction() totalFractionOfOtherBeneficiaries",
-      totalFractionOfOtherBeneficiaries
+      totalFractionOfOtherBeneficiaries.unwrap()
     );
-    return FIXED1_UINT - carbonFraction() - totalFractionOfOtherBeneficiaries;
+    return getBurnFractionFixidity().unwrap();
   }
 
   function getBurnFractionFixidity() internal view returns (FixidityLib.Fraction memory) {
-    return FixidityLib.wrap(FIXED1_UINT - carbonFraction() - totalFractionOfOtherBeneficiaries);
+    return FixidityLib.fixed1().subtract(getTotalFractionOfOtherBeneficiariesAndCarbonFixidity());
   }
 
   function _setCarbonFraction(uint256 newFraction) internal {
@@ -117,16 +119,23 @@ contract FeeHandler is
     emit CarbonFractionSet(newFraction);
   }
 
-  mapping(address => Beneficiary) private otherBeneficiaries; // TODO add getter
-  EnumerableSet.AddressSet private otherBeneficiariesAddresses;
-  uint256 private totalFractionOfOtherBeneficiaries; // TODO this can be a function, withou the carbon fund
-
   function getCeloBurningFraction() internal returns (FixidityLib.Fraction memory) {
-    return FixidityLib.wrap(FIXED1_UINT.sub(totalFractionOfOtherBeneficiaries));
+    return
+      FixidityLib.fixed1().subtract(
+        FixidityLib.wrap(getTotalFractionOfOtherBeneficiariesAndCarbon())
+      );
+  }
+
+  function getTotalFractionOfOtherBeneficiariesAndCarbonFixidity()
+    internal
+    view
+    returns (FixidityLib.Fraction memory)
+  {
+    return totalFractionOfOtherBeneficiaries.add(getCarbonFractionFixidity());
   }
 
   function getTotalFractionOfOtherBeneficiariesAndCarbon() public view returns (uint256) {
-    return totalFractionOfOtherBeneficiaries + carbonFraction();
+    return getTotalFractionOfOtherBeneficiariesAndCarbonFixidity().unwrap();
   }
 
   function setOtherBeneficiary(
@@ -138,14 +147,16 @@ contract FeeHandler is
     // require it is not in the list already
     // write to memory before doing checks
     require(otherBeneficiaries[beneficiary].exists == false, "Beneficiary already exists");
-    uint256 _totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries +
+    uint256 _totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries.unwrap() +
       newCarbonFraction +
       newFraction;
-    // todo check strict <
+    // TODO check strict <
     require(_totalFractionOfOtherBeneficiaries < FIXED1_UINT, "Total fraction must be less than 1");
     _setCarbonFraction(newCarbonFraction);
     otherBeneficiaries[beneficiary] = Beneficiary(FixidityLib.wrap(newFraction), name, true);
-    totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries + newFraction;
+    totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries.add(
+      FixidityLib.wrap(newFraction)
+    );
     otherBeneficiariesAddresses.add(beneficiary);
     // TODO emit
   }
@@ -196,7 +207,7 @@ contract FeeHandler is
 
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
-    _setFeeBeneficiary(newFeeBeneficiary);
+    _setCarbonFeeBeneficiary(newFeeBeneficiary);
     _setCarbonFraction(newCarbonFraction);
 
     for (uint256 i = 0; i < tokens.length; i++) {
@@ -213,8 +224,8 @@ contract FeeHandler is
     @dev Sets the fee beneficiary address to the specified address.
     @param beneficiary The address to set as the fee beneficiary.
   */
-  function setFeeBeneficiary(address beneficiary) external onlyOwner {
-    return _setFeeBeneficiary(beneficiary);
+  function setCarbonFeeBeneficiary(address beneficiary) external onlyOwner {
+    return _setCarbonFeeBeneficiary(beneficiary);
   }
 
   /**
@@ -451,7 +462,7 @@ contract FeeHandler is
     return activeTokens.values;
   }
 
-  function _setFeeBeneficiary(address beneficiary) private {
+  function _setCarbonFeeBeneficiary(address beneficiary) private {
     carbonFeeBeneficiary = beneficiary;
     emit FeeBeneficiarySet(beneficiary);
   }
@@ -500,9 +511,8 @@ contract FeeHandler is
       token.balanceOf(address(this)).sub(tokenState.toDistribute)
     );
 
-    FixidityLib.Fraction memory calculatedBurnFraction = FixidityLib.wrap(
-      FIXED1_UINT.sub(totalFractionOfOtherBeneficiaries + carbonFraction())
-    ); // rename variables, this should be a function
+    FixidityLib.Fraction memory calculatedBurnFraction = getCeloBurningFraction();
+
     uint256 balanceToBurn = (calculatedBurnFraction.multiply(balanceToProcess).fromFixed());
 
     console.log("balanceToBurn", balanceToBurn);
@@ -612,8 +622,8 @@ contract FeeHandler is
 
     TokenState storage tokenState = tokenStates[tokenAddress];
 
-    FixidityLib.Fraction memory totalFractionOfOtherBeneficiariesAndCarbonFixidity = FixidityLib
-      .wrap(totalFractionOfOtherBeneficiaries + carbonFraction());
+    FixidityLib.Fraction
+      memory totalFractionOfOtherBeneficiariesAndCarbonFixidity = getTotalFractionOfOtherBeneficiariesAndCarbonFixidity();
 
     uint256 carbonFundAmount = _calculateDistributeAmounts(
       FixidityLib.wrap(carbonFraction()),

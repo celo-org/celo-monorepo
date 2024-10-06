@@ -350,17 +350,17 @@ contract FeeHandlerTest_SetFeeBeneficiary is FeeHandlerTest {
   function test_Reverts_WhenCallerNotOwner() public {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
-    feeHandler.setFeeBeneficiary(OTHER_BENEFICIARY_ADDRESS);
+    feeHandler.setCarbonFeeBeneficiary(OTHER_BENEFICIARY_ADDRESS);
   }
 
   function test_ShouldEmitFeeBeneficiarySet() public {
     vm.expectEmit(true, true, true, true);
     emit FeeBeneficiarySet(OTHER_BENEFICIARY_ADDRESS);
-    feeHandler.setFeeBeneficiary(OTHER_BENEFICIARY_ADDRESS);
+    feeHandler.setCarbonFeeBeneficiary(OTHER_BENEFICIARY_ADDRESS);
   }
 
   function test_SetsAddressCorrectly() public {
-    feeHandler.setFeeBeneficiary(OTHER_BENEFICIARY_ADDRESS);
+    feeHandler.setCarbonFeeBeneficiary(OTHER_BENEFICIARY_ADDRESS);
     assertEq(feeHandler.carbonFeeBeneficiary(), OTHER_BENEFICIARY_ADDRESS);
   }
 }
