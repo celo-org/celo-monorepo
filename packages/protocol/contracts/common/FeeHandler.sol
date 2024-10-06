@@ -23,6 +23,8 @@ import "../stability/interfaces/ISortedOracles.sol";
 // Using the minimal required signatures in the interfaces so more contracts could be compatible
 import "../common/libraries/ReentrancyGuard.sol";
 
+import { console } from "forge-std/console.sol";
+
 // An implementation of FeeHandler as described in CIP-52
 // See https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md
 contract FeeHandler is
@@ -106,7 +108,7 @@ contract FeeHandler is
 
   mapping(address => Beneficiary) private otherBeneficiaries;
   EnumerableSet.AddressSet private otherBeneficiariesAddresses;
-  uint256 private totalFractionOfOtherBeneficiaries; // TODO this can be a function
+  uint256 private totalFractionOfOtherBeneficiaries; // TODO this can be a function, withou the carbon fund
 
   function getCeloBurningFraction() internal returns (FixidityLib.Fraction memory) {
     return FixidityLib.wrap(FIXED1_UINT.sub(totalFractionOfOtherBeneficiaries));
@@ -128,7 +130,8 @@ contract FeeHandler is
     require(_totalFractionOfOtherBeneficiaries < FIXED1_UINT, "Total fraction must be less than 1");
     _setCarbonFraction(newFraction);
     otherBeneficiaries[beneficiary] = Beneficiary(newFraction, name, true);
-    totalFractionOfOtherBeneficiaries = _totalFractionOfOtherBeneficiaries;
+    totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries + newFraction;
+    otherBeneficiariesAddresses.add(beneficiary);
     // TODO emit
   }
 
@@ -501,11 +504,17 @@ contract FeeHandler is
       token.balanceOf(address(this)).sub(tokenState.toDistribute)
     );
 
-    uint256 balanceToBurn = (burnFraction.multiply(balanceToProcess).fromFixed());
+    FixidityLib.Fraction memory calculatedBurnFraction = FixidityLib.wrap(
+      FIXED1_UINT.sub(totalFractionOfOtherBeneficiaries + carbonFraction())
+    ); // rename variables, this should be a function
+    uint256 balanceToBurn = (calculatedBurnFraction.multiply(balanceToProcess).fromFixed());
+
+    console.log("balanceToBurn", balanceToBurn);
 
     tokenState.toDistribute = tokenState.toDistribute.add(
       balanceToProcess.fromFixed().sub(balanceToBurn)
     );
+    console.log("tokenState.toDistribute1", tokenState.toDistribute);
 
     emit DistributionAmountSet(address(token), tokenState.toDistribute);
     return balanceToBurn;
@@ -557,6 +566,7 @@ contract FeeHandler is
     address beneficiary,
     uint256 amount
   ) internal {
+    console.log("_executePayment amount", amount);
     require(
       _getTokenActive(tokenAddress) ||
         tokenAddress == registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID),
@@ -570,12 +580,14 @@ contract FeeHandler is
     uint256 tokenBalance = token.balanceOf(address(this));
     uint256 balanceToDistribute = Math.min(tokenBalance, amount);
 
+    console.log("balanceToDistribute", balanceToDistribute);
+
     if (balanceToDistribute == 0) {
       // don't distribute with zero balance
       return;
     }
 
-    token.transfer(feeBeneficiary, balanceToDistribute);
+    token.transfer(beneficiary, balanceToDistribute);
     state.toDistribute = state.toDistribute.sub(balanceToDistribute);
   }
 
@@ -606,38 +618,32 @@ contract FeeHandler is
       .wrap(totalFractionOfOtherBeneficiaries + carbonFraction());
 
     uint256 carbonFundAmount = _calculateDistributeAmounts(
-      FixidityLib.newFixed(carbonFraction()),
+      FixidityLib.wrap(carbonFraction()),
       totalFractionOfOtherBeneficiariesAndCarbonFixidity,
       tokenState.toDistribute
     );
+    console.log("carbonFundAmount", carbonFundAmount);
     _executePayment(tokenAddress, tokenState, feeBeneficiary, carbonFundAmount);
 
-    // pay carbon fund
-    // uint256 carbonFundAmount = _calculateDistributeAmounts(
-    //   carbonFraction(),
-    //   totalFractionOfOtherBeneficiariesAndCarbonFixidity,
-    //   tokenState.toDistribute
-    // );
+    for (uint256 i = 0; i < EnumerableSet.length(otherBeneficiariesAddresses); i++) {
+      address beneficiary = otherBeneficiariesAddresses.get(i);
+      Beneficiary storage otherBeneficiary = otherBeneficiaries[beneficiary];
 
-    // for (uint256 i = 0; i < EnumerableSet.length(otherBeneficiariesAddresses); i++) {
-    //   address beneficiary = otherBeneficiariesAddresses.get(i);
-    //   Beneficiary storage otherBeneficiary = otherBeneficiaries[beneficiary];
-    //   TokenState storage tokenStateBeneficiary = tokenStates[tokenAddress];
-    //   FixidityLib.Fraction memory fraction = FixidityLib.newFixed(otherBeneficiary.fraction).divide(
-    //     totalFractionOfOtherBeneficiariesAndCarbonFixidity
-    //   );
-    //   FixidityLib.Fraction memory toDistributeFraction = FixidityLib
-    //     .newFixed(tokenStateBeneficiary.toDistribute)
-    //     .multiply(fraction);
+      console.log("Inside otherBeneficiariesAddresses loop");
 
-    //   uint256 amount = (
-    //     totalFractionOfOtherBeneficiariesAndCarbonFixidity.multiply(toDistributeFraction)
-    //   ).fromFixed();
-    //   _executePayment(tokenAddress, tokenStateBeneficiary, beneficiary, amount);
-    // }
+      console.log("otherBeneficiary.fraction", otherBeneficiary.fraction);
+      console.log("tokenState.toDistribute", tokenState.toDistribute);
 
-    // for i in other beneficiaries:
-    //   uint256 portion = balanceToDistribute * (otherBeneficiaries[i].fraction/getTotalFractionOfOtherBeneficiaries);
+      uint256 amount = _calculateDistributeAmounts(
+        FixidityLib.newFixed(otherBeneficiary.fraction),
+        totalFractionOfOtherBeneficiariesAndCarbonFixidity,
+        tokenState.toDistribute
+      );
+
+      console.log("amount", amount);
+
+      _executePayment(tokenAddress, tokenState, beneficiary, amount);
+    }
   }
 
   function _setMaxSplippage(address token, uint256 newMax) private {
@@ -724,6 +730,7 @@ contract FeeHandler is
     celo.burn(totalBalanceToBurn);
 
     celoToBeBurned = 0;
+    // TODO fix allocation here
     tokenState.toDistribute = tokenState.toDistribute.add(
       balanceToProcess.sub(currentBalanceToBurn)
     );
