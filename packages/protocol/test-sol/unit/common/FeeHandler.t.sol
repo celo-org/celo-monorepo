@@ -395,7 +395,6 @@ contract FeeHandlerTestAbstract is FeeHandlerTest {
 contract FeeHandlerTest_Distribute is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
-    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
     setBurnFraction(80, 100);
     setMaxSlippage(address(stableToken), FIXED1);
   }
@@ -446,9 +445,10 @@ contract FeeHandlerTest_Distribute is FeeHandlerTestAbstract {
 contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
-    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
     setBurnFraction(80, 100);
     setMaxSlippage(address(stableToken), FIXED1);
+    fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
+    addAndActivateToken(address(stableToken), address(mentoSeller));
 
     feeHandler.setOtherBeneficiary(
       op,
@@ -459,8 +459,6 @@ contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstr
   }
 
   function test_DistributeOP() public {
-    fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
-    addAndActivateToken(address(stableToken), address(mentoSeller));
     feeHandler.sell(address(stableToken));
 
     assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 0); // Make sure the balance is zero at the beginning
@@ -468,11 +466,56 @@ contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstr
 
     assertEq(stableToken.balanceOf(address(feeHandler)), 0);
     assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
-
-    // TOD verify OP is still the same
     assertEq(stableToken.balanceOf(op), 2e17);
   }
+
+  function test_DistributeOP_WhenOneMoreBeneficiary() public {
+    address otherBeneficiary = actor("otherBeneficiary");
+    feeHandler.setOtherBeneficiary(
+      otherBeneficiary,
+      (30 * 1e24) / 100, // TODO use fixidity
+      (20 * 1e24) / 100,
+      "otherBeneficiary "
+    );
+
+    feeHandler.sell(address(stableToken));
+    assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 0); // Make sure the balance is zero at the beginning
+    feeHandler.distribute(address(stableToken));
+
+    assertEq(feeHandler.getTotalFractionOfOtherBeneficiariesAndCarbon(), 7e23);
+    assertEq(feeHandler.getBurnFraction(), 3e23);
+
+    assertApproxEqAbs(stableToken.balanceOf(address(feeHandler)), 0, 10);
+    assertApproxEqAbs(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17, 1);
+    assertApproxEqAbs(stableToken.balanceOf(op), 2e17, 1);
+    assertApproxEqAbs(stableToken.balanceOf(otherBeneficiary), 3e17, 1);
+  }
 }
+
+// function test_HandleCelo_WhenThereAreMoreTwoOtherBeneficiaries() public {
+//   feeHandler.setOtherBeneficiary(
+//     op,
+//     (20 * 1e24) / 100, // TODO use fixidity
+//     (20 * 1e24) / 100,
+//     "OP revenue share"
+//   );
+//   address otherBeneficiary = actor("otherBeneficiary");
+//   feeHandler.setOtherBeneficiary(
+//     otherBeneficiary ,
+//     (30 * 1e24) / 100, // TODO use fixidity
+//     (20 * 1e24) / 100,
+//     "otherBeneficiary "
+//   );
+
+//   assertEq(feeHandler.getTotalFractionOfOtherBeneficiariesAndCarbon(), 7e23);
+//   assertEq(feeHandler.getBurnFraction(), 3e23);
+
+//   feeHandler.handle(address(celoToken));
+//   assertEq(celoToken.getBurnedAmount(), 3e17);
+//   assertApproxEqAbs(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17, 1);
+//   assertApproxEqAbs(celoToken.balanceOf(op), 2e17, 1);
+//   assertApproxEqAbs(celoToken.balanceOf(otherBeneficiary), 3e17, 1);
+// }
 
 contract FeeHandlerTest_BurnCelo is FeeHandlerTestAbstract {
   function setUp() public {
@@ -504,7 +547,6 @@ contract FeeHandlerTest_BurnCelo is FeeHandlerTestAbstract {
     feeHandler.burnCelo();
     assertEq(celoToken.balanceOf(address(feeHandler)), 2e17);
 
-    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
     feeHandler.distribute(address(celoToken));
     assertEq(celoToken.balanceOf(address(feeHandler)), 0);
     assertEq(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
@@ -801,6 +843,31 @@ contract FeeHandlerTest_HandleCelo is FeeHandlerTestAbstract {
     assertEq(celoToken.getBurnedAmount(), 6e17);
     assertEq(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
     assertEq(celoToken.balanceOf(op), 2e17);
+  }
+
+  function test_HandleCelo_WhenThereAreMoreTwoOtherBeneficiaries() public {
+    feeHandler.setOtherBeneficiary(
+      op,
+      (20 * 1e24) / 100, // TODO use fixidity
+      (20 * 1e24) / 100,
+      "OP revenue share"
+    );
+    address otherBeneficiary = actor("otherBeneficiary");
+    feeHandler.setOtherBeneficiary(
+      otherBeneficiary,
+      (30 * 1e24) / 100, // TODO use fixidity
+      (20 * 1e24) / 100,
+      "otherBeneficiary "
+    );
+
+    assertEq(feeHandler.getTotalFractionOfOtherBeneficiariesAndCarbon(), 7e23);
+    assertEq(feeHandler.getBurnFraction(), 3e23);
+
+    feeHandler.handle(address(celoToken));
+    assertEq(celoToken.getBurnedAmount(), 3e17);
+    assertApproxEqAbs(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17, 1);
+    assertApproxEqAbs(celoToken.balanceOf(op), 2e17, 1);
+    assertApproxEqAbs(celoToken.balanceOf(otherBeneficiary), 3e17, 1);
   }
 }
 

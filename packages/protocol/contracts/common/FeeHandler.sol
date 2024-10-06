@@ -88,6 +88,11 @@ contract FeeHandler is
   }
 
   function getBurnFraction() public view returns (uint256) {
+    console.log("getBurnFraction() carbonFraction", carbonFraction());
+    console.log(
+      "getBurnFraction() totalFractionOfOtherBeneficiaries",
+      totalFractionOfOtherBeneficiaries
+    );
     return FIXED1_UINT - carbonFraction() - totalFractionOfOtherBeneficiaries;
   }
 
@@ -122,10 +127,14 @@ contract FeeHandler is
     return FixidityLib.wrap(FIXED1_UINT.sub(totalFractionOfOtherBeneficiaries));
   }
 
+  function getTotalFractionOfOtherBeneficiariesAndCarbon() public view returns (uint256) {
+    return totalFractionOfOtherBeneficiaries + carbonFraction();
+  }
+
   function setOtherBeneficiary(
     address beneficiary,
     uint256 newFraction,
-    uint256 newCarbonFraction,
+    uint256 newCarbonFraction, // I think this is actually not needed TODO
     string calldata name
   ) external onlyOwner {
     // require it is not in the list already
@@ -136,7 +145,7 @@ contract FeeHandler is
       newCarbonFraction +
       newFraction;
     require(_totalFractionOfOtherBeneficiaries < FIXED1_UINT, "Total fraction must be less than 1");
-    _setCarbonFraction(newFraction);
+    _setCarbonFraction(newCarbonFraction);
     otherBeneficiaries[beneficiary] = Beneficiary(newFraction, name, true);
     totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries + newFraction;
     otherBeneficiariesAddresses.add(beneficiary);
@@ -585,8 +594,10 @@ contract FeeHandler is
 
     // safety check to avoid a revert due balance
     // TODO probably remove this 2 lines
-    uint256 tokenBalance = token.balanceOf(address(this));
-    uint256 balanceToDistribute = Math.min(tokenBalance, amount);
+    // uint256 tokenBalance = token.balanceOf(address(this));
+    // uint256 balanceToDistribute = Math.min(tokenBalance, amount);
+
+    uint256 balanceToDistribute = amount;
 
     console.log("balanceToDistribute", balanceToDistribute);
 
@@ -596,7 +607,7 @@ contract FeeHandler is
     }
 
     token.transfer(beneficiary, balanceToDistribute);
-    state.toDistribute = state.toDistribute.sub(balanceToDistribute);
+    // state.toDistribute = state.toDistribute.sub(balanceToDistribute);
   }
 
   function _calculateDistributeAmounts(
@@ -630,6 +641,8 @@ contract FeeHandler is
       totalFractionOfOtherBeneficiariesAndCarbonFixidity,
       tokenState.toDistribute
     );
+    console.log("tokenState.toDistribute carbon", tokenState.toDistribute);
+
     console.log("carbonFundAmount", carbonFundAmount);
     _executePayment(tokenAddress, tokenState, feeBeneficiary, carbonFundAmount);
 
@@ -643,7 +656,7 @@ contract FeeHandler is
       console.log("tokenState.toDistribute", tokenState.toDistribute);
 
       uint256 amount = _calculateDistributeAmounts(
-        FixidityLib.newFixed(otherBeneficiary.fraction),
+        FixidityLib.wrap(otherBeneficiary.fraction),
         totalFractionOfOtherBeneficiariesAndCarbonFixidity,
         tokenState.toDistribute
       );
@@ -652,6 +665,8 @@ contract FeeHandler is
 
       _executePayment(tokenAddress, tokenState, beneficiary, amount);
     }
+
+    tokenState.toDistribute = 0;
   }
 
   function _setMaxSplippage(address token, uint256 newMax) private {
