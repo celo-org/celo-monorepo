@@ -50,7 +50,7 @@ contract FeeHandler is
     uint256 toDistribute;
     // Historical amounts burned by this contract
     uint256 pastBurn;
-    uint256 lastLimitDay;
+    // uint256 lastLimitDay; // this breaks the storage?
   }
 
   struct Beneficiary {
@@ -86,8 +86,9 @@ contract FeeHandler is
   // does not include carbon fund
   FixidityLib.Fraction private totalFractionOfOtherBeneficiaries; // TODO this can be a function, withou the carbon fund, TODO add getter
 
-  mapping(address => Beneficiary) private otherBeneficiaries; // TODO add getter
+  mapping(address => Beneficiary) private otherBeneficiaries;
   EnumerableSet.AddressSet private otherBeneficiariesAddresses;
+  mapping(address => uint256) private lastLimitDay; // TODO check storage
 
   event SoldAndBurnedToken(address token, uint256 value);
   event DailyLimitSet(address tokenAddress, uint256 newLimit);
@@ -418,7 +419,7 @@ contract FeeHandler is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (2, 0, 0, 0);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -436,8 +437,12 @@ contract FeeHandler is
 
     uint256 currentDay = now / 1 days;
     // Pattern borrowed from Reserve.sol
-    if (currentDay > tokenState.lastLimitDay) {
-      tokenState.lastLimitDay = currentDay;
+    // if (currentDay > tokenState.lastLimitDay) {
+    //   tokenState.lastLimitDay = currentDay;
+    //   tokenState.currentDaySellLimit = tokenState.dailySellLimit;
+    // }
+    if (currentDay > lastLimitDay[token]) {
+      lastLimitDay[token] = currentDay;
       tokenState.currentDaySellLimit = tokenState.dailySellLimit;
     }
 
