@@ -441,6 +441,38 @@ contract FeeHandlerTest_Distribute is FeeHandlerTestAbstract {
   }
 }
 
+contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstract {
+  address op;
+  function setUp() public {
+    super.setUp();
+    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
+    setBurnFraction(80, 100);
+    setMaxSlippage(address(stableToken), FIXED1);
+    op = actor("op");
+    feeHandler.setOtherBeneficiary(
+      op,
+      (20 * 1e24) / 100, // TODO use fixidity
+      (20 * 1e24) / 100,
+      "OP revenue share"
+    );
+  }
+
+  function test_DistributeOP() public {
+    fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
+    addAndActivateToken(address(stableToken), address(mentoSeller));
+    feeHandler.sell(address(stableToken));
+
+    assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 0); // Make sure the balance is zero at the beginning
+    feeHandler.distribute(address(stableToken));
+
+    assertEq(stableToken.balanceOf(address(feeHandler)), 0);
+    assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
+
+    // TOD verify OP is still the same
+    // assertEq(stableToken.balanceOf(op), 2e17);
+  }
+}
+
 contract FeeHandlerTest_BurnCelo is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
