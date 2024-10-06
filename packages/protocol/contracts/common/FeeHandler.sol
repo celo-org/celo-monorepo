@@ -53,6 +53,13 @@ contract FeeHandler is
     uint256 lastLimitDay;
   }
 
+  struct Beneficiary {
+    // uint256 fraction;
+    FixidityLib.Fraction fraction;
+    string name;
+    bool exists;
+  }
+
   uint256 public constant FIXED1_UINT = 1000000000000000000000000; // TODO move to FIX and add check
 
   // Min units that can be burned
@@ -62,12 +69,12 @@ contract FeeHandler is
   uint256 private _lastLimitDay; // deprecated
 
   // TODO test this after changed to private
-  FixidityLib.Fraction public burnFraction; // 80%
+  FixidityLib.Fraction public inverseCarbonFraction; // 80% reason it's inverse it's because it used to be burnFraction and was migrated
   // TODO change this to function
   // TODO don't let change fractions while there's balance to be handled
   // replace with carbonOfsetting fraction
 
-  address public feeBeneficiary;
+  address public carbonFeeBeneficiary;
 
   uint256 public celoToBeBurned;
 
@@ -80,7 +87,11 @@ contract FeeHandler is
   EnumerableSet.AddressSet private activeTokens;
 
   function carbonFraction() public view returns (uint256) {
-    return FIXED1_UINT.sub(burnFraction.unwrap());
+    return getCarbonFractionFixidity().unwrap();
+  }
+
+  function getCarbonFractionFixidity() internal view returns (FixidityLib.Fraction memory) {
+    return FixidityLib.fixed1().subtract(inverseCarbonFraction);
   }
 
   function setCarbonFraction(uint256 newFraction) external onlyOwner {
@@ -102,24 +113,11 @@ contract FeeHandler is
 
   function _setCarbonFraction(uint256 newFraction) internal {
     require(newFraction < FIXED1_UINT, "Carbon fraction must be less than 1");
-    burnFraction = FixidityLib.wrap(FIXED1_UINT.sub(newFraction));
+    inverseCarbonFraction = FixidityLib.wrap(FIXED1_UINT.sub(newFraction));
     emit CarbonFractionSet(newFraction);
   }
 
-  // total sum of otherBeneficiaries + burnFracction + carbon ofsetting = 100
-
-  // (total sum of otherBeneficiaries) + burnFracction + (carbon ofsetting) = 100
-  // cuando quema, quema 100 - otros - carbon
-  // cuando distribuye, distribuye 100 - otros - carbon
-
-  // TODO add name to this, OP benef?
-  struct Beneficiary {
-    uint256 fraction;
-    string name;
-    bool exists;
-  }
-
-  mapping(address => Beneficiary) private otherBeneficiaries;
+  mapping(address => Beneficiary) private otherBeneficiaries; // TODO add getter
   EnumerableSet.AddressSet private otherBeneficiariesAddresses;
   uint256 private totalFractionOfOtherBeneficiaries; // TODO this can be a function, withou the carbon fund
 
@@ -138,15 +136,15 @@ contract FeeHandler is
     string calldata name
   ) external onlyOwner {
     // require it is not in the list already
-    // todo check strict
     // write to memory before doing checks
     require(otherBeneficiaries[beneficiary].exists == false, "Beneficiary already exists");
     uint256 _totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries +
       newCarbonFraction +
       newFraction;
+    // todo check strict <
     require(_totalFractionOfOtherBeneficiaries < FIXED1_UINT, "Total fraction must be less than 1");
     _setCarbonFraction(newCarbonFraction);
-    otherBeneficiaries[beneficiary] = Beneficiary(newFraction, name, true);
+    otherBeneficiaries[beneficiary] = Beneficiary(FixidityLib.wrap(newFraction), name, true);
     totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries + newFraction;
     otherBeneficiariesAddresses.add(beneficiary);
     // TODO emit
@@ -183,7 +181,7 @@ contract FeeHandler is
   function initialize(
     address _registryAddress,
     address newFeeBeneficiary,
-    uint256 newBurnFraction,
+    uint256 newCarbonFraction,
     address[] calldata tokens,
     address[] calldata handlers,
     uint256[] calldata newLimits,
@@ -199,7 +197,7 @@ contract FeeHandler is
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
     _setFeeBeneficiary(newFeeBeneficiary);
-    _setBurnFraction(newBurnFraction);
+    _setCarbonFraction(newCarbonFraction);
 
     for (uint256 i = 0; i < tokens.length; i++) {
       _addToken(tokens[i], handlers[i]);
@@ -217,14 +215,6 @@ contract FeeHandler is
   */
   function setFeeBeneficiary(address beneficiary) external onlyOwner {
     return _setFeeBeneficiary(beneficiary);
-  }
-
-  /**
-    @dev Sets the burn fraction to the specified value.
-    @param fraction The value to set as the burn fraction.
-  */
-  function setBurnFraction(uint256 fraction) external onlyOwner {
-    return _setBurnFraction(fraction);
   }
 
   /**
@@ -308,21 +298,21 @@ contract FeeHandler is
   }
 
   /**
-    @dev Distributes the available tokens for all registered tokens to the feeBeneficiary.
+    @dev Distributes the available tokens for all registered tokens to the feeBeneficiaries.
   */
   function distributeAll() external {
     return _distributeAll();
   }
 
   /**
-    @dev Distributes the available tokens for all registered tokens to the feeBeneficiary.
+    @dev 
   */
   function handleAll() external {
     return _handleAll();
   }
 
   /**
-    @dev Distributes the the token for to the feeBeneficiary.
+    @dev 
   */
   function handle(address tokenAddress) external {
     return _handle(tokenAddress);
@@ -462,19 +452,8 @@ contract FeeHandler is
   }
 
   function _setFeeBeneficiary(address beneficiary) private {
-    feeBeneficiary = beneficiary;
+    carbonFeeBeneficiary = beneficiary;
     emit FeeBeneficiarySet(beneficiary);
-  }
-
-  // TODO probably deprecate
-  function _setBurnFraction(uint256 newFraction) private {
-    FixidityLib.Fraction memory fraction = FixidityLib.wrap(newFraction);
-    require(
-      FixidityLib.lte(fraction, FixidityLib.fixed1()),
-      "Burn fraction must be less than or equal to 1"
-    );
-    burnFraction = fraction;
-    emit BurnFractionSet(newFraction);
   }
 
   function _addToken(address tokenAddress, address handlerAddress) private {
@@ -627,7 +606,7 @@ contract FeeHandler is
   }
 
   function _distribute(address tokenAddress) private onlyWhenNotFrozen nonReentrant {
-    require(feeBeneficiary != address(0), "Can't distribute to the zero address");
+    require(carbonFeeBeneficiary != address(0), "Can't distribute to the zero address");
     IERC20 token = IERC20(tokenAddress);
     uint256 tokenBalance = token.balanceOf(address(this));
 
@@ -644,7 +623,7 @@ contract FeeHandler is
     console.log("tokenState.toDistribute carbon", tokenState.toDistribute);
 
     console.log("carbonFundAmount", carbonFundAmount);
-    _executePayment(tokenAddress, tokenState, feeBeneficiary, carbonFundAmount);
+    _executePayment(tokenAddress, tokenState, carbonFeeBeneficiary, carbonFundAmount);
 
     for (uint256 i = 0; i < EnumerableSet.length(otherBeneficiariesAddresses); i++) {
       address beneficiary = otherBeneficiariesAddresses.get(i);
@@ -652,11 +631,11 @@ contract FeeHandler is
 
       console.log("Inside otherBeneficiariesAddresses loop");
 
-      console.log("otherBeneficiary.fraction", otherBeneficiary.fraction);
+      // console.log("otherBeneficiary.fraction", otherBeneficiary.fraction);
       console.log("tokenState.toDistribute", tokenState.toDistribute);
 
       uint256 amount = _calculateDistributeAmounts(
-        FixidityLib.wrap(otherBeneficiary.fraction),
+        otherBeneficiary.fraction,
         totalFractionOfOtherBeneficiariesAndCarbonFixidity,
         tokenState.toDistribute
       );

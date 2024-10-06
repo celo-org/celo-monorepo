@@ -223,37 +223,38 @@ contract FeeHandlerTest_Initialize is FeeHandlerTest {
   }
 
   function test_FeeBeneficiarySet() public {
-    assertEq(feeHandler.feeBeneficiary(), EXAMPLE_BENEFICIARY_ADDRESS);
+    assertEq(feeHandler.carbonFeeBeneficiary(), EXAMPLE_BENEFICIARY_ADDRESS);
   }
 }
 
-contract FeeHandlerTest_SetBurnFraction is FeeHandlerTest {
-  function test_Reverts_WhenCallerNotOwner() public {
-    vm.prank(user);
-    vm.expectRevert("Ownable: caller is not the owner");
-    feeHandler.setBurnFraction(100);
-  }
+// TODO test setCarbonFraction
+// contract FeeHandlerTest_SetBurnFraction is FeeHandlerTest {
+//   function test_Reverts_WhenCallerNotOwner() public {
+//     vm.prank(user);
+//     vm.expectRevert("Ownable: caller is not the owner");
+//     feeHandler.setBurnFraction(100);
+//   }
 
-  function test_Reverts_WhenFractionsGreaterThanOne() public {
-    vm.expectRevert("Burn fraction must be less than or equal to 1");
-    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(3, 2).unwrap());
-  }
+//   function test_Reverts_WhenFractionsGreaterThanOne() public {
+//     vm.expectRevert("Burn fraction must be less than or equal to 1");
+//     feeHandler.setBurnFraction(FixidityLib.newFixedFraction(3, 2).unwrap());
+//   }
 
-  function test_SetBurnFraction() public {
-    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
-    assertEq(
-      feeHandler.burnFraction(),
-      FixidityLib.newFixedFraction(80, 100).unwrap(),
-      "Burn fraction should be set"
-    );
-  }
+//   function test_SetBurnFraction() public {
+//     feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
+//     assertEq(
+//       feeHandler.burnFraction(),
+//       FixidityLib.newFixedFraction(80, 100).unwrap(),
+//       "Burn fraction should be set"
+//     );
+//   }
 
-  function test_ShouldEmitBurnFractionSet() public {
-    vm.expectEmit(true, true, true, true);
-    emit BurnFractionSet(FixidityLib.newFixedFraction(80, 100).unwrap());
-    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
-  }
-}
+//   function test_ShouldEmitBurnFractionSet() public {
+//     vm.expectEmit(true, true, true, true);
+//     emit BurnFractionSet(FixidityLib.newFixedFraction(80, 100).unwrap());
+//     feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
+//   }
+// }
 
 contract FeeHandlerTest_SetHandler is FeeHandlerTest {
   function test_Reverts_WhenCallerNotOwner() public {
@@ -360,7 +361,7 @@ contract FeeHandlerTest_SetFeeBeneficiary is FeeHandlerTest {
 
   function test_SetsAddressCorrectly() public {
     feeHandler.setFeeBeneficiary(OTHER_BENEFICIARY_ADDRESS);
-    assertEq(feeHandler.feeBeneficiary(), OTHER_BENEFICIARY_ADDRESS);
+    assertEq(feeHandler.carbonFeeBeneficiary(), OTHER_BENEFICIARY_ADDRESS);
   }
 }
 
@@ -369,8 +370,8 @@ contract FeeHandlerTestAbstract is FeeHandlerTest {
     feeHandler.addToken(token, handler);
   }
 
-  function setBurnFraction(uint256 numerator, uint256 denominator) internal {
-    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(numerator, denominator).unwrap());
+  function setCarbonFraction(uint256 numerator, uint256 denominator) internal {
+    feeHandler.setCarbonFraction(FixidityLib.newFixedFraction(numerator, denominator).unwrap());
   }
 
   function fundFeeHandlerStable(
@@ -395,7 +396,7 @@ contract FeeHandlerTestAbstract is FeeHandlerTest {
 contract FeeHandlerTest_Distribute is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
-    setBurnFraction(80, 100);
+    setCarbonFraction(20, 100);
     setMaxSlippage(address(stableToken), FIXED1);
   }
 
@@ -445,7 +446,7 @@ contract FeeHandlerTest_Distribute is FeeHandlerTestAbstract {
 contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
-    setBurnFraction(80, 100);
+    setCarbonFraction(20, 100);
     setMaxSlippage(address(stableToken), FIXED1);
     fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
     addAndActivateToken(address(stableToken), address(mentoSeller));
@@ -520,7 +521,7 @@ contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstr
 contract FeeHandlerTest_BurnCelo is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
-    setBurnFraction(80, 100);
+    setCarbonFraction(20, 100);
     addAndActivateToken(address(stableToken), address(mentoSeller));
     fundFeeHandlerWithCelo();
   }
@@ -556,7 +557,7 @@ contract FeeHandlerTest_BurnCelo is FeeHandlerTestAbstract {
 contract FeeHandlerTest_SellMentoTokensAbstract is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
-    setBurnFraction(80, 100);
+    setCarbonFraction(20, 100);
     setMaxSlippage(address(stableToken), FIXED1);
   }
 }
@@ -670,7 +671,7 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
 
   function setUp() public {
     super.setUp();
-    setBurnFraction(80, 100);
+    setCarbonFraction(20, 100);
     setMaxSlippage(address(stableToken), FIXED1);
     setMaxSlippage(address(tokenA), FixidityLib.newFixedFraction(99, 100).unwrap());
     addAndActivateToken(address(tokenA), address(uniswapFeeHandlerSeller));
@@ -821,7 +822,7 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
 contract FeeHandlerTest_HandleCelo is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
-    setBurnFraction(80, 100);
+    setCarbonFraction(20, 100);
     fundFeeHandlerWithCelo();
   }
 
@@ -874,7 +875,7 @@ contract FeeHandlerTest_HandleCelo is FeeHandlerTestAbstract {
 contract FeeHandlerTest_HandleMentoTokens is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
-    setBurnFraction(80, 100);
+    setCarbonFraction(20, 100);
     setMaxSlippage(address(stableToken), FIXED1);
   }
 
@@ -901,7 +902,7 @@ contract FeeHandlerTest_HandleMentoTokens is FeeHandlerTestAbstract {
 contract FeeHandlerTest_HandleAll is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
-    setBurnFraction(80, 100);
+    setCarbonFraction(20, 100);
     setMaxSlippage(address(stableToken), FIXED1);
     setMaxSlippage(address(stableTokenEUR), FIXED1);
     feeHandler.addToken(address(stableToken), address(mentoSeller));
