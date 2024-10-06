@@ -68,8 +68,9 @@ contract FeeHandler is
   // last day the daily limits were updated
   uint256 private _lastLimitDay; // deprecated
 
-  // TODO test this after changed to private
-  FixidityLib.Fraction public inverseCarbonFraction; // 80% reason it's inverse it's because it used to be burnFraction and was migrated
+  // TODO try to make this private if it doesn't break storage
+  // reason it's inverse it's because it used to be burnFraction and was migrated
+  FixidityLib.Fraction public inverseCarbonFraction; // 80%
 
   address public carbonFeeBeneficiary;
 
@@ -417,7 +418,7 @@ contract FeeHandler is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 1);
+    return (2, 0, 0, 0);
   }
 
   /**

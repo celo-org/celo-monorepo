@@ -721,9 +721,8 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellM
     feeHandler.sell(address(stableToken));
     assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
 
-    // TODO test this in handle all
-    // make funtions fund more general
-    // try selling another token
+    // check that the daily limit of one
+    // doesn't influence the other
     uint256 celoAmount = 1e18;
     celoToken.approve(address(exchangeEUR), celoAmount);
     exchangeEUR.sell(celoAmount, 0, true);
