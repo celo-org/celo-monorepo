@@ -60,6 +60,9 @@ contract FeeHandler is
   uint256 private _lastLimitDay; // deprecated
 
   FixidityLib.Fraction public burnFraction; // 80%
+  // TODO change this to function
+  // TODO don't let change fractions while there's balance to be handled
+  // replace with carbonOfsetting fraction
 
   address public feeBeneficiary;
 
@@ -73,6 +76,21 @@ contract FeeHandler is
   // Celo not included in this list
   EnumerableSet.AddressSet private activeTokens;
 
+  function carbonFraction() public view returns (uint256) {
+    return FIXED1_UINT.sub(burnFraction.unwrap());
+  }
+
+  // total sum of otherBeneficiaries + burnFracction + carbon ofsetting = 100
+
+  // (total sum of otherBeneficiaries) + burnFracction + (carbon ofsetting) = 100
+  // cuando quema, quema 100 - otros - carbon
+  // cuando distribuye, distribuye 100 - otros - carbon
+
+  // TODO add name to this, OP benef?
+  mapping(address => uint256) private otherBeneficiariesFraction;
+  EnumerableSet.AddressSet private otherBeneficiaries;
+  uint256 private totalFractionOfOtherBeneficiaries;
+
   event SoldAndBurnedToken(address token, uint256 value);
   event DailyLimitSet(address tokenAddress, uint256 newLimit);
   event DailyLimitHit(address token, uint256 burning);
@@ -82,6 +100,7 @@ contract FeeHandler is
   event BurnFractionSet(uint256 fraction);
   event TokenAdded(address tokenAddress, address handlerAddress);
   event TokenRemoved(address tokenAddress);
+  event DistributionAmountSet(address tokenAddress, uint256 amount);
 
   /**
    * @notice Sets initialized == true on implementation contracts.
@@ -190,6 +209,7 @@ contract FeeHandler is
     @param tokenAddress The address of the token for which to distribute the available tokens.
   */
   function distribute(address tokenAddress) external {
+    // setDistributionAmountsWithCheck(tokenAddress); TODO modify tests to allow this
     return _distribute(tokenAddress);
   }
 
@@ -237,6 +257,16 @@ contract FeeHandler is
   */
   function handle(address tokenAddress) external {
     return _handle(tokenAddress);
+  }
+
+  function setDistributionAmounts(address tokenAddress) external {
+    setDistributionAmountsWithCheck(tokenAddress);
+  }
+
+  function setDistributionAmountsWithCheck(address tokenAddress) private {
+    require(_getTokenActive(tokenAddress), "Token needs to be active to set distribution amounts");
+    TokenState storage tokenState = tokenStates[tokenAddress];
+    _setDistributionAmounts(tokenState, IERC20(tokenAddress));
   }
 
   /**
@@ -412,15 +442,11 @@ contract FeeHandler is
     emit TokenRemoved(tokenAddress);
   }
 
-  function _sell(address tokenAddress) private onlyWhenNotFrozen nonReentrant {
-    IERC20 token = IERC20(tokenAddress);
-
-    TokenState storage tokenState = tokenStates[tokenAddress];
-    require(_getTokenActive(tokenAddress), "Token needs to be active to sell");
-    require(
-      FixidityLib.unwrap(tokenState.maxSlippage) != 0,
-      "Max slippage has to be set to sell token"
-    );
+  // TODO test this
+  function _setDistributionAmounts(
+    TokenState storage tokenState,
+    IERC20 token
+  ) internal returns (uint256) {
     FixidityLib.Fraction memory balanceToProcess = FixidityLib.newFixed(
       token.balanceOf(address(this)).sub(tokenState.toDistribute)
     );
@@ -430,6 +456,22 @@ contract FeeHandler is
     tokenState.toDistribute = tokenState.toDistribute.add(
       balanceToProcess.fromFixed().sub(balanceToBurn)
     );
+
+    emit DistributionAmountSet(address(token), tokenState.toDistribute);
+    return balanceToBurn;
+  }
+
+  function _sell(address tokenAddress) private onlyWhenNotFrozen nonReentrant {
+    IERC20 token = IERC20(tokenAddress);
+
+    TokenState storage tokenState = tokenStates[tokenAddress];
+    require(_getTokenActive(tokenAddress), "Token needs to be active to sell");
+    require(
+      FixidityLib.unwrap(tokenState.maxSlippage) != 0,
+      "Max slippage has to be set to sell token"
+    );
+
+    uint256 balanceToBurn = _setDistributionAmounts(tokenState, token);
 
     // small numbers cause rounding errors and zero case should be skipped
     if (balanceToBurn < MIN_BURN) {
@@ -504,6 +546,7 @@ contract FeeHandler is
   function _distributeAll() private {
     for (uint256 i = 0; i < EnumerableSet.length(activeTokens); i++) {
       address token = activeTokens.get(i);
+      // setDistributionAmountsWithCheck(token); TODO modify tests to allow this
       _distribute(token);
     }
     // distribute Celo
