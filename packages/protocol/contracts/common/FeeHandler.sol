@@ -60,7 +60,7 @@ contract FeeHandler is
     bool exists;
   }
 
-  uint256 public constant FIXED1_UINT = 1000000000000000000000000; // TODO move to FIX and add check
+  uint256 public constant FIXED1_UINT = 1000000000000000000000000;
 
   // Min units that can be burned
   uint256 public constant MIN_BURN = 200;
@@ -88,7 +88,23 @@ contract FeeHandler is
   mapping(address => Beneficiary) private otherBeneficiaries; // TODO add getter
   EnumerableSet.AddressSet private otherBeneficiariesAddresses;
 
-  function carbonFraction() public view returns (uint256) {
+  event SoldAndBurnedToken(address token, uint256 value);
+  event DailyLimitSet(address tokenAddress, uint256 newLimit);
+  event DailyLimitHit(address token, uint256 burning);
+  event MaxSlippageSet(address token, uint256 maxSlippage);
+  event DailySellLimitUpdated(uint256 amount);
+  event FeeBeneficiarySet(address newBeneficiary);
+  event BurnFractionSet(uint256 fraction);
+  event TokenAdded(address tokenAddress, address handlerAddress);
+  event TokenRemoved(address tokenAddress);
+  event DistributionAmountSet(address tokenAddress, uint256 amount);
+  event CarbonFractionSet(uint256 fraction);
+  event BeneficiaryAdded(address beneficiary);
+  event BeneficiaryNameSet(address beneficiary, string name);
+  event BeneficiaryFractionSet(address beneficiary, uint256 fraction);
+  event BeneficiaryRemoved(address beneficiary);
+
+  function getCarbonFraction() public view returns (uint256) {
     return getCarbonFractionFixidity().unwrap();
   }
 
@@ -101,7 +117,7 @@ contract FeeHandler is
   }
 
   function getBurnFraction() public view returns (uint256) {
-    console.log("getBurnFraction() carbonFraction", carbonFraction());
+    console.log("getBurnFraction() carbonFraction", getCarbonFraction());
     console.log(
       "getBurnFraction() totalFractionOfOtherBeneficiaries",
       totalFractionOfOtherBeneficiaries.unwrap()
@@ -113,10 +129,19 @@ contract FeeHandler is
     return FixidityLib.fixed1().subtract(getTotalFractionOfOtherBeneficiariesAndCarbonFixidity());
   }
 
-  function _setCarbonFraction(uint256 newFraction) internal {
-    require(newFraction < FIXED1_UINT, "Carbon fraction must be less than 1");
-    inverseCarbonFraction = FixidityLib.wrap(FIXED1_UINT.sub(newFraction));
-    emit CarbonFractionSet(newFraction);
+  function checkTotalBeneficiary() internal {
+    require(
+      getTotalFractionOfOtherBeneficiariesAndCarbonFixidity().lt(FixidityLib.fixed1()),
+      "Total beneficiaries fraction must be less than 1"
+    );
+  }
+
+  function _setCarbonFraction(uint256 _newFraction) internal {
+    FixidityLib.Fraction memory newFraction = FixidityLib.wrap(_newFraction);
+    require(newFraction.lt(FixidityLib.fixed1()), "New cargon fraction can't be greather than 1"); // TODO function
+    inverseCarbonFraction = FixidityLib.fixed1().subtract(newFraction);
+    checkTotalBeneficiary();
+    emit CarbonFractionSet(_newFraction);
   }
 
   function getTotalFractionOfOtherBeneficiariesAndCarbonFixidity()
@@ -131,7 +156,7 @@ contract FeeHandler is
     return getTotalFractionOfOtherBeneficiariesAndCarbonFixidity().unwrap();
   }
 
-  function getOtherBeneficiariesAddresses() public view returns (address[] memory) {
+  function getOtherBeneficiariesAddresses() external view returns (address[] memory) {
     return otherBeneficiariesAddresses.values;
   }
 
@@ -143,70 +168,69 @@ contract FeeHandler is
     return (otherBeneficiary.fraction.unwrap(), otherBeneficiary.name, otherBeneficiary.exists);
   }
 
-  function changeOtherBeneficiaryAllocation(address beneficiary, uint256 newFraction) external {
-    require(otherBeneficiaries[beneficiary].exists, "Beneficiary not found");
-    uint256 _totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries.unwrap() +
-      newFraction -
-      otherBeneficiaries[beneficiary].fraction.unwrap();
-    require(_totalFractionOfOtherBeneficiaries < FIXED1_UINT, "Total fraction must be less than 1");
-    totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries.add(
-      FixidityLib.wrap(newFraction).subtract(otherBeneficiaries[beneficiary].fraction)
-    );
-    otherBeneficiaries[beneficiary].fraction = FixidityLib.wrap(newFraction);
-    // TODO emit
+  function changeOtherBeneficiaryAllocation(
+    address beneficiary,
+    uint256 _newFraction
+  ) external onlyOwner {
+    FixidityLib.Fraction memory newFraction = FixidityLib.wrap(_newFraction);
+    _setBeneficiaryFraction(beneficiary, newFraction);
   }
 
   function addOtherBeneficiary(
     address beneficiary,
-    uint256 newFraction,
-    uint256 newCarbonFraction, // I think this is actually not needed TODO
+    uint256 _newFraction,
     string calldata name
   ) external onlyOwner {
-    // require it is not in the list already
-    // write to memory before doing checks
     require(otherBeneficiaries[beneficiary].exists == false, "Beneficiary already exists");
-    uint256 _totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries.unwrap() +
-      newCarbonFraction +
-      newFraction;
-    // TODO check strict <
-    // TODO check this case
-    require(_totalFractionOfOtherBeneficiaries < FIXED1_UINT, "Total fraction must be less than 1");
-    _setCarbonFraction(newCarbonFraction);
-    otherBeneficiaries[beneficiary] = Beneficiary(FixidityLib.wrap(newFraction), name, true);
-    totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries.add(
-      FixidityLib.wrap(newFraction)
-    );
+    FixidityLib.Fraction memory newFraction = FixidityLib.wrap(_newFraction);
+
+    otherBeneficiaries[beneficiary].exists = true;
+    _setBeneficiaryFraction(beneficiary, newFraction);
+    _setBeneficiaryName(beneficiary, name);
     otherBeneficiariesAddresses.add(beneficiary);
-    // TODO emit
+
+    emit BeneficiaryAdded(beneficiary);
   }
 
   function removeOtherBeneficiary(address beneficiary) external onlyOwner {
     require(otherBeneficiaries[beneficiary].exists, "Beneficiary not found");
     totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries.subtract(
       otherBeneficiaries[beneficiary].fraction
-    ); // TODO test this
+    );
     otherBeneficiariesAddresses.remove(beneficiary);
     delete otherBeneficiaries[beneficiary];
+    emit BeneficiaryRemoved(beneficiary);
   }
 
-  // function setBeneficiaryName(address beneficiary, uint256 name) external onlyOwner {
-  //   require(otherBeneficiaries.contains(beneficiary), "Beneficiary not found");
-  //   otherBeneficiaries[beneficiary].name = name;
-  // }
+  function _setBeneficiaryFraction(
+    address beneficiaryAddress,
+    FixidityLib.Fraction memory newFraction
+  ) internal {
+    Beneficiary storage beneficiary = otherBeneficiaries[beneficiaryAddress];
+    require(beneficiary.exists, "Beneficiary not found");
+    totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries.add(newFraction);
+    checkTotalBeneficiary();
+    beneficiary.fraction = newFraction;
+    emit BeneficiaryFractionSet(beneficiaryAddress, newFraction.unwrap());
+  }
 
-  // function changeAllocationBeneficiaries
+  function setBeneficiaryFraction(
+    address beneficiaryAddress,
+    uint256 _newFraction
+  ) external onlyOwner {
+    FixidityLib.Fraction memory newFraction = FixidityLib.wrap(_newFraction);
+    _setBeneficiaryFraction(beneficiaryAddress, newFraction);
+  }
 
-  event SoldAndBurnedToken(address token, uint256 value);
-  event DailyLimitSet(address tokenAddress, uint256 newLimit);
-  event DailyLimitHit(address token, uint256 burning);
-  event MaxSlippageSet(address token, uint256 maxSlippage);
-  event DailySellLimitUpdated(uint256 amount);
-  event FeeBeneficiarySet(address newBeneficiary);
-  event BurnFractionSet(uint256 fraction);
-  event TokenAdded(address tokenAddress, address handlerAddress);
-  event TokenRemoved(address tokenAddress);
-  event DistributionAmountSet(address tokenAddress, uint256 amount);
-  event CarbonFractionSet(uint256 fraction);
+  function setBeneficiaryName(address beneficiary, string calldata name) external onlyOwner {
+    _setBeneficiaryName(beneficiary, name);
+  }
+
+  function _setBeneficiaryName(address beneficiary, string memory name) internal {
+    require(otherBeneficiaries[beneficiary].exists, "Beneficiary not found");
+    otherBeneficiaries[beneficiary].name = name;
+    emit BeneficiaryNameSet(beneficiary, name);
+  }
 
   /**
    * @notice Sets initialized == true on implementation contracts.
@@ -307,7 +331,6 @@ contract FeeHandler is
     @param tokenAddress The address of the token for which to distribute the available tokens.
   */
   function distribute(address tokenAddress) external {
-    // setDistributionAmountsWithCheck(tokenAddress); TODO modify tests to allow this
     return _distribute(tokenAddress);
   }
 
@@ -357,19 +380,11 @@ contract FeeHandler is
     return _handle(tokenAddress);
   }
 
-  function setDistributionAmounts(address tokenAddress) external {
-    setDistributionAmountsWithCheck(tokenAddress);
-  }
-
-  function setDistributionAmountsWithCheck(address tokenAddress) private {
-    require(_getTokenActive(tokenAddress), "Token needs to be active to set distribution amounts");
-    TokenState storage tokenState = tokenStates[tokenAddress];
-    _setDistributionAmounts(tokenState, IERC20(tokenAddress));
-  }
-
   /**
     * @notice Allows owner to transfer tokens of this contract. It's meant for governance to
       trigger use cases not contemplated in this contract.
+      CAUTION: this function does not update internal account, so it may break the contract
+      inconsistent. It should be used as last resort.
       @param token The address of the token to transfer.
       @param recipient The address of the recipient to transfer the tokens to.
       @param value The amount of tokens to transfer.
@@ -530,7 +545,8 @@ contract FeeHandler is
     emit TokenRemoved(tokenAddress);
   }
 
-  // TODO test this in a public function
+  // TODO to allow this function to be called publicly, it should
+  // keep track of amounts to be burned, like the Celo token does
   function _setDistributionAmounts(
     TokenState storage tokenState,
     IERC20 token
@@ -601,12 +617,6 @@ contract FeeHandler is
     );
 
     IERC20 token = IERC20(tokenAddress);
-
-    // safety check to avoid a revert due balance
-    // TODO probably remove this 2 lines
-    // uint256 tokenBalance = token.balanceOf(address(this));
-    // uint256 balanceToDistribute = Math.min(tokenBalance, amount);
-
     uint256 balanceToDistribute = amount;
 
     console.log("balanceToDistribute", balanceToDistribute);
@@ -617,7 +627,6 @@ contract FeeHandler is
     }
 
     token.transfer(beneficiary, balanceToDistribute);
-    // state.toDistribute = state.toDistribute.sub(balanceToDistribute);
   }
 
   function _calculateDistributeAmounts(
@@ -647,7 +656,7 @@ contract FeeHandler is
       memory totalFractionOfOtherBeneficiariesAndCarbonFixidity = getTotalFractionOfOtherBeneficiariesAndCarbonFixidity();
 
     uint256 carbonFundAmount = _calculateDistributeAmounts(
-      FixidityLib.wrap(carbonFraction()),
+      FixidityLib.wrap(getCarbonFraction()),
       totalFractionOfOtherBeneficiariesAndCarbonFixidity,
       tokenState.toDistribute
     );
@@ -699,7 +708,6 @@ contract FeeHandler is
   function _distributeAll() private {
     for (uint256 i = 0; i < EnumerableSet.length(activeTokens); i++) {
       address token = activeTokens.get(i);
-      // setDistributionAmountsWithCheck(token); TODO modify tests to allow this
       _distribute(token);
     }
     // distribute Celo
@@ -750,8 +758,9 @@ contract FeeHandler is
     uint256 balanceToProcess
   ) internal returns (uint256) {
     uint256 balanceToBurn = FixidityLib
-    .newFixed(balanceToProcess)
-    .multiply(getBurnFractionFixidity()).fromFixed(); //here2
+      .newFixed(balanceToProcess)
+      .multiply(getBurnFractionFixidity())
+      .fromFixed(); //here2
     tokenState.toDistribute = tokenState.toDistribute.add(balanceToProcess.sub(balanceToBurn));
     return balanceToBurn;
   }

@@ -30,6 +30,10 @@ import { console } from "forge-std/console.sol";
 contract FeeHandlerTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
+  event BeneficiaryAdded(address beneficiary);
+  event BeneficiaryFractionSet(address beneficiary, uint256 fraction);
+  event BeneficiaryNameSet(address beneficiary, string name);
+
   FeeHandler feeHandler;
   IRegistry registry;
   GoldToken celoToken;
@@ -227,71 +231,42 @@ contract FeeHandlerTest_Initialize is FeeHandlerTest {
   }
 }
 
-// TODO test setCarbonFraction
-// contract FeeHandlerTest_SetBurnFraction is FeeHandlerTest {
-//   function test_Reverts_WhenCallerNotOwner() public {
-//     vm.prank(user);
-//     vm.expectRevert("Ownable: caller is not the owner");
-//     feeHandler.setBurnFraction(100);
-//   }
+contract FeeHandlerTest_SetCarbonFraction is FeeHandlerTest {
+  event CarbonFractionSet(uint256 fraction);
 
-//   function test_Reverts_WhenFractionsGreaterThanOne() public {
-//     vm.expectRevert("Burn fraction must be less than or equal to 1");
-//     feeHandler.setBurnFraction(FixidityLib.newFixedFraction(3, 2).unwrap());
-//   }
+  function test_Reverts_WhenCallerNotOwner() public {
+    vm.prank(user);
+    vm.expectRevert("Ownable: caller is not the owner");
+    feeHandler.setCarbonFraction(100);
+  }
 
-//   function test_SetBurnFraction() public {
-//     feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
-//     assertEq(
-//       feeHandler.burnFraction(),
-//       FixidityLib.newFixedFraction(80, 100).unwrap(),
-//       "Burn fraction should be set"
-//     );
-//   }
-
-//   function test_ShouldEmitBurnFractionSet() public {
-//     vm.expectEmit(true, true, true, true);
-//     emit BurnFractionSet(FixidityLib.newFixedFraction(80, 100).unwrap());
-//     feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
-//   }
-// }
-
-contract FeeHandlerTest_AddOtherBeneficiary is FeeHandlerTest {
-  function test_addsSucsesfully() public {
+  function test_Reverts_WhenFractionsGreaterThanOne() public {
+    vm.expectRevert("New cargon fraction can't be greather than 1");
+    feeHandler.setCarbonFraction(FixidityLib.newFixedFraction(3, 2).unwrap());
+    // add another and then try to make carbon out of bounds
     feeHandler.addOtherBeneficiary(
       op,
       (20 * 1e24) / 100, // TODO use fixidity
-      (20 * 1e24) / 100,
       "OP revenue share"
     );
-
-    assertEq(feeHandler.getOtherBeneficiariesAddresses().length, 1);
-    (uint256 fraction, string memory name, ) = feeHandler.getOtherBeneficiariesInfo(op);
-    assertEq(fraction, (20 * 1e24) / 100);
-    assertEq(name, "OP revenue share");
+    vm.expectRevert("Total beneficiaries fraction must be less than 1");
+    feeHandler.setCarbonFraction(FixidityLib.newFixedFraction(8, 10).unwrap());
   }
-  // TODO emits
-}
 
-contract FeeHandlerTest_RemoveOtherBeneficiary is FeeHandlerTest {
-  function setUp() public {
-    super.setUp();
-    feeHandler.addOtherBeneficiary(
-      op,
-      (20 * 1e24) / 100, // TODO use fixidity
-      (20 * 1e24) / 100,
-      "OP revenue share"
+  function test_setsCarbonFraction() public {
+    feeHandler.setCarbonFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
+    assertEq(
+      feeHandler.getCarbonFraction(),
+      FixidityLib.newFixedFraction(80, 100).unwrap(),
+      "Burn fraction should be set"
     );
   }
 
-  function test_removedSucsesfully() public {
-    feeHandler.removeOtherBeneficiary(op);
-    assertEq(feeHandler.getOtherBeneficiariesAddresses().length, 0);
-    vm.expectRevert("Beneficiary not found");
-    feeHandler.getOtherBeneficiariesInfo(op);
+  function test_ShouldEmitBurnFractionSet() public {
+    vm.expectEmit(true, true, true, true);
+    emit CarbonFractionSet(FixidityLib.newFixedFraction(80, 100).unwrap());
+    feeHandler.setCarbonFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
   }
-
-  // TODO emits
 }
 
 // TODO change beneficiary allocation
@@ -301,7 +276,6 @@ contract FeeHandlerTest_changeOtherBeneficiaryAllocation is FeeHandlerTest {
     feeHandler.addOtherBeneficiary(
       op,
       (20 * 1e24) / 100, // TODO use fixidity
-      (20 * 1e24) / 100,
       "OP revenue share"
     );
   }
@@ -310,11 +284,24 @@ contract FeeHandlerTest_changeOtherBeneficiaryAllocation is FeeHandlerTest {
     feeHandler.changeOtherBeneficiaryAllocation(op, (30 * 1e24) / 100);
     (uint256 fraction, string memory name, ) = feeHandler.getOtherBeneficiariesInfo(op);
     assertEq(fraction, (30 * 1e24) / 100);
-
-    // check fraction set correctly
   }
 
-  // TODO emits
+  function test_Reverts_WHenBeneficiaryNotExists() public {
+    vm.expectRevert("Beneficiary not found");
+    feeHandler.changeOtherBeneficiaryAllocation(actor("notExists"), (30 * 1e24) / 100);
+  }
+
+  function test_Emit() public {
+    vm.expectEmit(true, true, true, true);
+    emit BeneficiaryFractionSet(op, (30 * 1e24) / 100);
+    feeHandler.changeOtherBeneficiaryAllocation(op, (30 * 1e24) / 100);
+  }
+
+  function test_Reverts_WhenCallerNotOwner() public {
+    vm.prank(user);
+    vm.expectRevert("Ownable: caller is not the owner");
+    feeHandler.changeOtherBeneficiaryAllocation(op, (30 * 1e24) / 100);
+  }
 }
 
 contract FeeHandlerTest_SetHandler is FeeHandlerTest {
@@ -454,6 +441,70 @@ contract FeeHandlerTestAbstract is FeeHandlerTest {
   }
 }
 
+contract FeeHandlerTest_AddOtherBeneficiary is FeeHandlerTestAbstract {
+  // TODO only owner
+  function test_addsSucsesfully() public {
+    feeHandler.addOtherBeneficiary(
+      op,
+      (20 * 1e24) / 100, // TODO use fixidity
+      "OP revenue share"
+    );
+
+    assertEq(feeHandler.getOtherBeneficiariesAddresses().length, 1);
+    (uint256 fraction, string memory name, ) = feeHandler.getOtherBeneficiariesInfo(op);
+    assertEq(fraction, (20 * 1e24) / 100);
+    assertEq(name, "OP revenue share");
+  }
+
+  function test_Reverts_WhenBurningFractionWouldBeZero() public {
+    setCarbonFraction(20, 100);
+    vm.expectRevert("Total beneficiaries fraction must be less than 1");
+    feeHandler.addOtherBeneficiary(
+      op,
+      (80 * 1e24) / 100, // TODO use fixidity
+      "OP revenue share"
+    );
+  }
+
+  function test_Reverts_WhenaddingSameTokenTwice() public {
+    feeHandler.addOtherBeneficiary(
+      op,
+      (80 * 1e24) / 100, // TODO use fixidity
+      "OP revenue share"
+    );
+    vm.expectRevert("Beneficiary already exists");
+    feeHandler.addOtherBeneficiary(
+      op,
+      (80 * 1e24) / 100, // TODO use fixidity
+      "OP revenue share"
+    );
+  }
+
+  function test_Reverts_WhenCallerNotOwner() public {
+    vm.prank(user);
+    vm.expectRevert("Ownable: caller is not the owner");
+    feeHandler.addOtherBeneficiary(
+      op,
+      (80 * 1e24) / 100, // TODO use fixidity
+      "OP revenue share"
+    );
+  }
+
+  function test_Emmit() public {
+    vm.expectEmit(true, true, true, true);
+    emit BeneficiaryFractionSet(op, (80 * 1e24) / 100);
+    vm.expectEmit(true, true, true, true);
+    emit BeneficiaryNameSet(op, "OP revenue share");
+    vm.expectEmit(true, true, true, true);
+    emit BeneficiaryAdded(op);
+    feeHandler.addOtherBeneficiary(
+      op,
+      (80 * 1e24) / 100, // TODO use fixidity
+      "OP revenue share"
+    );
+  }
+}
+
 contract FeeHandlerTest_Distribute is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
@@ -515,7 +566,6 @@ contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstr
     feeHandler.addOtherBeneficiary(
       op,
       (20 * 1e24) / 100, // TODO use fixidity
-      (20 * 1e24) / 100,
       "OP revenue share"
     );
   }
@@ -536,7 +586,6 @@ contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstr
     feeHandler.addOtherBeneficiary(
       otherBeneficiary,
       (30 * 1e24) / 100, // TODO use fixidity
-      (20 * 1e24) / 100,
       "otherBeneficiary "
     );
 
@@ -897,7 +946,6 @@ contract FeeHandlerTest_HandleCelo is FeeHandlerTestAbstract {
     feeHandler.addOtherBeneficiary(
       op,
       (20 * 1e24) / 100, // TODO use fixidity
-      (20 * 1e24) / 100,
       "OP revenue share"
     );
 
@@ -911,14 +959,12 @@ contract FeeHandlerTest_HandleCelo is FeeHandlerTestAbstract {
     feeHandler.addOtherBeneficiary(
       op,
       (20 * 1e24) / 100, // TODO use fixidity
-      (20 * 1e24) / 100,
       "OP revenue share"
     );
     address otherBeneficiary = actor("otherBeneficiary");
     feeHandler.addOtherBeneficiary(
       otherBeneficiary,
       (30 * 1e24) / 100, // TODO use fixidity
-      (20 * 1e24) / 100,
       "otherBeneficiary "
     );
 
@@ -1061,5 +1107,111 @@ contract FeeHandlerTest_SetMaxSlippage is FeeHandlerTest {
     vm.expectEmit(true, true, true, true);
     emit MaxSlippageSet(address(stableToken), maxSlippage);
     feeHandler.setMaxSplippage(address(stableToken), maxSlippage);
+  }
+}
+
+contract FeeHandlerTest_RemoveOtherBeneficiary is FeeHandlerTestAbstract {
+  event BeneficiaryRemoved(address beneficiary);
+  function setUp() public {
+    super.setUp();
+    feeHandler.addOtherBeneficiary(
+      op,
+      (20 * 1e24) / 100, // TODO use fixidity
+      "OP revenue share"
+    );
+  }
+
+  function test_removedSucsesfully() public {
+    feeHandler.removeOtherBeneficiary(op);
+    assertEq(feeHandler.getOtherBeneficiariesAddresses().length, 0);
+    vm.expectRevert("Beneficiary not found");
+    feeHandler.getOtherBeneficiariesInfo(op);
+
+    setCarbonFraction(20, 100);
+    assertEq(
+      feeHandler.getTotalFractionOfOtherBeneficiariesAndCarbon(),
+      0.2e24,
+      "Allocation should only be carbon"
+    );
+  }
+
+  function test_Emits_BeneficiaryRemoved() public {
+    vm.expectEmit(true, true, true, true);
+    emit BeneficiaryRemoved(op);
+    feeHandler.removeOtherBeneficiary(op);
+  }
+
+  function test_Reverts_WhenCallerNotOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(user);
+    feeHandler.removeOtherBeneficiary(op);
+  }
+}
+
+contract FeeHandlerTest_SetBeneficiaryFraction is FeeHandlerTestAbstract {
+  function setUp() public {
+    super.setUp();
+    feeHandler.addOtherBeneficiary(
+      op,
+      (20 * 1e24) / 100, // TODO use fixidity
+      "OP revenue share"
+    );
+  }
+
+  function test_setFractionSucsesfully() public {
+    feeHandler.setBeneficiaryFraction(op, (30 * 1e24) / 100);
+    (uint256 fraction, string memory name, ) = feeHandler.getOtherBeneficiariesInfo(op);
+    assertEq(fraction, (30 * 1e24) / 100);
+  }
+
+  function test_Reverts_WhenFractionWouldBeZero() public {
+    vm.expectRevert("Total beneficiaries fraction must be less than 1");
+    feeHandler.setBeneficiaryFraction(op, (80 * 1e24) / 100);
+  }
+
+  function test_Emits_BeneficiaryFractionSet() public {
+    vm.expectEmit(true, true, true, true);
+    emit BeneficiaryFractionSet(op, (30 * 1e24) / 100);
+    feeHandler.setBeneficiaryFraction(op, (30 * 1e24) / 100);
+  }
+
+  function test_Reverts_WhenCallerNotOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(user);
+    feeHandler.setBeneficiaryFraction(op, (30 * 1e24) / 100);
+  }
+}
+
+contract FeeHandlerTest_SetBeneficiaryName is FeeHandlerTestAbstract {
+  function setUp() public {
+    super.setUp();
+    feeHandler.addOtherBeneficiary(
+      op,
+      (20 * 1e24) / 100, // TODO use fixidity
+      "OP revenue share"
+    );
+  }
+
+  function test_setNameSucsesfully() public {
+    feeHandler.setBeneficiaryName(op, "OP revenue share updated");
+    (uint256 fraction, string memory name, ) = feeHandler.getOtherBeneficiariesInfo(op);
+    assertEq(name, "OP revenue share updated");
+  }
+
+  function test_Reverts_WhenBeneficiaryNotFound() public {
+    vm.expectRevert("Beneficiary not found");
+    feeHandler.setBeneficiaryName(actor("otherBeneficiary"), "OP revenue share updated");
+  }
+
+  function test_Emits_BeneficiaryNameSet() public {
+    vm.expectEmit(true, true, true, true);
+    emit BeneficiaryNameSet(op, "OP revenue share updated");
+    feeHandler.setBeneficiaryName(op, "OP revenue share updated");
+  }
+
+  function test_Reverts_WhenCallerNotOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(user);
+    feeHandler.setBeneficiaryName(op, "OP revenue share updated");
   }
 }
