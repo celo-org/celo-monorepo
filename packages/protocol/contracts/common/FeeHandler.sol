@@ -54,7 +54,6 @@ contract FeeHandler is
   }
 
   struct Beneficiary {
-    // uint256 fraction;
     FixidityLib.Fraction fraction;
     string name;
     bool exists;
@@ -66,7 +65,7 @@ contract FeeHandler is
   uint256 public constant MIN_BURN = 200;
 
   // last day the daily limits were updated
-  uint256 private _lastLimitDay; // deprecated
+  uint256 public _dprecated_lastLimitDay; // deprecated
 
   // TODO try to make this private if it doesn't break storage
   // reason it's inverse it's because it used to be burnFraction and was migrated
@@ -83,8 +82,9 @@ contract FeeHandler is
 
   // Celo not included in this list
   EnumerableSet.AddressSet private activeTokens;
+
   // does not include carbon fund
-  FixidityLib.Fraction private totalFractionOfOtherBeneficiaries; // TODO this can be a function, withou the carbon fund, TODO add getter
+  FixidityLib.Fraction private totalFractionOfOtherBeneficiaries;
 
   mapping(address => Beneficiary) private otherBeneficiaries;
   EnumerableSet.AddressSet private otherBeneficiariesAddresses;
