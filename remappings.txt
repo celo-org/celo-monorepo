@@ -6,3 +6,4 @@ openzeppelin-solidity/=packages/protocol/lib/openzeppelin-contracts/
 solidity-bytes-utils/=packages/protocol/lib/solidity-bytes-utils/
 solidity-bytes-utils-8/=packages/protocol/lib/solidity-bytes-utils-8/
 contracts=packages/protocol/contracts/
+transient-goodies/=packages/protocol/lib/transient-goodies/src/

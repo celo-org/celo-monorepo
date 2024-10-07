@@ -1,4 +1,4 @@
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9;
 
 address constant EPOCH_SIZEPRE_COMPILE_ADDRESS = address(0xff - 7);
 contract EpochSizePrecompile {
