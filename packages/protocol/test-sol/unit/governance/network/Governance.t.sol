@@ -230,6 +230,8 @@ contract GovernanceTest is Test, TestConstants, Utils {
       baselineUpdateFactor.unwrap(),
       baselineQuorumFactor.unwrap()
     );
+
+    registry.setAddressFor("EpochManager", actor("epochManager"));
     vm.stopPrank();
   }
 
@@ -3185,13 +3187,13 @@ contract GovernanceTest_hotfixWhitelistValidatorTally is GovernanceTest {
     assertEq(governance.hotfixWhitelistValidatorTally(HOTFIX_HASH), 3);
   }
 
-  function test_Reverts_WhenCalledOnL2() public {
-    address validator = actor("validator1");
-    governance.addValidator(validator);
-    _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    governance.hotfixWhitelistValidatorTally(HOTFIX_HASH);
-  }
+  // function test_Reverts_WhenCalledOnL2() public {
+  //   address validator = actor("validator1");
+  //   governance.addValidator(validator);
+  //   _whenL2();
+  //   vm.expectRevert("This method is no longer supported in L2.");
+  //   governance.hotfixWhitelistValidatorTally(HOTFIX_HASH);
+  // }
 }
 
 contract GovernanceTest_isHotfixPassing is GovernanceTest {

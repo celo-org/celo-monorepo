@@ -16,6 +16,7 @@ import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
+import "../common/interfaces/IEpochManager.sol";
 
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
@@ -1268,10 +1269,12 @@ contract Governance is
     emit HotfixRecordReset(hash);
   }
 
-  function _getValidatorSignerAddressFromCurrentSet(uint256 index) internal view returns (address) {
+  function _getValidatorSignerAddressFromCurrentSet(
+    uint256 index,
+    IEpochManager epochManager
+  ) internal view returns (address) {
     if (isL2()) {
-      // TODO this has getEpochManage() inside the a loop
-      return getEpochManager().getElectedSigners()[index];
+      return epochManager.getElectedSigners()[index];
     } else {
       return validatorSignerAddressFromCurrentSet(index);
     }
@@ -1282,12 +1285,13 @@ contract Governance is
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
    * @return Whitelist tally
    */
-  function hotfixWhitelistValidatorTally(bytes32 hash) public view onlyL1 returns (uint256) {
+  function hotfixWhitelistValidatorTally(bytes32 hash) public view returns (uint256) {
     uint256 tally = 0;
     uint256 n = numberValidatorsInCurrentSet();
     IAccounts accounts = getAccounts();
+    IEpochManager epochManager = getEpochManager();
     for (uint256 i = 0; i < n; i = i.add(1)) {
-      address validatorSigner = _getValidatorSignerAddressFromCurrentSet(i);
+      address validatorSigner = _getValidatorSignerAddressFromCurrentSet(i, epochManager);
       address validatorAccount = accounts.signerToAccount(validatorSigner);
       if (
         isHotfixWhitelistedBy(hash, validatorSigner) ||
