@@ -117,7 +117,7 @@ contract AddressSortedLinkedListWithMedianTest_remove is AddressSortedLinkedList
     sortedList.insert(key, numerator, address(0), address(0));
   }
 
-  function test_ShouldRemoveTheELementFromTheList() public {
+  function test_ShouldRemoveTheElementFromTheList() public {
     sortedList.remove(key);
     assertEq(sortedList.contains(key), false, "should not contain the key");
   }

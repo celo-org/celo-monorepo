@@ -165,7 +165,7 @@ contract SortedLinkedListTest_remove is SortedLinkedListTest {
     sortedList.insert(key, numerator, bytes32(0), bytes32(0));
   }
 
-  function test_ShouldRemoveTheELementFromTheList() public {
+  function test_ShouldRemoveTheElementFromTheList() public {
     sortedList.remove(key);
     assertEq(sortedList.contains(key), false, "should not contain the key");
   }
