@@ -1315,6 +1315,19 @@ contract Governance is
   }
 
   /**
+   * @notice Gets information about a L1 hotfix.
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
+   * @return Hotfix approved.
+   * @return Hotfix executed.
+   * @return Hotfix preparedEpoch.
+   * @dev Provided for API backwards compatibility. Prefer the explicitly named
+   * `getL1HotfixRecord`/`getL2HotfixRecord` functions.
+   */
+  function getHotfixRecord(bytes32 hash) public view returns (bool, bool, uint256) {
+    return getL1HotfixRecord(hash);
+  }
+
+  /**
    * @notice Gets information about a L2 hotfix.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
    * @return Hotfix approved by approver.
