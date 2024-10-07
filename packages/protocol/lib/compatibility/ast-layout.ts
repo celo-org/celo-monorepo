@@ -199,6 +199,14 @@ export const generateCompatibilityReport = (oldArtifact: Artifact, oldArtifacts:
   const layoutReport = generateLayoutCompatibilityReport(oldLayout, newLayout)
   const structsReport = generateStructsCompatibilityReport(oldLayout, newLayout)
 
+  if (!layoutReport.compatible) {
+    console.log(newArtifact.contractName, "layoutReport incompatible", JSON.stringify(layoutReport.errors));
+  }
+
+  if (!structsReport.compatible) {
+    console.log(newArtifact.contractName, "structsReport incompatible", JSON.stringify(structsReport.errors));
+  }
+
   return {
     contract: newArtifact.contractName,
     compatible: layoutReport.compatible && structsReport.compatible,
