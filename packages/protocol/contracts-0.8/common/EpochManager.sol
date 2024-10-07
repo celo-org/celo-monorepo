@@ -13,7 +13,7 @@ import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/IEpochManager.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IEpochManagerInitializer.sol";
-import { tuint256 } from "transient-goodies/TransientPrimitives.sol";
+import { tuint256 } from "transient-goodies/src/TransientPrimitives.sol";
 
 contract EpochManager is
   Initializable,

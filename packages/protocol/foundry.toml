@@ -20,7 +20,7 @@ remappings = [
     'solidity-bytes-utils/=lib/solidity-bytes-utils/',
     'solidity-bytes-utils-8/=lib/solidity-bytes-utils-8/',
     'ds-test/=lib/celo-foundry/lib/forge-std/lib/ds-test/src/',
-    'transient-goodies/=lib/transient-goodies/src/',
+    'transient-goodies/=lib/transient-goodies/',
 ]
 
 no_match_test = "skip"
