@@ -1320,7 +1320,7 @@ contract Governance is
    * @return Hotfix executed.
    * @return Hotfix preparedEpoch.
    */
-  function getL1HotfixRecord(bytes32 hash) public view onlyL1 returns (bool, bool, uint256) {
+  function getL1HotfixRecord(bytes32 hash) public view returns (bool, bool, uint256) {
     return (
       hotfixes[hash].approved,
       hotfixes[hash].executed,
@@ -1360,10 +1360,7 @@ contract Governance is
    * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
    * @param whitelister Address to check whitelist status of.
    */
-  function isHotfixWhitelistedBy(
-    bytes32 hash,
-    address whitelister
-  ) public view onlyL1 returns (bool) {
+  function isHotfixWhitelistedBy(bytes32 hash, address whitelister) public view returns (bool) {
     return hotfixes[hash].deprecated_whitelisted[whitelister];
   }
 
