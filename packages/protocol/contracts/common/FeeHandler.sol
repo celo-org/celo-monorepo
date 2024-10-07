@@ -70,7 +70,7 @@ contract FeeHandler is
   // ignoreRenaming_ prefix allows the tooling to ignore the variable renaming
   FixidityLib.Fraction private ignoreRenaming_inverseCarbonFraction; // 80%
 
-  address public deprecated_feeBeneficiary;
+  address public ignoreRenaming_carbonFeeBeneficiary;
 
   uint256 public celoToBeBurned;
 
@@ -86,10 +86,6 @@ contract FeeHandler is
 
   mapping(address => Beneficiary) private otherBeneficiaries;
   EnumerableSet.AddressSet private otherBeneficiariesAddresses;
-
-  address public carbonFeeBeneficiary;
-
-  FixidityLib.Fraction private inverseCarbonFraction;
 
   event SoldAndBurnedToken(address token, uint256 value);
   event DailyLimitSet(address tokenAddress, uint256 newLimit);
@@ -323,6 +319,10 @@ contract FeeHandler is
    */
   function getPastBurnForToken(address token) external view returns (uint256) {
     return tokenStates[token].pastBurn;
+  }
+
+  function carbonFeeBeneficiary() external view returns (address) {
+    return ignoreRenaming_carbonFeeBeneficiary;
   }
 
   /**
@@ -585,7 +585,7 @@ contract FeeHandler is
   }
 
   function _setCarbonFeeBeneficiary(address beneficiary) private {
-    carbonFeeBeneficiary = beneficiary;
+    ignoreRenaming_carbonFeeBeneficiary = beneficiary;
     emit FeeBeneficiarySet(beneficiary);
   }
 
@@ -681,7 +681,10 @@ contract FeeHandler is
   }
 
   function _distribute(address tokenAddress) private onlyWhenNotFrozen nonReentrant {
-    require(carbonFeeBeneficiary != address(0), "Can't distribute to the zero address");
+    require(
+      ignoreRenaming_carbonFeeBeneficiary != address(0),
+      "Can't distribute to the zero address"
+    );
     IERC20 token = IERC20(tokenAddress);
     uint256 tokenBalance = token.balanceOf(address(this));
 
@@ -696,7 +699,12 @@ contract FeeHandler is
       tokenState.toDistribute
     );
 
-    _executePayment(tokenAddress, tokenState, carbonFeeBeneficiary, carbonFundAmount);
+    _executePayment(
+      tokenAddress,
+      tokenState,
+      ignoreRenaming_carbonFeeBeneficiary,
+      carbonFundAmount
+    );
 
     for (uint256 i = 0; i < EnumerableSet.length(otherBeneficiariesAddresses); i++) {
       address beneficiary = otherBeneficiariesAddresses.get(i);
