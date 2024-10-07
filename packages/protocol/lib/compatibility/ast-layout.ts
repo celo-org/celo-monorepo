@@ -42,7 +42,7 @@ export const getLayout = (artifact: Artifact, artifacts: BuildArtifacts) => {
 
 const selectIncompatibleOperations = (diff: Operation[]) =>
   diff.filter(operation => operation.action !== 'append'
-    && !(operation.action === 'rename' && ((`deprecated_${operation.original.label}` || `ignoreRenaming_${operation.original.label}`)  === operation.updated.label && operation.original.type === operation.updated.type)))
+    && !(operation.action === 'rename' && (((`deprecated_${operation.original.label}` === operation.updated.label) || (`ignoreRenaming_${operation.original.label}`  === operation.updated.label)) && operation.original.type === operation.updated.type)))
 
 export interface ASTStorageCompatibilityReport {
   contract: string
