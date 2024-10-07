@@ -91,7 +91,7 @@ contract AddressSortedLinkedListWithMedianTest_update is AddressSortedLinkedList
     assertEq(numerators[0], newNumerator, "should have the correct numerator");
   }
 
-  function test_ShouldRevertIfTheKEyIsNotInTheList() public {
+  function test_ShouldRevertIfTheKeyIsNotInTheList() public {
     vm.expectRevert("key not in list");
     sortedList.update(key2, newNumerator, address(0), address(0));
   }
