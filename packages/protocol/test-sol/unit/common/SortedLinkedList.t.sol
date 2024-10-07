@@ -88,21 +88,21 @@ contract SortedLinkedListTest_update is SortedLinkedListTest {
   function test_ShouldUpdateValueForAnExistingElement_whenBecomingTheSmallestElement() public {
     sortedList.update(key1, smallestValue, bytes32(0), key0);
     (bytes32[] memory keys, uint256[] memory values) = sortedList.getElements();
-    assertEq(keys.length, 3, "keys should have a single element");
+    assertEq(keys.length, 3, "keys should have three elements");
     assertEq(keys[2], key1, "should have the correct key");
 
-    assertEq(values.length, 3, "numerators should have a single element");
-    assertEq(values[2], smallestValue, "should have the correct numerator");
+    assertEq(values.length, 3, "values should have three elements");
+    assertEq(values[2], smallestValue, "should have the correct value");
   }
 
   function test_ShouldUpdateValueForAnExistingElement_whenBecomingTheLargestElement() public {
     sortedList.update(key1, largestValue, key2, bytes32(0));
     (bytes32[] memory keys, uint256[] memory values) = sortedList.getElements();
-    assertEq(keys.length, 3, "keys should have a single element");
+    assertEq(keys.length, 3, "keys should have three element");
     assertEq(keys[0], key1, "should have the correct key");
 
-    assertEq(values.length, 3, "numerators should have a single element");
-    assertEq(values[0], largestValue, "should have the correct numerator");
+    assertEq(values.length, 3, "values should have three elements");
+    assertEq(values[0], largestValue, "should have the correct value");
   }
 
   function test_ShouldUpdateValueForAnExistingElement_whenIncreasingValueButStayingInPlace()
@@ -110,11 +110,11 @@ contract SortedLinkedListTest_update is SortedLinkedListTest {
   {
     sortedList.update(key1, largerValue, key0, key2);
     (bytes32[] memory keys, uint256[] memory values) = sortedList.getElements();
-    assertEq(keys.length, 3, "keys should have a single element");
+    assertEq(keys.length, 3, "keys should have three element");
     assertEq(keys[1], key1, "should have the correct key");
 
-    assertEq(values.length, 3, "numerators should have a single element");
-    assertEq(values[1], largerValue, "should have the correct numerator");
+    assertEq(values.length, 3, "values should have three elements");
+    assertEq(values[1], largerValue, "should have the correct value");
   }
 
   function test_ShouldUpdateValueForAnExistingElement_whenDecreasingValueButStayingInPlace()
@@ -122,21 +122,21 @@ contract SortedLinkedListTest_update is SortedLinkedListTest {
   {
     sortedList.update(key1, smallerValue, key0, key2);
     (bytes32[] memory keys, uint256[] memory values) = sortedList.getElements();
-    assertEq(keys.length, 3, "keys should have a single element");
+    assertEq(keys.length, 3, "keys should have three element");
     assertEq(keys[1], key1, "should have the correct key");
 
-    assertEq(values.length, 3, "numerators should have a single element");
-    assertEq(values[1], smallerValue, "should have the correct numerator");
+    assertEq(values.length, 3, "values should have three elements");
+    assertEq(values[1], smallerValue, "should have the correct value");
   }
 
   function test_ShouldUpdateValueForAnExistingElement_whenNotChangingValue() public {
     sortedList.update(key1, value1, key0, key2);
     (bytes32[] memory keys, uint256[] memory values) = sortedList.getElements();
-    assertEq(keys.length, 3, "keys should have a single element");
+    assertEq(keys.length, 3, "keys should have three elements");
     assertEq(keys[1], key1, "should have the correct key");
 
-    assertEq(values.length, 3, "numerators should have a single element");
-    assertEq(values[1], value1, "should have the correct numerator");
+    assertEq(values.length, 3, "values should have three element");
+    assertEq(values[1], value1, "should have the correct value");
   }
 
   function test_ShouldRevertIfTheKeyIsNotInTheList() public {
