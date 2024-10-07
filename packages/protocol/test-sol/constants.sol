@@ -10,6 +10,7 @@ contract TestConstants {
   uint256 public constant MONTH = 30 * DAY;
   uint256 constant WEEK = 7 * DAY;
   uint256 public constant YEAR = 365 * DAY;
+  uint256 public constant L2_BLOCK_IN_EPOCH = 43200;
 
   // Contract names
   string constant ElectionContract = "Election";
