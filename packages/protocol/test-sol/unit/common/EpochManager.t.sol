@@ -20,6 +20,7 @@ import "@celo-contracts/common/interfaces/IRegistry.sol";
 import { IMockValidators } from "@celo-contracts-8/governance/test/IMockValidators.sol";
 
 import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
+import { MockElection } from "@celo-contracts/governance/test/MockElection.sol";
 
 import { MockAccounts } from "@celo-contracts-8/common/mocks/MockAccounts.sol";
 import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
@@ -31,7 +32,9 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
   MockStableToken08 stableToken;
   EpochRewardsMock08 epochRewards;
-  ValidatorsMock validators;
+  MockElection election;
+  MockAccounts accounts;
+  IMockValidators validators;
 
   address epochManagerEnabler;
   address carbonOffsettingPartner;
@@ -52,6 +55,16 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
   uint256 celoAmountForRate = 1e24;
   uint256 stableAmountForRate = 2 * celoAmountForRate;
 
+  uint256 validator1Reward = 42e18;
+  uint256 validator2Reward = 43e18;
+
+  address validator1;
+  uint256 validator1PK;
+  address validator2;
+  uint256 validator2PK;
+
+  address group = actor("group");
+
   event ValidatorEpochPaymentDistributed(
     address indexed validator,
     uint256 validatorPayment,
@@ -69,13 +82,18 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     epochManager = new EpochManager_WithMocks();
     sortedOracles = new MockSortedOracles();
     epochRewards = new EpochRewardsMock08();
-    validators = new ValidatorsMock();
+    validators = IMockValidators(actor("validators05"));
     stableToken = new MockStableToken08();
     celoToken = new MockCeloToken08();
     celoUnreleasedTreasury = new MockCeloUnreleasedTreasury();
+    election = new MockElection();
+    accounts = new MockAccounts();
 
-    firstElected.push(actor("validator1"));
-    firstElected.push(actor("validator2"));
+    (validator1, validator1PK) = actorWithPK(vm, "validator1");
+    (validator2, validator2PK) = actorWithPK(vm, "validator2");
+
+    firstElected.push(validator1);
+    firstElected.push(validator2);
 
     scoreManagerAddress = actor("scoreManagerAddress");
 
@@ -87,6 +105,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
     deployCodeTo("MockRegistry.sol", abi.encode(false), REGISTRY_ADDRESS);
     deployCodeTo("ScoreManager.sol", abi.encode(false), scoreManagerAddress);
+    deployCodeTo("MockValidators.sol", abi.encode(false), address(validators));
 
     registry = IRegistry(REGISTRY_ADDRESS);
     scoreManager = ScoreManager(scoreManagerAddress);
@@ -102,30 +121,63 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     registry.setAddressFor(CeloUnreleasedTreasuryContract, address(celoUnreleasedTreasury));
     registry.setAddressFor(CeloTokenContract, address(celoToken));
     registry.setAddressFor(ReserveContract, reserveAddress);
+    registry.setAddressFor(ElectionContract, address(election));
+    registry.setAddressFor(AccountsContract, address(accounts));
 
     celoToken.setTotalSupply(CELO_SUPPLY_CAP);
     vm.deal(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
     celoToken.setBalanceOf(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
 
     celoUnreleasedTreasury.setRegistry(REGISTRY_ADDRESS);
-    validators.setRegistry(REGISTRY_ADDRESS);
 
     sortedOracles.setMedianRate(address(stableToken), stableAmountForRate);
 
     scoreManager.setValidatorScore(actor("validator1"), 1);
 
     epochManager.initialize(REGISTRY_ADDRESS, 10);
+    epochRewards.setCarbonOffsettingPartner(carbonOffsettingPartner);
 
     blockTravel(vm, firstEpochBlock);
+
+    validators.setEpochRewards(validator1, validator1Reward);
+    validators.setEpochRewards(validator2, validator2Reward);
   }
 
   function initializeEpochManagerSystem() public {
+    validators.setValidatorGroup(group);
+    validators.setValidator(validator1);
+    accounts.setValidatorSigner(validator1, validator1);
+    validators.setValidator(validator2);
+    accounts.setValidatorSigner(validator2, validator2);
+
+    address[] memory members = new address[](2);
+    members[0] = validator1;
+    members[1] = validator2;
+    validators.setMembers(group, members);
+
+    election.setElectedValidators(members);
+
     deployCodeTo("MockRegistry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
     vm.prank(epochManagerEnabler);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
-    blockTravel(vm, 43200);
-    timeTravel(vm, DAY);
+    travelEpochL2(vm);
+  }
+
+  function getGroupsWithLessersAndGreaters()
+    public
+    returns (address[] memory, address[] memory, address[] memory)
+  {
+    address[] memory groups = new address[](1);
+    groups[0] = group;
+
+    address[] memory lessers = new address[](1);
+    lessers[0] = address(0);
+
+    address[] memory greaters = new address[](1);
+    greaters[0] = address(0);
+
+    return (groups, lessers, greaters);
   }
 }
 
@@ -226,9 +278,9 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     ) = epochManager.getEpochProcessingState();
     assertEq(status, 1);
     assertEq(perValidatorReward, 5);
-    assertEq(totalRewardsVoter, 5);
-    assertEq(totalRewardsCommunity, 5);
-    assertEq(totalRewardsCarbonFund, 5);
+    assertEq(totalRewardsVoter, 6);
+    assertEq(totalRewardsCommunity, 7);
+    assertEq(totalRewardsCarbonFund, 8);
   }
 
   function test_ShouldMintTotalValidatorStableRewardsToEpochManager() public {
@@ -236,8 +288,7 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     uint256 beforeBalance = stableToken.balanceOf(address(epochManager));
     epochManager.startNextEpochProcess();
 
-    uint256 afterBalance = stableToken.balanceOf(address(epochManager));
-    assertEq(afterBalance, 2);
+    assertEq(validators.mintedStable(), validator1Reward + validator2Reward);
   }
 
   function test_ShouldReleaseCorrectAmountToReserve() public {
@@ -245,7 +296,10 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     uint256 reserveBalanceBefore = celoToken.balanceOf(reserveAddress);
     epochManager.startNextEpochProcess();
     uint256 reserveBalanceAfter = celoToken.balanceOf(reserveAddress);
-    assertEq(reserveBalanceAfter, reserveBalanceBefore + 4);
+    assertEq(
+      reserveBalanceAfter,
+      (stableAmountForRate * (validator1Reward + validator2Reward)) / 1e24
+    );
   }
 }
 
@@ -321,10 +375,7 @@ contract EpochManagerTest_setOracleAddress is EpochManagerTest {
 }
 
 contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
-  address group = actor("group");
-  address validator1 = actor("validator1");
   address signer1 = actor("signer1");
-  address validator2 = actor("validator2");
   address signer2 = actor("signer2");
   address beneficiary = actor("beneficiary");
 
@@ -337,30 +388,19 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
 
   uint256 epochManagerBalanceBefore;
 
-  // TODO: unify mocks
-  IMockValidators mockValidators = IMockValidators(actor("MockValidators05"));
-
-  MockAccounts accounts;
-
   function setUp() public override {
     super.setUp();
 
-    deployCodeTo("MockValidators.sol", abi.encode(false), address(mockValidators));
-    registry.setAddressFor(ValidatorsContract, address(mockValidators));
-
-    accounts = new MockAccounts();
-    registry.setAddressFor(AccountsContract, address(accounts));
-
-    mockValidators.setValidatorGroup(group);
-    mockValidators.setValidator(validator1);
+    validators.setValidatorGroup(group);
+    validators.setValidator(validator1);
     accounts.setValidatorSigner(validator1, signer1);
-    mockValidators.setValidator(validator2);
+    validators.setValidator(validator2);
     accounts.setValidatorSigner(validator2, signer2);
 
-    address[] memory members = new address[](3);
+    address[] memory members = new address[](2);
     members[0] = validator1;
     members[1] = validator2;
-    mockValidators.setMembers(group, members);
+    validators.setMembers(group, members);
 
     vm.prank(epochManagerEnabler);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
@@ -381,7 +421,7 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
   }
 
   function test_sendsCUsdFromEpochManagerToValidatorAndGroup() public {
-    mockValidators.setCommission(group, twentyFivePercent);
+    validators.setCommission(group, twentyFivePercent);
 
     epochManager.sendValidatorPayment(validator1);
 
@@ -409,7 +449,7 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
   }
 
   function test_sendsCUsdFromEpochManagerToValidatorAndGroupAndBeneficiary() public {
-    mockValidators.setCommission(group, fiftyPercent);
+    validators.setCommission(group, fiftyPercent);
     accounts.setPaymentDelegationFor(validator1, beneficiary, fiftyPercent);
 
     epochManager.sendValidatorPayment(validator1);
@@ -426,7 +466,7 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
   }
 
   function test_emitsAValidatorEpochPaymentDistributedEvent() public {
-    mockValidators.setCommission(group, fiftyPercent);
+    validators.setCommission(group, fiftyPercent);
     accounts.setPaymentDelegationFor(validator1, beneficiary, fiftyPercent);
 
     vm.expectEmit(true, true, true, true, address(epochManager));
@@ -442,7 +482,7 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
   }
 
   function test_doesNothingIfNotAllocated() public {
-    mockValidators.setCommission(group, fiftyPercent);
+    validators.setCommission(group, fiftyPercent);
     accounts.setPaymentDelegationFor(validator2, beneficiary, fiftyPercent);
 
     epochManager.sendValidatorPayment(validator2);
@@ -467,5 +507,213 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
 
     assertEq(validatorBalanceAfter, paymentAmount);
     assertEq(epochManagerBalanceAfter, epochManagerBalanceBefore - paymentAmount);
+  }
+}
+
+contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
+  address signer1 = actor("signer1");
+  address signer2 = actor("signer2");
+
+  address validator3 = actor("validator3");
+  address validator4 = actor("validator4");
+
+  address group2 = actor("group2");
+
+  address[] elected;
+
+  uint256 groupEpochRewards = 44e18;
+
+  function setUp() public override {
+    super.setUp();
+
+    validators.setValidatorGroup(group);
+    validators.setValidator(validator1);
+    accounts.setValidatorSigner(validator1, signer1);
+    validators.setValidator(validator2);
+    accounts.setValidatorSigner(validator2, signer2);
+
+    validators.setValidatorGroup(group2);
+    validators.setValidator(validator3);
+    validators.setValidator(validator4);
+
+    address[] memory members = new address[](3);
+    members[0] = validator1;
+    members[1] = validator2;
+    validators.setMembers(group, members);
+    members[0] = validator3;
+    members[1] = validator4;
+    validators.setMembers(group2, members);
+
+    vm.prank(epochManagerEnabler);
+    initializeEpochManagerSystem();
+
+    elected = epochManager.getElected();
+
+    election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
+  }
+
+  function test_Reverts_WhenNotStarted() public {
+    address[] memory groups = new address[](0);
+
+    vm.expectRevert("Epoch process is not started");
+    epochManager.finishNextEpochProcess(groups, groups, groups);
+  }
+
+  function test_Reverts_WhenGroupsDoNotMatch() public {
+    address[] memory groups = new address[](0);
+    epochManager.startNextEpochProcess();
+    vm.expectRevert("number of groups does not match");
+    epochManager.finishNextEpochProcess(groups, groups, groups);
+  }
+
+  function test_Reverts_WhenGroupsNotFromElected() public {
+    address[] memory groups = new address[](1);
+    groups[0] = group2;
+    epochManager.startNextEpochProcess();
+    vm.expectRevert("group not from current elected set");
+    epochManager.finishNextEpochProcess(groups, groups, groups);
+  }
+
+  function test_TransfersToCommunityAndCarbonOffsetting() public {
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
+
+    epochManager.startNextEpochProcess();
+    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+
+    assertEq(celoToken.balanceOf(communityRewardFund), epochRewards.totalRewardsCommunity());
+    assertEq(celoToken.balanceOf(carbonOffsettingPartner), epochRewards.totalRewardsCarbonFund());
+  }
+
+  function test_TransfersToValidatorGroup() public {
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
+
+    epochManager.startNextEpochProcess();
+    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+
+    assertEq(election.distributedEpochRewards(group), groupEpochRewards);
+  }
+
+  function test_SetsNewlyElectedCorrectly() public {
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
+
+    epochManager.startNextEpochProcess();
+
+    address[] memory newElected = new address[](2);
+    newElected[0] = validator3;
+    newElected[1] = validator4;
+    election.setElectedValidators(newElected);
+
+    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+
+    address[] memory afterElected = epochManager.getElected();
+
+    for (uint256 i = 0; i < newElected.length; i++) {
+      assertEq(newElected[i], afterElected[i]);
+    }
+  }
+}
+
+contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
+  function _travelAndProcess_N_L2Epoch(uint256 n) public {
+    for (uint256 i = 0; i < n; i++) {
+      travelEpochL2(vm);
+      epochManager.startNextEpochProcess();
+
+      (
+        address[] memory groups,
+        address[] memory lessers,
+        address[] memory greaters
+      ) = getGroupsWithLessersAndGreaters();
+
+      epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    }
+  }
+
+  function test_shouldReturnTheEpochInfoOfSpecifiedEpoch() public {
+    uint256 numberOfEpochsToTravel = 9;
+
+    initializeEpochManagerSystem();
+    uint256 _startingEpochNumber = epochManager.getCurrentEpochNumber();
+
+    (
+      uint256 startingEpochFirstBlock,
+      uint256 startingEpochLastBlock,
+      uint256 startingEpochStartTimestamp,
+      uint256 startingEpochRewardBlock
+    ) = epochManager.getCurrentEpoch();
+
+    _travelAndProcess_N_L2Epoch(numberOfEpochsToTravel);
+
+    (
+      uint256 _firstBlock,
+      uint256 _lastBlock,
+      uint256 _startTimestamp,
+      uint256 _rewardBlock
+    ) = epochManager.getEpochByNumber(_startingEpochNumber + numberOfEpochsToTravel);
+
+    assertEq(
+      startingEpochFirstBlock + (L2_BLOCK_IN_EPOCH * (numberOfEpochsToTravel + 1)) + 1,
+      _firstBlock
+    );
+    assertEq(_lastBlock, 0);
+    assertEq(startingEpochStartTimestamp + (DAY * (numberOfEpochsToTravel + 1)), _startTimestamp);
+    assertEq(_rewardBlock, 0);
+  }
+
+  function test_ReturnsHistoricalEpochInfoAfter_N_Epochs() public {
+    initializeEpochManagerSystem();
+    uint256 _startingEpochNumber = epochManager.getCurrentEpochNumber();
+    uint256 numberOfEpochsToTravel = 7;
+    (
+      uint256 _startingEpochFirstBlock,
+      uint256 _startingLastBlock,
+      uint256 _startingStartTimestamp,
+      uint256 _startingRewardBlock
+    ) = epochManager.getCurrentEpoch();
+
+    _travelAndProcess_N_L2Epoch(numberOfEpochsToTravel);
+
+    (
+      uint256 _initialFirstBlock,
+      uint256 _initialLastBlock,
+      uint256 _initialStartTimestamp,
+      uint256 _initialRewardBlock
+    ) = epochManager.getEpochByNumber(_startingEpochNumber);
+
+    assertEq(_initialFirstBlock, _startingEpochFirstBlock);
+    assertEq(_initialLastBlock, _startingLastBlock + (L2_BLOCK_IN_EPOCH * 2) + firstEpochBlock);
+    assertEq(_initialStartTimestamp, _startingStartTimestamp);
+    assertEq(
+      _initialRewardBlock,
+      _startingRewardBlock + (L2_BLOCK_IN_EPOCH * 2) + firstEpochBlock + 1
+    );
+  }
+
+  function test_ReturnsZeroForFutureEpochs() public {
+    initializeEpochManagerSystem();
+
+    (
+      uint256 _firstBlock,
+      uint256 _lastBlock,
+      uint256 _startTimestamp,
+      uint256 _rewardBlock
+    ) = epochManager.getEpochByNumber(500);
+
+    assertEq(_firstBlock, 0);
+    assertEq(_lastBlock, 0);
+    assertEq(_startTimestamp, 0);
+    assertEq(_rewardBlock, 0);
   }
 }
