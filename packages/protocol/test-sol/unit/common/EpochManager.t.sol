@@ -63,6 +63,8 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
   address validator2;
   uint256 validator2PK;
 
+  address group = actor("group");
+
   event ValidatorEpochPaymentDistributed(
     address indexed validator,
     uint256 validatorPayment,
@@ -142,12 +144,40 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
   }
 
   function initializeEpochManagerSystem() public {
+    validators.setValidatorGroup(group);
+    validators.setValidator(validator1);
+    accounts.setValidatorSigner(validator1, validator1);
+    validators.setValidator(validator2);
+    accounts.setValidatorSigner(validator2, validator2);
+
+    address[] memory members = new address[](2);
+    members[0] = validator1;
+    members[1] = validator2;
+    validators.setMembers(group, members);
+
+    election.setElectedValidators(members);
+
     deployCodeTo("MockRegistry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
     vm.prank(epochManagerEnabler);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
-    blockTravel(vm, 43200);
-    timeTravel(vm, DAY);
+    travelEpochL2(vm);
+  }
+
+  function getGroupsWithLessersAndGreaters()
+    public
+    returns (address[] memory, address[] memory, address[] memory)
+  {
+    address[] memory groups = new address[](1);
+    groups[0] = group;
+
+    address[] memory lessers = new address[](1);
+    lessers[0] = address(0);
+
+    address[] memory greaters = new address[](1);
+    greaters[0] = address(0);
+
+    return (groups, lessers, greaters);
   }
 }
 
@@ -345,7 +375,6 @@ contract EpochManagerTest_setOracleAddress is EpochManagerTest {
 }
 
 contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
-  address group = actor("group");
   address signer1 = actor("signer1");
   address signer2 = actor("signer2");
   address beneficiary = actor("beneficiary");
@@ -368,7 +397,7 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
     validators.setValidator(validator2);
     accounts.setValidatorSigner(validator2, signer2);
 
-    address[] memory members = new address[](3);
+    address[] memory members = new address[](2);
     members[0] = validator1;
     members[1] = validator2;
     validators.setMembers(group, members);
@@ -491,7 +520,6 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
   address group2 = actor("group2");
 
   address[] elected;
-  address group = actor("group");
 
   uint256 groupEpochRewards = 44e18;
 
@@ -522,22 +550,6 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
     elected = epochManager.getElected();
 
     election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
-  }
-
-  function getGroupsWithLessersAndGreaters()
-    public
-    returns (address[] memory, address[] memory, address[] memory)
-  {
-    address[] memory groups = new address[](1);
-    groups[0] = group;
-
-    address[] memory lessers = new address[](1);
-    lessers[0] = address(0);
-
-    address[] memory greaters = new address[](1);
-    greaters[0] = address(0);
-
-    return (groups, lessers, greaters);
   }
 
   function test_Reverts_WhenNotStarted() public {
@@ -610,5 +622,98 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
     for (uint256 i = 0; i < newElected.length; i++) {
       assertEq(newElected[i], afterElected[i]);
     }
+  }
+}
+
+contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
+  function _travelAndProcess_N_L2Epoch(uint256 n) public {
+    for (uint256 i = 0; i < n; i++) {
+      travelEpochL2(vm);
+      epochManager.startNextEpochProcess();
+
+      (
+        address[] memory groups,
+        address[] memory lessers,
+        address[] memory greaters
+      ) = getGroupsWithLessersAndGreaters();
+
+      epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    }
+  }
+
+  function test_shouldReturnTheEpochInfoOfSpecifiedEpoch() public {
+    uint256 numberOfEpochsToTravel = 9;
+
+    initializeEpochManagerSystem();
+    uint256 _startingEpochNumber = epochManager.getCurrentEpochNumber();
+
+    (
+      uint256 startingEpochFirstBlock,
+      uint256 startingEpochLastBlock,
+      uint256 startingEpochStartTimestamp,
+      uint256 startingEpochRewardBlock
+    ) = epochManager.getCurrentEpoch();
+
+    _travelAndProcess_N_L2Epoch(numberOfEpochsToTravel);
+
+    (
+      uint256 _firstBlock,
+      uint256 _lastBlock,
+      uint256 _startTimestamp,
+      uint256 _rewardBlock
+    ) = epochManager.getEpochByNumber(_startingEpochNumber + numberOfEpochsToTravel);
+
+    assertEq(
+      startingEpochFirstBlock + (L2_BLOCK_IN_EPOCH * (numberOfEpochsToTravel + 1)) + 1,
+      _firstBlock
+    );
+    assertEq(_lastBlock, 0);
+    assertEq(startingEpochStartTimestamp + (DAY * (numberOfEpochsToTravel + 1)), _startTimestamp);
+    assertEq(_rewardBlock, 0);
+  }
+
+  function test_ReturnsHistoricalEpochInfoAfter_N_Epochs() public {
+    initializeEpochManagerSystem();
+    uint256 _startingEpochNumber = epochManager.getCurrentEpochNumber();
+    uint256 numberOfEpochsToTravel = 7;
+    (
+      uint256 _startingEpochFirstBlock,
+      uint256 _startingLastBlock,
+      uint256 _startingStartTimestamp,
+      uint256 _startingRewardBlock
+    ) = epochManager.getCurrentEpoch();
+
+    _travelAndProcess_N_L2Epoch(numberOfEpochsToTravel);
+
+    (
+      uint256 _initialFirstBlock,
+      uint256 _initialLastBlock,
+      uint256 _initialStartTimestamp,
+      uint256 _initialRewardBlock
+    ) = epochManager.getEpochByNumber(_startingEpochNumber);
+
+    assertEq(_initialFirstBlock, _startingEpochFirstBlock);
+    assertEq(_initialLastBlock, _startingLastBlock + (L2_BLOCK_IN_EPOCH * 2) + firstEpochBlock);
+    assertEq(_initialStartTimestamp, _startingStartTimestamp);
+    assertEq(
+      _initialRewardBlock,
+      _startingRewardBlock + (L2_BLOCK_IN_EPOCH * 2) + firstEpochBlock + 1
+    );
+  }
+
+  function test_ReturnsZeroForFutureEpochs() public {
+    initializeEpochManagerSystem();
+
+    (
+      uint256 _firstBlock,
+      uint256 _lastBlock,
+      uint256 _startTimestamp,
+      uint256 _rewardBlock
+    ) = epochManager.getEpochByNumber(500);
+
+    assertEq(_firstBlock, 0);
+    assertEq(_lastBlock, 0);
+    assertEq(_startTimestamp, 0);
+    assertEq(_rewardBlock, 0);
   }
 }
