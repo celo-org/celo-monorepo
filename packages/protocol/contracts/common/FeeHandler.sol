@@ -23,8 +23,6 @@ import "../stability/interfaces/ISortedOracles.sol";
 // Using the minimal required signatures in the interfaces so more contracts could be compatible
 import "../common/libraries/ReentrancyGuard.sol";
 
-// import { console } from "forge-std/console.sol";
-
 // An implementation of FeeHandler as described in CIP-52
 // See https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md
 contract FeeHandler is
@@ -293,16 +291,10 @@ contract FeeHandler is
     return _distributeAll();
   }
 
-  /**
-    @dev 
-  */
   function handleAll() external {
     return _handleAll();
   }
 
-  /**
-    @dev 
-  */
   function handle(address tokenAddress) external {
     return _handle(tokenAddress);
   }
@@ -310,7 +302,7 @@ contract FeeHandler is
   /**
     * @notice Allows owner to transfer tokens of this contract. It's meant for governance to
       trigger use cases not contemplated in this contract.
-      CAUTION: this function does not update internal account, so it may break the contract
+      CAUTION: this function does not update internal accounting, so it may leave the contract
       inconsistent. It should be used as last resort.
       @param token The address of the token to transfer.
       @param recipient The address of the recipient to transfer the tokens to.
@@ -510,7 +502,7 @@ contract FeeHandler is
 
   function _setCarbonFraction(uint256 _newFraction) internal {
     FixidityLib.Fraction memory newFraction = FixidityLib.wrap(_newFraction);
-    require(newFraction.lt(FixidityLib.fixed1()), "New cargon fraction can't be greather than 1"); // TODO function
+    require(newFraction.lt(FixidityLib.fixed1()), "New cargon fraction can't be greather than 1");
     ignoreRenaming_inverseCarbonFraction = FixidityLib.fixed1().subtract(newFraction);
     checkTotalBeneficiary();
     emit CarbonFractionSet(_newFraction);
