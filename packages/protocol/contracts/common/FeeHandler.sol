@@ -287,6 +287,9 @@ contract FeeHandler is
     return _distributeAll();
   }
 
+  /**
+    @dev Handles all the registered tokens.
+  */
   function handleAll() external {
     return _handleAll();
   }
