@@ -782,6 +782,19 @@ contract Validators is
   }
 
   /**
+   * @notice Returns the list of signers for the registered validator accounts.
+   * @return The list of signers for registered validator accounts.
+   */
+  function getRegisteredValidatorSigners() external view returns (address[] memory) {
+    IAccounts accounts = getAccounts();
+    address[] memory signers = new address[](registeredValidators.length);
+    for (uint256 i = 0; i < signers.length; i = i.add(1)) {
+      signers[i] = accounts.getValidatorSigner(registeredValidators[i]);
+    }
+    return signers;
+  }
+
+  /**
    * @notice Returns the list of registered validator accounts.
    * @return The list of registered validator accounts.
    */
@@ -891,6 +904,14 @@ contract Validators is
       sum = sum.add(FixidityLib.wrap(calculateEpochScore(uptimes[i])));
     }
     return sum.divide(FixidityLib.newFixed(uptimes.length)).unwrap();
+  }
+
+  /**
+   * @notice Returns the maximum number of members a group can add.
+   * @return The maximum number of members a group can add.
+   */
+  function getMaxGroupSize() external view returns (uint256) {
+    return maxGroupSize;
   }
 
   /**
