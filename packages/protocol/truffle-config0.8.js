@@ -15,7 +15,7 @@ module.exports = {
     solc: {
       version: SOLC_VERSION,
       settings: {
-        evmVersion: "cancun",
+        evmVersion: 'cancun',
         metadata: { useLiteralContent: true },
         optimizer: {
           enabled: true,
@@ -33,7 +33,7 @@ if (process.argv.includes('--gas')) {
       solc: {
         version: SOLC_VERSION,
         settings: {
-          evmVersion: "cancun",
+          evmVersion: 'cancun',
           metadata: { useLiteralContent: true },
         },
       },
