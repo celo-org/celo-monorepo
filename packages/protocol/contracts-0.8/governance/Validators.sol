@@ -894,6 +894,14 @@ contract Validators is
   }
 
   /**
+   * @notice Returns the maximum number of members a group can add.
+   * @return The maximum number of members a group can add.
+   */
+  function getMaxGroupSize() external view returns (uint256) {
+    return maxGroupSize;
+  }
+
+  /**
    * @notice Returns the block delay for a ValidatorGroup's commission udpdate.
    * @return The block delay for a ValidatorGroup's commission udpdate.
    */
