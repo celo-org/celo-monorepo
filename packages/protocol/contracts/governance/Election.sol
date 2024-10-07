@@ -902,6 +902,13 @@ contract Election is
     return electedValidators;
   }
 
+  function numberValidatorsInCurrentSet() public view returns (uint256) {
+    if (isL2()) {
+      return getEpochManager().getElectedSigners().length;
+    }
+    return super.numberValidatorsInCurrentSet();
+  }
+
   /**
    * @notice Returns get current validator signers using the precompiles.
    * @return List of current validator signers.
