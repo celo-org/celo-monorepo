@@ -458,19 +458,13 @@ contract FeeHandler is
     return balanceToBurn;
   }
 
-  function _executePayment(
-    address tokenAddress,
-    TokenState storage state,
-    address beneficiary,
-    uint256 amount
-  ) internal {
+  function _executePayment(address tokenAddress, address beneficiary, uint256 amount) internal {
     require(
       _getTokenActive(tokenAddress) ||
         tokenAddress == registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID),
       "Token needs to be active"
     );
 
-    IERC20 token = IERC20(tokenAddress);
     uint256 balanceToDistribute = amount;
 
     if (balanceToDistribute == 0) {
@@ -478,6 +472,7 @@ contract FeeHandler is
       return;
     }
 
+    IERC20 token = IERC20(tokenAddress);
     token.transfer(beneficiary, balanceToDistribute);
   }
 
@@ -699,12 +694,7 @@ contract FeeHandler is
       tokenState.toDistribute
     );
 
-    _executePayment(
-      tokenAddress,
-      tokenState,
-      ignoreRenaming_carbonFeeBeneficiary,
-      carbonFundAmount
-    );
+    _executePayment(tokenAddress, ignoreRenaming_carbonFeeBeneficiary, carbonFundAmount);
 
     for (uint256 i = 0; i < EnumerableSet.length(otherBeneficiariesAddresses); i++) {
       address beneficiary = otherBeneficiariesAddresses.get(i);
@@ -716,7 +706,7 @@ contract FeeHandler is
         tokenState.toDistribute
       );
 
-      _executePayment(tokenAddress, tokenState, beneficiary, amount);
+      _executePayment(tokenAddress, beneficiary, amount);
     }
 
     tokenState.toDistribute = 0;
