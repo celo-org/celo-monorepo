@@ -50,7 +50,7 @@ contract FeeHandler is
     uint256 toDistribute;
     // Historical amounts burned by this contract
     uint256 pastBurn;
-    // uint256 lastLimitDay; // this breaks the storage?
+    uint256 lastLimitDay;
   }
 
   struct Beneficiary {
@@ -65,11 +65,12 @@ contract FeeHandler is
   uint256 public constant MIN_BURN = 200;
 
   // last day the daily limits were updated
-  uint256 public _dprecated_lastLimitDay; // deprecated
+  uint256 private deprecated_lastLimitDay; // deprecated
 
   // TODO try to make this private if it doesn't break storage
   // reason it's inverse it's because it used to be burnFraction and was migrated
-  FixidityLib.Fraction public inverseCarbonFraction; // 80%
+  // ignoreRenaming_ prefix allows the tooling to ignore the variable renaming
+  FixidityLib.Fraction private ignoreRenaming_inverseCarbonFraction; // 80%
 
   address public carbonFeeBeneficiary;
 
@@ -82,13 +83,11 @@ contract FeeHandler is
 
   // Celo not included in this list
   EnumerableSet.AddressSet private activeTokens;
-
   // does not include carbon fund
   FixidityLib.Fraction private totalFractionOfOtherBeneficiaries;
 
   mapping(address => Beneficiary) private otherBeneficiaries;
   EnumerableSet.AddressSet private otherBeneficiariesAddresses;
-  mapping(address => uint256) private lastLimitDay; // TODO check storage
 
   event SoldAndBurnedToken(address token, uint256 value);
   event DailyLimitSet(address tokenAddress, uint256 newLimit);
@@ -437,12 +436,8 @@ contract FeeHandler is
 
     uint256 currentDay = now / 1 days;
     // Pattern borrowed from Reserve.sol
-    // if (currentDay > tokenState.lastLimitDay) {
-    //   tokenState.lastLimitDay = currentDay;
-    //   tokenState.currentDaySellLimit = tokenState.dailySellLimit;
-    // }
-    if (currentDay > lastLimitDay[token]) {
-      lastLimitDay[token] = currentDay;
+    if (currentDay > tokenState.lastLimitDay) {
+      tokenState.lastLimitDay = currentDay;
       tokenState.currentDaySellLimit = tokenState.dailySellLimit;
     }
 
@@ -512,7 +507,7 @@ contract FeeHandler is
   function _setCarbonFraction(uint256 _newFraction) internal {
     FixidityLib.Fraction memory newFraction = FixidityLib.wrap(_newFraction);
     require(newFraction.lt(FixidityLib.fixed1()), "New cargon fraction can't be greather than 1"); // TODO function
-    inverseCarbonFraction = FixidityLib.fixed1().subtract(newFraction);
+    ignoreRenaming_inverseCarbonFraction = FixidityLib.fixed1().subtract(newFraction);
     checkTotalBeneficiary();
     emit CarbonFractionSet(_newFraction);
   }
@@ -549,7 +544,7 @@ contract FeeHandler is
   }
 
   function getCarbonFractionFixidity() internal view returns (FixidityLib.Fraction memory) {
-    return FixidityLib.fixed1().subtract(inverseCarbonFraction);
+    return FixidityLib.fixed1().subtract(ignoreRenaming_inverseCarbonFraction);
   }
 
   function getBurnFractionFixidity() internal view returns (FixidityLib.Fraction memory) {
