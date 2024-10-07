@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity >=0.8.0 <0.8.20;
+pragma solidity >=0.8.0 <0.9;
 
 // Note: This is not an exact copy of UsingRegistry or UsingRegistryV2 in the contract's folder
 // because Mento's interfaces still don't support Solidity 0.8

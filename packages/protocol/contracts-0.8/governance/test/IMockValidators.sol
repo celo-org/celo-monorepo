@@ -1,4 +1,4 @@
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9;
 
 interface IMockValidators {
   function isValidator(address) external returns (bool);

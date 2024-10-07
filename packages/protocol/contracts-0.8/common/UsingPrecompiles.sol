@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity >=0.8.0 <0.8.20;
+pragma solidity >=0.8.0 <0.9;
 
 // Note: This is not an exact copy of UsingPrecompiles in the contract's folder, but in solidity 0.8
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";

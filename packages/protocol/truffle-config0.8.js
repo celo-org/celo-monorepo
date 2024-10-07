@@ -1,4 +1,4 @@
-const SOLC_VERSION = '0.8.19'
+const SOLC_VERSION = '0.8.24'
 
 const parent = require('./truffle-config-parent.js')
 const networks = { ...parent.networks }
@@ -15,6 +15,7 @@ module.exports = {
     solc: {
       version: SOLC_VERSION,
       settings: {
+        evmVersion: "cancun",
         metadata: { useLiteralContent: true },
         optimizer: {
           enabled: true,
@@ -32,6 +33,7 @@ if (process.argv.includes('--gas')) {
       solc: {
         version: SOLC_VERSION,
         settings: {
+          evmVersion: "cancun",
           metadata: { useLiteralContent: true },
         },
       },

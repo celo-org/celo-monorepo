@@ -1,4 +1,4 @@
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9;
 
 // this file only exists so that foundry compiles this contracts
 import "@test-sol/precompiles/ProofOfPossesionPrecompile.sol";

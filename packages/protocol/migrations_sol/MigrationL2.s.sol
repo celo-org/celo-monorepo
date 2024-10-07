@@ -1,4 +1,4 @@
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9;
 
 import { Script } from "forge-std-8/Script.sol";
 import { MigrationsConstants } from "@migrations-sol/constants.sol";

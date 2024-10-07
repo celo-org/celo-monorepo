@@ -104,7 +104,7 @@
   },
   "election": {
     "minElectableValidators": 1,
-    "maxElectableValidators": 100,
+    "maxElectableValidators": 110,
     "maxNumGroupsVotedFor": 10,
     "electabilityThreshold": 1000000000000000000000
   },

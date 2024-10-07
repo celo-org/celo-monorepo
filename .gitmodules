@@ -24,3 +24,6 @@
 	path = packages/protocol/lib/solidity-bytes-utils-8
 	url = https://github.com/GNSPS/solidity-bytes-utils
 	branch = master
+[submodule "packages/protocol/lib/transient-goodies"]
+	path = packages/protocol/lib/transient-goodies
+	url = https://github.com/Philogy/transient-goodies
