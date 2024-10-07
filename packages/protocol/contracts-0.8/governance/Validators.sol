@@ -459,7 +459,7 @@ contract Validators is
     address signer,
     bytes calldata ecdsaPublicKey,
     bytes calldata blsPublicKey,
-    bytes calldata blsPop
+    bytes calldata blsPop // TODO support this method on L2?
   ) external onlyRegisteredContract(ACCOUNTS_REGISTRY_ID) returns (bool) {
     allowOnlyL1();
     require(isValidator(account), "Not a validator");
@@ -611,7 +611,7 @@ contract Validators is
    * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
    */
   function forceDeaffiliateIfValidator(address validatorAccount) external nonReentrant onlySlasher {
-    allowOnlyL1();
+    allowOnlyL1(); // TODO, safe in L1?
     if (isValidator(validatorAccount)) {
       Validator storage validator = validators[validatorAccount];
       if (validator.affiliation != address(0)) {
@@ -640,7 +640,7 @@ contract Validators is
    * @param account The group being slashed.
    */
   function halveSlashingMultiplier(address account) external nonReentrant onlySlasher {
-    allowOnlyL1();
+    allowOnlyL1(); // TODO, safe in L1?
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     group.slashInfo.multiplier = FixidityLib.wrap(group.slashInfo.multiplier.unwrap().div(2));
@@ -1054,8 +1054,9 @@ contract Validators is
    * @param value New reset period for slashing multiplier.
    */
   function setSlashingMultiplierResetPeriod(uint256 value) public nonReentrant onlyOwner {
-    allowOnlyL1();
+    allowOnlyL1(); // TODO safe in L2?
     slashingMultiplierResetPeriod = value;
+    // TODO emit
   }
 
   /**

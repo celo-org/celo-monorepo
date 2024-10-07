@@ -30,4 +30,5 @@ interface IEpochManager {
   function isOnEpochProcess() external view returns (bool);
   function getFirstBlockAtEpoch(uint256) external view returns (uint256);
   function getLastBlockAtEpoch(uint256) external view returns (uint256);
+  function getElectedSigners() external view returns (address[] memory);
 }

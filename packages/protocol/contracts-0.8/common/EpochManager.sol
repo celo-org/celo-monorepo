@@ -9,6 +9,7 @@ import "./interfaces/IOracle.sol";
 import "../common/UsingRegistry.sol";
 
 import "../../contracts/common/FixidityLib.sol";
+import "../../contracts/common/interfaces/IAccounts.sol";
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/IEpochManager.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
@@ -48,6 +49,7 @@ contract EpochManager is
     bool processed;
     uint256 epochRewards;
   }
+
   bool public isSystemInitialized;
 
   // the length of an epoch in seconds
@@ -63,6 +65,9 @@ contract EpochManager is
   EpochProcessState public epochProcessing;
   mapping(uint256 => Epoch) private epochs;
   mapping(address => uint256) public validatorPendingPayments;
+  // Electeds in the L1 assumed signers can not change during the epoch
+  // so we keep a copy
+  address[] public electedSigners;
 
   /**
    * @notice Event emited when epochProcessing has begun.
@@ -269,9 +274,16 @@ contract EpochManager is
       getEpochRewards().carbonOffsettingPartner(),
       epochProcessing.totalRewardsCarbonFund
     );
+
     // run elections
     elected = election.electValidatorAccounts();
-    _epochProcessing.status = EpochProcessStatus.NotStarted;
+    // keep a copy of signers at the time of election
+    _setElectedSigners();
+
+    EpochProcessState memory _epochProcessingEmpty;
+
+    epochProcessing = _epochProcessingEmpty;
+    emit EpochProcessingEnded(currentEpochNumber - 1);
   }
 
   /**
@@ -378,6 +390,13 @@ contract EpochManager is
    */
   function getElected() external view returns (address[] memory) {
     return elected;
+  }
+
+  /**
+   * @return The list of the validator signers of elected validators.
+   */
+  function getElectedSigners() external view returns (address[] memory) {
+    return electedSigners;
   }
 
   /**
@@ -493,5 +512,13 @@ contract EpochManager is
       registry.getAddressForOrDie(RESERVE_REGISTRY_ID),
       CELOequivalent
     );
+  }
+
+  function _setElectedSigners() internal {
+    IAccounts accounts = getAccounts();
+    electedSigners = new address[](elected.length);
+    for (uint i = 0; i < elected.length; i++) {
+      electedSigners[i] = accounts.getValidatorSigner(elected[i]);
+    }
   }
 }

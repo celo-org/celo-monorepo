@@ -54,6 +54,9 @@ contract MockEpochManager is IEpochManager {
   }
 
   function startNextEpochProcess() external {}
+
+  function getElectedSigners() external view returns (address[] memory) {} // TODO add revert here
+
   function finishNextEpochProcess(
     address[] calldata groups,
     address[] calldata lessers,
