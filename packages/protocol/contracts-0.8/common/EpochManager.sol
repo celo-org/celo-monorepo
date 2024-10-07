@@ -276,9 +276,10 @@ contract EpochManager is
     );
 
     // run elections
-    elected = election.electValidatorAccounts();
+    address[] memory _elected = election.electValidatorAccounts();
+    elected = _elected;
     // keep a copy of signers at the time of election
-    _setElectedSigners();
+    _setElectedSigners(_elected);
 
     EpochProcessState memory _epochProcessingEmpty;
 
@@ -514,11 +515,11 @@ contract EpochManager is
     );
   }
 
-  function _setElectedSigners() internal {
+  function _setElectedSigners(address[] memory _elected) internal {
     IAccounts accounts = getAccounts();
-    electedSigners = new address[](elected.length);
-    for (uint i = 0; i < elected.length; i++) {
-      electedSigners[i] = accounts.getValidatorSigner(elected[i]);
+    electedSigners = new address[](_elected.length);
+    for (uint i = 0; i < _elected.length; i++) {
+      electedSigners[i] = accounts.getValidatorSigner(_elected[i]);
     }
   }
 }
