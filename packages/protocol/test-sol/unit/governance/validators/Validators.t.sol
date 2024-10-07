@@ -3639,9 +3639,8 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
     assertEq(entries.length, 0);
   }
 
-  function test_ShouldSendValidatorPayment_WhenL2() public {
+  function test_ShouldWork_WhenL2() public {
     _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(paymentDelegatee);
     validators.forceDeaffiliateIfValidator(validator);
   }
@@ -3806,11 +3805,10 @@ contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
     }
   }
 
-  function test_Reverts_HalveSlashingMultiplier_WhenL2() public {
+  function test_Should_HalveSlashingMultiplier_WhenL2() public {
     _whenL2();
     FixidityLib.Fraction memory expectedMultiplier = FixidityLib.fixed1();
     vm.prank(paymentDelegatee);
-    vm.expectRevert("This method is no longer supported in L2.");
     validators.halveSlashingMultiplier(group);
   }
 
@@ -3892,7 +3890,6 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
   function test_Reverts_SetSlashingMultiplierResetPeriod_WhenL2() public {
     _whenL2();
     uint256 newResetPeriod = 10 * DAY;
-    vm.expectRevert("This method is no longer supported in L2.");
     validators.setSlashingMultiplierResetPeriod(newResetPeriod);
   }
 }

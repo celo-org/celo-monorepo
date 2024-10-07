@@ -162,6 +162,7 @@ contract Validators is
     address indexed group,
     uint256 groupPayment
   );
+  event SlashingMultiplierResetPeriodSet(uint256 period);
 
   modifier onlySlasher() {
     require(getLockedGold().isSlasher(msg.sender), "Only registered slasher can call");
@@ -444,7 +445,8 @@ contract Validators is
   }
 
   /**
-   * @notice Updates a validator's ECDSA and BLS keys.
+   * @notice Updates a validator's ECDSA and BLS keys. This method was deprecated on CEL2
+   *   then use `updatePublicKeys`.
    * @param account The address under which the validator is registered.
    * @param signer The address which the validator is using to sign consensus messages.
    * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
@@ -611,7 +613,6 @@ contract Validators is
    * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
    */
   function forceDeaffiliateIfValidator(address validatorAccount) external nonReentrant onlySlasher {
-    allowOnlyL1();
     if (isValidator(validatorAccount)) {
       Validator storage validator = validators[validatorAccount];
       if (validator.affiliation != address(0)) {
@@ -640,7 +641,6 @@ contract Validators is
    * @param account The group being slashed.
    */
   function halveSlashingMultiplier(address account) external nonReentrant onlySlasher {
-    allowOnlyL1();
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     group.slashInfo.multiplier = FixidityLib.wrap(group.slashInfo.multiplier.unwrap().div(2));
@@ -1075,8 +1075,8 @@ contract Validators is
    * @param value New reset period for slashing multiplier.
    */
   function setSlashingMultiplierResetPeriod(uint256 value) public nonReentrant onlyOwner {
-    allowOnlyL1();
     slashingMultiplierResetPeriod = value;
+    emit SlashingMultiplierResetPeriodSet(value);
   }
 
   /**

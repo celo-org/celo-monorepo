@@ -28,6 +28,7 @@ contract IsL2Check {
   }
 
   function allowOnlyL1() internal view {
+    // TODO turn this into modifier?
     if (isL2()) {
       revert("This method is no longer supported in L2.");
     }

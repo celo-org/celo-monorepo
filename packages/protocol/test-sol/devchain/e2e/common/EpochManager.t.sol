@@ -10,6 +10,7 @@ import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.s
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@test-sol/utils/ECDSAHelper08.sol";
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
+import { console } from "forge-std/console.sol";
 
 contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
   struct VoterWithPK {
@@ -351,12 +352,17 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
       uint256 totalRewardsCarbonFund
     ) = epochManager.getEpochProcessingState();
 
-    assertGt(perValidatorReward, 0, "perValidatorReward");
-    assertGt(totalRewardsVoter, 0, "totalRewardsVoter");
-    assertGt(totalRewardsCommunity, 0, "totalRewardsCommunity");
-    assertGt(totalRewardsCarbonFund, 0, "totalRewardsCarbonFund");
+    assertEq(perValidatorReward, 0, "perValidatorReward");
+    assertEq(totalRewardsVoter, 0, "totalRewardsVoter");
+    assertEq(totalRewardsCommunity, 0, "totalRewardsCommunity");
+    assertEq(totalRewardsCarbonFund, 0, "totalRewardsCarbonFund");
+    assertEq(status, 0, "status should be reset");
 
+    // TODO verify addresses are correct
     assertEq(epochManager.getElected().length, validatorsArray.length - 1);
+    // TODO verify addresses are correct
+    // TODO fix migrations so that signers and accounts are different
+    assertEq(epochManager.getElectedSigners().length, validatorsArray.length - 1);
   }
 
   function registerNewValidatorGroupWithValidator()
@@ -409,15 +415,15 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     }
   }
 
-  function getValidatorGroupsFromElected() internal returns (address[] memory) {
-    address[] memory elected = epochManager.getElected();
-    address[] memory validatorGroups = new address[](elected.length);
-    for (uint256 i = 0; i < elected.length; i++) {
-      (, , address group, , ) = validators.getValidator(elected[i]);
-      validatorGroups[i] = group;
-    }
-    return validatorGroups;
-  }
+  // function getValidatorGroupsFromElected() internal returns (address[] memory) {
+  //   address[] memory elected = epochManager.getElected();
+  //   address[] memory validatorGroups = new address[](elected.length);
+  //   for (uint256 i = 0; i < elected.length; i++) {
+  //     (, , address group, , ) = validators.getValidator(elected[i]);
+  //     validatorGroups[i] = group;
+  //   }
+  //   return validatorGroups;
+  // }
 
   function getLessersAndGreaters(
     address[] memory groups

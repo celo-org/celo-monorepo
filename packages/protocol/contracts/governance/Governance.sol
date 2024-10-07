@@ -1268,6 +1268,15 @@ contract Governance is
     emit HotfixRecordReset(hash);
   }
 
+  function _getValidatorSignerAddressFromCurrentSet(uint256 index) internal view returns (address) {
+    if (isL2()) {
+      // TODO this has getEpochManage() inside the a loop
+      return getEpochManager().getElectedSigners()[index];
+    } else {
+      return validatorSignerAddressFromCurrentSet(index);
+    }
+  }
+
   /**
    * @notice Returns number of validators from current set which have whitelisted the given hotfix.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
@@ -1278,7 +1287,7 @@ contract Governance is
     uint256 n = numberValidatorsInCurrentSet();
     IAccounts accounts = getAccounts();
     for (uint256 i = 0; i < n; i = i.add(1)) {
-      address validatorSigner = validatorSignerAddressFromCurrentSet(i);
+      address validatorSigner = _getValidatorSignerAddressFromCurrentSet(i);
       address validatorAccount = accounts.signerToAccount(validatorSigner);
       if (
         isHotfixWhitelistedBy(hash, validatorSigner) ||
@@ -1296,6 +1305,7 @@ contract Governance is
    * @return Whether validator whitelist tally >= validator byzantine quorum
    */
   function isHotfixPassing(bytes32 hash) public view onlyL1 returns (bool) {
+    // TODO minQuorumSizeInCurrentSet should be in hotfix
     return hotfixWhitelistValidatorTally(hash) >= minQuorumSizeInCurrentSet();
   }
 

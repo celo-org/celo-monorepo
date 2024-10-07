@@ -902,17 +902,35 @@ contract Election is
     return electedValidators;
   }
 
+  function numberValidatorsInCurrentSet() public view returns (uint256) {
+    if (isL2()) {
+      return getEpochManager().getElectedSigners().length;
+    }
+    return super.numberValidatorsInCurrentSet();
+  }
+
   /**
    * @notice Returns get current validator signers using the precompiles.
    * @return List of current validator signers.
    */
-  function getCurrentValidatorSigners() public view onlyL1 returns (address[] memory) {
-    uint256 n = numberValidatorsInCurrentSet();
-    address[] memory res = new address[](n);
-    for (uint256 i = 0; i < n; i = i.add(1)) {
-      res[i] = validatorSignerAddressFromCurrentSet(i);
+  function getCurrentValidatorSigners()
+    external
+    view
+    returns (
+      // onlyL1 // TODO remove
+      address[] memory
+    )
+  {
+    if (isL2()) {
+      return getEpochManager().getElectedSigners();
+    } else {
+      uint256 n = numberValidatorsInCurrentSet();
+      address[] memory res = new address[](n);
+      for (uint256 i = 0; i < n; i = i.add(1)) {
+        res[i] = validatorSignerAddressFromCurrentSet(i);
+      }
+      return res;
     }
-    return res;
   }
   /**
    * @notice Returns the pending votes for `group` made by `account`.
