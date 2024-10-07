@@ -124,8 +124,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     vm.prank(epochManagerEnabler);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
-    blockTravel(vm, 43200);
-    timeTravel(vm, DAY);
+    travelEpochL2(vm);
   }
 }
 
@@ -467,5 +466,95 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
 
     assertEq(validatorBalanceAfter, paymentAmount);
     assertEq(epochManagerBalanceAfter, epochManagerBalanceBefore - paymentAmount);
+  }
+}
+
+contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
+  function _travelAndProcess_N_L2Epoch(uint256 n) public {
+    for (uint256 i = 0; i < n; i++) {
+      travelEpochL2(vm);
+      epochManager.startNextEpochProcess();
+
+      address[] memory groups = new address[](0);
+      address[] memory lessers = new address[](0);
+      address[] memory greaters = new address[](0);
+      epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    }
+  }
+
+  function test_shouldReturnTheEpochInfoOfSpecifiedEpoch() public {
+    uint256 numberOfEpochsToTravel = 9;
+
+    initializeEpochManagerSystem();
+    uint256 _startingEpochNumber = epochManager.getCurrentEpochNumber();
+
+    (
+      uint256 startingEpochFirstBlock,
+      uint256 startingEpochLastBlock,
+      uint256 startingEpochStartTimestamp,
+      uint256 startingEpochRewardBlock
+    ) = epochManager.getCurrentEpoch();
+
+    _travelAndProcess_N_L2Epoch(numberOfEpochsToTravel);
+
+    (
+      uint256 _firstBlock,
+      uint256 _lastBlock,
+      uint256 _startTimestamp,
+      uint256 _rewardBlock
+    ) = epochManager.getEpochByNumber(_startingEpochNumber + numberOfEpochsToTravel);
+
+    assertEq(
+      startingEpochFirstBlock + (L2_BLOCK_IN_EPOCH * (numberOfEpochsToTravel + 1)) + 1,
+      _firstBlock
+    );
+    assertEq(_lastBlock, 0);
+    assertEq(startingEpochStartTimestamp + (DAY * (numberOfEpochsToTravel + 1)), _startTimestamp);
+    assertEq(_rewardBlock, 0);
+  }
+
+  function test_ReturnsHistoricalEpochInfoAfter_N_Epochs() public {
+    initializeEpochManagerSystem();
+    uint256 _startingEpochNumber = epochManager.getCurrentEpochNumber();
+    uint256 numberOfEpochsToTravel = 7;
+    (
+      uint256 _startingEpochFirstBlock,
+      uint256 _startingLastBlock,
+      uint256 _startingStartTimestamp,
+      uint256 _startingRewardBlock
+    ) = epochManager.getCurrentEpoch();
+
+    _travelAndProcess_N_L2Epoch(numberOfEpochsToTravel);
+
+    (
+      uint256 _initialFirstBlock,
+      uint256 _initialLastBlock,
+      uint256 _initialStartTimestamp,
+      uint256 _initialRewardBlock
+    ) = epochManager.getEpochByNumber(_startingEpochNumber);
+
+    assertEq(_initialFirstBlock, _startingEpochFirstBlock);
+    assertEq(_initialLastBlock, _startingLastBlock + (L2_BLOCK_IN_EPOCH * 2) + firstEpochBlock);
+    assertEq(_initialStartTimestamp, _startingStartTimestamp);
+    assertEq(
+      _initialRewardBlock,
+      _startingRewardBlock + (L2_BLOCK_IN_EPOCH * 2) + firstEpochBlock + 1
+    );
+  }
+
+  function test_ReturnsZeroForFutureEpochs() public {
+    initializeEpochManagerSystem();
+
+    (
+      uint256 _firstBlock,
+      uint256 _lastBlock,
+      uint256 _startTimestamp,
+      uint256 _rewardBlock
+    ) = epochManager.getEpochByNumber(500);
+
+    assertEq(_firstBlock, 0);
+    assertEq(_lastBlock, 0);
+    assertEq(_startTimestamp, 0);
+    assertEq(_rewardBlock, 0);
   }
 }
