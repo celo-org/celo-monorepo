@@ -10,6 +10,11 @@ contract EpochRewardsMock08 is IEpochRewards {
   uint256 private numValidatorsInCurrentSet;
   address public carbonOffsettingPartner;
 
+  uint256 public perValidatorReward = 5;
+  uint256 public totalRewardsVoter = 6;
+  uint256 public totalRewardsCommunity = 7;
+  uint256 public totalRewardsCarbonFund = 8;
+
   function setNumberValidatorsInCurrentSet(uint256 value) external {
     numValidatorsInCurrentSet = value;
   }
@@ -32,7 +37,7 @@ contract EpochRewardsMock08 is IEpochRewards {
     view
     returns (uint256, uint256, uint256, uint256)
   {
-    return (5, 5, 5, 5);
+    return (perValidatorReward, totalRewardsVoter, totalRewardsCommunity, totalRewardsCarbonFund);
   }
   function getTargetVotingYieldParameters() external view returns (uint256, uint256, uint256) {
     return (0, 0, 0);
@@ -56,5 +61,9 @@ contract EpochRewardsMock08 is IEpochRewards {
   // mocks the precompile
   function numberValidatorsInCurrentSet() public view returns (uint256) {
     return numValidatorsInCurrentSet;
+  }
+
+  function setCarbonOffsettingPartner(address partner) external {
+    carbonOffsettingPartner = partner;
   }
 }
