@@ -65,13 +65,13 @@ contract FeeHandler is
   uint256 public constant MIN_BURN = 200;
 
   // last day the daily limits were updated
-  uint256 public _dprecated_lastLimitDay; // deprecated
+  uint256 public deprecated_lastLimitDay; // deprecated
 
   // TODO try to make this private if it doesn't break storage
   // reason it's inverse it's because it used to be burnFraction and was migrated
-  FixidityLib.Fraction public inverseCarbonFraction; // 80%
+  FixidityLib.Fraction public deprecated_burnFraction; // 80%
 
-  address public carbonFeeBeneficiary;
+  address public deprecated_feeBeneficiary;
 
   uint256 public celoToBeBurned;
 
@@ -89,6 +89,10 @@ contract FeeHandler is
   mapping(address => Beneficiary) private otherBeneficiaries;
   EnumerableSet.AddressSet private otherBeneficiariesAddresses;
   mapping(address => uint256) private lastLimitDay; // TODO check storage
+
+  address public carbonFeeBeneficiary;
+
+  FixidityLib.Fraction private inverseCarbonFraction;
 
   event SoldAndBurnedToken(address token, uint256 value);
   event DailyLimitSet(address tokenAddress, uint256 newLimit);
