@@ -162,6 +162,7 @@ contract Validators is
     address indexed group,
     uint256 groupPayment
   );
+  event SlashingMultiplierResetPeriodSet(uint256 period);
 
   modifier onlySlasher() {
     require(getLockedGold().isSlasher(msg.sender), "Only registered slasher can call");
@@ -611,7 +612,6 @@ contract Validators is
    * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
    */
   function forceDeaffiliateIfValidator(address validatorAccount) external nonReentrant onlySlasher {
-    allowOnlyL1(); // TODO, safe in L1?
     if (isValidator(validatorAccount)) {
       Validator storage validator = validators[validatorAccount];
       if (validator.affiliation != address(0)) {
@@ -640,7 +640,6 @@ contract Validators is
    * @param account The group being slashed.
    */
   function halveSlashingMultiplier(address account) external nonReentrant onlySlasher {
-    allowOnlyL1(); // TODO, safe in L1?
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     group.slashInfo.multiplier = FixidityLib.wrap(group.slashInfo.multiplier.unwrap().div(2));
@@ -1054,9 +1053,8 @@ contract Validators is
    * @param value New reset period for slashing multiplier.
    */
   function setSlashingMultiplierResetPeriod(uint256 value) public nonReentrant onlyOwner {
-    allowOnlyL1(); // TODO safe in L2?
     slashingMultiplierResetPeriod = value;
-    // TODO emit
+    emit SlashingMultiplierResetPeriodSet(value);
   }
 
   /**
