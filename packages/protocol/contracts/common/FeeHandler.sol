@@ -72,7 +72,7 @@ contract FeeHandler is
   // ignoreRenaming_ prefix allows the tooling to ignore the variable renaming
   FixidityLib.Fraction private ignoreRenaming_inverseCarbonFraction; // 80%
 
-  address public carbonFeeBeneficiary;
+  address public deprecated_feeBeneficiary;
 
   uint256 public celoToBeBurned;
 
@@ -88,6 +88,10 @@ contract FeeHandler is
 
   mapping(address => Beneficiary) private otherBeneficiaries;
   EnumerableSet.AddressSet private otherBeneficiariesAddresses;
+
+  address public carbonFeeBeneficiary;
+
+  FixidityLib.Fraction private inverseCarbonFraction;
 
   event SoldAndBurnedToken(address token, uint256 value);
   event DailyLimitSet(address tokenAddress, uint256 newLimit);
