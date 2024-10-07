@@ -239,7 +239,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   function test_SetsCurrentRewardBlock() public {
     _MockL2Migration(validatorsList);
 
-    blockTravel(vm, 43200);
+    blockTravel(vm, L2_BLOCK_IN_EPOCH);
     timeTravel(vm, DAY);
 
     epochManager.startNextEpochProcess();
