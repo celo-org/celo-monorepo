@@ -430,7 +430,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     timeTravel(vm, epochDuration / 2);
     blockTravel(vm, 100);
 
-    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups, true);
     uint256 gasLeftBefore1 = gasleft();
     epochManager.finishNextEpochProcess(groups, lessers, greaters);
     uint256 gasLeftAfter1 = gasleft();
@@ -444,7 +444,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
     timeTravel(vm, epochDuration / 2);
     blockTravel(vm, 100);
-    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups, true);
     gasLeftBefore1 = gasleft();
     epochManager.finishNextEpochProcess(groups, lessers, greaters);
     gasLeftAfter1 = gasleft();
@@ -528,6 +528,66 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
       validatorGroups[i] = group;
     }
     return validatorGroups;
+  }
+
+  function getLessersAndGreaters(
+    address[] memory groups,
+    bool print
+  )
+    private
+    returns (
+      address[] memory lessers,
+      address[] memory greaters,
+      GroupWithVotes[] memory groupWithVotes
+    )
+  {
+    (, , uint256 maxTotalRewards, , ) = epochManager.getEpochProcessingState();
+    uint256 totalRewards = 0;
+
+    (, groupWithVotes) = getGroupsWithVotes();
+
+    lessers = new address[](groups.length);
+    greaters = new address[](groups.length);
+
+    uint256[] memory rewards = new uint256[](groups.length);
+
+    for (uint256 i = 0; i < groups.length; i++) {
+      uint256 groupScore = scoreManager.getGroupScore(groups[i]);
+      rewards[i] = election.getGroupEpochRewardsBasedOnScore(
+        groups[i],
+        maxTotalRewards,
+        groupScore
+      );
+    }
+    for (uint256 i = 0; i < groups.length; i++) {
+      for (uint256 j = 0; j < groupWithVotes.length; j++) {
+        if (groupWithVotes[j].group == groups[i]) {
+          groupWithVotes[j].votes += rewards[i];
+          break;
+        }
+      }
+      sort(groupWithVotes);
+
+      address lesser = address(0);
+      address greater = address(0);
+
+      for (uint256 j = 0; j < groupWithVotes.length; j++) {
+        if (groupWithVotes[j].group == groups[i]) {
+          greater = j == 0 ? address(0) : groupWithVotes[j - 1].group;
+          lesser = j == groupWithVotes.length - 1 ? address(0) : groupWithVotes[j + 1].group;
+          break;
+        }
+      }
+
+      lessers[i] = lesser;
+      greaters[i] = greater;
+    }
+    if (print) {
+      console.log("PRINTING SORTED ARRAY!!!");
+      for (uint256 i = 0; i < groupWithVotes.length; i++) {
+        console.log(groupWithVotes[i].votes);
+      }
+    }
   }
 
   function getLessersAndGreaters(
