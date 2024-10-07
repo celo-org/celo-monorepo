@@ -80,11 +80,11 @@ contract MockValidators is IValidators, IsL2Check {
   }
 
   function halveSlashingMultiplier(address) external {
-    allowOnlyL1();
+    allowOnlyL1(); // TODO remove
   }
 
   function forceDeaffiliateIfValidator(address validator) external {
-    allowOnlyL1();
+    allowOnlyL1(); // TODO remove
   }
 
   function getValidatorsGroup(address validator) external view returns (address) {

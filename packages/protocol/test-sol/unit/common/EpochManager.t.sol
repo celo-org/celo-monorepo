@@ -7,7 +7,6 @@ import "@celo-contracts-8/stability/test/MockStableToken.sol";
 import "@celo-contracts-8/common/test/MockCeloToken.sol";
 import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts-8/common/ScoreManager.sol";
-import { CeloUnreleasedTreasury } from "@celo-contracts-8/common/CeloUnreleasedTreasury.sol";
 import { ICeloUnreleasedTreasury } from "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";

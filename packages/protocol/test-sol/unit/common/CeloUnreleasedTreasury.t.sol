@@ -62,8 +62,9 @@ contract CeloUnreleasedTreasuryTest is Test, TestConstants, IsL2Check {
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
     registry = IRegistry(REGISTRY_ADDRESS);
 
-    deployCodeTo("GoldToken.sol", abi.encode(false), celoTokenAddress);
+    deployCodeTo("GoldToken.sol", abi.encode(true), celoTokenAddress);
     celoToken = ICeloToken(celoTokenAddress);
+    celoToken.initialize(REGISTRY_ADDRESS);
     // Using a mock contract, as foundry does not allow for library linking when using deployCodeTo
     governance = new MockGovernance();
 
