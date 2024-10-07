@@ -445,7 +445,8 @@ contract Validators is
   }
 
   /**
-   * @notice Updates a validator's ECDSA and BLS keys.
+   * @notice Updates a validator's ECDSA and BLS keys. This method was deprecated on CEL2
+   *   then use `updatePublicKeys`.
    * @param account The address under which the validator is registered.
    * @param signer The address which the validator is using to sign consensus messages.
    * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
@@ -460,7 +461,7 @@ contract Validators is
     address signer,
     bytes calldata ecdsaPublicKey,
     bytes calldata blsPublicKey,
-    bytes calldata blsPop // TODO support this method on L2?
+    bytes calldata blsPop
   ) external onlyRegisteredContract(ACCOUNTS_REGISTRY_ID) returns (bool) {
     allowOnlyL1();
     require(isValidator(account), "Not a validator");
