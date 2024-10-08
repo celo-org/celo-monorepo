@@ -6,6 +6,11 @@ import "../../contracts-0.8/common/IsL2Check.sol";
 
 import "./UsingPrecompiles.sol";
 
+/**
+ * @title PrecompilesOverride Contract
+ * @notice This contract allows for a smoother transition from L1 to L2
+ * by abstracting away the usingPrecompile contract, and taking care of the L1 to L2 swtiching logic.
+ **/
 contract PrecompilesOverride is UsingPrecompiles {
   /**
    * @notice Returns the epoch number at a block.
@@ -37,8 +42,7 @@ contract PrecompilesOverride is UsingPrecompiles {
     uint256 index
   ) public view override returns (address) {
     if (isL2()) {
-      address[] memory _electedSigners = getEpochManager().getElectedSigners();
-      return _electedSigners[index];
+      return getEpochManager().getElectedSignerByIndex(index);
     } else {
       super.validatorSignerAddressFromCurrentSet(index);
     }
@@ -51,8 +55,7 @@ contract PrecompilesOverride is UsingPrecompiles {
    */
 
   function validatorAddressFromCurrentSet(uint256 index) public view onlyL2 returns (address) {
-    address[] memory _elected = getEpochManager().getElected();
-    return _elected[index];
+    return getEpochManager().getElectedAccountByIndex(index);
   }
 
   /**
@@ -66,10 +69,7 @@ contract PrecompilesOverride is UsingPrecompiles {
     uint256 blockNumber
   ) public view override returns (address) {
     if (isL2()) {
-      (, , , , , address[] memory _electedSigners) = getEpochManager().getEpochByBlockNumber(
-        blockNumber
-      );
-      return _electedSigners[index];
+      return getEpochManager().getElectedSignerAddressFromSet(index, blockNumber);
     } else {
       return super.validatorSignerAddressFromSet(index, blockNumber);
     }
@@ -85,8 +85,7 @@ contract PrecompilesOverride is UsingPrecompiles {
     uint256 index,
     uint256 blockNumber
   ) public view onlyL2 returns (address) {
-    (, , , , address[] memory _elected, ) = getEpochManager().getEpochByBlockNumber(blockNumber);
-    return _elected[index];
+    return getEpochManager().getElectedAccountAddressFromSet(index, blockNumber);
   }
 
   /**
@@ -95,7 +94,7 @@ contract PrecompilesOverride is UsingPrecompiles {
    */
   function numberValidatorsInCurrentSet() public view override returns (uint256) {
     if (isL2()) {
-      return getEpochManager().getElected().length;
+      return getEpochManager().numberOfElectedInCurrentSet();
     } else {
       return super.numberValidatorsInCurrentSet();
     }
@@ -108,9 +107,7 @@ contract PrecompilesOverride is UsingPrecompiles {
    */
   function numberValidatorsInSet(uint256 blockNumber) public view override returns (uint256) {
     if (isL2()) {
-      (, , , , address[] memory elected, ) = getEpochManager().getEpochByBlockNumber(blockNumber);
-
-      return elected.length;
+      return getEpochManager().numberOfElectedInSet(blockNumber);
     } else {
       return super.numberValidatorsInSet(blockNumber);
     }

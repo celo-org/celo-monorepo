@@ -391,6 +391,22 @@ contract EpochManager is
   }
 
   /**
+   * @return The number of elected accounts in the current set.
+   */
+  function numberOfElectedInCurrentSet() external view returns (uint256) {
+    return elected.length;
+  }
+
+  /**
+   * @notice Returns the number of elected accounts in a specified set.
+   * @param _blockNumber The block number at which to retreive the set.
+   */
+  function numberOfElectedInSet(uint256 _blockNumber) external view returns (uint256) {
+    (, , , , , address[] memory _elected, ) = _getEpochByBlockNumber(_blockNumber);
+    return _elected.length;
+  }
+
+  /**
    * @return The list of currently elected validators.
    */
   function getElected() external view returns (address[] memory) {
@@ -399,10 +415,26 @@ contract EpochManager is
   }
 
   /**
+   * @notice Returns the currently elected account at a specified index.
+   * @param index The index of the currently elected account.
+   */
+  function getElectedAccountByIndex(uint256 index) external view returns (address) {
+    return elected[index];
+  }
+
+  /**
    * @return The list of the validator signers of elected validators.
    */
   function getElectedSigners() external view returns (address[] memory) {
     return electedSigners;
+  }
+
+  /**
+   * @notice Returns the currently elected signer address at a specified index.
+   * @param index The index of the currently elected signer.
+   */
+  function getElectedSignerByIndex(uint256 index) external view returns (address) {
+    return electedSigners[index];
   }
 
   /**
@@ -463,6 +495,48 @@ contract EpochManager is
       _electedAccounts,
       _electedSigners
     );
+  }
+
+  /**
+   * @notice Returns the elected account address at a specified index of a specified block number.
+   * @param index The index of the elected account.
+   * @param _blockNumber The block number of interest.
+   */
+  function getElectedAccountAddressFromSet(
+    uint256 index,
+    uint256 _blockNumber
+  ) external view returns (address) {
+    (
+      ,
+      uint256 _firstBlock,
+      uint256 _lastBlock,
+      uint256 _startTimestamp,
+      uint256 _rewardsBlock,
+      address[] memory _electedAccounts,
+      address[] memory _electedSigners
+    ) = _getEpochByBlockNumber(_blockNumber);
+    return _electedAccounts[index];
+  }
+
+  /**
+   * @notice Returns the elected signer address at a specified index of a specified block number.
+   * @param index The index of the elected signer.
+   * @param _blockNumber The block number of interest.
+   */
+  function getElectedSignerAddressFromSet(
+    uint256 index,
+    uint256 _blockNumber
+  ) external view returns (address) {
+    (
+      ,
+      uint256 _firstBlock,
+      uint256 _lastBlock,
+      uint256 _startTimestamp,
+      uint256 _rewardsBlock,
+      address[] memory _electedAccounts,
+      address[] memory _electedSigners
+    ) = _getEpochByBlockNumber(_blockNumber);
+    return _electedSigners[index];
   }
 
   /**
@@ -604,7 +678,8 @@ contract EpochManager is
    * @return lastBlock The first block of the given block number.
    * @return startTimestamp The starting timestamp of the given block number.
    * @return rewardsBlock The reward block of the given block number.
-   * @return elected The set of elected validator for the given block number.
+   * @return electedAccount The set of elected validator accounts for the given block number.
+   * @return electedSigners The set of elected validator signers for the given block number.
    */
   function _getEpochByBlockNumber(
     uint256 _blockNumber
@@ -647,9 +722,11 @@ contract EpochManager is
 
     while (left <= right) {
       uint256 mid = (left + right) / 2;
-      Epoch memory _epoch = epochs[mid];
+      uint256 _epochFirstBlock = epochs[mid].firstBlock;
+      uint256 _epochLastBlock = epochs[mid].lastBlock;
 
-      if (_blockNumber >= _epoch.firstBlock && _blockNumber <= _epoch.lastBlock) {
+      if (_blockNumber >= _epochFirstBlock && _blockNumber <= _epochLastBlock) {
+        Epoch memory _epoch = epochs[mid];
         return (
           mid,
           _epoch.firstBlock,
@@ -659,7 +736,7 @@ contract EpochManager is
           _epoch.electedAccounts,
           _epoch.electedSigners
         );
-      } else if (_blockNumber < _epoch.firstBlock) {
+      } else if (_blockNumber < _epochFirstBlock) {
         right = mid - 1;
       } else {
         left = mid + 1;
