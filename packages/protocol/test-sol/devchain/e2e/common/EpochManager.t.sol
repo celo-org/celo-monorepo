@@ -150,7 +150,7 @@ contract E2E_EpochManager_GetCurrentEpoch is E2E_EpochManager {
     assertEq(startTimestamp, block.timestamp);
     assertEq(rewardsBlock, 0);
     assertEq(elected, firstElected);
-    //TODO: add assertion
+    //TODO(soloseng): add assertion
   }
 }
 

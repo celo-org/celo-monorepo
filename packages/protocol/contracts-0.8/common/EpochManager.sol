@@ -410,7 +410,7 @@ contract EpochManager is
    * @return The list of currently elected validators.
    */
   function getElected() external view returns (address[] memory) {
-    // TODO: update name to getElectedAccounts
+    // (soloseng): update name to getElectedAccounts
     return elected;
   }
 
@@ -603,7 +603,8 @@ contract EpochManager is
    * @return lastBlock The first block of the given epoch.
    * @return startTimestamp The starting timestamp of the given epoch.
    * @return rewardsBlock The reward block of the given epoch.
-   * @return elected The set of elected validator for the given epoch.
+   * @return electedAccounts The set of elected validator accounts for the given epoch.
+   * @return electedSigners The set of elected validator signers for the given epoch.
    */
   function getEpochByNumber(
     uint256 epochNumber
