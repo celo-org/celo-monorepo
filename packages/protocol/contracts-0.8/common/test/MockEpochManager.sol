@@ -15,7 +15,8 @@ contract MockEpochManager is IEpochManager {
     uint256 startTimestamp;
     uint256 endTimestamp;
     uint256 rewardsBlock;
-    address[] elected;
+    address[] electedAccounts;
+    address[] electedSigners;
   }
 
   uint256 public epochDuration;
@@ -23,6 +24,7 @@ contract MockEpochManager is IEpochManager {
   uint256 public firstKnownEpoch;
   uint256 private currentEpochNumber;
   address[] public elected;
+  address[] public electedSigners;
   address public epochManagerEnabler;
   bool systemInitialized;
 
@@ -71,7 +73,7 @@ contract MockEpochManager is IEpochManager {
   function getCurrentEpoch()
     external
     view
-    returns (uint256, uint256, uint256, uint256, address[] memory)
+    returns (uint256, uint256, uint256, uint256, address[] memory, address[] memory)
   {
     return getEpochByNumber(currentEpochNumber);
   }
@@ -119,10 +121,11 @@ contract MockEpochManager is IEpochManager {
 
   function getEpochByBlockNumber(
     uint256 _blockNumber
-  ) external view returns (uint256, uint256, uint256, uint256, address[] memory) {
-    address[] memory _elected = new address[](0);
+  ) external view returns (uint256, uint256, uint256, uint256, address[] memory, address[] memory) {
+    address[] memory _electedAccounts = new address[](0);
+    address[] memory _electedSigners = new address[](0);
 
-    return (0, 0, 0, 0, _elected);
+    return (0, 0, 0, 0, _electedAccounts, _electedSigners);
   }
 
   function getEpochNumberOfBlock(uint256 _blockNumber) external view returns (uint256) {
@@ -135,14 +138,19 @@ contract MockEpochManager is IEpochManager {
 
   function getEpochByNumber(
     uint256 epochNumber
-  ) public view returns (uint256, uint256, uint256, uint256, address[] memory) {
+  ) public view returns (uint256, uint256, uint256, uint256, address[] memory, address[] memory) {
     Epoch storage _epoch = epochs[epochNumber];
     return (
       _epoch.firstBlock,
       _epoch.lastBlock,
       _epoch.startTimestamp,
       _epoch.rewardsBlock,
-      _epoch.elected
+      _epoch.electedAccounts,
+      _epoch.electedSigners
     );
+  }
+
+  function getElectedSigners() external view returns (address[] memory) {
+    return electedSigners;
   }
 }

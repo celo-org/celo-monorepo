@@ -125,7 +125,8 @@ contract E2E_EpochManager_GetCurrentEpoch is E2E_EpochManager {
       uint256 lastBlock,
       uint256 startTimestamp,
       uint256 rewardsBlock,
-      address[] memory elected
+      address[] memory elected,
+      address[] memory electedSigners
     ) = epochManager.getCurrentEpoch();
   }
 
@@ -141,13 +142,15 @@ contract E2E_EpochManager_GetCurrentEpoch is E2E_EpochManager {
       uint256 lastBlock,
       uint256 startTimestamp,
       uint256 rewardsBlock,
-      address[] memory elected
+      address[] memory elected,
+      address[] memory electedSigners
     ) = epochManager.getCurrentEpoch();
     assertEq(firstBlock, 43);
     assertEq(lastBlock, 0);
     assertEq(startTimestamp, block.timestamp);
     assertEq(rewardsBlock, 0);
     assertEq(elected, firstElected);
+    //TODO: add assertion
   }
 }
 

@@ -17,16 +17,17 @@ interface IEpochManager {
   function getCurrentEpoch()
     external
     view
-    returns (uint256, uint256, uint256, uint256, address[] memory);
+    returns (uint256, uint256, uint256, uint256, address[] memory, address[] memory);
   function getEpochByNumber(
     uint256 epochNumber
-  ) external view returns (uint256, uint256, uint256, uint256, address[] memory);
+  ) external view returns (uint256, uint256, uint256, uint256, address[] memory, address[] memory);
   function getEpochByBlockNumber(
     uint256 blockNumber
-  ) external view returns (uint256, uint256, uint256, uint256, address[] memory);
+  ) external view returns (uint256, uint256, uint256, uint256, address[] memory, address[] memory);
   function getEpochNumberOfBlock(uint256) external view returns (uint256);
   function getCurrentEpochNumber() external view returns (uint256);
   function getElected() external view returns (address[] memory);
+  function getElectedSigners() external view returns (address[] memory);
   function epochDuration() external view returns (uint256);
   function firstKnownEpoch() external view returns (uint256);
   function getEpochProcessingState()

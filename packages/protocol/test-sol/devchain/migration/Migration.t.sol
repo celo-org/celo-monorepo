@@ -244,7 +244,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
 
     epochManager.startNextEpochProcess();
 
-    (, , , uint256 _currentRewardsBlock, ) = epochManager.getCurrentEpoch();
+    (, , , uint256 _currentRewardsBlock, , ) = epochManager.getCurrentEpoch();
 
     assertEq(_currentRewardsBlock, block.number);
   }

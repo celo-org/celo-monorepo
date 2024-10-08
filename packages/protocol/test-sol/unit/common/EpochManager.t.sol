@@ -38,6 +38,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
   address communityRewardFund;
   address reserveAddress;
   address scoreManagerAddress;
+  address accountsAddress;
 
   uint256 firstEpochNumber = 100;
   uint256 firstEpochBlock = 100;
@@ -78,6 +79,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     firstElected.push(actor("validator2"));
 
     scoreManagerAddress = actor("scoreManagerAddress");
+    accountsAddress = actor("accountsAddress");
 
     reserveAddress = actor("reserve");
 
@@ -87,6 +89,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
     deployCodeTo("MockRegistry.sol", abi.encode(false), REGISTRY_ADDRESS);
     deployCodeTo("ScoreManager.sol", abi.encode(false), scoreManagerAddress);
+    deployCodeTo("Accounts.sol", abi.encode(false), accountsAddress);
 
     registry = IRegistry(REGISTRY_ADDRESS);
     scoreManager = ScoreManager(scoreManagerAddress);
@@ -102,6 +105,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     registry.setAddressFor(CeloUnreleasedTreasuryContract, address(celoUnreleasedTreasury));
     registry.setAddressFor(CeloTokenContract, address(celoToken));
     registry.setAddressFor(ReserveContract, reserveAddress);
+    registry.setAddressFor(AccountsContract, accountsAddress);
 
     celoToken.setTotalSupply(CELO_SUPPLY_CAP);
     vm.deal(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
@@ -150,7 +154,8 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
       uint256 _lastEpochBlock,
       uint256 _startTimestamp,
       uint256 _currentRewardsBlock,
-      address[] memory _elected
+      address[] memory _elected,
+      address[] memory _electedSigners
     ) = epochManager.getCurrentEpoch();
     assertGt(epochManager.getElected().length, 0);
     assertEq(epochManager.firstKnownEpoch(), firstEpochNumber);
@@ -210,7 +215,7 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     initializeEpochManagerSystem();
 
     epochManager.startNextEpochProcess();
-    (, , , uint256 _currentRewardsBlock, ) = epochManager.getCurrentEpoch();
+    (, , , uint256 _currentRewardsBlock, , ) = epochManager.getCurrentEpoch();
     assertEq(_currentRewardsBlock, block.number);
   }
 
@@ -495,7 +500,8 @@ contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
       uint256 startingEpochLastBlock,
       uint256 startingEpochStartTimestamp,
       uint256 startingEpochRewardBlock,
-      address[] memory startingElected
+      address[] memory startingElected,
+      address[] memory startingElectedSigners
     ) = epochManager.getCurrentEpoch();
 
     _travelAndProcess_N_L2Epoch(numberOfEpochsToTravel);
@@ -505,7 +511,8 @@ contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
       uint256 _lastBlock,
       uint256 _startTimestamp,
       uint256 _rewardBlock,
-      address[] memory _elected
+      address[] memory _elected,
+      address[] memory _electedSigners
     ) = epochManager.getEpochByNumber(_startingEpochNumber + numberOfEpochsToTravel);
 
     assertEq(
@@ -516,6 +523,7 @@ contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
     assertEq(startingEpochStartTimestamp + (DAY * (numberOfEpochsToTravel + 1)), _startTimestamp);
     assertEq(_rewardBlock, 0);
     assertEq(_elected, startingElected);
+    //TODO add asssertion
   }
 
   function test_ReturnsHistoricalEpochInfoAfter_N_Epochs() public {
@@ -527,7 +535,8 @@ contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
       uint256 _startingLastBlock,
       uint256 _startingStartTimestamp,
       uint256 _startingRewardBlock,
-      address[] memory _startingElected
+      address[] memory _startingElected,
+      address[] memory _startingElectedSigners
     ) = epochManager.getCurrentEpoch();
 
     _travelAndProcess_N_L2Epoch(numberOfEpochsToTravel);
@@ -537,7 +546,8 @@ contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
       uint256 _initialLastBlock,
       uint256 _initialStartTimestamp,
       uint256 _initialRewardBlock,
-      address[] memory _initialElected
+      address[] memory _initialElected,
+      address[] memory _initialElectedSigners
     ) = epochManager.getEpochByNumber(_startingEpochNumber);
 
     assertEq(_initialFirstBlock, _startingEpochFirstBlock);
@@ -558,7 +568,8 @@ contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
       uint256 _lastBlock,
       uint256 _startTimestamp,
       uint256 _rewardBlock,
-      address[] memory _elected
+      address[] memory _elected,
+      address[] memory _electedSigners
     ) = epochManager.getEpochByNumber(500);
 
     assertEq(_firstBlock, 0);

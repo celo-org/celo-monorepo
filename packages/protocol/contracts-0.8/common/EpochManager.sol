@@ -29,7 +29,8 @@ contract EpochManager is
     uint256 lastBlock;
     uint256 startTimestamp;
     uint256 rewardsBlock;
-    address[] elected;
+    address[] electedAccounts;
+    address[] electedSigners;
   }
 
   enum EpochProcessStatus {
@@ -49,6 +50,7 @@ contract EpochManager is
     bool processed;
     uint256 epochRewards;
   }
+
   bool public isSystemInitialized;
 
   // the length of an epoch in seconds
@@ -64,6 +66,10 @@ contract EpochManager is
   EpochProcessState public epochProcessing;
   mapping(uint256 => Epoch) internal epochs;
   mapping(address => uint256) public validatorPendingPayments;
+
+  // Electeds in the L1 assumed signers can not change during the epoch
+  // so we keep a copy
+  address[] public electedSigners;
 
   /**
    * @notice Event emited when epochProcessing has begun.
@@ -170,9 +176,10 @@ contract EpochManager is
     Epoch storage _currentEpoch = epochs[currentEpochNumber];
     _currentEpoch.firstBlock = firstEpochBlock;
     _currentEpoch.startTimestamp = block.timestamp;
-    _currentEpoch.elected = firstElected;
+    _currentEpoch.electedAccounts = firstElected;
 
     elected = firstElected;
+    _setElectedSigners(firstElected);
   }
 
   /**
@@ -272,9 +279,17 @@ contract EpochManager is
       epochProcessing.totalRewardsCarbonFund
     );
     // run elections
-    elected = election.electValidatorAccounts();
-    epochs[currentEpochNumber].elected = elected;
-    _epochProcessing.status = EpochProcessStatus.NotStarted;
+
+    address[] memory _elected = election.electValidatorAccounts();
+    elected = _elected;
+
+    epochs[currentEpochNumber].electedAccounts = _elected;
+
+    _setElectedSigners(_elected);
+
+    EpochProcessState memory _epochProcessingEmpty;
+    epochProcessing = _epochProcessingEmpty;
+    emit EpochProcessingEnded(currentEpochNumber - 1);
   }
 
   /**
@@ -336,7 +351,7 @@ contract EpochManager is
     external
     view
     onlySystemAlreadyInitialized
-    returns (uint256, uint256, uint256, uint256, address[] memory)
+    returns (uint256, uint256, uint256, uint256, address[] memory, address[] memory)
   {
     return getEpochByNumber(currentEpochNumber);
   }
@@ -379,7 +394,15 @@ contract EpochManager is
    * @return The list of currently elected validators.
    */
   function getElected() external view returns (address[] memory) {
+    // TODO: update name to getElectedAccounts
     return elected;
+  }
+
+  /**
+   * @return The list of the validator signers of elected validators.
+   */
+  function getElectedSigners() external view returns (address[] memory) {
+    return electedSigners;
   }
 
   /**
@@ -407,7 +430,7 @@ contract EpochManager is
    * @param _blockNumber Block number of the epoch info is retreived.
    */
   function getEpochNumberOfBlock(uint256 _blockNumber) external view returns (uint256) {
-    (uint256 _epochNumber, , , , , ) = _getEpochByBlockNumber(_blockNumber);
+    (uint256 _epochNumber, , , , , , ) = _getEpochByBlockNumber(_blockNumber);
     return _epochNumber;
   }
 
@@ -422,16 +445,24 @@ contract EpochManager is
    */
   function getEpochByBlockNumber(
     uint256 _blockNumber
-  ) external view returns (uint256, uint256, uint256, uint256, address[] memory) {
+  ) external view returns (uint256, uint256, uint256, uint256, address[] memory, address[] memory) {
     (
       ,
       uint256 _firstBlock,
       uint256 _lastBlock,
       uint256 _startTimestamp,
       uint256 _rewardsBlock,
-      address[] memory _elected
+      address[] memory _electedAccounts,
+      address[] memory _electedSigners
     ) = _getEpochByBlockNumber(_blockNumber);
-    return (_firstBlock, _lastBlock, _startTimestamp, _rewardsBlock, _elected);
+    return (
+      _firstBlock,
+      _lastBlock,
+      _startTimestamp,
+      _rewardsBlock,
+      _electedAccounts,
+      _electedSigners
+    );
   }
 
   /**
@@ -506,7 +537,7 @@ contract EpochManager is
     public
     view
     onlySystemAlreadyInitialized
-    returns (uint256, uint256, uint256, uint256, address[] memory)
+    returns (uint256, uint256, uint256, uint256, address[] memory, address[] memory)
   {
     Epoch memory _epoch = epochs[epochNumber];
     return (
@@ -514,7 +545,8 @@ contract EpochManager is
       _epoch.lastBlock,
       _epoch.startTimestamp,
       _epoch.rewardsBlock,
-      _epoch.elected
+      _epoch.electedAccounts,
+      _epoch.electedSigners
     );
   }
 
@@ -556,6 +588,15 @@ contract EpochManager is
     );
   }
 
+  function _setElectedSigners(address[] memory _elected) internal {
+    IAccounts accounts = getAccounts();
+    electedSigners = new address[](_elected.length);
+    for (uint i = 0; i < _elected.length; i++) {
+      electedSigners[i] = accounts.getValidatorSigner(_elected[i]);
+    }
+    epochs[currentEpochNumber].electedSigners = electedSigners;
+  }
+
   /**
    * @notice Returns the epoch info of a specified blockNumber.
    * @param _blockNumber Block number of the epoch info is retreived.
@@ -571,11 +612,11 @@ contract EpochManager is
     internal
     view
     onlySystemAlreadyInitialized
-    returns (uint256, uint256, uint256, uint256, uint256, address[] memory)
+    returns (uint256, uint256, uint256, uint256, uint256, address[] memory, address[] memory)
   {
     require(_blockNumber <= block.number, "Invalid blockNumber. Value too high.");
 
-    (uint256 _firstBlockOfFirstEpoch, , , , ) = getEpochByNumber(firstKnownEpoch);
+    (uint256 _firstBlockOfFirstEpoch, , , , , ) = getEpochByNumber(firstKnownEpoch);
 
     require(_blockNumber >= _firstBlockOfFirstEpoch, "Invalid blockNumber. Value too low.");
 
@@ -587,7 +628,8 @@ contract EpochManager is
         uint256 _lastBlock,
         uint256 _startTimestamp,
         uint256 _rewardsBlock,
-        address[] memory _elected
+        address[] memory _electedAccounts,
+        address[] memory _electedSigners
       ) = getEpochByNumber(currentEpochNumber);
       return (
         currentEpochNumber,
@@ -595,7 +637,8 @@ contract EpochManager is
         _lastBlock,
         _startTimestamp,
         _rewardsBlock,
-        _elected
+        _electedAccounts,
+        _electedSigners
       );
     }
 
@@ -613,7 +656,8 @@ contract EpochManager is
           _epoch.lastBlock,
           _epoch.startTimestamp,
           _epoch.rewardsBlock,
-          _epoch.elected
+          _epoch.electedAccounts,
+          _epoch.electedSigners
         );
       } else if (_blockNumber < _epoch.firstBlock) {
         right = mid - 1;
