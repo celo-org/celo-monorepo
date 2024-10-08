@@ -622,7 +622,7 @@ contract EpochManager is
 
     uint256 _firstBlockOfCurrentEpoch = epochs[currentEpochNumber].firstBlock;
 
-    if (_blockNumber > _firstBlockOfCurrentEpoch) {
+    if (_blockNumber >= _firstBlockOfCurrentEpoch) {
       (
         uint256 _firstBlock,
         uint256 _lastBlock,
