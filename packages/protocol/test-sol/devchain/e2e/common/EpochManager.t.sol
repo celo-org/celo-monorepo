@@ -345,6 +345,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
     timeTravel(vm, epochDuration + 1);
     epochManager.startNextEpochProcess();
+
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
     epochManager.finishNextEpochProcess(groups, lessers, greaters);
     assertGroupWithVotes(groupWithVotes);
@@ -357,10 +358,10 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
       uint256 totalRewardsCarbonFund
     ) = epochManager.getEpochProcessingState();
 
-    assertGt(perValidatorReward, 0, "perValidatorReward");
-    assertGt(totalRewardsVoter, 0, "totalRewardsVoter");
-    assertGt(totalRewardsCommunity, 0, "totalRewardsCommunity");
-    assertGt(totalRewardsCarbonFund, 0, "totalRewardsCarbonFund");
+    assertEq(perValidatorReward, 0, "perValidatorReward");
+    assertEq(totalRewardsVoter, 0, "totalRewardsVoter");
+    assertEq(totalRewardsCommunity, 0, "totalRewardsCommunity");
+    assertEq(totalRewardsCarbonFund, 0, "totalRewardsCarbonFund");
 
     assertEq(epochManager.getElected().length, validatorsArray.length - 1);
   }

@@ -29,6 +29,7 @@ contract EpochManager is
     uint256 lastBlock;
     uint256 startTimestamp;
     uint256 rewardsBlock;
+    // TODO:(soloseng) move to own mapping to save gas
     address[] electedAccounts;
     address[] electedSigners;
   }
@@ -289,6 +290,8 @@ contract EpochManager is
 
     EpochProcessState memory _epochProcessingEmpty;
     epochProcessing = _epochProcessingEmpty;
+
+    // _epochProcessing.status = EpochProcessStatus.NotStarted;
     emit EpochProcessingEnded(currentEpochNumber - 1);
   }
 
