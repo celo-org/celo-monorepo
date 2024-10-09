@@ -14,16 +14,13 @@ interface IEpochManager {
     address[] calldata greaters
   ) external;
   function sendValidatorPayment(address) external;
-  function getCurrentEpoch()
-    external
-    view
-    returns (uint256, uint256, uint256, uint256, address[] memory, address[] memory);
+  function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256);
   function getEpochByNumber(
     uint256 epochNumber
-  ) external view returns (uint256, uint256, uint256, uint256, address[] memory, address[] memory);
+  ) external view returns (uint256, uint256, uint256, uint256);
   function getEpochByBlockNumber(
     uint256 blockNumber
-  ) external view returns (uint256, uint256, uint256, uint256, address[] memory, address[] memory);
+  ) external view returns (uint256, uint256, uint256, uint256);
   function getElectedAccountAddressFromSet(
     uint256 index,
     uint256 _blockNumber
@@ -36,7 +33,7 @@ interface IEpochManager {
   function getCurrentEpochNumber() external view returns (uint256);
   function numberOfElectedInCurrentSet() external view returns (uint256);
   function numberOfElectedInSet(uint256 _blockNumber) external view returns (uint256);
-  function getElected() external view returns (address[] memory);
+  function getElectedAccounts() external view returns (address[] memory);
   function getElectedAccountByIndex(uint256 index) external view returns (address);
   function getElectedSigners() external view returns (address[] memory);
   function getElectedSignerByIndex(uint256 index) external view returns (address);

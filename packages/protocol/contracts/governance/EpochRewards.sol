@@ -453,9 +453,11 @@ contract EpochRewards is
     (uint256 numerator, uint256 denominator) = getSortedOracles().medianRate(stableTokenAddress);
     if (isL2()) {
       return
-        getEpochManager().getElected().length.mul(targetValidatorEpochPayment).mul(denominator).div(
-          numerator
-        );
+        getEpochManager()
+          .numberOfElectedInCurrentSet()
+          .mul(targetValidatorEpochPayment)
+          .mul(denominator)
+          .div(numerator);
     }
     return
       numberValidatorsInCurrentSet().mul(targetValidatorEpochPayment).mul(denominator).div(

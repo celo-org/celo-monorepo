@@ -20,8 +20,6 @@ contract MockEpochManager is IEpochManager {
     uint256 startTimestamp;
     uint256 endTimestamp;
     uint256 rewardsBlock;
-    address[] electedAccounts;
-    address[] electedSigners;
   }
 
   struct EpochProcessState {
@@ -38,6 +36,8 @@ contract MockEpochManager is IEpochManager {
   uint256 private currentEpochNumber;
   address[] public elected;
   address[] public electedSigners;
+  mapping(uint256 => address[]) internal electedAccountsOfEpoch;
+  mapping(uint256 => address[]) internal electedSignersOfEpoch;
   address public epochManagerEnabler;
   bool systemInitialized;
 
@@ -63,11 +63,11 @@ contract MockEpochManager is IEpochManager {
     Epoch storage _currentEpoch = epochs[currentEpochNumber];
     _currentEpoch.firstBlock = firstEpochBlock;
     _currentEpoch.startTimestamp = block.timestamp;
-    _currentEpoch.electedAccounts = firstElected;
-    _currentEpoch.electedSigners = firstElected;
 
     elected = firstElected;
     electedSigners = firstElected;
+    electedAccountsOfEpoch[currentEpochNumber] = elected;
+    electedSignersOfEpoch[currentEpochNumber] = electedSigners;
 
     systemInitialized = true;
     epochManagerEnabler = address(0);
@@ -85,10 +85,11 @@ contract MockEpochManager is IEpochManager {
     epochs[currentEpochNumber].firstBlock = block.number;
     epochs[currentEpochNumber].startTimestamp = block.timestamp;
 
-    EpochProcessState storage _epochProcessing = epochProcessing;
-    epochs[currentEpochNumber].electedAccounts = elected;
-    epochs[currentEpochNumber].electedSigners = electedSigners;
-    _epochProcessing.status = EpochProcessStatus.NotStarted;
+    electedAccountsOfEpoch[currentEpochNumber] = elected;
+    electedSignersOfEpoch[currentEpochNumber] = electedSigners;
+
+    EpochProcessState memory _epochProcessingEmpty;
+    epochProcessing = _epochProcessingEmpty;
   }
 
   function setIsTimeForNextEpoch(bool _isTime) external {
@@ -98,11 +99,7 @@ contract MockEpochManager is IEpochManager {
     isProcessingEpoch = _isProcessing;
   }
 
-  function getCurrentEpoch()
-    external
-    view
-    returns (uint256, uint256, uint256, uint256, address[] memory, address[] memory)
-  {
+  function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256) {
     return getEpochByNumber(currentEpochNumber);
   }
 
@@ -115,11 +112,11 @@ contract MockEpochManager is IEpochManager {
   }
 
   function numberOfElectedInSet(uint256 _blockNumber) external view returns (uint256) {
-    (, , , , , address[] memory _elected, ) = _getEpochByBlockNumber(_blockNumber);
-    return _elected.length;
+    (uint256 _epochNumber, , , , ) = _getEpochByBlockNumber(_blockNumber);
+    return electedAccountsOfEpoch[_epochNumber].length;
   }
 
-  function getElected() external view returns (address[] memory) {
+  function getElectedAccounts() external view returns (address[] memory) {
     return elected;
   }
 
@@ -163,11 +160,8 @@ contract MockEpochManager is IEpochManager {
 
   function getEpochByBlockNumber(
     uint256 _blockNumber
-  ) external view returns (uint256, uint256, uint256, uint256, address[] memory, address[] memory) {
-    address[] memory _electedAccounts = new address[](0);
-    address[] memory _electedSigners = new address[](0);
-
-    return (0, 0, 0, 0, _electedAccounts, _electedSigners);
+  ) external view returns (uint256, uint256, uint256, uint256) {
+    return (0, 0, 0, 0);
   }
 
   function getElectedAccountAddressFromSet(
@@ -184,26 +178,8 @@ contract MockEpochManager is IEpochManager {
   }
 
   function getEpochNumberOfBlock(uint256 _blockNumber) external view returns (uint256) {
-    (uint256 _epochNumber, , , , , , ) = _getEpochByBlockNumber(_blockNumber);
+    (uint256 _epochNumber, , , , ) = _getEpochByBlockNumber(_blockNumber);
     return _epochNumber;
-  }
-
-  function sendValidatorPayment(address validator) public {
-    emit SendValidatorPaymentCalled(validator);
-  }
-
-  function getEpochByNumber(
-    uint256 epochNumber
-  ) public view returns (uint256, uint256, uint256, uint256, address[] memory, address[] memory) {
-    Epoch storage _epoch = epochs[epochNumber];
-    return (
-      _epoch.firstBlock,
-      _epoch.lastBlock,
-      _epoch.startTimestamp,
-      _epoch.rewardsBlock,
-      _epoch.electedAccounts,
-      _epoch.electedSigners
-    );
   }
 
   function getElectedSigners() external view returns (address[] memory) {
@@ -214,15 +190,22 @@ contract MockEpochManager is IEpochManager {
     return electedSigners[index];
   }
 
+  function sendValidatorPayment(address validator) public {
+    emit SendValidatorPaymentCalled(validator);
+  }
+
+  function getEpochByNumber(
+    uint256 epochNumber
+  ) public view returns (uint256, uint256, uint256, uint256) {
+    Epoch storage _epoch = epochs[epochNumber];
+    return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
+  }
+
   function _getEpochByBlockNumber(
     uint256 _blockNumber
-  )
-    internal
-    view
-    returns (uint256, uint256, uint256, uint256, uint256, address[] memory, address[] memory)
-  {
+  ) internal view returns (uint256, uint256, uint256, uint256, uint256) {
     require(_blockNumber <= block.number, "Invalid blockNumber. Value too high.");
-    (uint256 _firstBlockOfFirstEpoch, , , , , ) = getEpochByNumber(firstKnownEpoch);
+    (uint256 _firstBlockOfFirstEpoch, , , ) = getEpochByNumber(firstKnownEpoch);
     require(_blockNumber >= _firstBlockOfFirstEpoch, "Invalid blockNumber. Value too low.");
     uint256 _firstBlockOfCurrentEpoch = epochs[currentEpochNumber].firstBlock;
 
@@ -231,19 +214,9 @@ contract MockEpochManager is IEpochManager {
         uint256 _firstBlock,
         uint256 _lastBlock,
         uint256 _startTimestamp,
-        uint256 _rewardsBlock,
-        address[] memory _electedAccounts,
-        address[] memory _electedSigners
+        uint256 _rewardsBlock
       ) = getEpochByNumber(currentEpochNumber);
-      return (
-        currentEpochNumber,
-        _firstBlock,
-        _lastBlock,
-        _startTimestamp,
-        _rewardsBlock,
-        _electedAccounts,
-        _electedSigners
-      );
+      return (currentEpochNumber, _firstBlock, _lastBlock, _startTimestamp, _rewardsBlock);
     }
 
     uint256 left = firstKnownEpoch;
@@ -259,9 +232,7 @@ contract MockEpochManager is IEpochManager {
           _epoch.firstBlock,
           _epoch.lastBlock,
           _epoch.startTimestamp,
-          _epoch.rewardsBlock,
-          _epoch.electedAccounts,
-          _epoch.electedSigners
+          _epoch.rewardsBlock
         );
       } else if (_blockNumber < _epoch.firstBlock) {
         right = mid - 1;
