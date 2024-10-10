@@ -34,8 +34,6 @@ contract MockEpochManager is IEpochManager {
 
   uint256 public firstKnownEpoch;
   uint256 private currentEpochNumber;
-  address[] public elected;
-  address[] public electedSigners;
   mapping(uint256 => address[]) internal electedAccountsOfEpoch;
   mapping(uint256 => address[]) internal electedSignersOfEpoch;
   address public epochManagerEnabler;
@@ -64,10 +62,8 @@ contract MockEpochManager is IEpochManager {
     _currentEpoch.firstBlock = firstEpochBlock;
     _currentEpoch.startTimestamp = block.timestamp;
 
-    elected = firstElected;
-    electedSigners = firstElected;
-    electedAccountsOfEpoch[currentEpochNumber] = elected;
-    electedSignersOfEpoch[currentEpochNumber] = electedSigners;
+    electedAccountsOfEpoch[currentEpochNumber] = firstElected;
+    electedSignersOfEpoch[currentEpochNumber] = firstElected;
 
     systemInitialized = true;
     epochManagerEnabler = address(0);
@@ -84,9 +80,6 @@ contract MockEpochManager is IEpochManager {
     currentEpochNumber++;
     epochs[currentEpochNumber].firstBlock = block.number;
     epochs[currentEpochNumber].startTimestamp = block.timestamp;
-
-    electedAccountsOfEpoch[currentEpochNumber] = elected;
-    electedSignersOfEpoch[currentEpochNumber] = electedSigners;
 
     EpochProcessState memory _epochProcessingEmpty;
     epochProcessing = _epochProcessingEmpty;
@@ -108,7 +101,7 @@ contract MockEpochManager is IEpochManager {
   }
 
   function numberOfElectedInCurrentSet() external view returns (uint256) {
-    return elected.length;
+    return electedAccountsOfEpoch[currentEpochNumber].length;
   }
 
   function numberOfElectedInSet(uint256 _blockNumber) external view returns (uint256) {
@@ -117,11 +110,11 @@ contract MockEpochManager is IEpochManager {
   }
 
   function getElectedAccounts() external view returns (address[] memory) {
-    return elected;
+    return electedAccountsOfEpoch[currentEpochNumber];
   }
 
   function getElectedAccountByIndex(uint256 index) external view returns (address) {
-    return elected[index];
+    return electedAccountsOfEpoch[currentEpochNumber][index];
   }
 
   function getFirstBlockAtEpoch(uint256 _epoch) external view returns (uint256) {
@@ -183,11 +176,11 @@ contract MockEpochManager is IEpochManager {
   }
 
   function getElectedSigners() external view returns (address[] memory) {
-    return electedSigners;
+    return electedSignersOfEpoch[currentEpochNumber];
   }
 
   function getElectedSignerByIndex(uint256 index) external view returns (address) {
-    return electedSigners[index];
+    return electedSignersOfEpoch[currentEpochNumber][index];
   }
 
   function sendValidatorPayment(address validator) public {

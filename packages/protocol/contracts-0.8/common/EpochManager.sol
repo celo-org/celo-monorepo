@@ -57,7 +57,6 @@ contract EpochManager is
   uint256 public firstKnownEpoch;
   uint256 internal currentEpochNumber;
   address public oracleAddress;
-  address[] public elected;
 
   mapping(address => ProcessedGroup) public processedGroups;
 
@@ -69,7 +68,7 @@ contract EpochManager is
 
   // Electeds in the L1 assumed signers can not change during the epoch
   // so we keep a copy
-  address[] public electedSigners;
+  // address[] public electedSigners;
 
   /**
    * @notice Event emited when epochProcessing has begun.
@@ -177,7 +176,6 @@ contract EpochManager is
     _currentEpoch.firstBlock = firstEpochBlock;
     _currentEpoch.startTimestamp = block.timestamp;
 
-    elected = firstElected;
     electedAccountsOfEpoch[currentEpochNumber] = firstElected;
 
     _setElectedSigners(firstElected);
@@ -230,6 +228,7 @@ contract EpochManager is
     // finalize epoch
     // last block should be the block before and timestamp from previous block
     epochs[currentEpochNumber].lastBlock = block.number - 1;
+    address[] memory _elected = getElectedAccounts();
     // start new epoch
     currentEpochNumber++;
     epochs[currentEpochNumber].firstBlock = block.number;
@@ -241,8 +240,9 @@ contract EpochManager is
     IValidators validators = getValidators();
     IElection election = getElection();
     IScoreReader scoreReader = getScoreReader();
-    for (uint i = 0; i < elected.length; i++) {
-      address group = validators.getValidatorsGroup(elected[i]);
+
+    for (uint i = 0; i < _elected.length; i++) {
+      address group = validators.getValidatorsGroup(_elected[i]);
       if (!processedGroups[group].processed) {
         toProcessGroups++;
         uint256 groupScore = scoreReader.getGroupScore(group);
@@ -281,12 +281,11 @@ contract EpochManager is
     );
     // run elections
 
-    address[] memory _elected = election.electValidatorAccounts();
-    elected = _elected;
+    address[] memory _newlyElected = election.electValidatorAccounts();
 
-    electedAccountsOfEpoch[currentEpochNumber] = _elected;
+    electedAccountsOfEpoch[currentEpochNumber] = _newlyElected;
 
-    _setElectedSigners(_elected);
+    _setElectedSigners(_newlyElected);
 
     EpochProcessState memory _epochProcessingEmpty;
     epochProcessing = _epochProcessingEmpty;
@@ -411,7 +410,7 @@ contract EpochManager is
   /**
    * @return The list of currently elected validators.
    */
-  function getElectedAccounts() external view returns (address[] memory) {
+  function getElectedAccounts() public view returns (address[] memory) {
     return electedAccountsOfEpoch[currentEpochNumber];
   }
 
@@ -420,14 +419,14 @@ contract EpochManager is
    * @param index The index of the currently elected account.
    */
   function getElectedAccountByIndex(uint256 index) external view returns (address) {
-    return elected[index];
+    return electedAccountsOfEpoch[currentEpochNumber][index];
   }
 
   /**
    * @return The list of the validator signers of elected validators.
    */
   function getElectedSigners() external view returns (address[] memory) {
-    return electedSigners;
+    return electedSignersOfEpoch[currentEpochNumber];
   }
 
   /**
@@ -435,7 +434,7 @@ contract EpochManager is
    * @param index The index of the currently elected signer.
    */
   function getElectedSignerByIndex(uint256 index) external view returns (address) {
-    return electedSigners[index];
+    return electedSignersOfEpoch[currentEpochNumber][index];
   }
 
   /**
@@ -595,15 +594,15 @@ contract EpochManager is
     IValidators validators = getValidators();
 
     EpochProcessState storage _epochProcessing = epochProcessing;
-
-    for (uint i = 0; i < elected.length; i++) {
-      uint256 validatorScore = scoreReader.getValidatorScore(elected[i]);
+    address[] memory _elected = getElectedAccounts();
+    for (uint i = 0; i < _elected.length; i++) {
+      uint256 validatorScore = scoreReader.getValidatorScore(_elected[i]);
       uint256 validatorReward = validators.computeEpochReward(
-        elected[i],
+        _elected[i],
         validatorScore,
         _epochProcessing.perValidatorReward
       );
-      validatorPendingPayments[elected[i]] += validatorReward;
+      validatorPendingPayments[_elected[i]] += validatorReward;
       totalRewards += validatorReward;
     }
     if (totalRewards == 0) {
@@ -626,7 +625,7 @@ contract EpochManager is
 
   function _setElectedSigners(address[] memory _elected) internal {
     IAccounts accounts = getAccounts();
-    electedSigners = new address[](_elected.length);
+    address[] memory electedSigners = new address[](_elected.length);
     for (uint i = 0; i < _elected.length; i++) {
       electedSigners[i] = accounts.getValidatorSigner(_elected[i]);
     }
