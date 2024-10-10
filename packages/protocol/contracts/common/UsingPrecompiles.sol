@@ -2,11 +2,10 @@ pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/UsingRegistry.sol";
 import "../common/interfaces/IEpochManager.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
 
-contract UsingPrecompiles is IsL2Check, UsingRegistry {
+contract UsingPrecompiles is IsL2Check {
   using SafeMath for uint256;
 
   address constant TRANSFER = address(0xff - 2);
