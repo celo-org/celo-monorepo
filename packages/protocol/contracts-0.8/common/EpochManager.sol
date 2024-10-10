@@ -63,12 +63,10 @@ contract EpochManager is
   EpochProcessState public epochProcessing;
   mapping(uint256 => Epoch) internal epochs;
   mapping(uint256 => address[]) internal electedAccountsOfEpoch;
-  mapping(uint256 => address[]) internal electedSignersOfEpoch;
-  mapping(address => uint256) public validatorPendingPayments;
-
   // Electeds in the L1 assumed signers can not change during the epoch
   // so we keep a copy
-  // address[] public electedSigners;
+  mapping(uint256 => address[]) internal electedSignersOfEpoch;
+  mapping(address => uint256) public validatorPendingPayments;
 
   /**
    * @notice Event emited when epochProcessing has begun.
