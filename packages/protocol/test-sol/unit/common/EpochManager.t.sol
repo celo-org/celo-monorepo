@@ -831,7 +831,6 @@ contract EpochManagerTest_getElectedSignerByIndex is EpochManagerTest {
 contract EpochManagerTest_getElectedAccountAddressFromSet is EpochManagerTest {
   function test_ShouldRetreiveThecorrectElectedAccountFromGivenSet() public {
     initializeEpochManagerSystem();
-    address[] memory electedSigners = new address[](firstElected.length);
 
     assertEq(epochManager.getElectedAccountAddressFromSet(1, firstEpochBlock), firstElected[1]);
   }
