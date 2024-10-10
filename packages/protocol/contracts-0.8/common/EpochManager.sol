@@ -195,9 +195,8 @@ contract EpochManager is
   function startNextEpochProcess() external nonReentrant onlySystemAlreadyInitialized {
     require(isTimeForNextEpoch(), "Epoch is not ready to start");
     require(!isOnEpochProcess(), "Epoch process is already started");
+    updateElectionHistory();
     epochProcessing.status = EpochProcessStatus.Started;
-    electedAccountsOfEpoch[currentEpochNumber] = electedAccounts;
-    electedSignersOfEpoch[currentEpochNumber] = electedSigners;
     epochs[currentEpochNumber].rewardsBlock = block.number;
 
     // calculate rewards
@@ -660,9 +659,17 @@ contract EpochManager is
     );
   }
 
+  /**
+   * @notice Updates the list of elected validator signers.
+   */
   function _setElectedSigners(address[] memory _elected) internal {
     IAccounts accounts = getAccounts();
-    electedSigners = new address[](_elected.length);
+    require(electedAccounts.length > 0, "Elected list length cannot be zero.");
+    if (electedSigners.length == 0) {
+      electedSigners = new address[](_elected.length);
+    }
+
+    require(_elected.length == electedSigners.length, "Account and Signer list lenght mismatch.");
     for (uint i = 0; i < _elected.length; i++) {
       electedSigners[i] = accounts.getValidatorSigner(_elected[i]);
     }
