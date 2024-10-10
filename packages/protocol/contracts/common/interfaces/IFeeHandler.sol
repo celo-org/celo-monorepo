@@ -4,7 +4,7 @@ import "../FixidityLib.sol";
 
 interface IFeeHandler {
   // sets the portion of the fee that should be burned.
-  function setBurnFraction(uint256 fraction) external;
+  // function setBurnFraction(uint256 fraction) external;
 
   function addToken(address tokenAddress, address handlerAddress) external;
   function removeToken(address tokenAddress) external;
@@ -35,4 +35,5 @@ interface IFeeHandler {
 
   // in case some funds need to be returned or moved to another contract
   function transfer(address token, address recipient, uint256 value) external returns (bool);
+  function setCarbonFeeBeneficiary(address beneficiary) external;
 }
