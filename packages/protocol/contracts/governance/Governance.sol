@@ -1028,7 +1028,7 @@ contract Governance is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 5, 0, 0);
+    return (1, 4, 2, 0);
   }
 
   /**
@@ -1312,6 +1312,19 @@ contract Governance is
       hotfixes[hash].executed,
       hotfixes[hash].deprecated_preparedEpoch
     );
+  }
+
+  /**
+   * @notice Gets information about a L1 hotfix.
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
+   * @return Hotfix approved.
+   * @return Hotfix executed.
+   * @return Hotfix preparedEpoch.
+   * @dev Provided for API backwards compatibility. Prefer the explicitly named
+   * `getL1HotfixRecord`/`getL2HotfixRecord` functions.
+   */
+  function getHotfixRecord(bytes32 hash) public view returns (bool, bool, uint256) {
+    return getL1HotfixRecord(hash);
   }
 
   /**
