@@ -33,6 +33,13 @@ contract Utils08 is TestConstants {
     vm.etch(0x4200000000000000000000000000000000000018, abi.encodePacked(bytes1(0x01)));
   }
 
+  function actorWithPK(Vm vm, string memory name) public returns (address, uint256) {
+    uint256 pk = uint256(keccak256(bytes(name)));
+    address addr = vm.addr(pk);
+    vm.label(addr, name);
+    return (addr, pk);
+  }
+
   // This function can be also found in OpenZeppelin's library, but in a newer version than the one
   function compareStrings(string memory a, string memory b) public pure returns (bool) {
     return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));

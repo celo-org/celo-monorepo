@@ -58,4 +58,8 @@ interface IMockValidators {
   function groupMembershipInEpoch(address addr, uint256, uint256) external view returns (address);
 
   function getGroupNumMembers(address group) external view returns (uint256);
+
+  function setEpochRewards(address account, uint256 reward) external;
+
+  function mintedStable() external view returns (uint256);
 }
