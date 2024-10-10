@@ -2,6 +2,7 @@ pragma solidity ^0.5.13;
 
 import "./interfaces/ICeloVersionedContract.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
+import "./UsingRegistry.sol";
 
 import "./UsingPrecompiles.sol";
 
@@ -10,7 +11,7 @@ import "./UsingPrecompiles.sol";
  * @notice This contract allows for a smoother transition from L1 to L2
  * by abstracting away the usingPrecompile contract, and taking care of the L1 to L2 swtiching logic.
  **/
-contract PrecompilesOverride is UsingPrecompiles {
+contract PrecompilesOverride is UsingPrecompiles, UsingRegistry {
   /**
    * @notice Returns the epoch number at a block.
    * @param blockNumber Block number where epoch number is calculated.
