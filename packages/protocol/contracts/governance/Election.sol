@@ -10,12 +10,12 @@ import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
-import "../common/UsingPrecompiles.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/Heap.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 import "../common/Blockable.sol";
+import "../common/PrecompilesOverride.sol";
 
 contract Election is
   IElection,
@@ -24,7 +24,7 @@ contract Election is
   ReentrancyGuard,
   Initializable,
   UsingRegistry,
-  UsingPrecompiles,
+  PrecompilesOverride,
   CalledByVm,
   Blockable
 {
@@ -637,7 +637,7 @@ contract Election is
    */
   function hasActivatablePendingVotes(address account, address group) external view returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
-    return pendingVote.epoch < _getEpochNumber() && pendingVote.value > 0;
+    return pendingVote.epoch < getEpochNumber() && pendingVote.value > 0;
   }
 
   /**
@@ -1008,7 +1008,7 @@ contract Election is
   function _activate(address group, address account) internal onlyWhenNotBlocked returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
 
-    require(pendingVote.epoch < _getEpochNumber(), "Pending vote epoch not passed");
+    require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
 
     uint256 value = pendingVote.value;
     require(value > 0, "Vote value cannot be zero");
@@ -1157,7 +1157,7 @@ contract Election is
 
     PendingVote storage pendingVote = groupPending.byAccount[account];
     pendingVote.value = pendingVote.value.add(value);
-    pendingVote.epoch = _getEpochNumber();
+    pendingVote.epoch = getEpochNumber();
   }
 
   /**
@@ -1276,19 +1276,6 @@ contract Election is
     } else {
       return
         value.mul(votes.active.forGroup[group].total).div(votes.active.forGroup[group].totalUnits);
-    }
-  }
-
-  /**
-   * @notice Returns the epoch number.
-   * @return Current epoch number.
-   */
-  function _getEpochNumber() private view returns (uint256) {
-    // TODO remove this after L2 is fully implemented
-    if (isL2()) {
-      return getEpochManager().getCurrentEpochNumber();
-    } else {
-      return getEpochNumber();
     }
   }
 }

@@ -15,8 +15,28 @@ interface IEpochManager {
   ) external;
   function sendValidatorPayment(address) external;
   function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256);
+  function getEpochByNumber(
+    uint256 epochNumber
+  ) external view returns (uint256, uint256, uint256, uint256);
+  function getEpochByBlockNumber(
+    uint256 blockNumber
+  ) external view returns (uint256, uint256, uint256, uint256);
+  function getElectedAccountAddressFromSet(
+    uint256 index,
+    uint256 _blockNumber
+  ) external view returns (address);
+  function getElectedSignerAddressFromSet(
+    uint256 index,
+    uint256 _blockNumber
+  ) external view returns (address);
+  function getEpochNumberOfBlock(uint256) external view returns (uint256);
   function getCurrentEpochNumber() external view returns (uint256);
-  function getElected() external view returns (address[] memory);
+  function numberOfElectedInCurrentSet() external view returns (uint256);
+  function numberOfElectedInSet(uint256 _blockNumber) external view returns (uint256);
+  function getElectedAccounts() external view returns (address[] memory);
+  function getElectedAccountByIndex(uint256 index) external view returns (address);
+  function getElectedSigners() external view returns (address[] memory);
+  function getElectedSignerByIndex(uint256 index) external view returns (address);
   function epochDuration() external view returns (uint256);
   function firstKnownEpoch() external view returns (uint256);
   function getEpochProcessingState()

@@ -8,7 +8,7 @@ import "../common/FixidityLib.sol";
 import "../common/Freezable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
-import "../common/UsingPrecompiles.sol";
+import "../common/PrecompilesOverride.sol";
 import "../common/interfaces/ICeloToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
@@ -20,8 +20,8 @@ contract EpochRewards is
   IEpochRewards,
   Ownable,
   Initializable,
-  UsingPrecompiles,
   UsingRegistry,
+  PrecompilesOverride,
   Freezable
 {
   using FixidityLib for FixidityLib.Fraction;
@@ -453,9 +453,11 @@ contract EpochRewards is
     (uint256 numerator, uint256 denominator) = getSortedOracles().medianRate(stableTokenAddress);
     if (isL2()) {
       return
-        getEpochManager().getElected().length.mul(targetValidatorEpochPayment).mul(denominator).div(
-          numerator
-        );
+        getEpochManager()
+          .numberOfElectedInCurrentSet()
+          .mul(targetValidatorEpochPayment)
+          .mul(denominator)
+          .div(numerator);
     }
     return
       numberValidatorsInCurrentSet().mul(targetValidatorEpochPayment).mul(denominator).div(

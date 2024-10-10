@@ -31,6 +31,7 @@ contract UsingPrecompiles is IsL2Check {
    * @param _decimals precision
    * @return Numerator of the computed quantity (not reduced).
    * @return Denominator of the computed quantity (not reduced).
+   * @dev This function will be deprecated in L2.
    */
   function fractionMulExp(
     uint256 aNumerator,
@@ -39,7 +40,7 @@ contract UsingPrecompiles is IsL2Check {
     uint256 bDenominator,
     uint256 exponent,
     uint256 _decimals
-  ) public view returns (uint256, uint256) {
+  ) public view onlyL1 returns (uint256, uint256) {
     require(aDenominator != 0 && bDenominator != 0, "a denominator is zero");
     uint256 returnNumerator;
     uint256 returnDenominator;
@@ -57,9 +58,9 @@ contract UsingPrecompiles is IsL2Check {
   /**
    * @notice Returns the current epoch size in blocks.
    * @return The current epoch size in blocks.
+   * @dev This function will be deprecated in L2.
    */
-  function getEpochSize() public view returns (uint256) {
-    allowOnlyL1();
+  function getEpochSize() public view onlyL1 returns (uint256) {
     bytes memory out;
     bool success;
     (success, out) = EPOCH_SIZE.staticcall(abi.encodePacked(true));
@@ -71,27 +72,30 @@ contract UsingPrecompiles is IsL2Check {
    * @notice Returns the epoch number at a block.
    * @param blockNumber Block number where epoch number is calculated.
    * @return Epoch number.
+   * @dev This function will be deprecated in L2.
    */
-  function getEpochNumberOfBlock(uint256 blockNumber) public view returns (uint256) {
+  function getEpochNumberOfBlock(uint256 blockNumber) public view virtual onlyL1 returns (uint256) {
     return epochNumberOfBlock(blockNumber, getEpochSize());
   }
 
   /**
    * @notice Returns the epoch number at a block.
    * @return Current epoch number.
+   * @dev This function will be deprecated in L2.
    */
-  function getEpochNumber() public view returns (uint256) {
+  function getEpochNumber() public view virtual onlyL1 returns (uint256) {
     return getEpochNumberOfBlock(block.number);
   }
 
   /**
-   * @notice Gets a validator address from the current validator set.
+   * @notice Gets a validator signer address from the current validator set.
    * @param index Index of requested validator in the validator set.
-   * @return Address of validator at the requested index.
+   * @return Address of validator signer at the requested index.
+   * @dev This function will be deprecated in L2.
    */
   function validatorSignerAddressFromCurrentSet(
     uint256 index
-  ) public view virtual returns (address) {
+  ) public view virtual onlyL1 returns (address) {
     bytes memory out;
     bool success;
     (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, uint256(block.number)));
@@ -100,15 +104,16 @@ contract UsingPrecompiles is IsL2Check {
   }
 
   /**
-   * @notice Gets a validator address from the validator set at the given block number.
+   * @notice Gets a validator signer address from the validator set at the given block number.
    * @param index Index of requested validator in the validator set.
    * @param blockNumber Block number to retrieve the validator set from.
-   * @return Address of validator at the requested index.
+   * @return Address of validator signer at the requested index.
+   * @dev This function will be deprecated in L2.
    */
   function validatorSignerAddressFromSet(
     uint256 index,
     uint256 blockNumber
-  ) public view returns (address) {
+  ) public view virtual onlyL1 returns (address) {
     bytes memory out;
     bool success;
     (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, blockNumber));
@@ -119,8 +124,9 @@ contract UsingPrecompiles is IsL2Check {
   /**
    * @notice Gets the size of the current elected validator set.
    * @return Size of the current elected validator set.
+   * @dev This function will be deprecated in L2.
    */
-  function numberValidatorsInCurrentSet() public view virtual returns (uint256) {
+  function numberValidatorsInCurrentSet() public view virtual onlyL1 returns (uint256) {
     bytes memory out;
     bool success;
     (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(uint256(block.number)));
@@ -132,8 +138,9 @@ contract UsingPrecompiles is IsL2Check {
    * @notice Gets the size of the validator set that must sign the given block number.
    * @param blockNumber Block number to retrieve the validator set from.
    * @return Size of the validator set.
+   * @dev This function will be deprecated in L2.
    */
-  function numberValidatorsInSet(uint256 blockNumber) public view virtual returns (uint256) {
+  function numberValidatorsInSet(uint256 blockNumber) public view virtual onlyL1 returns (uint256) {
     bytes memory out;
     bool success;
     (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(blockNumber));
@@ -149,12 +156,13 @@ contract UsingPrecompiles is IsL2Check {
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
    *   account address. 96 bytes.
    * @return True upon success.
+   * @dev This function will be deprecated in L2.
    */
   function checkProofOfPossession(
     address sender,
     bytes memory blsKey,
     bytes memory blsPop
-  ) public view returns (bool) {
+  ) public view onlyL1 returns (bool) {
     bool success;
     (success, ) = PROOF_OF_POSSESSION.staticcall(abi.encodePacked(sender, blsKey, blsPop));
     return success;
@@ -164,8 +172,9 @@ contract UsingPrecompiles is IsL2Check {
    * @notice Parses block number out of header.
    * @param header RLP encoded header
    * @return Block number.
+   * @dev This function will be deprecated in L2.
    */
-  function getBlockNumberFromHeader(bytes memory header) public view returns (uint256) {
+  function getBlockNumberFromHeader(bytes memory header) public view onlyL1 returns (uint256) {
     bytes memory out;
     bool success;
     (success, out) = BLOCK_NUMBER_FROM_HEADER.staticcall(abi.encodePacked(header));
@@ -177,8 +186,9 @@ contract UsingPrecompiles is IsL2Check {
    * @notice Computes hash of header.
    * @param header RLP encoded header
    * @return Header hash.
+   * @dev This function will be deprecated in L2.
    */
-  function hashHeader(bytes memory header) public view returns (bytes32) {
+  function hashHeader(bytes memory header) public view onlyL1 returns (bytes32) {
     bytes memory out;
     bool success;
     (success, out) = HASH_HEADER.staticcall(abi.encodePacked(header));
@@ -190,8 +200,9 @@ contract UsingPrecompiles is IsL2Check {
    * @notice Gets the parent seal bitmap from the header at the given block number.
    * @param blockNumber Block number to retrieve. Must be within 4 epochs of the current number.
    * @return Bitmap parent seal with set bits at indices corresponding to signing validators.
+   * @dev This function will be deprecated in L2.
    */
-  function getParentSealBitmap(uint256 blockNumber) public view returns (bytes32) {
+  function getParentSealBitmap(uint256 blockNumber) public view onlyL1 returns (bytes32) {
     bytes memory out;
     bool success;
     (success, out) = GET_PARENT_SEAL_BITMAP.staticcall(abi.encodePacked(blockNumber));
@@ -205,8 +216,11 @@ contract UsingPrecompiles is IsL2Check {
    * header.  If the parent hash is not in the blockchain, verification fails.
    * @param header RLP encoded header
    * @return Bitmap parent seal with set bits at indices correspoinding to signing validators.
+   * @dev This function will be deprecated in L2.
    */
-  function getVerifiedSealBitmapFromHeader(bytes memory header) public view returns (bytes32) {
+  function getVerifiedSealBitmapFromHeader(
+    bytes memory header
+  ) public view onlyL1 returns (bytes32) {
     bytes memory out;
     bool success;
     (success, out) = GET_VERIFIED_SEAL_BITMAP.staticcall(abi.encodePacked(header));
@@ -217,16 +231,18 @@ contract UsingPrecompiles is IsL2Check {
   /**
    * @notice Returns the minimum number of required signers for a given block number.
    * @dev Computed in celo-blockchain as int(math.Ceil(float64(2*valSet.Size()) / 3))
+   * @dev This function will be deprecated in L2.
    */
-  function minQuorumSize(uint256 blockNumber) public view returns (uint256) {
+  function minQuorumSize(uint256 blockNumber) public view onlyL1 returns (uint256) {
     return numberValidatorsInSet(blockNumber).mul(2).add(2).div(3);
   }
 
   /**
    * @notice Computes byzantine quorum from current validator set size
    * @return Byzantine quorum of validators.
+   * @dev This function will be deprecated in L2.
    */
-  function minQuorumSizeInCurrentSet() public view returns (uint256) {
+  function minQuorumSizeInCurrentSet() public view onlyL1 returns (uint256) {
     return minQuorumSize(block.number);
   }
 
