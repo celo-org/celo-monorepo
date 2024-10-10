@@ -20,7 +20,7 @@ import "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
 import "@celo-contracts/uniswap/test/MockUniswapV2Router02.sol";
 import "@celo-contracts/uniswap/test/MockUniswapV2Factory.sol";
 import "@celo-contracts/uniswap/test/MockERC20.sol";
-import "@mento-core/test/mocks/MockSortedOracles.sol";
+import "@celo-contracts/stability/test/MockSortedOracles.sol";
 import "@mento-core/test/mocks/MockReserve.sol";
 import "@celo-contracts/common/ProxyFactory.sol";
 import "@celo-contracts/governance/GovernanceApproverMultiSig.sol";
@@ -1213,3 +1213,6 @@ contract FeeHandlerTest_SetBeneficiaryName is FeeHandlerTestAbstract {
     feeHandler.setBeneficiaryName(op, "OP revenue share updated");
   }
 }
+
+// Mento doesn't need this sibce
+// TODO add sets setting the oracle
