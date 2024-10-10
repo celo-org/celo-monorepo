@@ -392,7 +392,12 @@ contract EpochManager is
   /**
    * @return The number of elected accounts in the current set.
    */
-  function numberOfElectedInCurrentSet() external view returns (uint256) {
+  function numberOfElectedInCurrentSet()
+    external
+    view
+    onlySystemAlreadyInitialized
+    returns (uint256)
+  {
     return electedAccountsOfEpoch[currentEpochNumber].length;
   }
 
@@ -400,30 +405,32 @@ contract EpochManager is
    * @notice Returns the number of elected accounts in a specified set.
    * @param _blockNumber The block number at which to retreive the set.
    */
-  function numberOfElectedInSet(uint256 _blockNumber) external view returns (uint256) {
+  function numberOfElectedInSet(
+    uint256 _blockNumber
+  ) external view onlySystemAlreadyInitialized returns (uint256) {
     (uint256 _epochNumber, , , , ) = _getEpochByBlockNumber(_blockNumber);
     return electedAccountsOfEpoch[_epochNumber].length;
-  }
-
-  /**
-   * @return The list of currently elected validators.
-   */
-  function getElectedAccounts() public view returns (address[] memory) {
-    return electedAccountsOfEpoch[currentEpochNumber];
   }
 
   /**
    * @notice Returns the currently elected account at a specified index.
    * @param index The index of the currently elected account.
    */
-  function getElectedAccountByIndex(uint256 index) external view returns (address) {
+  function getElectedAccountByIndex(
+    uint256 index
+  ) external view onlySystemAlreadyInitialized returns (address) {
     return electedAccountsOfEpoch[currentEpochNumber][index];
   }
 
   /**
    * @return The list of the validator signers of elected validators.
    */
-  function getElectedSigners() external view returns (address[] memory) {
+  function getElectedSigners()
+    external
+    view
+    onlySystemAlreadyInitialized
+    returns (address[] memory)
+  {
     return electedSignersOfEpoch[currentEpochNumber];
   }
 
@@ -431,7 +438,9 @@ contract EpochManager is
    * @notice Returns the currently elected signer address at a specified index.
    * @param index The index of the currently elected signer.
    */
-  function getElectedSignerByIndex(uint256 index) external view returns (address) {
+  function getElectedSignerByIndex(
+    uint256 index
+  ) external view onlySystemAlreadyInitialized returns (address) {
     return electedSignersOfEpoch[currentEpochNumber][index];
   }
 
@@ -459,7 +468,9 @@ contract EpochManager is
    * @notice Returns the epoch number of a specified blockNumber.
    * @param _blockNumber Block number of the epoch info is retreived.
    */
-  function getEpochNumberOfBlock(uint256 _blockNumber) external view returns (uint256) {
+  function getEpochNumberOfBlock(
+    uint256 _blockNumber
+  ) external view onlySystemAlreadyInitialized returns (uint256) {
     (uint256 _epochNumber, , , , ) = _getEpochByBlockNumber(_blockNumber);
     return _epochNumber;
   }
@@ -474,7 +485,7 @@ contract EpochManager is
    */
   function getEpochByBlockNumber(
     uint256 _blockNumber
-  ) external view returns (uint256, uint256, uint256, uint256) {
+  ) external view onlySystemAlreadyInitialized returns (uint256, uint256, uint256, uint256) {
     (
       ,
       uint256 _firstBlock,
@@ -493,7 +504,7 @@ contract EpochManager is
   function getElectedAccountAddressFromSet(
     uint256 index,
     uint256 _blockNumber
-  ) external view returns (address) {
+  ) external view onlySystemAlreadyInitialized returns (address) {
     (uint256 _epochNumber, , , , ) = _getEpochByBlockNumber(_blockNumber);
     return electedAccountsOfEpoch[_epochNumber][index];
   }
@@ -506,7 +517,7 @@ contract EpochManager is
   function getElectedSignerAddressFromSet(
     uint256 index,
     uint256 _blockNumber
-  ) external view returns (address) {
+  ) external view onlySystemAlreadyInitialized returns (address) {
     (uint256 _epochNumber, , , , ) = _getEpochByBlockNumber(_blockNumber);
     return electedSignersOfEpoch[_epochNumber][index];
   }
@@ -545,6 +556,18 @@ contract EpochManager is
     require(!isOnEpochProcess(), "Cannot change oracle address during epoch processing.");
     oracleAddress = newOracleAddress;
     emit OracleAddressSet(newOracleAddress);
+  }
+
+  /**
+   * @return The list of currently elected validators.
+   */
+  function getElectedAccounts()
+    public
+    view
+    onlySystemAlreadyInitialized
+    returns (address[] memory)
+  {
+    return electedAccountsOfEpoch[currentEpochNumber];
   }
 
   /**

@@ -124,7 +124,6 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     registry.setAddressFor(CeloUnreleasedTreasuryContract, address(celoUnreleasedTreasury));
     registry.setAddressFor(CeloTokenContract, address(celoToken));
     registry.setAddressFor(ReserveContract, reserveAddress);
-    registry.setAddressFor(AccountsContract, accountsAddress);
     registry.setAddressFor(ElectionContract, address(election));
     registry.setAddressFor(AccountsContract, address(accounts));
 
@@ -182,6 +181,21 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     greaters[0] = address(0);
 
     return (groups, lessers, greaters);
+  }
+
+  function _travelAndProcess_N_L2Epoch(uint256 n) public {
+    for (uint256 i = 0; i < n; i++) {
+      travelEpochL2(vm);
+      epochManager.startNextEpochProcess();
+
+      (
+        address[] memory groups,
+        address[] memory lessers,
+        address[] memory greaters
+      ) = getGroupsWithLessersAndGreaters();
+
+      epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    }
   }
 }
 
@@ -630,21 +644,6 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
 }
 
 contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
-  function _travelAndProcess_N_L2Epoch(uint256 n) public {
-    for (uint256 i = 0; i < n; i++) {
-      travelEpochL2(vm);
-      epochManager.startNextEpochProcess();
-
-      (
-        address[] memory groups,
-        address[] memory lessers,
-        address[] memory greaters
-      ) = getGroupsWithLessersAndGreaters();
-
-      epochManager.finishNextEpochProcess(groups, lessers, greaters);
-    }
-  }
-
   function test_shouldReturnTheEpochInfoOfSpecifiedEpoch() public {
     uint256 numberOfEpochsToTravel = 9;
 
@@ -674,8 +673,6 @@ contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
     assertEq(_lastBlock, 0);
     assertEq(startingEpochStartTimestamp + (DAY * (numberOfEpochsToTravel + 1)), _startTimestamp);
     assertEq(_rewardBlock, 0);
-    // assertEq(_elected, startingElected);
-    //TODO(soloseng) add asssertion
   }
 
   function test_ReturnsHistoricalEpochInfoAfter_N_Epochs() public {
@@ -705,7 +702,6 @@ contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
       _initialRewardBlock,
       _startingRewardBlock + (L2_BLOCK_IN_EPOCH * 2) + firstEpochBlock + 1
     );
-    // assertEq(_initialElected, _startingElected);
   }
 
   function test_ReturnsZeroForFutureEpochs() public {
@@ -722,6 +718,140 @@ contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
     assertEq(_lastBlock, 0);
     assertEq(_startTimestamp, 0);
     assertEq(_rewardBlock, 0);
-    // assertEq(_elected, _expectedElected);
+  }
+}
+
+contract EpochManagerTest_getEpochNumberOfBlock is EpochManagerTest {
+  function test_ShouldRetreiveTheCorrectBlockNumberOfTheEpoch() public {
+    initializeEpochManagerSystem();
+    assertEq(epochManager.getEpochNumberOfBlock(firstEpochBlock), firstEpochNumber);
+  }
+
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("Epoch system not initialized");
+    epochManager.getEpochNumberOfBlock(firstEpochBlock);
+  }
+}
+
+contract EpochManagerTest_getEpochByBlockNumber is EpochManagerTest {
+  function test_ShouldRetreiveTheCorrectEpochInfoOfGivenBlock() public {
+    initializeEpochManagerSystem();
+
+    _travelAndProcess_N_L2Epoch(2);
+
+    (
+      uint256 _firstBlock,
+      uint256 _lastBlock,
+      uint256 _timestamp,
+      uint256 rewardsBlock
+    ) = epochManager.getEpochByBlockNumber(firstEpochBlock + (3 * L2_BLOCK_IN_EPOCH));
+    assertEq(_firstBlock, firstEpochBlock + 1 + (2 * L2_BLOCK_IN_EPOCH));
+    assertEq(_lastBlock, firstEpochBlock + 1 + (3 * L2_BLOCK_IN_EPOCH) - 1);
+  }
+
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("Epoch system not initialized");
+    epochManager.getEpochNumberOfBlock(firstEpochBlock);
+  }
+}
+
+contract EpochManagerTest_numberOfElectedInCurrentSet is EpochManagerTest {
+  function test_ShouldRetreiveTheNumberOfElected() public {
+    initializeEpochManagerSystem();
+    assertEq(epochManager.numberOfElectedInCurrentSet(), 2);
+  }
+
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("Epoch system not initialized");
+    epochManager.numberOfElectedInCurrentSet();
+  }
+}
+
+contract EpochManagerTest_numberOfElectedInSet is EpochManagerTest {
+  function test_ShouldRetreiveTheNumberOfElected() public {
+    initializeEpochManagerSystem();
+    assertEq(epochManager.numberOfElectedInSet(firstEpochBlock), 2);
+  }
+
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("Epoch system not initialized");
+    epochManager.numberOfElectedInSet(firstEpochBlock);
+  }
+}
+contract EpochManagerTest_getElectedAccounts is EpochManagerTest {
+  function test_ShouldRetreiveThelistOfElectedAccounts() public {
+    initializeEpochManagerSystem();
+    assertEq(epochManager.getElectedAccounts(), firstElected);
+  }
+
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("Epoch system not initialized");
+    epochManager.getElectedAccounts();
+  }
+}
+contract EpochManagerTest_getElectedAccountByIndex is EpochManagerTest {
+  function test_ShouldRetreiveThecorrectValidator() public {
+    initializeEpochManagerSystem();
+    assertEq(epochManager.getElectedAccountByIndex(0), validator1);
+  }
+
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("Epoch system not initialized");
+    epochManager.getElectedAccountByIndex(0);
+  }
+}
+contract EpochManagerTest_getElectedSigners is EpochManagerTest {
+  function test_ShouldRetreiveTheElectedSigners() public {
+    initializeEpochManagerSystem();
+    address[] memory electedSigners = new address[](firstElected.length);
+    electedSigners[0] = accounts.getValidatorSigner(firstElected[0]);
+    electedSigners[1] = accounts.getValidatorSigner(firstElected[1]);
+    assertEq(epochManager.getElectedSigners(), electedSigners);
+  }
+
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("Epoch system not initialized");
+    epochManager.getElectedSigners();
+  }
+}
+contract EpochManagerTest_getElectedSignerByIndex is EpochManagerTest {
+  function test_ShouldRetreiveThecorrectElectedSigner() public {
+    initializeEpochManagerSystem();
+    address[] memory electedSigners = new address[](firstElected.length);
+
+    electedSigners[1] = accounts.getValidatorSigner(firstElected[1]);
+    assertEq(epochManager.getElectedSignerByIndex(1), electedSigners[1]);
+  }
+
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("Epoch system not initialized");
+    epochManager.getElectedSignerByIndex(1);
+  }
+}
+contract EpochManagerTest_getElectedAccountAddressFromSet is EpochManagerTest {
+  function test_ShouldRetreiveThecorrectElectedAccountFromGivenSet() public {
+    initializeEpochManagerSystem();
+    address[] memory electedSigners = new address[](firstElected.length);
+
+    assertEq(epochManager.getElectedAccountAddressFromSet(1, firstEpochBlock), firstElected[1]);
+  }
+
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("Epoch system not initialized");
+    epochManager.getElectedAccountAddressFromSet(1, firstEpochBlock);
+  }
+}
+contract EpochManagerTest_getElectedSignerAddressFromSet is EpochManagerTest {
+  function test_ShouldRetreiveThecorrectElectedSignerFromGivenSet() public {
+    initializeEpochManagerSystem();
+    address[] memory electedSigners = new address[](firstElected.length);
+
+    electedSigners[1] = accounts.getValidatorSigner(firstElected[1]);
+    assertEq(epochManager.getElectedSignerAddressFromSet(1, firstEpochBlock), electedSigners[1]);
+  }
+
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("Epoch system not initialized");
+    epochManager.getElectedSignerAddressFromSet(1, firstEpochBlock);
   }
 }
