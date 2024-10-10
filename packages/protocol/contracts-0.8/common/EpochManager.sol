@@ -56,6 +56,8 @@ contract EpochManager is
 
   uint256 public firstKnownEpoch;
   uint256 internal currentEpochNumber;
+  address[] internal electedAccounts;
+  address[] internal electedSigners;
   address public oracleAddress;
 
   mapping(address => ProcessedGroup) public processedGroups;
@@ -152,7 +154,11 @@ contract EpochManager is
     uint256 firstEpochNumber,
     uint256 firstEpochBlock,
     address[] memory firstElected
-  ) external onlyEpochManagerEnabler {
+  )
+    external
+    // address[] memory firstElectedSigners
+    onlyEpochManagerEnabler
+  {
     require(
       getCeloToken().balanceOf(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURY_REGISTRY_ID)) >
         0,
@@ -174,9 +180,11 @@ contract EpochManager is
     _currentEpoch.firstBlock = firstEpochBlock;
     _currentEpoch.startTimestamp = block.timestamp;
 
-    electedAccountsOfEpoch[currentEpochNumber] = firstElected;
+    electedAccounts = firstElected;
 
     _setElectedSigners(firstElected);
+
+    updateElectionHistory();
   }
 
   /**
@@ -188,7 +196,8 @@ contract EpochManager is
     require(isTimeForNextEpoch(), "Epoch is not ready to start");
     require(!isOnEpochProcess(), "Epoch process is already started");
     epochProcessing.status = EpochProcessStatus.Started;
-
+    electedAccountsOfEpoch[currentEpochNumber] = electedAccounts;
+    electedSignersOfEpoch[currentEpochNumber] = electedSigners;
     epochs[currentEpochNumber].rewardsBlock = block.number;
 
     // calculate rewards
@@ -281,7 +290,7 @@ contract EpochManager is
 
     address[] memory _newlyElected = election.electValidatorAccounts();
 
-    electedAccountsOfEpoch[currentEpochNumber] = _newlyElected;
+    electedAccounts = _newlyElected;
 
     _setElectedSigners(_newlyElected);
 
@@ -419,7 +428,7 @@ contract EpochManager is
   function getElectedAccountByIndex(
     uint256 index
   ) external view onlySystemAlreadyInitialized returns (address) {
-    return electedAccountsOfEpoch[currentEpochNumber][index];
+    return electedAccounts[index];
   }
 
   /**
@@ -431,7 +440,7 @@ contract EpochManager is
     onlySystemAlreadyInitialized
     returns (address[] memory)
   {
-    return electedSignersOfEpoch[currentEpochNumber];
+    return electedSigners;
   }
 
   /**
@@ -441,7 +450,7 @@ contract EpochManager is
   function getElectedSignerByIndex(
     uint256 index
   ) external view onlySystemAlreadyInitialized returns (address) {
-    return electedSignersOfEpoch[currentEpochNumber][index];
+    return electedSigners[index];
   }
 
   /**
@@ -505,6 +514,9 @@ contract EpochManager is
     uint256 index,
     uint256 _blockNumber
   ) external view onlySystemAlreadyInitialized returns (address) {
+    if (_blockNumber == block.number) {
+      return electedAccounts[index];
+    }
     (uint256 _epochNumber, , , , ) = _getEpochByBlockNumber(_blockNumber);
     return electedAccountsOfEpoch[_epochNumber][index];
   }
@@ -518,6 +530,10 @@ contract EpochManager is
     uint256 index,
     uint256 _blockNumber
   ) external view onlySystemAlreadyInitialized returns (address) {
+    if (_blockNumber == block.number) {
+      return electedSigners[index];
+    }
+
     (uint256 _epochNumber, , , , ) = _getEpochByBlockNumber(_blockNumber);
     return electedSignersOfEpoch[_epochNumber][index];
   }
@@ -567,7 +583,7 @@ contract EpochManager is
     onlySystemAlreadyInitialized
     returns (address[] memory)
   {
-    return electedAccountsOfEpoch[currentEpochNumber];
+    return electedAccounts;
   }
 
   /**
@@ -646,11 +662,10 @@ contract EpochManager is
 
   function _setElectedSigners(address[] memory _elected) internal {
     IAccounts accounts = getAccounts();
-    address[] memory electedSigners = new address[](_elected.length);
+    electedSigners = new address[](_elected.length);
     for (uint i = 0; i < _elected.length; i++) {
       electedSigners[i] = accounts.getValidatorSigner(_elected[i]);
     }
-    electedSignersOfEpoch[currentEpochNumber] = electedSigners;
   }
 
   /**
@@ -712,5 +727,10 @@ contract EpochManager is
     }
 
     revert("No matching epoch found for the given block number.");
+  }
+
+  function updateElectionHistory() private {
+    electedAccountsOfEpoch[currentEpochNumber] = electedAccounts;
+    electedSignersOfEpoch[currentEpochNumber] = electedSigners;
   }
 }
