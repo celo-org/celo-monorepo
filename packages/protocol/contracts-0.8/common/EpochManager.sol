@@ -249,13 +249,7 @@ contract EpochManager is
       // checks that group is actually from elected group
       require(epochRewards > 0, "group not from current elected set");
       if (epochRewards != type(uint256).max) {
-      
-        election.distributeEpochRewards(
-          groups[i],
-          epochRewards,
-          lessers[i],
-          greaters[i]
-        );
+        election.distributeEpochRewards(groups[i], epochRewards, lessers[i], greaters[i]);
       }
 
       delete processedGroups[groups[i]];

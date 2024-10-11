@@ -176,7 +176,6 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
     }
   }
 
-
   function assertGroupWithVotes(GroupWithVotes[] memory groupWithVotes) internal {
     for (uint256 i = 0; i < groupWithVotes.length; i++) {
       uint256 expected = election.getTotalVotesForGroup(groupWithVotes[i].group);
@@ -271,7 +270,7 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
     ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
   }
 
-   function getParsedSignatureOfAddress(
+  function getParsedSignatureOfAddress(
     address _address,
     uint256 privateKey
   ) public pure returns (uint8, bytes32, bytes32) {
@@ -602,7 +601,7 @@ contract E2E_GasTest_FinishNextEpochProcess is E2E_EpochManager {
     timeTravel(vm, epochDuration + 1);
     epochManager.startNextEpochProcess();
 
-     address[] memory lessers;
+    address[] memory lessers;
     address[] memory greaters;
     address[] memory groupsEligible;
     GroupWithVotes[] memory groupWithVotes;
