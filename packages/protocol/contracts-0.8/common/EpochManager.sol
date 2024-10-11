@@ -44,11 +44,6 @@ contract EpochManager is
     uint256 totalRewardsCarbonFund; // The total carbon offsetting partner reward.
   }
 
-  struct ProcessedGroup {
-    bool processed;
-    uint256 epochRewards;
-  }
-
   bool public isSystemInitialized;
 
   // the length of an epoch in seconds
@@ -60,7 +55,7 @@ contract EpochManager is
   address[] internal electedSigners;
   address public oracleAddress;
 
-  mapping(address => ProcessedGroup) public processedGroups;
+  mapping(address => uint256) public processedGroups;
 
   EpochProcessState public epochProcessing;
   mapping(uint256 => Epoch) internal epochs;
@@ -247,7 +242,7 @@ contract EpochManager is
     IScoreReader scoreReader = getScoreReader();
     for (uint i = 0; i < electedAccounts.length; i++) {
       address group = validators.getValidatorsGroup(electedAccounts[i]);
-      if (!processedGroups[group].processed) {
+      if (processedGroups[group] == 0) {
         toProcessGroups++;
         uint256 groupScore = scoreReader.getGroupScore(group);
         // We need to precompute epoch rewards for each group since computation depends on total active votes for all groups.
@@ -256,22 +251,20 @@ contract EpochManager is
           _epochProcessing.totalRewardsVoter,
           groupScore
         );
-        processedGroups[group] = ProcessedGroup(true, epochRewards);
+        processedGroups[group] = epochRewards == 0 ? type(uint256).max : epochRewards;
       }
+      delete electedAccounts[i];
     }
 
     require(toProcessGroups == groups.length, "number of groups does not match");
 
     for (uint i = 0; i < groups.length; i++) {
-      ProcessedGroup storage processedGroup = processedGroups[groups[i]];
+      uint256 epochRewards = processedGroups[groups[i]];
       // checks that group is actually from elected group
-      require(processedGroup.processed, "group not from current elected set");
-      election.distributeEpochRewards(
-        groups[i],
-        processedGroup.epochRewards,
-        lessers[i],
-        greaters[i]
-      );
+      require(epochRewards > 0, "group not from current elected set");
+      if (epochRewards != type(uint256).max) {
+        election.distributeEpochRewards(groups[i], epochRewards, lessers[i], greaters[i]);
+      }
 
       delete processedGroups[groups[i]];
     }

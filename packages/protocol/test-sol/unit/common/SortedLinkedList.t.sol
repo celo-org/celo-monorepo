@@ -3,118 +3,166 @@ pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
 
-import "@celo-contracts/common/test/AddressSortedLinkedListWithMedianMock.sol";
+import "@celo-contracts/common/test/SortedLinkedListMock.sol";
 
-contract AddressSortedLinkedListWithMedianTest is Test {
-  AddressSortedLinkedListWithMedianMock sortedList;
+contract SortedLinkedListTest is Test {
+  SortedLinkedListMock sortedList;
 
   function setUp() public {
-    sortedList = new AddressSortedLinkedListWithMedianMock();
+    sortedList = new SortedLinkedListMock();
   }
 }
 
-contract AddressSortedLinkedListWithMedianTest_insert is AddressSortedLinkedListWithMedianTest {
-  address key = actor("key");
+contract SortedLinkedListTest_insert is SortedLinkedListTest {
+  bytes32 key = keccak256("key");
   uint256 numerator = 2;
 
   function test_ShouldAddASingleElementToTheList() public {
-    sortedList.insert(key, numerator, address(0), address(0));
+    sortedList.insert(key, numerator, bytes32(0), bytes32(0));
     assertEq(sortedList.contains(key), true, "should contain the key");
-    (address[] memory addresses, uint256[] memory numerators, ) = sortedList.getElements();
-    assertEq(addresses.length, 1, "addresses should have a single element");
-    assertEq(addresses[0], key, "should have the correct key");
+    (bytes32[] memory keys, uint256[] memory numerators) = sortedList.getElements();
+    assertEq(keys.length, 1, "keys should have a single element");
+    assertEq(keys[0], key, "should have the correct key");
 
     assertEq(numerators.length, 1, "numerators should have a single element");
     assertEq(numerators[0], numerator, "should have the correct numerator");
   }
 
   function test_ShouldIncrementNumElements() public {
-    sortedList.insert(key, numerator, address(0), address(0));
+    sortedList.insert(key, numerator, bytes32(0), bytes32(0));
     assertEq(sortedList.getNumElements(), 1, "should have a single element");
   }
 
   function test_ShouldUpdateTheHead() public {
-    sortedList.insert(key, numerator, address(0), address(0));
+    sortedList.insert(key, numerator, bytes32(0), bytes32(0));
     assertEq(sortedList.head(), key, "should have the correct head");
   }
 
   function test_ShouldUpdateTheTail() public {
-    sortedList.insert(key, numerator, address(0), address(0));
+    sortedList.insert(key, numerator, bytes32(0), bytes32(0));
     assertEq(sortedList.tail(), key, "should have the correct tail");
-  }
-
-  function test_ShouldUpdateTheMedian() public {
-    sortedList.insert(key, numerator, address(0), address(0));
-    assertEq(sortedList.medianKey(), key, "should have the correct median");
   }
 
   function test_ShouldRevertIfKeyIsZero() public {
     vm.expectRevert("invalid key");
-    sortedList.insert(address(0), numerator, address(0), address(0));
+    sortedList.insert(bytes32(0), numerator, bytes32(0), bytes32(0));
   }
 
   function test_ShouldRevertIfLesserIsEqualToKey() public {
     vm.expectRevert("invalid key");
-    sortedList.insert(key, numerator, key, address(0));
+    sortedList.insert(key, numerator, key, bytes32(0));
   }
 
   function test_ShouldRevertIfGreaterIsEqualToKey() public {
     vm.expectRevert("invalid key");
-    sortedList.insert(key, numerator, address(0), key);
+    sortedList.insert(key, numerator, bytes32(0), key);
   }
 
   function test_ShouldRevert_WhenInsertingElementAlreadyInTheList() public {
-    sortedList.insert(key, numerator, address(0), address(0));
+    sortedList.insert(key, numerator, bytes32(0), bytes32(0));
     vm.expectRevert("invalid key");
-    sortedList.insert(key, numerator, address(0), address(0));
+    sortedList.insert(key, numerator, bytes32(0), bytes32(0));
   }
 }
 
-contract AddressSortedLinkedListWithMedianTest_update is AddressSortedLinkedListWithMedianTest {
-  address key = actor("key");
-  address key2 = actor("key2");
-  uint256 numerator = 2;
-  uint256 newNumerator = 3;
+contract SortedLinkedListTest_update is SortedLinkedListTest {
+  bytes32 key0 = keccak256("key");
+  bytes32 key1 = keccak256("key2");
+  bytes32 key2 = keccak256("key3");
+  bytes32 absentKey = keccak256("absentKey");
+  uint256 value0 = 1;
+  uint256 value1 = 3;
+  uint256 value2 = 5;
+  uint256 smallestValue = 0;
+  uint256 smallerValue = 2;
+  uint256 largerValue = 4;
+  uint256 largestValue = 6;
 
   function setUp() public {
     super.setUp();
-    sortedList.insert(key, numerator, address(0), address(0));
+    sortedList.insert(key0, value0, bytes32(0), bytes32(0));
+    sortedList.insert(key1, value1, key0, bytes32(0));
+    sortedList.insert(key2, value2, key1, bytes32(0));
   }
 
-  function test_ShouldUpdateValueForAnExistingElement() public {
-    sortedList.update(key, newNumerator, address(0), address(0));
-    (address[] memory addresses, uint256[] memory numerators, ) = sortedList.getElements();
-    assertEq(addresses.length, 1, "addresses should have a single element");
-    assertEq(addresses[0], key, "should have the correct key");
+  function test_ShouldUpdateValueForAnExistingElement_whenBecomingTheSmallestElement() public {
+    sortedList.update(key1, smallestValue, bytes32(0), key0);
+    (bytes32[] memory keys, uint256[] memory values) = sortedList.getElements();
+    assertEq(keys.length, 3, "keys should have three elements");
+    assertEq(keys[2], key1, "should have the correct key");
 
-    assertEq(numerators.length, 1, "numerators should have a single element");
-    assertEq(numerators[0], newNumerator, "should have the correct numerator");
+    assertEq(values.length, 3, "values should have three elements");
+    assertEq(values[2], smallestValue, "should have the correct value");
+  }
+
+  function test_ShouldUpdateValueForAnExistingElement_whenBecomingTheLargestElement() public {
+    sortedList.update(key1, largestValue, key2, bytes32(0));
+    (bytes32[] memory keys, uint256[] memory values) = sortedList.getElements();
+    assertEq(keys.length, 3, "keys should have three element");
+    assertEq(keys[0], key1, "should have the correct key");
+
+    assertEq(values.length, 3, "values should have three elements");
+    assertEq(values[0], largestValue, "should have the correct value");
+  }
+
+  function test_ShouldUpdateValueForAnExistingElement_whenIncreasingValueButStayingInPlace()
+    public
+  {
+    sortedList.update(key1, largerValue, key0, key2);
+    (bytes32[] memory keys, uint256[] memory values) = sortedList.getElements();
+    assertEq(keys.length, 3, "keys should have three element");
+    assertEq(keys[1], key1, "should have the correct key");
+
+    assertEq(values.length, 3, "values should have three elements");
+    assertEq(values[1], largerValue, "should have the correct value");
+  }
+
+  function test_ShouldUpdateValueForAnExistingElement_whenDecreasingValueButStayingInPlace()
+    public
+  {
+    sortedList.update(key1, smallerValue, key0, key2);
+    (bytes32[] memory keys, uint256[] memory values) = sortedList.getElements();
+    assertEq(keys.length, 3, "keys should have three element");
+    assertEq(keys[1], key1, "should have the correct key");
+
+    assertEq(values.length, 3, "values should have three elements");
+    assertEq(values[1], smallerValue, "should have the correct value");
+  }
+
+  function test_ShouldUpdateValueForAnExistingElement_whenNotChangingValue() public {
+    sortedList.update(key1, value1, key0, key2);
+    (bytes32[] memory keys, uint256[] memory values) = sortedList.getElements();
+    assertEq(keys.length, 3, "keys should have three elements");
+    assertEq(keys[1], key1, "should have the correct key");
+
+    assertEq(values.length, 3, "values should have three element");
+    assertEq(values[1], value1, "should have the correct value");
   }
 
   function test_ShouldRevertIfTheKeyIsNotInTheList() public {
     vm.expectRevert("key not in list");
-    sortedList.update(key2, newNumerator, address(0), address(0));
+    sortedList.update(absentKey, smallestValue, bytes32(0), key0);
   }
 
   function test_ShouldRevertIfLesserIsEqualToKey() public {
     vm.expectRevert("invalid key");
-    sortedList.update(key, newNumerator, key, address(0));
+    sortedList.update(key1, smallestValue, key1, key0);
   }
 
   function test_ShouldRevertIfGreaterIsEqualToKey() public {
     vm.expectRevert("invalid key");
-    sortedList.update(key, newNumerator, address(0), key);
+    sortedList.update(key1, largestValue, key2, key1);
   }
 }
 
-contract AddressSortedLinkedListWithMedianTest_remove is AddressSortedLinkedListWithMedianTest {
-  address key = actor("key");
-  address key2 = actor("key2");
+contract SortedLinkedListTest_remove is SortedLinkedListTest {
+  bytes32 key = keccak256("key");
+  bytes32 key2 = keccak256("key2");
   uint256 numerator = 2;
 
   function setUp() public {
     super.setUp();
-    sortedList.insert(key, numerator, address(0), address(0));
+    sortedList.insert(key, numerator, bytes32(0), bytes32(0));
   }
 
   function test_ShouldRemoveTheElementFromTheList() public {
@@ -129,17 +177,12 @@ contract AddressSortedLinkedListWithMedianTest_remove is AddressSortedLinkedList
 
   function test_ShouldUpdateTheHead() public {
     sortedList.remove(key);
-    assertEq(sortedList.head(), address(0), "should have the correct head");
+    assertEq(sortedList.head(), bytes32(0), "should have the correct head");
   }
 
   function test_ShouldUpdateTheTail() public {
     sortedList.remove(key);
-    assertEq(sortedList.tail(), address(0), "should have the correct tail");
-  }
-
-  function test_ShouldUpdateTheMedian() public {
-    sortedList.remove(key);
-    assertEq(sortedList.medianKey(), address(0), "should have the correct median");
+    assertEq(sortedList.tail(), bytes32(0), "should have the correct tail");
   }
 
   function test_ShouldRevertIfTheKeyIsNotInTheList() public {
@@ -148,9 +191,7 @@ contract AddressSortedLinkedListWithMedianTest_remove is AddressSortedLinkedList
   }
 }
 
-contract AddressSortedLinkedListWithMedianTest_WhenThereAreMultipleActions is
-  AddressSortedLinkedListWithMedianTest
-{
+contract SortedLinkedListTest_WhenThereAreMultipleActions is SortedLinkedListTest {
   uint256 nonce = 0;
 
   enum SortedListActionType {
@@ -160,7 +201,7 @@ contract AddressSortedLinkedListWithMedianTest_WhenThereAreMultipleActions is
   }
 
   struct SortedElement {
-    address key;
+    bytes32 key;
     uint256 numerator;
   }
 
@@ -171,13 +212,13 @@ contract AddressSortedLinkedListWithMedianTest_WhenThereAreMultipleActions is
 
   function getLesserAndGreater(
     uint256 numerator
-  ) internal view returns (address lesser, address greater) {
+  ) internal view returns (bytes32 lesser, bytes32 greater) {
     // Fetch all elements from the list
-    (address[] memory keys, uint256[] memory numerators, ) = sortedList.getElements();
+    (bytes32[] memory keys, uint256[] memory numerators) = sortedList.getElements();
     uint256 length = keys.length;
 
-    lesser = address(0); // Initialize with the default values
-    greater = address(0);
+    lesser = bytes32(0); // Initialize with the default values
+    greater = bytes32(0);
 
     for (uint256 i = 0; i < length; i++) {
       // Find the first key with a numerator greater than the given one
@@ -191,7 +232,7 @@ contract AddressSortedLinkedListWithMedianTest_WhenThereAreMultipleActions is
     }
 
     // If no greater key is found, the last key in the list is considered `lesser`
-    if (greater == address(0) && length > 0) {
+    if (greater == bytes32(0) && length > 0) {
       lesser = keys[length - 1];
     }
   }
@@ -203,12 +244,12 @@ contract AddressSortedLinkedListWithMedianTest_WhenThereAreMultipleActions is
       maxNumber;
   }
 
-  function getLesserAndGreaterIncorrect() internal returns (address lesser, address greater) {
-    (address[] memory keys, , ) = sortedList.getElements();
+  function getLesserAndGreaterIncorrect() internal returns (bytes32 lesser, bytes32 greater) {
+    (bytes32[] memory keys, ) = sortedList.getElements();
 
     uint256 random1 = random(100);
     if (random1 < 50) {
-      return (address(0), address(0));
+      return (bytes32(0), bytes32(0));
     } else {
       uint256 random2 = random(keys.length);
       uint256 random3 = random(keys.length);
@@ -218,13 +259,8 @@ contract AddressSortedLinkedListWithMedianTest_WhenThereAreMultipleActions is
 
   function assertSortedFractionListInvariants() internal view {
     // Fetch all elements from the list
-    (
-      address[] memory keys,
-      uint256[] memory numerators,
-      SortedLinkedListWithMedian.MedianRelation[] memory relations
-    ) = sortedList.getElements();
+    (bytes32[] memory keys, uint256[] memory numerators) = sortedList.getElements();
     uint256 numElements = sortedList.getNumElements(); // Assuming getNumElements() returns the total number of elements
-    address medianKey = sortedList.medianKey(); // Assuming medianKey() returns the key of the median element
 
     // Assert the number of elements is correct
     require(keys.length == numElements, "Incorrect number of elements");
@@ -233,57 +269,33 @@ contract AddressSortedLinkedListWithMedianTest_WhenThereAreMultipleActions is
     for (uint256 i = 1; i < keys.length; i++) {
       require(numerators[i - 1] >= numerators[i], "Elements not sorted");
     }
-
-    // Assert median key is correct
-    uint256 medianIndex = (keys.length - 1) / 2;
-    require(keys.length == 0 || keys[medianIndex] == medianKey, "Incorrect median element");
-
-    // Assert relations are correct according to median
-    for (uint256 i = 0; i < relations.length; i++) {
-      if (i < medianIndex) {
-        require(
-          relations[i] == SortedLinkedListWithMedian.MedianRelation.Greater,
-          "Incorrect relation for lesser element"
-        );
-      } else if (i == medianIndex) {
-        require(
-          relations[i] == SortedLinkedListWithMedian.MedianRelation.Equal,
-          "Incorrect relation for median element"
-        );
-      } else {
-        require(
-          relations[i] == SortedLinkedListWithMedian.MedianRelation.Lesser,
-          "Incorrect relation for greater element"
-        );
-      }
-    }
   }
 
   function test_MultipleInsertsUpdatesRemovals() public {
-    address[100] memory keys;
+    bytes32[100] memory keys;
     uint256[100] memory numerators;
 
     // Initialize keys and numerators
     for (uint256 i = 0; i < 100; i++) {
-      keys[i] = address(uint160(i + 1));
+      keys[i] = bytes32(uint256(i + 1));
       numerators[i] = i * 100; // Example numerator values
     }
 
     // Simulating the action sequence
     for (uint256 i = 0; i < 100; i++) {
-      address key = keys[i];
+      bytes32 key = keys[i];
       uint256 numerator = numerators[i];
 
       // Randomly decide on action: Insert, Update, or Remove
       uint256 actionType = i % 3; // This is a simplification of random selection
 
       if (actionType == uint256(SortedListActionType.Insert)) {
-        (address greater, address lesser) = getLesserAndGreater(numerator);
+        (bytes32 greater, bytes32 lesser) = getLesserAndGreater(numerator);
         sortedList.insert(key, numerator, greater, lesser);
         assertTrue(sortedList.contains(key));
       } else if (actionType == uint256(SortedListActionType.Update)) {
         if (sortedList.contains(key)) {
-          (address greater, address lesser) = getLesserAndGreater(numerator);
+          (bytes32 greater, bytes32 lesser) = getLesserAndGreater(numerator);
           sortedList.update(key, numerator + 1, greater, lesser);
         }
       } else if (actionType == uint256(SortedListActionType.Remove)) {
@@ -298,25 +310,25 @@ contract AddressSortedLinkedListWithMedianTest_WhenThereAreMultipleActions is
   }
 
   function test_MultipleInsertsUpdatesRemovalsIncorrectGreaterAndLesser() public {
-    address[100] memory keys;
+    bytes32[100] memory keys;
     uint256[100] memory numerators;
 
     // Initialize keys and numerators
     for (uint256 i = 0; i < 100; i++) {
-      keys[i] = address(uint160(i + 1));
+      keys[i] = bytes32(uint256(i + 1));
       numerators[i] = i * 100; // Example numerator values
     }
 
     // Simulating the action sequence
     for (uint256 i = 0; i < 100; i++) {
-      address key = keys[i];
+      bytes32 key = keys[i];
       uint256 numerator = numerators[i];
 
       // Randomly decide on action: Insert, Update, or Remove
       uint256 actionType = i % 3; // This is a simplification of random selection
 
       if (actionType == uint256(SortedListActionType.Insert)) {
-        (address greater, address lesser) = getLesserAndGreaterIncorrect();
+        (bytes32 greater, bytes32 lesser) = getLesserAndGreaterIncorrect();
         (bool success, ) = address(sortedList).call(
           abi.encodeWithSelector(sortedList.insert.selector, key, numerator, greater, lesser)
         );
@@ -326,7 +338,7 @@ contract AddressSortedLinkedListWithMedianTest_WhenThereAreMultipleActions is
         // Handle failure case if needed
       } else if (actionType == uint256(SortedListActionType.Update)) {
         if (sortedList.contains(key)) {
-          (address greater, address lesser) = getLesserAndGreaterIncorrect();
+          (bytes32 greater, bytes32 lesser) = getLesserAndGreaterIncorrect();
           (bool success, ) = address(sortedList).call(
             abi.encodeWithSelector(sortedList.update.selector, key, numerator + 1, greater, lesser)
           );

@@ -3173,7 +3173,7 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
   function WhenSlashAffectsElectionOrder() public {
     WhenAccountHasVotedForMoreThanOneGroupInequally();
 
-    slashedValue = value / 4;
+    slashedValue = value / 4 + 1;
     group1RemainingActiveVotes = value - slashedValue;
 
     election.vote(group, value / 2, group2, address(0));
