@@ -1214,5 +1214,4 @@ contract FeeHandlerTest_SetBeneficiaryName is FeeHandlerTestAbstract {
   }
 }
 
-// Mento doesn't need this sibce
-// TODO add sets setting the oracle
+// TODO add sets setting the oracle and the setters
