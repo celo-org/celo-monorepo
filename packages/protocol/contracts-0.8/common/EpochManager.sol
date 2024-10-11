@@ -234,7 +234,6 @@ contract EpochManager is
     // finalize epoch
     // last block should be the block before and timestamp from previous block
     epochs[currentEpochNumber].lastBlock = block.number - 1;
-    address[] memory _elected = getElectedAccounts();
     // start new epoch
     currentEpochNumber++;
     epochs[currentEpochNumber].firstBlock = block.number;
@@ -246,9 +245,8 @@ contract EpochManager is
     IValidators validators = getValidators();
     IElection election = getElection();
     IScoreReader scoreReader = getScoreReader();
-
-    for (uint i = 0; i < _elected.length; i++) {
-      address group = validators.getValidatorsGroup(_elected[i]);
+    for (uint i = 0; i < electedAccounts.length; i++) {
+      address group = validators.getValidatorsGroup(electedAccounts[i]);
       if (!processedGroups[group].processed) {
         toProcessGroups++;
         uint256 groupScore = scoreReader.getGroupScore(group);
@@ -630,15 +628,15 @@ contract EpochManager is
     IValidators validators = getValidators();
 
     EpochProcessState storage _epochProcessing = epochProcessing;
-    address[] memory _elected = getElectedAccounts();
-    for (uint i = 0; i < _elected.length; i++) {
-      uint256 validatorScore = scoreReader.getValidatorScore(_elected[i]);
+
+    for (uint i = 0; i < electedAccounts.length; i++) {
+      uint256 validatorScore = scoreReader.getValidatorScore(electedAccounts[i]);
       uint256 validatorReward = validators.computeEpochReward(
-        _elected[i],
+        electedAccounts[i],
         validatorScore,
         _epochProcessing.perValidatorReward
       );
-      validatorPendingPayments[_elected[i]] += validatorReward;
+      validatorPendingPayments[electedAccounts[i]] += validatorReward;
       totalRewards += validatorReward;
     }
     if (totalRewards == 0) {
