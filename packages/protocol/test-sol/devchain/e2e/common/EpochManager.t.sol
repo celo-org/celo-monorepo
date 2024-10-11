@@ -690,11 +690,9 @@ contract E2E_GasTest_Setup is E2E_EpochManager {
     timeTravel(vm, epochDuration / 2);
     blockTravel(vm, 100);
   }
-
 }
 
 contract E2E_GasTest1_FinishNextEpochProcess is E2E_GasTest_Setup {
-  
   function setUp() public override {
     super.setUp();
     super.setUpHelper(120, 2);
@@ -747,4 +745,3 @@ contract E2E_GasTest2_FinishNextEpochProcess is E2E_GasTest_Setup {
     console.log("elected count2: ", epochManager.getElected().length);
   }
 }
-
