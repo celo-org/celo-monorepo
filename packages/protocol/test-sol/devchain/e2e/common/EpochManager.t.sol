@@ -184,39 +184,57 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
   }
 
   function registerNewValidatorGroupWithValidator(
-    uint256 index
+    uint256 index,
+    uint256 validatorCount
   ) internal returns (address newValidatorGroup, address newValidator) {
+    require(validatorCount > 0, "validatorCount must be at least 1");
     (, GroupWithVotes[] memory groupWithVotes) = getGroupsWithVotes();
     uint256 newGroupPK = uint256(keccak256(abi.encodePacked("newGroup", index + 1)));
-    uint256 newValidatorPK = uint256(keccak256(abi.encodePacked("newValidator", index + 1)));
 
-    vm.deal(vm.addr(newGroupPK), 100_000_000 ether);
-    vm.deal(vm.addr(newValidatorPK), 100_000_000 ether);
+    address[] memory validatorAddresses = new address[](validatorCount);
 
     (uint256 validatorLockedGoldRequirement, ) = validators.getValidatorLockedGoldRequirements();
     (uint256 groupLockedGoldRequirement, ) = validators.getGroupLockedGoldRequirements();
 
+    vm.deal(vm.addr(newGroupPK), 100_000_000 ether);
+
     newValidatorGroup = registerValidatorGroup(
       "newGroup",
       newGroupPK,
-      groupLockedGoldRequirement,
+      groupLockedGoldRequirement + validatorCount * validatorLockedGoldRequirement,
       100000000000000000000000
     );
-    newValidator = registerValidator(
-      newValidatorPK,
-      validatorLockedGoldRequirement,
-      newValidatorGroup
-    );
+
+    for (uint256 i = 0; i < validatorCount; i++) {
+      uint256 newValidatorPK = uint256(keccak256(abi.encodePacked("newValidator", index, i + 1)));
+      validatorAddresses[i] = vm.addr(newValidatorPK);
+      vm.deal(vm.addr(newValidatorPK), 100_000_000 ether);
+
+      newValidator = registerValidator(
+        newValidatorPK,
+        validatorLockedGoldRequirement,
+        newValidatorGroup
+      );
+
+      vm.prank(scoreManager.owner());
+      scoreManager.setValidatorScore(validatorAddresses[i], validatorScore[6]);
+    }
+
     vm.prank(newValidatorGroup);
-    validators.addFirstMember(newValidator, address(0), groupWithVotes[0].group);
-    uint256 nonVotingLockedGold = lockedCelo.getAccountNonvotingLockedGold(newValidator);
+    validators.addFirstMember(validatorAddresses[0], address(0), groupWithVotes[0].group);
+    uint256 nonVotingLockedGold = lockedCelo.getAccountNonvotingLockedGold(validatorAddresses[0]);
     vm.prank(newValidatorGroup);
     election.vote(newValidatorGroup, nonVotingLockedGold, address(0), groupWithVotes[0].group);
 
-    vm.startPrank(scoreManager.owner());
+    for (uint256 i = 1; i < validatorAddresses.length; i++) {
+      vm.prank(validatorAddresses[i]);
+      validators.affiliate(newValidatorGroup);
+      vm.prank(newValidatorGroup);
+      validators.addMember(validatorAddresses[i]);
+    }
+
+    vm.prank(scoreManager.owner());
     scoreManager.setGroupScore(newValidatorGroup, groupScore[3]);
-    scoreManager.setValidatorScore(newValidator, validatorScore[6]);
-    vm.stopPrank();
   }
 
   function getValidatorGroupsFromElected() internal returns (address[] memory) {
@@ -505,7 +523,10 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     }
 
     // add new validator group and validator
-    (address newValidatorGroup, address newValidator) = registerNewValidatorGroupWithValidator(0);
+    (address newValidatorGroup, address newValidator) = registerNewValidatorGroupWithValidator(
+      0,
+      1
+    );
 
     timeTravel(vm, epochDuration + 1);
     epochManager.startNextEpochProcess();
@@ -652,7 +673,10 @@ contract E2E_GasTest_FinishNextEpochProcess is E2E_EpochManager {
 
     for (uint256 i = 0; i < newValidators.length; i++) {
       // add new validator group and validator
-      (address newValidatorGroup, address newValidator) = registerNewValidatorGroupWithValidator(i);
+      (address newValidatorGroup, address newValidator) = registerNewValidatorGroupWithValidator(
+        i,
+        2
+      );
       newValidators[i] = newValidator;
       newGroups[i] = newValidatorGroup;
     }

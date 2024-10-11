@@ -240,6 +240,7 @@ contract EpochManager is
         );
         processedGroups[group] = epochRewards == 0 ? type(uint256).max : epochRewards;
       }
+      delete elected[i];
     }
 
     require(toProcessGroups == groups.length, "number of groups does not match");
