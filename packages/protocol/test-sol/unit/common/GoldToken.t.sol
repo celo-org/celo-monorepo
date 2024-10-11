@@ -15,7 +15,7 @@ contract GoldTokenTest is Test, TestConstants, IsL2Check {
   address receiver;
   address sender;
   address celoTokenOwner;
-  address celoUnreleasedTreasury;
+  address celoUnreleasedTreasuryAddress;
 
   event Transfer(address indexed from, address indexed to, uint256 value);
   event TransferComment(string comment);
@@ -26,16 +26,17 @@ contract GoldTokenTest is Test, TestConstants, IsL2Check {
   }
 
   function setUp() public {
+    celoTokenOwner = actor("celoTokenOwner");
+    celoUnreleasedTreasuryAddress = actor("celoUnreleasedTreasury");
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    deployCodeTo("CeloUnreleasedTreasury.sol", abi.encode(false), celoUnreleasedTreasuryAddress);
     registry = IRegistry(REGISTRY_ADDRESS);
 
-    celoTokenOwner = actor("celoTokenOwner");
-    celoUnreleasedTreasury = actor("celoUnreleasedTreasury");
     vm.prank(celoTokenOwner);
     celoToken = new GoldToken(true);
     vm.prank(celoTokenOwner);
     celoToken.setRegistry(REGISTRY_ADDRESS);
-    registry.setAddressFor("CeloUnreleasedTreasury", celoUnreleasedTreasury);
+    registry.setAddressFor("CeloUnreleasedTreasury", celoUnreleasedTreasuryAddress);
     receiver = actor("receiver");
     sender = actor("sender");
     vm.deal(receiver, ONE_CELOTOKEN);
@@ -127,10 +128,24 @@ contract GoldTokenTest_transfer is GoldTokenTest {
     celoToken.transfer(address(0), ONE_CELOTOKEN);
   }
 
-  function test_Reverts_whenTransferingToCeloUnreleasedTreasury() public {
+  function test_Succeeds_whenTransferingToCeloUnreleasedTreasury() public {
     vm.prank(sender);
-    vm.expectRevert("transfer attempted to reserved CeloUnreleasedTreasury address");
-    celoToken.transfer(celoUnreleasedTreasury, ONE_CELOTOKEN);
+    uint256 balanceBefore = celoToken.balanceOf(celoUnreleasedTreasuryAddress);
+
+    celoToken.transfer(celoUnreleasedTreasuryAddress, ONE_CELOTOKEN);
+    uint256 balanceAfter = celoToken.balanceOf(celoUnreleasedTreasuryAddress);
+    assertGt(balanceAfter, balanceBefore);
+  }
+
+  function test_FailsWhenNativeTransferingToCeloUnreleasedTreasury() public payable {
+    (bool success, ) = address(uint160(celoUnreleasedTreasuryAddress)).call.value(ONE_CELOTOKEN)(
+      ""
+    );
+
+    assertFalse(success);
+
+    bool sent = address(uint160(celoUnreleasedTreasuryAddress)).send(ONE_CELOTOKEN);
+    assertFalse(sent);
   }
 }
 
@@ -156,11 +171,12 @@ contract GoldTokenTest_transferFrom is GoldTokenTest {
     celoToken.transferFrom(sender, address(0), ONE_CELOTOKEN);
   }
 
-  function test_Reverts_whenTransferingToCeloUnreleasedTreasury() public {
+  function test_Succeeds_whenTransferingToCeloUnreleasedTreasury() public {
+    uint256 balanceBefore = celoToken.balanceOf(celoUnreleasedTreasuryAddress);
     vm.prank(receiver);
-    vm.expectRevert("transfer attempted to reserved CeloUnreleasedTreasury address");
-
-    celoToken.transferFrom(sender, celoUnreleasedTreasury, ONE_CELOTOKEN);
+    celoToken.transferFrom(sender, celoUnreleasedTreasuryAddress, ONE_CELOTOKEN);
+    uint256 balanceAfter = celoToken.balanceOf(celoUnreleasedTreasuryAddress);
+    assertGt(balanceAfter, balanceBefore);
   }
 
   function test_Reverts_WhenTransferMoreThanSenderHas() public {
@@ -211,7 +227,7 @@ contract GoldTokenTest_mint is GoldTokenTest {
     vm.expectRevert("Only VM can call");
     celoToken.mint(receiver, ONE_CELOTOKEN);
 
-    vm.prank(celoUnreleasedTreasury);
+    vm.prank(celoUnreleasedTreasuryAddress);
     vm.expectRevert("Only VM can call");
     celoToken.mint(receiver, ONE_CELOTOKEN);
   }
@@ -233,7 +249,7 @@ contract GoldTokenTest_mint is GoldTokenTest {
 
   function test_Reverts_whenL2() public _whenL2 {
     vm.expectRevert("This method is no longer supported in L2.");
-    vm.prank(celoUnreleasedTreasury);
+    vm.prank(celoUnreleasedTreasuryAddress);
     celoToken.mint(receiver, ONE_CELOTOKEN);
     vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(address(0));
@@ -262,23 +278,24 @@ contract CeloTokenMockTest is Test, TestConstants {
   GoldTokenMock mockCeloToken;
   uint256 ONE_CELOTOKEN = 1000000000000000000;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
-  address celoUnreleasedTreasury;
+  address celoUnreleasedTreasuryAddress = actor("CeloUnreleasedTreasury");
 
   modifier _whenL2() {
     deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
-    vm.deal(celoUnreleasedTreasury, L2_INITIAL_STASH_BALANCE);
+    vm.deal(celoUnreleasedTreasuryAddress, L2_INITIAL_STASH_BALANCE);
     _;
   }
 
   function setUp() public {
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    deployCodeTo("CeloUnreleasedTreasury.sol", abi.encode(false), celoUnreleasedTreasuryAddress);
     registry = IRegistry(REGISTRY_ADDRESS);
 
     mockCeloToken = new GoldTokenMock();
     mockCeloToken.setRegistry(REGISTRY_ADDRESS);
     mockCeloToken.setTotalSupply(L1_MINTED_CELO_SUPPLY);
-    celoUnreleasedTreasury = actor("CeloUnreleasedTreasury");
-    registry.setAddressFor("CeloUnreleasedTreasury", celoUnreleasedTreasury);
+    vm.deal(celoUnreleasedTreasuryAddress, L2_INITIAL_STASH_BALANCE);
+    registry.setAddressFor("CeloUnreleasedTreasury", celoUnreleasedTreasuryAddress);
   }
 }
 
@@ -317,7 +334,7 @@ contract GoldTokenTest_AllocatedSupply is CeloTokenMockTest {
   }
 
   function test_ShouldReturn_WhenWithdrawn_WhenInL2() public _whenL2 {
-    deal(address(celoUnreleasedTreasury), ONE_CELOTOKEN);
+    deal(celoUnreleasedTreasuryAddress, ONE_CELOTOKEN);
     assertEq(mockCeloToken.allocatedSupply(), mockCeloToken.totalSupply() - ONE_CELOTOKEN);
   }
 }

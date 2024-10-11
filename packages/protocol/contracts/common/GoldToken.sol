@@ -10,7 +10,6 @@ import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
 import "./interfaces/ICeloTokenInitializer.sol";
 import "./interfaces/ICeloVersionedContract.sol";
-import "./interfaces/ICeloUnreleasedTreasury.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
 
 contract GoldToken is
@@ -152,10 +151,6 @@ contract GoldToken is
    */
   function transferFrom(address from, address to, uint256 value) external returns (bool) {
     require(to != address(0), "transfer attempted to reserved address 0x0");
-    require(
-      to != registry.getAddressForOrDie(CELO_UNRELEASED_TREASURY_REGISTRY_ID),
-      "transfer attempted to reserved CeloUnreleasedTreasury address"
-    );
     require(value <= balanceOf(from), "transfer value exceeded balance of sender");
     require(
       value <= allowed[from][msg.sender],
@@ -274,8 +269,7 @@ contract GoldToken is
    */
   function allocatedSupply() public view returns (uint256) {
     if (isL2()) {
-      return
-        CELO_SUPPLY_CAP - registry.getAddressForOrDie(CELO_UNRELEASED_TREASURY_REGISTRY_ID).balance;
+      return CELO_SUPPLY_CAP - getCeloUnreleasedTreasury().getRemainingBalanceToRelease();
     } else {
       return totalSupply();
     }
@@ -299,10 +293,6 @@ contract GoldToken is
    * @return True if the transaction succeeds.
    */
   function _transfer(address to, uint256 value) internal returns (bool) {
-    require(
-      to != registry.getAddressForOrDie(CELO_UNRELEASED_TREASURY_REGISTRY_ID),
-      "transfer attempted to reserved CeloUnreleasedTreasury address"
-    );
     require(value <= balanceOf(msg.sender), "transfer value exceeded balance of sender");
 
     bool success;
