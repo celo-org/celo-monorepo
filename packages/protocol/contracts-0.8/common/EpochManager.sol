@@ -663,13 +663,9 @@ contract EpochManager is
    * @notice Updates the list of elected validator signers.
    */
   function _setElectedSigners(address[] memory _elected) internal {
-    IAccounts accounts = getAccounts();
     require(electedAccounts.length > 0, "Elected list length cannot be zero.");
-    if (electedSigners.length == 0) {
-      electedSigners = new address[](_elected.length);
-    }
-
-    require(_elected.length == electedSigners.length, "Account and Signer list lenght mismatch.");
+    IAccounts accounts = getAccounts();
+    electedSigners = new address[](_elected.length);
     for (uint i = 0; i < _elected.length; i++) {
       electedSigners[i] = accounts.getValidatorSigner(_elected[i]);
     }
