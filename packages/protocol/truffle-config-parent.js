@@ -66,7 +66,7 @@ const networks = {
   development: {
     ...defaultConfig,
     from: DEVELOPMENT_FROM,
-    gasPrice: 1,
+    gasPrice: 0,
     gas: gasLimit,
     defaultBalance: 200000000,
     mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
