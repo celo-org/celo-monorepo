@@ -587,13 +587,11 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
   }
 }
 
-contract E2E_GasTest_FinishNextEpochProcess is E2E_EpochManager {
+contract E2E_GasTest_Setup is E2E_EpochManager {
   using EnumerableSet for EnumerableSet.AddressSet;
-
   EnumerableSet.AddressSet internal originalyElected;
 
-  function setUp() public override {
-    super.setUp();
+  function setUpHelper(uint256 validatorGroupCount, uint256 validatorPerGroupCount) internal {
     activateValidators();
     whenL2(vm);
 
@@ -603,9 +601,7 @@ contract E2E_GasTest_FinishNextEpochProcess is E2E_EpochManager {
     validatorsArray = getValidators().getRegisteredValidators();
     groups = getValidators().getRegisteredValidatorGroups();
 
-    address scoreManagerOwner = scoreManager.owner();
-
-    vm.startPrank(scoreManagerOwner);
+    vm.startPrank(scoreManager.owner());
     scoreManager.setGroupScore(groups[0], groupScore[0]);
     scoreManager.setGroupScore(groups[1], groupScore[1]);
     scoreManager.setGroupScore(groups[2], groupScore[2]);
@@ -668,17 +664,11 @@ contract E2E_GasTest_FinishNextEpochProcess is E2E_EpochManager {
       assertEq(originalyElected.contains(newlyElected2[i]), true);
     }
 
-    address[] memory newValidators = new address[](120);
-    address[] memory newGroups = new address[](newValidators.length);
-
-    for (uint256 i = 0; i < newValidators.length; i++) {
-      // add new validator group and validator
+    for (uint256 i = 0; i < validatorGroupCount; i++) {
       (address newValidatorGroup, address newValidator) = registerNewValidatorGroupWithValidator(
         i,
-        2
+        validatorPerGroupCount
       );
-      newValidators[i] = newValidator;
-      newGroups[i] = newValidatorGroup;
     }
 
     timeTravel(vm, epochDuration + 1);
@@ -688,11 +678,7 @@ contract E2E_GasTest_FinishNextEpochProcess is E2E_EpochManager {
     blockTravel(vm, 100);
 
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
-    uint256 gasLeftBefore1 = gasleft();
     epochManager.finishNextEpochProcess(groups, lessers, greaters);
-    uint256 gasLeftAfter1 = gasleft();
-    console.log("finishNextEpochProcess gas used: ", gasLeftBefore1 - gasLeftAfter1);
-    console.log("elected count: ", epochManager.getElected().length);
 
     activateValidators();
 
@@ -703,6 +689,15 @@ contract E2E_GasTest_FinishNextEpochProcess is E2E_EpochManager {
 
     timeTravel(vm, epochDuration / 2);
     blockTravel(vm, 100);
+  }
+
+}
+
+contract E2E_GasTest1_FinishNextEpochProcess is E2E_GasTest_Setup {
+  
+  function setUp() public override {
+    super.setUp();
+    super.setUpHelper(120, 2);
   }
 
   /**
@@ -719,7 +714,37 @@ contract E2E_GasTest_FinishNextEpochProcess is E2E_EpochManager {
     uint256 gasLeftBefore1 = gasleft();
     epochManager.finishNextEpochProcess(groups, lessers, greaters);
     uint256 gasLeftAfter1 = gasleft();
+    console.log("validator groups: 120");
+    console.log("validators per group: 2");
     console.log("finishNextEpochProcess gas used 2: ", gasLeftBefore1 - gasLeftAfter1);
     console.log("elected count2: ", epochManager.getElected().length);
   }
 }
+
+contract E2E_GasTest2_FinishNextEpochProcess is E2E_GasTest_Setup {
+  function setUp() public override {
+    super.setUp();
+    super.setUpHelper(60, 2);
+  }
+
+  /**
+    * @notice Test the gas used by finishNextEpochProcess
+    This test is trying to measure gas used by finishNextEpochProcess in a real life worst case. We have 126 validators and 123 groups.
+    There are two main loops in the function, one for calculating rewards and the other for updating the elected validators.
+    FinishNextEpochProcess is called twice, first time with going from 6 -> 110 validators which consumes approx. 6M gas and the second time with going from 110 -> 110 validators which consumes approx. 19M gas. 
+     */
+  function test_shouldFinishNextEpochProcessing_GasTest() public {
+    address[] memory lessers;
+    address[] memory greaters;
+    GroupWithVotes[] memory groupWithVotes;
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    uint256 gasLeftBefore1 = gasleft();
+    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    uint256 gasLeftAfter1 = gasleft();
+    console.log("validator groups: 60");
+    console.log("validators per group: 2");
+    console.log("finishNextEpochProcess gas used 2: ", gasLeftBefore1 - gasLeftAfter1);
+    console.log("elected count2: ", epochManager.getElected().length);
+  }
+}
+
