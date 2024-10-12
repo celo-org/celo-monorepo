@@ -60,6 +60,8 @@ contract EpochManager is
   mapping(uint256 => Epoch) internal epochs;
   mapping(address => uint256) public validatorPendingPayments;
 
+  uint256 toProcessGroups = 0;
+
   /**
    * @notice Event emited when epochProcessing has begun.
    * @param epochNumber The epoch number that is being processed.
@@ -201,29 +203,11 @@ contract EpochManager is
     emit EpochProcessingStarted(currentEpochNumber);
   }
 
-  /**
-   * @notice Finishes processing an epoch and releasing funds to the beneficiaries.
-   * @param groups List of validator groups to be processed.
-   * @param lessers List of validator groups that hold less votes that indexed group.
-   * @param greaters List of validator groups that hold more votes that indexed group.
-   */
-  function finishNextEpochProcess(
-    address[] calldata groups,
-    address[] calldata lessers,
-    address[] calldata greaters
-  ) external virtual nonReentrant {
+  function setToProcessGroups() external {
     require(isOnEpochProcess(), "Epoch process is not started");
-    // finalize epoch
-    // last block should be the block before and timestamp from previous block
-    epochs[currentEpochNumber].lastBlock = block.number - 1;
-    // start new epoch
-    currentEpochNumber++;
-    epochs[currentEpochNumber].firstBlock = block.number;
-    epochs[currentEpochNumber].startTimestamp = block.timestamp;
 
     EpochProcessState storage _epochProcessing = epochProcessing;
 
-    uint256 toProcessGroups = 0;
     IValidators validators = getValidators();
     IElection election = getElection();
     IScoreReader scoreReader = getScoreReader();
@@ -240,10 +224,92 @@ contract EpochManager is
         );
         processedGroups[group] = epochRewards == 0 ? type(uint256).max : epochRewards;
       }
+    }
+  }
+
+  function processGroup(address group, address lesser, address greater) external {
+    require(isOnEpochProcess(), "Epoch process is not started");
+    require(toProcessGroups > 0, "no more groups to process");
+
+    uint256 epochRewards = processedGroups[group];
+    // checks that group is actually from elected group
+    require(epochRewards > 0, "group not from current elected set");
+    IElection election = getElection();
+
+    if (epochRewards != type(uint256).max) {
+      election.distributeEpochRewards(group, epochRewards, lesser, greater);
+    }
+
+    delete processedGroups[group];
+    toProcessGroups--;
+
+    if (toProcessGroups == 0) {
+      getCeloUnreleasedTreasury().release(
+        registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID),
+        epochProcessing.totalRewardsCommunity
+      );
+      getCeloUnreleasedTreasury().release(
+        getEpochRewards().carbonOffsettingPartner(),
+        epochProcessing.totalRewardsCarbonFund
+      );
+      // run elections
+      elected = election.electValidatorAccounts();
+      epochProcessing.status = EpochProcessStatus.NotStarted;
+
+      // finalize epoch
+      // last block should be the block before and timestamp from previous block
+      epochs[currentEpochNumber].lastBlock = block.number - 1;
+      // start new epoch
+      currentEpochNumber++;
+      epochs[currentEpochNumber].firstBlock = block.number;
+      epochs[currentEpochNumber].startTimestamp = block.timestamp;
+    }
+  }
+
+  /**
+   * @notice Finishes processing an epoch and releasing funds to the beneficiaries.
+   * @param groups List of validator groups to be processed.
+   * @param lessers List of validator groups that hold less votes that indexed group.
+   * @param greaters List of validator groups that hold more votes that indexed group.
+   */
+  function finishNextEpochProcess(
+    address[] calldata groups,
+    address[] calldata lessers,
+    address[] calldata greaters
+  ) external virtual nonReentrant {
+    require(isOnEpochProcess(), "Epoch process is not started");
+    require(toProcessGroups == 0, "not all groups processed");
+    // finalize epoch
+    // last block should be the block before and timestamp from previous block
+    epochs[currentEpochNumber].lastBlock = block.number - 1;
+    // start new epoch
+    currentEpochNumber++;
+    epochs[currentEpochNumber].firstBlock = block.number;
+    epochs[currentEpochNumber].startTimestamp = block.timestamp;
+
+    EpochProcessState storage _epochProcessing = epochProcessing;
+
+    uint256 _toProcessGroups = 0;
+    IValidators validators = getValidators();
+    IElection election = getElection();
+    IScoreReader scoreReader = getScoreReader();
+    for (uint i = 0; i < elected.length; i++) {
+      address group = validators.getValidatorsGroup(elected[i]);
+      if (processedGroups[group] == 0) {
+        _toProcessGroups++;
+        uint256 groupScore = scoreReader.getGroupScore(group);
+        // We need to precompute epoch rewards for each group since computation depends on total active votes for all groups.
+        uint256 epochRewards = election.getGroupEpochRewardsBasedOnScore(
+          group,
+          _epochProcessing.totalRewardsVoter,
+          groupScore
+        );
+        processedGroups[group] = epochRewards == 0 ? type(uint256).max : epochRewards;
+      }
       delete elected[i];
     }
 
-    require(toProcessGroups == groups.length, "number of groups does not match");
+    require(_toProcessGroups == groups.length, "number of groups does not match");
 
     for (uint i = 0; i < groups.length; i++) {
       uint256 epochRewards = processedGroups[groups[i]];
