@@ -165,14 +165,7 @@ contract EpochRewards is
    *    the community reward. Targets initial critical ratio of 2 with a linear
    *    decline until 25 years have passed where the critical ratio will be 1.
    */
-  function isReserveLow()
-    external
-    view
-    returns (
-      // onlyL1
-      bool
-    )
-  {
+  function isReserveLow() external view returns (bool) {
     // critical reserve ratio = 2 - time in second / 25 years
     FixidityLib.Fraction memory timeSinceInitialization = FixidityLib.newFixed(now.sub(startTime));
     FixidityLib.Fraction memory m = FixidityLib.newFixed(25 * 365 * 1 days);

@@ -8,13 +8,7 @@ import "@openzeppelin/contracts8/access/Ownable.sol";
 import "../../contracts/common/interfaces/IScoreManagerGovernance.sol";
 import "../../contracts/common/interfaces/IScoreManager.sol";
 
-contract ScoreManager is
-  Initializable,
-  Ownable,
-  // ,
-  IScoreManager,
-  ICeloVersionedContract
-{
+contract ScoreManager is Initializable, Ownable, IScoreManager, ICeloVersionedContract {
   struct Score {
     uint256 score;
     bool exists;

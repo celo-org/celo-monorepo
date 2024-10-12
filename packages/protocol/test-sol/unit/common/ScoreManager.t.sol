@@ -71,6 +71,14 @@ contract ScoreManagerTest_setGroupScore is ScoreManagerTest {
     emit GroupScoreSet(owner, 42);
     scoreManager.setGroupScore(owner, 42);
   }
+
+  function test_WhenCalledByScoreManager() public {
+    scoreManager.setScoreManager(scoreManagerSetter);
+
+    vm.prank(scoreManagerSetter);
+    scoreManager.setGroupScore(owner, 42);
+    assertEq(scoreManager.getGroupScore(owner), 42);
+  }
 }
 
 contract ScoreManagerTest_setValidatorScore is ScoreManagerTest {
