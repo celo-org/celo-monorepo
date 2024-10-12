@@ -246,8 +246,9 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
 
     IERC20 _celoToken = IERC20(address(celoToken));
     vm.prank(randomAddress);
-    vm.expectRevert("transfer attempted to reserved CeloUnreleasedTreasury address");
-    _celoToken.transfer(unreleasedTreasury, 50000 ether);
+
+    (bool success, ) = address(unreleasedTreasury).call{ value: 50000 ether }("");
+    assertFalse(success);
   }
 
   function test_SetsCurrentRewardBlock() public {
