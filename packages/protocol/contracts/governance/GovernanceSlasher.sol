@@ -5,6 +5,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
+import "./interfaces/IValidators.sol";
 
 contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
   using SafeMath for uint256;
@@ -36,7 +37,13 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
    * @param penalty Amount of penalty in wei.
    * @dev Only callable by governance.
    */
-  function approveSlashing(address account, uint256 penalty) external onlyOwner {
+  function approveSlashing(
+    address account,
+    uint256 penalty
+  )
+    external
+    onlyOwner // slashing multisig?
+  {
     slashed[account] = slashed[account].add(penalty);
     emit SlashingApproved(account, penalty);
   }
@@ -50,10 +57,18 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
    */
   function slash(
     address account,
+    address group,
     address[] calldata electionLessers,
     address[] calldata electionGreaters,
     uint256[] calldata electionIndices
-  ) external returns (bool) {
+  )
+    external
+    onlyOwner
+    returns (
+      // slashing multisig?
+      bool
+    )
+  {
     uint256 penalty = slashed[account];
     require(penalty > 0, "No penalty given by governance");
     slashed[account] = 0;
@@ -66,9 +81,21 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
       electionGreaters,
       electionIndices
     );
+
+    IValidators validators = getValidators();
+
+    if (group != address(0)) {
+      validators.forceDeaffiliateIfValidator(account);
+      // The slashing multiplier is for references purposes only.
+      // score needs to be manually updated to reflect the change.
+      validators.halveSlashingMultiplier(group);
+    }
+
     emit GovernanceSlashPerformed(account, penalty);
     return true;
   }
+
+  // function slashAndRemoveValidator()
 
   /**
    * @notice Gets account penalty.
