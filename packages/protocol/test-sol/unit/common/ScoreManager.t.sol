@@ -5,14 +5,15 @@ import "celo-foundry-8/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts/common/interfaces/IScoreManager.sol";
-import "@celo-contracts-8/common/ScoreManager.sol";
+import "@celo-contracts/common/interfaces/IScoreManagerGovernance.sol";
+import { ScoreManager } from "@celo-contracts-8/common/ScoreManager.sol";
 
 contract ScoreManagerTest is Test, TestConstants {
   IRegistry registry;
-  IScoreManager public scoreManager;
+  IScoreManagerGovernance public scoreManager;
   address owner;
   address nonOwner;
+  address scoreManagerSetter;
 
   event GroupScoreSet(address indexed group, uint256 score);
   event ValidatorScoreSet(address indexed validator, uint256 score);
@@ -20,11 +21,12 @@ contract ScoreManagerTest is Test, TestConstants {
   function setUp() public virtual {
     owner = address(this);
     nonOwner = actor("nonOwner");
+    scoreManagerSetter = actor("scoreManager");
 
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
     ScoreManager scoreManagerImpl = new ScoreManager(true);
-    scoreManager = IScoreManager(address(scoreManagerImpl));
+    scoreManager = IScoreManagerGovernance(address(scoreManagerImpl));
 
     registry = IRegistry(REGISTRY_ADDRESS);
 
@@ -41,12 +43,12 @@ contract ScoreManagerTest is Test, TestConstants {
 contract ScoreManagerTest_setGroupScore is ScoreManagerTest {
   function test_setGroupScore() public {
     scoreManager.setGroupScore(owner, 42);
-    assert(scoreManager.getGroupScore(owner) == 42);
+    assertEq(scoreManager.getGroupScore(owner), 42);
   }
 
   function test_Reverts_WhenNotCalledByOwner() public {
     vm.prank(nonOwner);
-    vm.expectRevert("Ownable: caller is not the owner");
+    vm.expectRevert("Sender not authorized to update score");
     scoreManager.setGroupScore(owner, 42);
   }
 
@@ -56,7 +58,7 @@ contract ScoreManagerTest_setGroupScore is ScoreManagerTest {
   }
 
   function test_Returns1FixidityWhenGroupScoreDoesNotExist() public {
-    assert(scoreManager.getGroupScore(owner) == 1e24);
+    assertEq(scoreManager.getGroupScore(owner), 1e24);
   }
 
   function test_EmitsGroupScoreSet() public {
@@ -69,12 +71,12 @@ contract ScoreManagerTest_setGroupScore is ScoreManagerTest {
 contract ScoreManagerTest_setValidatorScore is ScoreManagerTest {
   function test_setValidatorScore() public {
     scoreManager.setValidatorScore(owner, 42);
-    assert(scoreManager.getValidatorScore(owner) == 42);
+    assertEq(scoreManager.getValidatorScore(owner), 42);
   }
 
   function test_Reverts_WhenNotCalledByOwner() public {
     vm.prank(nonOwner);
-    vm.expectRevert("Ownable: caller is not the owner");
+    vm.expectRevert("Sender not authorized to update score");
     scoreManager.setValidatorScore(owner, 42);
   }
 
@@ -90,6 +92,27 @@ contract ScoreManagerTest_setValidatorScore is ScoreManagerTest {
   }
 
   function test_Returns1FixidityWhenValidatorScoreDoesNotExist() public {
-    assert(scoreManager.getValidatorScore(owner) == 1e24);
+    assertEq(scoreManager.getValidatorScore(owner), 1e24);
+  }
+
+  function test_setScoreManager_WhenCalledByScoreManager() public {
+    scoreManager.setScoreManager(scoreManagerSetter);
+
+    vm.prank(scoreManagerSetter);
+    scoreManager.setValidatorScore(owner, 42);
+    assertEq(scoreManager.getValidatorScore(owner), 42);
+  }
+}
+
+contract ScoreManagerTest_setScoreManager is ScoreManagerTest {
+  function test_onlyOwnwerCanSetScoreManager() public {
+    vm.prank(nonOwner);
+    vm.expectRevert("Ownable: caller is not the owner");
+    scoreManager.setScoreManager(owner);
+  }
+
+  function test_setScoreManager() public {
+    scoreManager.setScoreManager(nonOwner);
+    assertEq(scoreManager.getScoreManager(), nonOwner, "Score Manager not set");
   }
 }
