@@ -6,11 +6,16 @@ import { TestConstants } from "@test-sol/constants.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IScoreManagerGovernance.sol";
+import "@celo-contracts/common/interfaces/IScoreManager.sol";
 import { ScoreManager } from "@celo-contracts-8/common/ScoreManager.sol";
+
+// merging interfaces here because in 0.5 it can't be done
+// TODO remove this from here after moving everything to 0.8
+interface IScoreManagerTemp is IScoreManagerGovernance, IScoreManager {}
 
 contract ScoreManagerTest is Test, TestConstants {
   IRegistry registry;
-  IScoreManagerGovernance public scoreManager;
+  IScoreManagerTemp public scoreManager;
   address owner;
   address nonOwner;
   address scoreManagerSetter;
@@ -26,7 +31,7 @@ contract ScoreManagerTest is Test, TestConstants {
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
     ScoreManager scoreManagerImpl = new ScoreManager(true);
-    scoreManager = IScoreManagerGovernance(address(scoreManagerImpl));
+    scoreManager = IScoreManagerTemp(address(scoreManagerImpl));
 
     registry = IRegistry(REGISTRY_ADDRESS);
 

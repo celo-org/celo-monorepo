@@ -6,6 +6,7 @@ import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "../../contracts/common/interfaces/IScoreManagerGovernance.sol";
+import "../../contracts/common/interfaces/IScoreManager.sol";
 
 contract ScoreManager is
   Initializable,
