@@ -25,6 +25,8 @@ contract MockValidators is IValidators, IsL2Check {
   mapping(address => address) private affiliations;
   mapping(address => uint256) private commissions;
   uint256 private numRegisteredValidators;
+  mapping(address => uint256) private epochRewards;
+  uint256 public mintedStable;
 
   function updateEcdsaPublicKey(address, address, bytes calldata) external returns (bool) {
     return true;
@@ -224,7 +226,7 @@ contract MockValidators is IValidators, IsL2Check {
   }
 
   function mintStableToEpochManager(uint256 amount) external {
-    revert("Method not implemented in mock");
+    mintedStable = mintedStable.add(amount);
   }
 
   function maxGroupSize() external view returns (uint256) {
@@ -304,7 +306,11 @@ contract MockValidators is IValidators, IsL2Check {
     uint256 score,
     uint256 maxPayment
   ) external view returns (uint256) {
-    revert("Method not implemented in mock");
+    return epochRewards[account];
+  }
+
+  function setEpochRewards(address account, uint256 reward) external {
+    epochRewards[account] = reward;
   }
 
   function registerValidator(
