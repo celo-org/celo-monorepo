@@ -25,6 +25,7 @@ import { MockElection } from "@celo-contracts/governance/test/MockElection.sol";
 import { MockAccounts } from "@celo-contracts-8/common/mocks/MockAccounts.sol";
 import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
 import { MockCeloUnreleasedTreasury } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasury.sol";
+import {console} from "forge-std/console.sol";
 
 contract EpochManagerTest is Test, TestConstants, Utils08 {
   EpochManager_WithMocks epochManager;
@@ -621,6 +622,84 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
 
     for (uint256 i = 0; i < newElected.length; i++) {
       assertEq(newElected[i], afterElected[i]);
+    }
+  }
+}
+
+contract EpochManagerTest_setToProcessGroups is EpochManagerTest {
+  address signer1 = actor("signer1");
+  address signer2 = actor("signer2");
+
+  address validator3 = actor("validator3");
+  address validator4 = actor("validator4");
+
+  address group2 = actor("group2");
+
+  address[] elected;
+
+  uint256 groupEpochRewards = 44e18;
+
+  function setUp() public override {
+    super.setUp();
+
+    validators.setValidatorGroup(group);
+    validators.setValidator(validator1);
+    accounts.setValidatorSigner(validator1, signer1);
+    validators.setValidator(validator2);
+    accounts.setValidatorSigner(validator2, signer2);
+
+    validators.setValidatorGroup(group2);
+    validators.setValidator(validator3);
+    validators.setValidator(validator4);
+
+    address[] memory members = new address[](3);
+    members[0] = validator1;
+    members[1] = validator2;
+    validators.setMembers(group, members);
+    members[0] = validator3;
+    members[1] = validator4;
+    validators.setMembers(group2, members);
+
+    vm.prank(epochManagerEnabler);
+    initializeEpochManagerSystem();
+
+    elected = epochManager.getElected();
+
+    election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
+  }
+
+  function test_Reverts_WhenNotStarted() public {
+    address[] memory groups = new address[](0);
+
+    vm.expectRevert("Epoch process is not started");
+    epochManager.setToProcessGroups();
+  }
+
+  function test_setsToProcessGroups() public {
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
+
+    epochManager.startNextEpochProcess();
+    epochManager.setToProcessGroups();
+
+    assertEq(EpochManager(address(epochManager)).toProcessGroups(), groups.length);
+  }
+
+  function test_setsGroupRewards() public {
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
+
+    epochManager.startNextEpochProcess();
+    epochManager.setToProcessGroups();
+
+    for (uint256 i = 0; i < groups.length; i++) {
+      assertEq(EpochManager(address(epochManager)).processedGroups(group), groupEpochRewards);
     }
   }
 }

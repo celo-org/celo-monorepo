@@ -60,7 +60,7 @@ contract EpochManager is
   mapping(uint256 => Epoch) internal epochs;
   mapping(address => uint256) public validatorPendingPayments;
 
-  uint256 toProcessGroups = 0;
+  uint256 public toProcessGroups = 0;
 
   /**
    * @notice Event emited when epochProcessing has begun.
