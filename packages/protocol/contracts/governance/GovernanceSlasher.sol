@@ -130,9 +130,8 @@ contract GovernanceSlasher is
       electionIndices
     );
 
-    IValidators validators = getValidators();
-
     if (group != address(0)) {
+      IValidators validators = getValidators();
       validators.forceDeaffiliateIfValidator(account);
       validators.halveSlashingMultiplier(group);
     }

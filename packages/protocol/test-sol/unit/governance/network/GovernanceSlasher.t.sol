@@ -134,11 +134,36 @@ contract GovernanceSlasherTest_slashL2_WhenL1 is GovernanceSlasherTest {
   }
 }
 
-contract GovernanceSlasherTest_slashL2_WhenL2 is GovernanceSlasherTest, L2MakerAbstract {
+// should work just like the deprecated version
+contract GovernanceSlasherTest_slashL2_WhenL2_WhenNotGroup is
+  GovernanceSlasherTest,
+  L2MakerAbstract
+{
+  address group = address(0);
+
   function setUp() public {
     super.setUp();
     _whenL2();
   }
 
   // only onwer or multisig can call
+
+  function test_ShouldDecrementCelo() public {
+    governanceSlasher.approveSlashing(validator, 1000);
+    governanceSlasher.slashL2(validator, group, lessers, greaters, indices);
+    assertEq(mockLockedGold.accountTotalLockedGold(validator), 4000);
+  }
+
+  function test_ShouldHaveSetTheApprovedSlashingToZero() public {
+    governanceSlasher.approveSlashing(validator, 1000);
+    governanceSlasher.slashL2(validator, group, lessers, greaters, indices);
+    assertEq(governanceSlasher.getApprovedSlashing(validator), 0);
+  }
+
+  function test_EmitsGovernanceSlashPerformedEvent() public {
+    governanceSlasher.approveSlashing(validator, 1000);
+    vm.expectEmit(true, true, true, true);
+    emit GovernanceSlashPerformed(validator, 1000);
+    governanceSlasher.slashL2(validator, group, lessers, greaters, indices);
+  }
 }
