@@ -34,14 +34,20 @@ contract ScoreManager is Initializable, Ownable {
   }
 
   function setGroupScore(address group, uint256 score) external onlyOwner {
-    require(score <= ZERO_FIXED1_UINT, "Score must be less than or equal to 1e24 or ZERO_FIXED1_UINT.");
+    require(
+      score <= ZERO_FIXED1_UINT,
+      "Score must be less than or equal to 1e24 or ZERO_FIXED1_UINT."
+    );
     groupScores[group] = score;
 
     emit GroupScoreSet(group, score);
   }
 
   function setValidatorScore(address validator, uint256 score) external onlyOwner {
-    require(score <= ZERO_FIXED1_UINT, "Score must be less than or equal to 1e24 or ZERO_FIXED1_UINT.");
+    require(
+      score <= ZERO_FIXED1_UINT,
+      "Score must be less than or equal to 1e24 or ZERO_FIXED1_UINT."
+    );
     validatorScores[validator] = score;
 
     emit ValidatorScoreSet(validator, score);
