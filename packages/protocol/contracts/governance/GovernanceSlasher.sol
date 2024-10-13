@@ -6,8 +6,9 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "./interfaces/IValidators.sol";
+import "../../contracts-0.8/common/IsL2Check.sol";
 
-contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
+contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, IsL2Check {
   using SafeMath for uint256;
   // Maps a slashed address to the amount to be slashed.
   // Note that there is no reward paid when slashing via governance.
@@ -62,6 +63,7 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
     uint256[] calldata electionIndices
   )
     external
+    onlyL1
     returns (
       // TODO only L1
       bool
