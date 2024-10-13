@@ -30,6 +30,7 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   // without this line the contract can't receive native Celo transfers
   function() external payable {}
 
+  // Note: current version of Mento is not compatible with this Seller
   function sell(
     address sellTokenAddress,
     address buyTokenAddress,

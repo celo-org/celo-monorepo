@@ -176,7 +176,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     uint256 amount,
     IUniswapV2RouterMin bestRouter
   ) private view returns (uint256) {
-    address _oracleAddress = getOracleAddress();
+    address _oracleAddress = getOracleAddress(sellTokenAddress);
 
     uint256 minReports = minimumReports[sellTokenAddress];
 

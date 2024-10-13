@@ -16,10 +16,12 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
   // Address of the token
   // Minimal number of reports in SortedOracles contract
   mapping(address => uint256) public minimumReports;
-  address private oracleAddress; // TODO add setter
+  // address private oracleAddress; // TODO remove
+  mapping(address => address) public oracleAddresses;
 
   event MinimumReportsSet(address tokenAddress, uint256 minimumReports);
   event TokenSold(address soldTokenAddress, address boughtTokenAddress, uint256 amount);
+  event OracleAddressSet(address _token, address _oracle);
 
   function initialize(
     address _registryAddress,
@@ -89,15 +91,13 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
     emit MinimumReportsSet(tokenAddress, newMininumReports);
   }
 
-  // TODO this oracle is per token
-  // TODO make external
-  function _setOracleAddress(address _oracleAddress) internal {
-    oracleAddress = _oracleAddress;
-    // TODO emit
+  function setOracleAddress(address _tokenAddress, address _oracleAddress) external onlyOwner {
+    oracleAddresses[_tokenAddress] = _oracleAddress;
+    emit OracleAddressSet(_tokenAddress, _oracleAddress);
   }
 
-  // TODO this oracle is per token
-  function getOracleAddress() public view returns (address) {
+  function getOracleAddress(address _tokenAddress) public view returns (address) {
+    address oracleAddress = oracleAddresses[_tokenAddress];
     if (oracleAddress != address(0)) {
       return oracleAddress;
     }
