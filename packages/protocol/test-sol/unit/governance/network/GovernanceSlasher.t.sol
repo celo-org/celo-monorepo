@@ -27,6 +27,10 @@ contract GovernanceSlasherTest is Test, TestConstants {
   address validator;
   address slashedAddress;
 
+  address[] lessers = new address[](0);
+  address[] greaters = new address[](0);
+  uint256[] indices = new uint256[](0);
+
   function setUp() public {
     owner = address(this);
     nonOwner = actor("nonOwner");
@@ -83,11 +87,7 @@ contract GovernanceSlasherTest_approveSlashingTest is GovernanceSlasherTest {
   }
 }
 
-contract GovernanceSlasherTest_slasherSlashTest is GovernanceSlasherTest, L2MakerAbstract {
-  address[] lessers = new address[](0);
-  address[] greaters = new address[](0);
-  uint256[] indices = new uint256[](0);
-
+contract GovernanceSlasherTest_slash is GovernanceSlasherTest, L2MakerAbstract {
   function test_ShouldFailIfThereIsNothingToSlash() public {
     vm.expectRevert("No penalty given by governance");
     governanceSlasher.slash(validator, lessers, greaters, indices);
@@ -118,4 +118,27 @@ contract GovernanceSlasherTest_slasherSlashTest is GovernanceSlasherTest, L2Make
     vm.expectRevert("This method is no longer supported in L2.");
     governanceSlasher.slash(validator, lessers, greaters, indices);
   }
+}
+
+contract GovernanceSlasherTest_slashL2_WhenL1 is GovernanceSlasherTest {
+  function test_Reverts() public {
+    governanceSlasher.approveSlashing(validator, 1000);
+    vm.expectRevert("This method is not supported in L1.");
+    governanceSlasher.slashL2(
+      validator,
+      validator,
+      new address[](0),
+      new address[](0),
+      new uint256[](0)
+    );
+  }
+}
+
+contract GovernanceSlasherTest_slashL2_WhenL2 is GovernanceSlasherTest, L2MakerAbstract {
+  function setUp() public {
+    super.setUp();
+    _whenL2();
+  }
+
+  // only onwer or multisig can call
 }

@@ -7,8 +7,17 @@ import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "./interfaces/IValidators.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
-contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, IsL2Check {
+// import {console} from "forge-std/console.sol";
+
+contract GovernanceSlasher is
+  Ownable,
+  Initializable,
+  UsingRegistry,
+  ICeloVersionedContract,
+  IsL2Check
+{
   using SafeMath for uint256;
   // Maps a slashed address to the amount to be slashed.
   // Note that there is no reward paid when slashing via governance.
@@ -30,6 +39,17 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, IsL2Check {
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
   }
 
   /**
@@ -61,14 +81,7 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, IsL2Check {
     address[] calldata electionLessers,
     address[] calldata electionGreaters,
     uint256[] calldata electionIndices
-  )
-    external
-    onlyL1
-    returns (
-      // TODO only L1
-      bool
-    )
-  {
+  ) external onlyL1 returns (bool) {
     uint256 penalty = slashed[account];
     require(penalty > 0, "No penalty given by governance");
     slashed[account] = 0;
@@ -92,7 +105,6 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, IsL2Check {
    * @param electionGreaters Greater pointers for slashing locked election gold.
    * @param electionIndices Indices of groups voted by slashed account.
    */
-  // TODO keep old signature?
   function slashL2(
     address account,
     address group,
@@ -101,11 +113,9 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, IsL2Check {
     uint256[] calldata electionIndices
   )
     external
-    onlyOwner
-    returns (
-      // slashing multisig + governance
-      bool
-    )
+    onlyL2
+    onlyOwner // TODO slashing multisig + governance
+    returns (bool)
   {
     uint256 penalty = slashed[account];
     require(penalty > 0, "No penalty given by governance");
