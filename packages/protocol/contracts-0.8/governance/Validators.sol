@@ -1073,7 +1073,6 @@ contract Validators is
    * @param value New reset period for slashing multiplier.
    */
   function setSlashingMultiplierResetPeriod(uint256 value) public nonReentrant onlyOwner {
-    allowOnlyL1();
     slashingMultiplierResetPeriod = value;
   }
 

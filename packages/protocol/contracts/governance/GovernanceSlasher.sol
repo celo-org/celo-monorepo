@@ -57,6 +57,42 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
    */
   function slash(
     address account,
+    address[] calldata electionLessers,
+    address[] calldata electionGreaters,
+    uint256[] calldata electionIndices
+  )
+    external
+    returns (
+      // TODO only L1
+      bool
+    )
+  {
+    uint256 penalty = slashed[account];
+    require(penalty > 0, "No penalty given by governance");
+    slashed[account] = 0;
+    getLockedGold().slash(
+      account,
+      penalty,
+      address(0),
+      0,
+      electionLessers,
+      electionGreaters,
+      electionIndices
+    );
+    emit GovernanceSlashPerformed(account, penalty);
+    return true;
+  }
+
+  /**
+   * @notice Calls `LockedGold.slash` on `account` if `account` has an entry in `slashed`.
+   * @param account Account to slash
+   * @param electionLessers Lesser pointers for slashing locked election gold.
+   * @param electionGreaters Greater pointers for slashing locked election gold.
+   * @param electionIndices Indices of groups voted by slashed account.
+   */
+  // TODO keep old signature?
+  function slashL2(
+    address account,
     address group,
     address[] calldata electionLessers,
     address[] calldata electionGreaters,
@@ -65,7 +101,7 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
     external
     onlyOwner
     returns (
-      // slashing multisig?
+      // slashing multisig + governance
       bool
     )
   {
@@ -86,16 +122,12 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
 
     if (group != address(0)) {
       validators.forceDeaffiliateIfValidator(account);
-      // The slashing multiplier is for references purposes only.
-      // score needs to be manually updated to reflect the change.
       validators.halveSlashingMultiplier(group);
     }
 
     emit GovernanceSlashPerformed(account, penalty);
     return true;
   }
-
-  // function slashAndRemoveValidator()
 
   /**
    * @notice Gets account penalty.
