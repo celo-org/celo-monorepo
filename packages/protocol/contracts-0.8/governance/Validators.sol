@@ -218,8 +218,10 @@ contract Validators is
    * @param signer The validator signer of the validator account whose score needs updating.
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
    */
-  function updateValidatorScoreFromSigner(address signer, uint256 uptime) external virtual onlyVm {
-    allowOnlyL1();
+  function updateValidatorScoreFromSigner(
+    address signer,
+    uint256 uptime
+  ) external virtual onlyVm onlyL1 {
     _updateValidatorScoreFromSigner(signer, uptime);
   }
 
@@ -233,8 +235,7 @@ contract Validators is
   function distributeEpochPaymentsFromSigner(
     address signer,
     uint256 maxPayment
-  ) external virtual onlyVm returns (uint256) {
-    allowOnlyL1();
+  ) external virtual onlyVm onlyL1 returns (uint256) {
     return _distributeEpochPaymentsFromSigner(signer, maxPayment);
   }
 
@@ -254,8 +255,12 @@ contract Validators is
     bytes calldata ecdsaPublicKey,
     bytes calldata blsPublicKey,
     bytes calldata blsPop
-  ) external nonReentrant returns (bool) {
-    allowOnlyL1(); // For L2, use registerValidatorNoBls
+  )
+    external
+    nonReentrant
+    onlyL1 // For L2, use registerValidatorNoBls
+    returns (bool)
+  {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     _isRegistrationAllowed(account);
     require(!isValidator(account) && !isValidatorGroup(account), "Already registered");
@@ -384,8 +389,7 @@ contract Validators is
   function updateBlsPublicKey(
     bytes calldata blsPublicKey,
     bytes calldata blsPop
-  ) external returns (bool) {
-    allowOnlyL1();
+  ) external onlyL1 returns (bool) {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidator(account), "Not a validator");
     Validator storage validator = validators[account];
@@ -460,8 +464,7 @@ contract Validators is
     bytes calldata ecdsaPublicKey,
     bytes calldata blsPublicKey,
     bytes calldata blsPop
-  ) external onlyRegisteredContract(ACCOUNTS_REGISTRY_ID) returns (bool) {
-    allowOnlyL1();
+  ) external onlyL1 onlyRegisteredContract(ACCOUNTS_REGISTRY_ID) returns (bool) {
     require(isValidator(account), "Not a validator");
     Validator storage validator = validators[account];
     require(
@@ -1009,8 +1012,7 @@ contract Validators is
   function setValidatorScoreParameters(
     uint256 exponent,
     uint256 adjustmentSpeed
-  ) public onlyOwner returns (bool) {
-    allowOnlyL1();
+  ) public onlyOwner onlyL1 returns (bool) {
     require(
       adjustmentSpeed <= FixidityLib.fixed1().unwrap(),
       "Adjustment speed cannot be larger than 1"
@@ -1080,8 +1082,7 @@ contract Validators is
    * @notice Sets the downtimeGracePeriod property if called by owner.
    * @param value New downtime grace period for calculating epoch scores.
    */
-  function setDowntimeGracePeriod(uint256 value) public nonReentrant onlyOwner {
-    allowOnlyL1();
+  function setDowntimeGracePeriod(uint256 value) public nonReentrant onlyOwner onlyL1 {
     downtimeGracePeriod = value;
   }
 
@@ -1135,8 +1136,7 @@ contract Validators is
    * @dev epoch_score = uptime ** exponent
    * @return Fixidity representation of the epoch score between 0 and 1.
    */
-  function calculateEpochScore(uint256 uptime) public view returns (uint256) {
-    allowOnlyL1();
+  function calculateEpochScore(uint256 uptime) public view onlyL1 returns (uint256) {
     require(uptime <= FixidityLib.fixed1().unwrap(), "Uptime cannot be larger than one");
     uint256 numerator;
     uint256 denominator;
