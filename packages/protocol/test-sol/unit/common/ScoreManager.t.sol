@@ -73,7 +73,7 @@ contract ScoreManagerTest_setGroupScore is ScoreManagerTest {
   }
 
   function test_WhenCalledByScoreManager() public {
-    scoreManager.setScoreManager(scoreManagerSetter);
+    scoreManager.setScoreManagerSetter(scoreManagerSetter);
 
     vm.prank(scoreManagerSetter);
     scoreManager.setGroupScore(owner, 42);
@@ -109,7 +109,7 @@ contract ScoreManagerTest_setValidatorScore is ScoreManagerTest {
   }
 
   function test_setScoreManager_WhenCalledByScoreManager() public {
-    scoreManager.setScoreManager(scoreManagerSetter);
+    scoreManager.setScoreManagerSetter(scoreManagerSetter);
 
     vm.prank(scoreManagerSetter);
     scoreManager.setValidatorScore(owner, 42);
@@ -117,15 +117,15 @@ contract ScoreManagerTest_setValidatorScore is ScoreManagerTest {
   }
 }
 
-contract ScoreManagerTest_setScoreManager is ScoreManagerTest {
+contract ScoreManagerTest_setScoreManagerSetter is ScoreManagerTest {
   function test_onlyOwnwerCanSetScoreManager() public {
     vm.prank(nonOwner);
     vm.expectRevert("Ownable: caller is not the owner");
-    scoreManager.setScoreManager(owner);
+    scoreManager.setScoreManagerSetter(owner);
   }
 
   function test_setScoreManager() public {
-    scoreManager.setScoreManager(nonOwner);
-    assertEq(scoreManager.getScoreManager(), nonOwner, "Score Manager not set");
+    scoreManager.setScoreManagerSetter(nonOwner);
+    assertEq(scoreManager.getScoreManagerSetter(), nonOwner, "Score Manager not set");
   }
 }
