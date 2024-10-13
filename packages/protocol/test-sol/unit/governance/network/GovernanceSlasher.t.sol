@@ -112,7 +112,7 @@ contract GovernanceSlasherTest_slasherSlashTest is GovernanceSlasherTest, L2Make
     governanceSlasher.slash(validator, lessers, greaters, indices);
   }
 
-  function test_Reverts_WhenL1() public {
+  function test_Reverts_WhenL2() public {
     _whenL2();
     governanceSlasher.approveSlashing(validator, 1000);
     vm.expectRevert("This method is no longer supported in L2.");
