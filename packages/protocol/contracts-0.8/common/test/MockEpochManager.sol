@@ -60,6 +60,9 @@ contract MockEpochManager is IEpochManager {
     address[] calldata greaters
   ) external {}
 
+  function setToProcessGroups() external {}
+  function processGroup(address group, address lesser, address greater) external {}
+
   function setIsTimeForNextEpoch(bool _isTime) external {
     _isTimeForNextEpoch = _isTime;
   }

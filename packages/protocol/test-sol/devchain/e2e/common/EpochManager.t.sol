@@ -745,3 +745,143 @@ contract E2E_GasTest2_FinishNextEpochProcess is E2E_GasTest_Setup {
     console.log("elected count2: ", epochManager.getElected().length);
   }
 }
+
+contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
+  using EnumerableSet for EnumerableSet.AddressSet;
+
+  function setUp() public override {
+    super.setUp();
+
+    activateValidators();
+    whenL2(vm);
+
+    vm.prank(epochManagerEnabler);
+    epochManager.initializeSystem(1, 1, firstElected);
+
+    validatorsArray = getValidators().getRegisteredValidators();
+    groups = getValidators().getRegisteredValidatorGroups();
+
+    vm.startPrank(scoreManager.owner());
+    scoreManager.setGroupScore(groups[0], groupScore[0]);
+    scoreManager.setGroupScore(groups[1], groupScore[1]);
+    scoreManager.setGroupScore(groups[2], groupScore[2]);
+
+    scoreManager.setValidatorScore(validatorsArray[0], validatorScore[0]);
+    scoreManager.setValidatorScore(validatorsArray[1], validatorScore[1]);
+    scoreManager.setValidatorScore(validatorsArray[2], validatorScore[2]);
+    scoreManager.setValidatorScore(validatorsArray[3], validatorScore[3]);
+    scoreManager.setValidatorScore(validatorsArray[4], validatorScore[4]);
+    scoreManager.setValidatorScore(validatorsArray[5], validatorScore[5]);
+
+    vm.stopPrank();
+
+    timeTravel(vm, epochDuration + 1);
+    epochManager.startNextEpochProcess();
+
+    address[] memory lessers;
+    address[] memory greaters;
+    address[] memory groupsEligible;
+    GroupWithVotes[] memory groupWithVotes;
+    uint256[] memory groupActiveBalances;
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+
+    uint256 currentEpoch = epochManager.getCurrentEpochNumber();
+    address[] memory currentlyElected = epochManager.getElected();
+    for (uint256 i = 0; i < currentlyElected.length; i++) {
+      originalyElected.add(currentlyElected[i]);
+    }
+
+    // wait some time before finishing
+    timeTravel(vm, epochDuration / 2);
+    blockTravel(vm, 100);
+
+    epochManager.setToProcessGroups();
+    for (uint256 i = 0; i < groups.length; i++) {
+      epochManager.processGroup(groups[i], lessers[i], greaters[i]);
+    }
+
+    assertEq(currentEpoch + 1, epochManager.getCurrentEpochNumber());
+
+    address[] memory newlyElected = epochManager.getElected();
+
+    for (uint256 i = 0; i < currentlyElected.length; i++) {
+      assertEq(originalyElected.contains(currentlyElected[i]), true);
+    }
+
+    timeTravel(vm, epochDuration + 1);
+    epochManager.startNextEpochProcess();
+
+    // wait some time before finishing
+    timeTravel(vm, epochDuration / 2);
+    blockTravel(vm, 100);
+
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManager.setToProcessGroups();
+    for (uint256 i = 0; i < groups.length; i++) {
+      epochManager.processGroup(groups[i], lessers[i], greaters[i]);
+    }
+    // epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
+
+    assertEq(currentEpoch + 2, epochManager.getCurrentEpochNumber());
+
+    address[] memory newlyElected2 = epochManager.getElected();
+
+    for (uint256 i = 0; i < currentlyElected.length; i++) {
+      assertEq(originalyElected.contains(newlyElected2[i]), true);
+    }
+    uint256 validatorGroupCount = 60;
+    uint256 validatorPerGroupCount = 2;
+
+    for (uint256 i = 0; i < validatorGroupCount; i++) {
+      (address newValidatorGroup, address newValidator) = registerNewValidatorGroupWithValidator(
+        i,
+        validatorPerGroupCount
+      );
+    }
+
+    timeTravel(vm, epochDuration + 1);
+    epochManager.startNextEpochProcess();
+
+    timeTravel(vm, epochDuration / 2);
+    blockTravel(vm, 100);
+
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+
+    epochManager.setToProcessGroups();
+    for (uint256 i = 0; i < groups.length; i++) {
+      epochManager.processGroup(groups[i], lessers[i], greaters[i]);
+    }
+
+    activateValidators();
+
+    timeTravel(vm, epochDuration + 1);
+    epochManager.startNextEpochProcess();
+
+    groups = getCurrentlyElectedGroups();
+
+    timeTravel(vm, epochDuration / 2);
+    blockTravel(vm, 100);
+  }
+
+  /**
+    * @notice Test the gas used by finishNextEpochProcess
+    This test is trying to measure gas used by finishNextEpochProcess in a real life worst case. We have 126 validators and 123 groups.
+    There are two main loops in the function, one for calculating rewards and the other for updating the elected validators.
+    FinishNextEpochProcess is called twice, first time with going from 6 -> 110 validators which consumes approx. 6M gas and the second time with going from 110 -> 110 validators which consumes approx. 19M gas. 
+     */
+  function test_shouldFinishNextEpochProcessing_GasTest_Split() public {
+    address[] memory lessers;
+    address[] memory greaters;
+    GroupWithVotes[] memory groupWithVotes;
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManager.setToProcessGroups();
+
+    for (uint256 i = 0; i < groups.length; i++) {
+      uint256 gasLeftBefore1 = gasleft();
+      epochManager.processGroup(groups[i], lessers[i], greaters[i]);
+      uint256 gasLeftAfter1 = gasleft();
+      console.log("processGroup gas used: ", gasLeftBefore1 - gasLeftAfter1);
+    }
+  }
+}
