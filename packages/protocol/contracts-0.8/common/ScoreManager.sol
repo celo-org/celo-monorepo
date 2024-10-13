@@ -54,24 +54,11 @@ contract ScoreManager is Initializable, Ownable {
   }
 
   function getGroupScore(address group) external view returns (uint256) {
-    uint256 score = groupScores[group];
-    if (score == 0) {
-      return FIXED1_UINT;
-    } else if (score == ZERO_FIXED1_UINT) {
-      return 0;
-    }
-
-    return score;
+    return getScore(groupScores[group]);
   }
 
   function getValidatorScore(address validator) external view returns (uint256) {
-    uint256 score = validatorScores[validator];
-    if (score == 0) {
-      return FIXED1_UINT;
-    } else if (score == ZERO_FIXED1_UINT) {
-      return 0;
-    }
-    return score;
+    return getScore(validatorScores[validator]);
   }
 
   /**
@@ -83,5 +70,14 @@ contract ScoreManager is Initializable, Ownable {
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 0, 0);
+  }
+
+  function getScore(uint256 score) internal pure returns (uint256) {
+    if (score == 0) {
+      return FIXED1_UINT;
+    } else if (score == ZERO_FIXED1_UINT) {
+      return 0;
+    }
+    return score;
   }
 }
