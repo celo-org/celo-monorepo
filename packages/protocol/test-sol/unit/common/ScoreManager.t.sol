@@ -17,6 +17,8 @@ contract ScoreManagerTest is Test, TestConstants {
   event GroupScoreSet(address indexed group, uint256 score);
   event ValidatorScoreSet(address indexed validator, uint256 score);
 
+  uint256 constant ZERO_FIXED1_UINT = 1e24 + 1;
+
   function setUp() public virtual {
     owner = address(this);
     nonOwner = actor("nonOwner");
@@ -51,12 +53,17 @@ contract ScoreManagerTest_setGroupScore is ScoreManagerTest {
   }
 
   function test_Reverts_WhenSetToMoreThan1e24() public {
-    vm.expectRevert("Score must be less than or equal to 1e24.");
-    scoreManager.setGroupScore(owner, 1e24 + 1);
+    vm.expectRevert("Score must be less than or equal to 1e24 or ZERO_FIXED1_UINT.");
+    scoreManager.setGroupScore(owner, 1e24 + 2);
   }
 
   function test_Returns1FixidityWhenGroupScoreDoesNotExist() public {
     assert(scoreManager.getGroupScore(owner) == 1e24);
+  }
+
+  function test_Returns0WhenGroupScoreIsZero() public {
+    scoreManager.setGroupScore(owner, ZERO_FIXED1_UINT);
+    assert(scoreManager.getGroupScore(owner) == 0);
   }
 
   function test_EmitsGroupScoreSet() public {
@@ -79,8 +86,13 @@ contract ScoreManagerTest_setValidatorScore is ScoreManagerTest {
   }
 
   function test_Reverts_WhenSetToMoreThan1e24() public {
-    vm.expectRevert("Score must be less than or equal to 1e24.");
-    scoreManager.setValidatorScore(owner, 1e24 + 1);
+    vm.expectRevert("Score must be less than or equal to 1e24 or ZERO_FIXED1_UINT.");
+    scoreManager.setValidatorScore(owner, 1e24 + 2);
+  }
+
+  function test_Returns0WhenValidatorScoreIsZero() public {
+    scoreManager.setValidatorScore(owner, ZERO_FIXED1_UINT);
+    assert(scoreManager.getValidatorScore(owner) == 0);
   }
 
   function test_EmitsValidatorScoreSet() public {
