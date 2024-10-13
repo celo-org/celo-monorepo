@@ -8,7 +8,13 @@ import "@openzeppelin/contracts8/access/Ownable.sol";
 import "../../contracts/common/interfaces/IScoreManagerGovernance.sol";
 import "../../contracts/common/interfaces/IScoreManager.sol";
 
-contract ScoreManager is Initializable, Ownable, IScoreManager, ICeloVersionedContract {
+contract ScoreManager is
+  Initializable,
+  Ownable,
+  IScoreManager,
+  IScoreManagerGovernance,
+  ICeloVersionedContract
+{
   struct Score {
     uint256 score;
     bool exists;
@@ -18,15 +24,15 @@ contract ScoreManager is Initializable, Ownable, IScoreManager, ICeloVersionedCo
 
   mapping(address => Score) public groupScores;
   mapping(address => Score) public validatorScores;
-  address private scoreManager;
+  address private scoreManagerSetter;
 
   event GroupScoreSet(address indexed group, uint256 score);
   event ValidatorScoreSet(address indexed validator, uint256 score);
-  event ScoreManagerSet(address indexed scoreManager);
+  event ScoreManagerSet(address indexed scoreManagerSetter);
 
   modifier onlyAuthorizedToUpdateScore() {
     require(
-      msg.sender == owner() || scoreManager == msg.sender,
+      msg.sender == owner() || scoreManagerSetter == msg.sender,
       "Sender not authorized to update score"
     );
     _;
@@ -70,9 +76,9 @@ contract ScoreManager is Initializable, Ownable, IScoreManager, ICeloVersionedCo
     emit ValidatorScoreSet(validator, score);
   }
 
-  function setScoreManager(address _scoreManager) external onlyOwner {
-    scoreManager = _scoreManager;
-    emit ScoreManagerSet(_scoreManager);
+  function setScoreManagerSetter(address _scoreManagerSetter) external onlyOwner {
+    scoreManagerSetter = _scoreManagerSetter;
+    emit ScoreManagerSet(_scoreManagerSetter);
   }
 
   function getGroupScore(address group) external view returns (uint256) {
@@ -91,8 +97,8 @@ contract ScoreManager is Initializable, Ownable, IScoreManager, ICeloVersionedCo
     return validatorScore.score;
   }
 
-  function getScoreManager() external view returns (address) {
-    return scoreManager;
+  function getScoreManagerSetter() external view returns (address) {
+    return scoreManagerSetter;
   }
 
   /**
