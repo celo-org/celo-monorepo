@@ -21,9 +21,10 @@ contract ScoreManager is
   }
 
   uint256 private constant FIXED1_UINT = 1e24;
+  uint256 public constant ZERO_FIXED1_UINT = FIXED1_UINT + 1;
 
-  mapping(address => Score) public groupScores;
-  mapping(address => Score) public validatorScores;
+  mapping(address => uint256) public groupScores;
+  mapping(address => uint256) public validatorScores;
   address private scoreManagerSetter;
 
   event GroupScoreSet(address indexed group, uint256 score);
@@ -52,12 +53,11 @@ contract ScoreManager is
   }
 
   function setGroupScore(address group, uint256 score) external onlyAuthorizedToUpdateScore {
-    require(score <= FIXED1_UINT, "Score must be less than or equal to 1e24.");
-    Score storage groupScore = groupScores[group];
-    if (!groupScore.exists) {
-      groupScore.exists = true;
-    }
-    groupScore.score = score;
+    require(
+      score <= ZERO_FIXED1_UINT,
+      "Score must be less than or equal to 1e24 or ZERO_FIXED1_UINT."
+    );
+    groupScores[group] = score;
 
     emit GroupScoreSet(group, score);
   }
@@ -66,12 +66,11 @@ contract ScoreManager is
     address validator,
     uint256 score
   ) external onlyAuthorizedToUpdateScore {
-    require(score <= FIXED1_UINT, "Score must be less than or equal to 1e24.");
-    Score storage validatorScore = validatorScores[validator];
-    if (!validatorScore.exists) {
-      validatorScore.exists = true;
-    }
-    validatorScore.score = score;
+    require(
+      score <= ZERO_FIXED1_UINT,
+      "Score must be less than or equal to 1e24 or ZERO_FIXED1_UINT."
+    );
+    validatorScores[validator] = score;
 
     emit ValidatorScoreSet(validator, score);
   }
@@ -82,19 +81,11 @@ contract ScoreManager is
   }
 
   function getGroupScore(address group) external view returns (uint256) {
-    Score storage groupScore = groupScores[group];
-    if (!groupScore.exists) {
-      return FIXED1_UINT;
-    }
-    return groupScore.score;
+    return getScore(groupScores[group]);
   }
 
   function getValidatorScore(address validator) external view returns (uint256) {
-    Score storage validatorScore = validatorScores[validator];
-    if (!validatorScore.exists) {
-      return FIXED1_UINT;
-    }
-    return validatorScore.score;
+    return getScore(validatorScores[validator]);
   }
 
   function getScoreManagerSetter() external view returns (address) {
@@ -110,5 +101,14 @@ contract ScoreManager is
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 0, 0);
+  }
+
+  function getScore(uint256 score) internal pure returns (uint256) {
+    if (score == 0) {
+      return FIXED1_UINT;
+    } else if (score == ZERO_FIXED1_UINT) {
+      return 0;
+    }
+    return score;
   }
 }
