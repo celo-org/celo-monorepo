@@ -1213,5 +1213,3 @@ contract FeeHandlerTest_SetBeneficiaryName is FeeHandlerTestAbstract {
     feeHandler.setBeneficiaryName(op, "OP revenue share updated");
   }
 }
-
-// TODO add sets setting the oracle and the setters
