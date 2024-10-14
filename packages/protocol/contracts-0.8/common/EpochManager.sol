@@ -146,11 +146,7 @@ contract EpochManager is
     uint256 firstEpochNumber,
     uint256 firstEpochBlock,
     address[] memory firstElected
-  )
-    external
-    // address[] memory firstElectedSigners
-    onlyEpochManagerEnabler
-  {
+  ) external onlyEpochManagerEnabler {
     require(
       getCeloToken().balanceOf(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURY_REGISTRY_ID)) >
         0,
@@ -392,7 +388,14 @@ contract EpochManager is
     onlySystemAlreadyInitialized
     returns (uint256)
   {
-    return electedAccountsOfEpoch[currentEpochNumber].length;
+    return electedAccounts.length;
+  }
+
+  /**
+   * @return The list of currently elected validators.
+   */
+  function getElected() external view onlySystemAlreadyInitialized returns (address[] memory) {
+    return electedAccounts;
   }
 
   /**
@@ -513,18 +516,6 @@ contract EpochManager is
     require(!isOnEpochProcess(), "Cannot change oracle address during epoch processing.");
     oracleAddress = newOracleAddress;
     emit OracleAddressSet(newOracleAddress);
-  }
-
-  /**
-   * @return The list of currently elected validators.
-   */
-  function getElectedAccounts()
-    public
-    view
-    onlySystemAlreadyInitialized
-    returns (address[] memory)
-  {
-    return electedAccounts;
   }
 
   /**
