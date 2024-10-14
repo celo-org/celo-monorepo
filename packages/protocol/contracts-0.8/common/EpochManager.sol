@@ -61,7 +61,6 @@ contract EpochManager is
 
   EpochProcessState public epochProcessing;
   mapping(uint256 => Epoch) internal epochs;
-
   mapping(address => uint256) public validatorPendingPayments;
 
   /**
