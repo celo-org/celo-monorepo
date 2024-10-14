@@ -480,8 +480,6 @@ contract EpochManager is
     EpochProcessState storage _epochProcessing = epochProcessing;
 
     for (uint i = 0; i < elected.length; i++) {
-      // TODO here the score should be multiplied by the validator's slashing multiplier
-      // but to save gas the scoreSetters have to manually update the score.
       uint256 validatorScore = scoreReader.getValidatorScore(elected[i]);
       uint256 validatorReward = validators.computeEpochReward(
         elected[i],
