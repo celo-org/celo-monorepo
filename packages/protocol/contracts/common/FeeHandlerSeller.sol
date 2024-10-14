@@ -16,7 +16,6 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
   // Address of the token
   // Minimal number of reports in SortedOracles contract
   mapping(address => uint256) public minimumReports;
-  // address private oracleAddress; // TODO remove
   mapping(address => address) public oracleAddresses;
 
   event MinimumReportsSet(address tokenAddress, uint256 minimumReports);
@@ -103,5 +102,16 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
     }
 
     return address(getSortedOracles());
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
   }
 }
