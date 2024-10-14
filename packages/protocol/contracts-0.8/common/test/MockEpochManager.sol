@@ -34,8 +34,8 @@ contract MockEpochManager is IEpochManager {
 
   uint256 public firstKnownEpoch;
   uint256 private currentEpochNumber;
-  mapping(uint256 => address[]) internal electedAccountsOfEpoch;
-  mapping(uint256 => address[]) internal electedSignersOfEpoch;
+  address[] public electedAccounts;
+  address[] public electedSigners;
   address public epochManagerEnabler;
   bool systemInitialized;
 
@@ -62,8 +62,8 @@ contract MockEpochManager is IEpochManager {
     _currentEpoch.firstBlock = firstEpochBlock;
     _currentEpoch.startTimestamp = block.timestamp;
 
-    electedAccountsOfEpoch[currentEpochNumber] = firstElected;
-    electedSignersOfEpoch[currentEpochNumber] = firstElected;
+    electedAccounts = firstElected;
+    electedSigners = firstElected;
 
     systemInitialized = true;
     epochManagerEnabler = address(0);
@@ -101,20 +101,15 @@ contract MockEpochManager is IEpochManager {
   }
 
   function numberOfElectedInCurrentSet() external view returns (uint256) {
-    return electedAccountsOfEpoch[currentEpochNumber].length;
-  }
-
-  function numberOfElectedInSet(uint256 _blockNumber) external view returns (uint256) {
-    (uint256 _epochNumber, , , , ) = _getEpochByBlockNumber(_blockNumber);
-    return electedAccountsOfEpoch[_epochNumber].length;
+    return electedAccounts.length;
   }
 
   function getElectedAccounts() external view returns (address[] memory) {
-    return electedAccountsOfEpoch[currentEpochNumber];
+    return electedAccounts;
   }
 
   function getElectedAccountByIndex(uint256 index) external view returns (address) {
-    return electedAccountsOfEpoch[currentEpochNumber][index];
+    return electedAccounts[index];
   }
 
   function getFirstBlockAtEpoch(uint256 _epoch) external view returns (uint256) {
@@ -157,30 +152,17 @@ contract MockEpochManager is IEpochManager {
     return (0, 0, 0, 0);
   }
 
-  function getElectedAccountAddressFromSet(
-    uint256 index,
-    uint256 _blockNumber
-  ) external view returns (address) {
-    return address(0);
-  }
-  function getElectedSignerAddressFromSet(
-    uint256 index,
-    uint256 _blockNumber
-  ) external view returns (address) {
-    return address(0);
-  }
-
   function getEpochNumberOfBlock(uint256 _blockNumber) external view returns (uint256) {
     (uint256 _epochNumber, , , , ) = _getEpochByBlockNumber(_blockNumber);
     return _epochNumber;
   }
 
   function getElectedSigners() external view returns (address[] memory) {
-    return electedSignersOfEpoch[currentEpochNumber];
+    return electedSigners;
   }
 
   function getElectedSignerByIndex(uint256 index) external view returns (address) {
-    return electedSignersOfEpoch[currentEpochNumber][index];
+    return electedSigners[index];
   }
 
   function sendValidatorPayment(address validator) public {

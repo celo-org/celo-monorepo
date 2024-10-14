@@ -767,17 +767,6 @@ contract EpochManagerTest_numberOfElectedInCurrentSet is EpochManagerTest {
   }
 }
 
-contract EpochManagerTest_numberOfElectedInSet is EpochManagerTest {
-  function test_ShouldRetreiveTheNumberOfElected() public {
-    initializeEpochManagerSystem();
-    assertEq(epochManager.numberOfElectedInSet(firstEpochBlock), 2);
-  }
-
-  function test_Reverts_WhenL1() public {
-    vm.expectRevert("Epoch system not initialized");
-    epochManager.numberOfElectedInSet(firstEpochBlock);
-  }
-}
 contract EpochManagerTest_getElectedAccounts is EpochManagerTest {
   function test_ShouldRetreiveThelistOfElectedAccounts() public {
     initializeEpochManagerSystem();
@@ -789,6 +778,7 @@ contract EpochManagerTest_getElectedAccounts is EpochManagerTest {
     epochManager.getElectedAccounts();
   }
 }
+
 contract EpochManagerTest_getElectedAccountByIndex is EpochManagerTest {
   function test_ShouldRetreiveThecorrectValidator() public {
     initializeEpochManagerSystem();
@@ -826,31 +816,5 @@ contract EpochManagerTest_getElectedSignerByIndex is EpochManagerTest {
   function test_Reverts_WhenL1() public {
     vm.expectRevert("Epoch system not initialized");
     epochManager.getElectedSignerByIndex(1);
-  }
-}
-contract EpochManagerTest_getElectedAccountAddressFromSet is EpochManagerTest {
-  function test_ShouldRetreiveThecorrectElectedAccountFromGivenSet() public {
-    initializeEpochManagerSystem();
-
-    assertEq(epochManager.getElectedAccountAddressFromSet(1, firstEpochBlock), firstElected[1]);
-  }
-
-  function test_Reverts_WhenL1() public {
-    vm.expectRevert("Epoch system not initialized");
-    epochManager.getElectedAccountAddressFromSet(1, firstEpochBlock);
-  }
-}
-contract EpochManagerTest_getElectedSignerAddressFromSet is EpochManagerTest {
-  function test_ShouldRetreiveThecorrectElectedSignerFromGivenSet() public {
-    initializeEpochManagerSystem();
-    address[] memory electedSigners = new address[](firstElected.length);
-
-    electedSigners[1] = accounts.getValidatorSigner(firstElected[1]);
-    assertEq(epochManager.getElectedSignerAddressFromSet(1, firstEpochBlock), electedSigners[1]);
-  }
-
-  function test_Reverts_WhenL1() public {
-    vm.expectRevert("Epoch system not initialized");
-    epochManager.getElectedSignerAddressFromSet(1, firstEpochBlock);
   }
 }

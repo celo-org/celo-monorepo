@@ -9,7 +9,7 @@ import "./UsingPrecompiles.sol";
 /**
  * @title PrecompilesOverride Contract
  * @notice This contract allows for a smoother transition from L1 to L2
- * by abstracting away the usingPrecompile contract, and taking care of the L1 to L2 swtiching logic.
+ * by abstracting away the usingPrecompile contract, and taking care of the L1 to L2 switching logic.
  **/
 contract PrecompilesOverride is UsingPrecompiles, UsingRegistry {
   /**
@@ -57,36 +57,6 @@ contract PrecompilesOverride is UsingPrecompiles, UsingRegistry {
   }
 
   /**
-   * @notice Gets a validator signer address from the validator set at the given block number.
-   * @param index Index of requested validator in the validator set.
-   * @param blockNumber Block number to retrieve the validator set from.
-   * @return Address of validator signer at the requested index.
-   */
-  function validatorSignerAddressFromSet(
-    uint256 index,
-    uint256 blockNumber
-  ) public view returns (address) {
-    if (isL2()) {
-      return getEpochManager().getElectedSignerAddressFromSet(index, blockNumber);
-    } else {
-      return super.validatorSignerAddressFromSet(index, blockNumber);
-    }
-  }
-
-  /**
-   * @notice Gets a validator address from the validator set at the given block number.
-   * @param index Index of requested validator in the validator set.
-   * @param blockNumber Block number to retrieve the validator set from.
-   * @return Address of validator at the requested index.
-   */
-  function validatorAddressFromSet(
-    uint256 index,
-    uint256 blockNumber
-  ) public view onlyL2 returns (address) {
-    return getEpochManager().getElectedAccountAddressFromSet(index, blockNumber);
-  }
-
-  /**
    * @notice Gets the size of the current elected validator set.
    * @return Size of the current elected validator set.
    */
@@ -95,19 +65,6 @@ contract PrecompilesOverride is UsingPrecompiles, UsingRegistry {
       return getEpochManager().numberOfElectedInCurrentSet();
     } else {
       return super.numberValidatorsInCurrentSet();
-    }
-  }
-
-  /**
-   * @notice Gets the size of the validator set that must sign the given block number.
-   * @param blockNumber Block number to retrieve the validator set from.
-   * @return Size of the validator set.
-   */
-  function numberValidatorsInSet(uint256 blockNumber) public view returns (uint256) {
-    if (isL2()) {
-      return getEpochManager().numberOfElectedInSet(blockNumber);
-    } else {
-      return super.numberValidatorsInSet(blockNumber);
     }
   }
 }

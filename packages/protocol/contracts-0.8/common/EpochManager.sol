@@ -178,8 +178,6 @@ contract EpochManager is
     electedAccounts = firstElected;
 
     _setElectedSigners(firstElected);
-
-    updateElectionHistory();
   }
 
   /**
@@ -190,7 +188,7 @@ contract EpochManager is
   function startNextEpochProcess() external nonReentrant onlySystemAlreadyInitialized {
     require(isTimeForNextEpoch(), "Epoch is not ready to start");
     require(!isOnEpochProcess(), "Epoch process is already started");
-    updateElectionHistory();
+
     epochProcessing.status = EpochProcessStatus.Started;
     epochs[currentEpochNumber].rewardsBlock = block.number;
 
@@ -401,17 +399,6 @@ contract EpochManager is
   }
 
   /**
-   * @notice Returns the number of elected accounts in a specified set.
-   * @param _blockNumber The block number at which to retreive the set.
-   */
-  function numberOfElectedInSet(
-    uint256 _blockNumber
-  ) external view onlySystemAlreadyInitialized returns (uint256) {
-    (uint256 _epochNumber, , , , ) = _getEpochByBlockNumber(_blockNumber);
-    return electedAccountsOfEpoch[_epochNumber].length;
-  }
-
-  /**
    * @notice Returns the currently elected account at a specified index.
    * @param index The index of the currently elected account.
    */
@@ -493,39 +480,6 @@ contract EpochManager is
       uint256 _rewardsBlock
     ) = _getEpochByBlockNumber(_blockNumber);
     return (_firstBlock, _lastBlock, _startTimestamp, _rewardsBlock);
-  }
-
-  /**
-   * @notice Returns the elected account address at a specified index of a specified block number.
-   * @param index The index of the elected account.
-   * @param _blockNumber The block number of interest.
-   */
-  function getElectedAccountAddressFromSet(
-    uint256 index,
-    uint256 _blockNumber
-  ) external view onlySystemAlreadyInitialized returns (address) {
-    if (_blockNumber == block.number) {
-      return electedAccounts[index];
-    }
-    (uint256 _epochNumber, , , , ) = _getEpochByBlockNumber(_blockNumber);
-    return electedAccountsOfEpoch[_epochNumber][index];
-  }
-
-  /**
-   * @notice Returns the elected signer address at a specified index of a specified block number.
-   * @param index The index of the elected signer.
-   * @param _blockNumber The block number of interest.
-   */
-  function getElectedSignerAddressFromSet(
-    uint256 index,
-    uint256 _blockNumber
-  ) external view onlySystemAlreadyInitialized returns (address) {
-    if (_blockNumber == block.number) {
-      return electedSigners[index];
-    }
-
-    (uint256 _epochNumber, , , , ) = _getEpochByBlockNumber(_blockNumber);
-    return electedSignersOfEpoch[_epochNumber][index];
   }
 
   /**
@@ -721,10 +675,5 @@ contract EpochManager is
     }
 
     revert("No matching epoch found for the given block number.");
-  }
-
-  function updateElectionHistory() private {
-    electedAccountsOfEpoch[currentEpochNumber] = electedAccounts;
-    electedSignersOfEpoch[currentEpochNumber] = electedSigners;
   }
 }
