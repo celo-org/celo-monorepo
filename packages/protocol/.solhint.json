@@ -3,6 +3,6 @@
   "rules": {
     "function-max-lines": "off",
     "max-line-length": "off",
-    "ordering": "error"
+    "ordering": "warn"
   }
 }
