@@ -49,8 +49,10 @@ contract FeeCurrencyWhitelist is
 
   /**
    * @return a list of all tokens enabled as gas fee currency.
+   * @dev Once Celo becomes an L2, use the FeeCurrencyDirectory contract
+   * instead.
    */
-  function getWhitelist() external view returns (address[] memory) {
+  function getWhitelist() external view onlyL1 returns (address[] memory) {
     return deprecated_whitelist;
   }
 
