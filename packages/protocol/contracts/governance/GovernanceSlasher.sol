@@ -9,8 +9,6 @@ import "./interfaces/IValidators.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
-// import {console} from "forge-std/console.sol";
-
 contract GovernanceSlasher is
   Ownable,
   Initializable,
