@@ -231,6 +231,10 @@ contract EpochManager is
     IValidators validators = getValidators();
     IElection election = getElection();
     IScoreReader scoreReader = getScoreReader();
+    require(
+      electedAccounts.length == electedSigners.length,
+      "Elected accounts and signers of different lengths."
+    );
     for (uint i = 0; i < electedAccounts.length; i++) {
       address group = validators.getValidatorsGroup(electedAccounts[i]);
       if (processedGroups[group] == 0) {
@@ -245,6 +249,7 @@ contract EpochManager is
         processedGroups[group] = epochRewards == 0 ? type(uint256).max : epochRewards;
       }
       delete electedAccounts[i];
+      delete electedSigners[i];
     }
 
     require(toProcessGroups == groups.length, "number of groups does not match");
