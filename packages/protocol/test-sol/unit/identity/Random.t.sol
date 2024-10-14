@@ -8,16 +8,18 @@ import { TestConstants } from "@test-sol/constants.sol";
 import "@celo-contracts/identity/Random.sol";
 import "@celo-contracts/identity/test/RandomTest.sol";
 
-contract RandomnessTest_SetRandomnessRetentionWindow is Test, TestConstants, IsL2Check {
-  event RandomnessBlockRetentionWindowSet(uint256 value);
-
+contract RandomTest_ is Test, TestConstants, Utils, IsL2Check {
   RandomTest random;
+
+  event RandomnessBlockRetentionWindowSet(uint256 value);
 
   function setUp() public {
     random = new RandomTest();
     random.initialize(256);
   }
+}
 
+contract RandomTest_SetRandomnessRetentionWindow is RandomTest_ {
   function test_ShouldSetTheVariable() public {
     random.setRandomnessBlockRetentionWindow(1000);
     assertEq(random.randomnessBlockRetentionWindow(), 1000);
@@ -42,16 +44,9 @@ contract RandomnessTest_SetRandomnessRetentionWindow is Test, TestConstants, IsL
   }
 }
 
-contract RandomnessTest_AddTestRandomness is Test, TestConstants, Utils, IsL2Check {
+contract RandomTest_AddTestRandomness is RandomTest_ {
   uint256 constant RETENTION_WINDOW = 5;
   uint256 constant EPOCH_SIZE = 10;
-
-  RandomTest random;
-
-  function setUp() public {
-    random = new RandomTest();
-    random.initialize(256);
-  }
 
   function test_ShouldBeAbleToSimulateAddingRandomness() public {
     random.addTestRandomness(1, 0x0000000000000000000000000000000000000000000000000000000000000001);
@@ -225,15 +220,12 @@ contract RandomnessTest_AddTestRandomness is Test, TestConstants, Utils, IsL2Che
   }
 }
 
-contract RandomnessTest_RevealAndCommit is Test, TestConstants, Utils, IsL2Check {
+contract RandomTest_RevealAndCommit is RandomTest_ {
   address constant ACCOUNT = address(0x01);
   bytes32 constant RANDONMESS = bytes32(uint256(0x00));
 
-  RandomTest random;
-
   function setUp() public {
-    random = new RandomTest();
-    random.initialize(256);
+    super.setUp();
     random.setRandomnessBlockRetentionWindow(256);
   }
 
