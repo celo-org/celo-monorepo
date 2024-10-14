@@ -18,7 +18,7 @@ contract IsL2Check {
     _;
   }
 
-  function isL2() public view returns (bool) {
+  function isL2() internal view returns (bool) {
     uint32 size;
     address _addr = proxyAdminAddress;
     assembly {
