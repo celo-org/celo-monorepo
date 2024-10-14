@@ -4,7 +4,9 @@ pragma solidity ^0.5.13;
 import "celo-foundry/Test.sol";
 import "@celo-contracts/common/FeeCurrencyWhitelist.sol";
 
-contract FeeCurrencyWhitelistTest is Test {
+import { TestConstants } from "@test-sol/constants.sol";
+
+contract FeeCurrencyWhitelistTest is Test, TestConstants {
   FeeCurrencyWhitelist feeCurrencyWhitelist;
   address nonOwner;
   address owner;
@@ -15,6 +17,10 @@ contract FeeCurrencyWhitelistTest is Test {
 
     feeCurrencyWhitelist = new FeeCurrencyWhitelist(true);
     feeCurrencyWhitelist.initialize();
+  }
+
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 }
 
@@ -70,5 +76,23 @@ contract FeeCurrencyWhitelistRemoveToken is FeeCurrencyWhitelistTest {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(nonOwner);
     feeCurrencyWhitelist.removeToken(address(2), 1);
+  }
+}
+
+contract FeeCurrencyWhitelist_whitelist is FeeCurrencyWhitelistTest {
+  function setUp() public {
+    super.setUp();
+    feeCurrencyWhitelist.addToken(address(1));
+  }
+
+  function test_ShouldRetrieveAToken() public {
+    address token = feeCurrencyWhitelist.whitelist(0);
+    assertEq(token, address(1));
+  }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    feeCurrencyWhitelist.whitelist(0);
   }
 }
