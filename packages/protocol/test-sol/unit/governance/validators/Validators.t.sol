@@ -3641,9 +3641,12 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
 
   function test_ShouldSendValidatorPayment_WhenL2() public {
     _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    vm.prank(paymentDelegatee);
-    validators.forceDeaffiliateIfValidator(validator);
+    test_ShouldNotTryToSendValidatorPayment_WhenL1();
+  }
+
+  function test_ShouldSucceed_WhenSenderIsWhitelistedSlashingAddress_L2() public {
+    _whenL2();
+    test_ShouldSucceed_WhenSenderIsWhitelistedSlashingAddress();
   }
 }
 
@@ -3806,12 +3809,9 @@ contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
     }
   }
 
-  function test_Reverts_HalveSlashingMultiplier_WhenL2() public {
+  function test_ShouldHalveslashingMultiplier_WhenL2() public {
     _whenL2();
-    FixidityLib.Fraction memory expectedMultiplier = FixidityLib.fixed1();
-    vm.prank(paymentDelegatee);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.halveSlashingMultiplier(group);
+    test_ShouldHalveslashingMultiplier();
   }
 
   function test_ShouldUpdateLastSlashedTimestamp() public {
@@ -3889,10 +3889,8 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
     assertEq(actualMultiplier, FixidityLib.fixed1().unwrap());
   }
 
-  function test_Reverts_SetSlashingMultiplierResetPeriod_WhenL2() public {
+  function test_ShouldReadProperly_WhenSlashingResetPeriosIsUpdated_WhenL2() public {
     _whenL2();
-    uint256 newResetPeriod = 10 * DAY;
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.setSlashingMultiplierResetPeriod(newResetPeriod);
+    test_ShouldReadProperly_WhenSlashingResetPeriosIsUpdated();
   }
 }
