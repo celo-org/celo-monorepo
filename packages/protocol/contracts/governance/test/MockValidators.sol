@@ -14,6 +14,9 @@ import "../../../contracts-0.8/common/IsL2Check.sol";
 contract MockValidators is IValidators, IsL2Check {
   using SafeMath for uint256;
 
+  event HavelSlashingMultiplierHalved(address validator);
+  event ValidatorDeaffiliatedCalled(address validator);
+
   uint256 private constant FIXED1_UINT = 1000000000000000000000000;
 
   mapping(address => bool) public isValidator;
@@ -79,12 +82,12 @@ contract MockValidators is IValidators, IsL2Check {
     lockedGoldRequirements[account] = value;
   }
 
-  function halveSlashingMultiplier(address) external {
-    allowOnlyL1(); // TODO remove
+  function halveSlashingMultiplier(address validator) external {
+    emit HavelSlashingMultiplierHalved(validator);
   }
 
   function forceDeaffiliateIfValidator(address validator) external {
-    allowOnlyL1(); // TODO remove
+    emit ValidatorDeaffiliatedCalled(validator);
   }
 
   function getValidatorsGroup(address validator) external view returns (address) {
