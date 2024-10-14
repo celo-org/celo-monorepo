@@ -51,18 +51,17 @@ contract EpochManager is
 
   uint256 public firstKnownEpoch;
   uint256 internal currentEpochNumber;
-  address[] internal electedAccounts;
-  address[] internal electedSigners;
+  address[] public electedAccounts;
+  // Electeds in the L1 assumed signers can not change during the epoch
+  // so we keep a copy
+  address[] public electedSigners;
   address public oracleAddress;
 
   mapping(address => uint256) public processedGroups;
 
   EpochProcessState public epochProcessing;
   mapping(uint256 => Epoch) internal epochs;
-  mapping(uint256 => address[]) internal electedAccountsOfEpoch;
-  // Electeds in the L1 assumed signers can not change during the epoch
-  // so we keep a copy
-  mapping(uint256 => address[]) internal electedSignersOfEpoch;
+
   mapping(address => uint256) public validatorPendingPayments;
 
   /**
