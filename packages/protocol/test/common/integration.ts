@@ -244,11 +244,11 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
       await governanceSlasher.slash(slashedAccount, lessers, greaters, indices)
     })
 
-    it.skip('should set approved slashing to zero', async () => {
+    it('should set approved slashing to zero', async () => {
       assert.equal((await governanceSlasher.getApprovedSlashing(slashedAccount)).toNumber(), 0)
     })
 
-    it.skip('should slash the account', async () => {
+    it('should slash the account', async () => {
       assertEqualBN(
         await lockedGold.getAccountTotalLockedGold(slashedAccount),
         valueOfSlashed.minus(penalty)
