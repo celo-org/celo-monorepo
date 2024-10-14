@@ -22,6 +22,7 @@ contract ScoreManagerTest is Test, TestConstants {
 
   event GroupScoreSet(address indexed group, uint256 score);
   event ValidatorScoreSet(address indexed validator, uint256 score);
+  event ScoreManagerSetterSet(address indexed scoreManagerSetter);
 
   function setUp() public virtual {
     owner = address(this);
@@ -127,5 +128,11 @@ contract ScoreManagerTest_setScoreManagerSetter is ScoreManagerTest {
   function test_setScoreManager() public {
     scoreManager.setScoreManagerSetter(nonOwner);
     assertEq(scoreManager.getScoreManagerSetter(), nonOwner, "Score Manager not set");
+  }
+
+  function test_emits_ScoreManagerSetterSet() public {
+    vm.expectEmit(false, false, false, true);
+    emit ScoreManagerSetterSet(nonOwner);
+    scoreManager.setScoreManagerSetter(nonOwner);
   }
 }

@@ -28,7 +28,7 @@ contract ScoreManager is
 
   event GroupScoreSet(address indexed group, uint256 score);
   event ValidatorScoreSet(address indexed validator, uint256 score);
-  event ScoreManagerSet(address indexed scoreManagerSetter);
+  event ScoreManagerSetterSet(address indexed scoreManagerSetter);
 
   modifier onlyAuthorizedToUpdateScore() {
     require(
@@ -78,7 +78,7 @@ contract ScoreManager is
 
   function setScoreManagerSetter(address _scoreManagerSetter) external onlyOwner {
     scoreManagerSetter = _scoreManagerSetter;
-    emit ScoreManagerSet(_scoreManagerSetter);
+    emit ScoreManagerSetterSet(_scoreManagerSetter);
   }
 
   function getGroupScore(address group) external view returns (uint256) {
