@@ -30,7 +30,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   ClientVersion private minimumClientVersion; // obsolete
   uint256 private deprecated_blockGasLimit;
   uint256 private deprecated_intrinsicGasForAlternativeFeeCurrency;
-  LookbackWindow public uptimeLookbackWindow;
+  LookbackWindow private uptimeLookbackWindow;
 
   event IntrinsicGasForAlternativeFeeCurrencySet(uint256 gas);
   event BlockGasLimitSet(uint256 limit);
