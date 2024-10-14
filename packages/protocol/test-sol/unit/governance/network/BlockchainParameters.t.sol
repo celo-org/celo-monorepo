@@ -173,3 +173,11 @@ contract BlockchainParametersTest_setUptimeLookbackWindow is BlockchainParameter
     blockchainParameters.setUptimeLookbackWindow(100);
   }
 }
+
+contract BlockchainParametersTest_blockGasLimit is BlockchainParametersTest {
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    blockchainParameters.blockGasLimit();
+  }
+}

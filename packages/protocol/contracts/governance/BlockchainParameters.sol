@@ -28,7 +28,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   }
 
   ClientVersion private minimumClientVersion; // obsolete
-  uint256 public blockGasLimit;
+  uint256 private deprecated_blockGasLimit;
   uint256 public intrinsicGasForAlternativeFeeCurrency;
   LookbackWindow public uptimeLookbackWindow;
 
@@ -75,7 +75,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    * @param gasLimit New block gas limit.
    */
   function setBlockGasLimit(uint256 gasLimit) public onlyOwner onlyL1 {
-    blockGasLimit = gasLimit;
+    deprecated_blockGasLimit = gasLimit;
     emit BlockGasLimitSet(gasLimit);
   }
 
@@ -114,6 +114,16 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   function getUptimeLookbackWindow() public view returns (uint256 lookbackWindow) {
     lookbackWindow = _getUptimeLookbackWindow();
     require(lookbackWindow != 0, "UptimeLookbackWindow is not initialized");
+  }
+
+  /**
+   * @notice Gets the Celo L1 block gas limit.
+   * @return The block gas limit.
+   * @dev Once Celo becomes an L2, query Optimism's L1 SystemConfig contract
+   * instead.
+   */
+  function blockGasLimit() public view onlyL1 returns (uint256) {
+    return deprecated_blockGasLimit;
   }
 
   /**
