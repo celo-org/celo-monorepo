@@ -23,3 +23,9 @@ if [ $VERSION_NUMBER -eq 9 ]
   then
   CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|SortedOracles"
 fi
+
+if [ $VERSION_NUMBER -eq 11 ]
+  then
+  # FeeHandlerSeller is not deployed, only its childs
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|SortedOracles|FeeHandlerSeller"
+fi
