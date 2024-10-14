@@ -181,3 +181,13 @@ contract BlockchainParametersTest_blockGasLimit is BlockchainParametersTest {
     blockchainParameters.blockGasLimit();
   }
 }
+
+contract BlockchainParametersTest_intrinsicGasForAlternativeFeeCurrency is
+  BlockchainParametersTest
+{
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    blockchainParameters.intrinsicGasForAlternativeFeeCurrency();
+  }
+}

@@ -29,7 +29,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
 
   ClientVersion private minimumClientVersion; // obsolete
   uint256 private deprecated_blockGasLimit;
-  uint256 public intrinsicGasForAlternativeFeeCurrency;
+  uint256 private deprecated_intrinsicGasForAlternativeFeeCurrency;
   LookbackWindow public uptimeLookbackWindow;
 
   event IntrinsicGasForAlternativeFeeCurrencySet(uint256 gas);
@@ -84,7 +84,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    * @param gas Intrinsic gas for non-gold gas currencies.
    */
   function setIntrinsicGasForAlternativeFeeCurrency(uint256 gas) public onlyOwner onlyL1 {
-    intrinsicGasForAlternativeFeeCurrency = gas;
+    deprecated_intrinsicGasForAlternativeFeeCurrency = gas;
     emit IntrinsicGasForAlternativeFeeCurrencySet(gas);
   }
 
@@ -124,6 +124,16 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    */
   function blockGasLimit() public view onlyL1 returns (uint256) {
     return deprecated_blockGasLimit;
+  }
+
+  /**
+   * @notice Gets the intrinsic gas paid for transactions using alternative fee
+   * currencies.
+   * @return The intrinsic gas for alternative fee currencies.
+   * @dev Once Celo becomes an L2, query the FeeCurrencyDirectory instead.
+   */
+  function intrinsicGasForAlternativeFeeCurrency() public view onlyL1 returns (uint256) {
+    return deprecated_intrinsicGasForAlternativeFeeCurrency;
   }
 
   /**
