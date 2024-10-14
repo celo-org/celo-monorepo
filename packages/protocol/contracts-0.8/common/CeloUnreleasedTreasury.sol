@@ -64,8 +64,9 @@ contract CeloUnreleasedTreasury is
     }
 
     require(remainingBalanceToRelease >= amount, "Insufficient balance.");
-    require(getCeloToken().transfer(to, amount), "CELO transfer failed.");
     remainingBalanceToRelease -= amount;
+    require(getCeloToken().transfer(to, amount), "CELO transfer failed.");
+
     emit Released(to, amount);
   }
 
