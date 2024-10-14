@@ -51,9 +51,8 @@ contract EpochManager is
 
   uint256 public firstKnownEpoch;
   uint256 internal currentEpochNumber;
-  address[] public electedAccounts;
   address public oracleAddress;
-
+  address[] public electedAccounts;
   mapping(address => uint256) public processedGroups;
 
   EpochProcessState public epochProcessing;
