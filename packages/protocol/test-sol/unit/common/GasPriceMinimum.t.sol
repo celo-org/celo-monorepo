@@ -298,3 +298,16 @@ contract GasPriceMinimumTest_setUpdatedGasPriceMinimum is GasPriceMinimumTest {
     }
   }
 }
+
+contract GasPriceMinimumTest_gasPriceMinimumFloor is GasPriceMinimumTest {
+  function test_shouldReturnTheGasPriceMinimumFloor() public {
+    uint256 gasPriceMinFloor = gasPriceMinimum.gasPriceMinimumFloor();
+    assertEq(gasPriceMinFloor, gasPriceMinimumFloor);
+  }
+
+  function test_shouldRevert_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    gasPriceMinimum.gasPriceMinimumFloor();
+  }
+}

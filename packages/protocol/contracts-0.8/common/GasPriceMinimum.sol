@@ -27,7 +27,7 @@ contract GasPriceMinimum is
   using FixidityLib for FixidityLib.Fraction;
 
   uint256 private deprecated_gasPriceMinimum;
-  uint256 public gasPriceMinimumFloor;
+  uint256 private deprecated_gasPriceMinimumFloor;
 
   // Block congestion level targeted by the gas price minimum calculation.
   FixidityLib.Fraction public targetDensity;
@@ -155,7 +155,7 @@ contract GasPriceMinimum is
    */
   function setGasPriceMinimumFloor(uint256 _gasPriceMinimumFloor) public onlyOwner onlyL1 {
     require(_gasPriceMinimumFloor > 0, "gas price minimum floor must be greater than zero");
-    gasPriceMinimumFloor = _gasPriceMinimumFloor;
+    deprecated_gasPriceMinimumFloor = _gasPriceMinimumFloor;
     emit GasPriceMinimumFloorSet(_gasPriceMinimumFloor);
   }
 
@@ -197,7 +197,18 @@ contract GasPriceMinimum is
       .add(FixidityLib.fixed1())
       .fromFixed();
 
-    return newGasPriceMinimum >= gasPriceMinimumFloor ? newGasPriceMinimum : gasPriceMinimumFloor;
+    return
+      newGasPriceMinimum >= deprecated_gasPriceMinimumFloor
+        ? newGasPriceMinimum
+        : deprecated_gasPriceMinimumFloor;
+  }
+
+  /**
+   * @notice Returns the gas price minimum floor.
+   * @return The gas price minimum floor.
+   */
+  function gasPriceMinimumFloor() external view onlyL1 returns (uint256) {
+    return deprecated_gasPriceMinimumFloor;
   }
 
   /**
