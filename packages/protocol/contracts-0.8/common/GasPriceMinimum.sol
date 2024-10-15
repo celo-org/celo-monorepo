@@ -35,7 +35,7 @@ contract GasPriceMinimum is
   // Speed of gas price minimum adjustment due to congestion.
   FixidityLib.Fraction private deprecated_adjustmentSpeed;
 
-  uint256 public baseFeeOpCodeActivationBlock;
+  uint256 private deprecated_baseFeeOpCodeActivationBlock;
   uint256 public constant ABSOLUTE_MINIMAL_GAS_PRICE = 1;
 
   event TargetDensitySet(uint256 targetDensity);
@@ -166,7 +166,10 @@ contract GasPriceMinimum is
   }
 
   function gasPriceMinimum() public view returns (uint256) {
-    if (baseFeeOpCodeActivationBlock > 0 && block.number >= baseFeeOpCodeActivationBlock) {
+    if (
+      deprecated_baseFeeOpCodeActivationBlock > 0 &&
+      block.number >= deprecated_baseFeeOpCodeActivationBlock
+    ) {
       return block.basefee;
     } else {
       return deprecated_gasPriceMinimum;
@@ -234,6 +237,14 @@ contract GasPriceMinimum is
   }
 
   /**
+   * @notice Returns the basefee opcode activation block.
+   * @return The basefee opcode activation block.
+   */
+  function baseFeeOpCodeActivationBlock() external view onlyL1 returns (uint256) {
+    return deprecated_baseFeeOpCodeActivationBlock;
+  }
+
+  /**
    * @notice Set the activation block of the baseFee opCode.
    * @param _baseFeeOpCodeActivationBlock Block number where the baseFee opCode is activated
    * @dev Value is expected to be > 0.
@@ -246,7 +257,7 @@ contract GasPriceMinimum is
       allowZero || _baseFeeOpCodeActivationBlock > 0,
       "baseFee opCode activation block must be greater than zero"
     );
-    baseFeeOpCodeActivationBlock = _baseFeeOpCodeActivationBlock;
+    deprecated_baseFeeOpCodeActivationBlock = _baseFeeOpCodeActivationBlock;
     emit BaseFeeOpCodeActivationBlockSet(_baseFeeOpCodeActivationBlock);
   }
 

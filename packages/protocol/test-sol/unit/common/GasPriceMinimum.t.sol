@@ -337,3 +337,23 @@ contract GasPriceMinimumTest_adjustmentSpeed is GasPriceMinimumTest {
     gasPriceMinimum.adjustmentSpeed();
   }
 }
+
+contract GasPriceMinimumTest_baseFeeOpCodeActivationBlock is GasPriceMinimumTest {
+  uint256 baseFeeOpCodeActivationBlock = 123;
+
+  function setUp() public override {
+    super.setUp();
+    gasPriceMinimum.setBaseFeeOpCodeActivationBlock(baseFeeOpCodeActivationBlock);
+  }
+
+  function test_shouldReturnTheBaseFeeOpCodeActivationBlock() public {
+    uint256 realBaseFeeOpCodeActivationBlock = gasPriceMinimum.baseFeeOpCodeActivationBlock();
+    assertEq(realBaseFeeOpCodeActivationBlock, baseFeeOpCodeActivationBlock);
+  }
+
+  function test_shouldRevert_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    gasPriceMinimum.baseFeeOpCodeActivationBlock();
+  }
+}
