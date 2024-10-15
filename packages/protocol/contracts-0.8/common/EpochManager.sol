@@ -13,7 +13,6 @@ import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/IEpochManager.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IEpochManagerInitializer.sol";
-import { console } from "forge-std/console.sol";
 
 contract EpochManager is
   Initializable,
@@ -323,8 +322,6 @@ contract EpochManager is
       delete electedSigners[i];
     }
 
-    console.log("_toProcessGroups", _toProcessGroups);
-    console.log("groups", groups.length);
     require(_toProcessGroups == groups.length, "number of groups does not match");
 
     for (uint i = 0; i < groups.length; i++) {
@@ -684,7 +681,6 @@ contract EpochManager is
     electedSigners = new address[](_elected.length);
     for (uint i = 0; i < _elected.length; i++) {
       electedSigners[i] = accounts.getValidatorSigner(_elected[i]);
-      console.log("setting elected signer", electedSigners[i]);
     }
   }
 

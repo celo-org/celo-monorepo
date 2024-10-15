@@ -681,7 +681,7 @@ contract EpochManagerTest_setToProcessGroups is EpochManagerTest {
     vm.prank(epochManagerEnabler);
     initializeEpochManagerSystem();
 
-    elected = epochManager.getElected();
+    elected = epochManager.getElectedAccounts();
 
     election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
   }
@@ -725,6 +725,8 @@ contract EpochManagerTest_setToProcessGroups is EpochManagerTest {
 contract EpochManagerTest_processGroup is EpochManagerTest {
   address signer1 = actor("signer1");
   address signer2 = actor("signer2");
+  address signer3 = actor("signer3");
+  address signer4 = actor("signer4");
 
   address validator3 = actor("validator3");
   address validator4 = actor("validator4");
@@ -759,7 +761,7 @@ contract EpochManagerTest_processGroup is EpochManagerTest {
     vm.prank(epochManagerEnabler);
     initializeEpochManagerSystem();
 
-    elected = epochManager.getElected();
+    elected = epochManager.getElectedAccounts();
 
     election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
   }
@@ -834,16 +836,28 @@ contract EpochManagerTest_processGroup is EpochManagerTest {
     newElected[1] = validator4;
     election.setElectedValidators(newElected);
 
+    address[] memory signers = new address[](2);
+    signers[0] = signer3;
+    signers[1] = signer4;
+    accounts.setValidatorSigner(validator3, signer3);
+    accounts.setValidatorSigner(validator4, signer4);
+
     epochManager.setToProcessGroups();
 
     for (uint256 i = 0; i < groups.length; i++) {
       epochManager.processGroup(groups[i], lessers[i], greaters[i]);
     }
 
-    address[] memory afterElected = epochManager.getElected();
+    address[] memory afterElected = epochManager.getElectedAccounts();
 
     for (uint256 i = 0; i < newElected.length; i++) {
       assertEq(newElected[i], afterElected[i]);
+    }
+
+    address[] memory afterSigners = epochManager.getElectedSigners();
+    assertEq(afterSigners.length, signers.length);
+    for (uint256 i = 0; i < signers.length; i++) {
+      assertEq(signers[i], afterSigners[i]);
     }
   }
 }

@@ -787,7 +787,7 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
 
     uint256 currentEpoch = epochManager.getCurrentEpochNumber();
-    address[] memory currentlyElected = epochManager.getElected();
+    address[] memory currentlyElected = epochManager.getElectedAccounts();
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       originalyElected.add(currentlyElected[i]);
     }
@@ -803,7 +803,7 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
 
     assertEq(currentEpoch + 1, epochManager.getCurrentEpochNumber());
 
-    address[] memory newlyElected = epochManager.getElected();
+    address[] memory newlyElected = epochManager.getElectedAccounts();
 
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       assertEq(originalyElected.contains(currentlyElected[i]), true);
@@ -826,7 +826,7 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
 
     assertEq(currentEpoch + 2, epochManager.getCurrentEpochNumber());
 
-    address[] memory newlyElected2 = epochManager.getElected();
+    address[] memory newlyElected2 = epochManager.getElectedAccounts();
 
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       assertEq(originalyElected.contains(newlyElected2[i]), true);
