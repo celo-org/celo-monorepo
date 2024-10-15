@@ -4,7 +4,9 @@ pragma solidity ^0.5.13;
 import "celo-foundry/Test.sol";
 import "@celo-contracts/common/FeeCurrencyWhitelist.sol";
 
-contract FeeCurrencyWhitelistTest is Test {
+import { TestConstants } from "@test-sol/constants.sol";
+
+contract FeeCurrencyWhitelistTest is Test, TestConstants {
   FeeCurrencyWhitelist feeCurrencyWhitelist;
   address nonOwner;
   address owner;
@@ -15,6 +17,10 @@ contract FeeCurrencyWhitelistTest is Test {
 
     feeCurrencyWhitelist = new FeeCurrencyWhitelist(true);
     feeCurrencyWhitelist.initialize();
+  }
+
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 }
 
@@ -41,6 +47,12 @@ contract FeeCurrencyWhitelistAddToken is FeeCurrencyWhitelistTest {
   function test_ShouldRevert_WhenNonOwnerAddsAToken() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(nonOwner);
+    feeCurrencyWhitelist.addToken(address(1));
+  }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
     feeCurrencyWhitelist.addToken(address(1));
   }
 }
@@ -70,5 +82,50 @@ contract FeeCurrencyWhitelistRemoveToken is FeeCurrencyWhitelistTest {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(nonOwner);
     feeCurrencyWhitelist.removeToken(address(2), 1);
+  }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    feeCurrencyWhitelist.removeToken(address(2), 1);
+  }
+}
+
+contract FeeCurrencyWhitelist_whitelist is FeeCurrencyWhitelistTest {
+  function setUp() public {
+    super.setUp();
+    feeCurrencyWhitelist.addToken(address(1));
+  }
+
+  function test_ShouldRetrieveAToken() public {
+    address token = feeCurrencyWhitelist.whitelist(0);
+    assertEq(token, address(1));
+  }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    feeCurrencyWhitelist.whitelist(0);
+  }
+}
+
+contract FeeCurrencyWhitelist_getWhitelist is FeeCurrencyWhitelistTest {
+  function setUp() public {
+    super.setUp();
+    feeCurrencyWhitelist.addToken(address(1));
+    feeCurrencyWhitelist.addToken(address(2));
+  }
+
+  function test_ShouldRetrieveAToken() public {
+    address[] memory tokens = feeCurrencyWhitelist.getWhitelist();
+    assertEq(tokens.length, 2);
+    assertEq(tokens[0], address(1));
+    assertEq(tokens[1], address(2));
+  }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    feeCurrencyWhitelist.getWhitelist();
   }
 }
