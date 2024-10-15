@@ -8,6 +8,12 @@ import "@openzeppelin/contracts8/access/Ownable.sol";
 import "../../contracts/common/interfaces/IScoreManagerGovernance.sol";
 import "../../contracts/common/interfaces/IScoreManager.sol";
 
+/**
+ * @title ScoreManager contract
+ * @notice This contract updates the score of validators and validator groups on L2.
+ * This replaces the previous method of calculating scores based on validator uptime
+ * with a governable score.
+ **/
 contract ScoreManager is
   Initializable,
   Ownable,
@@ -31,6 +37,9 @@ contract ScoreManager is
   event ValidatorScoreSet(address indexed validator, uint256 score);
   event ScoreManagerSetterSet(address indexed scoreManagerSetter);
 
+  /**
+   * @notice Reverts if msg.sender is not authorized to update score.
+   **/
   modifier onlyAuthorizedToUpdateScore() {
     require(
       msg.sender == owner() || scoreManagerSetter == msg.sender,
@@ -52,7 +61,14 @@ contract ScoreManager is
     _transferOwnership(msg.sender);
   }
 
+  /**
+   * @notice Sets the group score for a specified group.
+   * @param group The address of the group wich score needs to be updated.
+   * @param score The new score of the group to be updated.
+   * @dev Set value to `ZERO_FIXED1_UINT` to set score to zero.
+   **/
   function setGroupScore(address group, uint256 score) external onlyAuthorizedToUpdateScore {
+    require(score > 0, "Score must be greater than ZERO.");
     require(
       score <= ZERO_FIXED1_UINT,
       "Score must be less than or equal to 1e24 or ZERO_FIXED1_UINT."
@@ -62,10 +78,17 @@ contract ScoreManager is
     emit GroupScoreSet(group, score);
   }
 
+  /**
+   * @notice Sets the score for a specified validator.
+   * @param validator The address of the validator wich score needs to be updated.
+   * @param score The new score of the validator to be updated.
+   * @dev Set value to `ZERO_FIXED1_UINT` to set score to zero.
+   **/
   function setValidatorScore(
     address validator,
     uint256 score
   ) external onlyAuthorizedToUpdateScore {
+    require(score > 0, "Score must be greater than ZERO.");
     require(
       score <= ZERO_FIXED1_UINT,
       "Score must be less than or equal to 1e24 or ZERO_FIXED1_UINT."
@@ -75,19 +98,34 @@ contract ScoreManager is
     emit ValidatorScoreSet(validator, score);
   }
 
+  /**
+   * @notice Sets the whitelisted address allowed to set validator and group scores.
+   * @param _scoreManagerSetter Address of whitelisted score setter.
+   **/
   function setScoreManagerSetter(address _scoreManagerSetter) external onlyOwner {
     scoreManagerSetter = _scoreManagerSetter;
     emit ScoreManagerSetterSet(_scoreManagerSetter);
   }
 
+  /**
+   * @notice Returns the score of the specified group.
+   * @param group The address of the group of interest.
+   **/
   function getGroupScore(address group) external view returns (uint256) {
     return getScore(groupScores[group]);
   }
 
+  /**
+   * @notice Returns the score of the specified validator.
+   * @param validator The address of the validator of interest.
+   **/
   function getValidatorScore(address validator) external view returns (uint256) {
     return getScore(validatorScores[validator]);
   }
 
+  /**
+   * @notice Returns the address of the whitelisted score setter.
+   **/
   function getScoreManagerSetter() external view returns (address) {
     return scoreManagerSetter;
   }
@@ -103,6 +141,10 @@ contract ScoreManager is
     return (1, 1, 0, 0);
   }
 
+  /**
+   * @notice Returns the actual score based on the input value.
+   * @param score The value from `validatorScores` or `groupScores` mappings .
+   **/
   function getScore(uint256 score) internal pure returns (uint256) {
     if (score == 0) {
       return FIXED1_UINT;
