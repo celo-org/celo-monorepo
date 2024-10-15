@@ -9,6 +9,11 @@ import "../../../contracts/common/interfaces/IEpochManager.sol";
  */
 
 contract MockEpochManager is IEpochManager {
+  enum EpochProcessStatus {
+    NotStarted,
+    Started
+  }
+
   struct Epoch {
     uint256 firstBlock;
     uint256 lastBlock;
@@ -17,16 +22,26 @@ contract MockEpochManager is IEpochManager {
     uint256 rewardsBlock;
   }
 
+  struct EpochProcessState {
+    EpochProcessStatus status;
+    uint256 perValidatorReward; // The per validator epoch reward.
+    uint256 totalRewardsVoter; // The total rewards to voters.
+    uint256 totalRewardsCommunity; // The total community reward.
+    uint256 totalRewardsCarbonFund; // The total carbon offsetting partner reward.
+  }
+
   uint256 public epochDuration;
 
   uint256 public firstKnownEpoch;
   uint256 private currentEpochNumber;
-  address[] public elected;
+  address[] public electedAccounts;
+  address[] public electedSigners;
   address public epochManagerEnabler;
   bool systemInitialized;
 
   bool private _isTimeForNextEpoch;
   bool private isProcessingEpoch;
+  EpochProcessState public epochProcessing;
   mapping(uint256 => Epoch) private epochs;
 
   event SendValidatorPaymentCalled(address validator);
@@ -47,7 +62,8 @@ contract MockEpochManager is IEpochManager {
     _currentEpoch.firstBlock = firstEpochBlock;
     _currentEpoch.startTimestamp = block.timestamp;
 
-    elected = firstElected;
+    electedAccounts = firstElected;
+    electedSigners = firstElected;
 
     systemInitialized = true;
     epochManagerEnabler = address(0);
@@ -58,7 +74,16 @@ contract MockEpochManager is IEpochManager {
     address[] calldata groups,
     address[] calldata lessers,
     address[] calldata greaters
-  ) external {}
+  ) external {
+    epochs[currentEpochNumber].lastBlock = block.number - 1;
+
+    currentEpochNumber++;
+    epochs[currentEpochNumber].firstBlock = block.number;
+    epochs[currentEpochNumber].startTimestamp = block.timestamp;
+
+    EpochProcessState memory _epochProcessingEmpty;
+    epochProcessing = _epochProcessingEmpty;
+  }
 
   function setToProcessGroups() external {}
   function processGroup(address group, address lesser, address greater) external {}
@@ -71,16 +96,23 @@ contract MockEpochManager is IEpochManager {
   }
 
   function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256) {
-    Epoch storage _epoch = epochs[currentEpochNumber];
-
-    return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
+    return getEpochByNumber(currentEpochNumber);
   }
 
   function getCurrentEpochNumber() external view returns (uint256) {
     return currentEpochNumber;
   }
-  function getElected() external view returns (address[] memory) {
-    return elected;
+
+  function numberOfElectedInCurrentSet() external view returns (uint256) {
+    return electedAccounts.length;
+  }
+
+  function getElectedAccounts() external view returns (address[] memory) {
+    return electedAccounts;
+  }
+
+  function getElectedAccountByIndex(uint256 index) external view returns (address) {
+    return electedAccounts[index];
   }
 
   function getFirstBlockAtEpoch(uint256 _epoch) external view returns (uint256) {
@@ -117,7 +149,76 @@ contract MockEpochManager is IEpochManager {
     return isProcessingEpoch;
   }
 
+  function getEpochByBlockNumber(
+    uint256 _blockNumber
+  ) external view returns (uint256, uint256, uint256, uint256) {
+    return (0, 0, 0, 0);
+  }
+
+  function getEpochNumberOfBlock(uint256 _blockNumber) external view returns (uint256) {
+    (uint256 _epochNumber, , , , ) = _getEpochByBlockNumber(_blockNumber);
+    return _epochNumber;
+  }
+
+  function getElectedSigners() external view returns (address[] memory) {
+    return electedSigners;
+  }
+
+  function getElectedSignerByIndex(uint256 index) external view returns (address) {
+    return electedSigners[index];
+  }
+
   function sendValidatorPayment(address validator) public {
     emit SendValidatorPaymentCalled(validator);
+  }
+
+  function getEpochByNumber(
+    uint256 epochNumber
+  ) public view returns (uint256, uint256, uint256, uint256) {
+    Epoch storage _epoch = epochs[epochNumber];
+    return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
+  }
+
+  function _getEpochByBlockNumber(
+    uint256 _blockNumber
+  ) internal view returns (uint256, uint256, uint256, uint256, uint256) {
+    require(_blockNumber <= block.number, "Invalid blockNumber. Value too high.");
+    (uint256 _firstBlockOfFirstEpoch, , , ) = getEpochByNumber(firstKnownEpoch);
+    require(_blockNumber >= _firstBlockOfFirstEpoch, "Invalid blockNumber. Value too low.");
+    uint256 _firstBlockOfCurrentEpoch = epochs[currentEpochNumber].firstBlock;
+
+    if (_blockNumber >= _firstBlockOfCurrentEpoch) {
+      (
+        uint256 _firstBlock,
+        uint256 _lastBlock,
+        uint256 _startTimestamp,
+        uint256 _rewardsBlock
+      ) = getEpochByNumber(currentEpochNumber);
+      return (currentEpochNumber, _firstBlock, _lastBlock, _startTimestamp, _rewardsBlock);
+    }
+
+    uint256 left = firstKnownEpoch;
+    uint256 right = currentEpochNumber - 1;
+
+    while (left <= right) {
+      uint256 mid = (left + right) / 2;
+      Epoch memory _epoch = epochs[mid];
+
+      if (_blockNumber >= _epoch.firstBlock && _blockNumber <= _epoch.lastBlock) {
+        return (
+          mid,
+          _epoch.firstBlock,
+          _epoch.lastBlock,
+          _epoch.startTimestamp,
+          _epoch.rewardsBlock
+        );
+      } else if (_blockNumber < _epoch.firstBlock) {
+        right = mid - 1;
+      } else {
+        left = mid + 1;
+      }
+    }
+
+    revert("No matching epoch found for the given block number.");
   }
 }
