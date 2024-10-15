@@ -13,7 +13,7 @@ import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
-import "../common/UsingPrecompiles.sol";
+import "../common/PrecompilesOverride.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
@@ -27,7 +27,7 @@ contract Governance is
   Initializable,
   ReentrancyGuard,
   UsingRegistry,
-  UsingPrecompiles
+  PrecompilesOverride
 {
   using Proposals for Proposals.Proposal;
   using FixidityLib for FixidityLib.Fraction;
