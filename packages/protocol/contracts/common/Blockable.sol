@@ -15,20 +15,27 @@ contract Blockable is IBlockable {
 
   event BlockedBySet(address indexed _blockedBy);
 
-  /// @notice Modifier to ensure the function is only executed when the contract is not blocked.
-  /// @dev Reverts with an error if the contract is blocked.
+  /**
+   * @notice Modifier to ensure the function is only executed when the contract is not blocked.
+   * @dev Reverts with an error if the contract is blocked.
+   **/
   modifier onlyWhenNotBlocked() {
     require(!_isBlocked(), "Contract is blocked from performing this action");
     _;
   }
 
-  /// @notice Checks if the contract is currently blocked.
-  /// @return Returns true if the contract is blocked, otherwise false.
-  /// @dev The function returns false if no blocking contract has been set.
+  /**
+   * @notice Checks if the contract is currently blocked.
+   * @return Returns true if the contract is blocked, otherwise false.
+   * @dev The function returns false if no blocking contract has been set.
+   **/
   function isBlocked() external view returns (bool) {
     return _isBlocked();
   }
 
+  /**
+   * @notice Returns the address of the contract imposing the block.
+   **/
   function getBlockedbyContract() public view returns (address blockedBy) {
     bytes32 blockedByPosition = BLOCKEDBY_POSITION;
     assembly {
@@ -37,6 +44,10 @@ contract Blockable is IBlockable {
     return blockedBy;
   }
 
+  /**
+   * @notice Sets the address of the contract allowed to impose a block.
+   * @param _blockedBy The address of the contract that will impose a block.
+   **/
   function _setBlockedBy(address _blockedBy) internal {
     bytes32 blockedByPosition = BLOCKEDBY_POSITION;
     assembly {
@@ -46,6 +57,9 @@ contract Blockable is IBlockable {
     emit BlockedBySet(_blockedBy);
   }
 
+  /**
+   * @notice Checks if the contract is currently blocked.
+   **/
   function _isBlocked() internal view returns (bool) {
     if (getBlockedbyContract() == address(0)) {
       return false;
