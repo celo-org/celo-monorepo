@@ -8,4 +8,6 @@ interface ICeloUnreleasedTreasury {
    * @param amount The amount to release.
    */
   function release(address to, uint256 amount) external;
+
+  function getRemainingBalanceToRelease() external view returns (uint256);
 }
