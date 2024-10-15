@@ -363,3 +363,16 @@ contract GasPriceMinimumTest_baseFeeOpCodeActivationBlock is GasPriceMinimumTest
     gasPriceMinimum.baseFeeOpCodeActivationBlock();
   }
 }
+
+contract GasPriceMinimumTest_gasPriceMinimum is GasPriceMinimumTest {
+  function test_shouldReturnTheGasPriceMinimum() public {
+    uint256 realGasPriceMinimum = gasPriceMinimum.gasPriceMinimum();
+    assertEq(realGasPriceMinimum, 100);
+  }
+
+  function test_shouldRevert_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    gasPriceMinimum.gasPriceMinimum();
+  }
+}

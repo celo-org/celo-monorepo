@@ -165,7 +165,7 @@ contract GasPriceMinimum is
     emit GasPriceMinimumFloorSet(_gasPriceMinimumFloor);
   }
 
-  function gasPriceMinimum() public view returns (uint256) {
+  function gasPriceMinimum() public view onlyL1 returns (uint256) {
     if (
       deprecated_baseFeeOpCodeActivationBlock > 0 &&
       block.number >= deprecated_baseFeeOpCodeActivationBlock
