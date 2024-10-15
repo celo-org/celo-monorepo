@@ -188,7 +188,7 @@ contract GasPriceMinimum is
   function getUpdatedGasPriceMinimum(
     uint256 blockGasTotal,
     uint256 blockGasLimit
-  ) public view returns (uint256) {
+  ) public view onlyL1 returns (uint256) {
     FixidityLib.Fraction memory blockDensity = FixidityLib.newFixedFraction(
       blockGasTotal,
       blockGasLimit

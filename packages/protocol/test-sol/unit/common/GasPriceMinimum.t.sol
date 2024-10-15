@@ -199,7 +199,7 @@ contract GasPriceMinimumTest_setGasPriceMinimumFloor is GasPriceMinimumTest {
   }
 }
 
-contract GasPriceMinimumTest_setUpdatedGasPriceMinimum is GasPriceMinimumTest {
+contract GasPriceMinimumTest_getUpdatedGasPriceMinimum is GasPriceMinimumTest {
   using FixidityLib for FixidityLib.Fraction;
   uint256 nonce = 0;
 
@@ -296,6 +296,12 @@ contract GasPriceMinimumTest_setUpdatedGasPriceMinimum is GasPriceMinimumTest {
 
       assertEq(actualUpdatedGasPriceMinimum, expectedUpdatedGasPriceMinimum);
     }
+  }
+
+  function test_shouldRevert_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    gasPriceMinimum.getUpdatedGasPriceMinimum(0, 1);
   }
 }
 
