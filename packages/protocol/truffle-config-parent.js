@@ -29,7 +29,7 @@ const BAKLAVASTAGING_FROM = '0x4588ABb84e1BBEFc2BcF4b2296F785fB7AD9F285'
 const STAGING_FROM = '0x4e3d385ecdee402da395a3b18575b05cc5e8ff21'
 const CANNOLI_FROM = '0x8C174E896A85E487aa895865657b78Ea64879dC7' // validator zero
 
-const gasLimit = 13000000
+const gasLimit = 20000000
 const hostAddress = process.env.CELO_NODE_ADDRESS || '127.0.0.1'
 const hostPort = parseInt(process.env.CELO_NODE_PORT || '8545')
 
