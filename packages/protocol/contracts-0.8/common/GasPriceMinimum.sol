@@ -26,7 +26,7 @@ contract GasPriceMinimum is
   // TODO add IGasPriceMinimum
   using FixidityLib for FixidityLib.Fraction;
 
-  uint256 public deprecated_gasPriceMinimum;
+  uint256 private deprecated_gasPriceMinimum;
   uint256 public gasPriceMinimumFloor;
 
   // Block congestion level targeted by the gas price minimum calculation.
