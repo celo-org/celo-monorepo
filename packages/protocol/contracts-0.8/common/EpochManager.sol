@@ -14,6 +14,12 @@ import "../../contracts/common/interfaces/IEpochManager.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IEpochManagerInitializer.sol";
 
+/**
+ * @title Contract used for managing CELO L2 epoch and elections.
+ * @notice DESIGN_DESICION: we assume that the first epoch on the L2 starts as soon as the system is initialized
+ * to minimize amount of "limbo blocks" the network should stop relatively close to an epoch number (but with enough time)
+ * to have time to call the function `EpochInitializer.migrateEpochAndValidators()`
+ */
 contract EpochManager is
   Initializable,
   UsingRegistry,
@@ -105,6 +111,9 @@ contract EpochManager is
     uint256 delegatedPayment
   );
 
+  /**
+   * @notice Throws if called by other than EpochManagerEnabler contract.
+   */
   modifier onlyEpochManagerEnabler() {
     require(
       msg.sender == registry.getAddressForOrDie(EPOCH_MANAGER_ENABLER_REGISTRY_ID),
@@ -113,6 +122,9 @@ contract EpochManager is
     _;
   }
 
+  /**
+   * @notice Throws if called when EpochManager system has not yet been initalized.
+   */
   modifier onlySystemAlreadyInitialized() {
     require(systemAlreadyInitialized(), "Epoch system not initialized");
     _;
@@ -135,10 +147,6 @@ contract EpochManager is
     setEpochDuration(newEpochDuration);
     setOracleAddress(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
   }
-
-  // DESIGNDESICION(XXX): we assume that the first epoch on the L2 starts as soon as the system is initialized
-  // to minimize amount of "limbo blocks" the network should stop relatively close to an epoch number (but with enough time)
-  // to have time to call the function EpochInitializer.migrateEpochAndValidators()
 
   /**
    * @notice Initializes the EpochManager system, allowing it to start processing epoch
@@ -398,7 +406,7 @@ contract EpochManager is
   }
 
   /**
-   * @notice Returns the epoch info of the specified epoch, for current epoch.
+   * @notice Returns the epoch info of the specified epoch, for the current epoch.
    */
   function getCurrentEpoch()
     external

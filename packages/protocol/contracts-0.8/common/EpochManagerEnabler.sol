@@ -10,6 +10,9 @@ import "../../contracts/governance/interfaces/IEpochRewards.sol";
 import "../../contracts/common/interfaces/IEpochManagerEnabler.sol";
 import "./interfaces/IEpochManagerEnablerInitializer.sol";
 
+/**
+ * @title Contract Used to initialize the EpochManager system after L2 transition.
+ */
 contract EpochManagerEnabler is
   Initializable,
   UsingRegistry,
@@ -66,7 +69,6 @@ contract EpochManagerEnabler is
     _setFirstBlockOfEpoch();
 
     for (uint256 i = 0; i < numberElectedValidators; i++) {
-      // TODO: document how much gas this takes for 110 signers
       address validatorAccountAddress = getAccounts().validatorSignerToAccount(
         validatorSignerAddressFromCurrentSet(i)
       );
@@ -93,6 +95,10 @@ contract EpochManagerEnabler is
     return (1, 1, 0, 0);
   }
 
+  /**
+   * @notice Sets the first block of the current epoch.
+   * @dev Only callable on L1.
+   */
   function _setFirstBlockOfEpoch() internal onlyL1 {
     uint256 blocksSinceEpochBlock = block.number % getEpochSize();
     uint256 epochBlock = block.number - blocksSinceEpochBlock;
