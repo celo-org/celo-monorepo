@@ -13,6 +13,8 @@ interface IEpochManager {
     address[] calldata lessers,
     address[] calldata greaters
   ) external;
+  function setToProcessGroups() external;
+  function processGroup(address group, address lesser, address greater) external;
   function sendValidatorPayment(address) external;
   function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256);
   function getEpochByNumber(
