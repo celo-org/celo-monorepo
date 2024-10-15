@@ -58,14 +58,15 @@ contract CeloUnreleasedTreasury is
    * @param amount The amount to release.
    */
   function release(address to, uint256 amount) external onlyEpochManager {
+    IERC20 celoToken = getCeloToken();
     if (!hasAlreadyReleased) {
-      remainingBalanceToRelease = address(this).balance;
+      remainingBalanceToRelease = celoToken.balanceOf(address(this));
       hasAlreadyReleased = true;
     }
 
     require(remainingBalanceToRelease >= amount, "Insufficient balance.");
     remainingBalanceToRelease -= amount;
-    require(getCeloToken().transfer(to, amount), "CELO transfer failed.");
+    require(celoToken.transfer(to, amount), "CELO transfer failed.");
 
     emit Released(to, amount);
   }
@@ -77,7 +78,7 @@ contract CeloUnreleasedTreasury is
    */
   function getRemainingBalanceToRelease() external view returns (uint256) {
     if (!hasAlreadyReleased) {
-      return address(this).balance;
+      return getCeloToken().balanceOf(address(this));
     } else {
       return remainingBalanceToRelease;
     }
