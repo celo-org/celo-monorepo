@@ -36,7 +36,7 @@ contract GasPriceMinimum is
   FixidityLib.Fraction private deprecated_adjustmentSpeed;
 
   uint256 private deprecated_baseFeeOpCodeActivationBlock;
-  uint256 public constant ABSOLUTE_MINIMAL_GAS_PRICE = 1;
+  uint256 private constant ABSOLUTE_MINIMAL_GAS_PRICE = 1;
 
   event TargetDensitySet(uint256 targetDensity);
   event GasPriceMinimumFloorSet(uint256 gasPriceMinimumFloor);
