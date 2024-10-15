@@ -40,7 +40,7 @@ contract Utils08 is TestConstants {
     return (addr, pk);
   }
 
-  // This function can be also found in OpenZeppelin's library, but in a newer version than the one
+  // This function can be also found in OpenZeppelin's library, but in a newer version than the one we use.
   function compareStrings(string memory a, string memory b) public pure returns (bool) {
     return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
   }
