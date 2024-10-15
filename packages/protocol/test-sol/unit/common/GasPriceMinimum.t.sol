@@ -376,3 +376,16 @@ contract GasPriceMinimumTest_gasPriceMinimum is GasPriceMinimumTest {
     gasPriceMinimum.gasPriceMinimum();
   }
 }
+
+contract GasPriceMinimumTest_getGasPriceMinimum is GasPriceMinimumTest {
+  function test_shouldReturnTheGasPriceMinimum() public {
+    uint256 realGasPriceMinimum = gasPriceMinimum.getGasPriceMinimum(address(0));
+    assertEq(realGasPriceMinimum, 100);
+  }
+
+  function test_shouldRevert_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    gasPriceMinimum.getGasPriceMinimum(address(0));
+  }
+}

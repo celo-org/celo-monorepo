@@ -112,7 +112,7 @@ contract GasPriceMinimum is
    * @param tokenAddress The currency the gas price should be in (defaults to Celo).
    * @return current gas price minimum in the requested currency
    */
-  function getGasPriceMinimum(address tokenAddress) external view returns (uint256) {
+  function getGasPriceMinimum(address tokenAddress) external view onlyL1 returns (uint256) {
     return Math.max(_getGasPriceMinimum(tokenAddress), ABSOLUTE_MINIMAL_GAS_PRICE);
   }
   /**
