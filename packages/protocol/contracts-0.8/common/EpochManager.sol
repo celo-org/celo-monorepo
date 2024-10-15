@@ -33,7 +33,8 @@ contract EpochManager is
 
   enum EpochProcessStatus {
     NotStarted,
-    Started
+    Started,
+    IndivudualGroupsProcessing
   }
 
   struct EpochProcessState {
@@ -207,10 +208,15 @@ contract EpochManager is
     emit EpochProcessingStarted(currentEpochNumber);
   }
 
+  /**
+   * @notice Starts individual processing of the elected groups.
+   * As second step it is necessary to call processGroup
+   */
   function setToProcessGroups() external {
     require(isOnEpochProcess(), "Epoch process is not started");
 
     EpochProcessState storage _epochProcessing = epochProcessing;
+    _epochProcessing.status = EpochProcessStatus.IndivudualGroupsProcessing;
 
     IValidators validators = getValidators();
     IElection election = getElection();
@@ -235,8 +241,34 @@ contract EpochManager is
     }
   }
 
-  function processGroup(address group, address lesser, address greater) external {
-    require(isOnEpochProcess(), "Epoch process is not started");
+  /**
+   * @notice Processes the rewards for a list of groups. For last group it will also finalize the epoch.
+   * @param groups List of validator groups to be processed.
+   * @param lessers List of validator groups that hold less votes that indexed group.
+   * @param greaters List of validator groups that hold more votes that indexed group.
+   */
+  function processGroups(
+    address[] calldata groups,
+    address[] calldata lessers,
+    address[] calldata greaters
+  ) external {
+    for (uint i = 0; i < groups.length; i++) {
+      processGroup(groups[i], lessers[i], greaters[i]);
+    }
+  }
+
+  /**
+   * @notice Processes the rewards for a group. For last group it will also finalize the epoch.
+   * @param group The group to process.
+   * @param lesser The group with less votes than the indexed group.
+   * @param greater The group with more votes than the indexed group.
+   */
+  function processGroup(address group, address lesser, address greater) public {
+    EpochProcessState storage _epochProcessing = epochProcessing;
+    require(
+      _epochProcessing.status == EpochProcessStatus.IndivudualGroupsProcessing,
+      "Indivudual epoch process is not started"
+    );
     require(toProcessGroups > 0, "no more groups to process");
 
     uint256 epochRewards = processedGroups[group];
@@ -252,28 +284,7 @@ contract EpochManager is
     toProcessGroups--;
 
     if (toProcessGroups == 0) {
-      getCeloUnreleasedTreasury().release(
-        registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID),
-        epochProcessing.totalRewardsCommunity
-      );
-      getCeloUnreleasedTreasury().release(
-        getEpochRewards().carbonOffsettingPartner(),
-        epochProcessing.totalRewardsCarbonFund
-      );
-      // run elections
-      address[] memory _newlyElected = election.electValidatorAccounts();
-      electedAccounts = _newlyElected;
-      _setElectedSigners(_newlyElected);
-
-      epochProcessing.status = EpochProcessStatus.NotStarted;
-
-      // finalize epoch
-      // last block should be the block before and timestamp from previous block
-      epochs[currentEpochNumber].lastBlock = block.number - 1;
-      // start new epoch
-      currentEpochNumber++;
-      epochs[currentEpochNumber].firstBlock = block.number;
-      epochs[currentEpochNumber].startTimestamp = block.timestamp;
+      _finishEpochHelper(_epochProcessing, election);
     }
   }
 
@@ -289,14 +300,7 @@ contract EpochManager is
     address[] calldata greaters
   ) external virtual nonReentrant {
     require(isOnEpochProcess(), "Epoch process is not started");
-    require(toProcessGroups == 0, "not all groups processed");
-    // finalize epoch
-    // last block should be the block before and timestamp from previous block
-    epochs[currentEpochNumber].lastBlock = block.number - 1;
-    // start new epoch
-    currentEpochNumber++;
-    epochs[currentEpochNumber].firstBlock = block.number;
-    epochs[currentEpochNumber].startTimestamp = block.timestamp;
+    require(toProcessGroups == 0, "Can't finish epoch while individual groups are being processed");
 
     EpochProcessState storage _epochProcessing = epochProcessing;
 
@@ -337,26 +341,8 @@ contract EpochManager is
 
       delete processedGroups[groups[i]];
     }
-    getCeloUnreleasedTreasury().release(
-      registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID),
-      epochProcessing.totalRewardsCommunity
-    );
-    getCeloUnreleasedTreasury().release(
-      getEpochRewards().carbonOffsettingPartner(),
-      epochProcessing.totalRewardsCarbonFund
-    );
-    // run elections
 
-    address[] memory _newlyElected = election.electValidatorAccounts();
-
-    electedAccounts = _newlyElected;
-
-    _setElectedSigners(_newlyElected);
-
-    EpochProcessState memory _epochProcessingEmpty;
-    epochProcessing = _epochProcessingEmpty;
-
-    emit EpochProcessingEnded(currentEpochNumber - 1);
+    _finishEpochHelper(_epochProcessing, election);
   }
 
   /**
@@ -685,6 +671,47 @@ contract EpochManager is
     for (uint i = 0; i < _elected.length; i++) {
       electedSigners[i] = accounts.getValidatorSigner(_elected[i]);
     }
+  }
+
+  /**
+   * @notice Finishes processing an epoch and releasing funds to the beneficiaries.
+   * @param _epochProcessing The current epoch processing state.
+   * @param election The Election contract.
+   */
+  function _finishEpochHelper(
+    EpochProcessState storage _epochProcessing,
+    IElection election
+  ) internal {
+    // finalize epoch
+    // last block should be the block before and timestamp from previous block
+    epochs[currentEpochNumber].lastBlock = block.number - 1;
+    currentEpochNumber++;
+    // start new epoch
+    epochs[currentEpochNumber].firstBlock = block.number;
+    epochs[currentEpochNumber].startTimestamp = block.timestamp;
+
+    // run elections
+    address[] memory _newlyElected = election.electValidatorAccounts();
+    electedAccounts = _newlyElected;
+    _setElectedSigners(_newlyElected);
+
+    ICeloUnreleasedTreasury celoUnreleasedTreasury = getCeloUnreleasedTreasury();
+    celoUnreleasedTreasury.release(
+      registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID),
+      _epochProcessing.totalRewardsCommunity
+    );
+    celoUnreleasedTreasury.release(
+      getEpochRewards().carbonOffsettingPartner(),
+      _epochProcessing.totalRewardsCarbonFund
+    );
+
+    _epochProcessing.status = EpochProcessStatus.NotStarted;
+    _epochProcessing.perValidatorReward = 0;
+    _epochProcessing.totalRewardsVoter = 0;
+    _epochProcessing.totalRewardsCommunity = 0;
+    _epochProcessing.totalRewardsCarbonFund = 0;
+
+    emit EpochProcessingEnded(currentEpochNumber - 1);
   }
 
   /**

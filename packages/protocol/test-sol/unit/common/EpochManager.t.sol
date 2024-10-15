@@ -767,7 +767,7 @@ contract EpochManagerTest_processGroup is EpochManagerTest {
   }
 
   function test_Reverts_WhenNotStarted() public {
-    vm.expectRevert("Epoch process is not started");
+    vm.expectRevert("Indivudual epoch process is not started");
     epochManager.processGroup(group, address(0), address(0));
   }
 
