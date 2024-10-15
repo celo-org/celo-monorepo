@@ -17,6 +17,14 @@ contract RandomTest_ is Test, TestConstants, Utils, IsL2Check {
     random = new RandomTest();
     random.initialize(256);
   }
+
+  function commitmentFor(uint256 value) internal pure returns (bytes32) {
+    return keccak256(abi.encodePacked(bytes32(value)));
+  }
+
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+  }
 }
 
 contract RandomTest_SetRandomnessRetentionWindow is RandomTest_ {
@@ -38,7 +46,7 @@ contract RandomTest_SetRandomnessRetentionWindow is RandomTest_ {
   }
 
   function test_Reverts_WhenCalledOnL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+    _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
     random.setRandomnessBlockRetentionWindow(1000);
   }
@@ -212,7 +220,7 @@ contract RandomTest_AddTestRandomness is RandomTest_ {
   }
 
   function test_Reverts_WhenCalledOnL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+    _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
     random.addTestRandomness(1, 0x0000000000000000000000000000000000000000000000000000000000000001);
     vm.expectRevert("This method is no longer supported in L2.");
@@ -227,10 +235,6 @@ contract RandomTest_RevealAndCommit is RandomTest_ {
   function setUp() public {
     super.setUp();
     random.setRandomnessBlockRetentionWindow(256);
-  }
-
-  function commitmentFor(uint256 value) private pure returns (bytes32) {
-    return keccak256(abi.encodePacked(bytes32(value)));
   }
 
   function testRevert_CannotAddZeroCommitment() public {
@@ -255,9 +259,50 @@ contract RandomTest_RevealAndCommit is RandomTest_ {
   }
 
   function test_Reverts_WhenCalledOnL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+    _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
     blockTravel(2);
     random.testRevealAndCommit(RANDONMESS, commitmentFor(0x01), ACCOUNT);
+  }
+}
+
+contract RandomTest_Commitments is RandomTest_ {
+  address constant ACCOUNT = address(0x01);
+  bytes32 constant RANDONMESS = bytes32(uint256(0x00));
+  uint256 randomness2 = 0x01;
+  bytes32 commitment2 = commitmentFor(randomness2);
+
+  function setUp() public {
+    super.setUp();
+    random.testRevealAndCommit(RANDONMESS, commitment2, ACCOUNT);
+  }
+
+  function test_returnsACommtiment() public {
+    bytes32 commitment = random.commitments(ACCOUNT);
+    assertEq(commitment, commitment2);
+  }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    random.commitments(ACCOUNT);
+  }
+}
+
+contract RandomTest_RandomnessBlockRetentionWindow is RandomTest_ {
+  function setUp() public {
+    super.setUp();
+    random.setRandomnessBlockRetentionWindow(256);
+  }
+
+  function test_getsTheRandomnessBlockRetentionWindow() public {
+    uint256 randomnessBlockRetentionWindow = random.randomnessBlockRetentionWindow();
+    assertEq(randomnessBlockRetentionWindow, 256);
+  }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    random.randomnessBlockRetentionWindow();
   }
 }
