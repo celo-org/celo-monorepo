@@ -30,10 +30,10 @@ contract GasPriceMinimum is
   uint256 private deprecated_gasPriceMinimumFloor;
 
   // Block congestion level targeted by the gas price minimum calculation.
-  FixidityLib.Fraction public targetDensity;
+  FixidityLib.Fraction private deprecated_targetDensity;
 
   // Speed of gas price minimum adjustment due to congestion.
-  FixidityLib.Fraction public adjustmentSpeed;
+  FixidityLib.Fraction private deprecated_adjustmentSpeed;
 
   uint256 public baseFeeOpCodeActivationBlock;
   uint256 public constant ABSOLUTE_MINIMAL_GAS_PRICE = 1;
@@ -132,8 +132,11 @@ contract GasPriceMinimum is
    * @dev Value is expected to be < 1.
    */
   function setAdjustmentSpeed(uint256 _adjustmentSpeed) public onlyOwner onlyL1 {
-    adjustmentSpeed = FixidityLib.wrap(_adjustmentSpeed);
-    require(adjustmentSpeed.lt(FixidityLib.fixed1()), "adjustment speed must be smaller than 1");
+    deprecated_adjustmentSpeed = FixidityLib.wrap(_adjustmentSpeed);
+    require(
+      deprecated_adjustmentSpeed.lt(FixidityLib.fixed1()),
+      "adjustment speed must be smaller than 1"
+    );
     emit AdjustmentSpeedSet(_adjustmentSpeed);
   }
 
@@ -143,8 +146,11 @@ contract GasPriceMinimum is
    * @dev Value is expected to be < 1.
    */
   function setTargetDensity(uint256 _targetDensity) public onlyOwner onlyL1 {
-    targetDensity = FixidityLib.wrap(_targetDensity);
-    require(targetDensity.lt(FixidityLib.fixed1()), "target density must be smaller than 1");
+    deprecated_targetDensity = FixidityLib.wrap(_targetDensity);
+    require(
+      deprecated_targetDensity.lt(FixidityLib.fixed1()),
+      "target density must be smaller than 1"
+    );
     emit TargetDensitySet(_targetDensity);
   }
 
@@ -184,13 +190,13 @@ contract GasPriceMinimum is
       blockGasTotal,
       blockGasLimit
     );
-    bool densityGreaterThanTarget = blockDensity.gt(targetDensity);
+    bool densityGreaterThanTarget = blockDensity.gt(deprecated_targetDensity);
     FixidityLib.Fraction memory densityDelta = densityGreaterThanTarget
-      ? blockDensity.subtract(targetDensity)
-      : targetDensity.subtract(blockDensity);
+      ? blockDensity.subtract(deprecated_targetDensity)
+      : deprecated_targetDensity.subtract(blockDensity);
     FixidityLib.Fraction memory adjustment = densityGreaterThanTarget
-      ? FixidityLib.fixed1().add(adjustmentSpeed.multiply(densityDelta))
-      : FixidityLib.fixed1().subtract(adjustmentSpeed.multiply(densityDelta));
+      ? FixidityLib.fixed1().add(deprecated_adjustmentSpeed.multiply(densityDelta))
+      : FixidityLib.fixed1().subtract(deprecated_adjustmentSpeed.multiply(densityDelta));
 
     uint256 newGasPriceMinimum = adjustment
       .multiply(FixidityLib.newFixed(gasPriceMinimum()))
@@ -209,6 +215,22 @@ contract GasPriceMinimum is
    */
   function gasPriceMinimumFloor() external view onlyL1 returns (uint256) {
     return deprecated_gasPriceMinimumFloor;
+  }
+
+  /**
+   * @notice Returns the target density.
+   * @return The target density.
+   */
+  function targetDensity() external view onlyL1 returns (uint256) {
+    return deprecated_targetDensity.unwrap();
+  }
+
+  /**
+   * @notice Returns the adjustment speed.
+   * @return The adjustment speed.
+   */
+  function adjustmentSpeed() external view onlyL1 returns (uint256) {
+    return deprecated_adjustmentSpeed.unwrap();
   }
 
   /**

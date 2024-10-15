@@ -311,3 +311,29 @@ contract GasPriceMinimumTest_gasPriceMinimumFloor is GasPriceMinimumTest {
     gasPriceMinimum.gasPriceMinimumFloor();
   }
 }
+
+contract GasPriceMinimumTest_targetDensity is GasPriceMinimumTest {
+  function test_shouldReturnTheTargetDensity() public {
+    uint256 realTargetDensity = gasPriceMinimum.targetDensity();
+    assertEq(realTargetDensity, targetDensity);
+  }
+
+  function test_shouldRevert_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    gasPriceMinimum.targetDensity();
+  }
+}
+
+contract GasPriceMinimumTest_adjustmentSpeed is GasPriceMinimumTest {
+  function test_shouldReturnTheAdjustementSpeed() public {
+    uint256 realAdjustementSpeed = gasPriceMinimum.adjustmentSpeed();
+    assertEq(realAdjustementSpeed, adjustmentSpeed);
+  }
+
+  function test_shouldRevert_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    gasPriceMinimum.adjustmentSpeed();
+  }
+}
