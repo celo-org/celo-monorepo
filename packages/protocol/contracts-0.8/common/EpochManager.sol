@@ -616,6 +616,7 @@ contract EpochManager is
 
   /**
    * @notice Returns the epoch info of a specified blockNumber.
+   * @dev This function is here for backward compatibility. It is rather gas heavy and can run out of gas.
    * @param _blockNumber Block number of the epoch info is retreived.
    * @return firstEpoch The first block of the given block number.
    * @return lastBlock The first block of the given block number.
