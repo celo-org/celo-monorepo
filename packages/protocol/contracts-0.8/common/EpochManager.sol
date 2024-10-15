@@ -52,13 +52,15 @@ contract EpochManager is
   uint256 public firstKnownEpoch;
   uint256 internal currentEpochNumber;
   address public oracleAddress;
-  address[] public elected;
-
+  address[] public electedAccounts;
   mapping(address => uint256) public processedGroups;
 
   EpochProcessState public epochProcessing;
   mapping(uint256 => Epoch) internal epochs;
   mapping(address => uint256) public validatorPendingPayments;
+  // Electeds in the L1 assumed signers can not change during the epoch
+  // so we keep a copy
+  address[] public electedSigners;
 
   /**
    * @notice Event emited when epochProcessing has begun.
@@ -166,7 +168,9 @@ contract EpochManager is
     _currentEpoch.firstBlock = firstEpochBlock;
     _currentEpoch.startTimestamp = block.timestamp;
 
-    elected = firstElected;
+    electedAccounts = firstElected;
+
+    _setElectedSigners(firstElected);
   }
 
   /**
@@ -177,8 +181,8 @@ contract EpochManager is
   function startNextEpochProcess() external nonReentrant onlySystemAlreadyInitialized {
     require(isTimeForNextEpoch(), "Epoch is not ready to start");
     require(!isOnEpochProcess(), "Epoch process is already started");
-    epochProcessing.status = EpochProcessStatus.Started;
 
+    epochProcessing.status = EpochProcessStatus.Started;
     epochs[currentEpochNumber].rewardsBlock = block.number;
 
     // calculate rewards
@@ -227,8 +231,12 @@ contract EpochManager is
     IValidators validators = getValidators();
     IElection election = getElection();
     IScoreReader scoreReader = getScoreReader();
-    for (uint i = 0; i < elected.length; i++) {
-      address group = validators.getValidatorsGroup(elected[i]);
+    require(
+      electedAccounts.length == electedSigners.length,
+      "Elected accounts and signers of different lengths."
+    );
+    for (uint i = 0; i < electedAccounts.length; i++) {
+      address group = validators.getValidatorsGroup(electedAccounts[i]);
       if (processedGroups[group] == 0) {
         toProcessGroups++;
         uint256 groupScore = scoreReader.getGroupScore(group);
@@ -240,7 +248,8 @@ contract EpochManager is
         );
         processedGroups[group] = epochRewards == 0 ? type(uint256).max : epochRewards;
       }
-      delete elected[i];
+      delete electedAccounts[i];
+      delete electedSigners[i];
     }
 
     require(toProcessGroups == groups.length, "number of groups does not match");
@@ -264,8 +273,17 @@ contract EpochManager is
       epochProcessing.totalRewardsCarbonFund
     );
     // run elections
-    elected = election.electValidatorAccounts();
-    _epochProcessing.status = EpochProcessStatus.NotStarted;
+
+    address[] memory _newlyElected = election.electValidatorAccounts();
+
+    electedAccounts = _newlyElected;
+
+    _setElectedSigners(_newlyElected);
+
+    EpochProcessState memory _epochProcessingEmpty;
+    epochProcessing = _epochProcessingEmpty;
+
+    emit EpochProcessingEnded(currentEpochNumber - 1);
   }
 
   /**
@@ -321,11 +339,7 @@ contract EpochManager is
   }
 
   /**
-   * @notice Returns the info of the current epoch.
-   * @return firstEpoch The first block of the epoch.
-   * @return lastBlock The first block of the epoch.
-   * @return startTimestamp The starting timestamp of the epoch.
-   * @return rewardsBlock The reward block of the epoch.
+   * @notice Returns the epoch info of the specified epoch, for current epoch.
    */
   function getCurrentEpoch()
     external
@@ -371,10 +385,59 @@ contract EpochManager is
   }
 
   /**
+   * @return The number of elected accounts in the current set.
+   */
+  function numberOfElectedInCurrentSet()
+    external
+    view
+    onlySystemAlreadyInitialized
+    returns (uint256)
+  {
+    return electedAccounts.length;
+  }
+
+  /**
    * @return The list of currently elected validators.
    */
-  function getElected() external view returns (address[] memory) {
-    return elected;
+  function getElectedAccounts()
+    external
+    view
+    onlySystemAlreadyInitialized
+    returns (address[] memory)
+  {
+    return electedAccounts;
+  }
+
+  /**
+   * @notice Returns the currently elected account at a specified index.
+   * @param index The index of the currently elected account.
+   */
+  function getElectedAccountByIndex(
+    uint256 index
+  ) external view onlySystemAlreadyInitialized returns (address) {
+    return electedAccounts[index];
+  }
+
+  /**
+   * @return The list of the validator signers of elected validators.
+   */
+  function getElectedSigners()
+    external
+    view
+    onlySystemAlreadyInitialized
+    returns (address[] memory)
+  {
+    return electedSigners;
+  }
+
+  /**
+   * @notice Returns the currently elected signer address at a specified index.
+   * @param index The index of the currently elected signer.
+   */
+  function getElectedSignerByIndex(
+    uint256 index
+  ) external view onlySystemAlreadyInitialized returns (address) {
+    return electedSigners[index];
   }
 
   /**
@@ -395,6 +458,38 @@ contract EpochManager is
     require(epoch >= firstKnownEpoch, "Epoch not known");
     require(epoch < currentEpochNumber, "Epoch not finished yet");
     return epochs[epoch].lastBlock;
+  }
+
+  /**
+   * @notice Returns the epoch number of a specified blockNumber.
+   * @param _blockNumber Block number of the epoch info is retreived.
+   */
+  function getEpochNumberOfBlock(
+    uint256 _blockNumber
+  ) external view onlySystemAlreadyInitialized returns (uint256) {
+    (uint256 _epochNumber, , , , ) = _getEpochByBlockNumber(_blockNumber);
+    return _epochNumber;
+  }
+
+  /**
+   * @notice Returns the epoch info of a specified blockNumber.
+   * @param _blockNumber Block number of the epoch info is retreived.
+   * @return firstEpoch The first block of the given block number.
+   * @return lastBlock The first block of the given block number.
+   * @return startTimestamp The starting timestamp of the given block number.
+   * @return rewardsBlock The reward block of the given block number.
+   */
+  function getEpochByBlockNumber(
+    uint256 _blockNumber
+  ) external view onlySystemAlreadyInitialized returns (uint256, uint256, uint256, uint256) {
+    (
+      ,
+      uint256 _firstBlock,
+      uint256 _lastBlock,
+      uint256 _startTimestamp,
+      uint256 _rewardsBlock
+    ) = _getEpochByBlockNumber(_blockNumber);
+    return (_firstBlock, _lastBlock, _startTimestamp, _rewardsBlock);
   }
 
   /**
@@ -456,16 +551,16 @@ contract EpochManager is
 
   /**
    * @notice Returns the epoch info of a specified epoch.
-   * @param epochNumber Epoch number where epoch info is retreived.
-   * @return firstEpoch The first block of the epoch.
-   * @return lastBlock The first block of the epoch.
-   * @return startTimestamp The starting timestamp of the epoch.
-   * @return rewardsBlock The reward block of the epoch.
+   * @param epochNumber Epoch number where the epoch info is retreived.
+   * @return firstEpoch The first block of the given epoch.
+   * @return lastBlock The first block of the given epoch.
+   * @return startTimestamp The starting timestamp of the given epoch.
+   * @return rewardsBlock The reward block of the given epoch.
    */
   function getEpochByNumber(
     uint256 epochNumber
   ) public view onlySystemAlreadyInitialized returns (uint256, uint256, uint256, uint256) {
-    Epoch storage _epoch = epochs[epochNumber];
+    Epoch memory _epoch = epochs[epochNumber];
     return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
   }
 
@@ -479,14 +574,14 @@ contract EpochManager is
 
     EpochProcessState storage _epochProcessing = epochProcessing;
 
-    for (uint i = 0; i < elected.length; i++) {
-      uint256 validatorScore = scoreReader.getValidatorScore(elected[i]);
+    for (uint i = 0; i < electedAccounts.length; i++) {
+      uint256 validatorScore = scoreReader.getValidatorScore(electedAccounts[i]);
       uint256 validatorReward = validators.computeEpochReward(
-        elected[i],
+        electedAccounts[i],
         validatorScore,
         _epochProcessing.perValidatorReward
       );
-      validatorPendingPayments[elected[i]] += validatorReward;
+      validatorPendingPayments[electedAccounts[i]] += validatorReward;
       totalRewards += validatorReward;
     }
     if (totalRewards == 0) {
@@ -505,5 +600,79 @@ contract EpochManager is
       registry.getAddressForOrDie(RESERVE_REGISTRY_ID),
       CELOequivalent
     );
+  }
+
+  /**
+   * @notice Updates the list of elected validator signers.
+   */
+  function _setElectedSigners(address[] memory _elected) internal {
+    require(electedAccounts.length > 0, "Elected list length cannot be zero.");
+    IAccounts accounts = getAccounts();
+    electedSigners = new address[](_elected.length);
+    for (uint i = 0; i < _elected.length; i++) {
+      electedSigners[i] = accounts.getValidatorSigner(_elected[i]);
+    }
+  }
+
+  /**
+   * @notice Returns the epoch info of a specified blockNumber.
+   * @dev This function is here for backward compatibility. It is rather gas heavy and can run out of gas.
+   * @param _blockNumber Block number of the epoch info is retreived.
+   * @return firstEpoch The first block of the given block number.
+   * @return lastBlock The first block of the given block number.
+   * @return startTimestamp The starting timestamp of the given block number.
+   * @return rewardsBlock The reward block of the given block number.
+   */
+  function _getEpochByBlockNumber(
+    uint256 _blockNumber
+  )
+    internal
+    view
+    onlySystemAlreadyInitialized
+    returns (uint256, uint256, uint256, uint256, uint256)
+  {
+    require(_blockNumber <= block.number, "Invalid blockNumber. Value too high.");
+
+    (uint256 _firstBlockOfFirstEpoch, , , ) = getEpochByNumber(firstKnownEpoch);
+
+    require(_blockNumber >= _firstBlockOfFirstEpoch, "Invalid blockNumber. Value too low.");
+
+    uint256 _firstBlockOfCurrentEpoch = epochs[currentEpochNumber].firstBlock;
+
+    if (_blockNumber >= _firstBlockOfCurrentEpoch) {
+      (
+        uint256 _firstBlock,
+        uint256 _lastBlock,
+        uint256 _startTimestamp,
+        uint256 _rewardsBlock
+      ) = getEpochByNumber(currentEpochNumber);
+      return (currentEpochNumber, _firstBlock, _lastBlock, _startTimestamp, _rewardsBlock);
+    }
+
+    uint256 left = firstKnownEpoch;
+    uint256 right = currentEpochNumber - 1;
+
+    while (left <= right) {
+      uint256 mid = (left + right) / 2;
+      uint256 _epochFirstBlock = epochs[mid].firstBlock;
+      uint256 _epochLastBlock = epochs[mid].lastBlock;
+
+      if (_blockNumber >= _epochFirstBlock && _blockNumber <= _epochLastBlock) {
+        Epoch memory _epoch = epochs[mid];
+        return (
+          mid,
+          _epoch.firstBlock,
+          _epoch.lastBlock,
+          _epoch.startTimestamp,
+          _epoch.rewardsBlock
+        );
+      } else if (_blockNumber < _epochFirstBlock) {
+        right = mid - 1;
+      } else {
+        left = mid + 1;
+      }
+    }
+
+    revert("No matching epoch found for the given block number.");
   }
 }

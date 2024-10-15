@@ -106,7 +106,7 @@ contract EpochManagerEnablerTest_initEpochManager is EpochManagerEnablerTest {
     vm.prank(nonOwner);
     epochManagerEnabler.initEpochManager();
 
-    assertGt(epochManager.getElected().length, 0);
+    assertGt(epochManager.getElectedAccounts().length, 0);
     assertTrue(epochManager.systemAlreadyInitialized());
   }
 

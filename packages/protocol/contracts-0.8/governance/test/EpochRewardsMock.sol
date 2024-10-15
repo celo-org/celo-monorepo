@@ -19,13 +19,11 @@ contract EpochRewardsMock08 is IEpochRewards {
     numValidatorsInCurrentSet = value;
   }
 
-  // TODO: (soloseng) implement mock
   function updateTargetVotingYield() external {}
 
   function getRewardsMultiplier(
     uint256 targetGoldTotalSupplyIncrease
   ) external view returns (uint256) {
-    // return _getRewardsMultiplier(targetGoldTotalSupplyIncrease).unwrap();
     return 0;
   }
 
