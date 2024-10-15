@@ -33,7 +33,8 @@ contract EpochManager is
 
   enum EpochProcessStatus {
     NotStarted,
-    Started
+    Started,
+    IndivudualGroupsProcessing
   }
 
   struct EpochProcessState {
@@ -61,6 +62,8 @@ contract EpochManager is
   // Electeds in the L1 assumed signers can not change during the epoch
   // so we keep a copy
   address[] public electedSigners;
+
+  uint256 public toProcessGroups = 0;
 
   /**
    * @notice Event emited when epochProcessing has begun.
@@ -206,28 +209,15 @@ contract EpochManager is
   }
 
   /**
-   * @notice Finishes processing an epoch and releasing funds to the beneficiaries.
-   * @param groups List of validator groups to be processed.
-   * @param lessers List of validator groups that hold less votes that indexed group.
-   * @param greaters List of validator groups that hold more votes that indexed group.
+   * @notice Starts individual processing of the elected groups.
+   * As second step it is necessary to call processGroup
    */
-  function finishNextEpochProcess(
-    address[] calldata groups,
-    address[] calldata lessers,
-    address[] calldata greaters
-  ) external virtual nonReentrant {
+  function setToProcessGroups() external {
     require(isOnEpochProcess(), "Epoch process is not started");
-    // finalize epoch
-    // last block should be the block before and timestamp from previous block
-    epochs[currentEpochNumber].lastBlock = block.number - 1;
-    // start new epoch
-    currentEpochNumber++;
-    epochs[currentEpochNumber].firstBlock = block.number;
-    epochs[currentEpochNumber].startTimestamp = block.timestamp;
 
     EpochProcessState storage _epochProcessing = epochProcessing;
+    _epochProcessing.status = EpochProcessStatus.IndivudualGroupsProcessing;
 
-    uint256 toProcessGroups = 0;
     IValidators validators = getValidators();
     IElection election = getElection();
     IScoreReader scoreReader = getScoreReader();
@@ -248,11 +238,98 @@ contract EpochManager is
         );
         processedGroups[group] = epochRewards == 0 ? type(uint256).max : epochRewards;
       }
+    }
+  }
+
+  /**
+   * @notice Processes the rewards for a list of groups. For last group it will also finalize the epoch.
+   * @param groups List of validator groups to be processed.
+   * @param lessers List of validator groups that hold less votes that indexed group.
+   * @param greaters List of validator groups that hold more votes that indexed group.
+   */
+  function processGroups(
+    address[] calldata groups,
+    address[] calldata lessers,
+    address[] calldata greaters
+  ) external {
+    for (uint i = 0; i < groups.length; i++) {
+      processGroup(groups[i], lessers[i], greaters[i]);
+    }
+  }
+
+  /**
+   * @notice Processes the rewards for a group. For last group it will also finalize the epoch.
+   * @param group The group to process.
+   * @param lesser The group with less votes than the indexed group.
+   * @param greater The group with more votes than the indexed group.
+   */
+  function processGroup(address group, address lesser, address greater) public {
+    EpochProcessState storage _epochProcessing = epochProcessing;
+    require(
+      _epochProcessing.status == EpochProcessStatus.IndivudualGroupsProcessing,
+      "Indivudual epoch process is not started"
+    );
+    require(toProcessGroups > 0, "no more groups to process");
+
+    uint256 epochRewards = processedGroups[group];
+    // checks that group is actually from elected group
+    require(epochRewards > 0, "group not from current elected set");
+    IElection election = getElection();
+
+    if (epochRewards != type(uint256).max) {
+      election.distributeEpochRewards(group, epochRewards, lesser, greater);
+    }
+
+    delete processedGroups[group];
+    toProcessGroups--;
+
+    if (toProcessGroups == 0) {
+      _finishEpochHelper(_epochProcessing, election);
+    }
+  }
+
+  /**
+   * @notice Finishes processing an epoch and releasing funds to the beneficiaries.
+   * @param groups List of validator groups to be processed.
+   * @param lessers List of validator groups that hold less votes that indexed group.
+   * @param greaters List of validator groups that hold more votes that indexed group.
+   */
+  function finishNextEpochProcess(
+    address[] calldata groups,
+    address[] calldata lessers,
+    address[] calldata greaters
+  ) external virtual nonReentrant {
+    require(isOnEpochProcess(), "Epoch process is not started");
+    require(toProcessGroups == 0, "Can't finish epoch while individual groups are being processed");
+
+    EpochProcessState storage _epochProcessing = epochProcessing;
+
+    uint256 _toProcessGroups = 0;
+    IValidators validators = getValidators();
+    IElection election = getElection();
+    IScoreReader scoreReader = getScoreReader();
+    require(
+      electedAccounts.length == electedSigners.length,
+      "Elected accounts and signers of different lengths."
+    );
+    for (uint i = 0; i < electedAccounts.length; i++) {
+      address group = validators.getValidatorsGroup(electedAccounts[i]);
+      if (processedGroups[group] == 0) {
+        _toProcessGroups++;
+        uint256 groupScore = scoreReader.getGroupScore(group);
+        // We need to precompute epoch rewards for each group since computation depends on total active votes for all groups.
+        uint256 epochRewards = election.getGroupEpochRewardsBasedOnScore(
+          group,
+          _epochProcessing.totalRewardsVoter,
+          groupScore
+        );
+        processedGroups[group] = epochRewards == 0 ? type(uint256).max : epochRewards;
+      }
       delete electedAccounts[i];
       delete electedSigners[i];
     }
 
-    require(toProcessGroups == groups.length, "number of groups does not match");
+    require(_toProcessGroups == groups.length, "number of groups does not match");
 
     for (uint i = 0; i < groups.length; i++) {
       uint256 epochRewards = processedGroups[groups[i]];
@@ -264,26 +341,8 @@ contract EpochManager is
 
       delete processedGroups[groups[i]];
     }
-    getCeloUnreleasedTreasury().release(
-      registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID),
-      epochProcessing.totalRewardsCommunity
-    );
-    getCeloUnreleasedTreasury().release(
-      getEpochRewards().carbonOffsettingPartner(),
-      epochProcessing.totalRewardsCarbonFund
-    );
-    // run elections
 
-    address[] memory _newlyElected = election.electValidatorAccounts();
-
-    electedAccounts = _newlyElected;
-
-    _setElectedSigners(_newlyElected);
-
-    EpochProcessState memory _epochProcessingEmpty;
-    epochProcessing = _epochProcessingEmpty;
-
-    emit EpochProcessingEnded(currentEpochNumber - 1);
+    _finishEpochHelper(_epochProcessing, election);
   }
 
   /**
@@ -612,6 +671,47 @@ contract EpochManager is
     for (uint i = 0; i < _elected.length; i++) {
       electedSigners[i] = accounts.getValidatorSigner(_elected[i]);
     }
+  }
+
+  /**
+   * @notice Finishes processing an epoch and releasing funds to the beneficiaries.
+   * @param _epochProcessing The current epoch processing state.
+   * @param election The Election contract.
+   */
+  function _finishEpochHelper(
+    EpochProcessState storage _epochProcessing,
+    IElection election
+  ) internal {
+    // finalize epoch
+    // last block should be the block before and timestamp from previous block
+    epochs[currentEpochNumber].lastBlock = block.number - 1;
+    currentEpochNumber++;
+    // start new epoch
+    epochs[currentEpochNumber].firstBlock = block.number;
+    epochs[currentEpochNumber].startTimestamp = block.timestamp;
+
+    // run elections
+    address[] memory _newlyElected = election.electValidatorAccounts();
+    electedAccounts = _newlyElected;
+    _setElectedSigners(_newlyElected);
+
+    ICeloUnreleasedTreasury celoUnreleasedTreasury = getCeloUnreleasedTreasury();
+    celoUnreleasedTreasury.release(
+      registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID),
+      _epochProcessing.totalRewardsCommunity
+    );
+    celoUnreleasedTreasury.release(
+      getEpochRewards().carbonOffsettingPartner(),
+      _epochProcessing.totalRewardsCarbonFund
+    );
+
+    _epochProcessing.status = EpochProcessStatus.NotStarted;
+    _epochProcessing.perValidatorReward = 0;
+    _epochProcessing.totalRewardsVoter = 0;
+    _epochProcessing.totalRewardsCommunity = 0;
+    _epochProcessing.totalRewardsCarbonFund = 0;
+
+    emit EpochProcessingEnded(currentEpochNumber - 1);
   }
 
   /**
