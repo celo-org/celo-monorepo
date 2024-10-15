@@ -42,7 +42,7 @@ contract FeeCurrencyWhitelist is
    * @dev Add a token to the whitelist
    * @param tokenAddress The address of the token to add.
    */
-  function addToken(address tokenAddress) external onlyOwner {
+  function addToken(address tokenAddress) external onlyOwner onlyL1 {
     deprecated_whitelist.push(tokenAddress);
     emit FeeCurrencyWhitelisted(tokenAddress);
   }
@@ -83,7 +83,7 @@ contract FeeCurrencyWhitelist is
    * @param tokenAddress The address of the token to remove.
    * @param index The index of the token in the whitelist array.
    */
-  function removeToken(address tokenAddress, uint256 index) public onlyOwner {
+  function removeToken(address tokenAddress, uint256 index) public onlyOwner onlyL1 {
     require(deprecated_whitelist[index] == tokenAddress, "Index does not match");
     uint256 length = deprecated_whitelist.length;
     deprecated_whitelist[index] = deprecated_whitelist[length - 1];

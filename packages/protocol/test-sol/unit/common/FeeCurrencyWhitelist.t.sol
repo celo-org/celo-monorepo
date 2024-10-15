@@ -49,6 +49,12 @@ contract FeeCurrencyWhitelistAddToken is FeeCurrencyWhitelistTest {
     vm.prank(nonOwner);
     feeCurrencyWhitelist.addToken(address(1));
   }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    feeCurrencyWhitelist.addToken(address(1));
+  }
 }
 
 contract FeeCurrencyWhitelistRemoveToken is FeeCurrencyWhitelistTest {
@@ -75,6 +81,12 @@ contract FeeCurrencyWhitelistRemoveToken is FeeCurrencyWhitelistTest {
   function test_ShouldRevert_WhenNonOwnerRemovesToken() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(nonOwner);
+    feeCurrencyWhitelist.removeToken(address(2), 1);
+  }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
     feeCurrencyWhitelist.removeToken(address(2), 1);
   }
 }
