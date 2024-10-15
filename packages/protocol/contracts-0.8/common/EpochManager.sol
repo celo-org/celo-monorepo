@@ -399,7 +399,12 @@ contract EpochManager is
   /**
    * @return The list of currently elected validators.
    */
-  function getElected() external view onlySystemAlreadyInitialized returns (address[] memory) {
+  function getElectedAccounts()
+    external
+    view
+    onlySystemAlreadyInitialized
+    returns (address[] memory)
+  {
     return electedAccounts;
   }
 
