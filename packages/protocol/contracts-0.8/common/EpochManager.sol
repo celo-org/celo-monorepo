@@ -16,7 +16,7 @@ import "./interfaces/IEpochManagerInitializer.sol";
 
 /**
  * @title Contract used for managing CELO L2 epoch and elections.
- * @notice DESIGN_DESICION: we assume that the first epoch on the L2 starts as soon as the system is initialized
+ * @dev DESIGN_DESICION: we assume that the first epoch on the L2 starts as soon as the system is initialized
  * to minimize amount of "limbo blocks" the network should stop relatively close to an epoch number (but with enough time)
  * to have time to call the function `EpochInitializer.migrateEpochAndValidators()`
  */
@@ -406,7 +406,11 @@ contract EpochManager is
   }
 
   /**
-   * @notice Returns the epoch info of the specified epoch, for the current epoch.
+   * @notice Returns the epoch info for the current epoch.
+   * @return firstEpoch The first block of the current epoch.
+   * @return lastBlock The first block of the current epoch.
+   * @return startTimestamp The starting timestamp of the current epoch.
+   * @return rewardsBlock The reward block of the current epoch.
    */
   function getCurrentEpoch()
     external

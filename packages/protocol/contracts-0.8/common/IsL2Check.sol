@@ -25,8 +25,8 @@ contract IsL2Check {
   }
 
   /**
-   * @notice Checks to see if current network is CELO L2.
-   * @return Whether or not the current network is a CELO L2.
+   * @notice Checks to see if current network is Celo L2.
+   * @return Whether or not the current network is a Celo L2.
    */
   function isL2() internal view returns (bool) {
     uint32 size;
@@ -39,7 +39,7 @@ contract IsL2Check {
 
   /**
    * @notice Used to restrict usage of the parent function to L1 execution.
-   * @dev Reverts if called on a CELO L2 network.
+   * @dev Reverts if called on a Celo L2 network.
    */
   function allowOnlyL1() internal view {
     if (isL2()) {
