@@ -43,8 +43,6 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
   EnumerableSet.AddressSet internal electedGroupsHelper;
 
   function setUp() public virtual {
-    uint256 totalVotes = election.getTotalVotes();
-
     epochManagerOwner = Ownable(address(epochManager)).owner();
     epochManagerEnabler = registry.getAddressForOrDie(EPOCH_MANAGER_ENABLER_REGISTRY_ID);
     firstElected = getValidators().getRegisteredValidators();
@@ -96,9 +94,10 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
   }
 
   function getLessersAndGreaters(
-    address[] memory groups
+    address[] memory _groups
   )
     internal
+    view
     returns (
       address[] memory lessers,
       address[] memory greaters,
@@ -106,26 +105,24 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
     )
   {
     (, , uint256 maxTotalRewards, , ) = epochManager.getEpochProcessingState();
-    uint256 totalRewards = 0;
-
     (, groupWithVotes) = getGroupsWithVotes();
 
-    lessers = new address[](groups.length);
-    greaters = new address[](groups.length);
+    lessers = new address[](_groups.length);
+    greaters = new address[](_groups.length);
 
-    uint256[] memory rewards = new uint256[](groups.length);
+    uint256[] memory rewards = new uint256[](_groups.length);
 
-    for (uint256 i = 0; i < groups.length; i++) {
-      uint256 groupScore = scoreManager.getGroupScore(groups[i]);
+    for (uint256 i = 0; i < _groups.length; i++) {
+      uint256 _groupScore = scoreManager.getGroupScore(_groups[i]);
       rewards[i] = election.getGroupEpochRewardsBasedOnScore(
-        groups[i],
+        _groups[i],
         maxTotalRewards,
-        groupScore
+        _groupScore
       );
     }
-    for (uint256 i = 0; i < groups.length; i++) {
+    for (uint256 i = 0; i < _groups.length; i++) {
       for (uint256 j = 0; j < groupWithVotes.length; j++) {
-        if (groupWithVotes[j].group == groups[i]) {
+        if (groupWithVotes[j].group == _groups[i]) {
           groupWithVotes[j].votes += rewards[i];
           break;
         }
@@ -136,7 +133,7 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
       address greater = address(0);
 
       for (uint256 j = 0; j < groupWithVotes.length; j++) {
-        if (groupWithVotes[j].group == groups[i]) {
+        if (groupWithVotes[j].group == _groups[i]) {
           greater = j == 0 ? address(0) : groupWithVotes[j - 1].group;
           lesser = j == groupWithVotes.length - 1 ? address(0) : groupWithVotes[j + 1].group;
           break;
@@ -150,6 +147,7 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
 
   function getGroupsWithVotes()
     internal
+    view
     returns (address[] memory groupsInOrder, GroupWithVotes[] memory groupWithVotes)
   {
     uint256[] memory votesTotal;
@@ -162,7 +160,7 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
   }
 
   // Bubble sort algorithm since it is a small array
-  function sort(GroupWithVotes[] memory items) internal {
+  function sort(GroupWithVotes[] memory items) internal pure {
     uint length = items.length;
     for (uint i = 0; i < length; i++) {
       for (uint j = 0; j < length - 1; j++) {
@@ -178,7 +176,6 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
 
   function assertGroupWithVotes(GroupWithVotes[] memory groupWithVotes) internal {
     for (uint256 i = 0; i < groupWithVotes.length; i++) {
-      uint256 expected = election.getTotalVotesForGroup(groupWithVotes[i].group);
       assertEq(election.getTotalVotesForGroup(groupWithVotes[i].group), groupWithVotes[i].votes);
     }
   }
@@ -237,7 +234,7 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
     scoreManager.setGroupScore(newValidatorGroup, groupScore[3]);
   }
 
-  function getValidatorGroupsFromElected() internal returns (address[] memory) {
+  function getValidatorGroupsFromElected() internal view returns (address[] memory) {
     address[] memory elected = epochManager.getElectedAccounts();
     address[] memory validatorGroups = new address[](elected.length);
     for (uint256 i = 0; i < elected.length; i++) {
@@ -343,12 +340,7 @@ contract E2E_EpochManager_GetCurrentEpoch is E2E_EpochManager {
 
   function test_Revert_WhenSystemNotInitialized() public {
     vm.expectRevert("Epoch system not initialized");
-    (
-      uint256 firstBlock,
-      uint256 lastBlock,
-      uint256 startTimestamp,
-      uint256 rewardsBlock
-    ) = epochManager.getCurrentEpoch();
+    epochManager.getCurrentEpoch();
   }
 
   function test_ReturnExpectedValues() public {
@@ -478,9 +470,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
   function test_shouldFinishNextEpochProcessing() public {
     address[] memory lessers;
     address[] memory greaters;
-    address[] memory groupsEligible;
     GroupWithVotes[] memory groupWithVotes;
-    uint256[] memory groupActiveBalances;
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
 
     uint256 currentEpoch = epochManager.getCurrentEpochNumber();
@@ -496,8 +486,6 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     epochManager.finishNextEpochProcess(groups, lessers, greaters);
 
     assertEq(currentEpoch + 1, epochManager.getCurrentEpochNumber());
-
-    address[] memory newlyElected = epochManager.getElectedAccounts();
 
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       assertEq(originalyElected.contains(currentlyElected[i]), true);
@@ -564,7 +552,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     assertGroupWithVotes(groupWithVotes);
 
     (
-      uint256 status,
+      ,
       uint256 perValidatorReward,
       uint256 totalRewardsVoter,
       uint256 totalRewardsCommunity,
@@ -621,9 +609,7 @@ contract E2E_GasTest_Setup is E2E_EpochManager {
 
     address[] memory lessers;
     address[] memory greaters;
-    address[] memory groupsEligible;
     GroupWithVotes[] memory groupWithVotes;
-    uint256[] memory groupActiveBalances;
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
 
     uint256 currentEpoch = epochManager.getCurrentEpochNumber();
@@ -639,8 +625,6 @@ contract E2E_GasTest_Setup is E2E_EpochManager {
     epochManager.finishNextEpochProcess(groups, lessers, greaters);
 
     assertEq(currentEpoch + 1, epochManager.getCurrentEpochNumber());
-
-    address[] memory newlyElected = epochManager.getElectedAccounts();
 
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       assertEq(originalyElected.contains(currentlyElected[i]), true);
@@ -666,7 +650,7 @@ contract E2E_GasTest_Setup is E2E_EpochManager {
     }
 
     for (uint256 i = 0; i < validatorGroupCount; i++) {
-      (address newValidatorGroup, address newValidator) = registerNewValidatorGroupWithValidator(
+      registerNewValidatorGroupWithValidator(
         i,
         validatorPerGroupCount
       );
@@ -781,9 +765,7 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
 
     address[] memory lessers;
     address[] memory greaters;
-    address[] memory groupsEligible;
     GroupWithVotes[] memory groupWithVotes;
-    uint256[] memory groupActiveBalances;
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
 
     uint256 currentEpoch = epochManager.getCurrentEpochNumber();
@@ -802,8 +784,6 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
     }
 
     assertEq(currentEpoch + 1, epochManager.getCurrentEpochNumber());
-
-    address[] memory newlyElected = epochManager.getElectedAccounts();
 
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       assertEq(originalyElected.contains(currentlyElected[i]), true);
@@ -835,7 +815,7 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
     uint256 validatorPerGroupCount = 2;
 
     for (uint256 i = 0; i < validatorGroupCount; i++) {
-      (address newValidatorGroup, address newValidator) = registerNewValidatorGroupWithValidator(
+      registerNewValidatorGroupWithValidator(
         i,
         validatorPerGroupCount
       );

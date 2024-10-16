@@ -21,13 +21,11 @@ contract EpochRewardsMock08 is IEpochRewards {
 
   function updateTargetVotingYield() external {}
 
-  function getRewardsMultiplier(
-    uint256 targetGoldTotalSupplyIncrease
-  ) external view returns (uint256) {
+  function getRewardsMultiplier(uint256) external pure returns (uint256) {
     return 0;
   }
 
-  function isReserveLow() external view returns (bool) {
+  function isReserveLow() external pure returns (bool) {
     return false;
   }
   function calculateTargetEpochRewards()
@@ -37,22 +35,22 @@ contract EpochRewardsMock08 is IEpochRewards {
   {
     return (perValidatorReward, totalRewardsVoter, totalRewardsCommunity, totalRewardsCarbonFund);
   }
-  function getTargetVotingYieldParameters() external view returns (uint256, uint256, uint256) {
+  function getTargetVotingYieldParameters() external pure returns (uint256, uint256, uint256) {
     return (0, 0, 0);
   }
-  function getRewardsMultiplierParameters() external view returns (uint256, uint256, uint256) {
+  function getRewardsMultiplierParameters() external pure returns (uint256, uint256, uint256) {
     return (0, 0, 0);
   }
-  function getCommunityRewardFraction() external view returns (uint256) {
+  function getCommunityRewardFraction() external pure returns (uint256) {
     return 0;
   }
-  function getCarbonOffsettingFraction() external view returns (uint256) {
+  function getCarbonOffsettingFraction() external pure returns (uint256) {
     return 0;
   }
-  function getTargetVotingGoldFraction() external view returns (uint256) {
+  function getTargetVotingGoldFraction() external pure returns (uint256) {
     return 0;
   }
-  function getRewardsMultiplier() external view returns (uint256) {
+  function getRewardsMultiplier() external pure returns (uint256) {
     return 0;
   }
 

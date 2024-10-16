@@ -28,7 +28,7 @@ contract CeloUnreleasedTreasury is UsingRegistry, ReentrancyGuard, Initializable
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice A constructor for initialising a new instance of a CeloUnreleasedTreasury contract.

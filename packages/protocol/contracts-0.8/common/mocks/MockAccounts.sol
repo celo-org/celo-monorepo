@@ -20,7 +20,7 @@ contract MockAccounts {
     accountToSigner[account] = signer;
   }
 
-  function getValidatorSigner(address account) external returns (address) {
+  function getValidatorSigner(address account) external view returns (address) {
     return accountToSigner[account];
   }
 

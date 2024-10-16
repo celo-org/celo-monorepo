@@ -42,22 +42,22 @@ contract MockGovernance is IGovernance {
     removeVotesCalledFor[account] = maxAmountAllowed;
   }
 
-  function setConstitution(address destination, bytes4 functionId, uint256 threshold) external {
+  function setConstitution(address, bytes4, uint256) external {
     revert("not implemented");
   }
 
   function votePartially(
-    uint256 proposalId,
-    uint256 index,
-    uint256 yesVotes,
-    uint256 noVotes,
-    uint256 abstainVotes
+    uint256,
+    uint256,
+    uint256,
+    uint256,
+    uint256
   ) external returns (bool) {
     return true;
   }
 
   function getProposal(
-    uint256 proposalId
+    uint256
   ) external view returns (address, uint256, uint256, uint256, string memory, uint256, bool) {
     return (address(0), 0, 0, 0, "", 0, false);
   }
@@ -66,7 +66,7 @@ contract MockGovernance is IGovernance {
     return totalVotes[account];
   }
 
-  function getReferendumStageDuration() external view returns (uint256) {
+  function getReferendumStageDuration() external pure returns (uint256) {
     return 0;
   }
 }
