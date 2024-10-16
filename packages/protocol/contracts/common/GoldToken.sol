@@ -14,6 +14,9 @@ import "../../contracts-0.8/common/IsL2Check.sol";
 
 /**
  * @title ERC20 interface for the CELO token.
+ * @notice The native token was initially called "Celo Gold", but soon after
+ * mainnet launch, the community voted to change the name to "CELO". For legacy
+ * reasons, the contract itself is still called GoldToken.
  * @dev Note that this is not a wrapper token like WETH. Thanks to the
  * `transfer` precompile, this contract provides an ERC20 interface *directly*
  * to the native token.
