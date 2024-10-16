@@ -67,7 +67,8 @@ contract MultiSigTest_fallbackFunction is MultiSigTest {
   uint256 amount = 100;
 
   function uncheckedSendViaCall(address payable _to, uint256 _amount) public payable {
-    _to.call.value(_amount)("");
+    (bool res, ) = _to.call.value(_amount)("");
+    require(res, "call failed");
   }
 
   function test_Emits_DepositEventWithCorrectParameters_whenReceivingCelo() public payable {
