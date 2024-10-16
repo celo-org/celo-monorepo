@@ -23,7 +23,6 @@ contract GasPriceMinimum is
   IsL2Check,
   CalledByVm
 {
-  // TODO add IGasPriceMinimum
   using FixidityLib for FixidityLib.Fraction;
 
   uint256 private deprecated_gasPriceMinimum;
@@ -165,6 +164,10 @@ contract GasPriceMinimum is
     emit GasPriceMinimumFloorSet(_gasPriceMinimumFloor);
   }
 
+  /**
+   * @notice Returns the gas price minimum.
+   * @return The gas price minimum.
+   */
   function gasPriceMinimum() public view onlyL1 returns (uint256) {
     if (
       deprecated_baseFeeOpCodeActivationBlock > 0 &&

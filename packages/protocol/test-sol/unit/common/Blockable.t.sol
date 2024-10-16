@@ -48,7 +48,7 @@ contract BlockableTest is Test {
 contract BlockableTest_setBlockable is BlockableTest {
   function test_setBlockable() public {
     blockable.setBlockedByContract(address(blocker));
-    assert(blockable.getBlockedbyContract() == address(blocker));
+    assert(blockable.getBlockedByContract() == address(blocker));
   }
 
   function test_Reverts_WhenNotCalledByOwner() public {
