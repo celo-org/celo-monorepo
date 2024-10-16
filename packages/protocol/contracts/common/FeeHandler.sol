@@ -681,9 +681,6 @@ contract FeeHandler is
       ignoreRenaming_carbonFeeBeneficiary != address(0),
       "Can't distribute to the zero address"
     );
-    IERC20 token = IERC20(tokenAddress);
-    token.balanceOf(address(this));
-
     TokenState storage tokenState = tokenStates[tokenAddress];
 
     FixidityLib.Fraction
