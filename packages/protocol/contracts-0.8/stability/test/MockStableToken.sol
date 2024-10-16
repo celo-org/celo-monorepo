@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.0 <0.9.0;
 // solhint-disable no-unused-vars
 
@@ -19,7 +20,7 @@ contract MockStableToken08 {
   // Stored as units. Value can be found using unitsToValue().
   mapping(address => uint256) public balances;
 
-  constructor() public {
+  constructor() {
     setInflationFactor(FixidityLib.fixed1().unwrap());
   }
 

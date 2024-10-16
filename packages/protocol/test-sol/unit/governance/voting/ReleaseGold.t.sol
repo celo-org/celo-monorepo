@@ -846,7 +846,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
   }
 
   function test_ShouldRevertIfTheSignatureIsIncorrect() public {
-    (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount");
+    (, uint256 otherAccountPK) = actorWithPK("otherAccount");
     (uint8 otherV, bytes32 otherR, bytes32 otherS) = getParsedSignatureOfAddress(
       address(releaseGold),
       otherAccountPK
@@ -1039,7 +1039,7 @@ contract ReleaseGoldTest_AuthorizeWithPublicKeys is ReleaseGoldTest {
 
   bytes ecdsaPublicKey;
 
-  function _randomBytes32() internal returns (bytes32) {
+  function _randomBytes32() internal view returns (bytes32) {
     return keccak256(abi.encodePacked(block.timestamp, block.difficulty, msg.sender));
   }
 
