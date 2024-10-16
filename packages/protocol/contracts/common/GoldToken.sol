@@ -12,6 +12,12 @@ import "./interfaces/ICeloTokenInitializer.sol";
 import "./interfaces/ICeloVersionedContract.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
 
+/**
+ * @title ERC20 interface for the CELO token.
+ * @dev Note that this is not a wrapper token like WETH. Thanks to the
+ * `transfer` precompile, this contract provides an ERC20 interface *directly*
+ * to the native token.
+ */
 contract GoldToken is
   Initializable,
   CalledByVm,
