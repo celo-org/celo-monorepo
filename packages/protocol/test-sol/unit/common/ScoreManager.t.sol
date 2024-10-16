@@ -61,8 +61,8 @@ contract ScoreManagerTest_setGroupScore is ScoreManagerTest {
   }
 
   function test_Reverts_WhenSetToMoreThan1e24Plus1() public {
-    vm.expectRevert("Score must be less than or equal to 1e24 or ZERO_SCORE.");
-    scoreManager.setGroupScore(owner, 1e24 + 2);
+    vm.expectRevert("Score must be less than or equal to 1e24.");
+    scoreManager.setGroupScore(owner, 1e24 + 1);
   }
 
   function test_Returns1FixidityWhenGroupScoreDoesNotExist() public {
@@ -70,13 +70,8 @@ contract ScoreManagerTest_setGroupScore is ScoreManagerTest {
   }
 
   function test_Returns0WhenGroupScoreIsZERO_SCORE() public {
-    scoreManager.setGroupScore(owner, ZERO_SCORE);
-    assert(scoreManager.getGroupScore(owner) == 0);
-  }
-
-  function test_Reverts_WhenSettingScoreToZero() public {
-    vm.expectRevert("Score must be greater than ZERO.");
     scoreManager.setGroupScore(owner, 0);
+    assert(scoreManager.getGroupScore(owner) == 0);
   }
 
   function test_EmitsGroupScoreSet() public {
@@ -107,18 +102,13 @@ contract ScoreManagerTest_setValidatorScore is ScoreManagerTest {
   }
 
   function test_Reverts_WhenSetToMoreThan1e24() public {
-    vm.expectRevert("Score must be less than or equal to 1e24 or ZERO_SCORE.");
-    scoreManager.setValidatorScore(owner, 1e24 + 2);
+    vm.expectRevert("Score must be less than or equal to 1e24.");
+    scoreManager.setValidatorScore(owner, 1e24 + 1);
   }
 
   function test_Returns0WhenValidatorScoreIsZero() public {
-    scoreManager.setValidatorScore(owner, ZERO_SCORE);
+    scoreManager.setValidatorScore(owner, 0);
     assert(scoreManager.getValidatorScore(owner) == 0);
-  }
-
-  function test_Reverts_WhenSettingScoreToZero() public {
-    vm.expectRevert("Score must be greater than ZERO.");
-    scoreManager.setGroupScore(owner, 0);
   }
 
   function test_EmitsValidatorScoreSet() public {

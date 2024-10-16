@@ -68,10 +68,7 @@ contract ScoreManager is
    * @dev Set value to `ZERO_SCORE` to set score to zero.
    */
   function setGroupScore(address group, uint256 score) external onlyAuthorizedToUpdateScore {
-    require(score > 0, "Score must be greater than ZERO.");
-    require(score <= ZERO_SCORE, "Score must be less than or equal to 1e24 or ZERO_SCORE.");
-    groupScores[group] = score;
-
+    groupScores[group] = checkScore(score);
     emit GroupScoreSet(group, score);
   }
 
@@ -85,10 +82,7 @@ contract ScoreManager is
     address validator,
     uint256 score
   ) external onlyAuthorizedToUpdateScore {
-    require(score > 0, "Score must be greater than ZERO.");
-    require(score <= ZERO_SCORE, "Score must be less than or equal to 1e24 or ZERO_SCORE.");
-    validatorScores[validator] = score;
-
+    validatorScores[validator] = checkScore(score);
     emit ValidatorScoreSet(validator, score);
   }
 
@@ -148,6 +142,19 @@ contract ScoreManager is
     } else if (score == ZERO_SCORE) {
       return 0;
     }
+    return score;
+  }
+
+  /**
+   * @notice Checks if the score is valid and returns the score.
+   * @param score The score to be checked.
+   */
+  function checkScore(uint256 score) internal pure returns (uint256) {
+    if (score == 0) {
+      return ZERO_SCORE;
+    }
+
+    require(score <= FIXED1_UINT, "Score must be less than or equal to 1e24.");
     return score;
   }
 }
