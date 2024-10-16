@@ -26,7 +26,7 @@ contract BlockableMock is Blockable, Ownable {
 }
 
 contract TestBlockable is BlockableMock {
-  function functionToBeBlocked() public onlyWhenNotBlocked {
+  function functionToBeBlocked() public view onlyWhenNotBlocked {
     return;
   }
 }
@@ -48,7 +48,7 @@ contract BlockableTest is Test {
 contract BlockableTest_setBlockable is BlockableTest {
   function test_setBlockable() public {
     blockable.setBlockedByContract(address(blocker));
-    assert(blockable.getBlockedbyContract() == address(blocker));
+    assert(blockable.getBlockedByContract() == address(blocker));
   }
 
   function test_Reverts_WhenNotCalledByOwner() public {
@@ -65,7 +65,7 @@ contract BlockableTest_setBlockable is BlockableTest {
 }
 
 contract BlockableTest_isBlocked is BlockableTest {
-  function test_isFalse_WhenBlockableNotSet() public {
+  function test_isFalse_WhenBlockableNotSet() public view {
     assert(blockable.isBlocked() == false);
   }
 
@@ -92,7 +92,7 @@ contract BlockableTest_onlyWhenNotBlocked is BlockableTest {
     blockableWithFunction.functionToBeBlocked();
   }
 
-  function test_callsucceeds_WhenNotBlocked() public {
+  function test_callsucceeds_WhenNotBlocked() public view {
     blockableWithFunction.functionToBeBlocked();
   }
 }

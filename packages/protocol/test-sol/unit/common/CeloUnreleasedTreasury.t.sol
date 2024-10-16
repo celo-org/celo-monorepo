@@ -81,7 +81,7 @@ contract CeloUnreleasedTreasuryTest is Test, TestConstants, IsL2Check {
     assertEq(celoToken.allocatedSupply(), L1_MINTED_CELO_SUPPLY, "total supply incorrect.");
   }
 
-  function newCeloUnreleasedTreasury() internal returns (CeloUnreleasedTreasury) {
+  function newCeloUnreleasedTreasury() internal {
     vm.warp(block.timestamp + l2StartTime);
     vm.prank(celoDistributionOwner);
     celoUnreleasedTreasury = new CeloUnreleasedTreasury(true);

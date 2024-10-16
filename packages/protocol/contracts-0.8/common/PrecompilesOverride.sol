@@ -45,7 +45,7 @@ contract PrecompilesOverride is UsingPrecompiles, UsingRegistry {
     if (isL2()) {
       return getEpochManager().getElectedSignerByIndex(index);
     } else {
-      super.validatorSignerAddressFromCurrentSet(index);
+      return super.validatorSignerAddressFromCurrentSet(index);
     }
   }
 
@@ -54,7 +54,6 @@ contract PrecompilesOverride is UsingPrecompiles, UsingRegistry {
    * @param index Index of requested validator in the validator set.
    * @return Address of validator at the requested index.
    */
-
   function validatorAddressFromCurrentSet(uint256 index) public view onlyL2 returns (address) {
     return getEpochManager().getElectedAccountByIndex(index);
   }

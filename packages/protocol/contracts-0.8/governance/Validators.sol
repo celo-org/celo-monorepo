@@ -172,7 +172,7 @@ contract Validators is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -250,17 +250,13 @@ contract Validators is
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient Locked Gold.
+   * @dev Fails on L2. Use registerValidatorNoBls instead.
    */
   function registerValidator(
     bytes calldata ecdsaPublicKey,
     bytes calldata blsPublicKey,
     bytes calldata blsPop
-  )
-    external
-    nonReentrant
-    onlyL1 // For L2, use registerValidatorNoBls
-    returns (bool)
-  {
+  ) external nonReentrant onlyL1 returns (bool) {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     _isRegistrationAllowed(account);
     require(!isValidator(account) && !isValidatorGroup(account), "Already registered");
@@ -652,7 +648,7 @@ contract Validators is
   // to allow `EpochManager` to mint.
   /**
    * @notice Allows the EpochManager contract to mint stable token for itself.
-   * @param amount The amount to be minted.
+   * @param amount The amount of stableToken to be minted.
    */
   function mintStableToEpochManager(
     uint256 amount
@@ -733,6 +729,12 @@ contract Validators is
     return topValidators;
   }
 
+  /**
+   * @notice Retreives the top validator accounts of the specified group.
+   * @param account The address of the validator group.
+   * @param n The number of members to return.
+   * @return The accounts of the top n group members for a particular group.
+   */
   function getTopGroupValidatorsAccounts(
     address account,
     uint256 n
@@ -1305,7 +1307,7 @@ contract Validators is
     emit ValidatorScoreUpdated(account, validators[account].score.unwrap(), epochScore.unwrap());
   }
 
-  function _isRegistrationAllowed(address account) private returns (bool) {
+  function _isRegistrationAllowed(address account) private {
     require(
       !getElection().allowedToVoteOverMaxNumberOfGroups(account),
       "Cannot vote for more than max number of groups"

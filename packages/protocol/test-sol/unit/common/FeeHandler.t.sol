@@ -282,7 +282,7 @@ contract FeeHandlerTest_changeOtherBeneficiaryAllocation is FeeHandlerTest {
 
   function test_changedSucsesfully() public {
     feeHandler.changeOtherBeneficiaryAllocation(op, (30 * 1e24) / 100);
-    (uint256 fraction, string memory name, ) = feeHandler.getOtherBeneficiariesInfo(op);
+    (uint256 fraction, , ) = feeHandler.getOtherBeneficiariesInfo(op);
     assertEq(fraction, (30 * 1e24) / 100);
   }
 
@@ -1158,7 +1158,7 @@ contract FeeHandlerTest_SetBeneficiaryFraction is FeeHandlerTestAbstract {
 
   function test_setFractionSucsesfully() public {
     feeHandler.setBeneficiaryFraction(op, (30 * 1e24) / 100);
-    (uint256 fraction, string memory name, ) = feeHandler.getOtherBeneficiariesInfo(op);
+    (uint256 fraction, , ) = feeHandler.getOtherBeneficiariesInfo(op);
     assertEq(fraction, (30 * 1e24) / 100);
   }
 
@@ -1192,7 +1192,7 @@ contract FeeHandlerTest_SetBeneficiaryName is FeeHandlerTestAbstract {
 
   function test_setNameSucsesfully() public {
     feeHandler.setBeneficiaryName(op, "OP revenue share updated");
-    (uint256 fraction, string memory name, ) = feeHandler.getOtherBeneficiariesInfo(op);
+    (, string memory name, ) = feeHandler.getOtherBeneficiariesInfo(op);
     assertEq(name, "OP revenue share updated");
   }
 
