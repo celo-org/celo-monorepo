@@ -207,21 +207,38 @@ contract Governance is
 
   event HotfixRecordReset(bytes32 indexed hash);
 
+  /**
+   * @notice Ensures a hotfix can be executed only once.
+   * @param hash Hash of the hotfix.
+   * @dev Reverts if the hotfix has already been executed.
+   */
   modifier hotfixNotExecuted(bytes32 hash) {
     require(!hotfixes[hash].executed, "hotfix already executed");
     _;
   }
 
+  /**
+   * @notice Ensures function can only be called by the approver address.
+   */
   modifier onlyApprover() {
     require(msg.sender == approver, "msg.sender not approver");
     _;
   }
 
+  /**
+   * @notice Ensures function can only be called by the LockedGold contract.
+   */
   modifier onlyLockedGold() {
     require(msg.sender == address(getLockedGold()), "msg.sender not lockedGold");
     _;
   }
 
+  /**
+   * @notice Ensures a hotfix cannot be executed after the time limit.
+   * @param hash Hash of the hotfix.
+   * @dev Reverts if the hotfix time limit has been reached, or the hotfix is
+   * not prepared yet.
+   */
   modifier hotfixTimedOut(bytes32 hash) {
     require(hotfixes[hash].executionTimeLimit > 0, "hotfix not prepared");
     require(hotfixes[hash].executionTimeLimit < now, "hotfix execution time limit not reached");
@@ -327,6 +344,11 @@ contract Governance is
     emit SecurityCouncilSet(_council);
   }
 
+  /**
+   * @notice Sets the time window during which a hotfix has to be executed.
+   * @param timeWindow The time (in seconds) during which a hotfix can be
+   * executed after it has been prepared.
+   */
   function setHotfixExecutionTimeWindow(uint256 timeWindow) external onlyOwner {
     require(timeWindow > 0, "Execution time window cannot be zero");
     hotfixExecutionTimeWindow = timeWindow;
