@@ -36,7 +36,7 @@ contract GoldToken is
   string constant NAME = "Celo native asset";
   string constant SYMBOL = "CELO";
   uint8 constant DECIMALS = 18;
-  uint256 constant CELO_SUPPLY_CAP = 1000000000 ether; // 1 billion Celo
+  uint256 constant CELO_SUPPLY_CAP = 1000000000 ether; // 1 billion CELO
   uint256 internal totalSupply_;
   // solhint-enable state-visibility
 
@@ -255,7 +255,7 @@ contract GoldToken is
 
   /**
    * @notice Gets the amount of CELO that has been burned.
-   * @return The total amount of Celo that has been sent to the burn address.
+   * @return The total amount of CELO that has been sent to the burn address.
    */
   function getBurnedAmount() public view returns (uint256) {
     return balanceOf(BURN_ADDRESS);
