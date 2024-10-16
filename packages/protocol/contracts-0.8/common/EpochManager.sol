@@ -408,7 +408,7 @@ contract EpochManager is
   /**
    * @notice Returns the epoch info for the current epoch.
    * @return firstEpoch The first block of the current epoch.
-   * @return lastBlock The first block of the current epoch.
+   * @return lastBlock The last block of the current epoch.
    * @return startTimestamp The starting timestamp of the current epoch.
    * @return rewardsBlock The reward block of the current epoch.
    */

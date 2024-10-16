@@ -140,7 +140,7 @@ contract ScoreManager is
    * @param score The value from `validatorScores` or `groupScores` mappings.
    * @dev To set the score to 100% by default when the contract is first initialized
    * or when new groups or validators are added, the default score of 0 returns 1e24.
-   * Conversly, a score of (1e24)+1 returns 0.
+   * To encode a score value of 0 we use the magic number ZERO_SCORE = (1e24)+1.
    */
   function getScore(uint256 score) internal pure returns (uint256) {
     if (score == 0) {
