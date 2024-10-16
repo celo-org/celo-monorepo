@@ -169,7 +169,7 @@ contract MockValidators is IValidators, IsL2Check {
     revert("Method not implemented in mock");
   }
 
-  function registerValidatorNoBls(bytes calldata ecdsaPublicKey) external returns (bool) {
+  function registerValidatorNoBls(bytes calldata) external returns (bool) {
     revert("Method not implemented in mock");
   }
   function removeMember(address) external returns (bool) {
@@ -208,7 +208,7 @@ contract MockValidators is IValidators, IsL2Check {
     revert("Method not implemented in mock");
   }
 
-  function setDowntimeGracePeriod(uint256 value) external {
+  function setDowntimeGracePeriod(uint256) external {
     revert("Method not implemented in mock");
   }
 
@@ -304,11 +304,7 @@ contract MockValidators is IValidators, IsL2Check {
     revert("Method not implemented in mock");
   }
 
-  function computeEpochReward(
-    address account,
-    uint256 score,
-    uint256 maxPayment
-  ) external view returns (uint256) {
+  function computeEpochReward(address account, uint256, uint256) external view returns (uint256) {
     return epochRewards[account];
   }
 
@@ -331,7 +327,7 @@ contract MockValidators is IValidators, IsL2Check {
   }
 
   function getValidator(
-    address account
+    address
   ) external view returns (bytes memory, bytes memory, address, uint256, address) {
     revert("Method not implemented in mock");
   }
