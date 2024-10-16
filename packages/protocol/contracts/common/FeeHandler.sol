@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -488,7 +489,7 @@ contract FeeHandler is
     return balanceToBurn;
   }
 
-  function checkTotalBeneficiary() internal {
+  function checkTotalBeneficiary() internal view {
     require(
       getTotalFractionOfOtherBeneficiariesAndCarbonFixidity().lt(FixidityLib.fixed1()),
       "Total beneficiaries fraction must be less than 1"
@@ -663,7 +664,7 @@ contract FeeHandler is
     FixidityLib.Fraction memory thisTokenFraction,
     FixidityLib.Fraction memory totalFractionOfOtherBeneficiariesAndCarbonFixidity,
     uint256 toDistribute
-  ) private returns (uint256) {
+  ) private pure returns (uint256) {
     FixidityLib.Fraction memory proportionOfThisToken = thisTokenFraction.divide(
       totalFractionOfOtherBeneficiariesAndCarbonFixidity
     );
@@ -680,9 +681,6 @@ contract FeeHandler is
       ignoreRenaming_carbonFeeBeneficiary != address(0),
       "Can't distribute to the zero address"
     );
-    IERC20 token = IERC20(tokenAddress);
-    uint256 tokenBalance = token.balanceOf(address(this));
-
     TokenState storage tokenState = tokenStates[tokenAddress];
 
     FixidityLib.Fraction
@@ -761,7 +759,6 @@ contract FeeHandler is
   // new handle
   // tokenAddresses should not contain the Celo address
   function _handle(address[] memory tokenAddresses) private {
-    address celoToken = getCeloTokenAddress();
     // Celo doesn't have to be exchanged for anything
     for (uint256 i = 0; i < tokenAddresses.length; i++) {
       address token = tokenAddresses[i];
