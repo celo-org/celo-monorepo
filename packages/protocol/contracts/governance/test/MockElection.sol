@@ -35,23 +35,23 @@ contract MockElection is IsL2Check {
     electedValidators = _electedValidators;
   }
 
-  function vote(address, uint256, address, address) external returns (bool) {
+  function vote(address, uint256, address, address) external pure returns (bool) {
     return true;
   }
 
-  function activate(address) external returns (bool) {
+  function activate(address) external pure returns (bool) {
     return true;
   }
 
-  function revokeAllActive(address, address, address, uint256) external returns (bool) {
+  function revokeAllActive(address, address, address, uint256) external pure returns (bool) {
     return true;
   }
 
-  function revokeActive(address, uint256, address, address, uint256) external returns (bool) {
+  function revokeActive(address, uint256, address, address, uint256) external pure returns (bool) {
     return true;
   }
 
-  function revokePending(address, uint256, address, address, uint256) external returns (bool) {
+  function revokePending(address, uint256, address, address, uint256) external pure returns (bool) {
     return true;
   }
 
@@ -74,7 +74,7 @@ contract MockElection is IsL2Check {
     return active;
   }
 
-  function getTotalVotesByAccount(address) external view returns (uint256) {
+  function getTotalVotesByAccount(address) external pure returns (uint256) {
     return 0;
   }
 
@@ -91,8 +91,8 @@ contract MockElection is IsL2Check {
 
   function getGroupEpochRewardsBasedOnScore(
     address group,
-    uint256 totalEpochRewards,
-    uint256 groupScore
+    uint256,
+    uint256
   ) external view returns (uint256) {
     return groupRewardsBasedOnScore[group];
   }
@@ -101,12 +101,7 @@ contract MockElection is IsL2Check {
     groupRewardsBasedOnScore[group] = groupRewards;
   }
 
-  function distributeEpochRewards(
-    address group,
-    uint256 value,
-    address lesser,
-    address greater
-  ) external {
+  function distributeEpochRewards(address group, uint256 value, address, address) external {
     distributedEpochRewards[group] = value;
   }
 

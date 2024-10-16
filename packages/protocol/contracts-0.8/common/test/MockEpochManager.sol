@@ -71,9 +71,9 @@ contract MockEpochManager is IEpochManager {
 
   function startNextEpochProcess() external {}
   function finishNextEpochProcess(
-    address[] calldata groups,
-    address[] calldata lessers,
-    address[] calldata greaters
+    address[] calldata,
+    address[] calldata,
+    address[] calldata
   ) external {
     epochs[currentEpochNumber].lastBlock = block.number - 1;
 
@@ -150,7 +150,7 @@ contract MockEpochManager is IEpochManager {
   }
 
   function getEpochByBlockNumber(
-    uint256 _blockNumber
+    uint256
   ) external view returns (uint256, uint256, uint256, uint256) {
     return (0, 0, 0, 0);
   }

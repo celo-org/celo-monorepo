@@ -106,13 +106,7 @@ contract FeeCurrencyAdapterTest is Test {
     feeCurrencyAdapter = new CeloFeeCurrencyAdapterTestContract(true);
     feeCurrencyAdapterForFuzzyTests = new CeloFeeCurrencyAdapterTestContract(true);
 
-    address feeCurrencyAddress = actor("feeCurrency");
-
-    string memory name = "tokenName";
-    string memory symbol = "tN";
-
     feeCurrency = new FeeCurrency6DecimalsTest(initialSupply);
-
     feeCurrencyAdapter.initialize(address(feeCurrency), "wrapper", "wr", 18);
   }
 }
