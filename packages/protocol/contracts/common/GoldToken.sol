@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -12,6 +13,15 @@ import "./interfaces/ICeloTokenInitializer.sol";
 import "./interfaces/ICeloVersionedContract.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
 
+/**
+ * @title ERC20 interface for the CELO token.
+ * @notice The native token was initially called "Celo Gold", but soon after
+ * mainnet launch, the community voted to change the name to "CELO". For legacy
+ * reasons, the contract itself is still called GoldToken.
+ * @dev Note that this is not a wrapper token like WETH. Thanks to the
+ * `transfer` precompile, this contract provides an ERC20 interface *directly*
+ * to the native token.
+ */
 contract GoldToken is
   Initializable,
   CalledByVm,
@@ -30,7 +40,7 @@ contract GoldToken is
   string constant NAME = "Celo native asset";
   string constant SYMBOL = "CELO";
   uint8 constant DECIMALS = 18;
-  uint256 constant CELO_SUPPLY_CAP = 1000000000 ether; // 1 billion Celo
+  uint256 constant CELO_SUPPLY_CAP = 1000000000 ether; // 1 billion CELO
   uint256 internal totalSupply_;
   // solhint-enable state-visibility
 
@@ -249,7 +259,7 @@ contract GoldToken is
 
   /**
    * @notice Gets the amount of CELO that has been burned.
-   * @return The total amount of Celo that has been sent to the burn address.
+   * @return The total amount of CELO that has been sent to the burn address.
    */
   function getBurnedAmount() public view returns (uint256) {
     return balanceOf(BURN_ADDRESS);

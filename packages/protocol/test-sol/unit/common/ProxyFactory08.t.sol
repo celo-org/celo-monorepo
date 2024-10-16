@@ -25,7 +25,7 @@ contract ProxyFactoryTest is Test, Utils08 {
   }
 
   function test_Reverts_WhenDeployingWithSameSenderAddressAndBytecode() public {
-    address deployedAddress = proxyFactory08.deployArbitraryByteCode(0, owner, 0, proxyInitCode);
+    proxyFactory08.deployArbitraryByteCode(0, owner, 0, proxyInitCode);
     vm.expectRevert("Create2: Failed on deploy");
     proxyFactory08.deployArbitraryByteCode(0, owner, 0, proxyInitCode);
   }
@@ -49,7 +49,7 @@ contract ProxyFactoryTest is Test, Utils08 {
     string memory compiler,
     bytes memory bytecode,
     string memory artifactPath
-  ) public {
+  ) public view {
     string memory bytecodeBackUp = vm.readFile(string.concat(artifactPath, compiler, ".hex"));
     string memory bytecodeString = vm.toString(bytecode);
 
