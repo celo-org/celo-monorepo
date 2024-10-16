@@ -132,6 +132,9 @@ contract Accounts is
     _setEip712DomainSeparator();
   }
 
+  /**
+   * @notice Sets the EIP712 domain separator for the Celo Accounts abstraction.
+   */
   function setEip712DomainSeparator() external {
     _setEip712DomainSeparator();
   }

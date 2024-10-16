@@ -8,7 +8,7 @@ import "forge-std/console.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
 
 contract CompileValidatorIntegrationMock is Test {
-  function test_nop() public {
+  function test_nop() public view {
     console.log("nop");
   }
 }

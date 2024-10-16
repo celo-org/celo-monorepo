@@ -302,7 +302,7 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
     epochManager.initializeSystem(l1EpochNumber, block.number, _elected);
   }
 
-  function _registerValidatorGroupHelper(address _group, uint256 numMembers) internal {
+  function _registerValidatorGroupHelper(address _group, uint256) internal {
     vm.startPrank(_group);
     if (!accounts.isAccount(_group)) {
       accounts.createAccount();
@@ -485,10 +485,7 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
     address _validator,
     uint256 signerPk
   ) internal returns (bytes memory) {
-    (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
-      _validator,
-      signerPk
-    );
+    (bytes memory _ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(_validator, signerPk);
 
     ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(_validator, blsPublicKey, blsPop));
 

@@ -7,7 +7,6 @@ import "@celo-contracts-8/stability/test/MockStableToken.sol";
 import "@celo-contracts-8/common/test/MockCeloToken.sol";
 import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts-8/common/ScoreManager.sol";
-import { CeloUnreleasedTreasury } from "@celo-contracts-8/common/CeloUnreleasedTreasury.sol";
 import { ICeloUnreleasedTreasury } from "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";
@@ -170,6 +169,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
   function getGroupsWithLessersAndGreaters()
     public
+    view
     returns (address[] memory, address[] memory, address[] memory)
   {
     address[] memory groups = new address[](1);
@@ -304,7 +304,6 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
 
   function test_ShouldMintTotalValidatorStableRewardsToEpochManager() public {
     initializeEpochManagerSystem();
-    uint256 beforeBalance = stableToken.balanceOf(address(epochManager));
     epochManager.startNextEpochProcess();
 
     assertEq(validators.mintedStable(), validator1Reward + validator2Reward);
@@ -312,7 +311,6 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
 
   function test_ShouldReleaseCorrectAmountToReserve() public {
     initializeEpochManagerSystem();
-    uint256 reserveBalanceBefore = celoToken.balanceOf(reserveAddress);
     epochManager.startNextEpochProcess();
     uint256 reserveBalanceAfter = celoToken.balanceOf(reserveAddress);
     assertEq(
@@ -687,18 +685,12 @@ contract EpochManagerTest_setToProcessGroups is EpochManagerTest {
   }
 
   function test_Reverts_WhenNotStarted() public {
-    address[] memory groups = new address[](0);
-
     vm.expectRevert("Epoch process is not started");
     epochManager.setToProcessGroups();
   }
 
   function test_setsToProcessGroups() public {
-    (
-      address[] memory groups,
-      address[] memory lessers,
-      address[] memory greaters
-    ) = getGroupsWithLessersAndGreaters();
+    (address[] memory groups, , ) = getGroupsWithLessersAndGreaters();
 
     epochManager.startNextEpochProcess();
     epochManager.setToProcessGroups();
@@ -707,12 +699,7 @@ contract EpochManagerTest_setToProcessGroups is EpochManagerTest {
   }
 
   function test_setsGroupRewards() public {
-    (
-      address[] memory groups,
-      address[] memory lessers,
-      address[] memory greaters
-    ) = getGroupsWithLessersAndGreaters();
-
+    (address[] memory groups, , ) = getGroupsWithLessersAndGreaters();
     epochManager.startNextEpochProcess();
     epochManager.setToProcessGroups();
 
@@ -779,12 +766,6 @@ contract EpochManagerTest_processGroup is EpochManagerTest {
   }
 
   function test_ProcessesGroup() public {
-    (
-      address[] memory groups,
-      address[] memory lessers,
-      address[] memory greaters
-    ) = getGroupsWithLessersAndGreaters();
-
     epochManager.startNextEpochProcess();
     epochManager.setToProcessGroups();
     epochManager.processGroup(group, address(0), address(0));
@@ -794,12 +775,6 @@ contract EpochManagerTest_processGroup is EpochManagerTest {
   }
 
   function test_TransfersToCommunityAndCarbonOffsetting() public {
-    (
-      address[] memory groups,
-      address[] memory lessers,
-      address[] memory greaters
-    ) = getGroupsWithLessersAndGreaters();
-
     epochManager.startNextEpochProcess();
     epochManager.setToProcessGroups();
     epochManager.processGroup(group, address(0), address(0));
@@ -809,12 +784,6 @@ contract EpochManagerTest_processGroup is EpochManagerTest {
   }
 
   function test_TransfersToValidatorGroup() public {
-    (
-      address[] memory groups,
-      address[] memory lessers,
-      address[] memory greaters
-    ) = getGroupsWithLessersAndGreaters();
-
     epochManager.startNextEpochProcess();
     epochManager.setToProcessGroups();
     epochManager.processGroup(group, address(0), address(0));
@@ -869,12 +838,8 @@ contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
     initializeEpochManagerSystem();
     uint256 _startingEpochNumber = epochManager.getCurrentEpochNumber();
 
-    (
-      uint256 startingEpochFirstBlock,
-      uint256 startingEpochLastBlock,
-      uint256 startingEpochStartTimestamp,
-      uint256 startingEpochRewardBlock
-    ) = epochManager.getCurrentEpoch();
+    (uint256 startingEpochFirstBlock, , uint256 startingEpochStartTimestamp, ) = epochManager
+      .getCurrentEpoch();
 
     _travelAndProcess_N_L2Epoch(numberOfEpochsToTravel);
 
@@ -925,7 +890,6 @@ contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
 
   function test_ReturnsZeroForFutureEpochs() public {
     initializeEpochManagerSystem();
-    address[] memory _expectedElected = new address[](0);
     (
       uint256 _firstBlock,
       uint256 _lastBlock,
@@ -958,12 +922,9 @@ contract EpochManagerTest_getEpochByBlockNumber is EpochManagerTest {
 
     _travelAndProcess_N_L2Epoch(2);
 
-    (
-      uint256 _firstBlock,
-      uint256 _lastBlock,
-      uint256 _timestamp,
-      uint256 rewardsBlock
-    ) = epochManager.getEpochByBlockNumber(firstEpochBlock + (3 * L2_BLOCK_IN_EPOCH));
+    (uint256 _firstBlock, uint256 _lastBlock, , ) = epochManager.getEpochByBlockNumber(
+      firstEpochBlock + (3 * L2_BLOCK_IN_EPOCH)
+    );
     assertEq(_firstBlock, firstEpochBlock + 1 + (2 * L2_BLOCK_IN_EPOCH));
     assertEq(_lastBlock, firstEpochBlock + 1 + (3 * L2_BLOCK_IN_EPOCH) - 1);
   }

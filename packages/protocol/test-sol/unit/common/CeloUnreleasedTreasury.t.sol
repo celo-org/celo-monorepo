@@ -62,8 +62,9 @@ contract CeloUnreleasedTreasuryTest is Test, TestConstants, IsL2Check {
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
     registry = IRegistry(REGISTRY_ADDRESS);
 
-    deployCodeTo("GoldToken.sol", abi.encode(false), celoTokenAddress);
+    deployCodeTo("GoldToken.sol", abi.encode(true), celoTokenAddress);
     celoToken = ICeloToken(celoTokenAddress);
+    celoToken.initialize(REGISTRY_ADDRESS);
     // Using a mock contract, as foundry does not allow for library linking when using deployCodeTo
     governance = new MockGovernance();
 
@@ -80,7 +81,7 @@ contract CeloUnreleasedTreasuryTest is Test, TestConstants, IsL2Check {
     assertEq(celoToken.allocatedSupply(), L1_MINTED_CELO_SUPPLY, "total supply incorrect.");
   }
 
-  function newCeloUnreleasedTreasury() internal returns (CeloUnreleasedTreasury) {
+  function newCeloUnreleasedTreasury() internal {
     vm.warp(block.timestamp + l2StartTime);
     vm.prank(celoDistributionOwner);
     celoUnreleasedTreasury = new CeloUnreleasedTreasury(true);
@@ -154,5 +155,41 @@ contract CeloUnreleasedTreasuryTest_release is CeloUnreleasedTreasuryTest {
 
     vm.expectRevert("Only the EpochManager contract can call this function.");
     celoUnreleasedTreasury.release(randomAddress, 4);
+  }
+}
+contract CeloUnreleasedTreasuryTest_getRemainingBalanceToRelease is CeloUnreleasedTreasuryTest {
+  uint256 _startingBalance;
+  function setUp() public override {
+    super.setUp();
+    newCeloUnreleasedTreasury();
+    _startingBalance = address(celoUnreleasedTreasury).balance;
+  }
+
+  function test_ShouldReturnContractBalanceBeforeFirstRelease() public {
+    uint256 _remainingBalance = celoUnreleasedTreasury.getRemainingBalanceToRelease();
+
+    assertEq(_startingBalance, _remainingBalance);
+  }
+
+  function test_ShouldReturnRemainingBalanceToReleaseAfterFirstRelease() public {
+    vm.prank(epochManagerAddress);
+
+    celoUnreleasedTreasury.release(randomAddress, 4);
+    uint256 _remainingBalance = celoUnreleasedTreasury.getRemainingBalanceToRelease();
+    assertEq(_remainingBalance, _startingBalance - 4);
+  }
+
+  function test_RemainingBalanceToReleaseShouldRemainUnchangedAfterCeloTransferBackToContract()
+    public
+  {
+    vm.prank(epochManagerAddress);
+
+    celoUnreleasedTreasury.release(randomAddress, 4);
+    uint256 _remainingBalanceBeforeTransfer = celoUnreleasedTreasury.getRemainingBalanceToRelease();
+    assertEq(_remainingBalanceBeforeTransfer, _startingBalance - 4);
+    // set the contract balance to mock a CELO token transfer
+    vm.deal(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
+    uint256 _remainingBalanceAfterTransfer = celoUnreleasedTreasury.getRemainingBalanceToRelease();
+    assertEq(_remainingBalanceAfterTransfer, _remainingBalanceBeforeTransfer);
   }
 }
