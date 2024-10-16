@@ -17,6 +17,9 @@ import "../common/libraries/ReentrancyGuard.sol";
 import "../common/Blockable.sol";
 import "../common/PrecompilesOverride.sol";
 
+/**
+ * @title Manages the validator election process.
+ */
 contract Election is
   IElection,
   ICeloVersionedContract,
@@ -153,6 +156,12 @@ contract Election is
   );
   event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
 
+  /**
+   * @notice - On L1, ensures the function is called via the consensus client.
+   *         - On L2, ensures the function is called by the permitted address.
+   * @param permittedAddress The address permitted to call permissioned
+   * functions on L2.
+   */
   modifier onlyVmOrPermitted(address permittedAddress) {
     if (isL2()) require(msg.sender == permittedAddress, "Only permitted address can call");
     else {
@@ -428,9 +437,11 @@ contract Election is
     return value;
   }
 
-  /// @notice Sets the address of the blocking contract.
-  /// @param _blockedBy The address of the contract that will determine if this contract is blocked.
-  /// @dev Can only be called by the owner of the contract.
+  /**
+   *  @notice Sets the address of the blocking contract.
+   *  @param _blockedBy The address of the contract that will determine if this contract is blocked.
+   *  @dev Can only be called by the owner of the contract.
+   */
   function setBlockedByContract(address _blockedBy) external onlyOwner {
     _setBlockedBy(_blockedBy);
   }
