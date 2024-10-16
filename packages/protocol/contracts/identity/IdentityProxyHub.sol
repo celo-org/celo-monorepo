@@ -103,10 +103,7 @@ contract IdentityProxyHub is UsingRegistry, ICeloVersionedContract {
     for (uint256 i = 0; i < addresses.length; i++) {
       address otherAddr = addresses[i];
       if (otherAddr != addr) {
-        (uint32 otherCompleted,) = attestations.getAttestationStats(
-          identifier,
-          otherAddr
-        );
+        (uint32 otherCompleted, ) = attestations.getAttestationStats(identifier, otherAddr);
         hasMostCompletions = hasMostCompletions && otherCompleted <= completed;
       }
     }

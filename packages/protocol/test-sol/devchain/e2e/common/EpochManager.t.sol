@@ -650,10 +650,7 @@ contract E2E_GasTest_Setup is E2E_EpochManager {
     }
 
     for (uint256 i = 0; i < validatorGroupCount; i++) {
-      registerNewValidatorGroupWithValidator(
-        i,
-        validatorPerGroupCount
-      );
+      registerNewValidatorGroupWithValidator(i, validatorPerGroupCount);
     }
 
     timeTravel(vm, epochDuration + 1);
@@ -815,10 +812,7 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
     uint256 validatorPerGroupCount = 2;
 
     for (uint256 i = 0; i < validatorGroupCount; i++) {
-      registerNewValidatorGroupWithValidator(
-        i,
-        validatorPerGroupCount
-      );
+      registerNewValidatorGroupWithValidator(i, validatorPerGroupCount);
     }
 
     timeTravel(vm, epochDuration + 1);
