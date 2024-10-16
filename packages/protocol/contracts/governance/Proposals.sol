@@ -169,6 +169,10 @@ library Proposals {
     executeTransactions(proposal.transactions);
   }
 
+  /**
+   * @notice Executes a list of transactions.
+   * @param transactions The transactions to execute.
+   */
   function executeTransactions(Transaction[] memory transactions) internal {
     for (uint256 i = 0; i < transactions.length; i = i.add(1)) {
       require(
@@ -219,6 +223,7 @@ library Proposals {
    * @param dataLengths The lengths of each transaction's data.
    * @param proposer The proposer.
    * @param deposit The proposal deposit.
+   * @return The constructed proposal struct.
    */
   function makeMem(
     uint256[] memory values,
@@ -275,6 +280,7 @@ library Proposals {
    * @return transaction Transaction count.
    * @return description Description url.
    * @return networkWeight Network weight.
+   * @return Approval status.
    */
   function unpack(
     Proposal storage proposal

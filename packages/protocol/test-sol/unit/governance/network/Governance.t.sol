@@ -145,7 +145,7 @@ contract GovernanceTest is Test, TestConstants, Utils {
     }
   }
 
-  function makeValidProposal() internal returns (uint256 proposalId) {
+  function makeValidProposal() internal returns (uint256) {
     return
       governance.propose.value(DEPOSIT)(
         okProp.values,
@@ -156,7 +156,7 @@ contract GovernanceTest is Test, TestConstants, Utils {
       );
   }
 
-  function makeEmptyProposal() internal returns (uint256 proposalId) {
+  function makeEmptyProposal() internal returns (uint256) {
     Proposal memory emptyProposal;
     return
       governance.propose.value(DEPOSIT)(
@@ -584,12 +584,7 @@ contract GovernanceTest_setParticipationFloor is GovernanceTest {
   function test_SetsValue() public {
     vm.prank(accOwner);
     governance.setParticipationFloor(NEW_VALUE);
-    (
-      uint256 baseline,
-      uint256 baselineFloor,
-      uint256 _baselineUpdateFactor,
-      uint256 _baselineQuorumFactor
-    ) = governance.getParticipationParameters();
+    (, uint256 baselineFloor, , ) = governance.getParticipationParameters();
     assertEq(baselineFloor, NEW_VALUE);
   }
 
@@ -619,12 +614,7 @@ contract GovernanceTest_setBaselineUpdateFactor is GovernanceTest {
   function test_SetsValue() public {
     vm.prank(accOwner);
     governance.setBaselineUpdateFactor(NEW_VALUE);
-    (
-      uint256 baseline,
-      uint256 baselineFloor,
-      uint256 _baselineUpdateFactor,
-      uint256 _baselineQuorumFactor
-    ) = governance.getParticipationParameters();
+    (, , uint256 _baselineUpdateFactor, ) = governance.getParticipationParameters();
     assertEq(_baselineUpdateFactor, NEW_VALUE);
   }
 
@@ -654,12 +644,7 @@ contract GovernanceTest_setBaselineQuorumFactor is GovernanceTest {
   function test_SetsValue() public {
     vm.prank(accOwner);
     governance.setBaselineQuorumFactor(NEW_VALUE);
-    (
-      uint256 baseline,
-      uint256 baselineFloor,
-      uint256 _baselineUpdateFactor,
-      uint256 _baselineQuorumFactor
-    ) = governance.getParticipationParameters();
+    (, , , uint256 _baselineQuorumFactor) = governance.getParticipationParameters();
     assertEq(_baselineQuorumFactor, NEW_VALUE);
   }
 
@@ -1288,7 +1273,6 @@ contract GovernanceTest_revokeUpvote is GovernanceTest {
   function test_markAccountAsNotHavingUpvoted_whenMoreThanDequeueFrequencySinceLastDequeue()
     public
   {
-    uint256 originalLastDequeue = governance.lastDequeue();
     vm.warp(block.timestamp + governance.dequeueFrequency());
     governance.revokeUpvote(0, 0);
     (uint256 recordId, uint256 recordWeight) = governance.getUpvoteRecord(accVoter);
@@ -1758,7 +1742,7 @@ contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest {
     vm.startPrank(accVoter);
     governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
     governance.vote(proposalId, 0, Proposals.VoteValue.No);
-    (uint256 yes, uint256 no, uint256 abstain) = governance.getVoteTotals(proposalId);
+    (uint256 yes, uint256 no, ) = governance.getVoteTotals(proposalId);
     assertEq(yes, 0);
     assertEq(no, VOTER_GOLD);
   }
@@ -1767,8 +1751,7 @@ contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest {
     vm.startPrank(accVoter);
     governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
     governance.vote(proposalId, 0, Proposals.VoteValue.No);
-    (uint256 id, uint256 _1, uint256 _2, uint256 yes, uint256 no, uint256 abstain) = governance
-      .getVoteRecord(accVoter, 0);
+    (uint256 id, , , uint256 yes, uint256 no, ) = governance.getVoteRecord(accVoter, 0);
     assertEq(id, proposalId);
     assertEq(yes, 0);
     assertEq(no, VOTER_GOLD);
@@ -1778,7 +1761,7 @@ contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest {
     vm.startPrank(accVoter);
     governance.vote(proposalId, 0, Proposals.VoteValue.No);
     governance.vote(proposalId, 0, Proposals.VoteValue.Abstain);
-    (uint256 yes, uint256 no, uint256 abstain) = governance.getVoteTotals(proposalId);
+    (, uint256 no, uint256 abstain) = governance.getVoteTotals(proposalId);
     assertEq(no, 0);
     assertEq(abstain, VOTER_GOLD);
   }
@@ -1787,8 +1770,7 @@ contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest {
     vm.startPrank(accVoter);
     governance.vote(proposalId, 0, Proposals.VoteValue.No);
     governance.vote(proposalId, 0, Proposals.VoteValue.Abstain);
-    (uint256 id, uint256 _1, uint256 _2, uint256 yes, uint256 no, uint256 abstain) = governance
-      .getVoteRecord(accVoter, 0);
+    (uint256 id, , , , uint256 no, uint256 abstain) = governance.getVoteRecord(accVoter, 0);
     assertEq(id, proposalId);
     assertEq(no, 0);
     assertEq(abstain, VOTER_GOLD);
@@ -1798,7 +1780,7 @@ contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest {
     vm.startPrank(accVoter);
     governance.vote(proposalId, 0, Proposals.VoteValue.Abstain);
     governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
-    (uint256 yes, uint256 no, uint256 abstain) = governance.getVoteTotals(proposalId);
+    (uint256 yes, , uint256 abstain) = governance.getVoteTotals(proposalId);
     assertEq(abstain, 0);
     assertEq(yes, VOTER_GOLD);
   }
@@ -1807,8 +1789,7 @@ contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest {
     vm.startPrank(accVoter);
     governance.vote(proposalId, 0, Proposals.VoteValue.Abstain);
     governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
-    (uint256 id, uint256 _1, uint256 _2, uint256 yes, uint256 no, uint256 abstain) = governance
-      .getVoteRecord(accVoter, 0);
+    (uint256 id, , , uint256 yes, , uint256 abstain) = governance.getVoteRecord(accVoter, 0);
     assertEq(id, proposalId);
     assertEq(abstain, 0);
     assertEq(yes, VOTER_GOLD);
@@ -2241,8 +2222,10 @@ contract GovernanceTest_vote_PartiallyWhenProposalIsApproved is GovernanceTest {
     vm.startPrank(accVoter);
     governance.votePartially(proposalId, 0, 10, 50, 30);
     governance.votePartially(proposalId, 0, 30, 20, 40);
-    (uint256 id, uint256 _1, uint256 _2, uint256 yes, uint256 no, uint256 abstain) = governance
-      .getVoteRecord(accVoter, 0);
+    (uint256 id, , , uint256 yes, uint256 no, uint256 abstain) = governance.getVoteRecord(
+      accVoter,
+      0
+    );
     assertEq(id, proposalId);
     assertEq(yes, 30);
     assertEq(no, 20);

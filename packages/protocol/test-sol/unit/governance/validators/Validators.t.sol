@@ -175,7 +175,6 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     lockedGold = new MockLockedGold();
     election = new MockElection();
     address validatorsAddress = actor("Validators");
-    address validatorsMockFactoryAddress = actor("validatorsMockFactory");
 
     deployCodeTo("ValidatorsMock.sol", validatorsAddress);
     validators = IValidators(validatorsAddress);
