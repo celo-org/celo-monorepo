@@ -16,8 +16,8 @@ contract ProxyFactory08 {
    * @param _salt The Create2 salt to use.
    * @param initCode The contract init code to use for deployment.
    * @return Address of the deployed contract.
-   * @dev Calls with initCode that results in the same bytecode, sender, and salt
-   * will revert as two contracts cannot get deployed to the same address.
+   * @dev Calls with the same initCode, sender, and salt will revert as two
+   * contracts cannot get deployed to the same address.
    * @dev Assumes the deployed contract is a Proxy with a `_transferOwnership`
    * function that will be called. Will revert if that call reverts.
    */
