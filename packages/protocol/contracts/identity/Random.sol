@@ -23,9 +23,9 @@ contract Random is
   using SafeMath for uint256;
 
   /* Stores most recent commitment per address */
-  mapping(address => bytes32) public commitments;
+  mapping(address => bytes32) private deprecated_commitments;
 
-  uint256 public randomnessBlockRetentionWindow;
+  uint256 private deprecated_randomnessBlockRetentionWindow;
 
   mapping(uint256 => bytes32) private history;
   uint256 private historyFirst;
@@ -78,6 +78,20 @@ contract Random is
   }
 
   /**
+   * @notice Returns the most recent commitment by a validator.
+   * @param addr Address of the validator.
+   * @return The validator's most recent commitment.
+   * @dev The Random system will be deprecated once Celo becomes an L2.
+   */
+  function commitments(address addr) external view onlyL1 returns (bytes32) {
+    return deprecated_commitments[addr];
+  }
+
+  function randomnessBlockRetentionWindow() external view onlyL1 returns (uint256) {
+    return deprecated_randomnessBlockRetentionWindow;
+  }
+
+  /**
    * @notice Get randomness values of previous blocks.
    * @param blockNumber The number of block whose randomness value we want to know.
    * @return The associated randomness value.
@@ -95,7 +109,7 @@ contract Random is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 1);
+    return (1, 1, 2, 0);
   }
 
   /**
@@ -105,7 +119,7 @@ contract Random is
    */
   function setRandomnessBlockRetentionWindow(uint256 value) public onlyL1 onlyOwner {
     require(value > 0, "randomnessBlockRetetionWindow cannot be zero");
-    randomnessBlockRetentionWindow = value;
+    deprecated_randomnessBlockRetentionWindow = value;
     emit RandomnessBlockRetentionWindowSet(value);
   }
 
@@ -133,11 +147,11 @@ contract Random is
     require(newCommitment != computeCommitment(0), "cannot commit zero randomness");
 
     // ensure revealed randomness matches previous commitment
-    if (commitments[proposer] != 0) {
+    if (deprecated_commitments[proposer] != 0) {
       require(randomness != 0, "randomness cannot be zero if there is a previous commitment");
       bytes32 expectedCommitment = computeCommitment(randomness);
       require(
-        expectedCommitment == commitments[proposer],
+        expectedCommitment == deprecated_commitments[proposer],
         "commitment didn't match the posted randomness"
       );
     } else {
@@ -148,7 +162,7 @@ contract Random is
     uint256 blockNumber = block.number == 0 ? 0 : block.number.sub(1);
     addRandomness(block.number, keccak256(abi.encodePacked(history[blockNumber], randomness)));
 
-    commitments[proposer] = newCommitment;
+    deprecated_commitments[proposer] = newCommitment;
   }
 
   /**
@@ -170,16 +184,16 @@ contract Random is
       if (historySize == 0) {
         historyFirst = blockNumber;
         historySize = 1;
-      } else if (historySize > randomnessBlockRetentionWindow) {
+      } else if (historySize > deprecated_randomnessBlockRetentionWindow) {
         deleteHistoryIfNotLastEpochBlock(historyFirst);
         deleteHistoryIfNotLastEpochBlock(historyFirst.add(1));
         historyFirst = historyFirst.add(2);
         historySize = historySize.sub(1);
-      } else if (historySize == randomnessBlockRetentionWindow) {
+      } else if (historySize == deprecated_randomnessBlockRetentionWindow) {
         deleteHistoryIfNotLastEpochBlock(historyFirst);
         historyFirst = historyFirst.add(1);
       } else {
-        // historySize < randomnessBlockRetentionWindow
+        // historySize < deprecated_randomnessBlockRetentionWindow
         historySize = historySize.add(1);
       }
     }
@@ -206,8 +220,8 @@ contract Random is
     require(
       blockNumber == lastEpochBlock ||
         (blockNumber > cur.sub(historySize) &&
-          (randomnessBlockRetentionWindow >= cur ||
-            blockNumber > cur.sub(randomnessBlockRetentionWindow))),
+          (deprecated_randomnessBlockRetentionWindow >= cur ||
+            blockNumber > cur.sub(deprecated_randomnessBlockRetentionWindow))),
       "Cannot query randomness older than the stored history"
     );
     return history[blockNumber];

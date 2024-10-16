@@ -28,9 +28,9 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   }
 
   ClientVersion private minimumClientVersion; // obsolete
-  uint256 public blockGasLimit;
-  uint256 public intrinsicGasForAlternativeFeeCurrency;
-  LookbackWindow public uptimeLookbackWindow;
+  uint256 private deprecated_blockGasLimit;
+  uint256 private deprecated_intrinsicGasForAlternativeFeeCurrency;
+  LookbackWindow private uptimeLookbackWindow;
 
   event IntrinsicGasForAlternativeFeeCurrencySet(uint256 gas);
   event BlockGasLimitSet(uint256 limit);
@@ -67,7 +67,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 3, 0, 1);
+    return (1, 3, 1, 0);
   }
 
   /**
@@ -75,7 +75,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    * @param gasLimit New block gas limit.
    */
   function setBlockGasLimit(uint256 gasLimit) public onlyOwner onlyL1 {
-    blockGasLimit = gasLimit;
+    deprecated_blockGasLimit = gasLimit;
     emit BlockGasLimitSet(gasLimit);
   }
 
@@ -84,7 +84,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    * @param gas Intrinsic gas for non-gold gas currencies.
    */
   function setIntrinsicGasForAlternativeFeeCurrency(uint256 gas) public onlyOwner onlyL1 {
-    intrinsicGasForAlternativeFeeCurrency = gas;
+    deprecated_intrinsicGasForAlternativeFeeCurrency = gas;
     emit IntrinsicGasForAlternativeFeeCurrencySet(gas);
   }
 
@@ -114,6 +114,26 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   function getUptimeLookbackWindow() public view returns (uint256 lookbackWindow) {
     lookbackWindow = _getUptimeLookbackWindow();
     require(lookbackWindow != 0, "UptimeLookbackWindow is not initialized");
+  }
+
+  /**
+   * @notice Gets the Celo L1 block gas limit.
+   * @return The block gas limit.
+   * @dev Once Celo becomes an L2, query Optimism's L1 SystemConfig contract
+   * instead.
+   */
+  function blockGasLimit() public view onlyL1 returns (uint256) {
+    return deprecated_blockGasLimit;
+  }
+
+  /**
+   * @notice Gets the intrinsic gas paid for transactions using alternative fee
+   * currencies.
+   * @return The intrinsic gas for alternative fee currencies.
+   * @dev Once Celo becomes an L2, query the FeeCurrencyDirectory instead.
+   */
+  function intrinsicGasForAlternativeFeeCurrency() public view onlyL1 returns (uint256) {
+    return deprecated_intrinsicGasForAlternativeFeeCurrency;
   }
 
   /**

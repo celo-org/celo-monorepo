@@ -172,7 +172,7 @@ contract Validators is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -1305,7 +1305,7 @@ contract Validators is
     emit ValidatorScoreUpdated(account, validators[account].score.unwrap(), epochScore.unwrap());
   }
 
-  function _isRegistrationAllowed(address account) private returns (bool) {
+  function _isRegistrationAllowed(address account) private {
     require(
       !getElection().allowedToVoteOverMaxNumberOfGroups(account),
       "Cannot vote for more than max number of groups"
