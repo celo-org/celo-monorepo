@@ -28,6 +28,9 @@ contract CeloUnreleasedTreasury is
 
   event Released(address indexed to, uint256 amount);
 
+  /**
+   * @notice Only allows EpochManager to call.
+   */
   modifier onlyEpochManager() {
     require(
       msg.sender == registry.getAddressForOrDie(EPOCH_MANAGER_REGISTRY_ID),
@@ -40,12 +43,11 @@ contract CeloUnreleasedTreasury is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice A constructor for initialising a new instance of a CeloUnreleasedTreasury contract.
    * @param registryAddress The address of the registry core smart contract.
-   
    */
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
