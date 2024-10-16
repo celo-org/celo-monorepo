@@ -11,7 +11,7 @@ import "@openzeppelin/contracts8/utils/Create2.sol";
 contract ProxyFactory08 {
   /**
    * @notice Deploys a new bytecode and transfers ownership to the provided address.
-   * @param value Amount of Celo to transfer to the new contract.
+   * @param value Amount of CELO to transfer to the new contract.
    * @param owner The proxy owner to set.
    * @param _salt The Create2 salt to use.
    * @param initCode The contract init code to use for deployment.
