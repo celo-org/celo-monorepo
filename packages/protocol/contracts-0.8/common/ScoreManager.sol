@@ -145,6 +145,10 @@ contract ScoreManager is
     return score;
   }
 
+  /**
+   * @notice Checks if the score is valid and returns the score.
+   * @param score The score to be checked.
+   */
   function checkScore(uint256 score) internal pure returns (uint256) {
     if (score == 0) {
       return ZERO_SCORE;
