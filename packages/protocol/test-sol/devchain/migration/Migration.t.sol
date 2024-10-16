@@ -22,6 +22,8 @@ import "@celo-contracts/governance/interfaces/IValidators.sol";
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 import "@celo-contracts-8/common/interfaces/IScoreManager.sol";
 
+import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
+
 contract IntegrationTest is Test, TestConstants, Utils08 {
   IRegistry registry = IRegistry(REGISTRY_ADDRESS);
 
@@ -236,6 +238,19 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     epochManager.initializeSystem(100, block.number, firstElected);
   }
 
+  function test_Reverts_whenTransferingCeloToUnreleasedTreasury() public {
+    _MockL2Migration(validatorsList);
+
+    blockTravel(vm, 43200);
+    timeTravel(vm, DAY);
+
+    IERC20 _celoToken = IERC20(address(celoToken));
+    vm.prank(randomAddress);
+
+    (bool success, ) = address(unreleasedTreasury).call{ value: 50000 ether }("");
+    assertFalse(success);
+  }
+
   function test_SetsCurrentRewardBlock() public {
     _MockL2Migration(validatorsList);
 
@@ -245,8 +260,9 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     epochManager.startNextEpochProcess();
 
     (, , , uint256 _currentRewardsBlock) = epochManager.getCurrentEpoch();
-
+    (uint256 status, , , , ) = epochManager.getEpochProcessingState();
     assertEq(_currentRewardsBlock, block.number);
+    assertEq(status, 1);
   }
 
   function _MockL2Migration(address[] memory _validatorsList) internal {

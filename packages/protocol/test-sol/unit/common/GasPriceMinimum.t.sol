@@ -199,7 +199,7 @@ contract GasPriceMinimumTest_setGasPriceMinimumFloor is GasPriceMinimumTest {
   }
 }
 
-contract GasPriceMinimumTest_setUpdatedGasPriceMinimum is GasPriceMinimumTest {
+contract GasPriceMinimumTest_getUpdatedGasPriceMinimum is GasPriceMinimumTest {
   using FixidityLib for FixidityLib.Fraction;
   uint256 nonce = 0;
 
@@ -296,5 +296,96 @@ contract GasPriceMinimumTest_setUpdatedGasPriceMinimum is GasPriceMinimumTest {
 
       assertEq(actualUpdatedGasPriceMinimum, expectedUpdatedGasPriceMinimum);
     }
+  }
+
+  function test_shouldRevert_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    gasPriceMinimum.getUpdatedGasPriceMinimum(0, 1);
+  }
+}
+
+contract GasPriceMinimumTest_gasPriceMinimumFloor is GasPriceMinimumTest {
+  function test_shouldReturnTheGasPriceMinimumFloor() public {
+    uint256 gasPriceMinFloor = gasPriceMinimum.gasPriceMinimumFloor();
+    assertEq(gasPriceMinFloor, gasPriceMinimumFloor);
+  }
+
+  function test_shouldRevert_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    gasPriceMinimum.gasPriceMinimumFloor();
+  }
+}
+
+contract GasPriceMinimumTest_targetDensity is GasPriceMinimumTest {
+  function test_shouldReturnTheTargetDensity() public {
+    uint256 realTargetDensity = gasPriceMinimum.targetDensity();
+    assertEq(realTargetDensity, targetDensity);
+  }
+
+  function test_shouldRevert_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    gasPriceMinimum.targetDensity();
+  }
+}
+
+contract GasPriceMinimumTest_adjustmentSpeed is GasPriceMinimumTest {
+  function test_shouldReturnTheAdjustementSpeed() public {
+    uint256 realAdjustementSpeed = gasPriceMinimum.adjustmentSpeed();
+    assertEq(realAdjustementSpeed, adjustmentSpeed);
+  }
+
+  function test_shouldRevert_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    gasPriceMinimum.adjustmentSpeed();
+  }
+}
+
+contract GasPriceMinimumTest_baseFeeOpCodeActivationBlock is GasPriceMinimumTest {
+  uint256 baseFeeOpCodeActivationBlock = 123;
+
+  function setUp() public override {
+    super.setUp();
+    gasPriceMinimum.setBaseFeeOpCodeActivationBlock(baseFeeOpCodeActivationBlock);
+  }
+
+  function test_shouldReturnTheBaseFeeOpCodeActivationBlock() public {
+    uint256 realBaseFeeOpCodeActivationBlock = gasPriceMinimum.baseFeeOpCodeActivationBlock();
+    assertEq(realBaseFeeOpCodeActivationBlock, baseFeeOpCodeActivationBlock);
+  }
+
+  function test_shouldRevert_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    gasPriceMinimum.baseFeeOpCodeActivationBlock();
+  }
+}
+
+contract GasPriceMinimumTest_gasPriceMinimum is GasPriceMinimumTest {
+  function test_shouldReturnTheGasPriceMinimum() public {
+    uint256 realGasPriceMinimum = gasPriceMinimum.gasPriceMinimum();
+    assertEq(realGasPriceMinimum, 100);
+  }
+
+  function test_shouldRevert_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    gasPriceMinimum.gasPriceMinimum();
+  }
+}
+
+contract GasPriceMinimumTest_getGasPriceMinimum is GasPriceMinimumTest {
+  function test_shouldReturnTheGasPriceMinimum() public {
+    uint256 realGasPriceMinimum = gasPriceMinimum.getGasPriceMinimum(address(0));
+    assertEq(realGasPriceMinimum, 100);
+  }
+
+  function test_shouldRevert_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    gasPriceMinimum.getGasPriceMinimum(address(0));
   }
 }

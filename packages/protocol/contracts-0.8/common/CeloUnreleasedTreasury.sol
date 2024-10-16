@@ -5,15 +5,27 @@ import "@openzeppelin/contracts8/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 import "./UsingRegistry.sol";
-import "../common/IsL2Check.sol";
 
 import "../../contracts/common/Initializable.sol";
 import "./interfaces/ICeloUnreleasedTreasuryInitializer.sol";
 
 /**
  * @title Contract for unreleased Celo tokens.
+ * @notice This contract is not allowed to receive transfers of CELO,
+ * to avoid miscalculating the epoch rewards and to prevent any malicious actor
+ * from routing stolen fund through the epoch reward distribution.
  */
-contract CeloUnreleasedTreasury is UsingRegistry, ReentrancyGuard, Initializable, IsL2Check {
+contract CeloUnreleasedTreasury is
+  ICeloUnreleasedTreasuryInitializer,
+  UsingRegistry,
+  ReentrancyGuard,
+  Initializable
+{
+  bool internal hasAlreadyReleased;
+
+  // Remaining epoch rewards to distribute.
+  uint256 internal remainingBalanceToRelease;
+
   event Released(address indexed to, uint256 amount);
 
   modifier onlyEpochManager() {
@@ -46,9 +58,29 @@ contract CeloUnreleasedTreasury is UsingRegistry, ReentrancyGuard, Initializable
    * @param amount The amount to release.
    */
   function release(address to, uint256 amount) external onlyEpochManager {
-    require(address(this).balance >= amount, "Insufficient balance.");
+    if (!hasAlreadyReleased) {
+      remainingBalanceToRelease = address(this).balance;
+      hasAlreadyReleased = true;
+    }
+
+    require(remainingBalanceToRelease >= amount, "Insufficient balance.");
+    remainingBalanceToRelease -= amount;
     require(getCeloToken().transfer(to, amount), "CELO transfer failed.");
+
     emit Released(to, amount);
+  }
+
+  /**
+   * @notice Returns the remaining balance this contract has left to release.
+   * @dev This uses internal accounting of the released balance,
+   * to avoid recounting CELO that was transferred back to this contract.
+   */
+  function getRemainingBalanceToRelease() external view returns (uint256) {
+    if (!hasAlreadyReleased) {
+      return address(this).balance;
+    } else {
+      return remainingBalanceToRelease;
+    }
   }
 
   /**

@@ -11,7 +11,6 @@ import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
 import "./interfaces/ICeloTokenInitializer.sol";
 import "./interfaces/ICeloVersionedContract.sol";
-import "./interfaces/ICeloUnreleasedTreasury.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
 
 contract GoldToken is
@@ -271,8 +270,7 @@ contract GoldToken is
    */
   function allocatedSupply() public view returns (uint256) {
     if (isL2()) {
-      return
-        CELO_SUPPLY_CAP - registry.getAddressForOrDie(CELO_UNRELEASED_TREASURY_REGISTRY_ID).balance;
+      return CELO_SUPPLY_CAP - getCeloUnreleasedTreasury().getRemainingBalanceToRelease();
     } else {
       return totalSupply();
     }
