@@ -30,6 +30,7 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   // without this line the contract can't receive native Celo transfers
   function() external payable {}
 
+  // Note: current version of Mento is not compatible with this Seller
   function sell(
     address sellTokenAddress,
     address buyTokenAddress,
@@ -80,6 +81,6 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 1);
+    return (1, 1, 1, 0);
   }
 }
