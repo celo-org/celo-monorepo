@@ -11,7 +11,11 @@ import { FeeHandlerSeller } from "@celo-contracts/common/FeeHandlerSeller.sol";
 import { MentoFeeHandlerSeller } from "@celo-contracts/common/MentoFeeHandlerSeller.sol";
 import { UniswapFeeHandlerSeller } from "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
 
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+
 contract FeeHandlerSellerTest is Test, TestConstants {
+  event OracleAddressSet(address _token, address _oracle);
+
   // Actors
   address RECEIVER_ADDRESS = actor("Arbitrary Receiver");
   address NON_OWNER_ADDRESS = actor("Arbitrary Non-Owner");
@@ -21,15 +25,21 @@ contract FeeHandlerSellerTest is Test, TestConstants {
   FeeHandlerSeller mentoFeeHandlerSeller;
   FeeHandlerSeller uniswapFeeHandlerSeller;
 
-  // Contract addresses
-  address MOCK_CELO_TOKEN_ADDRESS;
+  address oracle;
+  address sortedOracles;
 
   // Helper data structures
   FeeHandlerSeller[] feeHandlerSellerInstances;
 
   function setUp() public {
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    IRegistry registry = IRegistry(REGISTRY_ADDRESS);
+
     celoToken = new GoldTokenMock();
-    MOCK_CELO_TOKEN_ADDRESS = address(celoToken);
+    oracle = actor("oracle");
+    sortedOracles = actor("sortedOracles");
+
+    registry.setAddressFor("SortedOracles", sortedOracles);
 
     mentoFeeHandlerSeller = new MentoFeeHandlerSeller(true);
     uniswapFeeHandlerSeller = new UniswapFeeHandlerSeller(true);
@@ -41,7 +51,7 @@ contract FeeHandlerSellerTest is Test, TestConstants {
 
 contract FeeHandlerSellerTest_Transfer is FeeHandlerSellerTest {
   uint256 constant ZERO_CELOTOKEN = 0;
-  uint256 constant ONE_CELOTOKEN = 1000000000000000000;
+  uint256 constant ONE_CELOTOKEN = 1e18;
 
   function test_FeeHandlerSeller_ShouldTransfer_WhenCalledByOwner() public {
     for (uint256 i = 0; i < feeHandlerSellerInstances.length; i++) {
@@ -59,11 +69,7 @@ contract FeeHandlerSellerTest_Transfer is FeeHandlerSellerTest {
       );
 
       vm.prank(feeHandlerSellerInstances[i].owner());
-      feeHandlerSellerInstances[i].transfer(
-        MOCK_CELO_TOKEN_ADDRESS,
-        ONE_CELOTOKEN,
-        RECEIVER_ADDRESS
-      );
+      feeHandlerSellerInstances[i].transfer(address(celoToken), ONE_CELOTOKEN, RECEIVER_ADDRESS);
 
       assertEq(
         celoToken.balanceOf(RECEIVER_ADDRESS),
@@ -83,11 +89,7 @@ contract FeeHandlerSellerTest_Transfer is FeeHandlerSellerTest {
       vm.prank(NON_OWNER_ADDRESS);
 
       vm.expectRevert("Ownable: caller is not the owner");
-      feeHandlerSellerInstances[i].transfer(
-        MOCK_CELO_TOKEN_ADDRESS,
-        ONE_CELOTOKEN,
-        RECEIVER_ADDRESS
-      );
+      feeHandlerSellerInstances[i].transfer(address(celoToken), ONE_CELOTOKEN, RECEIVER_ADDRESS);
     }
   }
 }
@@ -123,5 +125,29 @@ contract FeeHandlerSellerTest_SetMinimumReports is FeeHandlerSellerTest {
         ARBITRARY_NR_OF_MINIMUM_REPORTS
       );
     }
+  }
+}
+
+contract FeeHandlerSellerTest_setOracleAddress is FeeHandlerSellerTest {
+  function test_Reverts_WhenCalledByNonOwner() public {
+    vm.prank(NON_OWNER_ADDRESS);
+    vm.expectRevert("Ownable: caller is not the owner");
+    uniswapFeeHandlerSeller.setOracleAddress(address(celoToken), oracle);
+  }
+
+  function test_SetsCorrectly() public {
+    uniswapFeeHandlerSeller.setOracleAddress(address(celoToken), oracle);
+    assertEq(uniswapFeeHandlerSeller.getOracleAddress(address(celoToken)), oracle);
+  }
+
+  function test_DefaultIsSortedOracles() public {
+    uniswapFeeHandlerSeller.initialize(REGISTRY_ADDRESS, new address[](0), new uint256[](0));
+    assertEq(uniswapFeeHandlerSeller.getOracleAddress(address(celoToken)), sortedOracles);
+  }
+
+  function test_Emits_OracleAddressSet() public {
+    vm.expectEmit(false, false, false, true);
+    emit OracleAddressSet(address(celoToken), oracle);
+    uniswapFeeHandlerSeller.setOracleAddress(address(celoToken), oracle);
   }
 }

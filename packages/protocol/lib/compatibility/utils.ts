@@ -1,11 +1,11 @@
-import { reportASTIncompatibilities } from '@celo/protocol/lib/compatibility/ast-code'
-import { reportLayoutIncompatibilities } from '@celo/protocol/lib/compatibility/ast-layout'
-import { Categorizer } from '@celo/protocol/lib/compatibility/categorizer'
-import { reportLibraryLinkingIncompatibilities } from '@celo/protocol/lib/compatibility/library-linking'
-import { ASTDetailedVersionedReport, ASTReports } from '@celo/protocol/lib/compatibility/report'
-import { linkedLibraries } from '@celo/protocol/migrationsConfig'
-import { BuildArtifacts, Contracts, getBuildArtifacts } from '@openzeppelin/upgrades'
-import { readJsonSync } from 'fs-extra'
+import { reportASTIncompatibilities } from '@celo/protocol/lib/compatibility/ast-code';
+import { reportLayoutIncompatibilities } from '@celo/protocol/lib/compatibility/ast-layout';
+import { Categorizer } from '@celo/protocol/lib/compatibility/categorizer';
+import { reportLibraryLinkingIncompatibilities } from '@celo/protocol/lib/compatibility/library-linking';
+import { ASTDetailedVersionedReport, ASTReports } from '@celo/protocol/lib/compatibility/report';
+import { linkedLibraries } from '@celo/protocol/migrationsConfig';
+import { BuildArtifacts, Contracts, getBuildArtifacts } from '@openzeppelin/upgrades';
+import { readJsonSync } from 'fs-extra';
 
 
 
@@ -16,7 +16,7 @@ import { readJsonSync } from 'fs-extra'
 export class ASTBackwardReport {
 
   static create = (
-    oldArtifactsFolder: string,
+    oldArtifactsFolders: string[],
     newArtifactsFolders: string[],
     oldArtifacts: BuildArtifacts[],
     newArtifacts: BuildArtifacts[],
@@ -44,14 +44,14 @@ export class ASTBackwardReport {
     logFunction("Done\n")
 
     return new ASTBackwardReport(
-      oldArtifactsFolder,
+      oldArtifactsFolders,
       newArtifactsFolders,
       exclude.toString(),
       versionedReport)
   }
 
   constructor(
-    public readonly oldArtifactsFolder: string,
+    public readonly oldArtifactsFolder: string[],
     public readonly newArtifactsFolder: string[],
     public readonly exclude: string,
     public readonly report: ASTDetailedVersionedReport
