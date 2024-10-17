@@ -105,5 +105,4 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry, ICeloVersion
 
     return address(getSortedOracles());
   }
-
 }
