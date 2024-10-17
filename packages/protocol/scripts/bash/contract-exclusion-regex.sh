@@ -29,11 +29,11 @@ fi
 if [ $VERSION_NUMBER -eq 11 ]
   then
   # FeeHandlerSeller is not deployed, only its children
-  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|SortedOracles|FeeHandlerSeller"
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|SortedOracles|\\bFeeHandlerSeller\\b"
 fi
 
 if [ $VERSION_NUMBER -eq 12 ]
   then
   # FeeHandlerSeller is not deployed, only its children
-  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|FeeHandlerSeller"
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|\\bFeeHandlerSeller\\b"
 fi
