@@ -1,3 +1,4 @@
+import { StrongAddress } from '@celo/base'
 import { CeloTx } from '@celo/connect'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
@@ -26,7 +27,6 @@ const validatorPrivateKey = generatePrivateKey(mnemonic, AccountType.VALIDATOR, 
 const validatorAddress = privateKeyToAddress(validatorPrivateKey)
 // Arbitrary addresses to use in the transactions
 const toAddress = '0x8c36775E95A5f7FEf6894Ba658628352Ac58605B'
-const gatewayFeeRecipientAddress = '0xc77538d1e30C0e4ec44B0DcaD97FD3dc63fcaCC4'
 
 // Simple contract with a single constant
 const bytecode =
@@ -47,8 +47,6 @@ const devFilter: Filter = {
   ethCompatible: undefined,
   contractCreation: undefined,
   useFeeCurrency: undefined,
-  useGatewayFee: undefined,
-  useGatewayFeeRecipient: undefined,
   sendRawTransaction: undefined,
 }
 /// ////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,8 +63,6 @@ interface TestCase {
   ethCompatible: boolean
   contractCreation: boolean
   useFeeCurrency: boolean
-  useGatewayFee: boolean
-  useGatewayFeeRecipient: boolean
   sendRawTransaction: boolean // whether to use eth_sendRawTransaction ot eth_sendTransaction
   errorString: string | null
   errorReason: string | null
@@ -88,38 +84,32 @@ function generateTestCases(cipIsActivated: boolean) {
     for (const ethCompatible of getValues(devFilter.ethCompatible)) {
       for (const contractCreation of getValues(devFilter.contractCreation)) {
         for (const useFeeCurrency of getValues(devFilter.useFeeCurrency)) {
-          for (const useGatewayFee of getValues(devFilter.useGatewayFee)) {
-            for (const useGatewayFeeRecipient of getValues(devFilter.useGatewayFeeRecipient)) {
-              for (const sendRawTransaction of getValues(devFilter.sendRawTransaction)) {
-                let errorString: string | null = null
-                let errorReason: string | null = null
-                const hasCeloFields = useFeeCurrency || useGatewayFee || useGatewayFeeRecipient
-                if (ethCompatible && hasCeloFields) {
-                  errorString = notCompatibleError
-                  errorReason = 'transaction has celo-only fields'
-                } else if (ethCompatible && !cipIsActivated) {
-                  errorString = notYetActivatedError
-                  errorReason = 'Donut is not activated'
-                }
-                if (sendRawTransaction && ethCompatible && hasCeloFields) {
-                  // Such scenarios don't make sense, since eth-compatible transactions in RLP can't have
-                  // these fields.  So skip these cases.
-                  continue
-                }
-                cases.push({
-                  cipIsActivated,
-                  lightNode,
-                  ethCompatible,
-                  contractCreation,
-                  useFeeCurrency,
-                  useGatewayFee,
-                  useGatewayFeeRecipient,
-                  sendRawTransaction,
-                  errorString,
-                  errorReason,
-                })
-              }
+          for (const sendRawTransaction of getValues(devFilter.sendRawTransaction)) {
+            let errorString: string | null = null
+            let errorReason: string | null = null
+            const hasCeloFields = useFeeCurrency
+            if (ethCompatible && hasCeloFields) {
+              errorString = notCompatibleError
+              errorReason = 'transaction has celo-only fields'
+            } else if (ethCompatible && !cipIsActivated) {
+              errorString = notYetActivatedError
+              errorReason = 'Donut is not activated'
             }
+            if (sendRawTransaction && ethCompatible && hasCeloFields) {
+              // Such scenarios don't make sense, since eth-compatible transactions in RLP can't have
+              // these fields.  So skip these cases.
+              continue
+            }
+            cases.push({
+              cipIsActivated,
+              lightNode,
+              ethCompatible,
+              contractCreation,
+              useFeeCurrency,
+              sendRawTransaction,
+              errorString,
+              errorReason,
+            })
           }
         }
       }
@@ -344,13 +334,7 @@ class TestEnv {
           nonce: await this.kit.connection.nonce(validatorAddress),
         }
         if (testCase.useFeeCurrency) {
-          tx.feeCurrency = this.stableTokenAddr
-        }
-        if (testCase.useGatewayFee) {
-          tx.gatewayFee = '0x25'
-        }
-        if (testCase.useGatewayFeeRecipient) {
-          tx.gatewayFeeRecipient = gatewayFeeRecipientAddress
+          tx.feeCurrency = this.stableTokenAddr as StrongAddress
         }
 
         if (testCase.contractCreation) {
