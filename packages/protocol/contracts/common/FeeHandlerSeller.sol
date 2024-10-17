@@ -1,24 +1,28 @@
 pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "../common/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+
 import "./UsingRegistry.sol";
+import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
 // Abstract class for a FeeHandlerSeller, as defined in CIP-52
 // https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md
-contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
+contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry, ICeloVersionedContract {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
   // Address of the token
   // Minimal number of reports in SortedOracles contract
   mapping(address => uint256) public minimumReports;
+  mapping(address => address) public oracleAddresses;
 
   event MinimumReportsSet(address tokenAddress, uint256 minimumReports);
   event TokenSold(address soldTokenAddress, address boughtTokenAddress, uint256 amount);
+  event OracleAddressSet(address _token, address _oracle);
 
   function initialize(
     address _registryAddress,
@@ -86,5 +90,19 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
   function _setMinimumReports(address tokenAddress, uint256 newMininumReports) internal {
     minimumReports[tokenAddress] = newMininumReports;
     emit MinimumReportsSet(tokenAddress, newMininumReports);
+  }
+
+  function setOracleAddress(address _tokenAddress, address _oracleAddress) external onlyOwner {
+    oracleAddresses[_tokenAddress] = _oracleAddress;
+    emit OracleAddressSet(_tokenAddress, _oracleAddress);
+  }
+
+  function getOracleAddress(address _tokenAddress) public view returns (address) {
+    address oracleAddress = oracleAddresses[_tokenAddress];
+    if (oracleAddress != address(0)) {
+      return oracleAddress;
+    }
+
+    return address(getSortedOracles());
   }
 }

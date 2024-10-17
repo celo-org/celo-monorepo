@@ -1,9 +1,10 @@
 pragma solidity >=0.5.13 <0.9.0;
+import "../../../contracts-0.8/common/interfaces/IOracle.sol";
 
 /**
  * @title A mock SortedOracles for testing.
  */
-contract MockSortedOracles {
+contract MockSortedOracles is IOracle {
   uint256 public constant DENOMINATOR = 1000000000000000000000000;
   mapping(address => uint256) public numerators;
   mapping(address => uint256) public medianTimestamp;

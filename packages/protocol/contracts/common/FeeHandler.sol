@@ -19,7 +19,6 @@ import "../common/interfaces/IFeeHandlerSeller.sol";
 import "./interfaces/IStableTokenMento.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/interfaces/ICeloToken.sol";
-import "../stability/interfaces/ISortedOracles.sol";
 
 // Using the minimal required signatures in the interfaces so more contracts could be compatible
 import "../common/libraries/ReentrancyGuard.sol";
@@ -66,6 +65,8 @@ contract FeeHandler is
   // last day the daily limits were updated
   uint256 private deprecated_lastLimitDay; // deprecated
 
+  // reason it's inverse it's because it used to be burnFraction and was migrated
+  // ignoreRenaming_ prefix allows the tooling to ignore the variable renaming
   FixidityLib.Fraction private ignoreRenaming_inverseCarbonFraction; // 80%
 
   address public ignoreRenaming_carbonFeeBeneficiary;

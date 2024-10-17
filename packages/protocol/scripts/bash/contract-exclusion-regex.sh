@@ -8,6 +8,8 @@ CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|
 # Before CR7, UsingRegistry and UsingRegistryV2 had been deployed, they need to keep getting deployed to keep the release reports without changes.
 VERSION_NUMBER=$(echo "$BRANCH" | tr -dc '0-9')
 
+echo "VERSION_NUMBER: $VERSION_NUMBER"
+
 if [ $VERSION_NUMBER -gt 6 ]
   then
   CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|^UsingRegistry"
@@ -22,4 +24,16 @@ fi
 if [ $VERSION_NUMBER -eq 9 ]
   then
   CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|SortedOracles"
+fi
+
+if [ $VERSION_NUMBER -eq 11 ]
+  then
+  # FeeHandlerSeller is not deployed, only its children
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|\\bFeeHandlerSeller\\b"
+fi
+
+if [ $VERSION_NUMBER -eq 12 ]
+  then
+  # FeeHandlerSeller is not deployed, only its children
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|\\bFeeHandlerSeller\\b"
 fi

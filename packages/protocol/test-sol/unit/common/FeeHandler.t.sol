@@ -1213,6 +1213,3 @@ contract FeeHandlerTest_SetBeneficiaryName is FeeHandlerTestAbstract {
     feeHandler.setBeneficiaryName(op, "OP revenue share updated");
   }
 }
-
-// Mento doesn't need this sibce
-// TODO add sets setting the oracle

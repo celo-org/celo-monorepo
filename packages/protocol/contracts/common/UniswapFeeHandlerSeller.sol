@@ -10,6 +10,7 @@ import "./UsingRegistry.sol";
 
 import "../common/interfaces/IFeeHandlerSeller.sol";
 import "../stability/interfaces/ISortedOracles.sol";
+import "../../contracts-0.8/common/interfaces/IOracle.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "./FeeHandlerSeller.sol";
@@ -147,7 +148,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 1);
+    return (2, 0, 0, 0);
   }
 
   function _setRouter(address token, address router) private {
@@ -175,18 +176,22 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     uint256 amount,
     IUniswapV2RouterMin bestRouter
   ) private view returns (uint256) {
-    ISortedOracles sortedOracles = getSortedOracles();
+    address _oracleAddress = getOracleAddress(sellTokenAddress);
+
     uint256 minReports = minimumReports[sellTokenAddress];
 
-    require(
-      sortedOracles.numRates(sellTokenAddress) >= minReports,
-      "Number of reports for token not enough"
-    );
+    IOracle oracle = IOracle(_oracleAddress);
 
     uint256 minimalSortedOracles = 0;
     // if minimumReports for this token is zero, assume the check is not needed
     if (minReports > 0) {
-      (uint256 rateNumerator, uint256 rateDenominator) = sortedOracles.medianRate(sellTokenAddress);
+      ISortedOracles sortedOracles = ISortedOracles(_oracleAddress);
+      require(
+        sortedOracles.numRates(sellTokenAddress) >= minReports,
+        "Number of reports for token not enough"
+      );
+
+      (uint256 rateNumerator, uint256 rateDenominator) = oracle.getExchangeRate(sellTokenAddress);
 
       minimalSortedOracles = calculateMinAmount(
         rateNumerator,
