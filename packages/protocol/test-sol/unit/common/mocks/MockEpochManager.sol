@@ -2,10 +2,10 @@
 pragma solidity >=0.5.13 <0.9.0;
 // solhint-disable no-unused-vars
 
-import "../../../contracts/common/interfaces/IEpochManager.sol";
+import "../../../../contracts/common/interfaces/IEpochManager.sol";
 
 /**
- * @title A mock EpochManager for testing.
+ * @title A mock EpochManager for testing with 0.5.
  */
 
 contract MockEpochManager is IEpochManager {

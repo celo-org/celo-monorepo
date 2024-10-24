@@ -3,7 +3,6 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
-import { TestConstants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
@@ -15,7 +14,7 @@ import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/linkedlists/AddressSortedLinkedList.sol";
 import "@celo-contracts/identity/test/MockRandom.sol";
 import "@celo-contracts/common/Freezer.sol";
-import "@celo-contracts-8/common/test/MockEpochManager.sol";
+import "@test-sol/unit/common/mocks/MockEpochManager.sol";
 
 import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";
 
@@ -30,7 +29,7 @@ contract ElectionMock is Election(true) {
   }
 }
 
-contract ElectionTest is Utils, TestConstants, IsL2Check {
+contract ElectionTest is Utils {
   using FixidityLib for FixidityLib.Fraction;
 
   Accounts accounts;
@@ -39,8 +38,6 @@ contract ElectionTest is Utils, TestConstants, IsL2Check {
   MockLockedGold lockedGold;
   MockValidators validators;
   MockRandom random;
-  IRegistry registry;
-  MockEpochManager epochManager;
 
   address nonOwner = actor("nonOwner");
   address owner = address(this);
@@ -114,7 +111,8 @@ contract ElectionTest is Utils, TestConstants, IsL2Check {
 
   function setUp() public {
     ph.setEpochSize(DAY / 5);
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    setupRegistry();
+    setupEpochManager();
 
     accounts = new Accounts(true);
 
@@ -139,16 +137,13 @@ contract ElectionTest is Utils, TestConstants, IsL2Check {
     freezer = new Freezer(true);
     lockedGold = new MockLockedGold();
     validators = new MockValidators();
-    registry = IRegistry(REGISTRY_ADDRESS);
     random = new MockRandom();
-    epochManager = new MockEpochManager();
 
     registry.setAddressFor("Accounts", address(accounts));
     registry.setAddressFor("Freezer", address(freezer));
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("Random", address(random));
-    registry.setAddressFor("EpochManager", address(epochManager));
 
     election.initialize(
       REGISTRY_ADDRESS,
@@ -174,13 +169,13 @@ contract ElectionTest is Utils, TestConstants, IsL2Check {
     epochManager.initializeSystem(l1EpochNumber, block.number, _elected);
   }
 
-  function travelNEpoch(uint256 n) public {
-    if (isL2()) {
-      epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + n);
-    } else {
-      blockTravel((n * ph.epochSize()) + 1);
-    }
-  }
+  //   function travelNEpoch(uint256 n) public {
+  //     if (isL2()) {
+  //       travelNL2Epoch(n);
+  //     } else {
+  //       blockTravel((n * ph.epochSize()) + 1);
+  //     }
+  //   }
 }
 
 contract TransitionToL2After is ElectionTest {

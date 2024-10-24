@@ -23,7 +23,7 @@ import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 
-import "@celo-contracts-8/common/test/MockEpochManager.sol";
+import "@test-sol/unit/common/mocks/MockEpochManager.sol";
 import "@test-sol/constants.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
 import { Utils } from "@test-sol/utils.sol";
@@ -48,14 +48,12 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     FixidityLib.Fraction adjustmentSpeed;
   }
 
-  Registry registry;
   Accounts accounts;
   MockStableToken stableToken;
   MockElection election;
   ValidatorsMockTunnel public validatorsMockTunnel;
   IValidators public validators;
   MockLockedGold lockedGold;
-  MockEpochManager epochManager;
 
   address owner;
   address nonValidator;
@@ -166,9 +164,8 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
       adjustmentSpeed: FixidityLib.newFixedFraction(5, 20)
     });
 
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
-    registry = Registry(REGISTRY_ADDRESS);
-
+    setupRegistry();
+    setupEpochManager();
     accounts = new Accounts(true);
     accounts.initialize(REGISTRY_ADDRESS);
 
@@ -181,7 +178,6 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
 
     stableToken = new MockStableToken();
-    epochManager = new MockEpochManager();
 
     registry.setAddressFor(AccountsContract, address(accounts));
     registry.setAddressFor(ElectionContract, address(election));

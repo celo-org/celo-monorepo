@@ -9,7 +9,6 @@ import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/GoldToken.sol";
-import "@celo-contracts-8/common/test/MockEpochManager.sol";
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 import "@celo-contracts/governance/interfaces/IValidators.sol";
 
@@ -27,13 +26,13 @@ import { Utils } from "@test-sol/utils.sol";
 import { Test as ForgeTest } from "forge-std/Test.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 import "@test-sol/unit/governance/voting/mocks/ReleaseGoldMockTunnel.sol";
+import "@test-sol/unit/common/mocks/MockEpochManager.sol";
 
 contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils {
   using FixidityLib for FixidityLib.Fraction;
 
   uint256 constant TOTAL_AMOUNT = 1 ether * 1_000_000;
 
-  Registry registry;
   Accounts accounts;
   MockStableToken stableToken;
   Election election;
@@ -43,7 +42,6 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
   Governance governance;
   GoldToken goldToken;
   ReleaseGold releaseGold;
-  MockEpochManager epochManager;
 
   address owner;
   address accApprover;
@@ -55,7 +53,6 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
   address beneficiary;
   address refundAddress;
   address releaseOwner;
-  address epochManagerAddress = actor("epochManagerAddress");
 
   address authorizedValidatorSigner;
   uint256 authorizedValidatorSignerPK;
@@ -171,8 +168,8 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
       )
       .unwrap();
 
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
-    registry = Registry(REGISTRY_ADDRESS);
+    setupRegistry();
+    setupEpochManager();
 
     accounts = new Accounts(true);
     stableToken = new MockStableToken();
@@ -186,8 +183,6 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
     governance = new Governance(true);
     goldToken = new GoldToken(true);
     releaseGold = new ReleaseGold(true);
-
-    epochManager = new MockEpochManager();
 
     registry.setAddressFor(AccountsContract, address(accounts));
     registry.setAddressFor(ElectionContract, address(election));

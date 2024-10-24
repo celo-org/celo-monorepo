@@ -8,7 +8,7 @@ import { TestConstants } from "@test-sol/constants.sol";
 import "@celo-contracts/identity/Random.sol";
 import "@celo-contracts/identity/test/RandomTest.sol";
 
-contract RandomTest_ is Test, TestConstants, Utils, IsL2Check {
+contract RandomTest_ is Test, TestConstants, IsL2Check, Utils {
   RandomTest random;
 
   event RandomnessBlockRetentionWindowSet(uint256 value);
