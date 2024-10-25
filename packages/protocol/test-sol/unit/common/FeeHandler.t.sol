@@ -691,13 +691,17 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellM
     assertEq(stableToken.balanceOf(address(feeHandler)), balanceBefore);
   }
 
+  function resetLimit() internal {
+    skip(DAY);
+  }
+
   function test_ResetSellLimitDaily() public {
     fundFeeHandlerStable(3000, address(stableToken), address(exchangeUSD));
 
     feeHandler.setDailySellLimit(address(stableToken), 1000);
     feeHandler.sell(address(stableToken));
     assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
-    skip(DAY);
+    resetLimit();
     feeHandler.sell(address(stableToken));
     assertEq(stableToken.balanceOf(address(feeHandler)), 1000);
   }
@@ -710,6 +714,39 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellM
     // selling again shouldn't do anything
     feeHandler.sell(address(stableToken));
     assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
+  }
+
+  function test_HitLimitDoesntAffectAccounting() public {
+    fundFeeHandlerStable(3000, address(stableToken), address(exchangeUSD));
+    feeHandler.setDailySellLimit(address(stableToken), 1000);
+
+    feeHandler.sell(address(stableToken));
+    assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
+
+    assertEq(feeHandler.getTokenToDistribute(address(stableToken)), 600);
+
+    resetLimit();
+
+    feeHandler.sell(address(stableToken));
+    assertEq(feeHandler.getTokenToDistribute(address(stableToken)), 600);
+    assertEq(stableToken.balanceOf(address(feeHandler)), 1000);
+
+    resetLimit();
+
+    feeHandler.sell(address(stableToken));
+    assertEq(feeHandler.getTokenToDistribute(address(stableToken)), 600);
+    assertEq(stableToken.balanceOf(address(feeHandler)), 600);
+  }
+
+  function test_setDistributionAndBurnAmountsDoesntAffectBurn() public {
+    fundFeeHandlerStable(3000, address(stableToken), address(exchangeUSD));
+    feeHandler.setDailySellLimit(address(stableToken), 1000);
+
+    feeHandler.setDistributionAndBurnAmounts(address(stableToken));
+    feeHandler.sell(address(stableToken));
+
+    assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
+    assertEq(feeHandler.getTokenToDistribute(address(stableToken)), 600);
   }
 
   function test_Sell_WhenOtherTokenHitLimit() public {
@@ -746,7 +783,7 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellM
     assertEq(feeHandler.getPastBurnForToken(address(stableToken)), 8e17);
     assertEq(stableToken.balanceOf(address(feeHandler)), 2e17);
     assertEq(feeHandler.getTokenToDistribute(address(stableToken)), 2e17);
-    assertEq(feeHandler.celoToBeBurned(), expectedCeloAmount);
+    assertEq(feeHandler.getCeloToBeBurned(), expectedCeloAmount);
   }
 
   function test_Reverts_WhenNotEnoughReports() public {
@@ -1001,6 +1038,7 @@ contract FeeHandlerTest_HandleMentoTokens is FeeHandlerTestAbstract {
       celoToken.balanceOf(address(0x000000000000000000000000000000000000dEaD)),
       398482170620712919
     );
+
     assertEq(stableToken.balanceOf(address(feeHandler)), 0);
   }
 }

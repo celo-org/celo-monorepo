@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.5.13;
 
+import { console } from "forge-std/console.sol";
+
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -72,7 +74,7 @@ contract FeeHandler is
 
   address public ignoreRenaming_carbonFeeBeneficiary;
 
-  uint256 public celoToBeBurned; // TODO deprecate
+  uint256 private celoToBeBurned; // TODO deprecate
 
   // This mapping can not be public because it contains a FixidityLib.Fraction
   // and that'd be only supported with experimental features in this
@@ -145,6 +147,10 @@ contract FeeHandler is
 
   function setCarbonFraction(uint256 newFraction) external onlyOwner {
     _setCarbonFraction(newFraction);
+  }
+
+  function setDistributionAndBurnAmounts(address tokenAddress) external {
+    return _setDistributionAndBurnAmounts(tokenStates[tokenAddress], IERC20(tokenAddress));
   }
 
   function changeOtherBeneficiaryAllocation(
@@ -316,6 +322,10 @@ contract FeeHandler is
     return IERC20(token).transfer(recipient, value);
   }
 
+  function getCeloToBeBurned() external view returns (uint256) {
+    return getCeloTokenState().toBurn;
+  }
+
   /**
    * @param token The address of the token to query.
    * @return The amount burned for a token.
@@ -385,6 +395,10 @@ contract FeeHandler is
     return tokenStates[tokenAddress].toDistribute;
   }
 
+  function getTokenToBurn(address tokenAddress) external view returns (uint256) {
+    return tokenStates[tokenAddress].toDistribute;
+  }
+
   function getCarbonFraction() external view returns (uint256) {
     return getCarbonFractionFixidity().unwrap();
   }
@@ -446,19 +460,15 @@ contract FeeHandler is
   function getActiveTokens() public view returns (address[] memory) {
     return activeTokens.values;
   }
-  // TODO to allow this function to be called publicly, it should
-  // keep track of amounts to be burned, like the Celo token does
-  function _setDistributionAmounts(
-    TokenState storage tokenState,
-    IERC20 token
-  ) internal returns (uint256) {
-    uint256 balanceOfToken = token.balanceOf(address(this));
-    uint256 balanceToProcess = balanceOfToken.sub(tokenState.toDistribute).sub(tokenState.toBurn);
 
-    uint256 balanceToBurn = _setDistributeAfterBurn(tokenState, balanceToProcess);
+  function _setDistributionAndBurnAmounts(TokenState storage tokenState, IERC20 token) internal {
+    uint256 balanceOfToken = token.balanceOf(address(this));
+    console.log("balanceOfToken", balanceOfToken);
+    uint256 balanceToProcess = balanceOfToken.sub(tokenState.toDistribute).sub(tokenState.toBurn);
+    console.log("balanceToProcess", balanceToProcess);
+    _setDistributeAfterBurn(tokenState, balanceToProcess);
 
     emit DistributionAmountSet(address(token), tokenState.toDistribute);
-    return balanceToBurn;
   }
 
   function _executePayment(address tokenAddress, address beneficiary, uint256 amount) internal {
@@ -487,9 +497,9 @@ contract FeeHandler is
       .newFixed(balanceToProcess)
       .multiply(getBurnFractionFixidity())
       .fromFixed();
-    tokenState.toBurn.add(balanceToBurn);
+    tokenState.toBurn = tokenState.toBurn.add(balanceToBurn);
     tokenState.toDistribute = tokenState.toDistribute.add(balanceToProcess.sub(balanceToBurn));
-    return balanceToBurn;
+    return tokenState.toBurn;
   }
 
   function checkTotalBeneficiary() internal view {
@@ -554,17 +564,12 @@ contract FeeHandler is
    * @notice Burns all the Celo balance of this contract.
    */
   function _burnCelo() private {
-    TokenState storage tokenState = tokenStates[getCeloTokenAddress()];
-    ICeloToken celo = ICeloToken(getCeloTokenAddress());
+    address celoTokenAddress = getCeloTokenAddress();
+    TokenState storage tokenState = tokenStates[celoTokenAddress];
+    _setDistributionAndBurnAmounts(tokenState, IERC20(celoTokenAddress));
 
-    uint256 balanceOfCelo = address(this).balance;
-
-    uint256 balanceToProcess = balanceOfCelo.sub(tokenState.toDistribute).sub(tokenState.toBurn);
-    uint256 balanceToBurn = _setDistributeAfterBurn(tokenState, balanceToProcess);
-    uint256 totalBalanceToBurn = balanceToBurn.add(tokenState.toBurn);
-    getCeloTokenState().toBurn = 0;
-
-    celo.burn(totalBalanceToBurn);
+    ICeloToken(celoTokenAddress).burn(tokenState.toBurn);
+    tokenState.toBurn = 0;
   }
 
   /**
@@ -633,17 +638,20 @@ contract FeeHandler is
       "Max slippage has to be set to sell token"
     );
 
-    uint256 balanceToBurn = _setDistributionAmounts(tokenState, token);
+    _setDistributionAndBurnAmounts(tokenState, token);
 
-    // small numbers cause rounding errors and zero case should be skipped
-    if (balanceToBurn < MIN_BURN) {
-      return;
-    }
+    uint256 balanceToBurn = tokenState.toBurn;
+    console.log("balanceToBurn", balanceToBurn);
 
     if (dailySellLimitHit(tokenAddress, balanceToBurn)) {
       // in case the limit is hit, burn the max possible
       balanceToBurn = tokenState.currentDaySellLimit;
       emit DailyLimitHit(tokenAddress, balanceToBurn);
+    }
+
+    // small numbers cause rounding errors and zero case should be skipped
+    if (balanceToBurn < MIN_BURN) {
+      return;
     }
 
     token.transfer(tokenState.handler, balanceToBurn);
@@ -656,7 +664,9 @@ contract FeeHandler is
       FixidityLib.unwrap(tokenState.maxSlippage)
     );
 
-    celoToBeBurned = celoToBeBurned.add(celoReceived);
+    // substract from toBurn only the amount that was burned
+    tokenState.toBurn = tokenState.toBurn.sub(balanceToBurn);
+    getCeloTokenState().toBurn = getCeloTokenState().toBurn.add(celoReceived);
     tokenState.pastBurn = tokenState.pastBurn.add(balanceToBurn);
     updateLimits(tokenAddress, balanceToBurn);
 
@@ -733,9 +743,11 @@ contract FeeHandler is
   function _distributeAll() private {
     for (uint256 i = 0; i < EnumerableSet.length(activeTokens); i++) {
       address token = activeTokens.get(i);
+      _setDistributionAndBurnAmounts(tokenStates[token], IERC20(token));
       _distribute(token);
     }
     // distribute Celo
+    _setDistributionAndBurnAmounts(getCeloTokenState(), IERC20(getCeloTokenAddress()));
     _distribute(getCeloTokenAddress());
   }
 
