@@ -1583,14 +1583,14 @@ contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
   }
 
   function test_ShouldSetValidatorEcdsaPubKey_WhenCalledByRegisteredAccountsContract() public {
-    // (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
-    //   address(accounts),
-    //   signerPk
-    // );
-    // vm.prank(address(accounts));
-    // validators.updateEcdsaPublicKey(validator, signer, _newEcdsaPubKey);
-    // (bytes memory actualEcdsaPubKey, , , , ) = validators.getValidator(validator);
-    // assertEq(actualEcdsaPubKey, _newEcdsaPubKey);
+    (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
+      address(accounts),
+      signerPk
+    );
+    vm.prank(address(accounts));
+    validators.updateEcdsaPublicKey(validator, signer, _newEcdsaPubKey);
+    (bytes memory actualEcdsaPubKey, , , , ) = validators.getValidator(validator);
+    assertEq(actualEcdsaPubKey, _newEcdsaPubKey);
   }
 
   function test_ShouldSetValidatorEcdsaPubKey_WhenCalledByRegisteredAccountsContract_WhenL2()
