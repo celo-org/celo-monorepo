@@ -454,7 +454,7 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
   }
 }
 
-contract TransitionToL2After is ValidatorsTest {
+contract TransitionToL2AfterL1 is ValidatorsTest {
   function setUp() public {
     super.setUp();
     _whenL2WithEpoch();
@@ -582,7 +582,7 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
 }
 
 contract ValidatorsTest_SetMembershipHistoryLength_L2 is
-  TransitionToL2After,
+  TransitionToL2AfterL1,
   ValidatorsTest_SetMembershipHistoryLength
 {}
 
@@ -615,6 +615,11 @@ contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
     validators.setMaxGroupSize(maxGroupSize);
   }
 }
+
+contract ValidatorsTest_SetMaxGroupSize_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_SetMaxGroupSize
+{}
 
 contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
   GroupLockedGoldRequirements private newRequirements =
@@ -651,6 +656,11 @@ contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
   }
 }
 
+contract ValidatorsTest_SetGroupLockedGoldRequirements_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_SetGroupLockedGoldRequirements
+{}
+
 contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
   ValidatorLockedGoldRequirements private newRequirements =
     ValidatorLockedGoldRequirements({
@@ -685,6 +695,11 @@ contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
     );
   }
 }
+
+contract ValidatorsTest_SetValidatorLockedGoldRequirements_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_SetValidatorLockedGoldRequirements
+{}
 
 contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
   ValidatorScoreParameters newParams =
@@ -769,7 +784,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
     assertTrue(validators.isValidator(validator));
   }
 
-  function test_ShouldRevert_WhenInL2_WhenAccountHasAuthorizedValidatorSigner() public {
+  function test_Reverts_WhenInL2() public {
     lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
 
     (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
@@ -961,7 +976,7 @@ contract ValidatorsTest_RegisterValidator_NoBls is ValidatorsTest {
     assertTrue(validators.isValidator(validator));
   }
 
-  function test_ShouldRevert_WhenInL1_WhenAccountHasAuthorizedValidatorSigner() public {
+  function test_ShouldRevert_WhenInL1() public {
     lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
 
     (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
@@ -1171,6 +1186,11 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValid
   }
 }
 
+contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValidatorGroup_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValidatorGroup
+{}
+
 contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorGroup is
   ValidatorsTest
 {
@@ -1266,6 +1286,11 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
   }
 }
 
+contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorGroup_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorGroup
+{}
+
 contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirements is
   ValidatorsTest
 {
@@ -1328,6 +1353,11 @@ contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirement
     validators.affiliate(group);
   }
 }
+
+contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirements_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirements
+{}
 
 contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup is
   ValidatorsTest
@@ -1461,6 +1491,11 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
     validators.affiliate(group);
   }
 }
+
+contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup
+{}
 
 contract ValidatorsTest_Deaffiliate is ValidatorsTest {
   uint256 additionEpoch;
@@ -1602,6 +1637,8 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
   }
 }
 
+contract ValidatorsTest_Deaffiliate_L2 is TransitionToL2AfterL1, ValidatorsTest_Deaffiliate {}
+
 contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
   bytes validatorEcdsaPubKey;
 
@@ -1677,6 +1714,11 @@ contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
     validators.updateEcdsaPublicKey(validator, signer, _newEcdsaPubKey);
   }
 }
+
+contract ValidatorsTest_UpdateEcdsaPublicKey_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_UpdateEcdsaPublicKey
+{}
 
 contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
   bytes validatorEcdsaPubKey;
@@ -1795,6 +1837,18 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
     vm.prank(validator);
     validators.updatePublicKeys(validator, signer, _newEcdsaPubKey, newBlsPublicKey, newBlsPop);
   }
+
+  function test_Reverts_WhenL2() public {
+    _whenL2WithEpoch();
+    (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
+      address(accounts),
+      signerPk
+    );
+
+    vm.expectRevert("This method is no longer supported in L2.");
+    vm.prank(address(accounts));
+    validators.updatePublicKeys(validator, signer, _newEcdsaPubKey, newBlsPublicKey, newBlsPop);
+  }
 }
 
 contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
@@ -1893,6 +1947,15 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
     vm.expectRevert("Wrong BLS PoP length");
     vm.prank(validator);
     validators.updateBlsPublicKey(newBlsPublicKey, wrongBlsPop);
+  }
+
+  function test_Reverts_WhenL2() public {
+    _whenL2WithEpoch();
+
+    vm.expectRevert("This method is no longer supported in L2.");
+
+    vm.prank(validator);
+    validators.updateBlsPublicKey(newBlsPublicKey, newBlsPop);
   }
 }
 
@@ -1994,6 +2057,11 @@ contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
   }
 }
 
+contract ValidatorsTest_RegisterValidatorGroup_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_RegisterValidatorGroup
+{}
+
 contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers is ValidatorsTest {
   uint256 public constant INDEX = 0;
 
@@ -2045,6 +2113,11 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers is 
     validators.deregisterValidatorGroup(INDEX);
   }
 }
+
+contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers
+{}
 
 contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is ValidatorsTest {
   uint256 public constant INDEX = 0;
@@ -2139,6 +2212,11 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
     validators.deregisterValidatorGroup(INDEX);
   }
 }
+
+contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers
+{}
 
 contract ValidatorsTest_AddMember is ValidatorsTest {
   uint256 _registrationEpoch;
@@ -2349,7 +2427,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_AddMember_L2 is TransitionToL2After, ValidatorsTest_AddMember {}
+contract ValidatorsTest_AddMember_L2 is TransitionToL2AfterL1, ValidatorsTest_AddMember {}
 
 contract ValidatorsTest_RemoveMember is ValidatorsTest {
   uint256 _registrationEpoch;
@@ -2439,7 +2517,7 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_RemoveMember_L2 is TransitionToL2After, ValidatorsTest_RemoveMember {}
+contract ValidatorsTest_RemoveMember_L2 is TransitionToL2AfterL1, ValidatorsTest_RemoveMember {}
 
 contract ValidatorsTest_ReorderMember is ValidatorsTest {
   function setUp() public {
@@ -2489,7 +2567,7 @@ contract ValidatorsTest_ReorderMember is ValidatorsTest {
     validators.reorderMember(vm.addr(1), validator, address(0));
   }
 }
-contract ValidatorsTest_ReorderMember_L2 is TransitionToL2After, ValidatorsTest_ReorderMember {}
+contract ValidatorsTest_ReorderMember_L2 is TransitionToL2AfterL1, ValidatorsTest_ReorderMember {}
 
 contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
   uint256 newCommission = commission.unwrap().add(1);
@@ -2541,6 +2619,11 @@ contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
     validators.setNextCommissionUpdate(FixidityLib.fixed1().unwrap().add(1));
   }
 }
+
+contract ValidatorsTest_SetNextCommissionUpdate_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_SetNextCommissionUpdate
+{}
 
 contract ValidatorsTest_UpdateCommission is ValidatorsTest {
   uint256 newCommission = commission.unwrap().add(1);
@@ -2647,6 +2730,11 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
     validators.updateCommission();
   }
 }
+
+contract ValidatorsTest_UpdateCommission_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_UpdateCommission
+{}
 
 contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
   function setUp() public {
@@ -2986,6 +3074,14 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
     vm.expectRevert("Uptime cannot be larger than one");
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
   }
+
+  function test_Reverts_WhenL2() public {
+    _whenL2WithEpoch();
+    vm.expectRevert("This method is no longer supported in L2.");
+
+    vm.prank(address(0));
+    validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
+  }
 }
 
 contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
@@ -3012,7 +3108,7 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
     expectedMembershipHistoryEpochs.push(validatorRegistrationEpochNumber);
 
     for (uint256 i = 0; i < numTest; i++) {
-      blockTravel(ph.epochSize());
+      travelNEpoch(1);
       uint256 epochNumber = _getEpochNumberBasedOnLayer();
 
       vm.prank(validator);
@@ -3062,7 +3158,7 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
     expectedMembershipHistoryEpochs.push(validatorRegistrationEpochNumber);
 
     for (uint256 i = 0; i < membershipHistoryLength.add(1); i++) {
-      blockTravel(ph.epochSize());
+      travelNEpoch(1);
       uint256 epochNumber = _getEpochNumberBasedOnLayer();
       vm.prank(validator);
       validators.affiliate(vm.addr(i + 1));
@@ -3092,6 +3188,11 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
   }
 }
 
+contract ValidatorsTest_UpdateMembershipHistory_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_UpdateMembershipHistory
+{}
+
 contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
   function setUp() public {
     super.setUp();
@@ -3108,7 +3209,7 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
     public
   {
     for (uint256 i = 0; i < membershipHistoryLength.add(1); i++) {
-      blockTravel(ph.epochSize());
+      travelNEpoch(1);
 
       vm.prank(validator);
       validators.affiliate(vm.addr(i + 1));
@@ -3124,31 +3225,38 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
   }
 
   function test_MaintainsMembershipAfterL2Transition() public {
-    address lastValidatorGroup;
-    address nextValidatorGroup;
-    for (uint256 i = 0; i < membershipHistoryLength.add(1); i++) {
-      blockTravel(ph.epochSize());
+    if (isL2()) {} else {
+      address lastValidatorGroup;
+      address nextValidatorGroup;
+      for (uint256 i = 0; i < membershipHistoryLength.add(1); i++) {
+        blockTravel(ph.epochSize());
 
-      vm.prank(validator);
-      validators.affiliate(vm.addr(i + 1));
-      vm.prank(vm.addr(i + 1));
-      validators.addFirstMember(validator, address(0), address(0));
+        vm.prank(validator);
+        validators.affiliate(vm.addr(i + 1));
+        vm.prank(vm.addr(i + 1));
+        validators.addFirstMember(validator, address(0), address(0));
 
-      if (i == 0) {
-        assertEq(validators.getMembershipInLastEpoch(validator), address(0));
-      } else {
-        lastValidatorGroup = vm.addr(i);
-        nextValidatorGroup = vm.addr(i + 1);
-        assertEq(validators.getMembershipInLastEpoch(validator), vm.addr(i));
+        if (i == 0) {
+          assertEq(validators.getMembershipInLastEpoch(validator), address(0));
+        } else {
+          lastValidatorGroup = vm.addr(i);
+          nextValidatorGroup = vm.addr(i + 1);
+          assertEq(validators.getMembershipInLastEpoch(validator), vm.addr(i));
+        }
       }
-    }
 
-    _whenL2WithEpoch();
-    assertEq(validators.getMembershipInLastEpoch(validator), lastValidatorGroup);
-    epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + 1);
-    assertEq(validators.getMembershipInLastEpoch(validator), nextValidatorGroup);
+      _whenL2WithEpoch();
+      assertEq(validators.getMembershipInLastEpoch(validator), lastValidatorGroup);
+      epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + 1);
+      assertEq(validators.getMembershipInLastEpoch(validator), nextValidatorGroup);
+    }
   }
 }
+
+contract ValidatorsTest_GetMembershipInLastEpoch_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_GetMembershipInLastEpoch
+{}
 
 contract ValidatorsTest_GetTopGroupValidators is ValidatorsTest {
   function setUp() public {
@@ -3170,19 +3278,16 @@ contract ValidatorsTest_GetTopGroupValidators is ValidatorsTest {
   }
 }
 
+contract ValidatorsTest_GetTopGroupValidators_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_GetTopGroupValidators
+{}
+
 contract ValidatorsTest_GetTopGroupValidatorsAccounts is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
     _registerValidatorGroupWithMembersHavingSigners(group, 5);
-  }
-
-  function test_ShouldReturnTheAccount_WhenL2() public {
-    _whenL2WithEpoch();
-    address[] memory validatorAccount = validators.getTopGroupValidatorsAccounts(group, 3);
-    assertEq(validatorAccount[0], validator);
-    assertEq(validatorAccount[1], vm.addr(1));
-    assertFalse(validatorAccount[0] == accounts.getValidatorSigner(validator));
   }
 
   function test_ShouldReturnTheAccount() public {
@@ -3259,6 +3364,11 @@ contract ValidatorsTest_GetAccountLockedGoldRequirement is ValidatorsTest {
     }
   }
 }
+
+contract ValidatorsTest_GetAccountLockedGoldRequirement_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_GetAccountLockedGoldRequirement
+{}
 
 contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
   uint256 public numMembers = 5;
@@ -3359,7 +3469,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
   }
 
-  function test_Reverts_WhenValidatorAndGroupMeetBalanceRequirements_WhenL2() public {
+  function test_Reverts_WhenL2() public {
     _whenL2WithEpoch();
     vm.prank(address(0));
     vm.expectRevert("This method is no longer supported in L2.");

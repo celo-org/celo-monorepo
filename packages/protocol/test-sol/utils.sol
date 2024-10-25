@@ -47,7 +47,6 @@ contract Utils is Test, TestConstants, IsL2Check {
   function travelNEpoch(uint256 n) public {
     if (isL2()) {
       travelNL2Epoch(n);
-      epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + n);
     } else {
       blockTravel((n * ph.epochSize()) + 1);
     }
