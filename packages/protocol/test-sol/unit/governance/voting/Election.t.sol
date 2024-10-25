@@ -157,7 +157,7 @@ contract ElectionTest is Utils {
     election.setBlockedByContract(address(blocker));
   }
 
-  function _whenL2() public {
+  function _whenL2WithEpoch() public {
     blockTravel(ph.epochSize() + 1);
     uint256 l1EpochNumber = election.getEpochNumber();
 
@@ -173,7 +173,7 @@ contract ElectionTest is Utils {
 contract TransitionToL2After is ElectionTest {
   function setUp() public {
     super.setUp();
-    _whenL2();
+    _whenL2WithEpoch();
   }
 }
 
@@ -2933,12 +2933,6 @@ contract ElectionTest_HasActivatablePendingVotes is ElectionTest {
     travelNEpoch(1);
   }
   function test_ReturnsTrue_WhenUserHasVoted() public {
-    assertTrue(election.hasActivatablePendingVotes(voter, group));
-  }
-
-  function test_ReturnsTrue_WhenUserHasVotedOnL2() public {
-    _whenL2();
-
     assertTrue(election.hasActivatablePendingVotes(voter, group));
   }
 }

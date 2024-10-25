@@ -14,7 +14,6 @@ contract Utils is Test, TestConstants, IsL2Check {
 
   EnumerableSet.AddressSet addressSet;
   IRegistry registry;
-  // IValidators public validators;
   MockEpochManager public epochManager;
 
   function setupRegistry() public {
@@ -27,14 +26,6 @@ contract Utils is Test, TestConstants, IsL2Check {
 
     registry.setAddressFor(EpochManagerContract, address(epochManager));
   }
-
-  // function setupValidators() public {
-  //   address validatorsAddress = actor("Validators");
-  //   deployCodeTo("ValidatorsMock.sol", validatorsAddress);
-  //   validators = IValidators(validatorsAddress);
-
-  //   registry.setAddressFor(ValidatorsContract, address(validators));
-  // }
 
   function timeTravel(uint256 timeDelta) public {
     vm.warp(block.timestamp + timeDelta);
@@ -62,16 +53,9 @@ contract Utils is Test, TestConstants, IsL2Check {
     }
   }
 
-  // function _whenL2() public {
-  //   blockTravel(ph.epochSize() + 1);
-  //   uint256 l1EpochNumber = IPrecompiles(address(validators)).getEpochNumber();
-  //   deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
-
-  //   address[] memory _elected = new address[](2);
-  //   _elected[0] = actor("validator");
-  //   _elected[1] = actor("otherValidator");
-  //   epochManager.initializeSystem(l1EpochNumber, block.number, _elected);
-  // }
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+  }
 
   function assertAlmostEqual(uint256 actual, uint256 expected, uint256 margin) public {
     uint256 diff = actual > expected ? actual - expected : expected - actual;

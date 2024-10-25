@@ -21,10 +21,6 @@ contract RandomTest_ is Test, TestConstants, IsL2Check, Utils {
   function commitmentFor(uint256 value) internal pure returns (bytes32) {
     return keccak256(abi.encodePacked(bytes32(value)));
   }
-
-  function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
-  }
 }
 
 contract RandomTest_SetRandomnessRetentionWindow is RandomTest_ {

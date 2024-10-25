@@ -24,9 +24,6 @@ contract BlockchainParametersTest is Test, TestConstants, Utils {
     ph.setEpochSize(DAY / 5);
     blockchainParameters = new BlockchainParameters(true);
   }
-  function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
-  }
 }
 
 contract BlockchainParametersTest_initialize is BlockchainParametersTest {
