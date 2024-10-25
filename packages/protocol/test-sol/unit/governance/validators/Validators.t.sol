@@ -228,6 +228,14 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     epochManager.initializeSystem(l1EpochNumber, block.number, _elected);
   }
 
+  function _getEpochNumberBasedOnLayer() internal returns (uint256) {
+    if (isL2()) {
+      return epochManager.getCurrentEpochNumber();
+    } else {
+      return IPrecompiles(address(validators)).getEpochNumber();
+    }
+  }
+
   function _registerValidatorGroupWithMembers(address _group, uint256 _numMembers) public {
     _registerValidatorGroupHelper(_group, _numMembers);
 
@@ -321,14 +329,20 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
       _signerPk
     );
 
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(_validator, blsPublicKey, blsPop));
-
     vm.prank(_validator);
     accounts.authorizeValidatorSigner(_signer, v, r, s);
 
-    vm.prank(_validator);
-    validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
-    validatorRegistrationEpochNumber = IPrecompiles(address(validators)).getEpochNumber();
+    if (isL2()) {
+      vm.prank(_validator);
+      validators.registerValidatorNoBls(_ecdsaPubKey);
+    } else {
+      ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(_validator, blsPublicKey, blsPop));
+
+      vm.prank(_validator);
+      validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
+    }
+
+    validatorRegistrationEpochNumber = _getEpochNumberBasedOnLayer();
     return _ecdsaPubKey;
   }
 
@@ -371,11 +385,17 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     lockedGold.setAccountTotalLockedGold(_validator, originalValidatorLockedGoldRequirements.value);
     bytes memory _ecdsaPubKey = _generateEcdsaPubKey(_validator, _validatorPk);
 
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(_validator, blsPublicKey, blsPop));
+    if (isL2()) {
+      vm.prank(_validator);
+      validators.registerValidatorNoBls(_ecdsaPubKey);
+    } else {
+      ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(_validator, blsPublicKey, blsPop));
 
-    vm.prank(_validator);
-    validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
-    validatorRegistrationEpochNumber = IPrecompiles(address(validators)).getEpochNumber();
+      vm.prank(_validator);
+      validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
+    }
+
+    validatorRegistrationEpochNumber = _getEpochNumberBasedOnLayer();
     return _ecdsaPubKey;
   }
 
@@ -431,6 +451,13 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
       result = FixidityLib.multiply(result, base);
     }
     return result.unwrap();
+  }
+}
+
+contract TransitionToL2After is ValidatorsTest {
+  function setUp() public {
+    super.setUp();
+    _whenL2WithEpoch();
   }
 }
 
@@ -553,6 +580,11 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
     validators.setMembershipHistoryLength(newLength);
   }
 }
+
+contract ValidatorsTest_SetMembershipHistoryLength_L2 is
+  TransitionToL2After,
+  ValidatorsTest_SetMembershipHistoryLength
+{}
 
 contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
   uint256 newSize = maxGroupSize + 1;
@@ -945,7 +977,7 @@ contract ValidatorsTest_RegisterValidator_NoBls is ValidatorsTest {
     vm.expectRevert("This method is not supported in L1.");
     vm.prank(validator);
     validators.registerValidatorNoBls(_ecdsaPubKey);
-    validatorRegistrationEpochNumber = IPrecompiles(address(validators)).getEpochNumber();
+    validatorRegistrationEpochNumber = _getEpochNumberBasedOnLayer();
   }
 
   function test_ShouldAddAccountToValidatorList_WhenAccountHasAuthorizedValidatorSigner() public {
@@ -1363,12 +1395,12 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
 
-    validatorAdditionEpochNumber = IPrecompiles(address(validators)).getEpochNumber();
+    validatorAdditionEpochNumber = _getEpochNumberBasedOnLayer();
     timeTravel(10);
 
     vm.prank(validator);
     validators.affiliate(otherGroup);
-    validatorAffiliationEpochNumber = IPrecompiles(address(validators)).getEpochNumber();
+    validatorAffiliationEpochNumber = _getEpochNumberBasedOnLayer();
 
     (
       uint256[] memory epochs,
@@ -1484,11 +1516,11 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
 
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
-    additionEpoch = IPrecompiles(address(validators)).getEpochNumber();
+    additionEpoch = _getEpochNumberBasedOnLayer();
 
     vm.prank(validator);
     validators.deaffiliate();
-    deaffiliationEpoch = IPrecompiles(address(validators)).getEpochNumber();
+    deaffiliationEpoch = _getEpochNumberBasedOnLayer();
 
     (address[] memory members, , , , , , ) = validators.getValidatorGroup(group);
     assertEq(members, expectedMembersList);
@@ -1500,13 +1532,13 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
 
-    additionEpoch = IPrecompiles(address(validators)).getEpochNumber();
+    additionEpoch = _getEpochNumberBasedOnLayer();
 
     timeTravel(10);
 
     vm.prank(validator);
     validators.deaffiliate();
-    deaffiliationEpoch = IPrecompiles(address(validators)).getEpochNumber();
+    deaffiliationEpoch = _getEpochNumberBasedOnLayer();
 
     (
       uint256[] memory epochs,
@@ -1534,7 +1566,7 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
 
-    additionEpoch = IPrecompiles(address(validators)).getEpochNumber();
+    additionEpoch = _getEpochNumberBasedOnLayer();
 
     timeTravel(10);
 
@@ -2120,7 +2152,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
     _registerValidatorGroupHelper(group, 1);
 
     _registerValidatorHelper(validator, validatorPk);
-    _registrationEpoch = IPrecompiles(address(validators)).getEpochNumber();
+    _registrationEpoch = _getEpochNumberBasedOnLayer();
 
     vm.prank(validator);
     validators.affiliate(group);
@@ -2134,7 +2166,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
 
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
-    _additionEpoch = IPrecompiles(address(validators)).getEpochNumber();
+    _additionEpoch = _getEpochNumberBasedOnLayer();
 
     (address[] memory members, , , , , , ) = validators.getValidatorGroup(group);
 
@@ -2156,7 +2188,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
   function test_ShouldUpdateGroupSizeHistory() public {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
-    _additionEpoch = IPrecompiles(address(validators)).getEpochNumber();
+    _additionEpoch = _getEpochNumberBasedOnLayer();
 
     (, , , , uint256[] memory _sizeHistory, , ) = validators.getValidatorGroup(group);
 
@@ -2167,7 +2199,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
   function test_ShouldUpdateMembershipHistoryOfMember() public {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
-    _additionEpoch = IPrecompiles(address(validators)).getEpochNumber();
+    _additionEpoch = _getEpochNumberBasedOnLayer();
 
     uint256 expectedEntries = 1;
 
@@ -2187,7 +2219,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
   function test_ShouldMarkGroupAsEligible() public {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
-    _additionEpoch = IPrecompiles(address(validators)).getEpochNumber();
+    _additionEpoch = _getEpochNumberBasedOnLayer();
     assertTrue(election.isEligible(group));
   }
 
@@ -2317,6 +2349,8 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
   }
 }
 
+contract ValidatorsTest_AddMember_L2 is TransitionToL2After, ValidatorsTest_AddMember {}
+
 contract ValidatorsTest_RemoveMember is ValidatorsTest {
   uint256 _registrationEpoch;
   uint256 _additionEpoch;
@@ -2341,7 +2375,7 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
   function test_ShouldUpdateMemberMembershipHistory() public {
     vm.prank(group);
     validators.removeMember(validator);
-    uint256 _expectedEpoch = IPrecompiles(address(validators)).getEpochNumber();
+    uint256 _expectedEpoch = _getEpochNumberBasedOnLayer();
     (
       uint256[] memory _epochs,
       address[] memory _membershipGroups,
@@ -2405,6 +2439,8 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
   }
 }
 
+contract ValidatorsTest_RemoveMember_L2 is TransitionToL2After, ValidatorsTest_RemoveMember {}
+
 contract ValidatorsTest_ReorderMember is ValidatorsTest {
   function setUp() public {
     super.setUp();
@@ -2453,55 +2489,7 @@ contract ValidatorsTest_ReorderMember is ValidatorsTest {
     validators.reorderMember(vm.addr(1), validator, address(0));
   }
 }
-contract ValidatorsTest_ReorderMember_L2 is ValidatorsTest {
-  function setUp() public {
-    super.setUp();
-    _registerValidatorGroupWithMembers(group, 2);
-    _whenL2WithEpoch();
-  }
-
-  function test_ShouldReorderGroupMemberList() public {
-    address[] memory expectedMembersList = new address[](2);
-    expectedMembersList[0] = vm.addr(1);
-    expectedMembersList[1] = validator;
-
-    vm.prank(group);
-    validators.reorderMember(vm.addr(1), validator, address(0));
-    (address[] memory members, , , , , , ) = validators.getValidatorGroup(group);
-
-    assertEq(expectedMembersList, members);
-    assertEq(expectedMembersList.length, members.length);
-  }
-
-  function test_Emits_ValidatorGroupMemberReorderedEvent() public {
-    vm.expectEmit(true, true, true, true);
-    emit ValidatorGroupMemberReordered(group, vm.addr(1));
-
-    vm.prank(group);
-    validators.reorderMember(vm.addr(1), validator, address(0));
-  }
-
-  function test_Reverts_WhenAccountIsNotRegisteredValidatorGroup() public {
-    vm.expectRevert("Not a group");
-    vm.prank(vm.addr(1));
-    validators.reorderMember(vm.addr(1), validator, address(0));
-  }
-
-  function test_Reverts_WhenMemberNotRegisteredValidator() public {
-    vm.expectRevert("Not a validator");
-    vm.prank(group);
-    validators.reorderMember(nonValidator, validator, address(0));
-  }
-
-  function test_Reverts_WhenValidatorNotMemberOfValidatorGroup() public {
-    vm.prank(vm.addr(1));
-    validators.deaffiliate();
-
-    vm.expectRevert("Not a member of the group");
-    vm.prank(group);
-    validators.reorderMember(vm.addr(1), validator, address(0));
-  }
-}
+contract ValidatorsTest_ReorderMember_L2 is TransitionToL2After, ValidatorsTest_ReorderMember {}
 
 contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
   uint256 newCommission = commission.unwrap().add(1);
@@ -3025,7 +3013,7 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
 
     for (uint256 i = 0; i < numTest; i++) {
       blockTravel(ph.epochSize());
-      uint256 epochNumber = IPrecompiles(address(validators)).getEpochNumber();
+      uint256 epochNumber = _getEpochNumberBasedOnLayer();
 
       vm.prank(validator);
       validators.affiliate(group);
@@ -3075,7 +3063,7 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
 
     for (uint256 i = 0; i < membershipHistoryLength.add(1); i++) {
       blockTravel(ph.epochSize());
-      uint256 epochNumber = IPrecompiles(address(validators)).getEpochNumber();
+      uint256 epochNumber = _getEpochNumberBasedOnLayer();
       vm.prank(validator);
       validators.affiliate(vm.addr(i + 1));
       vm.prank(vm.addr(i + 1));
@@ -3670,7 +3658,7 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
     for (uint256 i = 1; i < totalEpochs; i++) {
       blockTravel(ph.epochSize());
 
-      uint256 epochNumber = IPrecompiles(address(validators)).getEpochNumber();
+      uint256 epochNumber = _getEpochNumberBasedOnLayer();
 
       if (i % gapSize == 0) {
         address _group = (i % gapSize.mul(gapSize)) != 0
@@ -3762,13 +3750,13 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
   }
 
   function test_Reverts_WhenProvidedEpochNumberGreaterThanCurrentEpochNumber() public {
-    uint256 _epochNumber = IPrecompiles(address(validators)).getEpochNumber();
+    uint256 _epochNumber = _getEpochNumberBasedOnLayer();
     vm.expectRevert("Epoch cannot be larger than current");
     validators.groupMembershipInEpoch(validator, _epochNumber.add(1), contractIndex);
   }
 
   function test_Reverts_WhenProvidedIndexGreaterThanIndexOnChain() public {
-    uint256 _epochNumber = IPrecompiles(address(validators)).getEpochNumber();
+    uint256 _epochNumber = _getEpochNumberBasedOnLayer();
     vm.expectRevert("index out of bounds");
     validators.groupMembershipInEpoch(validator, _epochNumber, contractIndex.add(1));
   }
