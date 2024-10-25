@@ -2948,12 +2948,6 @@ contract ElectionTest_HasActivatablePendingVotes is ElectionTest {
   function test_ReturnsTrue_WhenUserHasVoted() public {
     assertTrue(election.hasActivatablePendingVotes(voter, group));
   }
-
-  function test_ReturnsTrue_WhenUserHasVotedOnL2() public {
-    _whenL2();
-
-    assertTrue(election.hasActivatablePendingVotes(voter, group));
-  }
 }
 
 contract ElectionTest_HasActivatablePendingVotes_L2 is
