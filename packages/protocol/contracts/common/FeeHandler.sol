@@ -49,6 +49,7 @@ contract FeeHandler is
     // Historical amounts burned by this contract
     uint256 pastBurn;
     uint256 lastLimitDay;
+    uint256 toBurn;
   }
 
   struct Beneficiary {
@@ -71,7 +72,7 @@ contract FeeHandler is
 
   address public ignoreRenaming_carbonFeeBeneficiary;
 
-  uint256 public celoToBeBurned;
+  uint256 public celoToBeBurned; // TODO deprecate
 
   // This mapping can not be public because it contains a FixidityLib.Fraction
   // and that'd be only supported with experimental features in this
@@ -452,7 +453,7 @@ contract FeeHandler is
     IERC20 token
   ) internal returns (uint256) {
     uint256 balanceOfToken = token.balanceOf(address(this));
-    uint256 balanceToProcess = balanceOfToken.sub(tokenState.toDistribute);
+    uint256 balanceToProcess = balanceOfToken.sub(tokenState.toDistribute).sub(tokenState.toBurn);
 
     uint256 balanceToBurn = _setDistributeAfterBurn(tokenState, balanceToProcess);
 
@@ -485,7 +486,8 @@ contract FeeHandler is
     uint256 balanceToBurn = FixidityLib
       .newFixed(balanceToProcess)
       .multiply(getBurnFractionFixidity())
-      .fromFixed(); //here2
+      .fromFixed();
+    tokenState.toBurn.add(balanceToBurn);
     tokenState.toDistribute = tokenState.toDistribute.add(balanceToProcess.sub(balanceToBurn));
     return balanceToBurn;
   }
@@ -557,10 +559,10 @@ contract FeeHandler is
 
     uint256 balanceOfCelo = address(this).balance;
 
-    uint256 balanceToProcess = balanceOfCelo.sub(tokenState.toDistribute).sub(celoToBeBurned);
+    uint256 balanceToProcess = balanceOfCelo.sub(tokenState.toDistribute).sub(tokenState.toBurn);
     uint256 balanceToBurn = _setDistributeAfterBurn(tokenState, balanceToProcess);
-    uint256 totalBalanceToBurn = balanceToBurn.add(celoToBeBurned);
-    celoToBeBurned = 0;
+    uint256 totalBalanceToBurn = balanceToBurn.add(tokenState.toBurn);
+    getCeloTokenState().toBurn = 0;
 
     celo.burn(totalBalanceToBurn);
   }
@@ -636,7 +638,7 @@ contract FeeHandler is
     // small numbers cause rounding errors and zero case should be skipped
     if (balanceToBurn < MIN_BURN) {
       return;
-    } // eso debería estar antes de quemar el storage
+    }
 
     if (dailySellLimitHit(tokenAddress, balanceToBurn)) {
       // in case the limit is hit, burn the max possible
@@ -757,7 +759,6 @@ contract FeeHandler is
     _handleCelo();
   }
 
-  // new handle
   // tokenAddresses should not contain the Celo address
   function _handle(address[] memory tokenAddresses) private {
     // Celo doesn't have to be exchanged for anything
@@ -768,5 +769,9 @@ contract FeeHandler is
     }
 
     _handleCelo();
+  }
+
+  function getCeloTokenState() private view returns (TokenState storage) {
+    return tokenStates[getCeloTokenAddress()];
   }
 }
