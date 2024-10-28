@@ -2944,6 +2944,7 @@ contract ElectionTest_HasActivatablePendingVotes is ElectionTest {
     election.vote(group, value, address(0), address(0));
     travelNEpoch(1);
   }
+
   function test_ReturnsTrue_WhenUserHasVoted() public {
     assertTrue(election.hasActivatablePendingVotes(voter, group));
   }
