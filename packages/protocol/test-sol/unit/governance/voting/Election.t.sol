@@ -168,6 +168,14 @@ contract ElectionTest is Utils {
     deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
     epochManager.initializeSystem(l1EpochNumber, block.number, _elected);
   }
+
+  function travelNEpoch(uint256 n) public {
+    if (isL2()) {
+      epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + n);
+    } else {
+      blockTravel((n * ph.epochSize()) + 1);
+    }
+  }
 }
 
 contract TransitionToL2After is ElectionTest {
