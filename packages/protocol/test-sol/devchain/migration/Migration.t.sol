@@ -244,7 +244,6 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     blockTravel(vm, 43200);
     timeTravel(vm, DAY);
 
-    IERC20 _celoToken = IERC20(address(celoToken));
     vm.prank(randomAddress);
 
     (bool success, ) = address(unreleasedTreasury).call{ value: 50000 ether }("");
