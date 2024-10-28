@@ -1955,7 +1955,6 @@ contract ElectionTest_ElectValidatorsAccounts is ElectionTest_ElectValidatorsAbs
   }
 }
 
-// reruns all the ElectionTest_ElectValidatorsAccounts with L2 turned on
 contract ElectionTest_ElectValidatorsAccountsL2 is
   ElectionTest_ElectValidatorsAccounts,
   TransitionToL2After
@@ -2932,6 +2931,7 @@ contract ElectionTest_HasActivatablePendingVotes is ElectionTest {
     election.vote(group, value, address(0), address(0));
     travelNEpoch(1);
   }
+
   function test_ReturnsTrue_WhenUserHasVoted() public {
     assertTrue(election.hasActivatablePendingVotes(voter, group));
   }
