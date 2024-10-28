@@ -1968,7 +1968,6 @@ contract ElectionTest_ElectValidatorsAccounts is ElectionTest_ElectValidatorsAbs
   }
 }
 
-// reruns all the ElectionTest_ElectValidatorsAccounts with L2 turned on
 contract ElectionTest_ElectValidatorsAccountsL2 is
   ElectionTest_ElectValidatorsAccounts,
   TransitionToL2After
