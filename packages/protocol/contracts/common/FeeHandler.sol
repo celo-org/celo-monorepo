@@ -461,6 +461,10 @@ contract FeeHandler is
     return activeTokens.values;
   }
 
+  function _getBurnFraction() internal view returns (uint256) {
+    return getBurnFractionFixidity().unwrap();
+  }
+
   function _setDistributionAndBurnAmounts(TokenState storage tokenState, IERC20 token) internal {
     uint256 balanceOfToken = token.balanceOf(address(this));
     console.log("balanceOfToken", balanceOfToken);
@@ -502,9 +506,13 @@ contract FeeHandler is
     return tokenState.toBurn;
   }
 
+  function shouldBurn() public view returns (bool) {
+    return _getBurnFraction() > 0;
+  }
+
   function checkTotalBeneficiary() internal view {
     require(
-      getTotalFractionOfOtherBeneficiariesAndCarbonFixidity().lt(FixidityLib.fixed1()),
+      getTotalFractionOfOtherBeneficiariesAndCarbonFixidity().lte(FixidityLib.fixed1()),
       "Total beneficiaries fraction must be less than 1"
     );
   }
@@ -629,6 +637,9 @@ contract FeeHandler is
   }
 
   function _sell(address tokenAddress) private onlyWhenNotFrozen nonReentrant {
+    if (!shouldBurn()) {
+      return;
+    }
     IERC20 token = IERC20(tokenAddress);
 
     TokenState storage tokenState = tokenStates[tokenAddress];
@@ -695,6 +706,7 @@ contract FeeHandler is
       "Can't distribute to the zero address"
     );
     TokenState storage tokenState = tokenStates[tokenAddress];
+    _setDistributionAndBurnAmounts(tokenState, IERC20(tokenAddress));
 
     FixidityLib.Fraction
       memory totalFractionOfOtherBeneficiariesAndCarbonFixidity = getTotalFractionOfOtherBeneficiariesAndCarbonFixidity();
@@ -743,11 +755,9 @@ contract FeeHandler is
   function _distributeAll() private {
     for (uint256 i = 0; i < EnumerableSet.length(activeTokens); i++) {
       address token = activeTokens.get(i);
-      _setDistributionAndBurnAmounts(tokenStates[token], IERC20(token));
       _distribute(token);
     }
     // distribute Celo
-    _setDistributionAndBurnAmounts(getCeloTokenState(), IERC20(getCeloTokenAddress()));
     _distribute(getCeloTokenAddress());
   }
 
