@@ -450,6 +450,7 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
 
       result = FixidityLib.multiply(result, base);
     }
+
     return result.unwrap();
   }
 }
@@ -2568,6 +2569,7 @@ contract ValidatorsTest_ReorderMember is ValidatorsTest {
     validators.reorderMember(vm.addr(1), validator, address(0));
   }
 }
+
 contract ValidatorsTest_ReorderMember_L2 is TransitionToL2AfterL1, ValidatorsTest_ReorderMember {}
 
 contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
