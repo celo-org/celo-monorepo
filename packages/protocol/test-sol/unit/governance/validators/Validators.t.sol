@@ -3293,6 +3293,14 @@ contract ValidatorsTest_GetTopGroupValidatorsAccounts is ValidatorsTest {
     _registerValidatorGroupWithMembersHavingSigners(group, 5);
   }
 
+  function test_ShouldReturnTheAccount_WhenL2() public {
+    _whenL2WithEpoch();
+    address[] memory validatorAccount = validators.getTopGroupValidatorsAccounts(group, 3);
+    assertEq(validatorAccount[0], validator);
+    assertEq(validatorAccount[1], vm.addr(1));
+    assertFalse(validatorAccount[0] == accounts.getValidatorSigner(validator));
+  }
+
   function test_ShouldReturnTheAccount() public {
     address[] memory validatorAccount = validators.getTopGroupValidatorsAccounts(group, 3);
     assertEq(validatorAccount[0], validator);
