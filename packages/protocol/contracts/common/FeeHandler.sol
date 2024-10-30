@@ -258,6 +258,8 @@ contract FeeHandler is
     @param tokenAddress The address of the token for which to distribute the available tokens.
   */
   function distribute(address tokenAddress) external {
+    TokenState storage tokenState = tokenStates[tokenAddress];
+    _setDistributionAndBurnAmounts(tokenState, IERC20(tokenAddress));
     return _distribute(tokenAddress);
   }
 
@@ -519,7 +521,7 @@ contract FeeHandler is
 
   function _setCarbonFraction(uint256 _newFraction) internal {
     FixidityLib.Fraction memory newFraction = FixidityLib.wrap(_newFraction);
-    require(newFraction.lt(FixidityLib.fixed1()), "New cargon fraction can't be greather than 1");
+    require(newFraction.lte(FixidityLib.fixed1()), "New cargon fraction can't be greather than 1");
     ignoreRenaming_inverseCarbonFraction = FixidityLib.fixed1().subtract(newFraction);
     checkTotalBeneficiary();
     emit CarbonFractionSet(_newFraction);
@@ -706,7 +708,6 @@ contract FeeHandler is
       "Can't distribute to the zero address"
     );
     TokenState storage tokenState = tokenStates[tokenAddress];
-    _setDistributionAndBurnAmounts(tokenState, IERC20(tokenAddress));
 
     FixidityLib.Fraction
       memory totalFractionOfOtherBeneficiariesAndCarbonFixidity = getTotalFractionOfOtherBeneficiariesAndCarbonFixidity();

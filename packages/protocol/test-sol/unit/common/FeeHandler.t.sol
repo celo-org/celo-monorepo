@@ -788,6 +788,14 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellM
     assertEq(stableTokenEUR.balanceOf(address(feeHandler)), 2000);
   }
 
+  function test_WhenBurnFractionIsZero() public {
+    setCarbonFraction(100, 100);
+    fundFeeHandlerStable(3000, address(stableToken), address(exchangeUSD));
+    feeHandler.sell(address(stableToken));
+
+    assertEq(stableToken.balanceOf(address(feeHandler)), 3000);
+  }
+
   function test_SellsWithMento() public {
     fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
     assertEq(feeHandler.getPastBurnForToken(address(stableToken)), 0);
