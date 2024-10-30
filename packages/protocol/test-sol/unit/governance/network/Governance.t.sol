@@ -103,10 +103,6 @@ contract GovernanceTest is Test, TestConstants, Utils {
   uint256 proposalId;
   address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
-  function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
-  }
-
   function setUp() public {
     // Define Accounts
     accVoter = actor("voter");
