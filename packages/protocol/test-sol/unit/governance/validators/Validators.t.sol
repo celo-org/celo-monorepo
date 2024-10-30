@@ -24,12 +24,10 @@ import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 
 import "@test-sol/unit/common/mocks/MockEpochManager.sol";
-import "@test-sol/constants.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
 import { Utils } from "@test-sol/utils.sol";
-import { Test as ForgeTest } from "forge-std/Test.sol";
 
-contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
+contract ValidatorsTest is Test, Utils, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
