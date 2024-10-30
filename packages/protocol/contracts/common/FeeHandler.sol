@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.5.13;
 
-import { console } from "forge-std/console.sol";
-
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -398,7 +396,7 @@ contract FeeHandler is
   }
 
   function getTokenToBurn(address tokenAddress) external view returns (uint256) {
-    return tokenStates[tokenAddress].toDistribute;
+    return tokenStates[tokenAddress].toBurn;
   }
 
   function getCarbonFraction() external view returns (uint256) {
@@ -509,7 +507,7 @@ contract FeeHandler is
   }
 
   function shouldBurn() public view returns (bool) {
-    return _getBurnFraction() > 0;
+    return _getBurnFraction() != 0;
   }
 
   function checkTotalBeneficiary() internal view {
@@ -577,6 +575,10 @@ contract FeeHandler is
     address celoTokenAddress = getCeloTokenAddress();
     TokenState storage tokenState = tokenStates[celoTokenAddress];
     _setDistributionAndBurnAmounts(tokenState, IERC20(celoTokenAddress));
+
+    if (token.toBurn == 0) {
+      return;
+    }
 
     ICeloToken(celoTokenAddress).burn(tokenState.toBurn);
     tokenState.toBurn = 0;
