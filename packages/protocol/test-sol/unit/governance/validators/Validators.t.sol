@@ -1180,6 +1180,7 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValid
     vm.prank(validator);
     validators.deregisterValidator(INDEX + 1);
   }
+
   function _deregisterValidator(address _validator) internal {
     vm.prank(_validator);
     validators.deregisterValidator(INDEX);
@@ -3686,6 +3687,7 @@ contract ValidatorsTest_MintStableToEpochManager is ValidatorsTest {
     vm.expectRevert("only registered contract");
     validators.mintStableToEpochManager(5);
   }
+
   function test_WhenMintAmountIsZero() public {
     _whenL2WithEpoch();
     vm.prank(address(epochManager));
@@ -3816,6 +3818,7 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
       }
     }
   }
+
   function test_ShouldCorrectlyGetGroupAddressForExactEpochNumbers_WhenL2() public {
     _whenL2WithEpoch();
     for (uint256 i = 0; i < epochInfoList.length; i++) {
