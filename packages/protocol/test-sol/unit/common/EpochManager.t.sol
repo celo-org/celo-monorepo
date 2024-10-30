@@ -164,7 +164,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     vm.prank(epochManagerEnabler);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
-    travelEpochL2(vm);
+    travelNL2Epoch(vm, 1);
   }
 
   function getGroupsWithLessersAndGreaters()
@@ -186,7 +186,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
   function _travelAndProcess_N_L2Epoch(uint256 n) public {
     for (uint256 i = 0; i < n; i++) {
-      travelEpochL2(vm);
+      travelNL2Epoch(vm, 1);
       epochManager.startNextEpochProcess();
 
       (
