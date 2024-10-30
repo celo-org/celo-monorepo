@@ -184,7 +184,6 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     registry.setAddressFor(LockedGoldContract, address(lockedGold));
     registry.setAddressFor(ValidatorsContract, address(validators));
     registry.setAddressFor(StableTokenContract, address(stableToken));
-    registry.setAddressFor(EpochManagerContract, address(epochManager));
 
     initParams = ValidatorsMockTunnel.InitParams({
       registryAddress: REGISTRY_ADDRESS,
