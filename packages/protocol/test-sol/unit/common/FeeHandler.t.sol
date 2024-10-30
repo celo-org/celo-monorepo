@@ -566,6 +566,15 @@ contract FeeHandlerTest_Distribute is FeeHandlerTestAbstract {
     assertEq(stableToken.balanceOf(address(feeHandler)), 8e17);
     assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
   }
+
+  function test_WhenBurnFractionIsZero() public {
+    setCarbonFraction(100, 100);
+    fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
+    addAndActivateToken(address(stableToken), address(mentoSeller));
+
+    feeHandler.distribute(address(stableToken));
+    assertEq(stableToken.balanceOf(address(feeHandler)), 0);
+  }
 }
 
 contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstract {
