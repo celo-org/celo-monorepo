@@ -321,10 +321,6 @@ contract DowntimeSlasherTest is Test, TestConstants, Utils {
     }
     return (_epochNumber.sub(1)).mul(epochSize).add(1);
   }
-
-  function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
-  }
 }
 
 contract DowntimeSlasherTestInitialize is DowntimeSlasherTest {

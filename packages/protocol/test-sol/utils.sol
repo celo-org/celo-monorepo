@@ -2,11 +2,30 @@ pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
 import "openzeppelin-solidity/contracts/utils/EnumerableSet.sol";
+import { TestConstants } from "@test-sol/constants.sol";
+import "@test-sol/unit/common/mocks/MockEpochManager.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
+import "@celo-contracts/governance/interfaces/IValidators.sol";
+import "@celo-contracts/common/PrecompilesOverride.sol";
 
-contract Utils is Test {
+contract Utils is Test, TestConstants, IsL2Check {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   EnumerableSet.AddressSet addressSet;
+  IRegistry registry;
+  MockEpochManager public epochManager;
+
+  function setupRegistry() public {
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
+  }
+
+  function setupEpochManager() public {
+    epochManager = new MockEpochManager();
+
+    registry.setAddressFor(EpochManagerContract, address(epochManager));
+  }
 
   function timeTravel(uint256 timeDelta) public {
     vm.warp(block.timestamp + timeDelta);
@@ -14,6 +33,27 @@ contract Utils is Test {
 
   function blockTravel(uint256 blockDelta) public {
     vm.roll(block.number + blockDelta);
+  }
+
+  // XXX: this function only increases the block number and timestamp, but does not actually change epoch.
+  // XXX: you must start and finish epoch processing to change epochs.
+  function travelNL2Epoch(uint256 n) public {
+    uint256 blocksInEpoch = L2_BLOCK_IN_EPOCH;
+    blockTravel(n * blocksInEpoch);
+    timeTravel(n * DAY);
+    epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + n);
+  }
+
+  function travelNEpoch(uint256 n) public {
+    if (isL2()) {
+      travelNL2Epoch(n);
+    } else {
+      blockTravel((n * ph.epochSize()) + 1);
+    }
+  }
+
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 
   function assertAlmostEqual(uint256 actual, uint256 expected, uint256 margin) public {

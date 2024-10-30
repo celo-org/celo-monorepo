@@ -8,7 +8,7 @@ import { TestConstants } from "@test-sol/constants.sol";
 import "@celo-contracts/identity/Random.sol";
 import "@celo-contracts/identity/test/RandomTest.sol";
 
-contract RandomTest_ is Test, TestConstants, Utils, IsL2Check {
+contract RandomTest_ is Test, TestConstants, IsL2Check, Utils {
   RandomTest random;
 
   event RandomnessBlockRetentionWindowSet(uint256 value);
@@ -20,10 +20,6 @@ contract RandomTest_ is Test, TestConstants, Utils, IsL2Check {
 
   function commitmentFor(uint256 value) internal pure returns (bytes32) {
     return keccak256(abi.encodePacked(bytes32(value)));
-  }
-
-  function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 }
 
