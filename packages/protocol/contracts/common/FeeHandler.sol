@@ -467,9 +467,7 @@ contract FeeHandler is
 
   function _setDistributionAndBurnAmounts(TokenState storage tokenState, IERC20 token) internal {
     uint256 balanceOfToken = token.balanceOf(address(this));
-    console.log("balanceOfToken", balanceOfToken);
     uint256 balanceToProcess = balanceOfToken.sub(tokenState.toDistribute).sub(tokenState.toBurn);
-    console.log("balanceToProcess", balanceToProcess);
     _setDistributeAfterBurn(tokenState, balanceToProcess);
 
     emit DistributionAmountSet(address(token), tokenState.toDistribute);
@@ -656,7 +654,6 @@ contract FeeHandler is
     _setDistributionAndBurnAmounts(tokenState, token);
 
     uint256 balanceToBurn = tokenState.toBurn;
-    console.log("balanceToBurn", balanceToBurn);
 
     if (dailySellLimitHit(tokenAddress, balanceToBurn)) {
       // in case the limit is hit, burn the max possible
