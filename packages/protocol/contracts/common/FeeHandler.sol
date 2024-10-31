@@ -72,7 +72,7 @@ contract FeeHandler is
 
   address public ignoreRenaming_carbonFeeBeneficiary;
 
-  uint256 private celoToBeBurned; // TODO deprecate
+  uint256 private deprecated_celoToBeBurned; // deprecated
 
   // This mapping can not be public because it contains a FixidityLib.Fraction
   // and that'd be only supported with experimental features in this
