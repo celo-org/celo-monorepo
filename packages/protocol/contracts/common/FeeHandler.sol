@@ -574,7 +574,7 @@ contract FeeHandler is
     TokenState storage tokenState = tokenStates[celoTokenAddress];
     _setDistributionAndBurnAmounts(tokenState, IERC20(celoTokenAddress));
 
-    if (token.toBurn == 0) {
+    if (tokenState.toBurn == 0) {
       return;
     }
 
