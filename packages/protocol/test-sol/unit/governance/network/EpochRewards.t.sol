@@ -99,9 +99,6 @@ contract EpochRewardsTest is Test, TestConstants, Utils {
     );
   }
 
-  function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
-  }
   function getExpectedTargetTotalSupply(uint256 timeDelta) internal pure returns (uint256) {
     uint256 genesisSupply = 600000000 ether;
     uint256 linearRewards = 200000000 ether;
