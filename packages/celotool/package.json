@@ -50,7 +50,7 @@
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.3",
-    "@celo/dev-utils":"^0.0.3",
+    "@celo/dev-utils":"^0.0.6",
     "@celo/protocol": "1.0.2",
     "@types/bunyan": "1.8.8",
     "@types/chai": "^4.1.3",
