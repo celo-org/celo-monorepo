@@ -530,12 +530,6 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
     uint256 actual = validators.downtimeGracePeriod();
     assertEq(actual, downtimeGracePeriod, "Wrong downtimeGracePeriod.");
   }
-
-  function test_Reverts_SetDowntimeGracePeriod_WhenL2() public {
-    _whenL2WithEpoch();
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.setDowntimeGracePeriod(downtimeGracePeriod);
-  }
 }
 
 contract ValidatorsTest_setCommissionUpdateDelay is ValidatorsTest {
@@ -551,6 +545,21 @@ contract ValidatorsTest_setCommissionUpdateDelay_L2 is
   TransitionToL2AfterL1,
   ValidatorsTest_setCommissionUpdateDelay
 {}
+
+contract ValidatorsTest_setDowntimeGracePeriod is ValidatorsTest {
+  function test_shouldSetDowntimeGracePeriod() public {
+    validators.setDowntimeGracePeriod(downtimeGracePeriod + 1);
+    uint256 actual = validators.downtimeGracePeriod();
+    assertEq(actual, downtimeGracePeriod + 1, "Wrong downtime grace period.");
+  }
+}
+
+contract ValidatorsTest_setDowntimeGracePeriod_L2 is TransitionToL2AfterL1 {
+  function test_shouldRevert() public {
+    vm.expectRevert("This method is no longer supported in L2.");
+    validators.setDowntimeGracePeriod(downtimeGracePeriod + 1);
+  }
+}
 
 contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
   uint256 newLength = membershipHistoryLength + 1;
