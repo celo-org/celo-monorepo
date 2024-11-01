@@ -947,6 +947,25 @@ contract ValidatorsTest_RegisterValidator_L2 is TransitionToL2AfterL1 {
 }
 
 contract ValidatorsTest_RegisterValidatorNoBls is ValidatorsTest {
+  function test_ShouldRevert_WhenInL1() public {
+    lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
+
+    (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
+      validator,
+      signerPk
+    );
+
+    vm.prank(validator);
+    accounts.authorizeValidatorSigner(signer, v, r, s);
+
+    vm.expectRevert("This method is not supported in L1.");
+    vm.prank(validator);
+    validators.registerValidatorNoBls(_ecdsaPubKey);
+    validatorRegistrationEpochNumber = _getEpochNumberBasedOnLayer();
+  }
+}
+
+contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
@@ -987,25 +1006,6 @@ contract ValidatorsTest_RegisterValidatorNoBls is ValidatorsTest {
     _registerValidatorWithSignerHelper_noBls();
 
     assertTrue(validators.isValidator(validator));
-  }
-
-  function test_ShouldRevert_WhenInL1() public {
-    lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
-
-    (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
-      validator,
-      signerPk
-    );
-
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
-
-    vm.prank(validator);
-    accounts.authorizeValidatorSigner(signer, v, r, s);
-
-    vm.expectRevert("This method is not supported in L1.");
-    vm.prank(validator);
-    validators.registerValidatorNoBls(_ecdsaPubKey);
-    validatorRegistrationEpochNumber = _getEpochNumberBasedOnLayer();
   }
 
   function test_ShouldAddAccountToValidatorList_WhenAccountHasAuthorizedValidatorSigner() public {
