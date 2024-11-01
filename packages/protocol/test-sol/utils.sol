@@ -120,4 +120,36 @@ contract Utils is Test, TestConstants, IsL2Check {
   function compareStrings(string memory a, string memory b) public pure returns (bool) {
     return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
   }
+
+  function containsLog(
+    Vm.Log[] memory logs,
+    string memory signatureString
+  ) private view returns (bool) {
+    bytes32 signature = keccak256(abi.encodePacked(signatureString));
+    for (uint256 i = 0; i < logs.length; i++) {
+      bytes32 logSignature = logs[i].topics[0];
+      if (logSignature == signature) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function emitsLog(function() action, string memory signatureString) private returns (bool) {
+    vm.recordLogs();
+    action();
+    Vm.Log[] memory entries = vm.getRecordedLogs();
+    return containsLog(entries, signatureString);
+  }
+
+  /**
+   * @notice Counterpart to the `expectEmit` cheatcode: asserts that a given log was *not* emitted.
+   * @param action Function that, when called, performs the action to be tested.
+   * @param signatureString The string representation of the event signature
+   * that should not be emitted (e.g. "Transfer(address,address,uint256)").
+   */
+  function assertDoesNotEmit(function() action, string memory signatureString) internal {
+    assertFalse(emitsLog(action, signatureString));
+  }
 }

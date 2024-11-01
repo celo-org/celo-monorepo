@@ -1476,11 +1476,13 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
     assertTrue(election.isIneligible(group));
   }
 
-  function test_ShouldNotTryToSendValidatorPayment_WhenL1() public {
+  function _performAffiliation() internal {
     vm.prank(validator);
     validators.affiliate(group);
-    Vm.Log[] memory entries = vm.getRecordedLogs();
-    assertEq(entries.length, 0);
+  }
+
+  function test_ShouldNotTryToSendValidatorPayment_WhenL1() public {
+    assertDoesNotEmit(_performAffiliation, "SendValidatorPaymentCalled(address)");
   }
 
   function test_ShouldSendValidatorPayment_WhenL2() public {
