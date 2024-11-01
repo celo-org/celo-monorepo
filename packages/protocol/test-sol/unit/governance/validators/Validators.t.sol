@@ -465,7 +465,7 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
   }
 
   function test_Reverts_WhenCalledMoreThanOnce() public {
-    vm.expectRevert();
+    vm.expectRevert("contract already initialized");
     validatorsMockTunnel.MockInitialize(owner, initParams, initParams2);
   }
 
