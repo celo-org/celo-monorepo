@@ -965,7 +965,7 @@ contract ValidatorsTest_RegisterValidatorNoBls is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest {
+contract ValidatorsTest_RegisterValidatorNoBls_L2 is TransitionToL2AfterL1 {
   function setUp() public {
     super.setUp();
 
@@ -973,7 +973,6 @@ contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest {
   }
 
   function test_Reverts_WhenVoteOverMaxNumberOfGroupsSetToTrue() public {
-    _whenL2WithEpoch();
     vm.prank(validator);
     election.setAllowedToVoteOverMaxNumberOfGroups(validator, true);
 
@@ -989,7 +988,6 @@ contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest {
   }
 
   function test_Reverts_WhenDelagatingCELO() public {
-    _whenL2WithEpoch();
     lockedGold.setAccountTotalDelegatedAmountInPercents(validator, 10);
     (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
     vm.prank(validator);
@@ -1002,14 +1000,12 @@ contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest {
   }
 
   function test_ShouldMarkAccountAsValidator_WhenAccountHasAuthorizedValidatorSigner() public {
-    _whenL2WithEpoch();
     _registerValidatorWithSignerHelper_noBls();
 
     assertTrue(validators.isValidator(validator));
   }
 
   function test_ShouldAddAccountToValidatorList_WhenAccountHasAuthorizedValidatorSigner() public {
-    _whenL2WithEpoch();
     address[] memory ExpectedRegisteredValidators = new address[](1);
     ExpectedRegisteredValidators[0] = validator;
     _registerValidatorWithSignerHelper_noBls();
@@ -1018,7 +1014,6 @@ contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest {
   }
 
   function test_ShouldSetValidatorEcdsaPublicKey_WhenAccountHasAuthorizedValidatorSigner() public {
-    _whenL2WithEpoch();
     bytes memory _registeredEcdsaPubKey = _registerValidatorWithSignerHelper_noBls();
     (bytes memory actualEcdsaPubKey, , , , ) = validators.getValidator(validator);
 
@@ -1026,7 +1021,6 @@ contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest {
   }
 
   function test_ShouldNotSetValidatorBlsPublicKey_WhenAccountHasAuthorizedValidatorSigner() public {
-    _whenL2WithEpoch();
     _registerValidatorWithSignerHelper_noBls();
     (, bytes memory actualBlsPubKey, , , ) = validators.getValidator(validator);
 
@@ -1034,7 +1028,6 @@ contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest {
   }
 
   function test_ShouldSetValidatorSigner_WhenAccountHasAuthorizedValidatorSigner() public {
-    _whenL2WithEpoch();
     _registerValidatorWithSignerHelper_noBls();
     (, , , , address ActualSigner) = validators.getValidator(validator);
 
@@ -1042,7 +1035,6 @@ contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest {
   }
 
   function test_ShouldSetLockGoldRequirements_WhenAccountHasAuthorizedValidatorSigner() public {
-    _whenL2WithEpoch();
     _registerValidatorWithSignerHelper_noBls();
     uint256 _lockedGoldReq = validators.getAccountLockedGoldRequirement(validator);
 
@@ -1052,7 +1044,6 @@ contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest {
   function test_ShouldSetValidatorMembershipHistory_WhenAccountHasAuthorizedValidatorSigner()
     public
   {
-    _whenL2WithEpoch();
     _registerValidatorWithSignerHelper_noBls();
     (uint256[] memory _epoch, address[] memory _membershipGroups, , ) = validators
       .getMembershipHistory(validator);
@@ -1067,7 +1058,6 @@ contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest {
   }
 
   function testFail_DoesNotEmit_ValidatorBlsPublicKeyUpdatedEvent() public {
-    _whenL2WithEpoch();
     (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
       validator,
       signerPk
@@ -1084,7 +1074,6 @@ contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest {
   }
 
   function test_Emits_ValidatorRegisteredEvent() public {
-    _whenL2WithEpoch();
     (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
       validator,
       signerPk
@@ -1101,7 +1090,6 @@ contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest {
   }
 
   function test_Reverts_WhenAccountAlreadyRegisteredAsValidator() public {
-    _whenL2WithEpoch();
     bytes memory _registeredEcdsaPubKey = _registerValidatorWithSignerHelper_noBls();
     vm.prank(validator);
     vm.expectRevert("Already registered");
@@ -1109,7 +1097,6 @@ contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest {
   }
 
   function test_Reverts_WhenAccountAlreadyRegisteredAsValidatorGroup() public {
-    _whenL2WithEpoch();
     _registerValidatorGroupHelper(validator, 1);
     vm.prank(validator);
     vm.expectRevert("Already registered");
@@ -1119,7 +1106,6 @@ contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest {
   }
 
   function test_Reverts_WhenAccountDoesNotMeetLockedGoldRequirements() public {
-    _whenL2WithEpoch();
     lockedGold.setAccountTotalLockedGold(
       validator,
       originalValidatorLockedGoldRequirements.value.sub(11)
