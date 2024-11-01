@@ -946,7 +946,7 @@ contract ValidatorsTest_RegisterValidator_L2 is TransitionToL2AfterL1 {
   }
 }
 
-contract ValidatorsTest_RegisterValidator_NoBls is ValidatorsTest {
+contract ValidatorsTest_RegisterValidatorNoBls is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
