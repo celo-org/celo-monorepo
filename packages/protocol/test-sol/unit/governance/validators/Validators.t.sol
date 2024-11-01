@@ -526,14 +526,6 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
     assertEq(actual, commissionUpdateDelay, "Wrong commissionUpdateDelay.");
   }
 
-  function test_ShouldsetCommissionUpdateDelay_WhenL2() public {
-    _whenL2WithEpoch();
-    validators.setCommissionUpdateDelay(5);
-
-    uint256 actual = validators.getCommissionUpdateDelay();
-    assertEq(actual, 5, "Wrong commissionUpdateDelay.");
-  }
-
   function test_shouldHaveSetDowntimeGracePeriod() public {
     uint256 actual = validators.downtimeGracePeriod();
     assertEq(actual, downtimeGracePeriod, "Wrong downtimeGracePeriod.");
@@ -545,6 +537,20 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
     validators.setDowntimeGracePeriod(downtimeGracePeriod);
   }
 }
+
+contract ValidatorsTest_setCommissionUpdateDelay is ValidatorsTest {
+  function test_shouldSetCommissionUpdateDelay() public {
+    validators.setCommissionUpdateDelay(5);
+
+    uint256 actual = validators.getCommissionUpdateDelay();
+    assertEq(actual, 5, "Wrong commissionUpdateDelay.");
+  }
+}
+
+contract ValidatorsTest_setCommissionUpdateDelay_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_setCommissionUpdateDelay
+{}
 
 contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
   uint256 newLength = membershipHistoryLength + 1;
