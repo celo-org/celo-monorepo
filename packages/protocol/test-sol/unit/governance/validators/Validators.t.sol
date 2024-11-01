@@ -1359,7 +1359,7 @@ contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirement
   ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirements
 {}
 
-contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup is
+contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup_Setup is
   ValidatorsTest
 {
   address otherGroup;
@@ -1382,7 +1382,11 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
     vm.prank(validator);
     validators.affiliate(group);
   }
+}
 
+contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup is
+  ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup_Setup
+{
   function test_ShouldSetAffiliate_WhenValidatorNotMemberOfThatValidatorGroup() public {
     vm.prank(validator);
     validators.affiliate(otherGroup);
@@ -1475,29 +1479,32 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
 
     assertTrue(election.isIneligible(group));
   }
+}
 
+contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup_L1 is
+  ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup_Setup
+{
   function _performAffiliation() internal {
     vm.prank(validator);
     validators.affiliate(group);
   }
 
-  function test_ShouldNotTryToSendValidatorPayment_WhenL1() public {
+  function test_ShouldNotTryToSendValidatorPayment() public {
     assertDoesNotEmit(_performAffiliation, "SendValidatorPaymentCalled(address)");
-  }
-
-  function test_ShouldSendValidatorPayment_WhenL2() public {
-    _whenL2WithEpoch();
-    vm.expectEmit(true, true, true, true);
-    emit SendValidatorPaymentCalled(validator);
-    vm.prank(validator);
-    validators.affiliate(group);
   }
 }
 
 contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup_L2 is
   TransitionToL2AfterL1,
   ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup
-{}
+{
+  function test_ShouldSendValidatorPayment() public {
+    vm.expectEmit(true, true, true, true);
+    emit SendValidatorPaymentCalled(validator);
+    vm.prank(validator);
+    validators.affiliate(group);
+  }
+}
 
 contract ValidatorsTest_Deaffiliate is ValidatorsTest {
   uint256 additionEpoch;
