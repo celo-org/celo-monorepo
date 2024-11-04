@@ -1718,7 +1718,7 @@ contract ValidatorsTest_UpdateEcdsaPublicKey_L2 is
   ValidatorsTest_UpdateEcdsaPublicKey
 {}
 
-contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
+contract ValidatorsTest_UpdatePublicKeys_Setup is ValidatorsTest {
   bytes validatorEcdsaPubKey;
 
   bytes public constant newBlsPublicKey =
@@ -1742,7 +1742,9 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
 
     validatorEcdsaPubKey = _registerValidatorHelper(validator, validatorPk);
   }
+}
 
+contract ValidatorsTest_UpdatePublicKeys_L1 is ValidatorsTest_UpdatePublicKeys_Setup {
   function test_ShouldSetValidatorNewBlsPubKeyAndEcdsaPubKey_WhenCalledByRegisteredAccountsContract()
     public
   {
@@ -1835,9 +1837,13 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
     vm.prank(validator);
     validators.updatePublicKeys(validator, signer, _newEcdsaPubKey, newBlsPublicKey, newBlsPop);
   }
+}
 
-  function test_Reverts_WhenL2() public {
-    _whenL2WithEpoch();
+contract ValidatorsTest_UpdatePublicKeys_L2 is
+  ValidatorsTest_UpdatePublicKeys_Setup,
+  TransitionToL2AfterL1
+{
+  function test_Reverts() public {
     (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
       address(accounts),
       signerPk
