@@ -2823,10 +2823,10 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
     vm.expectRevert("Uptime cannot be larger than one");
     validators.calculateEpochScore(uptime.unwrap());
   }
+}
 
+contract ValidatorsTest_CalculateEpochScore_L2 is ValidatorsTest, TransitionToL2AfterL1 {
   function test_Reverts_WhenL2() public {
-    _whenL2WithEpoch();
-
     vm.expectRevert("This method is no longer supported in L2.");
     validators.calculateEpochScore(1);
   }
