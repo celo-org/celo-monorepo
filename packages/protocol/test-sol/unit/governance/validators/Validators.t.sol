@@ -3208,7 +3208,7 @@ contract ValidatorsTest_UpdateMembershipHistory_L2 is
   ValidatorsTest_UpdateMembershipHistory
 {}
 
-contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
+contract ValidatorsTest_GetMembershipInLastEpoch_Setup is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
@@ -3219,7 +3219,9 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
       _registerValidatorGroupHelper(vm.addr(i), 1);
     }
   }
+}
 
+contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest_GetMembershipInLastEpoch_Setup {
   function test_ShouldAlwaysReturnCorrectMembershipForLastEpoch_WhenChangingMoreTimesThanMembershipHistoryLength()
     public
   {
@@ -3238,33 +3240,35 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
       }
     }
   }
+}
 
+contract ValidatorsTest_GetMembershipInLastEpoch_L1 is
+  ValidatorsTest_GetMembershipInLastEpoch_Setup
+{
   function test_MaintainsMembershipAfterL2Transition() public {
-    if (isL2()) {} else {
-      address lastValidatorGroup;
-      address nextValidatorGroup;
-      for (uint256 i = 0; i < membershipHistoryLength.add(1); i++) {
-        blockTravel(ph.epochSize());
+    address lastValidatorGroup;
+    address nextValidatorGroup;
+    for (uint256 i = 0; i < membershipHistoryLength.add(1); i++) {
+      blockTravel(ph.epochSize());
 
-        vm.prank(validator);
-        validators.affiliate(vm.addr(i + 1));
-        vm.prank(vm.addr(i + 1));
-        validators.addFirstMember(validator, address(0), address(0));
+      vm.prank(validator);
+      validators.affiliate(vm.addr(i + 1));
+      vm.prank(vm.addr(i + 1));
+      validators.addFirstMember(validator, address(0), address(0));
 
-        if (i == 0) {
-          assertEq(validators.getMembershipInLastEpoch(validator), address(0));
-        } else {
-          lastValidatorGroup = vm.addr(i);
-          nextValidatorGroup = vm.addr(i + 1);
-          assertEq(validators.getMembershipInLastEpoch(validator), vm.addr(i));
-        }
+      if (i == 0) {
+        assertEq(validators.getMembershipInLastEpoch(validator), address(0));
+      } else {
+        lastValidatorGroup = vm.addr(i);
+        nextValidatorGroup = vm.addr(i + 1);
+        assertEq(validators.getMembershipInLastEpoch(validator), vm.addr(i));
       }
-
-      _whenL2WithEpoch();
-      assertEq(validators.getMembershipInLastEpoch(validator), lastValidatorGroup);
-      epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + 1);
-      assertEq(validators.getMembershipInLastEpoch(validator), nextValidatorGroup);
     }
+
+    _whenL2WithEpoch();
+    assertEq(validators.getMembershipInLastEpoch(validator), lastValidatorGroup);
+    epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + 1);
+    assertEq(validators.getMembershipInLastEpoch(validator), nextValidatorGroup);
   }
 }
 
