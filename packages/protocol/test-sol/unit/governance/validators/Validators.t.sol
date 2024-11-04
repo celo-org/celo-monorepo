@@ -3917,6 +3917,11 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
   }
 }
 
+contract ValidatorsTest_GroupMembershipInEpoch_L2 is
+  ValidatorsTest_GroupMembershipInEpoch,
+  TransitionToL2AfterL1
+{}
+
 contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
   function setUp() public {
     super.setUp();
