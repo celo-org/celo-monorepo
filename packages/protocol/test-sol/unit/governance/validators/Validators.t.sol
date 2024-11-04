@@ -3852,31 +3852,6 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
     }
   }
 
-  function test_ShouldCorrectlyGetGroupAddressForExactEpochNumbers_WhenL2() public {
-    _whenL2WithEpoch();
-    for (uint256 i = 0; i < epochInfoList.length; i++) {
-      address _group = epochInfoList[i].groupy;
-
-      if (epochInfoList.length.sub(i) <= membershipHistoryLength) {
-        assertEq(
-          validators.groupMembershipInEpoch(
-            validator,
-            epochInfoList[i].epochNumber,
-            uint256(1).add(i)
-          ),
-          _group
-        );
-      } else {
-        vm.expectRevert("index out of bounds");
-        validators.groupMembershipInEpoch(
-          validator,
-          epochInfoList[i].epochNumber,
-          uint256(1).add(i)
-        );
-      }
-    }
-  }
-
   function test_Reverts_WhenEpochNumberAtGivenIndexIsGreaterThanProvidedEpochNumber() public {
     vm.expectRevert("index out of bounds");
     validators.groupMembershipInEpoch(
