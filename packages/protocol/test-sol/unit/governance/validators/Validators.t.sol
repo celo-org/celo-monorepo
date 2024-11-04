@@ -2611,7 +2611,7 @@ contract ValidatorsTest_SetNextCommissionUpdate_L2 is
   ValidatorsTest_SetNextCommissionUpdate
 {}
 
-contract ValidatorsTest_UpdateCommission is ValidatorsTest {
+contract ValidatorsTest_UpdateCommission_Setup is ValidatorsTest {
   uint256 newCommission = commission.unwrap().add(1);
 
   function setUp() public {
@@ -2633,7 +2633,9 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
     require(_affiliation1 == group, "Affiliation failed.");
     require(_affiliation2 == group, "Affiliation failed.");
   }
+}
 
+contract ValidatorsTest_UpdateCommission is ValidatorsTest_UpdateCommission_Setup {
   function test_ShouldSetValidatorGroupCommission() public {
     vm.prank(group);
     validators.setNextCommissionUpdate(newCommission);
@@ -2690,14 +2692,30 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
     vm.prank(group);
     validators.updateCommission();
   }
+}
 
-  function test_ShouldNotTryTodSendMultipleValidatorPayments_WhenL1() public {
-    vm.prank(validator);
-    validators.affiliate(group);
-    Vm.Log[] memory entries = vm.getRecordedLogs();
-    assertEq(entries.length, 0);
+contract ValidatorsTest_UpdateCommission_L1 is ValidatorsTest_UpdateCommission_Setup {
+  function _performCommissionUpdate() internal {
+    vm.prank(group);
+    validators.addFirstMember(validator, address(0), address(0));
+
+    vm.prank(group);
+    validators.setNextCommissionUpdate(newCommission);
+    blockTravel(commissionUpdateDelay);
+
+    vm.prank(group);
+    validators.updateCommission();
   }
 
+  function test_ShouldNotTryTodSendMultipleValidatorPayments_WhenL1() public {
+    assertDoesNotEmit(_performCommissionUpdate, "SendValidatorPaymentCalled(address)");
+  }
+}
+
+contract ValidatorsTest_UpdateCommission_L2 is
+  TransitionToL2AfterL1,
+  ValidatorsTest_UpdateCommission
+{
   function test_ShouldSendMultipleValidatorPayments_WhenL2() public {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
@@ -2707,7 +2725,6 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
     validators.setNextCommissionUpdate(newCommission);
     blockTravel(commissionUpdateDelay);
 
-    _whenL2WithEpoch();
     vm.expectEmit(true, true, true, true);
     emit SendValidatorPaymentCalled(validator);
     vm.expectEmit(true, true, true, true);
@@ -2716,11 +2733,6 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
     validators.updateCommission();
   }
 }
-
-contract ValidatorsTest_UpdateCommission_L2 is
-  TransitionToL2AfterL1,
-  ValidatorsTest_UpdateCommission
-{}
 
 contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
   function setUp() public {
