@@ -2985,8 +2985,7 @@ contract ValidatorsTest_CalculateGroupEpochScore_L2 is
   ValidatorsTest_CalculateGroupEpochScore_Setup,
   TransitionToL2AfterL1
 {
-  function test_Reverts_WhenL2() public {
-    _whenL2WithEpoch();
+  function test_Reverts() public {
     FixidityLib.Fraction[] memory uptimes = new FixidityLib.Fraction[](5);
     uptimes[0] = FixidityLib.newFixedFraction(9, 10);
     uptimes[1] = FixidityLib.newFixedFraction(9, 10);
