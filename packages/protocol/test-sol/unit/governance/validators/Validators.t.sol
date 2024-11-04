@@ -1855,7 +1855,7 @@ contract ValidatorsTest_UpdatePublicKeys_L2 is
   }
 }
 
-contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
+contract ValidatorsTest_UpdateBlsPublicKey_Setup is ValidatorsTest {
   bytes validatorEcdsaPubKey;
 
   bytes public constant newBlsPublicKey =
@@ -1891,7 +1891,9 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
 
     validatorEcdsaPubKey = _registerValidatorHelper(validator, validatorPk);
   }
+}
 
+contract ValidatorsTest_UpdateBlsPublicKey_L1 is ValidatorsTest_UpdateBlsPublicKey_Setup {
   function test_ShouldSetNewValidatorBlsPubKey() public {
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
@@ -1940,10 +1942,13 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
     vm.prank(validator);
     validators.updateBlsPublicKey(newBlsPublicKey, wrongBlsPop);
   }
+}
 
-  function test_Reverts_WhenL2() public {
-    _whenL2WithEpoch();
-
+contract ValidatorsTest_UpdateBlsPublicKey_L2 is
+  ValidatorsTest_UpdateBlsPublicKey_Setup,
+  TransitionToL2AfterL1
+{
+  function test_Reverts() public {
     vm.expectRevert("This method is no longer supported in L2.");
 
     vm.prank(validator);
