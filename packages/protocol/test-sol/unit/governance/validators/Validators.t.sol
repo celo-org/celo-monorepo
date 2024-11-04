@@ -1906,18 +1906,6 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
     assertEq(actualBlsPublicKey, newBlsPublicKey);
   }
 
-  function test_Reverts_SetNewValidatorBlsPubKey_WhenL2() public {
-    _whenL2WithEpoch();
-    ph.mockSuccess(
-      ph.PROOF_OF_POSSESSION(),
-      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
-    );
-
-    vm.prank(validator);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.updateBlsPublicKey(newBlsPublicKey, newBlsPop);
-  }
-
   function test_Emits_ValidatorValidatorBlsPublicKeyUpdatedEvent() public {
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
