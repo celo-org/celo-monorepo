@@ -3918,11 +3918,6 @@ contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
     }
   }
 
-  function test_ShouldHalveslashingMultiplier_WhenL2() public {
-    _whenL2WithEpoch();
-    test_ShouldHalveslashingMultiplier();
-  }
-
   function test_ShouldUpdateLastSlashedTimestamp() public {
     (, , , , , , uint256 initialLastSlashed) = validators.getValidatorGroup(group);
 
@@ -3938,6 +3933,11 @@ contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
     validators.halveSlashingMultiplier(group);
   }
 }
+
+contract ValidatorsTest_HalveSlashingMultiplier_L2 is
+  ValidatorsTest_HalveSlashingMultiplier,
+  TransitionToL2AfterL1
+{}
 
 contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
   function setUp() public {
