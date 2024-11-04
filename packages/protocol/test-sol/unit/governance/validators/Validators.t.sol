@@ -2999,7 +2999,7 @@ contract ValidatorsTest_CalculateGroupEpochScore_L2 is
   }
 }
 
-contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
+contract ValidatorsTest_UpdateValidatorScoreFromSigner_Setup is ValidatorsTest {
   FixidityLib.Fraction public gracePeriod;
   FixidityLib.Fraction public uptime;
   uint256 public _epochScore;
@@ -3027,7 +3027,11 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
       abi.encodePacked(_epochScore, FixidityLib.fixed1().unwrap())
     );
   }
+}
 
+contract ValidatorsTest_UpdateValidatorScoreFromSigner_L1 is
+  ValidatorsTest_UpdateValidatorScoreFromSigner_Setup
+{
   function test_ShouldUpdateValidatorScore_WhenUptimeInRange0And1() public {
     uint256 _expectedScore = FixidityLib
       .multiply(
@@ -3081,9 +3085,13 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
     vm.expectRevert("Uptime cannot be larger than one");
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
   }
+}
 
+contract ValidatorsTest_UpdateValidatorScoreFromSigner is
+  ValidatorsTest_UpdateValidatorScoreFromSigner_Setup,
+  TransitionToL2AfterL1
+{
   function test_Reverts_WhenL2() public {
-    _whenL2WithEpoch();
     vm.expectRevert("This method is no longer supported in L2.");
 
     vm.prank(address(0));
