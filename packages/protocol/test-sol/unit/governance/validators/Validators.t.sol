@@ -580,13 +580,6 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
     validators.setMembershipHistoryLength(newLength);
   }
 
-  function test_Emits_MembershipHistoryLengthSet_WhenL2() public {
-    _whenL2WithEpoch();
-    vm.expectEmit(true, true, true, true);
-    emit MembershipHistoryLengthSet(newLength);
-    validators.setMembershipHistoryLength(newLength);
-  }
-
   function test_Reverts_WhenCalledByNonOwner() public {
     vm.prank(nonOwner);
     vm.expectRevert("Ownable: caller is not the owner");
@@ -603,13 +596,6 @@ contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
   uint256 newSize = maxGroupSize + 1;
 
   event MaxGroupSizeSet(uint256 size);
-
-  function test_Emits_MaxGroupSizeSet_WhenL2() public {
-    _whenL2WithEpoch();
-    vm.expectEmit(true, true, true, true);
-    emit MaxGroupSizeSet(newSize);
-    validators.setMaxGroupSize(newSize);
-  }
 
   function test_Emits_MaxGroupSizeSet() public {
     vm.expectEmit(true, true, true, true);
@@ -1768,25 +1754,6 @@ contract ValidatorsTest_UpdatePublicKeys_L1 is ValidatorsTest_UpdatePublicKeys_S
     assertEq(actualBlsPublicKey, newBlsPublicKey);
   }
 
-  function test_Reverts_SetValidatorNewBlsPubKeyAndEcdsaPubKey_WhenCalledByRegisteredAccountsContract_WhenL2()
-    public
-  {
-    _whenL2WithEpoch();
-    (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
-      address(accounts),
-      signerPk
-    );
-
-    ph.mockSuccess(
-      ph.PROOF_OF_POSSESSION(),
-      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
-    );
-
-    vm.prank(address(accounts));
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.updatePublicKeys(validator, signer, _newEcdsaPubKey, newBlsPublicKey, newBlsPop);
-  }
-
   function test_Emits_ValidatorEcdsaPublicKeyUpdatedAndValidatorBlsPublicKeyUpdatedEvent_WhenCalledByRegisteredAccountsContract()
     public
   {
@@ -1979,12 +1946,6 @@ contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
   }
 
   function test_ShouldMarkAccountAsValidatorGroup() public {
-    _registerValidatorGroupHelper(group, 1);
-    assertTrue(validators.isValidatorGroup(group));
-  }
-
-  function test_WhenInL2_ShouldMarkAccountAsValidatorGroup() public {
-    _whenL2WithEpoch();
     _registerValidatorGroupHelper(group, 1);
     assertTrue(validators.isValidatorGroup(group));
   }
