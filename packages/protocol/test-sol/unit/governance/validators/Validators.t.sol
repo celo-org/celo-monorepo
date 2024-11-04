@@ -217,7 +217,7 @@ contract ValidatorsTest is Test, Utils, ECDSAHelper {
 
   function _whenL2WithEpoch() public {
     uint256 l1EpochNumber = IPrecompiles(address(validators)).getEpochNumber();
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+    _whenL2();
 
     address[] memory _elected = new address[](2);
     _elected[0] = validator;
