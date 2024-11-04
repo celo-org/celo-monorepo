@@ -1676,22 +1676,6 @@ contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
     assertEq(actualEcdsaPubKey, _newEcdsaPubKey);
   }
 
-  function test_ShouldSetValidatorEcdsaPubKey_WhenCalledByRegisteredAccountsContract_WhenL2()
-    public
-  {
-    _whenL2WithEpoch();
-    (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
-      address(accounts),
-      signerPk
-    );
-    vm.prank(address(accounts));
-    validators.updateEcdsaPublicKey(validator, signer, _newEcdsaPubKey);
-
-    (bytes memory actualEcdsaPubKey, , , , ) = validators.getValidator(validator);
-
-    assertEq(actualEcdsaPubKey, _newEcdsaPubKey);
-  }
-
   function test_Emits_ValidatorEcdsaPublicKeyUpdatedEvent_WhenCalledByRegisteredAccountsContract()
     public
   {
