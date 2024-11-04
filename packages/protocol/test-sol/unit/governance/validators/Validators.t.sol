@@ -1506,7 +1506,7 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
   }
 }
 
-contract ValidatorsTest_Deaffiliate is ValidatorsTest {
+contract ValidatorsTest_Deaffiliate_Setup is ValidatorsTest {
   uint256 additionEpoch;
   uint256 deaffiliationEpoch;
 
@@ -1522,7 +1522,9 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
 
     require(_affiliation == group, "Affiliation failed.");
   }
+}
 
+contract ValidatorsTest_Deaffiliate is ValidatorsTest_Deaffiliate_Setup {
   function test_ShouldClearAffiliate() public {
     vm.prank(validator);
     validators.deaffiliate();
@@ -1629,24 +1631,27 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
     validators.deaffiliate();
     assertTrue(election.isIneligible(group));
   }
+}
 
-  function test_ShouldNotTryToSendValidatorPayment_WhenL1() public {
+contract ValidatorsTest_Deaffiliate_L1 is ValidatorsTest_Deaffiliate_Setup {
+  function _performDeaffiliation() internal {
     vm.prank(validator);
-    validators.affiliate(group);
-    Vm.Log[] memory entries = vm.getRecordedLogs();
-    assertEq(entries.length, 0);
+    validators.deaffiliate();
   }
 
-  function test_ShouldSendValidatorPayment_WhenL2() public {
-    _whenL2WithEpoch();
+  function test_ShouldNotTryToSendValidatorPayment() public {
+    assertDoesNotEmit(_performDeaffiliation, "SendValidatorPaymentCalled(address)");
+  }
+}
+
+contract ValidatorsTest_Deaffiliate_L2 is ValidatorsTest_Deaffiliate, TransitionToL2AfterL1 {
+  function test_ShouldSendValidatorPayment() public {
     vm.expectEmit(true, true, true, true);
     emit SendValidatorPaymentCalled(validator);
     vm.prank(validator);
     validators.deaffiliate();
   }
 }
-
-contract ValidatorsTest_Deaffiliate_L2 is TransitionToL2AfterL1, ValidatorsTest_Deaffiliate {}
 
 contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
   bytes validatorEcdsaPubKey;
