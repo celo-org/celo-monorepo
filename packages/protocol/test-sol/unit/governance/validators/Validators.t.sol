@@ -955,7 +955,6 @@ contract ValidatorsTest_RegisterValidatorNoBls is ValidatorsTest {
     vm.expectRevert("This method is not supported in L1.");
     vm.prank(validator);
     validators.registerValidatorNoBls(_ecdsaPubKey);
-    validatorRegistrationEpochNumber = _getEpochNumberBasedOnLayer();
   }
 }
 
