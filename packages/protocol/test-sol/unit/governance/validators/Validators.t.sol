@@ -10,12 +10,9 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 
-import "@celo-contracts/governance/Election.sol";
-import "@celo-contracts/governance/LockedGold.sol";
 import "@celo-contracts/governance/interfaces/IValidators.sol";
 
 import "@celo-contracts/stability/test/MockStableToken.sol";
@@ -23,7 +20,6 @@ import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 
-import "@test-sol/unit/common/mocks/MockEpochManager.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
 import { Utils } from "@test-sol/utils.sol";
 
