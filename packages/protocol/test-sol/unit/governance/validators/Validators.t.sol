@@ -3698,26 +3698,25 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner_L2 is
   }
 }
 
-contract ValidatorsTest_MintStableToEpochManager is ValidatorsTest {
+contract ValidatorsTest_MintStableToEpochManager_L1 is ValidatorsTest {
   function test_Reverts_WhenL1() public {
     vm.expectRevert("This method is not supported in L1.");
     validators.mintStableToEpochManager(5);
   }
+}
 
+contract ValidatorsTest_MintStableToEpochManager_L2 is ValidatorsTest, TransitionToL2AfterL1 {
   function test_Reverts_WhenCalledByOtherThanEpochManager() public {
-    _whenL2WithEpoch();
     vm.expectRevert("only registered contract");
     validators.mintStableToEpochManager(5);
   }
 
   function test_WhenMintAmountIsZero() public {
-    _whenL2WithEpoch();
     vm.prank(address(epochManager));
     validators.mintStableToEpochManager(0);
   }
 
   function test_ShouldMintStableToEpochManager() public {
-    _whenL2WithEpoch();
     vm.prank(address(epochManager));
     validators.mintStableToEpochManager(5);
     assertEq(stableToken.balanceOf(address(epochManager)), 5);
