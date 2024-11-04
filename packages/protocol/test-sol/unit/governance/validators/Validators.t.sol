@@ -2794,7 +2794,7 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_CalculateEpochScore_L2 is ValidatorsTest, TransitionToL2AfterL1 {
+contract ValidatorsTest_CalculateEpochScore_L2 is TransitionToL2AfterL1 {
   function test_Reverts_WhenL2() public {
     vm.expectRevert("This method is no longer supported in L2.");
     validators.calculateEpochScore(1);
@@ -3655,10 +3655,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_DistributeEpochPaymentsFromSigner_L2 is
-  ValidatorsTest,
-  TransitionToL2AfterL1
-{
+contract ValidatorsTest_DistributeEpochPaymentsFromSigner_L2 is TransitionToL2AfterL1 {
   function test_Reverts_WhenL2() public {
     vm.prank(address(0));
     vm.expectRevert("This method is no longer supported in L2.");
@@ -3673,7 +3670,7 @@ contract ValidatorsTest_MintStableToEpochManager_L1 is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_MintStableToEpochManager_L2 is ValidatorsTest, TransitionToL2AfterL1 {
+contract ValidatorsTest_MintStableToEpochManager_L2 is TransitionToL2AfterL1 {
   function test_Reverts_WhenCalledByOtherThanEpochManager() public {
     vm.expectRevert("only registered contract");
     validators.mintStableToEpochManager(5);
