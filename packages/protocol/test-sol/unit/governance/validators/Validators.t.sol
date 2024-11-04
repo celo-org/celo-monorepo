@@ -2832,7 +2832,7 @@ contract ValidatorsTest_CalculateEpochScore_L2 is ValidatorsTest, TransitionToL2
   }
 }
 
-contract ValidatorsTest_CalculateGroupEpochScore is ValidatorsTest {
+contract ValidatorsTest_CalculateGroupEpochScore_Setup is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
@@ -2874,7 +2874,11 @@ contract ValidatorsTest_CalculateGroupEpochScore is ValidatorsTest {
 
     return (unwrapedUptimes, expectedScore);
   }
+}
 
+contract ValidatorsTest_CalculateGroupEpochScore_L1 is
+  ValidatorsTest_CalculateGroupEpochScore_Setup
+{
   function test_ShouldCalculateGroupScoreCorrectly_WhenThereIs1ValidatorGroup() public {
     FixidityLib.Fraction[] memory uptimes = new FixidityLib.Fraction[](1);
     uptimes[0] = FixidityLib.newFixedFraction(969, 1000);
@@ -2975,7 +2979,12 @@ contract ValidatorsTest_CalculateGroupEpochScore is ValidatorsTest {
     vm.expectRevert("Uptime cannot be larger than one");
     validators.calculateGroupEpochScore(unwrapedUptimes);
   }
+}
 
+contract ValidatorsTest_CalculateGroupEpochScore_L2 is
+  ValidatorsTest_CalculateGroupEpochScore_Setup,
+  TransitionToL2AfterL1
+{
   function test_Reverts_WhenL2() public {
     _whenL2WithEpoch();
     FixidityLib.Fraction[] memory uptimes = new FixidityLib.Fraction[](5);
