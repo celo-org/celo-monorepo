@@ -3488,13 +3488,6 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
   }
 
-  function test_Reverts_WhenL2() public {
-    _whenL2WithEpoch();
-    vm.prank(address(0));
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
-  }
-
   function test_ShouldPayValidator_WhenValidatorAndGroupMeetBalanceRequirements() public {
     vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
@@ -3691,6 +3684,17 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
 
     vm.prank(address(0));
     assertEq(validators.distributeEpochPaymentsFromSigner(validator, maxPayment), 0);
+  }
+}
+
+contract ValidatorsTest_DistributeEpochPaymentsFromSigner_L2 is
+  ValidatorsTest,
+  TransitionToL2AfterL1
+{
+  function test_Reverts_WhenL2() public {
+    vm.prank(address(0));
+    vm.expectRevert("This method is no longer supported in L2.");
+    validators.distributeEpochPaymentsFromSigner(validator, 100);
   }
 }
 
