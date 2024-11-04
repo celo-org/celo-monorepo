@@ -3290,11 +3290,6 @@ contract ValidatorsTest_GetTopGroupValidators is ValidatorsTest {
     assertEq(_validatorSigner[1], accounts.getValidatorSigner(vm.addr(1)));
     assertFalse(_validatorSigner[0] == validator);
   }
-
-  function test_ShouldReturnTheSigner_WhenL2() public {
-    _whenL2WithEpoch();
-    test_ShouldReturnTheSigner();
-  }
 }
 
 contract ValidatorsTest_GetTopGroupValidators_L2 is
