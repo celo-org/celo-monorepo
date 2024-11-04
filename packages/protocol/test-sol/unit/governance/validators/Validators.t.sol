@@ -700,7 +700,7 @@ contract ValidatorsTest_SetValidatorLockedGoldRequirements_L2 is
   ValidatorsTest_SetValidatorLockedGoldRequirements
 {}
 
-contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
+contract ValidatorsTest_SetValidatorScoreParameters_Setup is ValidatorsTest {
   ValidatorScoreParameters newParams =
     ValidatorScoreParameters({
       exponent: originalValidatorScoreParameters.exponent + 1,
@@ -708,18 +708,16 @@ contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
     });
 
   event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
+}
 
+contract ValidatorsTest_SetValidatorScoreParameters_L1 is
+  ValidatorsTest_SetValidatorScoreParameters_Setup
+{
   function test_ShouldSetExponentAndAdjustmentSpeed() public {
     validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
     (uint256 _exponent, uint256 _adjustmentSpeed) = validators.getValidatorScoreParameters();
     assertEq(_exponent, newParams.exponent, "Incorrect Exponent");
     assertEq(_adjustmentSpeed, newParams.adjustmentSpeed.unwrap(), "Incorrect AdjustmentSpeed");
-  }
-
-  function test_Reverts_SetExponentAndAdjustmentSpeed_WhenL2() public {
-    _whenL2WithEpoch();
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
   }
 
   function test_Emits_ValidatorScoreParametersSet() public {
@@ -740,6 +738,16 @@ contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
       originalValidatorScoreParameters.exponent,
       originalValidatorScoreParameters.adjustmentSpeed.unwrap()
     );
+  }
+}
+
+contract ValidatorsTest_SetValidatorScoreParameters_L2 is
+  ValidatorsTest_SetValidatorScoreParameters_Setup,
+  TransitionToL2AfterL1
+{
+  function test_Reverts() public {
+    vm.expectRevert("This method is no longer supported in L2.");
+    validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
   }
 }
 
