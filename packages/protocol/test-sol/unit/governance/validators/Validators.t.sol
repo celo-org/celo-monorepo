@@ -3723,7 +3723,7 @@ contract ValidatorsTest_MintStableToEpochManager_L2 is ValidatorsTest, Transitio
   }
 }
 
-contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
+contract ValidatorsTest_ForceDeaffiliateIfValidator_Setup is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
@@ -3735,7 +3735,11 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
 
     lockedGold.addSlasherTest(paymentDelegatee);
   }
+}
 
+contract ValidatorsTest_ForceDeaffiliateIfValidator is
+  ValidatorsTest_ForceDeaffiliateIfValidator_Setup
+{
   function test_ShouldSucceed_WhenSenderIsWhitelistedSlashingAddress() public {
     vm.prank(paymentDelegatee);
     validators.forceDeaffiliateIfValidator(validator);
@@ -3747,22 +3751,30 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
     vm.expectRevert("Only registered slasher can call");
     validators.forceDeaffiliateIfValidator(validator);
   }
+}
+
+contract ValidatorsTest_ForceDeaffiliateIfValidator_L1 is
+  ValidatorsTest_ForceDeaffiliateIfValidator_Setup
+{
+  function _performForcedDeaffiliation() internal {
+    vm.prank(paymentDelegatee);
+    validators.forceDeaffiliateIfValidator(validator);
+  }
 
   function test_ShouldNotTryToSendValidatorPayment_WhenL1() public {
-    vm.prank(validator);
-    validators.affiliate(group);
-    Vm.Log[] memory entries = vm.getRecordedLogs();
-    assertEq(entries.length, 0);
+    assertDoesNotEmit(_performForcedDeaffiliation, "SendValidatorPaymentCalled(address)");
   }
+}
 
+contract ValidatorsTest_ForceDeaffiliateIfValidator_L2 is
+  ValidatorsTest_ForceDeaffiliateIfValidator,
+  TransitionToL2AfterL1
+{
   function test_ShouldSendValidatorPayment_WhenL2() public {
-    _whenL2WithEpoch();
-    test_ShouldNotTryToSendValidatorPayment_WhenL1();
-  }
-
-  function test_ShouldSucceed_WhenSenderIsWhitelistedSlashingAddress_L2() public {
-    _whenL2WithEpoch();
-    test_ShouldSucceed_WhenSenderIsWhitelistedSlashingAddress();
+    vm.expectEmit(true, true, true, true);
+    emit SendValidatorPaymentCalled(validator);
+    vm.prank(paymentDelegatee);
+    validators.forceDeaffiliateIfValidator(validator);
   }
 }
 
