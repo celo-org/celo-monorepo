@@ -2641,7 +2641,7 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest_UpdateCommission_Setu
     validators.updateCommission();
   }
 
-  function test_Reverts_WhennoCommissionHasBeenQueued() public {
+  function test_Reverts_WhenNoCommissionHasBeenQueued() public {
     vm.expectRevert("No commission update queued");
 
     vm.prank(group);
