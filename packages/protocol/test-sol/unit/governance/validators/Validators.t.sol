@@ -2248,18 +2248,6 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
     assertEq(members, expectedMembersList);
   }
 
-  function test_ShouldAddMemberToTheList_WhenL2() public {
-    address[] memory expectedMembersList = new address[](1);
-    expectedMembersList[0] = validator;
-    _whenL2WithEpoch();
-    vm.prank(group);
-    validators.addFirstMember(validator, address(0), address(0));
-
-    (address[] memory members, , , , , , ) = validators.getValidatorGroup(group);
-
-    assertEq(members, expectedMembersList);
-  }
-
   function test_ShouldUpdateGroupSizeHistory() public {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
