@@ -3970,18 +3970,6 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
     assertEq(actualMultiplier, FixidityLib.fixed1().unwrap());
   }
 
-  function test_ShouldReturnToDefault_WhenSlashingMultiplierIsResetAfterResetPeriod_WhenL2()
-    public
-  {
-    _whenL2WithEpoch();
-    timeTravel(slashingMultiplierResetPeriod);
-
-    vm.prank(group);
-    validators.resetSlashingMultiplier();
-    (, , , , , uint256 actualMultiplier, ) = validators.getValidatorGroup(group);
-    assertEq(actualMultiplier, FixidityLib.fixed1().unwrap());
-  }
-
   function test_Reverts_WhenSlashingMultiplierIsResetBeforeResetPeriod() public {
     vm.expectRevert("`resetSlashingMultiplier` called before resetPeriod expired");
     vm.prank(group);
@@ -3997,9 +3985,9 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
     (, , , , , uint256 actualMultiplier, ) = validators.getValidatorGroup(group);
     assertEq(actualMultiplier, FixidityLib.fixed1().unwrap());
   }
-
-  function test_ShouldReadProperly_WhenSlashingResetPeriosIsUpdated_WhenL2() public {
-    _whenL2WithEpoch();
-    test_ShouldReadProperly_WhenSlashingResetPeriosIsUpdated();
-  }
 }
+
+contract ValidatorsTest_ResetSlashingMultiplier_L2 is
+  ValidatorsTest_ResetSlashingMultiplier,
+  TransitionToL2AfterL1
+{}
