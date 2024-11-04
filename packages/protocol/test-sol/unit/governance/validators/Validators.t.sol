@@ -3304,14 +3304,6 @@ contract ValidatorsTest_GetTopGroupValidatorsAccounts is ValidatorsTest {
     _registerValidatorGroupWithMembersHavingSigners(group, 5);
   }
 
-  function test_ShouldReturnTheAccount_WhenL2() public {
-    _whenL2WithEpoch();
-    address[] memory validatorAccount = validators.getTopGroupValidatorsAccounts(group, 3);
-    assertEq(validatorAccount[0], validator);
-    assertEq(validatorAccount[1], vm.addr(1));
-    assertFalse(validatorAccount[0] == accounts.getValidatorSigner(validator));
-  }
-
   function test_ShouldReturnTheAccount() public {
     address[] memory validatorAccount = validators.getTopGroupValidatorsAccounts(group, 3);
     assertEq(validatorAccount[0], validator);
@@ -3319,6 +3311,11 @@ contract ValidatorsTest_GetTopGroupValidatorsAccounts is ValidatorsTest {
     assertFalse(validatorAccount[0] == accounts.getValidatorSigner(validator));
   }
 }
+
+contract ValidatorsTest_GetTopGroupValidatorsAccounts_L2 is
+  ValidatorsTest_GetTopGroupValidatorsAccounts,
+  TransitionToL2AfterL1
+{}
 
 contract ValidatorsTest_GetEpochSize is ValidatorsTest {
   function test_ShouldReturn17280() public {
