@@ -7,7 +7,7 @@ import "@test-sol/unit/common/mocks/MockEpochManager.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 import "@celo-contracts/governance/interfaces/IValidators.sol";
-import "@celo-contracts/common/PrecompilesOverride.sol";
+import "@celo-contracts-8/common/IsL2Check.sol";
 
 contract Utils is Test, TestConstants, IsL2Check {
   using EnumerableSet for EnumerableSet.AddressSet;
