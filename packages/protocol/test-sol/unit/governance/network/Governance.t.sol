@@ -3912,6 +3912,8 @@ contract GovernanceTest_isVoting is GovernanceTest {
   }
 }
 
+contract GovernanceTest_isVoting_L2 is TransitionToL2After, GovernanceTest_isVoting {}
+
 contract GovernanceTest_isProposalPassing is GovernanceTest {
   address accSndVoter;
 
@@ -3954,6 +3956,11 @@ contract GovernanceTest_isProposalPassing is GovernanceTest {
   }
 }
 
+contract GovernanceTest_isProposalPassing_L2 is
+  TransitionToL2After,
+  GovernanceTest_isProposalPassing
+{}
+
 contract GovernanceTest_dequeueProposalsIfReady is GovernanceTest {
   function test_notUpdateLastDequeueWhenThereAreNoQueuedProposals() public {
     uint256 originalLastDequeue = governance.lastDequeue();
@@ -3986,6 +3993,11 @@ contract GovernanceTest_dequeueProposalsIfReady is GovernanceTest {
     assertEq(governance.lastDequeue(), originalLastDequeue);
   }
 }
+
+contract GovernanceTest_dequeueProposalsIfReady_L2 is
+  TransitionToL2After,
+  GovernanceTest_dequeueProposalsIfReady
+{}
 
 contract GovernanceTest_getProposalStage is GovernanceTest {
   function test_returnNoneStageWhenProposalDoesNotExists() public {
@@ -4119,6 +4131,11 @@ contract GovernanceTest_getProposalStage is GovernanceTest {
   }
 }
 
+contract GovernanceTest_getProposalStage_L2 is
+  TransitionToL2After,
+  GovernanceTest_getProposalStage
+{}
+
 contract GovernanceTest_getAmountOfGoldUsedForVoting is GovernanceTest {
   function test_showCorrectNumberOfVotes_whenVotingOn1ConcurrentProposal() public {
     makeAndApprove3ConcurrentProposals();
@@ -4246,6 +4263,11 @@ contract GovernanceTest_getAmountOfGoldUsedForVoting is GovernanceTest {
     vm.stopPrank();
   }
 }
+
+contract GovernanceTest_getAmountOfGoldUsedForVoting_L2 is
+  TransitionToL2After,
+  GovernanceTest_getAmountOfGoldUsedForVoting
+{}
 
 contract GovernanceTest_removeVotesWhenRevokingDelegatedVotes is GovernanceTest {
   uint256[] proposalIds;
