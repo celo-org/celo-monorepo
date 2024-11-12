@@ -3504,6 +3504,59 @@ contract GovernanceTest_resetHotfix is GovernanceTest {
 
   function setUp() public {
     super.setUp();
+
+    address val1 = actor("validator1");
+    governance.addValidator(val1);
+    vm.prank(val1);
+    accounts.createAccount();
+
+    // _whenL2();
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+
+    hotfixHash = governance.getHotfixHash(
+      okProp.values,
+      okProp.destinations,
+      okProp.data,
+      okProp.dataLengths,
+      SALT
+    );
+  }
+
+  function test_Reverts_whenCalledOnL1() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+
+    vm.prank(accApprover);
+    governance.approveHotfix(HOTFIX_HASH);
+
+    (bool approved, , ) = governance.getHotfixRecord(HOTFIX_HASH);
+
+    assertTrue(approved);
+
+    vm.roll(block.number + governance.getEpochSize());
+    vm.prank(actor("validator1"));
+    governance.whitelistHotfix(HOTFIX_HASH);
+
+    uint256 epoch = governance.getEpochNumber();
+
+    governance.prepareHotfix(HOTFIX_HASH);
+
+    timeTravel(DAY + 1);
+
+    vm.expectRevert("hotfix not prepared");
+    governance.resetHotFixRecord(HOTFIX_HASH);
+  }
+}
+
+contract GovernanceTest_resetHotfix_L2 is GovernanceTest {
+  bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
+  bytes32 constant SALT = 0x657ed9d64e84fa3d1af43b3a307db22aba2d90a158015df1c588c02e24ca08f0;
+  bytes32 hotfixHash;
+  event HotfixRecordReset(bytes32 indexed hash);
+
+  function setUp() public {
+    super.setUp();
     _whenL2();
     vm.prank(accOwner);
     governance.setSecurityCouncil(accCouncil);
