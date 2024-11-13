@@ -4,16 +4,15 @@ pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";
+import { Utils } from "@test-sol/utils.sol";
 
-contract AccountsTest is Test, TestConstants {
+contract AccountsTest is Utils {
   using FixidityLib for FixidityLib.Fraction;
 
-  Registry registry;
   Accounts accounts;
   MockValidators validators;
 
@@ -80,12 +79,10 @@ contract AccountsTest is Test, TestConstants {
   event PaymentDelegationSet(address indexed beneficiary, uint256 fraction);
 
   function setUp() public {
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    setupRegistry();
 
     accounts = new Accounts(true);
     validators = new MockValidators();
-
-    registry = Registry(REGISTRY_ADDRESS);
 
     registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("Accounts", address(accounts));
@@ -95,10 +92,6 @@ contract AccountsTest is Test, TestConstants {
 
     (caller, callerPK) = actorWithPK("caller");
     (caller2, caller2PK) = actorWithPK("caller2");
-  }
-
-  function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 
   function getParsedSignatureOfAddress(
@@ -224,7 +217,7 @@ contract AccountsTest_createAccount is AccountsTest {
   }
 }
 
-contract AccountsTest_createAccount_L2 is  TransitionToL2AfterL1, AccountsTest_createAccount {}
+contract AccountsTest_createAccount_L2 is TransitionToL2AfterL1, AccountsTest_createAccount {}
 
 contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
   function setUp() public {
@@ -262,7 +255,7 @@ contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
 }
 
 contract AccountsTest_setAccountDataEncryptionKey_L2 is
-   TransitionToL2AfterL1,
+  TransitionToL2AfterL1,
   AccountsTest_setAccountDataEncryptionKey
 {}
 
@@ -352,7 +345,7 @@ contract AccountsTest_setAccount is AccountsTest {
   }
 }
 
-contract AccountsTest_setAccount_L2 is  TransitionToL2AfterL1, AccountsTest_setAccount {}
+contract AccountsTest_setAccount_L2 is TransitionToL2AfterL1, AccountsTest_setAccount {}
 
 contract AccountsTest_setWalletAddress is AccountsTest {
   function setUp() public {
@@ -404,7 +397,7 @@ contract AccountsTest_setWalletAddress is AccountsTest {
   }
 }
 
-contract AccountsTest_setWalletAddress_L2 is  TransitionToL2AfterL1, AccountsTest_setWalletAddress {}
+contract AccountsTest_setWalletAddress_L2 is TransitionToL2AfterL1, AccountsTest_setWalletAddress {}
 
 contract AccountsTest_setMetadataURL is AccountsTest {
   function setUp() public {
@@ -430,7 +423,7 @@ contract AccountsTest_setMetadataURL is AccountsTest {
   }
 }
 
-contract AccountsTest_setMetadataURL_L2 is  TransitionToL2AfterL1, AccountsTest_setMetadataURL {}
+contract AccountsTest_setMetadataURL_L2 is TransitionToL2AfterL1, AccountsTest_setMetadataURL {}
 
 contract AccountsTest_batchGetMetadataURL is AccountsTest {
   function setUp() public {
@@ -631,15 +624,6 @@ contract AccountsTest_setPaymentDelegation is AccountsTest {
   }
 
   function test_ShouldSetAnAddressAndAFraction() public {
-    accounts.createAccount();
-    accounts.setPaymentDelegation(beneficiary, fraction);
-    (address realBeneficiary, uint256 realFraction) = accounts.getPaymentDelegation(address(this));
-    assertEq(realBeneficiary, beneficiary);
-    assertEq(realFraction, fraction);
-  }
-
-  function test_ShouldSetAnAddressAndAFraction_WhenL2() public {
-    _whenL2();
     accounts.createAccount();
     accounts.setPaymentDelegation(beneficiary, fraction);
     (address realBeneficiary, uint256 realFraction) = accounts.getPaymentDelegation(address(this));
