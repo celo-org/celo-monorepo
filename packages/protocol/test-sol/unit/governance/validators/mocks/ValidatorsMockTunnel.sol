@@ -38,6 +38,34 @@ contract ValidatorsMockTunnel is ForgeTest {
     uint256 _downtimeGracePeriod;
   }
 
+  // TODO move this to a generic Tunnel helper contract, add to other tunnels.
+  /*
+   * Recovers the string encoded in return data from a failing call.
+   * The data is the RLP encoding of Error(<error string>).
+   * See https://docs.soliditylang.org/en/v0.5.17/control-structures.html#revert
+   * for details.
+   */
+  function recoverErrorString(bytes memory errorData) internal returns (string memory) {
+    // Offset in `errorData` due to it starting with the signature for Error(string)
+    uint256 signatureLength = 4;
+    uint256 stringEncodingLength = errorData.length - signatureLength;
+    // Buffer to store the encoded string
+    bytes memory stringEncodingData = new bytes(stringEncodingLength);
+
+    // The string encoding should be 32-byte aligned, as per RLP encoding
+    assert(stringEncodingLength % 32 == 0);
+
+    // Start the offset at 32, since the first 32 bytes of a `bytes` variable in
+    // memory are used to store its length
+    for (uint256 offset = 32; offset <= stringEncodingLength; offset += 32) {
+      assembly {
+        mstore(add(stringEncodingData, offset), mload(add(errorData, add(signatureLength, offset))))
+      }
+    }
+    string memory errorString = abi.decode(stringEncodingData, (string));
+    return errorString;
+  }
+
   function MockInitialize(
     address sender,
     InitParams calldata params,
@@ -63,7 +91,10 @@ contract ValidatorsMockTunnel is ForgeTest {
       initParamsTunnel
     );
     vm.prank(sender);
-    (bool success, ) = address(tunnelValidators).call(data);
-    require(success, "unsuccessful tunnel call");
+    (bool success, bytes memory errorData) = address(tunnelValidators).call(data);
+    if (!success) {
+      string memory errorString = recoverErrorString(errorData);
+      require(success, errorString);
+    }
   }
 }
