@@ -222,8 +222,8 @@ contract ElectionTest_SetElectabilityThreshold is ElectionTest {
 }
 
 contract ElectionTest_SetElectabilityThreshold_L2 is
-  ElectionTest_SetElectabilityThreshold,
-  TransitionToL2After
+  TransitionToL2After,
+  ElectionTest_SetElectabilityThreshold
 {}
 
 contract ElectionTest_SetElectableValidators is ElectionTest {
@@ -267,8 +267,8 @@ contract ElectionTest_SetElectableValidators is ElectionTest {
 }
 
 contract ElectionTest_SetElectableValidators_L2 is
-  ElectionTest_SetElectableValidators,
-  TransitionToL2After
+  TransitionToL2After,
+  ElectionTest_SetElectableValidators
 {}
 
 contract ElectionTest_SetMaxNumGroupsVotedFor is ElectionTest {
@@ -298,8 +298,8 @@ contract ElectionTest_SetMaxNumGroupsVotedFor is ElectionTest {
 }
 
 contract ElectionTest_SetMaxNumGroupsVotedFor_L2 is
-  ElectionTest_SetMaxNumGroupsVotedFor,
-  TransitionToL2After
+  TransitionToL2After,
+  ElectionTest_SetMaxNumGroupsVotedFor
 {}
 
 contract ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
@@ -342,8 +342,8 @@ contract ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
 }
 
 contract ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups_L2 is
-  ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups,
-  TransitionToL2After
+  TransitionToL2After,
+  ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups
 {}
 
 contract ElectionTest_MarkGroupEligible is ElectionTest {
@@ -382,7 +382,7 @@ contract ElectionTest_MarkGroupEligible is ElectionTest {
   }
 }
 
-contract ElectionTest_MarkGroupEligible_L2 is ElectionTest_MarkGroupEligible, TransitionToL2After {}
+contract ElectionTest_MarkGroupEligible_L2 is TransitionToL2After, ElectionTest_MarkGroupEligible {}
 
 contract ElectionTest_MarkGroupInEligible is ElectionTest {
   function setUp() public {
@@ -421,8 +421,8 @@ contract ElectionTest_MarkGroupInEligible is ElectionTest {
 }
 
 contract ElectionTest_MarkGroupInEligible_L2 is
-  ElectionTest_MarkGroupInEligible,
-  TransitionToL2After
+  TransitionToL2After,
+  ElectionTest_MarkGroupInEligible
 {}
 
 contract ElectionTest_Vote_WhenGroupEligible is ElectionTest {
@@ -784,8 +784,8 @@ contract ElectionTest_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes is Electio
 }
 
 contract ElectionTest_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes_L2 is
-  ElectionTest_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes,
-  TransitionToL2After
+  TransitionToL2After,
+  ElectionTest_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes
 {}
 
 contract ElectionTest_Vote_GroupNotEligible is ElectionTest {
@@ -812,8 +812,8 @@ contract ElectionTest_Vote_GroupNotEligible is ElectionTest {
 }
 
 contract ElectionTest_Vote_GroupNotEligible_L2 is
-  ElectionTest_Vote_GroupNotEligible,
-  TransitionToL2After
+  TransitionToL2After,
+  ElectionTest_Vote_GroupNotEligible
 {}
 
 contract ElectionTest_Activate is ElectionTest {
@@ -1297,7 +1297,7 @@ contract ElectionTest_RevokePending is ElectionTest {
   }
 }
 
-contract ElectionTest_RevokePending_L2 is ElectionTest_RevokePending, TransitionToL2After {}
+contract ElectionTest_RevokePending_L2 is TransitionToL2After, ElectionTest_RevokePending {}
 
 contract ElectionTest_RevokeActive is ElectionTest {
   address voter0 = address(this);
@@ -1840,8 +1840,8 @@ contract ElectionTest_ElectValidatorSigners is ElectionTest_ElectValidatorsAbstr
 }
 
 contract ElectionTest_ElectValidatorSignersL2 is
-  ElectionTest_ElectValidatorSigners,
-  TransitionToL2After
+  TransitionToL2After,
+  ElectionTest_ElectValidatorSigners
 {}
 
 contract ElectionTest_ElectValidatorsAccounts is ElectionTest_ElectValidatorsAbstract {
@@ -1956,8 +1956,8 @@ contract ElectionTest_ElectValidatorsAccounts is ElectionTest_ElectValidatorsAbs
 }
 
 contract ElectionTest_ElectValidatorsAccountsL2 is
-  ElectionTest_ElectValidatorsAccounts,
-  TransitionToL2After
+  TransitionToL2After,
+  ElectionTest_ElectValidatorsAccounts
 {}
 
 contract ElectionTest_GetGroupEpochRewards is ElectionTest {
