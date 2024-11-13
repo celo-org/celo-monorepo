@@ -442,18 +442,21 @@ describe('governance tests', () => {
 
       // groupKit uses a different node than kit does, so wait a second in case kit's node
       // got the new block before groupKit's node did.
-      await sleep(1)
+      await sleep(5)
       const txos = await (await groupKit.contracts.getElection()).activate(group)
       for (const txo of txos) {
         await txo.sendAndWaitForReceipt({ from: group })
       }
 
+      const validatorSetSigners0 = await election.methods.getCurrentValidatorSigners().call()
+      console.log(`### Got _validatorSetSigners0: ${validatorSetSigners0}`)
       validators = await groupKit._web3Contracts.getValidators()
       const membersToSwap = [validatorAccounts[0], validatorAccounts[1]]
       const memberSwapper = await newMemberSwapper(groupKit, membersToSwap)
       // The memberSwapper makes a change when it's created, so we wait for epoch change so it takes effect
       await waitForEpochTransition(web3, epoch)
-
+      const validatorSetSigners1 = await election.methods.getCurrentValidatorSigners().call()
+      console.log(`### Got _validatorSetSigners1: ${validatorSetSigners1}`)
       const handled: any = {}
 
       let errorWhileChangingValidatorSet = ''
@@ -498,6 +501,7 @@ describe('governance tests', () => {
 
     const getValidatorSetAccountsAtBlock = async (blockNumber: number) => {
       const signingKeys = await getValidatorSetSignersAtBlock(blockNumber)
+      console.log(`### Got signingKeys: ${signingKeys}`)
       return Promise.all(
         signingKeys.map((address: string) =>
           accounts.methods.signerToAccount(address).call({}, blockNumber)
