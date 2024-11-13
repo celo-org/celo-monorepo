@@ -23,9 +23,9 @@ import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
 import { Utils } from "@test-sol/utils.sol";
 
-import "@celo-contracts/common/PrecompilesOverrideV2.sol";
+import "@test-sol/utils/WhenL2.sol";
 
-contract ValidatorsTest is Test, Utils, ECDSAHelper, PrecompilesOverrideV2 {
+contract ValidatorsTest is Test, Utils, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -210,16 +210,6 @@ contract ValidatorsTest is Test, Utils, ECDSAHelper, PrecompilesOverrideV2 {
 
     vm.prank(nonValidator);
     accounts.createAccount();
-  }
-
-  function _whenL2WithEpoch() public {
-    uint256 l1EpochNumber = getEpochNumber();
-    _whenL2();
-
-    address[] memory _elected = new address[](2);
-    _elected[0] = validator;
-    _elected[1] = otherValidator;
-    epochManager.initializeSystem(l1EpochNumber, block.number, _elected);
   }
 
   function _registerValidatorGroupWithMembers(address _group, uint256 _numMembers) public {
@@ -441,12 +431,7 @@ contract ValidatorsTest is Test, Utils, ECDSAHelper, PrecompilesOverrideV2 {
   }
 }
 
-contract TransitionToL2AfterL1 is ValidatorsTest {
-  function setUp() public {
-    super.setUp();
-    _whenL2WithEpoch();
-  }
-}
+contract ValidatorsTest_L2 is ValidatorsTest, WhenL2 {}
 
 contract ValidatorsTest_Initialize is ValidatorsTest {
   function test_ShouldhaveSetTheOwner() public {
@@ -531,7 +516,7 @@ contract ValidatorsTest_setCommissionUpdateDelay is ValidatorsTest {
 }
 
 contract ValidatorsTest_setCommissionUpdateDelay_L2 is
-  TransitionToL2AfterL1,
+  ValidatorsTest_L2,
   ValidatorsTest_setCommissionUpdateDelay
 {}
 
@@ -543,7 +528,7 @@ contract ValidatorsTest_setDowntimeGracePeriod is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_setDowntimeGracePeriod_L2 is TransitionToL2AfterL1 {
+contract ValidatorsTest_setDowntimeGracePeriod_L2 is ValidatorsTest_L2 {
   function test_shouldRevert() public {
     vm.expectRevert("This method is no longer supported in L2.");
     validators.setDowntimeGracePeriod(downtimeGracePeriod + 1);
@@ -577,7 +562,7 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
 }
 
 contract ValidatorsTest_SetMembershipHistoryLength_L2 is
-  TransitionToL2AfterL1,
+  ValidatorsTest_L2,
   ValidatorsTest_SetMembershipHistoryLength
 {}
 
@@ -604,10 +589,7 @@ contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_SetMaxGroupSize_L2 is
-  TransitionToL2AfterL1,
-  ValidatorsTest_SetMaxGroupSize
-{}
+contract ValidatorsTest_SetMaxGroupSize_L2 is ValidatorsTest_L2, ValidatorsTest_SetMaxGroupSize {}
 
 contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
   GroupLockedGoldRequirements private newRequirements =
@@ -645,7 +627,7 @@ contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
 }
 
 contract ValidatorsTest_SetGroupLockedGoldRequirements_L2 is
-  TransitionToL2AfterL1,
+  ValidatorsTest_L2,
   ValidatorsTest_SetGroupLockedGoldRequirements
 {}
 
@@ -685,7 +667,7 @@ contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
 }
 
 contract ValidatorsTest_SetValidatorLockedGoldRequirements_L2 is
-  TransitionToL2AfterL1,
+  ValidatorsTest_L2,
   ValidatorsTest_SetValidatorLockedGoldRequirements
 {}
 
@@ -731,8 +713,8 @@ contract ValidatorsTest_SetValidatorScoreParameters_L1 is
 }
 
 contract ValidatorsTest_SetValidatorScoreParameters_L2 is
-  ValidatorsTest_SetValidatorScoreParameters_Setup,
-  TransitionToL2AfterL1
+  ValidatorsTest_L2,
+  ValidatorsTest_SetValidatorScoreParameters_Setup
 {
   function test_Reverts() public {
     vm.expectRevert("This method is no longer supported in L2.");
@@ -909,7 +891,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_RegisterValidator_L2 is TransitionToL2AfterL1 {
+contract ValidatorsTest_RegisterValidator_L2 is ValidatorsTest_L2 {
   function test_shouldRevert() public {
     lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
 
@@ -947,7 +929,7 @@ contract ValidatorsTest_RegisterValidatorNoBls is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_RegisterValidatorNoBls_L2 is TransitionToL2AfterL1 {
+contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest_L2 {
   function setUp() public {
     super.setUp();
 
@@ -1169,7 +1151,7 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValid
 }
 
 contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValidatorGroup_L2 is
-  TransitionToL2AfterL1,
+  ValidatorsTest_L2,
   ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValidatorGroup
 {}
 
@@ -1269,7 +1251,7 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
 }
 
 contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorGroup_L2 is
-  TransitionToL2AfterL1,
+  ValidatorsTest_L2,
   ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorGroup
 {}
 
@@ -1337,7 +1319,7 @@ contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirement
 }
 
 contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirements_L2 is
-  TransitionToL2AfterL1,
+  ValidatorsTest_L2,
   ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirements
 {}
 
@@ -1477,7 +1459,7 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
 }
 
 contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup_L2 is
-  TransitionToL2AfterL1,
+  ValidatorsTest_L2,
   ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup
 {
   function test_ShouldSendValidatorPayment() public {
@@ -1626,7 +1608,7 @@ contract ValidatorsTest_Deaffiliate_L1 is ValidatorsTest_Deaffiliate_Setup {
   }
 }
 
-contract ValidatorsTest_Deaffiliate_L2 is ValidatorsTest_Deaffiliate, TransitionToL2AfterL1 {
+contract ValidatorsTest_Deaffiliate_L2 is ValidatorsTest_Deaffiliate, ValidatorsTest_L2 {
   function test_ShouldSendValidatorPayment() public {
     vm.expectEmit(true, true, true, true);
     emit SendValidatorPaymentCalled(validator);
@@ -1696,7 +1678,7 @@ contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
 }
 
 contract ValidatorsTest_UpdateEcdsaPublicKey_L2 is
-  TransitionToL2AfterL1,
+  ValidatorsTest_L2,
   ValidatorsTest_UpdateEcdsaPublicKey
 {}
 
@@ -1804,7 +1786,7 @@ contract ValidatorsTest_UpdatePublicKeys_L1 is ValidatorsTest_UpdatePublicKeys_S
 
 contract ValidatorsTest_UpdatePublicKeys_L2 is
   ValidatorsTest_UpdatePublicKeys_Setup,
-  TransitionToL2AfterL1
+  ValidatorsTest_L2
 {
   function test_Reverts() public {
     (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
@@ -1909,7 +1891,7 @@ contract ValidatorsTest_UpdateBlsPublicKey_L1 is ValidatorsTest_UpdateBlsPublicK
 
 contract ValidatorsTest_UpdateBlsPublicKey_L2 is
   ValidatorsTest_UpdateBlsPublicKey_Setup,
-  TransitionToL2AfterL1
+  ValidatorsTest_L2
 {
   function test_Reverts() public {
     vm.expectRevert("This method is no longer supported in L2.");
@@ -2012,7 +1994,7 @@ contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
 }
 
 contract ValidatorsTest_RegisterValidatorGroup_L2 is
-  TransitionToL2AfterL1,
+  ValidatorsTest_L2,
   ValidatorsTest_RegisterValidatorGroup
 {}
 
@@ -2069,7 +2051,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers is 
 }
 
 contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers_L2 is
-  TransitionToL2AfterL1,
+  ValidatorsTest_L2,
   ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers
 {}
 
@@ -2168,7 +2150,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
 }
 
 contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers_L2 is
-  TransitionToL2AfterL1,
+  ValidatorsTest_L2,
   ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers
 {}
 
@@ -2369,7 +2351,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_AddMember_L2 is TransitionToL2AfterL1, ValidatorsTest_AddMember {}
+contract ValidatorsTest_AddMember_L2 is ValidatorsTest_L2, ValidatorsTest_AddMember {}
 
 contract ValidatorsTest_RemoveMember is ValidatorsTest {
   uint256 _registrationEpoch;
@@ -2459,7 +2441,7 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_RemoveMember_L2 is TransitionToL2AfterL1, ValidatorsTest_RemoveMember {}
+contract ValidatorsTest_RemoveMember_L2 is ValidatorsTest_L2, ValidatorsTest_RemoveMember {}
 
 contract ValidatorsTest_ReorderMember is ValidatorsTest {
   function setUp() public {
@@ -2510,7 +2492,7 @@ contract ValidatorsTest_ReorderMember is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_ReorderMember_L2 is TransitionToL2AfterL1, ValidatorsTest_ReorderMember {}
+contract ValidatorsTest_ReorderMember_L2 is ValidatorsTest_L2, ValidatorsTest_ReorderMember {}
 
 contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
   uint256 newCommission = commission.unwrap().add(1);
@@ -2564,7 +2546,7 @@ contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
 }
 
 contract ValidatorsTest_SetNextCommissionUpdate_L2 is
-  TransitionToL2AfterL1,
+  ValidatorsTest_L2,
   ValidatorsTest_SetNextCommissionUpdate
 {}
 
@@ -2669,10 +2651,7 @@ contract ValidatorsTest_UpdateCommission_L1 is ValidatorsTest_UpdateCommission_S
   }
 }
 
-contract ValidatorsTest_UpdateCommission_L2 is
-  TransitionToL2AfterL1,
-  ValidatorsTest_UpdateCommission
-{
+contract ValidatorsTest_UpdateCommission_L2 is ValidatorsTest_L2, ValidatorsTest_UpdateCommission {
   function test_ShouldSendMultipleValidatorPayments_WhenL2() public {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
@@ -2782,7 +2761,7 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_CalculateEpochScore_L2 is TransitionToL2AfterL1 {
+contract ValidatorsTest_CalculateEpochScore_L2 is ValidatorsTest_L2 {
   function test_Reverts_WhenL2() public {
     vm.expectRevert("This method is no longer supported in L2.");
     validators.calculateEpochScore(1);
@@ -2940,7 +2919,7 @@ contract ValidatorsTest_CalculateGroupEpochScore_L1 is
 
 contract ValidatorsTest_CalculateGroupEpochScore_L2 is
   ValidatorsTest_CalculateGroupEpochScore_Setup,
-  TransitionToL2AfterL1
+  ValidatorsTest_L2
 {
   function test_Reverts() public {
     FixidityLib.Fraction[] memory uptimes = new FixidityLib.Fraction[](5);
@@ -3045,7 +3024,7 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner_L1 is
 
 contract ValidatorsTest_UpdateValidatorScoreFromSigner is
   ValidatorsTest_UpdateValidatorScoreFromSigner_Setup,
-  TransitionToL2AfterL1
+  ValidatorsTest_L2
 {
   function test_Reverts_WhenL2() public {
     vm.expectRevert("This method is no longer supported in L2.");
@@ -3160,7 +3139,7 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
 }
 
 contract ValidatorsTest_UpdateMembershipHistory_L2 is
-  TransitionToL2AfterL1,
+  ValidatorsTest_L2,
   ValidatorsTest_UpdateMembershipHistory
 {}
 
@@ -3221,7 +3200,8 @@ contract ValidatorsTest_GetMembershipInLastEpoch_L1 is
       }
     }
 
-    _whenL2WithEpoch();
+    whenL2WithEpochManagerInitialization();
+
     assertEq(validators.getMembershipInLastEpoch(validator), lastValidatorGroup);
     epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + 1);
     assertEq(validators.getMembershipInLastEpoch(validator), nextValidatorGroup);
@@ -3229,7 +3209,7 @@ contract ValidatorsTest_GetMembershipInLastEpoch_L1 is
 }
 
 contract ValidatorsTest_GetMembershipInLastEpoch_L2 is
-  TransitionToL2AfterL1,
+  ValidatorsTest_L2,
   ValidatorsTest_GetMembershipInLastEpoch
 {}
 
@@ -3249,7 +3229,7 @@ contract ValidatorsTest_GetTopGroupValidators is ValidatorsTest {
 }
 
 contract ValidatorsTest_GetTopGroupValidators_L2 is
-  TransitionToL2AfterL1,
+  ValidatorsTest_L2,
   ValidatorsTest_GetTopGroupValidators
 {}
 
@@ -3270,7 +3250,7 @@ contract ValidatorsTest_GetTopGroupValidatorsAccounts is ValidatorsTest {
 
 contract ValidatorsTest_GetTopGroupValidatorsAccounts_L2 is
   ValidatorsTest_GetTopGroupValidatorsAccounts,
-  TransitionToL2AfterL1
+  ValidatorsTest_L2
 {}
 
 contract ValidatorsTest_GetEpochSize is ValidatorsTest {
@@ -3341,7 +3321,7 @@ contract ValidatorsTest_GetAccountLockedGoldRequirement is ValidatorsTest {
 }
 
 contract ValidatorsTest_GetAccountLockedGoldRequirement_L2 is
-  TransitionToL2AfterL1,
+  ValidatorsTest_L2,
   ValidatorsTest_GetAccountLockedGoldRequirement
 {}
 
@@ -3643,7 +3623,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_DistributeEpochPaymentsFromSigner_L2 is TransitionToL2AfterL1 {
+contract ValidatorsTest_DistributeEpochPaymentsFromSigner_L2 is ValidatorsTest_L2 {
   function test_Reverts_WhenL2() public {
     vm.prank(address(0));
     vm.expectRevert("This method is no longer supported in L2.");
@@ -3658,7 +3638,7 @@ contract ValidatorsTest_MintStableToEpochManager_L1 is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_MintStableToEpochManager_L2 is TransitionToL2AfterL1 {
+contract ValidatorsTest_MintStableToEpochManager_L2 is ValidatorsTest_L2 {
   function test_Reverts_WhenCalledByOtherThanEpochManager() public {
     vm.expectRevert("only registered contract");
     validators.mintStableToEpochManager(5);
@@ -3721,7 +3701,7 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator_L1 is
 
 contract ValidatorsTest_ForceDeaffiliateIfValidator_L2 is
   ValidatorsTest_ForceDeaffiliateIfValidator,
-  TransitionToL2AfterL1
+  ValidatorsTest_L2
 {
   function test_ShouldSendValidatorPayment_WhenL2() public {
     vm.expectEmit(true, true, true, true);
@@ -3847,7 +3827,7 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
 
 contract ValidatorsTest_GroupMembershipInEpoch_L2 is
   ValidatorsTest_GroupMembershipInEpoch,
-  TransitionToL2AfterL1
+  ValidatorsTest_L2
 {}
 
 contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
@@ -3889,7 +3869,7 @@ contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
 
 contract ValidatorsTest_HalveSlashingMultiplier_L2 is
   ValidatorsTest_HalveSlashingMultiplier,
-  TransitionToL2AfterL1
+  ValidatorsTest_L2
 {}
 
 contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
@@ -3942,5 +3922,5 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
 
 contract ValidatorsTest_ResetSlashingMultiplier_L2 is
   ValidatorsTest_ResetSlashingMultiplier,
-  TransitionToL2AfterL1
+  ValidatorsTest_L2
 {}

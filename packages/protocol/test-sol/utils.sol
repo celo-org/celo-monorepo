@@ -8,8 +8,9 @@ import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 import "@celo-contracts/governance/interfaces/IValidators.sol";
 import "@celo-contracts-8/common/IsL2Check.sol";
+import "@celo-contracts/common/PrecompilesOverrideV2.sol";
 
-contract Utils is Test, TestConstants, IsL2Check {
+contract Utils is Test, TestConstants, IsL2Check, PrecompilesOverrideV2 {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   EnumerableSet.AddressSet addressSet;
@@ -59,6 +60,18 @@ contract Utils is Test, TestConstants, IsL2Check {
 
   function _whenL2() public {
     deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+  }
+
+  function whenL2WithEpochManagerInitialization() internal {
+    uint256 l1EpochNumber = getEpochNumber();
+
+    address[] memory _elected = new address[](2);
+    _elected[0] = actor("validator");
+    _elected[1] = actor("otherValidator");
+
+    _whenL2();
+
+    epochManager.initializeSystem(l1EpochNumber, block.number, _elected);
   }
 
   function assertAlmostEqual(uint256 actual, uint256 expected, uint256 margin) public {
