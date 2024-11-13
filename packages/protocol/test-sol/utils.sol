@@ -16,6 +16,11 @@ contract Utils is Test, TestConstants, IsL2Check {
   IRegistry registry;
   MockEpochManager public epochManager;
 
+  function setUp() public {
+    setupRegistry();
+    setupEpochManager();
+  }
+
   function setupRegistry() public {
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
     registry = IRegistry(REGISTRY_ADDRESS);

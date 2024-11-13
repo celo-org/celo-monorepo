@@ -135,6 +135,7 @@ contract ValidatorsTest is Test, Utils, ECDSAHelper, PrecompilesOverrideV2 {
   event SendValidatorPaymentCalled(address validator);
 
   function setUp() public {
+    super.setUp();
     owner = address(this);
     group = actor("group");
     nonValidator = actor("nonValidator");
@@ -160,8 +161,6 @@ contract ValidatorsTest is Test, Utils, ECDSAHelper, PrecompilesOverrideV2 {
       adjustmentSpeed: FixidityLib.newFixedFraction(5, 20)
     });
 
-    setupRegistry();
-    setupEpochManager();
     accounts = new Accounts(true);
     accounts.initialize(REGISTRY_ADDRESS);
 
