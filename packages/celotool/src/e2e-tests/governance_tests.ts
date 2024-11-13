@@ -521,11 +521,18 @@ describe('governance tests', () => {
       for (const blockNumber of blockNumbers) {
         const lastEpochBlock = getLastEpochBlock(blockNumber, epoch)
         const memberAccounts = await getValidatorGroupMembers(lastEpochBlock)
+        console.log(`### Got memberAccounts: ${memberAccounts}`)
         const memberSigners = await Promise.all(
           memberAccounts.map((v: string) => getValidatorSigner(v, lastEpochBlock))
         )
+        console.log(`### Got memberSigners: ${memberSigners}`)
+
         const validatorSetSigners = await getValidatorSetSignersAtBlock(blockNumber)
+        console.log(`### Got validatorSetSigners: ${validatorSetSigners}`)
+
         const validatorSetAccounts = await getValidatorSetAccountsAtBlock(blockNumber)
+        console.log(`### Got validatorSetAccounts: ${validatorSetAccounts}`)
+
         assert.sameMembers(memberSigners, validatorSetSigners)
         assert.sameMembers(memberAccounts, validatorSetAccounts)
       }
