@@ -310,7 +310,7 @@ describe('governance tests', () => {
     if (myceloAddress === groupAddress) {
       return '0x' + generatePrivateKey(mnemonic, AccountType.VALIDATOR_GROUP, 0)
     }
-    // Otherwise, the validator group key is encoded in its name (see 25_elect_validators.ts)
+    // Otherwise, the validator group key is encoded in its name (see 30_elect_validators.ts)
     const name = await accounts.methods.getName(groupAddress).call()
     const encryptedKeystore64 = name.split(' ')[1]
     const encryptedKeystore = JSON.parse(Buffer.from(encryptedKeystore64, 'base64').toString())
@@ -442,18 +442,21 @@ describe('governance tests', () => {
 
       // groupKit uses a different node than kit does, so wait a second in case kit's node
       // got the new block before groupKit's node did.
-      await sleep(1)
+      await sleep(5)
       const txos = await (await groupKit.contracts.getElection()).activate(group)
       for (const txo of txos) {
         await txo.sendAndWaitForReceipt({ from: group })
       }
 
+      const validatorSetSigners0 = await election.methods.getCurrentValidatorSigners().call()
+      console.log(`### Got _validatorSetSigners0: ${validatorSetSigners0}`)
       validators = await groupKit._web3Contracts.getValidators()
       const membersToSwap = [validatorAccounts[0], validatorAccounts[1]]
       const memberSwapper = await newMemberSwapper(groupKit, membersToSwap)
       // The memberSwapper makes a change when it's created, so we wait for epoch change so it takes effect
       await waitForEpochTransition(web3, epoch)
-
+      const validatorSetSigners1 = await election.methods.getCurrentValidatorSigners().call()
+      console.log(`### Got _validatorSetSigners1: ${validatorSetSigners1}`)
       const handled: any = {}
 
       let errorWhileChangingValidatorSet = ''
@@ -498,6 +501,7 @@ describe('governance tests', () => {
 
     const getValidatorSetAccountsAtBlock = async (blockNumber: number) => {
       const signingKeys = await getValidatorSetSignersAtBlock(blockNumber)
+      console.log(`### Got signingKeys: ${signingKeys}`)
       return Promise.all(
         signingKeys.map((address: string) =>
           accounts.methods.signerToAccount(address).call({}, blockNumber)
@@ -515,17 +519,24 @@ describe('governance tests', () => {
         assert.equal(validatorSetSize, groupMembership.length)
       }
     })
-
+    // TODO (soloseng) fix test such that it returns expected validators
     it('should always return a validator set equal to the signing keys of the group members at the end of the last epoch', async function (this: any) {
       this.timeout(0)
       for (const blockNumber of blockNumbers) {
         const lastEpochBlock = getLastEpochBlock(blockNumber, epoch)
         const memberAccounts = await getValidatorGroupMembers(lastEpochBlock)
+        console.log(`### Got memberAccounts: ${memberAccounts}`)
         const memberSigners = await Promise.all(
           memberAccounts.map((v: string) => getValidatorSigner(v, lastEpochBlock))
         )
+        console.log(`### Got memberSigners: ${memberSigners}`)
+
         const validatorSetSigners = await getValidatorSetSignersAtBlock(blockNumber)
+        console.log(`### Got validatorSetSigners: ${validatorSetSigners}`)
+
         const validatorSetAccounts = await getValidatorSetAccountsAtBlock(blockNumber)
+        console.log(`### Got validatorSetAccounts: ${validatorSetAccounts}`)
+
         assert.sameMembers(memberSigners, validatorSetSigners)
         assert.sameMembers(memberAccounts, validatorSetAccounts)
       }
@@ -538,11 +549,13 @@ describe('governance tests', () => {
         // Fetch the round robin order if it hasn't already been set for this epoch.
         if (roundRobinOrder.length === 0 || blockNumber === lastEpochBlock + 1) {
           const validatorSet = await getValidatorSetSignersAtBlock(blockNumber)
+          console.log(`### validatorSet: ${validatorSet}`)
           roundRobinOrder = await Promise.all(
             validatorSet.map(
               async (_, i) => (await web3.eth.getBlock(lastEpochBlock + i + 1)).miner
             )
           )
+          console.log(`### roundRobinOrder: ${roundRobinOrder}`)
           assert.sameMembers(roundRobinOrder, validatorSet)
         }
         const indexInEpoch = blockNumber - lastEpochBlock - 1
