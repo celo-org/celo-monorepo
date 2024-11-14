@@ -105,7 +105,7 @@ contract EpochRewardsTest is Utils {
     );
   }
 
-  function _setNumberOfElectedInCurrentSet(uint256 numberValidators) internal {
+  function _setNumberOfElectedInCurrentSetBaseOnLayer(uint256 numberValidators) internal {
     if (isL2()) {
       epochManager.setNumberOfElectedInCurrentSet(numberValidators);
     } else {
@@ -468,10 +468,9 @@ contract EpochRewardsTest_getTargetVoterRewards_L2 is
 contract EpochRewardsTest_getTargetTotalEpochPaymentsInGold is EpochRewardsTest {
   function test_ShouldgetTargetTotalEpochPaymentsInGold_WhenExchangeRateIsSet() public {
     uint256 numberValidators = 100;
-    _setNumberOfElectedInCurrentSet(numberValidators);
+    _setNumberOfElectedInCurrentSetBaseOnLayer(numberValidators);
 
     uint256 expected = uint256((targetValidatorEpochPayment * numberValidators) / exchangeRate);
-
     assertEq(epochRewards.getTargetTotalEpochPaymentsInGold(), expected);
   }
 }
@@ -823,7 +822,7 @@ contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAn
   function setUp() public {
     super.setUp();
 
-    _setNumberOfElectedInCurrentSet(numberValidators);
+    _setNumberOfElectedInCurrentSetBaseOnLayer(numberValidators);
     election.setActiveVotes(activeVotes);
     uint256 expectedTargetTotalEpochPaymentsInGold = (targetValidatorEpochPayment *
       numberValidators) / exchangeRate;
