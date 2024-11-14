@@ -9,6 +9,7 @@ import "@celo-contracts/governance/test/MockValidators.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
+import "@test-sol/utils/WhenL2.sol";
 
 contract AccountsTest is Utils {
   using FixidityLib for FixidityLib.Fraction;
@@ -79,7 +80,7 @@ contract AccountsTest is Utils {
   event PaymentDelegationSet(address indexed beneficiary, uint256 fraction);
 
   function setUp() public {
-    setupRegistry();
+    super.setUp();
 
     accounts = new Accounts(true);
     validators = new MockValidators();
@@ -193,12 +194,9 @@ contract AccountsTest is Utils {
       );
   }
 }
-contract TransitionToL2AfterL1 is AccountsTest {
-  function setUp() public {
-    super.setUp();
-    _whenL2();
-  }
-}
+
+contract AccountsTest_L2 is AccountsTest, WhenL2 {}
+
 contract AccountsTest_createAccount is AccountsTest {
   function setUp() public {
     super.setUp();
@@ -217,7 +215,7 @@ contract AccountsTest_createAccount is AccountsTest {
   }
 }
 
-contract AccountsTest_createAccount_L2 is TransitionToL2AfterL1, AccountsTest_createAccount {}
+contract AccountsTest_createAccount_L2 is AccountsTest_L2, AccountsTest_createAccount {}
 
 contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
   function setUp() public {
@@ -255,7 +253,7 @@ contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
 }
 
 contract AccountsTest_setAccountDataEncryptionKey_L2 is
-  TransitionToL2AfterL1,
+  AccountsTest_L2,
   AccountsTest_setAccountDataEncryptionKey
 {}
 
@@ -345,7 +343,7 @@ contract AccountsTest_setAccount is AccountsTest {
   }
 }
 
-contract AccountsTest_setAccount_L2 is TransitionToL2AfterL1, AccountsTest_setAccount {}
+contract AccountsTest_setAccount_L2 is AccountsTest_L2, AccountsTest_setAccount {}
 
 contract AccountsTest_setWalletAddress is AccountsTest {
   function setUp() public {
@@ -397,7 +395,7 @@ contract AccountsTest_setWalletAddress is AccountsTest {
   }
 }
 
-contract AccountsTest_setWalletAddress_L2 is TransitionToL2AfterL1, AccountsTest_setWalletAddress {}
+contract AccountsTest_setWalletAddress_L2 is AccountsTest_L2, AccountsTest_setWalletAddress {}
 
 contract AccountsTest_setMetadataURL is AccountsTest {
   function setUp() public {
@@ -423,7 +421,7 @@ contract AccountsTest_setMetadataURL is AccountsTest {
   }
 }
 
-contract AccountsTest_setMetadataURL_L2 is TransitionToL2AfterL1, AccountsTest_setMetadataURL {}
+contract AccountsTest_setMetadataURL_L2 is AccountsTest_L2, AccountsTest_setMetadataURL {}
 
 contract AccountsTest_batchGetMetadataURL is AccountsTest {
   function setUp() public {
@@ -475,10 +473,7 @@ contract AccountsTest_batchGetMetadataURL is AccountsTest {
   }
 }
 
-contract AccountsTest_batchGetMetadataURL_L2 is
-  TransitionToL2AfterL1,
-  AccountsTest_batchGetMetadataURL
-{}
+contract AccountsTest_batchGetMetadataURL_L2 is AccountsTest_L2, AccountsTest_batchGetMetadataURL {}
 
 contract AccountsTest_addStorageRoot is AccountsTest {
   function setUp() public {
@@ -526,7 +521,7 @@ contract AccountsTest_addStorageRoot is AccountsTest {
   }
 }
 
-contract AccountsTest_addStorageRoot_L2 is TransitionToL2AfterL1, AccountsTest_addStorageRoot {}
+contract AccountsTest_addStorageRoot_L2 is AccountsTest_L2, AccountsTest_addStorageRoot {}
 
 contract AccountsTest_removeStorageRoot is AccountsTest {
   function setUp() public {
@@ -604,10 +599,7 @@ contract AccountsTest_removeStorageRoot is AccountsTest {
   }
 }
 
-contract AccountsTest_removeStorageRoot_L2 is
-  TransitionToL2AfterL1,
-  AccountsTest_removeStorageRoot
-{}
+contract AccountsTest_removeStorageRoot_L2 is AccountsTest_L2, AccountsTest_removeStorageRoot {}
 
 contract AccountsTest_setPaymentDelegation is AccountsTest {
   address beneficiary = actor("beneficiary");
@@ -652,7 +644,7 @@ contract AccountsTest_setPaymentDelegation is AccountsTest {
 }
 
 contract AccountsTest_setPaymentDelegation_L2 is
-  TransitionToL2AfterL1,
+  AccountsTest_L2,
   AccountsTest_setPaymentDelegation
 {}
 
@@ -687,7 +679,7 @@ contract AccountsTest_deletePaymentDelegation is AccountsTest {
 }
 
 contract AccountsTest_deletePaymentDelegation_L2 is
-  TransitionToL2AfterL1,
+  AccountsTest_L2,
   AccountsTest_deletePaymentDelegation
 {}
 
@@ -715,7 +707,7 @@ contract AccountsTest_setName is AccountsTest {
   }
 }
 
-contract AccountsTest_setName_L2 is TransitionToL2AfterL1, AccountsTest_setName {}
+contract AccountsTest_setName_L2 is AccountsTest_L2, AccountsTest_setName {}
 
 contract AccountsTest_GenericAuthorization is AccountsTest {
   address account2 = actor("account2");
@@ -902,7 +894,7 @@ contract AccountsTest_GenericAuthorization is AccountsTest {
 }
 
 contract AccountsTest_GenericAuthorization_L2 is
-  TransitionToL2AfterL1,
+  AccountsTest_L2,
   AccountsTest_GenericAuthorization
 {}
 
@@ -1575,6 +1567,6 @@ contract AccountsTest_BackwardCompatibility is AccountsTest {
 }
 
 contract AccountsTest_BackwardCompatibility_L2 is
-  TransitionToL2AfterL1,
+  AccountsTest_L2,
   AccountsTest_BackwardCompatibility
 {}
