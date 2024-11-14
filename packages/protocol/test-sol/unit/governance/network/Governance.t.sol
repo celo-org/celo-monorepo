@@ -3292,17 +3292,19 @@ contract GovernanceTest_hotfixWhitelistValidatorTally is GovernanceTest {
 
 contract GovernanceTest_isHotfixPassing is GovernanceTest {
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
+  address validator1;
+  address validator2;
 
   function setUp() public {
     super.setUp();
-    address val1 = actor("validator1");
-    governance.addValidator(val1);
-    vm.prank(val1);
+    validator1 = actor("validator1");
+    governance.addValidator(validator1);
+    vm.prank(validator1);
     accounts.createAccount();
 
-    address val2 = actor("validator2");
-    governance.addValidator(val2);
-    vm.prank(val2);
+    validator2 = actor("validator2");
+    governance.addValidator(validator2);
+    vm.prank(validator2);
     accounts.createAccount();
   }
 
@@ -3311,15 +3313,15 @@ contract GovernanceTest_isHotfixPassing is GovernanceTest {
   }
 
   function test_returnFalseWhenHotfixHasBeenWhitelistedButNotByQuorum() public {
-    vm.prank(actor("validator1"));
+    vm.prank(validator1);
     governance.whitelistHotfix(HOTFIX_HASH);
     assertFalse(governance.isHotfixPassing(HOTFIX_HASH));
   }
 
   function test_returnTrueWhenHotfixIsWhitelistedByQuorum() public {
-    vm.prank(actor("validator1"));
+    vm.prank(validator1);
     governance.whitelistHotfix(HOTFIX_HASH);
-    vm.prank(actor("validator2"));
+    vm.prank(validator2);
     governance.whitelistHotfix(HOTFIX_HASH);
     assertTrue(governance.isHotfixPassing(HOTFIX_HASH));
   }
@@ -3333,19 +3335,20 @@ contract GovernanceTest_isHotfixPassing is GovernanceTest {
 
 contract GovernanceTest_prepareHotfix is GovernanceTest {
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
+  address validator1;
   event HotfixPrepared(bytes32 indexed hash, uint256 indexed epoch);
 
   function setUp() public {
     super.setUp();
-    address val1 = actor("validator1");
-    governance.addValidator(val1);
-    vm.prank(val1);
+    validator1 = actor("validator1");
+    governance.addValidator(validator1);
+    vm.prank(validator1);
     accounts.createAccount();
   }
 
   function test_markHotfixRecordPreparedEpoch_whenHotfixIsPassing() public {
     vm.roll(block.number + governance.getEpochSize());
-    vm.prank(actor("validator1"));
+    vm.prank(validator1);
     governance.whitelistHotfix(HOTFIX_HASH);
     governance.prepareHotfix(HOTFIX_HASH);
     (, , uint256 preparedEpoch) = governance.getL1HotfixRecord(HOTFIX_HASH);
@@ -3355,7 +3358,7 @@ contract GovernanceTest_prepareHotfix is GovernanceTest {
 
   function test_emitHotfixPreparedEvent_whenHotfixIsPassing() public {
     vm.roll(block.number + governance.getEpochSize());
-    vm.prank(actor("validator1"));
+    vm.prank(validator1);
     governance.whitelistHotfix(HOTFIX_HASH);
 
     uint256 epoch = governance.getEpochNumber();
@@ -3366,7 +3369,7 @@ contract GovernanceTest_prepareHotfix is GovernanceTest {
 
   function test_succeedForEpochDifferentPreparedEpoch_whenHotfixIsPassing() public {
     vm.roll(block.number + governance.getEpochSize());
-    vm.prank(actor("validator1"));
+    vm.prank(validator1);
     governance.whitelistHotfix(HOTFIX_HASH);
     governance.prepareHotfix(HOTFIX_HASH);
     vm.roll(block.number + governance.getEpochSize());
@@ -3380,7 +3383,7 @@ contract GovernanceTest_prepareHotfix is GovernanceTest {
 
   function test_Reverts_IfEpochEqualsPreparedEpoch_whenHotfixIsPassing() public {
     vm.roll(block.number + governance.getEpochSize());
-    vm.prank(actor("validator1"));
+    vm.prank(validator1);
     governance.whitelistHotfix(HOTFIX_HASH);
     governance.prepareHotfix(HOTFIX_HASH);
     vm.expectRevert("hotfix already prepared for this epoch");
@@ -3503,17 +3506,17 @@ contract GovernanceTest_resetHotfix is GovernanceTest {
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
   bytes32 constant SALT = 0x657ed9d64e84fa3d1af43b3a307db22aba2d90a158015df1c588c02e24ca08f0;
   bytes32 hotfixHash;
+  address validator1;
   event HotfixRecordReset(bytes32 indexed hash);
 
   function setUp() public {
     super.setUp();
 
-    address val1 = actor("validator1");
-    governance.addValidator(val1);
-    vm.prank(val1);
+    validator1 = actor("validator1");
+    governance.addValidator(validator1);
+    vm.prank(validator1);
     accounts.createAccount();
 
-    // _whenL2();
     vm.prank(accOwner);
     governance.setSecurityCouncil(accCouncil);
 
@@ -3538,7 +3541,7 @@ contract GovernanceTest_resetHotfix is GovernanceTest {
     assertTrue(approved);
 
     vm.roll(block.number + governance.getEpochSize());
-    vm.prank(actor("validator1"));
+    vm.prank(validator1);
     governance.whitelistHotfix(HOTFIX_HASH);
 
     uint256 epoch = governance.getEpochNumber();
