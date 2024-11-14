@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 
-import "celo-foundry/Test.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Freezer.sol";
 
@@ -13,10 +12,10 @@ import { MockSortedOracles } from "@celo-contracts/stability/test/MockSortedOrac
 import { MockStableToken } from "@celo-contracts/stability/test/MockStableToken.sol";
 import { GoldTokenMock } from "@test-sol/unit/common/GoldTokenMock.sol";
 
-import { TestConstants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
+import "@test-sol/utils/WhenL2.sol";
 
-contract EpochRewardsTest is Test, TestConstants, Utils {
+contract EpochRewardsTest is Utils {
   uint256 constant targetVotingYieldParamsInitial = 0.00016e24; // 0.00016
   uint256 constant targetVotingYieldParamsMax = 0.0005e24; // 0.0005
   uint256 constant targetVotingYieldParamsAdjustmentFactor = 1127990000000000000; // 0.00000112799
@@ -61,6 +60,7 @@ contract EpochRewardsTest is Test, TestConstants, Utils {
   event TargetVotingYieldSet(uint256 target);
 
   function setUp() public {
+    super.setUp();
     // Mocked contracts
     epochRewards = new EpochRewardsMock();
     election = new MockElection();
@@ -73,8 +73,8 @@ contract EpochRewardsTest is Test, TestConstants, Utils {
 
     freezer = new Freezer(true);
 
-    setupRegistry();
-    setupEpochManager();
+    // setupRegistry();
+    // setupEpochManager();
 
     celoUnreleasedTreasuryAddress = actor("celoUnreleasedTreasury");
     deployCodeTo("CeloUnreleasedTreasury.sol", abi.encode(false), celoUnreleasedTreasuryAddress);
@@ -115,12 +115,9 @@ contract EpochRewardsTest is Test, TestConstants, Utils {
   }
 }
 
-contract TransitionToL2AfterL1 is EpochRewardsTest {
-  function setUp() public {
-    super.setUp();
-    _whenL2();
-  }
-}
+contract EpochRewardsTest_L2 is WhenL2,EpochRewardsTest {}
+
+
 
 contract EpochRewardsTest_initialize is EpochRewardsTest {
   function test_ShouldHaveSetOwner() public {
@@ -215,7 +212,7 @@ contract EpochRewardsTest_setTargetVotingGoldFraction is EpochRewardsTest {
 }
 
 contract EpochRewardsTest_setTargetVotingGoldFraction_L2 is
-  TransitionToL2AfterL1,
+  EpochRewardsTest_L2,
   EpochRewardsTest_setTargetVotingGoldFraction
 {}
 
@@ -266,7 +263,7 @@ contract EpochRewardsTest_setCommunityRewardFraction is EpochRewardsTest {
 }
 
 contract EpochRewardsTest_setCommunityRewardFraction_L2 is
-  TransitionToL2AfterL1,
+  EpochRewardsTest_L2,
   EpochRewardsTest_setCommunityRewardFraction
 {}
 
@@ -308,7 +305,7 @@ contract EpochRewardsTest_setTargetValidatorEpochPayment is EpochRewardsTest {
 }
 
 contract EpochRewardsTest_setTargetValidatorEpochPayment_L2 is
-  TransitionToL2AfterL1,
+  EpochRewardsTest_L2,
   EpochRewardsTest_setTargetValidatorEpochPayment
 {}
 
@@ -380,7 +377,7 @@ contract EpochRewardsTest_setRewardsMultiplierParameters is EpochRewardsTest {
 }
 
 contract EpochRewardsTest_setRewardsMultiplierParameters_L2 is
-  TransitionToL2AfterL1,
+  EpochRewardsTest_L2,
   EpochRewardsTest_setRewardsMultiplierParameters
 {}
 
@@ -444,7 +441,7 @@ contract EpochRewardsTest_setTargetVotingYieldParameters is EpochRewardsTest {
 }
 
 contract EpochRewardsTest_setTargetVotingYieldParameters_L2 is
-  TransitionToL2AfterL1,
+  EpochRewardsTest_L2,
   EpochRewardsTest_setTargetVotingYieldParameters
 {}
 
@@ -479,7 +476,7 @@ contract EpochRewardsTest_setTargetVotingYield is EpochRewardsTest {
 }
 
 contract EpochRewardsTest_setTargetVotingYield_L2 is
-  TransitionToL2AfterL1,
+  EpochRewardsTest_L2,
   EpochRewardsTest_setTargetVotingYield
 {}
 
@@ -492,7 +489,7 @@ contract EpochRewardsTest_getTargetGoldTotalSupply is EpochRewardsTest {
 }
 
 contract EpochRewardsTest_getTargetGoldTotalSupply_L2 is
-  TransitionToL2AfterL1,
+  EpochRewardsTest_L2,
   EpochRewardsTest_getTargetGoldTotalSupply
 {}
 
@@ -507,7 +504,7 @@ contract EpochRewardsTest_getTargetVoterRewards is EpochRewardsTest {
 }
 
 contract EpochRewardsTest_getTargetVoterRewards_L2 is
-  TransitionToL2AfterL1,
+  EpochRewardsTest_L2,
   EpochRewardsTest_getTargetVoterRewards
 {}
 
@@ -523,7 +520,7 @@ contract EpochRewardsTest_getTargetTotalEpochPaymentsInGold is EpochRewardsTest 
 }
 
 contract EpochRewardsTest_getTargetTotalEpochPaymentsInGold_L2 is
-  TransitionToL2AfterL1,
+  EpochRewardsTest_L2,
   EpochRewardsTest_getTargetTotalEpochPaymentsInGold
 {}
 
@@ -591,7 +588,7 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
 }
 
 contract EpochRewardsTest_getRewardsMultiplier_L2 is
-  TransitionToL2AfterL1,
+  EpochRewardsTest_L2,
   EpochRewardsTest_getRewardsMultiplier
 {}
 
@@ -889,7 +886,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
 }
 
 contract EpochRewardsTest_updateTargetVotingYield_L2 is
-  TransitionToL2AfterL1,
+  EpochRewardsTest_L2,
   EpochRewardsTest_updateTargetVotingYield
 {}
 
@@ -970,7 +967,7 @@ contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAn
 }
 
 contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAndTheActualRemainingSupplyIs10pMoreThanTheTargetRemainingSupplyAfterRewards_calculateTargetEpochRewards_L2 is
-  TransitionToL2AfterL1,
+  EpochRewardsTest_L2,
   EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAndTheActualRemainingSupplyIs10pMoreThanTheTargetRemainingSupplyAfterRewards_calculateTargetEpochRewards
 {}
 
@@ -1104,4 +1101,4 @@ contract EpochRewardsTest_isReserveLow is EpochRewardsTest {
   }
 }
 
-contract EpochRewardsTest_isReserveLow_L2 is TransitionToL2AfterL1, EpochRewardsTest_isReserveLow {}
+contract EpochRewardsTest_isReserveLow_L2 is EpochRewardsTest_L2, EpochRewardsTest_isReserveLow {}
