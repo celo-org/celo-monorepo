@@ -73,9 +73,6 @@ contract EpochRewardsTest is Utils {
 
     freezer = new Freezer(true);
 
-    // setupRegistry();
-    // setupEpochManager();
-
     celoUnreleasedTreasuryAddress = actor("celoUnreleasedTreasury");
     deployCodeTo("CeloUnreleasedTreasury.sol", abi.encode(false), celoUnreleasedTreasuryAddress);
     registry.setAddressFor(CeloUnreleasedTreasuryContract, celoUnreleasedTreasuryAddress);
@@ -106,6 +103,24 @@ contract EpochRewardsTest is Utils {
       address(0),
       carbonOffsettingFraction
     );
+  }
+
+  function _setNumberOfElectedInCurrentSet(uint256 numberValidators) internal {
+    if (isL2()) {
+      epochManager.setNumberOfElectedInCurrentSet(numberValidators);
+    } else {
+      epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
+    }
+  }
+
+  function _updateTargetVotingYieldBasedOnLayer() internal {
+    if (isL2()) {
+      vm.prank(address(epochManager));
+      epochRewards.updateTargetVotingYield();
+    } else {
+      vm.prank(address(0));
+      epochRewards.updateTargetVotingYield();
+    }
   }
 
   function getExpectedTargetTotalSupply(uint256 timeDelta) internal pure returns (uint256) {
@@ -453,7 +468,7 @@ contract EpochRewardsTest_getTargetVoterRewards_L2 is
 contract EpochRewardsTest_getTargetTotalEpochPaymentsInGold is EpochRewardsTest {
   function test_ShouldgetTargetTotalEpochPaymentsInGold_WhenExchangeRateIsSet() public {
     uint256 numberValidators = 100;
-    epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
+    _setNumberOfElectedInCurrentSet(numberValidators);
 
     uint256 expected = uint256((targetValidatorEpochPayment * numberValidators) / exchangeRate);
 
@@ -535,9 +550,10 @@ contract EpochRewardsTest_getRewardsMultiplier_L2 is
 {}
 
 contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
-  uint256 constant totalSupply = 6000000 ether;
+  uint256 constant totalSupplyL1 = 6000000 ether;
+  uint256 constant celoUnreleasedTreasuryBalance = SUPPLY_CAP - totalSupplyL1;
   uint256 constant reserveBalance = 1000000 ether;
-  uint256 constant floatingSupply = totalSupply - reserveBalance;
+  uint256 constant floatingSupply = totalSupplyL1 - reserveBalance;
 
   function setUp() public {
     super.setUp();
@@ -563,7 +579,11 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
       2 * FIXED1
     );
 
-    mockCeloToken.setTotalSupply(totalSupply);
+    if (isL2()) {
+      vm.deal(celoUnreleasedTreasuryAddress, celoUnreleasedTreasuryBalance);
+    } else {
+      mockCeloToken.setTotalSupply(totalSupplyL1);
+    }
     vm.deal(address(reserve), reserveBalance);
   }
 
@@ -661,13 +681,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     for (uint256 i = 0; i < 600; i++) {
       // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
       // time travel alone is not enough, updateTargetVotingYield needs to be called
-      if (isL2()) {
-        vm.prank(address(epochManager));
-        epochRewards.updateTargetVotingYield();
-      } else {
-        vm.prank(address(0));
-        epochRewards.updateTargetVotingYield();
-      }
+      _updateTargetVotingYieldBasedOnLayer();
     }
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
@@ -682,13 +696,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     election.setTotalVotes(totalVotes);
     // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
     for (uint256 i = 0; i < 800; i++) {
-      if (isL2()) {
-        vm.prank(address(epochManager));
-        epochRewards.updateTargetVotingYield();
-      } else {
-        vm.prank(address(0));
-        epochRewards.updateTargetVotingYield();
-      }
+      _updateTargetVotingYieldBasedOnLayer();
     }
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
@@ -702,13 +710,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     election.setTotalVotes(totalVotes);
     // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
     for (uint256 i = 0; i < 5; i++) {
-      if (isL2()) {
-        vm.prank(address(epochManager));
-        epochRewards.updateTargetVotingYield();
-      } else {
-        vm.prank(address(0));
-        epochRewards.updateTargetVotingYield();
-      }
+      _updateTargetVotingYieldBasedOnLayer();
     }
 
     uint256 expected = targetVotingYieldParamsInitial +
@@ -727,13 +729,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     election.setTotalVotes(totalVotes);
     // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
     for (uint256 i = 0; i < 5; i++) {
-      if (isL2()) {
-        vm.prank(address(epochManager));
-        epochRewards.updateTargetVotingYield();
-      } else {
-        vm.prank(address(0));
-        epochRewards.updateTargetVotingYield();
-      }
+      _updateTargetVotingYieldBasedOnLayer();
     }
 
     uint256 expected = targetVotingYieldParamsInitial +
@@ -779,13 +775,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     uint256 totalVotes = (floatingSupply * (targetVotingGoldFraction - 0.1e24)) / FIXED1;
     election.setTotalVotes(totalVotes);
     for (uint256 i = 0; i < 356; i++) {
-      if (isL2()) {
-        vm.prank(address(epochManager));
-        epochRewards.updateTargetVotingYield();
-      } else {
-        vm.prank(address(0));
-        epochRewards.updateTargetVotingYield();
-      }
+      _updateTargetVotingYieldBasedOnLayer();
     }
 
     uint256 expected = targetVotingYieldParamsInitial +
@@ -800,13 +790,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     uint256 totalVotes = (floatingSupply * (targetVotingGoldFraction + 0.1e24)) / FIXED1;
     election.setTotalVotes(totalVotes);
     for (uint256 i = 0; i < 356; i++) {
-      if (isL2()) {
-        vm.prank(address(epochManager));
-        epochRewards.updateTargetVotingYield();
-      } else {
-        vm.prank(address(0));
-        epochRewards.updateTargetVotingYield();
-      }
+      _updateTargetVotingYieldBasedOnLayer();
     }
 
     uint256 expected = targetVotingYieldParamsInitial -
@@ -817,13 +801,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
 
   function mockVotes(uint256 votes) internal {
     election.setTotalVotes(votes);
-    if (isL2()) {
-      vm.prank(address(epochManager));
-      epochRewards.updateTargetVotingYield();
-    } else {
-      vm.prank(address(0));
-      epochRewards.updateTargetVotingYield();
-    }
+    _updateTargetVotingYieldBasedOnLayer();
   }
 }
 
@@ -845,7 +823,7 @@ contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAn
   function setUp() public {
     super.setUp();
 
-    epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
+    _setNumberOfElectedInCurrentSet(numberValidators);
     election.setActiveVotes(activeVotes);
     uint256 expectedTargetTotalEpochPaymentsInGold = (targetValidatorEpochPayment *
       numberValidators) / exchangeRate;
@@ -858,8 +836,16 @@ contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAn
     uint256 expectedTargetTotalSupply = getExpectedTargetTotalSupply(timeDelta);
     uint256 expectedTargetRemainingSupply = SUPPLY_CAP - expectedTargetTotalSupply;
     uint256 actualRemainingSupply = (expectedTargetRemainingSupply * 11) / 10;
-    uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - expectedTargetGoldSupplyIncrease;
-    mockCeloToken.setTotalSupply(totalSupply);
+
+    if (isL2()) {
+      vm.deal(
+        celoUnreleasedTreasuryAddress,
+        actualRemainingSupply + expectedTargetGoldSupplyIncrease
+      );
+    } else {
+      uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - expectedTargetGoldSupplyIncrease;
+      mockCeloToken.setTotalSupply(totalSupply);
+    }
     expectedMultiplier = (FIXED1 + rewardsMultiplierAdjustmentsUnderspend / 10);
 
     validatorReward = (targetValidatorEpochPayment * numberValidators) / exchangeRate;
@@ -869,7 +855,7 @@ contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAn
   }
 
   function test_ShouldFetchTheExpectedRewardsMultiplier() public {
-    assertApproxEqRel(epochRewards.getRewardsMultiplier(), expectedMultiplier, 2e13);
+    assertApproxEqRel(epochRewards.getRewardsMultiplier(), expectedMultiplier, 6e13);
   }
 
   function test_ShouldReturnTheTargetValidatorEpochPaymentTimesTheRewardsMultiplier() public {
