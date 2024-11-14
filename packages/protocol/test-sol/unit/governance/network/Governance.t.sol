@@ -127,13 +127,12 @@ contract GovernanceTest is Test, TestConstants, Utils {
 
     // change block.tiemstamp so we're not on timestamp = 0
     vm.warp(100 * 60);
-    console2.log("###HERE");
+
     setUpContracts();
-    console2.log("###HERE1");
+
     setUpVoterAccount();
-    console2.log("###HERE2");
+
     setUpProposalStubs();
-    console2.log("###HERE3");
   }
 
   function assertNotEq(uint256 a, uint256 b) internal {
@@ -3177,10 +3176,12 @@ contract GovernanceTest_approveHotfix_L2 is GovernanceTest {
   }
 }
 
-contract GovernanceTest_whitelistHotfix is GovernanceTest {
+contract GovernanceTest_whitelistHotfix_setup is GovernanceTest {
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
   event HotfixWhitelisted(bytes32 indexed hash, address whitelister);
+}
 
+contract GovernanceTest_whitelistHotfix is GovernanceTest_whitelistHotfix_setup {
   function test_ShouldWhitelistHotfixByValidator() public {
     address validator = actor("validator1");
     governance.addValidator(validator);
@@ -3199,18 +3200,22 @@ contract GovernanceTest_whitelistHotfix is GovernanceTest {
     vm.prank(validator);
     governance.whitelistHotfix(HOTFIX_HASH);
   }
+}
 
-  function test_Reverts_WhenL2() public {
+contract GovernanceTest_whitelistHotfix_L2 is
+  GovernanceTest_L2,
+  GovernanceTest_whitelistHotfix_setup
+{
+  function test_Reverts_WhenCalled() public {
     address validator = actor("validator1");
     governance.addValidator(validator);
-    _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(validator);
     governance.whitelistHotfix(HOTFIX_HASH);
   }
 }
 
-contract GovernanceTest_hotfixWhitelistValidatorTally is GovernanceTest {
+contract GovernanceTest_hotfixWhitelistValidatorTally_setup is GovernanceTest {
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
 
   address[] validators;
@@ -3233,7 +3238,11 @@ contract GovernanceTest_hotfixWhitelistValidatorTally is GovernanceTest {
       signers.push(signer);
     }
   }
+}
 
+contract GovernanceTest_hotfixWhitelistValidatorTally is
+  GovernanceTest_hotfixWhitelistValidatorTally_setup
+{
   function test_countValidatorAccountsThatHaveWhitelisted() public {
     for (uint256 i = 0; i < 3; i++) {
       vm.prank(validators[i]);
@@ -3275,17 +3284,21 @@ contract GovernanceTest_hotfixWhitelistValidatorTally is GovernanceTest {
 
     assertEq(governance.hotfixWhitelistValidatorTally(HOTFIX_HASH), 3);
   }
+}
 
-  function test_Reverts_WhenL2() public {
+contract GovernanceTest_hotfixWhitelistValidatorTally_L2 is
+  GovernanceTest_L2,
+  GovernanceTest_hotfixWhitelistValidatorTally_setup
+{
+  function test_Reverts_WhenCalled() public {
     address validator = actor("validator1");
     governance.addValidator(validator);
-    _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
     governance.hotfixWhitelistValidatorTally(HOTFIX_HASH);
   }
 }
 
-contract GovernanceTest_isHotfixPassing is GovernanceTest {
+contract GovernanceTest_isHotfixPassing_setup is GovernanceTest {
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
   address validator1;
   address validator2;
@@ -3302,7 +3315,9 @@ contract GovernanceTest_isHotfixPassing is GovernanceTest {
     vm.prank(validator2);
     accounts.createAccount();
   }
+}
 
+contract GovernanceTest_isHotfixPassing is GovernanceTest_isHotfixPassing_setup {
   function test_returnFalseWhenHotfixHasNotBeenWhitelisted() public {
     assertFalse(governance.isHotfixPassing(HOTFIX_HASH));
   }
@@ -3320,9 +3335,13 @@ contract GovernanceTest_isHotfixPassing is GovernanceTest {
     governance.whitelistHotfix(HOTFIX_HASH);
     assertTrue(governance.isHotfixPassing(HOTFIX_HASH));
   }
+}
 
-  function test_Reverts_WhenL2() public {
-    _whenL2();
+contract GovernanceTest_isHotfixPassing_L2 is
+  GovernanceTest_L2,
+  GovernanceTest_isHotfixPassing_setup
+{
+  function test_Reverts_WhenCalled() public {
     vm.expectRevert("This method is no longer supported in L2.");
     governance.isHotfixPassing(HOTFIX_HASH);
   }
