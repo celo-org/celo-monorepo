@@ -15,6 +15,7 @@ import "@celo-contracts/common/linkedlists/AddressSortedLinkedList.sol";
 import "@celo-contracts/identity/test/MockRandom.sol";
 import "@celo-contracts/common/Freezer.sol";
 import "@test-sol/unit/common/mocks/MockEpochManager.sol";
+import "@test-sol/utils/WhenL2.sol";
 
 import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";
 
@@ -157,18 +158,6 @@ contract ElectionTest is Utils {
     election.setBlockedByContract(address(blocker));
   }
 
-  function _whenL2WithEpoch() public {
-    blockTravel(ph.epochSize() + 1);
-    uint256 l1EpochNumber = election.getEpochNumber();
-
-    address[] memory _elected = new address[](2);
-    _elected[0] = actor("validator");
-    _elected[1] = actor("otherValidator");
-
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
-    epochManager.initializeSystem(l1EpochNumber, block.number, _elected);
-  }
-
   function travelNEpoch(uint256 n) public {
     if (isL2()) {
       epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + n);
@@ -178,12 +167,7 @@ contract ElectionTest is Utils {
   }
 }
 
-contract TransitionToL2After is ElectionTest {
-  function setUp() public {
-    super.setUp();
-    _whenL2WithEpoch();
-  }
-}
+contract ElectionTest_L2 is ElectionTest, WhenL2 {}
 
 contract ElectionTest_Initialize is ElectionTest {
   function test_shouldHaveSetOwner() public {
@@ -231,7 +215,7 @@ contract ElectionTest_SetElectabilityThreshold is ElectionTest {
 
 contract ElectionTest_SetElectabilityThreshold_L2 is
   ElectionTest_SetElectabilityThreshold,
-  TransitionToL2After
+  ElectionTest_L2
 {}
 
 contract ElectionTest_SetElectableValidators is ElectionTest {
@@ -276,7 +260,7 @@ contract ElectionTest_SetElectableValidators is ElectionTest {
 
 contract ElectionTest_SetElectableValidators_L2 is
   ElectionTest_SetElectableValidators,
-  TransitionToL2After
+  ElectionTest_L2
 {}
 
 contract ElectionTest_SetMaxNumGroupsVotedFor is ElectionTest {
@@ -307,7 +291,7 @@ contract ElectionTest_SetMaxNumGroupsVotedFor is ElectionTest {
 
 contract ElectionTest_SetMaxNumGroupsVotedFor_L2 is
   ElectionTest_SetMaxNumGroupsVotedFor,
-  TransitionToL2After
+  ElectionTest_L2
 {}
 
 contract ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
@@ -351,7 +335,7 @@ contract ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
 
 contract ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups_L2 is
   ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups,
-  TransitionToL2After
+  ElectionTest_L2
 {}
 
 contract ElectionTest_MarkGroupEligible is ElectionTest {
@@ -390,7 +374,7 @@ contract ElectionTest_MarkGroupEligible is ElectionTest {
   }
 }
 
-contract ElectionTest_MarkGroupEligible_L2 is ElectionTest_MarkGroupEligible, TransitionToL2After {}
+contract ElectionTest_MarkGroupEligible_L2 is ElectionTest_MarkGroupEligible, ElectionTest_L2 {}
 
 contract ElectionTest_MarkGroupInEligible is ElectionTest {
   function setUp() public {
@@ -428,10 +412,7 @@ contract ElectionTest_MarkGroupInEligible is ElectionTest {
   }
 }
 
-contract ElectionTest_MarkGroupInEligible_L2 is
-  ElectionTest_MarkGroupInEligible,
-  TransitionToL2After
-{}
+contract ElectionTest_MarkGroupInEligible_L2 is ElectionTest_MarkGroupInEligible, ElectionTest_L2 {}
 
 contract ElectionTest_Vote_WhenGroupEligible is ElectionTest {
   address voter = address(this);
@@ -633,7 +614,7 @@ contract ElectionTest_Vote_WhenGroupEligible is ElectionTest {
 }
 
 contract ElectionTest_Vote_WhenGroupEligible_L2 is
-  TransitionToL2After,
+  ElectionTest_L2,
   ElectionTest_Vote_WhenGroupEligible
 {}
 
@@ -793,7 +774,7 @@ contract ElectionTest_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes is Electio
 
 contract ElectionTest_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes_L2 is
   ElectionTest_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes,
-  TransitionToL2After
+  ElectionTest_L2
 {}
 
 contract ElectionTest_Vote_GroupNotEligible is ElectionTest {
@@ -821,7 +802,7 @@ contract ElectionTest_Vote_GroupNotEligible is ElectionTest {
 
 contract ElectionTest_Vote_GroupNotEligible_L2 is
   ElectionTest_Vote_GroupNotEligible,
-  TransitionToL2After
+  ElectionTest_L2
 {}
 
 contract ElectionTest_Activate is ElectionTest {
@@ -988,7 +969,7 @@ contract ElectionTest_Activate is ElectionTest {
   }
 }
 
-contract ElectionTest_Activate_L2 is TransitionToL2After, ElectionTest_Activate {}
+contract ElectionTest_Activate_L2 is ElectionTest_L2, ElectionTest_Activate {}
 
 contract ElectionTest_ActivateForAccount is ElectionTest {
   address voter = address(this);
@@ -1144,10 +1125,7 @@ contract ElectionTest_ActivateForAccount is ElectionTest {
   }
 }
 
-contract ElectionTest_ActivateForAccount_L2 is
-  TransitionToL2After,
-  ElectionTest_ActivateForAccount
-{}
+contract ElectionTest_ActivateForAccount_L2 is ElectionTest_L2, ElectionTest_ActivateForAccount {}
 
 contract ElectionTest_RevokePending is ElectionTest {
   address voter = address(this);
@@ -1305,7 +1283,7 @@ contract ElectionTest_RevokePending is ElectionTest {
   }
 }
 
-contract ElectionTest_RevokePending_L2 is ElectionTest_RevokePending, TransitionToL2After {}
+contract ElectionTest_RevokePending_L2 is ElectionTest_RevokePending, ElectionTest_L2 {}
 
 contract ElectionTest_RevokeActive is ElectionTest {
   address voter0 = address(this);
@@ -1585,7 +1563,7 @@ contract ElectionTest_RevokeActive is ElectionTest {
   }
 }
 
-contract ElectionTest_RevokeActive_L2 is TransitionToL2After, ElectionTest_RevokeActive {}
+contract ElectionTest_RevokeActive_L2 is ElectionTest_L2, ElectionTest_RevokeActive {}
 
 contract ElectionTest_ElectValidatorsAbstract is ElectionTest {
   struct MemberWithVotes {
@@ -1849,7 +1827,7 @@ contract ElectionTest_ElectValidatorSigners is ElectionTest_ElectValidatorsAbstr
 
 contract ElectionTest_ElectValidatorSignersL2 is
   ElectionTest_ElectValidatorSigners,
-  TransitionToL2After
+  ElectionTest_L2
 {}
 
 contract ElectionTest_ElectValidatorsAccounts is ElectionTest_ElectValidatorsAbstract {
@@ -1965,7 +1943,7 @@ contract ElectionTest_ElectValidatorsAccounts is ElectionTest_ElectValidatorsAbs
 
 contract ElectionTest_ElectValidatorsAccountsL2 is
   ElectionTest_ElectValidatorsAccounts,
-  TransitionToL2After
+  ElectionTest_L2
 {}
 
 contract ElectionTest_GetGroupEpochRewards is ElectionTest {
@@ -2253,7 +2231,7 @@ contract ElectionTest_DistributeEpochRewards is ElectionTest {
 }
 
 contract ElectionTest_DistributeEpochRewards_L2 is
-  TransitionToL2After,
+  ElectionTest_L2,
   ElectionTest_DistributeEpochRewards
 {}
 
@@ -2682,10 +2660,7 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
   }
 }
 
-contract ElectionTest_ForceDecrementVotes_L2 is
-  TransitionToL2After,
-  ElectionTest_ForceDecrementVotes
-{}
+contract ElectionTest_ForceDecrementVotes_L2 is ElectionTest_L2, ElectionTest_ForceDecrementVotes {}
 
 contract ElectionTest_ConsistencyChecks is ElectionTest {
   struct AccountStruct {
@@ -2915,7 +2890,7 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
   }
 }
 
-contract ElectionTest_ConsistencyChecks_L2 is TransitionToL2After, ElectionTest_ConsistencyChecks {}
+contract ElectionTest_ConsistencyChecks_L2 is ElectionTest_L2, ElectionTest_ConsistencyChecks {}
 
 contract ElectionTest_HasActivatablePendingVotes is ElectionTest {
   address voter = address(this);
@@ -2946,6 +2921,6 @@ contract ElectionTest_HasActivatablePendingVotes is ElectionTest {
 }
 
 contract ElectionTest_HasActivatablePendingVotes_L2 is
-  TransitionToL2After,
+  ElectionTest_L2,
   ElectionTest_HasActivatablePendingVotes
 {}
