@@ -2,11 +2,10 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "celo-foundry/Test.sol";
-import { TestConstants } from "@test-sol/constants.sol";
+import { Utils } from "@test-sol/utils.sol";
+import "@test-sol/utils/WhenL2.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@test-sol/unit/common/GoldTokenMock.sol";
 import "@celo-contracts/governance/LockedGold.sol";
@@ -19,10 +18,9 @@ import "@celo-contracts/governance/test/MockValidators.sol";
 
 import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";
 
-contract LockedGoldTest is Test, TestConstants {
+contract LockedGoldTest is Utils {
   using FixidityLib for FixidityLib.Fraction;
 
-  Registry registry;
   Accounts accounts;
   GoldToken goldToken;
   MockStableToken stableToken;
@@ -68,8 +66,7 @@ contract LockedGoldTest is Test, TestConstants {
   event MaxDelegateesCountSet(uint256 value);
 
   function setUp() public {
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
-    registry = Registry(REGISTRY_ADDRESS);
+    super.setUp();
 
     goldToken = new GoldTokenMock();
     accounts = new Accounts(true);
@@ -215,6 +212,8 @@ contract LockedGoldTest is Test, TestConstants {
     lockedGold.lock.value(value)();
   }
 }
+
+contract LockedGoldTest_L2 is WhenL2, LockedGoldTest {}
 
 contract LockedGoldTest_initialize is LockedGoldTest {
   function setUp() public {
