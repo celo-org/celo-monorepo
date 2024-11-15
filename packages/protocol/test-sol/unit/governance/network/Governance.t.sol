@@ -3516,7 +3516,7 @@ contract GovernanceTest_prepareHotfix_L2 is GovernanceTest {
   }
 }
 
-contract GovernanceTest_resetHotfix is GovernanceTest {
+contract GovernanceTest_resetHotfix_setup is GovernanceTest {
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
   bytes32 constant SALT = 0x657ed9d64e84fa3d1af43b3a307db22aba2d90a158015df1c588c02e24ca08f0;
   bytes32 hotfixHash;
@@ -3525,12 +3525,6 @@ contract GovernanceTest_resetHotfix is GovernanceTest {
 
   function setUp() public {
     super.setUp();
-
-    validator1 = actor("validator1");
-    governance.addValidator(validator1);
-    vm.prank(validator1);
-    accounts.createAccount();
-
     vm.prank(accOwner);
     governance.setSecurityCouncil(accCouncil);
 
@@ -3541,6 +3535,17 @@ contract GovernanceTest_resetHotfix is GovernanceTest {
       okProp.dataLengths,
       SALT
     );
+  }
+}
+
+contract GovernanceTest_resetHotfix is GovernanceTest_resetHotfix_setup {
+  function setUp() public {
+    super.setUp();
+
+    validator1 = actor("validator1");
+    governance.addValidator(validator1);
+    vm.prank(validator1);
+    accounts.createAccount();
   }
 
   function test_Reverts_whenCalledOnL1() public {
@@ -3569,26 +3574,7 @@ contract GovernanceTest_resetHotfix is GovernanceTest {
   }
 }
 
-contract GovernanceTest_resetHotfix_L2 is GovernanceTest {
-  bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
-  bytes32 constant SALT = 0x657ed9d64e84fa3d1af43b3a307db22aba2d90a158015df1c588c02e24ca08f0;
-  bytes32 hotfixHash;
-  event HotfixRecordReset(bytes32 indexed hash);
-
-  function setUp() public {
-    super.setUp();
-    _whenL2();
-    vm.prank(accOwner);
-    governance.setSecurityCouncil(accCouncil);
-
-    hotfixHash = governance.getHotfixHash(
-      okProp.values,
-      okProp.destinations,
-      okProp.data,
-      okProp.dataLengths,
-      SALT
-    );
-  }
+contract GovernanceTest_resetHotfix_L2 is GovernanceTest_L2, GovernanceTest_resetHotfix_setup {
   function test_ShouldResetHotfixRecordWhenExecutionTimeLimitHasPassed() public {
     vm.prank(accOwner);
     governance.setHotfixExecutionTimeWindow(DAY);
