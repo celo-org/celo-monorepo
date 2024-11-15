@@ -157,14 +157,6 @@ contract ElectionTest is Utils {
     blocker = new TestBlocker();
     election.setBlockedByContract(address(blocker));
   }
-
-  function travelNEpoch(uint256 n) public {
-    if (isL2()) {
-      epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + n);
-    } else {
-      blockTravel((n * ph.epochSize()) + 1);
-    }
-  }
 }
 
 contract ElectionTest_L2 is ElectionTest, WhenL2 {}
