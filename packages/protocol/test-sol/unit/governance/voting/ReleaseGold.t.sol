@@ -2,9 +2,8 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "celo-foundry/Test.sol";
-
-import { TestConstants } from "@test-sol/constants.sol";
+import { Utils } from "@test-sol/utils.sol";
+import "@test-sol/utils/WhenL2.sol";
 import { ECDSAHelper } from "@test-sol/utils/ECDSAHelper.sol";
 
 import "@celo-contracts/identity/Escrow.sol";
@@ -13,7 +12,6 @@ import "@celo-contracts/identity/test/MockAttestations.sol";
 import "@celo-contracts/identity/test/MockERC20Token.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 
-import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/Freezer.sol";
 import "@celo-contracts/common/GoldToken.sol";
@@ -25,10 +23,9 @@ import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockGovernance.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 
-contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
+contract ReleaseGoldTest is Utils, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
 
-  Registry registry;
   Accounts accounts;
   Freezer freezer;
   GoldToken goldToken;
@@ -51,11 +48,6 @@ contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
   address celoUnreleasedTreasury = actor("CeloUnreleasedTreasury");
 
   uint256 constant TOTAL_AMOUNT = 1 ether * 10;
-
-  uint256 constant MINUTE = 60;
-  uint256 constant HOUR = 60 * 60;
-  uint256 constant DAY = 24 * HOUR;
-  uint256 constant MONTH = 30 * DAY;
   uint256 constant UNLOCKING_PERIOD = 3 * DAY;
 
   ReleaseGoldMockTunnel.InitParams initParams;
@@ -68,10 +60,6 @@ contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
   event LiquidityProvisionSet(address indexed beneficiary);
   event CanExpireSet(bool canExpire);
   event BeneficiarySet(address indexed beneficiary);
-
-  function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
-  }
 
   function newReleaseGold(bool prefund, bool startReleasing) internal returns (ReleaseGold) {
     releaseGold = new ReleaseGold(true);
@@ -101,11 +89,9 @@ contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
   }
 
   function setUp() public {
+    super.setUp();
     (beneficiary, beneficiaryPrivateKey) = actorWithPK("beneficiary");
     walletAddress = beneficiary;
-
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
-    registry = Registry(REGISTRY_ADDRESS);
 
     accounts = new Accounts(true);
     freezer = new Freezer(true);
@@ -157,11 +143,9 @@ contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
   }
 }
 
-contract ReleaseGoldTest_Initialize is ReleaseGoldTest {
-  function setUp() public {
-    super.setUp();
-  }
+contract ReleaseGoldTest_L2 is WhenL2, ReleaseGoldTest {}
 
+contract ReleaseGoldTest_Initialize is ReleaseGoldTest {
   function test_ShouldIndicateIsFundedIfDeploymentIsPrefunded() public {
     newReleaseGold(true, false);
     assertTrue(releaseGold.isFunded());
@@ -174,10 +158,6 @@ contract ReleaseGoldTest_Initialize is ReleaseGoldTest {
 }
 
 contract ReleaseGoldTest_Payable is ReleaseGoldTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldAcceptGoldTransferByDefaultFromAnyone() public {
     newReleaseGold(true, false);
     uint256 originalBalance = goldToken.balanceOf(address(releaseGold));
@@ -265,10 +245,6 @@ contract ReleaseGoldTest_GenericTransfer is ReleaseGoldTest {
 
 contract ReleaseGoldTest_Creation is ReleaseGoldTest {
   uint256 public maxUint256 = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
-
-  function setUp() public {
-    super.setUp();
-  }
 
   function test_ShouldHaveAssociatedFundsWithAScheduleUponCreation() public {
     newReleaseGold(true, false);
@@ -1164,10 +1140,6 @@ contract ReleaseGoldTest_AuthorizeWithPublicKeys is ReleaseGoldTest {
 }
 
 contract ReleaseGoldTest_Revoke is ReleaseGoldTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldAllowReleaseOwnerToRevokeTheReleaseGOld() public {
     newReleaseGold(true, false);
     vm.expectEmit(true, true, true, true);
