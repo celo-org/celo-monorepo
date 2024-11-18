@@ -78,6 +78,8 @@ contract RegistryTest_getAddressFor is RegistryTest {
   }
 }
 
+contract RegistryTest_getAddressFor_L2 is RegistryTest_L2, RegistryTest_getAddressFor {}
+
 contract RegistryTest_getAddressForString is RegistryTest {
   function test_GetsRightAddress() public {
     _registry.setAddressFor(SOME_ID, SOME_ADDRESS);
@@ -88,6 +90,8 @@ contract RegistryTest_getAddressForString is RegistryTest {
     _registry.getAddressForString(SOME_ID);
   }
 }
+
+contract RegistryTest_getAddressForString_L2 is RegistryTest_L2, RegistryTest_getAddressForString {}
 
 contract RegistryTest_getAddressForOrDie is RegistryTest {
   function test_GetsRightAddress() public {
@@ -101,6 +105,8 @@ contract RegistryTest_getAddressForOrDie is RegistryTest {
   }
 }
 
+contract RegistryTest_getAddressForOrDie_L2 is RegistryTest_L2, RegistryTest_getAddressForOrDie {}
+
 contract RegistryTest_getAddressForStringOrDie is RegistryTest {
   function test_GetAddressForStringOrDie_gets_address() public {
     _registry.setAddressFor(SOME_ID, SOME_ADDRESS);
@@ -112,3 +118,8 @@ contract RegistryTest_getAddressForStringOrDie is RegistryTest {
     _registry.getAddressForStringOrDie(SOME_ID);
   }
 }
+
+contract RegistryTest_getAddressForStringOrDie_L2 is
+  RegistryTest_L2,
+  RegistryTest_getAddressForStringOrDie
+{}
