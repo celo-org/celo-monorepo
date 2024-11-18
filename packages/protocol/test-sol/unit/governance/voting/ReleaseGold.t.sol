@@ -1092,22 +1092,6 @@ contract ReleaseGoldTest_AuthorizeWithPublicKeys_setup is ReleaseGoldTest {
 }
 
 contract ReleaseGoldTest_AuthorizeWithPublicKeys is ReleaseGoldTest_AuthorizeWithPublicKeys_setup {
-  // function setUp() public {
-  //   super.setUp();
-
-  //   initParams.revocable = false;
-  //   initParams2._canValidate = true;
-  //   initParams2._refundAddress = address(0);
-  //   newReleaseGold(true, false);
-
-  //   vm.prank(beneficiary);
-  //   releaseGold.createAccount();
-
-  //   (authorized, authorizedPK) = actorWithPK("authorized");
-  //   (v, r, s) = getParsedSignatureOfAddress(address(releaseGold), authorizedPK);
-  //   ecdsaPublicKey = addressToPublicKey(keccak256(abi.encodePacked("dummy_msg_data")), v, r, s);
-  // }
-
   function test_ShouldSetTheAuthorizedKeys_WhenUsingECDSAPublickKey() public {
     vm.prank(beneficiary);
     releaseGold.authorizeValidatorSignerWithPublicKey(
@@ -1154,53 +1138,6 @@ contract ReleaseGoldTest_AuthorizeWithPublicKeys is ReleaseGoldTest_AuthorizeWit
     assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
     assertEq(accounts.validatorSignerToAccount(authorized), address(releaseGold));
   }
-
-  // function test_ShouldSetTheAuthorizedKeys_WhenUsingECDSAPublickKey_WhenL2() public {
-  //   _whenL2();
-  //   vm.prank(beneficiary);
-  //   releaseGold.authorizeValidatorSignerWithPublicKey(
-  //     address(uint160(authorized)),
-  //     v,
-  //     r,
-  //     s,
-  //     ecdsaPublicKey
-  //   );
-
-  //   assertEq(accounts.authorizedBy(authorized), address(releaseGold));
-  //   assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
-  //   assertEq(accounts.validatorSignerToAccount(authorized), address(releaseGold));
-  // }
-
-  // function test_Reverts_WhenAuthorizeValidatorSignerWithKeysCalledOnL2() public {
-  //   _whenL2();
-  //   bytes32 newBlsPublicKeyPart1 = _randomBytes32();
-  //   bytes32 newBlsPublicKeyPart2 = _randomBytes32();
-  //   bytes32 newBlsPublicKeyPart3 = _randomBytes32();
-  //   bytes memory newBlsPublicKey = abi.encodePacked(
-  //     newBlsPublicKeyPart1,
-  //     newBlsPublicKeyPart2,
-  //     newBlsPublicKeyPart3
-  //   );
-  //   newBlsPublicKey = _truncateBytes(newBlsPublicKey, 96);
-
-  //   bytes32 newBlsPoPPart1 = _randomBytes32();
-  //   bytes32 newBlsPoPPart2 = _randomBytes32();
-  //   bytes memory newBlsPoP = abi.encodePacked(newBlsPoPPart1, newBlsPoPPart2);
-  //   newBlsPoP = _truncateBytes(newBlsPoP, 48);
-
-  //   vm.expectRevert("This method is no longer supported in L2.");
-
-  //   vm.prank(beneficiary);
-  //   releaseGold.authorizeValidatorSignerWithKeys(
-  //     address(uint160(authorized)),
-  //     v,
-  //     r,
-  //     s,
-  //     ecdsaPublicKey,
-  //     newBlsPublicKey,
-  //     newBlsPoP
-  //   );
-  // }
 }
 
 contract ReleaseGoldTest_AuthorizeWithPublicKeys_L2 is
@@ -2326,12 +2263,12 @@ contract ReleaseGoldTest_GetWithdrawableAmount_L2 is
   ReleaseGoldTest_GetWithdrawableAmount
 {}
 
-contract ReleaseGoldTest_DeployAndInitializeOnL2 is ReleaseGoldTest {
+contract ReleaseGoldTest_DeployAndInitialize is ReleaseGoldTest_L2 {
   uint256 public maxUint256 = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
   function setUp() public {
     super.setUp();
-    _whenL2();
-    initParams2.registryAddress = PROXY_ADMIN_ADDRESS;
+
+    // initParams2.registryAddress = PROXY_ADMIN_ADDRESS;
   }
 
   function test_ShouldIndicateIsFundedIfDeploymentIsPrefunded() public {
@@ -2461,8 +2398,3 @@ contract ReleaseGoldTest_DeployAndInitializeOnL2 is ReleaseGoldTest {
     tunnel.MockInitialize(owner, initParams, initParams2);
   }
 }
-
-contract ReleaseGoldTest_DeployAndInitializeOnL2_L2 is
-  ReleaseGoldTest_L2,
-  ReleaseGoldTest_DeployAndInitializeOnL2
-{}
