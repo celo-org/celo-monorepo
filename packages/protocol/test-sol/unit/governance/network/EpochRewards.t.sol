@@ -11,7 +11,7 @@ import { Reserve } from "@lib/mento-core/contracts/Reserve.sol";
 
 import { MockSortedOracles } from "@celo-contracts/stability/test/MockSortedOracles.sol";
 import { MockStableToken } from "@celo-contracts/stability/test/MockStableToken.sol";
-import { GoldTokenMock } from "@test-sol/unit/common/GoldTokenMock.sol";
+import { CeloTokenMock } from "@test-sol/unit/common/CeloTokenMock.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
@@ -42,7 +42,7 @@ contract EpochRewardsTest is Test, TestConstants, Utils {
   MockElection election;
   MockSortedOracles mockSortedOracles;
   MockStableToken mockStableToken;
-  GoldTokenMock mockGoldToken;
+  CeloTokenMock mockCeloToken;
   Reserve reserve;
   Freezer freezer;
 
@@ -67,7 +67,7 @@ contract EpochRewardsTest is Test, TestConstants, Utils {
     election = new MockElection();
     mockSortedOracles = new MockSortedOracles();
     mockStableToken = new MockStableToken();
-    mockGoldToken = new GoldTokenMock();
+    mockCeloToken = new CeloTokenMock();
 
     freezer = new Freezer(true);
     registry = new Registry(true);
@@ -75,7 +75,7 @@ contract EpochRewardsTest is Test, TestConstants, Utils {
     registry.setAddressFor(ElectionContract, address(election));
     registry.setAddressFor(SortedOraclesContract, address(mockSortedOracles));
     registry.setAddressFor(StableTokenContract, address(mockStableToken));
-    registry.setAddressFor(CeloTokenContract, address(mockGoldToken));
+    registry.setAddressFor(CeloTokenContract, address(mockCeloToken));
     registry.setAddressFor(FreezerContract, address(freezer));
 
     mockSortedOracles.setMedianRate(
@@ -482,7 +482,7 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
   }
 
   function test_ShouldReturnOne_WhenTheTargetSupplyIsEqualToTheActualSupplyAfterRewards() public {
-    mockGoldToken.setTotalSupply(expectedTargetTotalSupply - targetEpochReward);
+    mockCeloToken.setTotalSupply(expectedTargetTotalSupply - targetEpochReward);
     assertEq(epochRewards.getRewardsMultiplier(), FIXED1);
   }
 
@@ -491,7 +491,7 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
   {
     uint256 actualRemainingSupply = uint256((expectedTargetRemainingSupply * 11) / 10);
     uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - targetEpochReward;
-    mockGoldToken.setTotalSupply(totalSupply);
+    mockCeloToken.setTotalSupply(totalSupply);
 
     uint256 actual = epochRewards.getRewardsMultiplier();
     uint256 expected = uint256((FIXED1 + (rewardsMultiplierAdjustmentsUnderspend / 10)));
@@ -503,7 +503,7 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
   {
     uint256 actualRemainingSupply = uint256((expectedTargetRemainingSupply * 9) / 10);
     uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - targetEpochReward;
-    mockGoldToken.setTotalSupply(totalSupply);
+    mockCeloToken.setTotalSupply(totalSupply);
 
     uint256 actual = epochRewards.getRewardsMultiplier();
     uint256 expected = uint256((FIXED1 - (rewardsMultiplierAdjustmentsOverspend / 10)));
@@ -540,7 +540,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
       2 * FIXED1
     );
 
-    mockGoldToken.setTotalSupply(totalSupply);
+    mockCeloToken.setTotalSupply(totalSupply);
     vm.deal(address(reserve), reserveBalance);
   }
 
@@ -796,7 +796,7 @@ contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAn
     uint256 expectedTargetRemainingSupply = SUPPLY_CAP - expectedTargetTotalSupply;
     uint256 actualRemainingSupply = (expectedTargetRemainingSupply * 11) / 10;
     uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - expectedTargetGoldSupplyIncrease;
-    mockGoldToken.setTotalSupply(totalSupply);
+    mockCeloToken.setTotalSupply(totalSupply);
     expectedMultiplier = (FIXED1 + rewardsMultiplierAdjustmentsUnderspend / 10);
 
     validatorReward = (targetValidatorEpochPayment * numberValidators) / exchangeRate;
@@ -875,22 +875,22 @@ contract EpochRewardsTest_isReserveLow is EpochRewardsTest {
       2 * FIXED1
     );
     reserve.addToken(address(mockStableToken));
-    mockGoldToken.setTotalSupply(totalSupply);
+    mockCeloToken.setTotalSupply(totalSupply);
     mockStableToken.setTotalSupply(stableBalance);
   }
 
   // reserve ratio of 0.5'
   function test_ShouldBeLowAtStart_WhenReserveRatioIs05() public {
-    uint256 goldBalance = ((stableBalance / exchangeRate) / 2) / 2;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((stableBalance / exchangeRate) / 2) / 2;
+    vm.deal(address(reserve), celoBalance);
     // no time travel
     assertEq(epochRewards.isReserveLow(), true);
   }
 
   // reserve ratio of 1.5
   function test_ShouldBeLowAt15Years_WhenReserveRatioIs05() public {
-    uint256 goldBalance = ((stableBalance / exchangeRate) / 2) / 2;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((stableBalance / exchangeRate) / 2) / 2;
+    vm.deal(address(reserve), celoBalance);
     uint256 timeDelta = YEAR * 15;
     timeTravel(timeDelta);
 
@@ -898,8 +898,8 @@ contract EpochRewardsTest_isReserveLow is EpochRewardsTest {
   }
 
   function test_ShouldBeLowAt25Years_WhenReserveRatioIs05() public {
-    uint256 goldBalance = ((stableBalance / exchangeRate) / 2) / 2;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((stableBalance / exchangeRate) / 2) / 2;
+    vm.deal(address(reserve), celoBalance);
     uint256 timeDelta = YEAR * 25;
     timeTravel(timeDelta);
 
@@ -907,54 +907,54 @@ contract EpochRewardsTest_isReserveLow is EpochRewardsTest {
   }
 
   function test_ShouldBeLowAtStar_WhenReserveRatioIs1point5() public {
-    uint256 goldBalance = ((3 * stableBalance) / exchangeRate) / 4;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((3 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), celoBalance);
     // no time travel
     assertEq(epochRewards.isReserveLow(), true);
   }
 
   function test_ShouldBeLowAt12Years_WhenReserveRatioIs1point5() public {
-    uint256 goldBalance = ((3 * stableBalance) / exchangeRate) / 4;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((3 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), celoBalance);
     uint256 timeDelta = YEAR * 12;
     timeTravel(timeDelta);
     assertEq(epochRewards.isReserveLow(), true);
   }
 
   function test_ShouldNotBeLowAt15Years_WhenReserveRatioIs1point5() public {
-    uint256 goldBalance = ((3 * stableBalance) / exchangeRate) / 4;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((3 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), celoBalance);
     uint256 timeDelta = YEAR * 15;
     timeTravel(timeDelta);
     assertEq(epochRewards.isReserveLow(), false);
   }
 
   function test_ShouldNotBeLowAt25Years_WhenReserveRatioIs1point5() public {
-    uint256 goldBalance = ((3 * stableBalance) / exchangeRate) / 4;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((3 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), celoBalance);
     uint256 timeDelta = YEAR * 25;
     timeTravel(timeDelta);
     assertEq(epochRewards.isReserveLow(), false);
   }
 
   function test_ShouldBeLowAtStar_WhenReserveRatioIs2point5() public {
-    uint256 goldBalance = ((5 * stableBalance) / exchangeRate) / 4;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((5 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), celoBalance);
     // no time travel
     assertEq(epochRewards.isReserveLow(), false);
   }
 
   function test_ShouldNotBeLowAt15Years_WhenReserveRatioIs2point5() public {
-    uint256 goldBalance = ((5 * stableBalance) / exchangeRate) / 4;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((5 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), celoBalance);
     uint256 timeDelta = YEAR * 15;
     timeTravel(timeDelta);
     assertEq(epochRewards.isReserveLow(), false);
   }
 
   function test_ShouldNotBeLowAt25Years_WhenReserveRatioIs2point5() public {
-    uint256 goldBalance = ((5 * stableBalance) / exchangeRate) / 4;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((5 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), celoBalance);
     uint256 timeDelta = YEAR * 25;
     timeTravel(timeDelta);
     assertEq(epochRewards.isReserveLow(), false);
