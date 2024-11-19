@@ -2,7 +2,6 @@
 pragma solidity ^0.5.13;
 
 import "@celo-contracts/common/GoldToken.sol";
-import "@test-sol/unit/common/GoldTokenMock.sol";
 
 import { Utils } from "@test-sol/utils.sol";
 import "@test-sol/utils/WhenL2.sol";
