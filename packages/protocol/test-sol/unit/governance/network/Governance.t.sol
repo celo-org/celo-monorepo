@@ -1,8 +1,6 @@
 pragma solidity ^0.5.13;
 
-import "celo-foundry/Test.sol";
-import { TestConstants } from "@test-sol/constants.sol";
-import { Utils } from "@test-sol/utils.sol";
+import { TestWithUtils } from "@test-sol/testWithUtils.sol";
 import "@test-sol/utils/WhenL2.sol";
 
 import "solidity-bytes-utils/contracts/BytesLib.sol";
@@ -59,7 +57,7 @@ contract GovernanceMock is Governance(true) {
   }
 }
 
-contract GovernanceTest is Test, TestConstants, Utils {
+contract GovernanceTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
   using BytesLib for bytes;
 

@@ -2,8 +2,6 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "celo-foundry/Test.sol";
-
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
@@ -20,15 +18,14 @@ import "@celo-contracts/stability/test/MockStableToken.sol";
 import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/governance/Governance.sol";
 
-import { TestConstants } from "@test-sol/constants.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
-import { Utils } from "@test-sol/utils.sol";
-import { Test as ForgeTest } from "forge-std/Test.sol";
+import { TestWithUtils } from "@test-sol/testWithUtils.sol";
+
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 import "@test-sol/unit/governance/voting/mocks/ReleaseGoldMockTunnel.sol";
 import "@test-sol/unit/common/mocks/MockEpochManager.sol";
 
-contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils {
+contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
 
   uint256 constant TOTAL_AMOUNT = 1 ether * 1_000_000;

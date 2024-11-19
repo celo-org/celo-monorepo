@@ -4,7 +4,6 @@ pragma experimental ABIEncoderV2;
 
 // This test file is in 0.5 although the contract is in 0.8
 
-import "celo-foundry/Test.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -20,11 +19,11 @@ import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 
 import "@test-sol/utils/ECDSAHelper.sol";
-import { Utils } from "@test-sol/utils.sol";
+import { TestWithUtils } from "@test-sol/testWithUtils.sol";
 
 import "@test-sol/utils/WhenL2.sol";
 
-contract ValidatorsTest is Test, Utils, ECDSAHelper {
+contract ValidatorsTest is TestWithUtils, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 

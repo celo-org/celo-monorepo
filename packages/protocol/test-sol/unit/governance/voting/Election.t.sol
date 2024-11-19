@@ -2,8 +2,7 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "celo-foundry/Test.sol";
-import { Utils } from "@test-sol/utils.sol";
+import { TestWithUtils } from "@test-sol/testWithUtils.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
@@ -30,7 +29,7 @@ contract ElectionMock is Election(true) {
   }
 }
 
-contract ElectionTest is Utils {
+contract ElectionTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
 
   Accounts accounts;

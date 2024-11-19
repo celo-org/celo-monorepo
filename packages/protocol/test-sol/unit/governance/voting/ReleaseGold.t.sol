@@ -2,7 +2,7 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import { Utils } from "@test-sol/utils.sol";
+import { TestWithUtils } from "@test-sol/testWithUtils.sol";
 import "@test-sol/utils/WhenL2.sol";
 import { ECDSAHelper } from "@test-sol/utils/ECDSAHelper.sol";
 
@@ -23,7 +23,7 @@ import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockGovernance.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 
-contract ReleaseGoldTest is Utils, ECDSAHelper {
+contract ReleaseGoldTest is TestWithUtils, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
 
   Accounts accounts;
