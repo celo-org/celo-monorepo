@@ -6,7 +6,7 @@ import "@celo-contracts/common/GoldToken.sol";
 /**
  * @title A mock GoldToken for testing.
  */
-contract GoldTokenMock is GoldToken(true) {
+contract CeloTokenMock is GoldToken(true) {
   uint8 public constant decimals = 18;
   mapping(address => uint256) balances;
 

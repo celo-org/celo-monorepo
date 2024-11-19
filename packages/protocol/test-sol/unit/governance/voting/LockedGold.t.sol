@@ -7,7 +7,7 @@ import "@test-sol/utils/WhenL2.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Accounts.sol";
-import "@test-sol/unit/common/GoldTokenMock.sol";
+import "@test-sol/unit/common/CeloTokenMock.sol";
 import "@celo-contracts/governance/LockedGold.sol";
 import "@celo-contracts/governance/ReleaseGold.sol";
 import "@celo-contracts/governance/Election.sol";
@@ -22,7 +22,7 @@ contract LockedGoldTest is Utils {
   using FixidityLib for FixidityLib.Fraction;
 
   Accounts accounts;
-  GoldToken goldToken;
+  GoldToken celoToken;
   MockStableToken stableToken;
   MockElection election;
   MockGovernance governance;
@@ -68,7 +68,7 @@ contract LockedGoldTest is Utils {
   function setUp() public {
     super.setUp();
 
-    goldToken = new GoldTokenMock();
+    celoToken = new CeloTokenMock();
     accounts = new Accounts(true);
     lockedGold = new LockedGold(true);
     election = new MockElection();
