@@ -7,7 +7,7 @@ import "@test-sol/unit/common/GoldTokenMock.sol";
 import { Utils } from "@test-sol/utils.sol";
 import "@test-sol/utils/WhenL2.sol";
 
-contract GoldTokenTest is Utils {
+contract CeloTokenTest is Utils {
   GoldToken celoToken;
 
   uint256 constant ONE_CELOTOKEN = 1000000000000000000;
@@ -52,7 +52,7 @@ contract GoldTokenTest is Utils {
   }
 }
 
-contract GoldTokenTest_Pre_L2 is GoldTokenTest {
+contract CeloTokenTest_PreL2 is CeloTokenTest {
   function setUp() public {
     super.setUp();
 
@@ -63,9 +63,9 @@ contract GoldTokenTest_Pre_L2 is GoldTokenTest {
     vm.deal(address(0), 0);
   }
 }
-contract GoldTokenTest_L2 is GoldTokenTest_Pre_L2, WhenL2 {}
+contract CeloTokenTest_L2 is CeloTokenTest_PreL2, WhenL2 {}
 
-contract GoldTokenTest_general is GoldTokenTest {
+contract CeloTokenTest_general is CeloTokenTest {
   function test_name() public {
     assertEq(celoToken.name(), "Celo native asset");
   }
@@ -111,9 +111,9 @@ contract GoldTokenTest_general is GoldTokenTest {
   }
 }
 
-contract GoldTokenTest_general_L2 is GoldTokenTest_L2, GoldTokenTest_general {}
+contract CeloTokenTest_general_L2 is CeloTokenTest_L2, CeloTokenTest_general {}
 
-contract GoldTokenTest_transfer is GoldTokenTest {
+contract CeloTokenTest_transfer is CeloTokenTest {
   function setUp() public {
     super.setUp();
   }
@@ -168,9 +168,9 @@ contract GoldTokenTest_transfer is GoldTokenTest {
   }
 }
 
-contract GoldTokenTest_transfer_L2 is GoldTokenTest_L2, GoldTokenTest_transfer {}
+contract CeloTokenTest_transfer_L2 is CeloTokenTest_L2, CeloTokenTest_transfer {}
 
-contract GoldTokenTest_transferFrom is GoldTokenTest {
+contract CeloTokenTest_transferFrom is CeloTokenTest {
   function setUp() public {
     super.setUp();
     vm.prank(sender);
@@ -215,9 +215,9 @@ contract GoldTokenTest_transferFrom is GoldTokenTest {
   }
 }
 
-contract GoldTokenTest_transferFrom_L2 is GoldTokenTest_L2, GoldTokenTest_transferFrom {}
+contract CeloTokenTest_transferFrom_L2 is CeloTokenTest_L2, CeloTokenTest_transferFrom {}
 
-contract GoldTokenTest_burn is GoldTokenTest {
+contract CeloTokenTest_burn is CeloTokenTest {
   uint256 startBurn;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
 
@@ -244,9 +244,9 @@ contract GoldTokenTest_burn is GoldTokenTest {
   }
 }
 
-contract GoldTokenTest_burn_L2 is GoldTokenTest_L2, GoldTokenTest_burn {}
+contract CeloTokenTest_burn_L2 is CeloTokenTest_L2, CeloTokenTest_burn {}
 
-contract GoldTokenTest_mint is GoldTokenTest {
+contract CeloTokenTest_mint is CeloTokenTest {
   function test_Reverts_whenCalledByOtherThanVm() public {
     vm.prank(celoTokenOwner);
     vm.expectRevert("Only VM can call");
@@ -282,7 +282,7 @@ contract GoldTokenTest_mint is GoldTokenTest {
   }
 }
 
-contract GoldTokenTest_mint_L2 is GoldTokenTest_L2 {
+contract CeloTokenTest_mint_L2 is CeloTokenTest_L2 {
   function test_Reverts_whenL2() public {
     vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(celoUnreleasedTreasuryAddress);
@@ -293,7 +293,7 @@ contract GoldTokenTest_mint_L2 is GoldTokenTest_L2 {
   }
 }
 
-contract GoldTokenTest_increaseSupply is GoldTokenTest {
+contract CeloTokenTest_increaseSupply is CeloTokenTest {
   function test_ShouldIncreaseTotalSupply() public {
     uint256 celoTokenSupplyBefore = celoToken.totalSupply();
     vm.prank(address(0));
@@ -309,7 +309,7 @@ contract GoldTokenTest_increaseSupply is GoldTokenTest {
   }
 }
 
-contract GoldTokenTest_increaseSupply_L2 is GoldTokenTest_L2 {
+contract CeloTokenTest_increaseSupply_L2 is CeloTokenTest_L2 {
   function test_Reverts_WhenL2() public {
     vm.prank(celoTokenOwner);
     vm.expectRevert("This method is no longer supported in L2.");
@@ -317,7 +317,7 @@ contract GoldTokenTest_increaseSupply_L2 is GoldTokenTest_L2 {
   }
 }
 
-contract CeloTokenMock_circulatingSupply is GoldTokenTest {
+contract CeloTokenTest_circulatingSupply is CeloTokenTest {
   function test_ShouldMatchCirculatingSupply_WhenNoBurn() public {
     assertEq(celoToken.circulatingSupply(), celoToken.allocatedSupply());
     assertEq(celoToken.circulatingSupply(), L1_MINTED_CELO_SUPPLY);
@@ -331,20 +331,20 @@ contract CeloTokenMock_circulatingSupply is GoldTokenTest {
   }
 }
 
-contract CeloTokenMock_circulatingSupply_L2 is GoldTokenTest_L2, CeloTokenMock_circulatingSupply {
+contract CeloTokenTest_circulatingSupply_L2 is CeloTokenTest_L2, CeloTokenMock_circulatingSupply {
   function test_ShouldBeLessThanTheTotalSupply() public {
     assertLt(celoToken.circulatingSupply(), celoToken.totalSupply());
   }
 }
 
-contract GoldTokenTest_AllocatedSupply is GoldTokenTest {
+contract CeloTokenTest_AllocatedSupply is CeloTokenTest {
   function test_ShouldReturnTotalSupply() public {
     assertEq(celoToken.allocatedSupply(), L1_MINTED_CELO_SUPPLY);
     assertEq(celoToken.allocatedSupply(), celoToken.totalSupply());
   }
 }
 
-contract GoldTokenTest_AllocatedSupply_L2 is GoldTokenTest_L2 {
+contract CeloTokenTest_AllocatedSupply_L2 is CeloTokenTest_L2 {
   function test_ShouldReturnTotalSupplyMinusCeloUnreleasedTreasuryBalance() public {
     assertEq(celoToken.allocatedSupply(), CELO_SUPPLY_CAP - L2_INITIAL_STASH_BALANCE);
     assertEq(celoToken.allocatedSupply(), celoToken.totalSupply() - L2_INITIAL_STASH_BALANCE);
@@ -356,13 +356,13 @@ contract GoldTokenTest_AllocatedSupply_L2 is GoldTokenTest_L2 {
   }
 }
 
-contract GoldTokenTest_TotalSupply is GoldTokenTest {
+contract CeloTokenTest_TotalSupply is CeloTokenTest {
   function test_ShouldReturnL1MintedSupply() public {
     assertEq(celoToken.totalSupply(), L1_MINTED_CELO_SUPPLY);
   }
 }
 
-contract GoldTokenTest_TotalSupply_L2 is GoldTokenTest_L2 {
+contract CeloTokenTest_TotalSupply_L2 is CeloTokenTest_L2 {
   function test_ShouldReturnSupplyCap_WhenL2() public {
     assertEq(celoToken.totalSupply(), CELO_SUPPLY_CAP);
   }
