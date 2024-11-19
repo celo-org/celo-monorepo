@@ -1,54 +1,70 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 
-import "celo-foundry/Test.sol";
 import "@celo-contracts/common/GoldToken.sol";
-import "@test-sol/unit/common/GoldTokenMock.sol";
 
-import { TestConstants } from "@test-sol/constants.sol";
+import { Utils } from "@test-sol/utils.sol";
+import "@test-sol/utils/WhenL2.sol";
 
-contract GoldTokenTest is Test, TestConstants, IsL2Check {
+contract CeloTokenTest is Utils {
   GoldToken celoToken;
-  IRegistry registry;
 
   uint256 constant ONE_CELOTOKEN = 1000000000000000000;
   address receiver;
   address sender;
+  address randomAddress;
   address celoTokenOwner;
   address celoUnreleasedTreasuryAddress;
 
   event Transfer(address indexed from, address indexed to, uint256 value);
   event TransferComment(string comment);
 
-  modifier _whenL2() {
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
-    _;
-  }
-
   function setUp() public {
+    super.setUp();
     celoTokenOwner = actor("celoTokenOwner");
     celoUnreleasedTreasuryAddress = actor("celoUnreleasedTreasury");
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
     deployCodeTo("CeloUnreleasedTreasury.sol", abi.encode(false), celoUnreleasedTreasuryAddress);
-    registry = IRegistry(REGISTRY_ADDRESS);
 
     vm.prank(celoTokenOwner);
     celoToken = new GoldToken(true);
     vm.prank(celoTokenOwner);
     celoToken.setRegistry(REGISTRY_ADDRESS);
-    registry.setAddressFor("CeloUnreleasedTreasury", celoUnreleasedTreasuryAddress);
+    registry.setAddressFor(CeloUnreleasedTreasuryContract, celoUnreleasedTreasuryAddress);
     receiver = actor("receiver");
     sender = actor("sender");
+    randomAddress = actor("random");
+
+    vm.prank(address(0));
+    celoToken.mint(receiver, ONE_CELOTOKEN); // Increase total supply.
+    vm.prank(address(0));
+    celoToken.mint(sender, ONE_CELOTOKEN);
+    vm.prank(address(0));
+    celoToken.mint(randomAddress, L1_MINTED_CELO_SUPPLY - (2 * ONE_CELOTOKEN)); // Increase total supply.
+
     vm.deal(receiver, ONE_CELOTOKEN);
     vm.deal(sender, ONE_CELOTOKEN);
+    vm.deal(randomAddress, L1_MINTED_CELO_SUPPLY - (2 * ONE_CELOTOKEN)); // Increases balance.
+
+    // This step is required, as `vm.prank` funds the address,
+    // and causes a safeMath overflow when getting the circulating supply.
+    vm.deal(address(0), 0);
   }
 }
 
-contract GoldTokenTest_general is GoldTokenTest {
+contract CeloTokenTest_PreL2 is CeloTokenTest {
   function setUp() public {
     super.setUp();
-  }
 
+    vm.prank(address(0));
+    celoToken.mint(celoUnreleasedTreasuryAddress, L2_INITIAL_STASH_BALANCE);
+    vm.deal(celoUnreleasedTreasuryAddress, L2_INITIAL_STASH_BALANCE);
+
+    vm.deal(address(0), 0);
+  }
+}
+contract CeloTokenTest_L2 is CeloTokenTest_PreL2, WhenL2 {}
+
+contract CeloTokenTest_general is CeloTokenTest {
   function test_name() public {
     assertEq(celoToken.name(), "Celo native asset");
   }
@@ -94,7 +110,9 @@ contract GoldTokenTest_general is GoldTokenTest {
   }
 }
 
-contract GoldTokenTest_transfer is GoldTokenTest {
+contract CeloTokenTest_general_L2 is CeloTokenTest_L2, CeloTokenTest_general {}
+
+contract CeloTokenTest_transfer is CeloTokenTest {
   function setUp() public {
     super.setUp();
   }
@@ -149,7 +167,9 @@ contract GoldTokenTest_transfer is GoldTokenTest {
   }
 }
 
-contract GoldTokenTest_transferFrom is GoldTokenTest {
+contract CeloTokenTest_transfer_L2 is CeloTokenTest_L2, CeloTokenTest_transfer {}
+
+contract CeloTokenTest_transferFrom is CeloTokenTest {
   function setUp() public {
     super.setUp();
     vm.prank(sender);
@@ -194,7 +214,9 @@ contract GoldTokenTest_transferFrom is GoldTokenTest {
   }
 }
 
-contract GoldTokenTest_burn is GoldTokenTest {
+contract CeloTokenTest_transferFrom_L2 is CeloTokenTest_L2, CeloTokenTest_transferFrom {}
+
+contract CeloTokenTest_burn is CeloTokenTest {
   uint256 startBurn;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
 
@@ -221,7 +243,9 @@ contract GoldTokenTest_burn is GoldTokenTest {
   }
 }
 
-contract GoldTokenTest_mint is GoldTokenTest {
+contract CeloTokenTest_burn_L2 is CeloTokenTest_L2, CeloTokenTest_burn {}
+
+contract CeloTokenTest_mint is CeloTokenTest {
   function test_Reverts_whenCalledByOtherThanVm() public {
     vm.prank(celoTokenOwner);
     vm.expectRevert("Only VM can call");
@@ -246,8 +270,10 @@ contract GoldTokenTest_mint is GoldTokenTest {
     emit Transfer(address(0), receiver, ONE_CELOTOKEN);
     celoToken.mint(receiver, ONE_CELOTOKEN);
   }
+}
 
-  function test_Reverts_whenL2() public _whenL2 {
+contract CeloTokenTest_mint_L2 is CeloTokenTest_L2 {
+  function test_Reverts_whenL2() public {
     vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(celoUnreleasedTreasuryAddress);
     celoToken.mint(receiver, ONE_CELOTOKEN);
@@ -257,7 +283,7 @@ contract GoldTokenTest_mint is GoldTokenTest {
   }
 }
 
-contract GoldTokenTest_increaseSupply is GoldTokenTest {
+contract CeloTokenTest_increaseSupply is CeloTokenTest {
   function test_ShouldIncreaseTotalSupply() public {
     uint256 celoTokenSupplyBefore = celoToken.totalSupply();
     vm.prank(address(0));
@@ -273,77 +299,61 @@ contract GoldTokenTest_increaseSupply is GoldTokenTest {
   }
 }
 
-contract CeloTokenMockTest is Test, TestConstants {
-  IRegistry registry;
-  GoldTokenMock mockCeloToken;
-  uint256 ONE_CELOTOKEN = 1000000000000000000;
-  address burnAddress = address(0x000000000000000000000000000000000000dEaD);
-  address celoUnreleasedTreasuryAddress = actor("CeloUnreleasedTreasury");
-
-  modifier _whenL2() {
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
-    vm.deal(celoUnreleasedTreasuryAddress, L2_INITIAL_STASH_BALANCE);
-    _;
-  }
-
-  function setUp() public {
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
-    deployCodeTo("CeloUnreleasedTreasury.sol", abi.encode(false), celoUnreleasedTreasuryAddress);
-    registry = IRegistry(REGISTRY_ADDRESS);
-
-    mockCeloToken = new GoldTokenMock();
-    mockCeloToken.setRegistry(REGISTRY_ADDRESS);
-    mockCeloToken.setTotalSupply(L1_MINTED_CELO_SUPPLY);
-    vm.deal(celoUnreleasedTreasuryAddress, L2_INITIAL_STASH_BALANCE);
-    registry.setAddressFor("CeloUnreleasedTreasury", celoUnreleasedTreasuryAddress);
+contract CeloTokenTest_increaseSupply_L2 is CeloTokenTest_L2 {
+  function test_Reverts_WhenL2() public {
+    vm.prank(celoTokenOwner);
+    vm.expectRevert("This method is no longer supported in L2.");
+    celoToken.increaseSupply(ONE_CELOTOKEN);
   }
 }
 
-contract CeloTokenMock_circulatingSupply is CeloTokenMockTest {
-  function setUp() public {
-    super.setUp();
-  }
-
-  function test_ShouldMatchCirculationSupply_WhenNoBurn() public {
-    assertEq(mockCeloToken.circulatingSupply(), mockCeloToken.totalSupply());
+contract CeloTokenTest_circulatingSupply is CeloTokenTest {
+  function test_ShouldMatchCirculatingSupply_WhenNoBurn() public {
+    assertEq(celoToken.circulatingSupply(), celoToken.allocatedSupply());
+    assertEq(celoToken.circulatingSupply(), L1_MINTED_CELO_SUPPLY);
   }
 
   function test_ShouldDecreaseCirculatingSupply_WhenThereWasBurn() public {
-    mockCeloToken.setBalanceOf(burnAddress, ONE_CELOTOKEN);
-    assertEq(mockCeloToken.circulatingSupply(), mockCeloToken.allocatedSupply() - ONE_CELOTOKEN);
-    assertEq(mockCeloToken.circulatingSupply(), mockCeloToken.totalSupply() - ONE_CELOTOKEN);
-  }
-
-  function test_ShouldMatchCirculationSupply_WhenNoBurn_WhenL2() public _whenL2 {
-    assertEq(mockCeloToken.circulatingSupply(), mockCeloToken.allocatedSupply());
-  }
-
-  function test_ShouldDecreaseCirculatingSupply_WhenThereWasBurn_WhenL2() public _whenL2 {
-    mockCeloToken.setBalanceOf(burnAddress, ONE_CELOTOKEN);
-    assertEq(mockCeloToken.circulatingSupply(), mockCeloToken.allocatedSupply() - ONE_CELOTOKEN);
+    vm.prank(randomAddress);
+    celoToken.burn(ONE_CELOTOKEN);
+    assertEq(celoToken.circulatingSupply(), L1_MINTED_CELO_SUPPLY - ONE_CELOTOKEN);
+    assertEq(celoToken.circulatingSupply(), celoToken.allocatedSupply() - ONE_CELOTOKEN);
   }
 }
 
-contract GoldTokenTest_AllocatedSupply is CeloTokenMockTest {
-  function test_ShouldReturnTotalSupply_WhenL1() public {
-    assertEq(mockCeloToken.allocatedSupply(), L1_MINTED_CELO_SUPPLY);
-  }
-
-  function test_ShouldReturn_WhenInL2() public _whenL2 {
-    assertEq(mockCeloToken.allocatedSupply(), CELO_SUPPLY_CAP - L2_INITIAL_STASH_BALANCE);
-  }
-
-  function test_ShouldReturn_WhenWithdrawn_WhenInL2() public _whenL2 {
-    deal(celoUnreleasedTreasuryAddress, ONE_CELOTOKEN);
-    assertEq(mockCeloToken.allocatedSupply(), mockCeloToken.totalSupply() - ONE_CELOTOKEN);
+contract CeloTokenTest_circulatingSupply_L2 is CeloTokenTest_L2, CeloTokenTest_circulatingSupply {
+  function test_ShouldBeLessThanTheTotalSupply() public {
+    assertLt(celoToken.circulatingSupply(), celoToken.totalSupply());
   }
 }
 
-contract GoldTokenTest_TotalSupply is CeloTokenMockTest {
-  function test_ShouldReturnSupplyCap_WhenL2() public _whenL2 {
-    assertEq(mockCeloToken.totalSupply(), CELO_SUPPLY_CAP);
+contract CeloTokenTest_AllocatedSupply is CeloTokenTest {
+  function test_ShouldReturnTotalSupply() public {
+    assertEq(celoToken.allocatedSupply(), L1_MINTED_CELO_SUPPLY);
+    assertEq(celoToken.allocatedSupply(), celoToken.totalSupply());
   }
+}
+
+contract CeloTokenTest_AllocatedSupply_L2 is CeloTokenTest_L2 {
+  function test_ShouldReturnTotalSupplyMinusCeloUnreleasedTreasuryBalance() public {
+    assertEq(celoToken.allocatedSupply(), CELO_SUPPLY_CAP - L2_INITIAL_STASH_BALANCE);
+    assertEq(celoToken.allocatedSupply(), celoToken.totalSupply() - L2_INITIAL_STASH_BALANCE);
+  }
+
+  function test_ShouldReturnTotalSupplyWhenCeloUnreleasedTreasuryHasReleasedAllBalance() public {
+    deal(celoUnreleasedTreasuryAddress, 0);
+    assertEq(celoToken.allocatedSupply(), celoToken.totalSupply());
+  }
+}
+
+contract CeloTokenTest_TotalSupply is CeloTokenTest {
   function test_ShouldReturnL1MintedSupply() public {
-    assertEq(mockCeloToken.totalSupply(), L1_MINTED_CELO_SUPPLY);
+    assertEq(celoToken.totalSupply(), L1_MINTED_CELO_SUPPLY);
+  }
+}
+
+contract CeloTokenTest_TotalSupply_L2 is CeloTokenTest_L2 {
+  function test_ShouldReturnSupplyCap_WhenL2() public {
+    assertEq(celoToken.totalSupply(), CELO_SUPPLY_CAP);
   }
 }
