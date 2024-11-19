@@ -270,15 +270,6 @@ contract CeloTokenTest_mint is CeloTokenTest {
     emit Transfer(address(0), receiver, ONE_CELOTOKEN);
     celoToken.mint(receiver, ONE_CELOTOKEN);
   }
-
-  function test_Reverts_whenL2() public _whenL22 {
-    vm.expectRevert("This method is no longer supported in L2.");
-    vm.prank(celoUnreleasedTreasuryAddress);
-    celoToken.mint(receiver, ONE_CELOTOKEN);
-    vm.expectRevert("This method is no longer supported in L2.");
-    vm.prank(address(0));
-    celoToken.mint(receiver, ONE_CELOTOKEN);
-  }
 }
 
 contract CeloTokenTest_mint_L2 is CeloTokenTest_L2 {
@@ -330,7 +321,7 @@ contract CeloTokenTest_circulatingSupply is CeloTokenTest {
   }
 }
 
-contract CeloTokenTest_circulatingSupply_L2 is CeloTokenTest_L2, CeloTokenMock_circulatingSupply {
+contract CeloTokenTest_circulatingSupply_L2 is CeloTokenTest_L2, CeloTokenTest_circulatingSupply {
   function test_ShouldBeLessThanTheTotalSupply() public {
     assertLt(celoToken.circulatingSupply(), celoToken.totalSupply());
   }

@@ -6,7 +6,7 @@ pragma experimental ABIEncoderV2;
 import { Test } from "celo-foundry/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
-import { GoldTokenMock } from "@test-sol/unit/common/GoldTokenMock.sol";
+import { CeloTokenMock } from "@test-sol/unit/common/CeloTokenMock.sol";
 import { FeeHandlerSeller } from "@celo-contracts/common/FeeHandlerSeller.sol";
 import { MentoFeeHandlerSeller } from "@celo-contracts/common/MentoFeeHandlerSeller.sol";
 import { UniswapFeeHandlerSeller } from "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
@@ -21,7 +21,7 @@ contract FeeHandlerSellerTest is Test, TestConstants {
   address NON_OWNER_ADDRESS = actor("Arbitrary Non-Owner");
 
   // Contract instances
-  GoldTokenMock celoToken; // Using mock token to work around missing transfer precompile
+  CeloTokenMock celoToken; // Using mock token to work around missing transfer precompile
   FeeHandlerSeller mentoFeeHandlerSeller;
   FeeHandlerSeller uniswapFeeHandlerSeller;
 
@@ -35,7 +35,7 @@ contract FeeHandlerSellerTest is Test, TestConstants {
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
     IRegistry registry = IRegistry(REGISTRY_ADDRESS);
 
-    celoToken = new GoldTokenMock();
+    celoToken = new CeloTokenMock();
     oracle = actor("oracle");
     sortedOracles = actor("sortedOracles");
 
