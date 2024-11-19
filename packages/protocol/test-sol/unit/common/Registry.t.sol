@@ -29,7 +29,6 @@ contract RegistryTest_L2 is WhenL2, RegistryTest {
   function setUp() public {
     super.setUp();
     registry = IRegistry(address(_registry));
-    setupEpochManager();
   }
 }
 
