@@ -12,7 +12,7 @@ import { MockSortedOracles } from "@celo-contracts/stability/test/MockSortedOrac
 import { MockStableToken } from "@celo-contracts/stability/test/MockStableToken.sol";
 import { GoldTokenMock } from "@test-sol/unit/common/GoldTokenMock.sol";
 
-import { TestWithUtils } from "@test-sol/testWithUtils.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 contract EpochRewardsTest is TestWithUtils {
   uint256 constant targetVotingYieldParamsInitial = 0.00016e24; // 0.00016

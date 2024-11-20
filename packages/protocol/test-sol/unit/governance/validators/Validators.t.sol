@@ -19,7 +19,7 @@ import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 
 import "@test-sol/utils/ECDSAHelper.sol";
-import { TestWithUtils } from "@test-sol/testWithUtils.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 import "@test-sol/utils/WhenL2.sol";
 

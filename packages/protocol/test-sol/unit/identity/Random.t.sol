@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 
-import { TestWithUtils } from "@test-sol/testWithUtils.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 import "@celo-contracts/identity/Random.sol";
 import "@celo-contracts/identity/test/RandomTest.sol";

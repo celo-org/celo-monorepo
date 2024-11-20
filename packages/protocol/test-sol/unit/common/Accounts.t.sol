@@ -6,7 +6,7 @@ import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 
-import { TestWithUtils } from "@test-sol/testWithUtils.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 import "@test-sol/utils/WhenL2.sol";
 
 contract AccountsTest is TestWithUtils {

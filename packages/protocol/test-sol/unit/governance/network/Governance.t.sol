@@ -1,6 +1,6 @@
 pragma solidity ^0.5.13;
 
-import { TestWithUtils } from "@test-sol/testWithUtils.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 import "@test-sol/utils/WhenL2.sol";
 
 import "solidity-bytes-utils/contracts/BytesLib.sol";

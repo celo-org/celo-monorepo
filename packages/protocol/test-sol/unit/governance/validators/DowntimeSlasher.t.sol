@@ -12,7 +12,7 @@ import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/DowntimeSlasher.sol";
 import "@celo-contracts/governance/test/MockUsingPrecompiles.sol";
-import { TestWithUtils } from "@test-sol/testWithUtils.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 contract DowntimeSlasherMock is DowntimeSlasher(true), MockUsingPrecompiles, Test {
   struct SlashParams {

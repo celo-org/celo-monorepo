@@ -16,7 +16,7 @@ import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
 import "@celo-contracts/common/MentoFeeHandlerSeller.sol";
 
-import { TestWithUtils } from "@test-sol/testWithUtils.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 contract BlockchainParametersTest is TestWithUtils {
   function test_dummy_test() public {}

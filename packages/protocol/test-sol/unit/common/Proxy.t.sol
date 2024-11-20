@@ -2,7 +2,7 @@ pragma solidity ^0.5.13;
 
 import "@celo-contracts/common/Proxy.sol";
 
-import { TestWithUtils } from "@test-sol/testWithUtils.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 import "@celo-contracts/common/test/GetSetV0.sol";
 import "@celo-contracts/common/test/GetSetV1.sol";

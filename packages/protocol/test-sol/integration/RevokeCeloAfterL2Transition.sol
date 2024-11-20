@@ -19,8 +19,7 @@ import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/governance/Governance.sol";
 
 import "@test-sol/utils/ECDSAHelper.sol";
-import { TestWithUtils } from "@test-sol/testWithUtils.sol";
-
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 import "@test-sol/unit/governance/voting/mocks/ReleaseGoldMockTunnel.sol";
 import "@test-sol/unit/common/mocks/MockEpochManager.sol";
