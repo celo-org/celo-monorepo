@@ -271,6 +271,11 @@ contract FeeHandlerTest_SetCarbonFraction is FeeHandlerTest {
   }
 }
 
+contract FeeHandlerTest_SetCarbonFraction_L2 is
+  FeeHandlerTest_L2,
+  FeeHandlerTest_SetCarbonFraction
+{}
+
 // TODO change beneficiary allocation
 contract FeeHandlerTest_changeOtherBeneficiaryAllocation is FeeHandlerTest {
   function setUp() public {
@@ -306,6 +311,11 @@ contract FeeHandlerTest_changeOtherBeneficiaryAllocation is FeeHandlerTest {
   }
 }
 
+contract FeeHandlerTest_changeOtherBeneficiaryAllocation_L2 is
+  FeeHandlerTest_L2,
+  FeeHandlerTest_changeOtherBeneficiaryAllocation
+{}
+
 contract FeeHandlerTest_SetHandler is FeeHandlerTest {
   function test_Reverts_WhenCallerNotOwner() public {
     vm.prank(user);
@@ -322,6 +332,8 @@ contract FeeHandlerTest_SetHandler is FeeHandlerTest {
     );
   }
 }
+
+contract FeeHandlerTest_SetHandler_L2 is FeeHandlerTest_L2, FeeHandlerTest_SetHandler {}
 
 contract FeeHandlerTest_AddToken is FeeHandlerTest {
   function test_Reverts_WhenCallerNotOwner() public {
@@ -346,6 +358,8 @@ contract FeeHandlerTest_AddToken is FeeHandlerTest {
   }
 }
 
+contract FeeHandlerTest_AddToken_L2 is FeeHandlerTest_L2, FeeHandlerTest_AddToken {}
+
 contract FeeHandlerTest_RemoveToken is FeeHandlerTest {
   function test_Reverts_WhenCallerNotOwner() public {
     vm.prank(user);
@@ -368,6 +382,8 @@ contract FeeHandlerTest_RemoveToken is FeeHandlerTest {
     feeHandler.removeToken(address(stableToken));
   }
 }
+
+contract FeeHandlerTest_RemoveToken_L2 is FeeHandlerTest_L2, FeeHandlerTest_RemoveToken {}
 
 contract FeeHandlerTest_DeactivateAndActivateToken is FeeHandlerTest {
   function test_Reverts_WhenActivateCallerNotOwner() public {
@@ -396,6 +412,11 @@ contract FeeHandlerTest_DeactivateAndActivateToken is FeeHandlerTest {
   }
 }
 
+contract FeeHandlerTest_DeactivateAndActivateToken_L2 is
+  FeeHandlerTest_L2,
+  FeeHandlerTest_DeactivateAndActivateToken
+{}
+
 contract FeeHandlerTest_SetFeeBeneficiary is FeeHandlerTest {
   function test_Reverts_WhenCallerNotOwner() public {
     vm.prank(user);
@@ -414,6 +435,11 @@ contract FeeHandlerTest_SetFeeBeneficiary is FeeHandlerTest {
     assertEq(feeHandler.carbonFeeBeneficiary(), OTHER_BENEFICIARY_ADDRESS);
   }
 }
+
+contract FeeHandlerTest_SetFeeBeneficiary_L2 is
+  FeeHandlerTest_L2,
+  FeeHandlerTest_SetFeeBeneficiary
+{}
 
 contract FeeHandlerTestAbstract is FeeHandlerTest {
   function addAndActivateToken(address token, address handler) public {
@@ -442,6 +468,8 @@ contract FeeHandlerTestAbstract is FeeHandlerTest {
     celoToken.transfer(address(feeHandler), celoAmount);
   }
 }
+
+contract FeeHandlerTestAbstract_L2 is FeeHandlerTest_L2, FeeHandlerTestAbstract {}
 
 contract FeeHandlerTest_AddOtherBeneficiary is FeeHandlerTestAbstract {
   // TODO only owner
@@ -507,6 +535,11 @@ contract FeeHandlerTest_AddOtherBeneficiary is FeeHandlerTestAbstract {
     );
   }
 }
+
+contract FeeHandlerTest_AddOtherBeneficiary_L2 is
+  FeeHandlerTestAbstract_L2,
+  FeeHandlerTest_AddOtherBeneficiary
+{}
 
 contract FeeHandlerTest_Distribute is FeeHandlerTestAbstract {
   function setUp() public {
@@ -577,6 +610,8 @@ contract FeeHandlerTest_Distribute is FeeHandlerTestAbstract {
   }
 }
 
+contract FeeHandlerTest_Distribute_L2 is FeeHandlerTestAbstract_L2, FeeHandlerTest_Distribute {}
+
 contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
@@ -624,6 +659,11 @@ contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstr
     assertApproxEqAbs(stableToken.balanceOf(otherBeneficiary), 3e17, 1);
   }
 }
+
+contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries_L2 is
+  FeeHandlerTestAbstract_L2,
+  FeeHandlerTest_Distribute_WhenOtherBeneficiaries
+{}
 
 // function test_HandleCelo_WhenThereAreMoreTwoOtherBeneficiaries() public {
 //   feeHandler.addOtherBeneficiary(
@@ -686,6 +726,8 @@ contract FeeHandlerTest_BurnCelo is FeeHandlerTestAbstract {
   }
 }
 
+contract FeeHandlerTest_BurnCelo_L2 is FeeHandlerTestAbstract_L2, FeeHandlerTest_BurnCelo {}
+
 contract FeeHandlerTest_SellMentoTokensAbstract is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
@@ -693,6 +735,11 @@ contract FeeHandlerTest_SellMentoTokensAbstract is FeeHandlerTestAbstract {
     setMaxSlippage(address(stableToken), FIXED1);
   }
 }
+
+contract FeeHandlerTest_SellMentoTokensAbstract_L2 is
+  FeeHandlerTestAbstract_L2,
+  FeeHandlerTest_SellMentoTokensAbstract
+{}
 
 contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellMentoTokensAbstract {
   function setUp() public {
@@ -831,15 +878,25 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellM
   }
 }
 
+contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled_L2 is
+  FeeHandlerTest_SellMentoTokensAbstract_L2,
+  FeeHandlerTest_SellMentoTokens_WhenTokenEnabled
+{}
+
 contract FeeHandlerTest_SellMentoTokens_WhenTokenNotEnabled is
   FeeHandlerTest_SellMentoTokensAbstract
 {
-  function test_() public {
+  function test_Reverts_WhenSelling() public {
     fundFeeHandlerStable(3000, address(stableToken), address(exchangeUSD));
     vm.expectRevert("Token needs to be active to sell");
     feeHandler.sell(address(stableToken));
   }
 }
+
+contract FeeHandlerTest_SellMentoTokens_WhenTokenNotEnabled_L2 is
+  FeeHandlerTest_SellMentoTokensAbstract_L2,
+  FeeHandlerTest_SellMentoTokens_WhenTokenNotEnabled
+{}
 
 contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
   uint256 deadline;
@@ -994,6 +1051,11 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
   }
 }
 
+contract FeeHandlerTest_SellNonMentoTokens_L2 is
+  FeeHandlerTestAbstract_L2,
+  FeeHandlerTest_SellNonMentoTokens
+{}
+
 contract FeeHandlerTest_HandleCelo is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
@@ -1044,6 +1106,8 @@ contract FeeHandlerTest_HandleCelo is FeeHandlerTestAbstract {
   }
 }
 
+contract FeeHandlerTest_HandleCelo_L2 is FeeHandlerTestAbstract_L2, FeeHandlerTest_HandleCelo {}
+
 contract FeeHandlerTest_HandleMentoTokens is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
@@ -1071,6 +1135,11 @@ contract FeeHandlerTest_HandleMentoTokens is FeeHandlerTestAbstract {
     assertEq(stableToken.balanceOf(address(feeHandler)), 0);
   }
 }
+
+contract FeeHandlerTest_HandleMentoTokens_L2 is
+  FeeHandlerTestAbstract_L2,
+  FeeHandlerTest_HandleMentoTokens
+{}
 
 contract FeeHandlerTest_HandleAll is FeeHandlerTestAbstract {
   function setUp() public {
@@ -1105,6 +1174,8 @@ contract FeeHandlerTest_HandleAll is FeeHandlerTestAbstract {
   }
 }
 
+contract FeeHandlerTest_HandleAll_L2 is FeeHandlerTestAbstract_L2, FeeHandlerTest_HandleAll {}
+
 contract FeeHandlerTest_Transfer is FeeHandlerTest {
   modifier mintToken(uint256 amount) {
     tokenA.mint(address(feeHandler), amount);
@@ -1122,6 +1193,8 @@ contract FeeHandlerTest_Transfer is FeeHandlerTest {
     assertEq(tokenA.balanceOf(user), 1e18);
   }
 }
+
+contract FeeHandlerTest_Transfer_L2 is FeeHandlerTest_L2, FeeHandlerTest_Transfer {}
 
 contract FeeHandlerTest_SetDailySellLimit is FeeHandlerTest {
   uint256 newCeloAmountForRate;
@@ -1149,6 +1222,11 @@ contract FeeHandlerTest_SetDailySellLimit is FeeHandlerTest {
   }
 }
 
+contract FeeHandlerTest_SetDailySellLimit_L2 is
+  FeeHandlerTest_L2,
+  FeeHandlerTest_SetDailySellLimit
+{}
+
 contract FeeHandlerTest_SetMaxSlippage is FeeHandlerTest {
   uint256 newMaxSlipapge;
 
@@ -1174,6 +1252,8 @@ contract FeeHandlerTest_SetMaxSlippage is FeeHandlerTest {
     feeHandler.setMaxSplippage(address(stableToken), maxSlippage);
   }
 }
+
+contract FeeHandlerTest_SetMaxSlippage_L2 is FeeHandlerTest_L2, FeeHandlerTest_SetMaxSlippage {}
 
 contract FeeHandlerTest_RemoveOtherBeneficiary is FeeHandlerTestAbstract {
   event BeneficiaryRemoved(address beneficiary);
@@ -1213,6 +1293,11 @@ contract FeeHandlerTest_RemoveOtherBeneficiary is FeeHandlerTestAbstract {
   }
 }
 
+contract FeeHandlerTest_RemoveOtherBeneficiary_L2 is
+  FeeHandlerTestAbstract_L2,
+  FeeHandlerTest_RemoveOtherBeneficiary
+{}
+
 contract FeeHandlerTest_SetBeneficiaryFraction is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
@@ -1245,6 +1330,11 @@ contract FeeHandlerTest_SetBeneficiaryFraction is FeeHandlerTestAbstract {
     feeHandler.setBeneficiaryFraction(op, (30 * 1e24) / 100);
   }
 }
+
+contract FeeHandlerTest_SetBeneficiaryFraction_L2 is
+  FeeHandlerTestAbstract_L2,
+  FeeHandlerTest_SetBeneficiaryFraction
+{}
 
 contract FeeHandlerTest_SetBeneficiaryName is FeeHandlerTestAbstract {
   function setUp() public {
@@ -1279,3 +1369,8 @@ contract FeeHandlerTest_SetBeneficiaryName is FeeHandlerTestAbstract {
     feeHandler.setBeneficiaryName(op, "OP revenue share updated");
   }
 }
+
+contract FeeHandlerTest_SetBeneficiaryName_L2 is
+  FeeHandlerTestAbstract_L2,
+  FeeHandlerTest_SetBeneficiaryName
+{}
