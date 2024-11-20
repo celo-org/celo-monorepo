@@ -1,14 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 
-import "celo-foundry/Test.sol";
-import { Utils } from "@test-sol/utils.sol";
-import { TestConstants } from "@test-sol/constants.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 import "@celo-contracts/identity/Random.sol";
 import "@celo-contracts/identity/test/RandomTest.sol";
 
-contract RandomTest_ is Test, TestConstants, IsL2Check, Utils {
+contract RandomTest_ is TestWithUtils {
   RandomTest random;
 
   event RandomnessBlockRetentionWindowSet(uint256 value);
