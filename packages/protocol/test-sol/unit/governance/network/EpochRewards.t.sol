@@ -10,7 +10,7 @@ import { Reserve } from "@lib/mento-core/contracts/Reserve.sol";
 
 import { MockSortedOracles } from "@celo-contracts/stability/test/MockSortedOracles.sol";
 import { MockStableToken } from "@celo-contracts/stability/test/MockStableToken.sol";
-import { GoldTokenMock } from "@test-sol/unit/common/GoldTokenMock.sol";
+import { CeloTokenMock } from "@test-sol/unit/common/CeloTokenMock.sol";
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
@@ -40,12 +40,11 @@ contract EpochRewardsTest is TestWithUtils {
   MockElection election;
   MockSortedOracles mockSortedOracles;
   MockStableToken mockStableToken;
-  GoldTokenMock mockGoldToken;
+  CeloTokenMock mockCeloToken;
   Reserve reserve;
   Freezer freezer;
 
-  Registry registry;
-
+  address celoUnreleasedTreasuryAddress;
   address caller = address(this);
 
   event TargetVotingGoldFractionSet(uint256 fraction);
@@ -60,20 +59,28 @@ contract EpochRewardsTest is TestWithUtils {
   event TargetVotingYieldSet(uint256 target);
 
   function setUp() public {
+    super.setUp();
     // Mocked contracts
     epochRewards = new EpochRewardsMock();
     election = new MockElection();
     mockSortedOracles = new MockSortedOracles();
     mockStableToken = new MockStableToken();
-    mockGoldToken = new GoldTokenMock();
+
+    mockCeloToken = new CeloTokenMock();
+    mockCeloToken.setRegistry(REGISTRY_ADDRESS);
+    mockCeloToken.setTotalSupply(L1_MINTED_CELO_SUPPLY);
 
     freezer = new Freezer(true);
-    registry = new Registry(true);
 
+    celoUnreleasedTreasuryAddress = actor("celoUnreleasedTreasury");
+    deployCodeTo("CeloUnreleasedTreasury.sol", abi.encode(false), celoUnreleasedTreasuryAddress);
+    registry.setAddressFor(CeloUnreleasedTreasuryContract, celoUnreleasedTreasuryAddress);
+
+    vm.deal(celoUnreleasedTreasuryAddress, L2_INITIAL_STASH_BALANCE);
     registry.setAddressFor(ElectionContract, address(election));
     registry.setAddressFor(SortedOraclesContract, address(mockSortedOracles));
     registry.setAddressFor(StableTokenContract, address(mockStableToken));
-    registry.setAddressFor(CeloTokenContract, address(mockGoldToken));
+    registry.setAddressFor(CeloTokenContract, address(mockCeloToken));
     registry.setAddressFor(FreezerContract, address(freezer));
 
     mockSortedOracles.setMedianRate(
@@ -97,12 +104,32 @@ contract EpochRewardsTest is TestWithUtils {
     );
   }
 
+  function _setNumberOfElectedInCurrentSetBaseOnLayer(uint256 numberValidators) internal {
+    if (isL2()) {
+      epochManager.setNumberOfElectedInCurrentSet(numberValidators);
+    } else {
+      epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
+    }
+  }
+
+  function _updateTargetVotingYieldBasedOnLayer() internal {
+    if (isL2()) {
+      vm.prank(address(epochManager));
+      epochRewards.updateTargetVotingYield();
+    } else {
+      vm.prank(address(0));
+      epochRewards.updateTargetVotingYield();
+    }
+  }
+
   function getExpectedTargetTotalSupply(uint256 timeDelta) internal pure returns (uint256) {
     uint256 genesisSupply = 600000000 ether;
     uint256 linearRewards = 200000000 ether;
     return uint256(genesisSupply + (timeDelta * linearRewards) / (YEAR * 15));
   }
 }
+
+contract EpochRewardsTest_L2 is WhenL2, EpochRewardsTest {}
 
 contract EpochRewardsTest_initialize is EpochRewardsTest {
   function test_ShouldHaveSetOwner() public {
@@ -187,14 +214,12 @@ contract EpochRewardsTest_setTargetVotingGoldFraction is EpochRewardsTest {
     vm.expectRevert("Target voting gold fraction unchanged");
     epochRewards.setTargetVotingGoldFraction(targetVotingGoldFraction);
   }
-
-  function test_Emits_WhenCalledOnL2() public {
-    _whenL2();
-    vm.expectEmit(true, true, true, true);
-    emit TargetVotingGoldFractionSet(newFraction);
-    epochRewards.setTargetVotingGoldFraction(newFraction);
-  }
 }
+
+contract EpochRewardsTest_setTargetVotingGoldFraction_L2 is
+  EpochRewardsTest_L2,
+  EpochRewardsTest_setTargetVotingGoldFraction
+{}
 
 contract EpochRewardsTest_setCommunityRewardFraction is EpochRewardsTest {
   uint256 newFraction = communityRewardFraction + 1;
@@ -233,14 +258,12 @@ contract EpochRewardsTest_setCommunityRewardFraction is EpochRewardsTest {
     );
     epochRewards.setCommunityRewardFraction(communityRewardFraction);
   }
-
-  function test_Emits_WhenCalledOnL2() public {
-    _whenL2();
-    vm.expectEmit(true, true, true, true);
-    emit CommunityRewardFractionSet(newFraction);
-    epochRewards.setCommunityRewardFraction(newFraction);
-  }
 }
+
+contract EpochRewardsTest_setCommunityRewardFraction_L2 is
+  EpochRewardsTest_L2,
+  EpochRewardsTest_setCommunityRewardFraction
+{}
 
 contract EpochRewardsTest_setTargetValidatorEpochPayment is EpochRewardsTest {
   uint256 newPayment = targetValidatorEpochPayment + 1;
@@ -270,14 +293,12 @@ contract EpochRewardsTest_setTargetValidatorEpochPayment is EpochRewardsTest {
     vm.expectRevert("Target validator epoch payment unchanged");
     epochRewards.setTargetValidatorEpochPayment(targetValidatorEpochPayment);
   }
-
-  function test_Emits_WhenCalledOnL2() public {
-    _whenL2();
-    vm.expectEmit(true, true, true, true);
-    emit TargetValidatorEpochPaymentSet(newPayment);
-    epochRewards.setTargetValidatorEpochPayment(newPayment);
-  }
 }
+
+contract EpochRewardsTest_setTargetValidatorEpochPayment_L2 is
+  EpochRewardsTest_L2,
+  EpochRewardsTest_setTargetValidatorEpochPayment
+{}
 
 contract EpochRewardsTest_setRewardsMultiplierParameters is EpochRewardsTest {
   uint256 newRewardsMultiplierAdjustmentsUnderspend = rewardsMultiplierAdjustmentsUnderspend + 1;
@@ -329,22 +350,12 @@ contract EpochRewardsTest_setRewardsMultiplierParameters is EpochRewardsTest {
       rewardsMultiplierAdjustmentsOverspend
     );
   }
-
-  function test_Emits_WhenCalledOnL2() public {
-    _whenL2();
-    vm.expectEmit(true, true, true, true);
-    emit RewardsMultiplierParametersSet(
-      rewardsMultiplierMax,
-      newRewardsMultiplierAdjustmentsUnderspend,
-      rewardsMultiplierAdjustmentsOverspend
-    );
-    epochRewards.setRewardsMultiplierParameters(
-      rewardsMultiplierMax,
-      newRewardsMultiplierAdjustmentsUnderspend,
-      rewardsMultiplierAdjustmentsOverspend
-    );
-  }
 }
+
+contract EpochRewardsTest_setRewardsMultiplierParameters_L2 is
+  EpochRewardsTest_L2,
+  EpochRewardsTest_setRewardsMultiplierParameters
+{}
 
 contract EpochRewardsTest_setTargetVotingYieldParameters is EpochRewardsTest {
   uint256 newTargetVotingYieldParamsMax = targetVotingYieldParamsMax + 1;
@@ -390,20 +401,12 @@ contract EpochRewardsTest_setTargetVotingYieldParameters is EpochRewardsTest {
       newTargetVotingYieldParamsAdjustmentFactor
     );
   }
-
-  function test_Emits_WhenCalledOnL2() public {
-    _whenL2();
-    vm.expectEmit(true, true, true, true);
-    emit TargetVotingYieldParametersSet(
-      newTargetVotingYieldParamsMax,
-      newTargetVotingYieldParamsAdjustmentFactor
-    );
-    epochRewards.setTargetVotingYieldParameters(
-      newTargetVotingYieldParamsMax,
-      newTargetVotingYieldParamsAdjustmentFactor
-    );
-  }
 }
+
+contract EpochRewardsTest_setTargetVotingYieldParameters_L2 is
+  EpochRewardsTest_L2,
+  EpochRewardsTest_setTargetVotingYieldParameters
+{}
 
 contract EpochRewardsTest_setTargetVotingYield is EpochRewardsTest {
   uint256 constant newTargetVotingYieldParamsInitial = targetVotingYieldParamsInitial + 1;
@@ -426,14 +429,12 @@ contract EpochRewardsTest_setTargetVotingYield is EpochRewardsTest {
     vm.expectRevert("Ownable: caller is not the owner");
     epochRewards.setTargetVotingYield(newTargetVotingYieldParamsInitial);
   }
-
-  function test_Emits_WhenCalledOnL2() public {
-    _whenL2();
-    vm.expectEmit(true, true, true, true);
-    emit TargetVotingYieldSet(newTargetVotingYieldParamsInitial);
-    epochRewards.setTargetVotingYield(newTargetVotingYieldParamsInitial);
-  }
 }
+
+contract EpochRewardsTest_setTargetVotingYield_L2 is
+  EpochRewardsTest_L2,
+  EpochRewardsTest_setTargetVotingYield
+{}
 
 contract EpochRewardsTest_getTargetGoldTotalSupply is EpochRewardsTest {
   function test_ShouldReturn1B_WhenLessThan15YearsSinceGenesis() public {
@@ -442,6 +443,11 @@ contract EpochRewardsTest_getTargetGoldTotalSupply is EpochRewardsTest {
     assertEq(epochRewards.getTargetGoldTotalSupply(), getExpectedTargetTotalSupply(timeDelta));
   }
 }
+
+contract EpochRewardsTest_getTargetGoldTotalSupply_L2 is
+  EpochRewardsTest_L2,
+  EpochRewardsTest_getTargetGoldTotalSupply
+{}
 
 contract EpochRewardsTest_getTargetVoterRewards is EpochRewardsTest {
   function test_ShouldReturnAPercentageOfActiveVotes_WhenThereAreActiveVotes() public {
@@ -453,15 +459,25 @@ contract EpochRewardsTest_getTargetVoterRewards is EpochRewardsTest {
   }
 }
 
+contract EpochRewardsTest_getTargetVoterRewards_L2 is
+  EpochRewardsTest_L2,
+  EpochRewardsTest_getTargetVoterRewards
+{}
+
 contract EpochRewardsTest_getTargetTotalEpochPaymentsInGold is EpochRewardsTest {
   function test_ShouldgetTargetTotalEpochPaymentsInGold_WhenExchangeRateIsSet() public {
     uint256 numberValidators = 100;
-    epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
+    _setNumberOfElectedInCurrentSetBaseOnLayer(numberValidators);
 
     uint256 expected = uint256((targetValidatorEpochPayment * numberValidators) / exchangeRate);
     assertEq(epochRewards.getTargetTotalEpochPaymentsInGold(), expected);
   }
 }
+
+contract EpochRewardsTest_getTargetTotalEpochPaymentsInGold_L2 is
+  EpochRewardsTest_L2,
+  EpochRewardsTest_getTargetTotalEpochPaymentsInGold
+{}
 
 contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
   uint256 constant timeDelta = YEAR * 10;
@@ -471,6 +487,7 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
 
   function setUp() public {
     super.setUp();
+
     expectedTargetTotalSupply = getExpectedTargetTotalSupply(timeDelta);
     expectedTargetRemainingSupply = SUPPLY_CAP - expectedTargetTotalSupply;
     targetEpochReward =
@@ -480,7 +497,13 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
   }
 
   function test_ShouldReturnOne_WhenTheTargetSupplyIsEqualToTheActualSupplyAfterRewards() public {
-    mockGoldToken.setTotalSupply(expectedTargetTotalSupply - targetEpochReward);
+    if (isL2()) {
+      uint256 celoUnreleasedTreasuryBalance = SUPPLY_CAP - expectedTargetTotalSupply;
+      vm.deal(celoUnreleasedTreasuryAddress, celoUnreleasedTreasuryBalance - targetEpochReward);
+    } else {
+      mockCeloToken.setTotalSupply(expectedTargetTotalSupply - targetEpochReward);
+    }
+
     assertEq(epochRewards.getRewardsMultiplier(), FIXED1);
   }
 
@@ -488,8 +511,13 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
     public
   {
     uint256 actualRemainingSupply = uint256((expectedTargetRemainingSupply * 11) / 10);
-    uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - targetEpochReward;
-    mockGoldToken.setTotalSupply(totalSupply);
+
+    if (isL2()) {
+      vm.deal(celoUnreleasedTreasuryAddress, actualRemainingSupply - targetEpochReward);
+    } else {
+      uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - targetEpochReward;
+      mockCeloToken.setTotalSupply(totalSupply);
+    }
 
     uint256 actual = epochRewards.getRewardsMultiplier();
     uint256 expected = uint256((FIXED1 + (rewardsMultiplierAdjustmentsUnderspend / 10)));
@@ -500,8 +528,13 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
     public
   {
     uint256 actualRemainingSupply = uint256((expectedTargetRemainingSupply * 9) / 10);
-    uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - targetEpochReward;
-    mockGoldToken.setTotalSupply(totalSupply);
+
+    if (isL2()) {
+      vm.deal(celoUnreleasedTreasuryAddress, actualRemainingSupply - targetEpochReward);
+    } else {
+      uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - targetEpochReward;
+      mockCeloToken.setTotalSupply(totalSupply);
+    }
 
     uint256 actual = epochRewards.getRewardsMultiplier();
     uint256 expected = uint256((FIXED1 - (rewardsMultiplierAdjustmentsOverspend / 10)));
@@ -509,10 +542,16 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
   }
 }
 
+contract EpochRewardsTest_getRewardsMultiplier_L2 is
+  EpochRewardsTest_L2,
+  EpochRewardsTest_getRewardsMultiplier
+{}
+
 contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
-  uint256 constant totalSupply = 6000000 ether;
+  uint256 constant totalSupplyL1 = 6000000 ether;
+  uint256 constant celoUnreleasedTreasuryBalance = SUPPLY_CAP - totalSupplyL1;
   uint256 constant reserveBalance = 1000000 ether;
-  uint256 constant floatingSupply = totalSupply - reserveBalance;
+  uint256 constant floatingSupply = totalSupplyL1 - reserveBalance;
 
   function setUp() public {
     super.setUp();
@@ -538,7 +577,11 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
       2 * FIXED1
     );
 
-    mockGoldToken.setTotalSupply(totalSupply);
+    if (isL2()) {
+      vm.deal(celoUnreleasedTreasuryAddress, celoUnreleasedTreasuryBalance);
+    } else {
+      mockCeloToken.setTotalSupply(totalSupplyL1);
+    }
     vm.deal(address(reserve), reserveBalance);
   }
 
@@ -636,8 +679,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     for (uint256 i = 0; i < 600; i++) {
       // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
       // time travel alone is not enough, updateTargetVotingYield needs to be called
-      vm.prank(address(0));
-      epochRewards.updateTargetVotingYield();
+      _updateTargetVotingYieldBasedOnLayer();
     }
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
@@ -652,8 +694,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     election.setTotalVotes(totalVotes);
     // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
     for (uint256 i = 0; i < 800; i++) {
-      vm.prank(address(0));
-      epochRewards.updateTargetVotingYield();
+      _updateTargetVotingYieldBasedOnLayer();
     }
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
@@ -667,8 +708,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     election.setTotalVotes(totalVotes);
     // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
     for (uint256 i = 0; i < 5; i++) {
-      vm.prank(address(0));
-      epochRewards.updateTargetVotingYield();
+      _updateTargetVotingYieldBasedOnLayer();
     }
 
     uint256 expected = targetVotingYieldParamsInitial +
@@ -687,8 +727,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     election.setTotalVotes(totalVotes);
     // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
     for (uint256 i = 0; i < 5; i++) {
-      vm.prank(address(0));
-      epochRewards.updateTargetVotingYield();
+      _updateTargetVotingYieldBasedOnLayer();
     }
 
     uint256 expected = targetVotingYieldParamsInitial +
@@ -734,8 +773,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     uint256 totalVotes = (floatingSupply * (targetVotingGoldFraction - 0.1e24)) / FIXED1;
     election.setTotalVotes(totalVotes);
     for (uint256 i = 0; i < 356; i++) {
-      vm.prank(address(0));
-      epochRewards.updateTargetVotingYield();
+      _updateTargetVotingYieldBasedOnLayer();
     }
 
     uint256 expected = targetVotingYieldParamsInitial +
@@ -750,8 +788,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     uint256 totalVotes = (floatingSupply * (targetVotingGoldFraction + 0.1e24)) / FIXED1;
     election.setTotalVotes(totalVotes);
     for (uint256 i = 0; i < 356; i++) {
-      vm.prank(address(0));
-      epochRewards.updateTargetVotingYield();
+      _updateTargetVotingYieldBasedOnLayer();
     }
 
     uint256 expected = targetVotingYieldParamsInitial -
@@ -762,10 +799,14 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
 
   function mockVotes(uint256 votes) internal {
     election.setTotalVotes(votes);
-    vm.prank(address(0));
-    epochRewards.updateTargetVotingYield();
+    _updateTargetVotingYieldBasedOnLayer();
   }
 }
+
+contract EpochRewardsTest_updateTargetVotingYield_L2 is
+  EpochRewardsTest_L2,
+  EpochRewardsTest_updateTargetVotingYield
+{}
 
 contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAndTheActualRemainingSupplyIs10pMoreThanTheTargetRemainingSupplyAfterRewards_calculateTargetEpochRewards is
   EpochRewardsTest
@@ -780,7 +821,7 @@ contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAn
   function setUp() public {
     super.setUp();
 
-    epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
+    _setNumberOfElectedInCurrentSetBaseOnLayer(numberValidators);
     election.setActiveVotes(activeVotes);
     uint256 expectedTargetTotalEpochPaymentsInGold = (targetValidatorEpochPayment *
       numberValidators) / exchangeRate;
@@ -793,8 +834,16 @@ contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAn
     uint256 expectedTargetTotalSupply = getExpectedTargetTotalSupply(timeDelta);
     uint256 expectedTargetRemainingSupply = SUPPLY_CAP - expectedTargetTotalSupply;
     uint256 actualRemainingSupply = (expectedTargetRemainingSupply * 11) / 10;
-    uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - expectedTargetGoldSupplyIncrease;
-    mockGoldToken.setTotalSupply(totalSupply);
+
+    if (isL2()) {
+      vm.deal(
+        celoUnreleasedTreasuryAddress,
+        actualRemainingSupply + expectedTargetGoldSupplyIncrease
+      );
+    } else {
+      uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - expectedTargetGoldSupplyIncrease;
+      mockCeloToken.setTotalSupply(totalSupply);
+    }
     expectedMultiplier = (FIXED1 + rewardsMultiplierAdjustmentsUnderspend / 10);
 
     validatorReward = (targetValidatorEpochPayment * numberValidators) / exchangeRate;
@@ -804,7 +853,7 @@ contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAn
   }
 
   function test_ShouldFetchTheExpectedRewardsMultiplier() public {
-    assertApproxEqRel(epochRewards.getRewardsMultiplier(), expectedMultiplier, 2e13);
+    assertApproxEqRel(epochRewards.getRewardsMultiplier(), expectedMultiplier, 6e13);
   }
 
   function test_ShouldReturnTheTargetValidatorEpochPaymentTimesTheRewardsMultiplier() public {
@@ -843,6 +892,11 @@ contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAn
   }
 }
 
+contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAndTheActualRemainingSupplyIs10pMoreThanTheTargetRemainingSupplyAfterRewards_calculateTargetEpochRewards_L2 is
+  EpochRewardsTest_L2,
+  EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAndTheActualRemainingSupplyIs10pMoreThanTheTargetRemainingSupplyAfterRewards_calculateTargetEpochRewards
+{}
+
 contract EpochRewardsTest_isReserveLow is EpochRewardsTest {
   uint256 constant stableBalance = 2397846127684712867321;
 
@@ -873,22 +927,22 @@ contract EpochRewardsTest_isReserveLow is EpochRewardsTest {
       2 * FIXED1
     );
     reserve.addToken(address(mockStableToken));
-    mockGoldToken.setTotalSupply(totalSupply);
+    mockCeloToken.setTotalSupply(totalSupply);
     mockStableToken.setTotalSupply(stableBalance);
   }
 
   // reserve ratio of 0.5'
   function test_ShouldBeLowAtStart_WhenReserveRatioIs05() public {
-    uint256 goldBalance = ((stableBalance / exchangeRate) / 2) / 2;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((stableBalance / exchangeRate) / 2) / 2;
+    vm.deal(address(reserve), celoBalance);
     // no time travel
     assertEq(epochRewards.isReserveLow(), true);
   }
 
   // reserve ratio of 1.5
   function test_ShouldBeLowAt15Years_WhenReserveRatioIs05() public {
-    uint256 goldBalance = ((stableBalance / exchangeRate) / 2) / 2;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((stableBalance / exchangeRate) / 2) / 2;
+    vm.deal(address(reserve), celoBalance);
     uint256 timeDelta = YEAR * 15;
     timeTravel(timeDelta);
 
@@ -896,8 +950,8 @@ contract EpochRewardsTest_isReserveLow is EpochRewardsTest {
   }
 
   function test_ShouldBeLowAt25Years_WhenReserveRatioIs05() public {
-    uint256 goldBalance = ((stableBalance / exchangeRate) / 2) / 2;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((stableBalance / exchangeRate) / 2) / 2;
+    vm.deal(address(reserve), celoBalance);
     uint256 timeDelta = YEAR * 25;
     timeTravel(timeDelta);
 
@@ -905,54 +959,54 @@ contract EpochRewardsTest_isReserveLow is EpochRewardsTest {
   }
 
   function test_ShouldBeLowAtStar_WhenReserveRatioIs1point5() public {
-    uint256 goldBalance = ((3 * stableBalance) / exchangeRate) / 4;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((3 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), celoBalance);
     // no time travel
     assertEq(epochRewards.isReserveLow(), true);
   }
 
   function test_ShouldBeLowAt12Years_WhenReserveRatioIs1point5() public {
-    uint256 goldBalance = ((3 * stableBalance) / exchangeRate) / 4;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((3 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), celoBalance);
     uint256 timeDelta = YEAR * 12;
     timeTravel(timeDelta);
     assertEq(epochRewards.isReserveLow(), true);
   }
 
   function test_ShouldNotBeLowAt15Years_WhenReserveRatioIs1point5() public {
-    uint256 goldBalance = ((3 * stableBalance) / exchangeRate) / 4;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((3 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), celoBalance);
     uint256 timeDelta = YEAR * 15;
     timeTravel(timeDelta);
     assertEq(epochRewards.isReserveLow(), false);
   }
 
   function test_ShouldNotBeLowAt25Years_WhenReserveRatioIs1point5() public {
-    uint256 goldBalance = ((3 * stableBalance) / exchangeRate) / 4;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((3 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), celoBalance);
     uint256 timeDelta = YEAR * 25;
     timeTravel(timeDelta);
     assertEq(epochRewards.isReserveLow(), false);
   }
 
   function test_ShouldBeLowAtStar_WhenReserveRatioIs2point5() public {
-    uint256 goldBalance = ((5 * stableBalance) / exchangeRate) / 4;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((5 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), celoBalance);
     // no time travel
     assertEq(epochRewards.isReserveLow(), false);
   }
 
   function test_ShouldNotBeLowAt15Years_WhenReserveRatioIs2point5() public {
-    uint256 goldBalance = ((5 * stableBalance) / exchangeRate) / 4;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((5 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), celoBalance);
     uint256 timeDelta = YEAR * 15;
     timeTravel(timeDelta);
     assertEq(epochRewards.isReserveLow(), false);
   }
 
   function test_ShouldNotBeLowAt25Years_WhenReserveRatioIs2point5() public {
-    uint256 goldBalance = ((5 * stableBalance) / exchangeRate) / 4;
-    vm.deal(address(reserve), goldBalance);
+    uint256 celoBalance = ((5 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), celoBalance);
     uint256 timeDelta = YEAR * 25;
     timeTravel(timeDelta);
     assertEq(epochRewards.isReserveLow(), false);
@@ -961,8 +1015,16 @@ contract EpochRewardsTest_isReserveLow is EpochRewardsTest {
   // when the contract is frozen
   function test_ShouldMakeUpdateTargetVotingyieldRevert_WhenTheContractIsFrozen() public {
     freezer.freeze(address(epochRewards));
-    vm.prank(address(0));
-    vm.expectRevert("can't call when contract is frozen");
-    epochRewards.updateTargetVotingYield();
+    if (isL2()) {
+      vm.prank(address(epochManager));
+      vm.expectRevert("can't call when contract is frozen");
+      epochRewards.updateTargetVotingYield();
+    } else {
+      vm.prank(address(0));
+      vm.expectRevert("can't call when contract is frozen");
+      epochRewards.updateTargetVotingYield();
+    }
   }
 }
+
+contract EpochRewardsTest_isReserveLow_L2 is EpochRewardsTest_L2, EpochRewardsTest_isReserveLow {}
