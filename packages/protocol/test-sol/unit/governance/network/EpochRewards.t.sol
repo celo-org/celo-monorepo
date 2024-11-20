@@ -13,6 +13,7 @@ import { MockStableToken } from "@celo-contracts/stability/test/MockStableToken.
 import { CeloTokenMock } from "@test-sol/unit/common/CeloTokenMock.sol";
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import "@test-sol/utils/WhenL2.sol";
 
 contract EpochRewardsTest is TestWithUtils {
   uint256 constant targetVotingYieldParamsInitial = 0.00016e24; // 0.00016
