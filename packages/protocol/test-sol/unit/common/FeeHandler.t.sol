@@ -7,7 +7,7 @@ pragma experimental ABIEncoderV2;
 
 import "@celo-contracts/common/FeeHandler.sol";
 
-import { Utils } from "@test-sol/utils.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 import "@test-sol/utils/WhenL2.sol";
 
 import { Exchange } from "@mento-core/contracts/Exchange.sol";
@@ -26,7 +26,7 @@ import "@mento-core/test/mocks/MockReserve.sol";
 import "@celo-contracts/common/ProxyFactory.sol";
 import "@celo-contracts/governance/GovernanceApproverMultiSig.sol";
 
-contract FeeHandlerTest is Utils {
+contract FeeHandlerTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
 
   event BeneficiaryAdded(address beneficiary);
