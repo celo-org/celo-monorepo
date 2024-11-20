@@ -10,7 +10,7 @@ import "@celo-contracts/governance/interfaces/IValidators.sol";
 import "@celo-contracts-8/common/IsL2Check.sol";
 import "@celo-contracts/common/PrecompilesOverrideV2.sol";
 
-contract Utils is Test, TestConstants, IsL2Check, PrecompilesOverrideV2 {
+contract TestWithUtils is Test, TestConstants, IsL2Check, PrecompilesOverrideV2 {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   EnumerableSet.AddressSet addressSet;

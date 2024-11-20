@@ -2,16 +2,14 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "celo-foundry/Test.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 
-import { TestConstants } from "@test-sol/constants.sol";
-import { Utils } from "@test-sol/utils.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 import "@test-sol/utils/WhenL2.sol";
 
-contract AccountsTest is Utils {
+contract AccountsTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
 
   Accounts accounts;
