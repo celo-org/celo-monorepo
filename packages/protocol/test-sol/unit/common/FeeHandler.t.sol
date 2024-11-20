@@ -25,8 +25,6 @@ import "@mento-core/test/mocks/MockReserve.sol";
 import "@celo-contracts/common/ProxyFactory.sol";
 import "@celo-contracts/governance/GovernanceApproverMultiSig.sol";
 
-import { console } from "forge-std/console.sol";
-
 contract FeeHandlerTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
@@ -787,7 +785,6 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellM
     exchangeEUR.sell(celoAmount, 0, true);
     uint256 stableAmount = 3000;
     feeHandler.setMaxSplippage(address(stableTokenEUR), FIXED1);
-    console.log("Balance of StableToken", stableTokenEUR.balanceOf(address(feeHandler)));
     stableTokenEUR.transfer(address(feeHandler), stableAmount);
     feeHandler.addToken(address(stableTokenEUR), address(mentoSeller));
     feeHandler.activateToken(address(stableTokenEUR));
