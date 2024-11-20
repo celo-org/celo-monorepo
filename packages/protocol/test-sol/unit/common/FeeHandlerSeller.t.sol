@@ -9,12 +9,10 @@ import { FeeHandlerSeller } from "@celo-contracts/common/FeeHandlerSeller.sol";
 import { MentoFeeHandlerSeller } from "@celo-contracts/common/MentoFeeHandlerSeller.sol";
 import { UniswapFeeHandlerSeller } from "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
 
-import { Utils } from "@test-sol/utils.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 import "@test-sol/utils/WhenL2.sol";
 
-contract FeeHandlerSellerTest is Utils {
-  event OracleAddressSet(address _token, address _oracle);
-
+contract FeeHandlerSellerTest is TestWithUtils {
   // Actors
   address RECEIVER_ADDRESS = actor("Arbitrary Receiver");
   address NON_OWNER_ADDRESS = actor("Arbitrary Non-Owner");
@@ -29,6 +27,8 @@ contract FeeHandlerSellerTest is Utils {
 
   // Helper data structures
   FeeHandlerSeller[] feeHandlerSellerInstances;
+
+  event OracleAddressSet(address _token, address _oracle);
 
   function setUp() public {
     super.setUp();
