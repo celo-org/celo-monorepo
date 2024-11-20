@@ -2,7 +2,7 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import { Utils } from "@test-sol/utils.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 import "@test-sol/utils/WhenL2.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
@@ -18,7 +18,7 @@ import "@celo-contracts/governance/test/MockValidators.sol";
 
 import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";
 
-contract LockedGoldTest is Utils {
+contract LockedGoldTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
 
   Accounts accounts;

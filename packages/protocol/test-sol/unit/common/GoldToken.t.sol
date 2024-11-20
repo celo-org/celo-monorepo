@@ -3,10 +3,10 @@ pragma solidity ^0.5.13;
 
 import "@celo-contracts/common/GoldToken.sol";
 
-import { Utils } from "@test-sol/utils.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 import "@test-sol/utils/WhenL2.sol";
 
-contract CeloTokenTest is Utils {
+contract CeloTokenTest is TestWithUtils {
   GoldToken celoToken;
 
   uint256 constant ONE_CELOTOKEN = 1000000000000000000;
