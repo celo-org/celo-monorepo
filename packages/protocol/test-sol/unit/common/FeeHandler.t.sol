@@ -5,9 +5,10 @@ pragma experimental ABIEncoderV2;
 // Refactor this test, make it easy to generate
 // will have to support more fees
 
-import "celo-foundry/Test.sol";
 import "@celo-contracts/common/FeeHandler.sol";
-import { TestConstants } from "@test-sol/constants.sol";
+
+import { Utils } from "@test-sol/utils.sol";
+import "@test-sol/utils/WhenL2.sol";
 
 import { Exchange } from "@mento-core/contracts/Exchange.sol";
 import { StableToken } from "@mento-core/contracts/StableToken.sol";
@@ -25,7 +26,7 @@ import "@mento-core/test/mocks/MockReserve.sol";
 import "@celo-contracts/common/ProxyFactory.sol";
 import "@celo-contracts/governance/GovernanceApproverMultiSig.sol";
 
-contract FeeHandlerTest is Test, TestConstants {
+contract FeeHandlerTest is Utils {
   using FixidityLib for FixidityLib.Fraction;
 
   event BeneficiaryAdded(address beneficiary);
@@ -33,7 +34,7 @@ contract FeeHandlerTest is Test, TestConstants {
   event BeneficiaryNameSet(address beneficiary, string name);
 
   FeeHandler feeHandler;
-  IRegistry registry;
+
   GoldToken celoToken;
   MockSortedOracles mockSortedOracles;
   MockReserve mockReserve;
@@ -86,14 +87,13 @@ contract FeeHandlerTest is Test, TestConstants {
   event TokenRemoved(address tokenAddress);
 
   function setUp() public {
+    super.setUp();
     vm.warp(YEAR); // foundry starts block.timestamp at 0, which leads to underflow errors in Uniswap contracts
     op = actor("op");
 
     spread = FixidityLib.newFixedFraction(3, 1000).unwrap();
     reserveFraction = FixidityLib.newFixedFraction(5, 100).unwrap();
     maxSlippage = FixidityLib.newFixedFraction(1, 100).unwrap();
-
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
     celoToken = new GoldToken(true);
     mockReserve = new MockReserve();
@@ -205,6 +205,8 @@ contract FeeHandlerTest is Test, TestConstants {
     celoToken.transfer(address(mockReserve), initialReserveBalance);
   }
 }
+
+contract FeeHandlerTest_L2 is WhenL2, FeeHandlerTest {}
 
 contract FeeHandlerTest_Initialize is FeeHandlerTest {
   function test_Reverts_WhenAlreadyInitialized() public {
