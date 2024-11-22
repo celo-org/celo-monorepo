@@ -3,19 +3,16 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 // Helper contracts
-import { Test } from "celo-foundry/Test.sol";
-import { TestConstants } from "@test-sol/constants.sol";
 
 import { CeloTokenMock } from "@test-sol/unit/common/CeloTokenMock.sol";
 import { FeeHandlerSeller } from "@celo-contracts/common/FeeHandlerSeller.sol";
 import { MentoFeeHandlerSeller } from "@celo-contracts/common/MentoFeeHandlerSeller.sol";
 import { UniswapFeeHandlerSeller } from "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
 
-import "@celo-contracts/common/interfaces/IRegistry.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import "@test-sol/utils/WhenL2.sol";
 
-contract FeeHandlerSellerTest is Test, TestConstants {
-  event OracleAddressSet(address _token, address _oracle);
-
+contract FeeHandlerSellerTest is TestWithUtils {
   // Actors
   address RECEIVER_ADDRESS = actor("Arbitrary Receiver");
   address NON_OWNER_ADDRESS = actor("Arbitrary Non-Owner");
@@ -31,9 +28,10 @@ contract FeeHandlerSellerTest is Test, TestConstants {
   // Helper data structures
   FeeHandlerSeller[] feeHandlerSellerInstances;
 
+  event OracleAddressSet(address _token, address _oracle);
+
   function setUp() public {
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
-    IRegistry registry = IRegistry(REGISTRY_ADDRESS);
+    super.setUp();
 
     celoToken = new CeloTokenMock();
     oracle = actor("oracle");
@@ -48,6 +46,8 @@ contract FeeHandlerSellerTest is Test, TestConstants {
     feeHandlerSellerInstances.push(uniswapFeeHandlerSeller);
   }
 }
+
+contract FeeHandlerSellerTest_L2 is WhenL2, FeeHandlerSellerTest {}
 
 contract FeeHandlerSellerTest_Transfer is FeeHandlerSellerTest {
   uint256 constant ZERO_CELOTOKEN = 0;
@@ -94,6 +94,11 @@ contract FeeHandlerSellerTest_Transfer is FeeHandlerSellerTest {
   }
 }
 
+contract FeeHandlerSellerTest_Transfer_L2 is
+  FeeHandlerSellerTest_L2,
+  FeeHandlerSellerTest_Transfer
+{}
+
 contract FeeHandlerSellerTest_SetMinimumReports is FeeHandlerSellerTest {
   address ARBITRARY_TOKEN_ADDRESS = actor("Arbitrary Token Address");
   uint256 constant ARBITRARY_NR_OF_MINIMUM_REPORTS = 15;
@@ -128,6 +133,11 @@ contract FeeHandlerSellerTest_SetMinimumReports is FeeHandlerSellerTest {
   }
 }
 
+contract FeeHandlerSellerTest_SetMinimumReports_L2 is
+  FeeHandlerSellerTest_L2,
+  FeeHandlerSellerTest_SetMinimumReports
+{}
+
 contract FeeHandlerSellerTest_setOracleAddress is FeeHandlerSellerTest {
   function test_Reverts_WhenCalledByNonOwner() public {
     vm.prank(NON_OWNER_ADDRESS);
@@ -151,3 +161,8 @@ contract FeeHandlerSellerTest_setOracleAddress is FeeHandlerSellerTest {
     uniswapFeeHandlerSeller.setOracleAddress(address(celoToken), oracle);
   }
 }
+
+contract FeeHandlerSellerTest_setOracleAddress_L2 is
+  FeeHandlerSellerTest_L2,
+  FeeHandlerSellerTest_setOracleAddress
+{}
