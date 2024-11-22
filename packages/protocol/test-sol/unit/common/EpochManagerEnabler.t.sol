@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.0 <0.8.20;
 
-import "celo-foundry-8/Test.sol";
+// import "celo-foundry-8/Test.sol";
 import "@celo-contracts-8/common/EpochManager.sol";
 
 import { EpochManagerEnablerMock } from "@test-sol/mocks/EpochManagerEnablerMock.sol";
@@ -10,7 +10,7 @@ import { CeloUnreleasedTreasury } from "@celo-contracts-8/common/CeloUnreleasedT
 import { ICeloUnreleasedTreasury } from "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
 
-import { TestConstants } from "@test-sol/constants.sol";
+// import { TestConstants } from "@test-sol/constants.sol";
 import { Utils08 } from "@test-sol/utils08.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
@@ -20,7 +20,7 @@ import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/Valid
 import { MockCeloUnreleasedTreasury } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasury.sol";
 import "@celo-contracts-8/common/test/MockCeloToken.sol";
 
-contract EpochManagerEnablerTest is Test, TestConstants, Utils08 {
+contract EpochManagerEnablerTest is Utils08 {
   EpochManager epochManager;
   EpochManagerEnablerMock epochManagerEnabler;
   MockCeloUnreleasedTreasury celoUnreleasedTreasury;

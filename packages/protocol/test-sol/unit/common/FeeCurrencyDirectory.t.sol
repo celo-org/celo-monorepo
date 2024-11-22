@@ -1,17 +1,20 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry-8/Test.sol";
+import { Utils08 } from "@test-sol/utils08.sol";
+import "@test-sol/utils/WhenL2-08.sol";
+
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/mocks/MockOracle.sol";
 
-contract FeeCurrencyDirectoryTestBase is Test {
+contract FeeCurrencyDirectoryTest is Utils08 {
   FeeCurrencyDirectory directory;
   MockOracle oracle;
   address nonOwner;
   address owner;
 
   function setUp() public virtual {
+    super.setUp();
     owner = address(this);
     nonOwner = actor("nonOwner");
     oracle = new MockOracle();
@@ -21,7 +24,9 @@ contract FeeCurrencyDirectoryTestBase is Test {
   }
 }
 
-contract TestSetCurrencyConfig is FeeCurrencyDirectoryTestBase {
+contract FeeCurrencyDirectoryTest_L2 is FeeCurrencyDirectoryTest, WhenL2 {}
+
+contract TestSetCurrencyConfig is FeeCurrencyDirectoryTest {
   function test_ShouldAllowOwnerSetCurrencyConfig() public {
     address token = address(1);
     uint256 intrinsicGas = 21000;
@@ -63,7 +68,7 @@ contract TestSetCurrencyConfig is FeeCurrencyDirectoryTestBase {
   }
 }
 
-contract TestRemoveCurrencies is FeeCurrencyDirectoryTestBase {
+contract TestRemoveCurrencies is FeeCurrencyDirectoryTest {
   function setUp() public override {
     super.setUp();
     address token = address(4);
@@ -99,7 +104,7 @@ contract TestRemoveCurrencies is FeeCurrencyDirectoryTestBase {
   }
 }
 
-contract TestGetExchangeRate is FeeCurrencyDirectoryTestBase {
+contract TestGetExchangeRate is FeeCurrencyDirectoryTest {
   address token;
 
   function setUp() public override {
