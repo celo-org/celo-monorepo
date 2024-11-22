@@ -10,8 +10,6 @@ import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/governance/Proposals.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
-import { L2MakerAbstract } from "@test-sol/utils/L2MakerAbstract.sol";
-
 import "@celo-contracts/governance/GovernanceSlasher.sol";
 
 contract GovernanceSlasherTest is TestWithUtils {
@@ -99,7 +97,14 @@ contract GovernanceSlasherTest_approveSlashing is GovernanceSlasherTest {
   }
 }
 
-contract GovernanceSlasherTest_slash is GovernanceSlasherTest, L2MakerAbstract {
+contract GovernanceSlasherTest_approveSlashing_L2 is
+  GovernanceSlasherTest_L2,
+  GovernanceSlasherTest_approveSlashing
+{}
+
+// contract GovernanceSlasherTest_slash_setup is GovernanceSlasherTest {}
+
+contract GovernanceSlasherTest_slash is GovernanceSlasherTest {
   function test_ShouldFailIfThereIsNothingToSlash() public {
     vm.expectRevert("No penalty given by governance");
     governanceSlasher.slash(validator, lessers, greaters, indices);
@@ -123,9 +128,10 @@ contract GovernanceSlasherTest_slash is GovernanceSlasherTest, L2MakerAbstract {
     emit GovernanceSlashPerformed(validator, 1000);
     governanceSlasher.slash(validator, lessers, greaters, indices);
   }
+}
 
+contract GovernanceSlasherTest_slash_L2 is GovernanceSlasherTest_L2 {
   function test_Reverts_WhenL2() public {
-    _whenL2();
     governanceSlasher.approveSlashing(validator, 1000);
     vm.expectRevert("This method is no longer supported in L2.");
     governanceSlasher.slash(validator, lessers, greaters, indices);
@@ -147,16 +153,8 @@ contract GovernanceSlasherTest_slashL2_WhenL1 is GovernanceSlasherTest {
 }
 
 // should work just like the deprecated version
-contract GovernanceSlasherTest_slashL2_WhenL2_WhenNotGroup is
-  GovernanceSlasherTest,
-  L2MakerAbstract
-{
+contract GovernanceSlasherTest_slashL2_WhenNotGroup_L2 is GovernanceSlasherTest_L2 {
   address group = address(0);
-
-  function setUp() public {
-    super.setUp();
-    _whenL2();
-  }
 
   // only onwer or multisig can call
 
@@ -181,13 +179,12 @@ contract GovernanceSlasherTest_slashL2_WhenL2_WhenNotGroup is
 }
 
 // should work just like the deprecated version
-contract GovernanceSlasherTest_slashL2_WhenL2_WhenGroup is GovernanceSlasherTest, L2MakerAbstract {
+contract GovernanceSlasherTest_slashL2_WhenGroup_L2 is GovernanceSlasherTest_L2 {
   address group;
   MockValidators validators;
 
   function setUp() public {
     super.setUp();
-    _whenL2();
 
     validators = new MockValidators();
     registry.setAddressFor("Validators", address(validators));
@@ -249,7 +246,7 @@ contract GovernanceSlasherTest_slashL2_WhenL2_WhenGroup is GovernanceSlasherTest
   }
 }
 
-contract SlasherExecuterTest_setSlasherExecuter is GovernanceSlasherTest {
+contract GovernanceSlasherTest_setSlasherExecuter is GovernanceSlasherTest {
   function test_onlyOwnwerCanSetSlasherExecuter() public {
     vm.prank(nonOwner);
     vm.expectRevert("Ownable: caller is not the owner");
@@ -261,3 +258,8 @@ contract SlasherExecuterTest_setSlasherExecuter is GovernanceSlasherTest {
     assertEq(governanceSlasher.getSlasherExecuter(), nonOwner, "Score Manager not set");
   }
 }
+
+contract GovernanceSlasherTest_setSlasherExecuter_L2 is
+  GovernanceSlasherTest_L2,
+  GovernanceSlasherTest_setSlasherExecuter
+{}
