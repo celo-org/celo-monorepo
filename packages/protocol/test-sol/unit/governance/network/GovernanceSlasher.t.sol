@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 
-import "celo-foundry/Test.sol";
-import { TestConstants } from "@test-sol/constants.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import "@test-sol/utils/WhenL2.sol";
 
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/interfaces/IRegistry.sol";
+
 import "@celo-contracts/governance/Proposals.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
@@ -14,14 +14,13 @@ import { L2MakerAbstract } from "@test-sol/utils/L2MakerAbstract.sol";
 
 import "@celo-contracts/governance/GovernanceSlasher.sol";
 
-contract GovernanceSlasherTest is Test, TestConstants {
+contract GovernanceSlasherTest is TestWithUtils {
   event SlashingApproved(address indexed account, uint256 amount);
   event GovernanceSlashPerformed(address indexed account, uint256 amount);
   event GovernanceSlashL2Performed(address indexed account, address indexed group, uint256 amount);
   event HavelSlashingMultiplierHalved(address validator);
   event ValidatorDeaffiliatedCalled(address validator);
 
-  IRegistry registry;
   Accounts accounts;
   MockLockedGold mockLockedGold;
 
@@ -37,6 +36,7 @@ contract GovernanceSlasherTest is Test, TestConstants {
   address internal slasherExecuter;
 
   function setUp() public {
+    super.setUp();
     owner = address(this);
     nonOwner = actor("nonOwner");
     validator = actor("validator");
@@ -47,8 +47,6 @@ contract GovernanceSlasherTest is Test, TestConstants {
     mockLockedGold = new MockLockedGold();
     governanceSlasher = new GovernanceSlasher(true);
 
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
-    registry = IRegistry(REGISTRY_ADDRESS);
     registry.setAddressFor("Accounts", address(accounts));
     registry.setAddressFor("LockedGold", address(mockLockedGold));
 
@@ -56,6 +54,8 @@ contract GovernanceSlasherTest is Test, TestConstants {
     mockLockedGold.setAccountTotalLockedGold(validator, 5000);
   }
 }
+
+contract GovernanceSlasherTest_L2 is GovernanceSlasherTest, WhenL2 {}
 
 contract GovernanceSlasherTest_initialize is GovernanceSlasherTest {
   function test_shouldHaveSetOwner() public {
@@ -68,7 +68,7 @@ contract GovernanceSlasherTest_initialize is GovernanceSlasherTest {
   }
 }
 
-contract GovernanceSlasherTest_approveSlashingTest is GovernanceSlasherTest {
+contract GovernanceSlasherTest_approveSlashing is GovernanceSlasherTest {
   function test_ShouldSetSlashableAmount() public {
     governanceSlasher.approveSlashing(slashedAddress, 1000);
     assertEq(governanceSlasher.getApprovedSlashing(slashedAddress), 1000);
