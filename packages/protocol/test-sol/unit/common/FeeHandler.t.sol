@@ -665,31 +665,6 @@ contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries_L2 is
   FeeHandlerTest_Distribute_WhenOtherBeneficiaries
 {}
 
-// function test_HandleCelo_WhenThereAreMoreTwoOtherBeneficiaries() public {
-//   feeHandler.addOtherBeneficiary(
-//     op,
-//     (20 * 1e24) / 100, // TODO use fixidity
-//     (20 * 1e24) / 100,
-//     "OP revenue share"
-//   );
-//   address otherBeneficiary = actor("otherBeneficiary");
-//   feeHandler.addOtherBeneficiary(
-//     otherBeneficiary ,
-//     (30 * 1e24) / 100, // TODO use fixidity
-//     (20 * 1e24) / 100,
-//     "otherBeneficiary "
-//   );
-
-//   assertEq(feeHandler.getTotalFractionOfOtherBeneficiariesAndCarbon(), 7e23);
-//   assertEq(feeHandler.getBurnFraction(), 3e23);
-
-//   feeHandler.handle(address(celoToken));
-//   assertEq(celoToken.getBurnedAmount(), 3e17);
-//   assertApproxEqAbs(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17, 1);
-//   assertApproxEqAbs(celoToken.balanceOf(op), 2e17, 1);
-//   assertApproxEqAbs(celoToken.balanceOf(otherBeneficiary), 3e17, 1);
-// }
-
 contract FeeHandlerTest_BurnCelo is FeeHandlerTestAbstract {
   function setUp() public {
     super.setUp();
