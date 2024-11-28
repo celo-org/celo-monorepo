@@ -273,10 +273,7 @@ contract EpochManager is
    */
   function processGroup(address group, address lesser, address greater) public {
     EpochProcessState storage _epochProcessing = epochProcessing;
-    require(
-      _epochProcessing.status == EpochProcessStatus.IndivudualGroupsProcessing,
-      "Indivudual epoch process is not started"
-    );
+    require(isIndividualProcessing(), "Indivudual epoch process is not started");
     require(toProcessGroups > 0, "no more groups to process");
 
     uint256 epochRewards = processedGroups[group];
@@ -452,7 +449,7 @@ contract EpochManager is
    * @return Whether or not the blockable functions are blocked.
    */
   function isBlocked() external view returns (bool) {
-    return isOnEpochProcess();
+    return isOnEpochProcess() || isIndividualProcessing();
   }
 
   /**
@@ -597,6 +594,11 @@ contract EpochManager is
     require(!isOnEpochProcess(), "Cannot change oracle address during epoch processing.");
     oracleAddress = newOracleAddress;
     emit OracleAddressSet(newOracleAddress);
+  }
+
+  function isIndividualProcessing() public view returns (bool) {
+    EpochProcessState storage _epochProcessing = epochProcessing;
+    return _epochProcessing.status == EpochProcessStatus.IndivudualGroupsProcessing;
   }
 
   /**

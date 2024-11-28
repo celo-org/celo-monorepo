@@ -698,6 +698,12 @@ contract EpochManagerTest_setToProcessGroups is EpochManagerTest {
     assertEq(EpochManager(address(epochManager)).toProcessGroups(), groups.length);
   }
 
+  function test_blocksChilds() public {
+    epochManager.startNextEpochProcess();
+    epochManager.setToProcessGroups();
+    assertTrue(epochManager.isBlocked());
+  }
+
   function test_setsGroupRewards() public {
     (address[] memory groups, , ) = getGroupsWithLessersAndGreaters();
     epochManager.startNextEpochProcess();
