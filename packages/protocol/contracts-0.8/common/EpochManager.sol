@@ -191,7 +191,7 @@ contract EpochManager is
    */
   function startNextEpochProcess() external nonReentrant onlySystemAlreadyInitialized {
     require(isTimeForNextEpoch(), "Epoch is not ready to start");
-    require(!isOnEpochProcess(), "Epoch process is already started");
+    require(!isEpochProcessingStarted(), "Epoch process is already started");
 
     epochProcessing.status = EpochProcessStatus.Started;
     epochs[currentEpochNumber].rewardsBlock = block.number;
@@ -449,7 +449,7 @@ contract EpochManager is
    * @return Whether or not the blockable functions are blocked.
    */
   function isBlocked() external view returns (bool) {
-    return isOnEpochProcess() || isIndividualProcessing();
+    return isEpochProcessingStarted();
   }
 
   /**
@@ -597,8 +597,11 @@ contract EpochManager is
   }
 
   function isIndividualProcessing() public view returns (bool) {
-    EpochProcessState storage _epochProcessing = epochProcessing;
-    return _epochProcessing.status == EpochProcessStatus.IndivudualGroupsProcessing;
+    return epochProcessing.status == EpochProcessStatus.IndivudualGroupsProcessing;
+  }
+
+  function isEpochProcessingStarted() public view returns (bool) {
+    return isOnEpochProcess() || isIndividualProcessing();
   }
 
   /**
