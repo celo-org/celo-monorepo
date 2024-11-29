@@ -231,7 +231,7 @@ contract FeeHandler is
   }
 
   /**
-    @dev Distributes the the token for to the feeBeneficiary.
+    @dev Distributes the token for to the feeBeneficiary.
   */
   function handle(address tokenAddress) external {
     return _handle(tokenAddress);

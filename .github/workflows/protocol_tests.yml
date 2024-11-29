@@ -13,6 +13,9 @@ env:
   FOUNDRY_CACHE_KEY: 2
   ANVIL_PORT: 8546
 
+permissions:
+  contents: read
+
 jobs:
   check:
     defaults:

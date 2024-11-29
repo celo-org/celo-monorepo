@@ -17,12 +17,17 @@ on:
         required: true
         type: string
 
+
+
 env:
   # Increment these to force cache rebuilding
   FOUNDRY_CACHE_KEY: 1
   # Supported Foundry version defined at celo-org (GitHub organisation) level, for consistency across workflows.
   SUPPORTED_FOUNDRY_VERSION: ${{ vars.SUPPORTED_FOUNDRY_VERSION }}
   ANVIL_PORT: 8546
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -91,7 +96,7 @@ jobs:
           echo "Pull Request Number: ${{ env.PR_NUMBER }}"
 
       - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
+        uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
         with:
           version: ${{ env.SUPPORTED_FOUNDRY_VERSION }}
 
