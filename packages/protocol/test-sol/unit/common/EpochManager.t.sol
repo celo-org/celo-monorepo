@@ -78,6 +78,8 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
   event EpochProcessingStarted(uint256 indexed epochNumber);
   event EpochDurationSet(uint256 indexed newEpochDuration);
   event OracleAddressSet(address indexed newOracleAddress);
+  event GroupMarkedForProcessing(address indexed group);
+  event GroupProcessed(address indexed group);
 
   function setUp() public virtual {
     epochManager = new EpochManager_WithMocks();
@@ -707,6 +709,15 @@ contract EpochManagerTest_setToProcessGroups is EpochManagerTest {
       assertEq(EpochManager(address(epochManager)).processedGroups(group), groupEpochRewards);
     }
   }
+
+  function test_Emits_GroupMarkedForProcessingEvent() public {
+    (address[] memory groups, , ) = getGroupsWithLessersAndGreaters();
+
+    epochManager.startNextEpochProcess();
+    vm.expectEmit(true, true, true, true);
+    emit GroupMarkedForProcessing(groups[0]);
+    epochManager.setToProcessGroups();
+  }
 }
 
 contract EpochManagerTest_processGroup is EpochManagerTest {
@@ -828,6 +839,14 @@ contract EpochManagerTest_processGroup is EpochManagerTest {
     for (uint256 i = 0; i < signers.length; i++) {
       assertEq(signers[i], afterSigners[i]);
     }
+  }
+
+  function test_Emits_GroupProcessed() public {
+    epochManager.startNextEpochProcess();
+    epochManager.setToProcessGroups();
+    vm.expectEmit(true, true, true, true);
+    emit GroupProcessed(group);
+    epochManager.processGroup(group, address(0), address(0));
   }
 }
 

@@ -112,6 +112,18 @@ contract EpochManager is
   );
 
   /**
+   * @notice Emitted when group is marked for processing.
+   * @param group Address of the group to be processed.
+   */
+  event GroupMarkedForProcessing(address indexed group);
+
+  /**
+   * @notice Emitted when group is processed.
+   * @param group Address of the processed group.
+   */
+  event GroupProcessed(address indexed group);
+
+  /**
    * @notice Throws if called by other than EpochManagerEnabler contract.
    */
   modifier onlyEpochManagerEnabler() {
@@ -245,6 +257,7 @@ contract EpochManager is
           groupScore
         );
         processedGroups[group] = epochRewards == 0 ? type(uint256).max : epochRewards;
+        emit GroupMarkedForProcessing(group);
       }
     }
   }
@@ -294,6 +307,7 @@ contract EpochManager is
     if (toProcessGroups == 0) {
       _finishEpochHelper(_epochProcessing, election);
     }
+    emit GroupProcessed(group);
   }
 
   /**
