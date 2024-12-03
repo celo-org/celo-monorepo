@@ -101,8 +101,6 @@ contract GovernanceSlasherTest_approveSlashing_L2 is
   GovernanceSlasherTest_approveSlashing
 {}
 
-// contract GovernanceSlasherTest_slash_setup is GovernanceSlasherTest {}
-
 contract GovernanceSlasherTest_slash is GovernanceSlasherTest {
   function test_ShouldFailIfThereIsNothingToSlash() public {
     vm.expectRevert("No penalty given by governance");
