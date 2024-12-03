@@ -191,6 +191,10 @@ contract EpochManager is
    */
   function startNextEpochProcess() external nonReentrant onlySystemAlreadyInitialized {
     require(isTimeForNextEpoch(), "Epoch is not ready to start");
+    require(
+      epochProcessing.status != EpochProcessStatus.Started,
+      "Epoch process is already started"
+    );
     require(!isEpochProcessingStarted(), "Epoch process is already started");
 
     epochProcessing.status = EpochProcessStatus.Started;
