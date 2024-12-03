@@ -306,10 +306,11 @@ contract EpochManager is
     delete processedGroups[group];
     toProcessGroups--;
 
+    emit GroupProcessed(group, currentEpochNumber);
+
     if (toProcessGroups == 0) {
       _finishEpochHelper(_epochProcessing, election);
     }
-    emit GroupProcessed(group, currentEpochNumber);
   }
 
   /**
@@ -364,7 +365,7 @@ contract EpochManager is
       }
 
       delete processedGroups[groups[i]];
-      emit GroupProcessed(group, currentEpochNumber);
+      emit GroupProcessed(groups[i], currentEpochNumber);
     }
 
     _finishEpochHelper(_epochProcessing, election);
