@@ -252,7 +252,6 @@ contract LockedGoldTest is TestWithUtils {
     );
   }
 
-
   function helper_WhenAccountIsSlashedForAllOfItsLockedGold(
     uint256 penalty,
     uint256 reward,
@@ -1197,9 +1196,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
     accounts.createAccount();
     vm.prank(delegator2);
     accounts.createAccount();
-   
   }
-
 
   function test_Reverts_WhenBlocked() public {
     uint256 penalty = value;
@@ -1832,7 +1829,6 @@ contract LockedGoldTest_delegateGovernanceVotes_L2 is
 {}
 
 contract LockedGoldTest_revokeDelegatedGovernanceVotes is LockedGoldTest {
-
   uint256 value = 1000;
   uint256 percentageToRevoke = 2;
   uint256 percentageToDelegate = 10;
