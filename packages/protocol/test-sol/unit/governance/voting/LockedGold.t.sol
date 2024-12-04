@@ -1444,21 +1444,6 @@ contract LockedGoldTest_slash is LockedGoldTest {
 contract LockedGoldTest_slash_L2 is LockedGoldTest_L2, LockedGoldTest_slash {}
 
 contract LockedGoldTest_delegateGovernanceVotes is LockedGoldTest {
-  address delegatee1 = actor("delegatee1");
-  address delegatee2 = actor("delegatee2");
-  address delegatee3 = actor("delegatee3");
-  address delegator = actor("delegator");
-  address delegator2 = actor("delegator2");
-
-  address delegatorSigner;
-  uint256 delegatorSignerPK;
-  address delegatorSigner2;
-  uint256 delegatorSigner2PK;
-  address delegateeSigner1;
-  uint256 delegateeSigner1PK;
-  address delegateeSigner2;
-  uint256 delegateeSigner2PK;
-
   uint256 value = 1000;
   uint256 percentToDelegate = 30;
   uint256 delegatedAmount = (value * percentToDelegate) / 100;
@@ -1847,20 +1832,6 @@ contract LockedGoldTest_delegateGovernanceVotes_L2 is
 {}
 
 contract LockedGoldTest_revokeDelegatedGovernanceVotes is LockedGoldTest {
-  address delegatee1 = actor("delegatee1");
-  address delegatee2 = actor("delegatee2");
-  address delegatee3 = actor("delegatee3");
-  address delegator = actor("delegator");
-  address delegator2 = actor("delegator2");
-
-  address delegatorSigner;
-  uint256 delegatorSignerPK;
-  address delegatorSigner2;
-  uint256 delegatorSigner2PK;
-  address delegateeSigner1;
-  uint256 delegateeSigner1PK;
-  address delegateeSigner2;
-  uint256 delegateeSigner2PK;
 
   uint256 value = 1000;
   uint256 percentageToRevoke = 2;
