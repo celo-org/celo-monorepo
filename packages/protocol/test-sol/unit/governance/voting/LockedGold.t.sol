@@ -105,6 +105,13 @@ contract LockedGoldTest is TestWithUtils {
     blocker = new TestBlocker();
 
     lockedGold.setBlockedByContract(address(blocker));
+
+    (delegatorSigner, delegatorSignerPK) = actorWithPK("delegatorSigner");
+    (delegatorSigner2, delegatorSigner2PK) = actorWithPK("delegatorSigner2");
+    (delegateeSigner1, delegateeSigner1PK) = actorWithPK("delegateeSigner1");
+    (delegateeSigner2, delegateeSigner2PK) = actorWithPK("delegateeSigner2");
+    vm.deal(delegator, 10 ether);
+    vm.deal(delegator2, 10 ether);
   }
 
   function getParsedSignatureOfAddress(
@@ -1190,12 +1197,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
     accounts.createAccount();
     vm.prank(delegator2);
     accounts.createAccount();
-    (delegatorSigner, delegatorSignerPK) = actorWithPK("delegatorSigner");
-    (delegatorSigner2, delegatorSigner2PK) = actorWithPK("delegatorSigner2");
-    (delegateeSigner1, delegateeSigner1PK) = actorWithPK("delegateeSigner1");
-    (delegateeSigner2, delegateeSigner2PK) = actorWithPK("delegateeSigner2");
-    vm.deal(delegator, 10 ether);
-    vm.deal(delegator2, 10 ether);
+   
   }
 
 
