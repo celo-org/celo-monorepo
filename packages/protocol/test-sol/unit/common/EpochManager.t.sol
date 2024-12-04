@@ -74,10 +74,11 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     address indexed beneficiary,
     uint256 delegatedPayment
   );
-
   event EpochProcessingStarted(uint256 indexed epochNumber);
   event EpochDurationSet(uint256 indexed newEpochDuration);
   event OracleAddressSet(address indexed newOracleAddress);
+  event GroupMarkedForProcessing(address indexed group, uint256 indexed epochNumber);
+  event GroupProcessed(address indexed group, uint256 indexed epochNumber);
 
   function setUp() public virtual {
     epochManager = new EpochManager_WithMocks();
@@ -640,6 +641,23 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
       assertEq(newElected[i], afterElected[i]);
     }
   }
+
+  function test_Emits_GroupProcessedEvent() public {
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
+
+    epochManager.startNextEpochProcess();
+
+    for (uint i = 0; i < groups.length; i++) {
+      vm.expectEmit(true, true, true, true);
+      emit GroupProcessed(groups[i], firstEpochNumber);
+    }
+
+    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+  }
 }
 
 contract EpochManagerTest_setToProcessGroups is EpochManagerTest {
@@ -706,6 +724,19 @@ contract EpochManagerTest_setToProcessGroups is EpochManagerTest {
     for (uint256 i = 0; i < groups.length; i++) {
       assertEq(EpochManager(address(epochManager)).processedGroups(group), groupEpochRewards);
     }
+  }
+
+  function test_Emits_GroupMarkedForProcessingEvent() public {
+    (address[] memory groups, , ) = getGroupsWithLessersAndGreaters();
+
+    epochManager.startNextEpochProcess();
+
+    for (uint i = 0; i < groups.length; i++) {
+      vm.expectEmit(true, true, true, true);
+      emit GroupMarkedForProcessing(groups[i], firstEpochNumber);
+    }
+
+    epochManager.setToProcessGroups();
   }
 }
 
@@ -828,6 +859,14 @@ contract EpochManagerTest_processGroup is EpochManagerTest {
     for (uint256 i = 0; i < signers.length; i++) {
       assertEq(signers[i], afterSigners[i]);
     }
+  }
+
+  function test_Emits_GroupProcessed() public {
+    epochManager.startNextEpochProcess();
+    epochManager.setToProcessGroups();
+    vm.expectEmit(true, true, true, true);
+    emit GroupProcessed(group, firstEpochNumber);
+    epochManager.processGroup(group, address(0), address(0));
   }
 }
 
