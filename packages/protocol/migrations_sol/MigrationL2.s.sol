@@ -8,7 +8,7 @@ import "forge-std/console.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts-8/common/UsingRegistry.sol";
-import "../../contracts/common/interfaces/IEpochManagerEnabler.sol";
+import "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
 
 contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
   using FixidityLib for FixidityLib.Fraction;
