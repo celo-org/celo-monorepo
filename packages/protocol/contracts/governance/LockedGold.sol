@@ -505,6 +505,9 @@ contract LockedGold is
       _decrementNonvotingAccountBalance(account, maxSlash.sub(difference));
       _incrementNonvotingAccountBalance(reporter, reward);
     }
+
+    _updateDelegatedAmount(account);
+
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
     address payable communityFundPayable = address(uint160(communityFund));
     require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
