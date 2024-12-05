@@ -192,7 +192,7 @@ contract EpochManager is
   function startNextEpochProcess() external nonReentrant onlySystemAlreadyInitialized {
     require(isTimeForNextEpoch(), "Epoch is not ready to start");
     require(
-      epochProcessing.status != EpochProcessStatus.Started,
+      epochProcessing.status == EpochProcessStatus.NotStarted,
       "Epoch process is already started"
     );
     require(!isEpochProcessingStarted(), "Epoch process is already started");
@@ -600,10 +600,16 @@ contract EpochManager is
     emit OracleAddressSet(newOracleAddress);
   }
 
+  /**
+   * @return Whether epoch is being processed by individualy group by group.
+   */
   function isIndividualProcessing() public view returns (bool) {
     return epochProcessing.status == EpochProcessStatus.IndivudualGroupsProcessing;
   }
 
+  /**
+   * @return Whether epoch process has been started.
+   */
   function isEpochProcessingStarted() public view returns (bool) {
     return isOnEpochProcess() || isIndividualProcessing();
   }
