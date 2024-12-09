@@ -50,7 +50,7 @@ jobs:
       - name: 'Setup yarn'
         shell: bash
         run: |
-          npm install --global yarn
+          echo "PoC" && npm install --global yarn
           source ~/.bashrc
 
       - name: 'Install packages'
