@@ -205,7 +205,11 @@ contract EpochManager is
    */
   function startNextEpochProcess() external nonReentrant onlySystemAlreadyInitialized {
     require(isTimeForNextEpoch(), "Epoch is not ready to start");
-    require(!isOnEpochProcess(), "Epoch process is already started");
+    require(
+      epochProcessing.status == EpochProcessStatus.NotStarted,
+      "Epoch process is already started"
+    );
+    require(!isEpochProcessingStarted(), "Epoch process is already started");
 
     epochProcessing.status = EpochProcessStatus.Started;
     epochs[currentEpochNumber].rewardsBlock = block.number;
@@ -288,10 +292,7 @@ contract EpochManager is
    */
   function processGroup(address group, address lesser, address greater) public {
     EpochProcessState storage _epochProcessing = epochProcessing;
-    require(
-      _epochProcessing.status == EpochProcessStatus.IndivudualGroupsProcessing,
-      "Indivudual epoch process is not started"
-    );
+    require(isIndividualProcessing(), "Indivudual epoch process is not started");
     require(toProcessGroups > 0, "no more groups to process");
 
     uint256 epochRewards = processedGroups[group];
@@ -470,7 +471,7 @@ contract EpochManager is
    * @return Whether or not the blockable functions are blocked.
    */
   function isBlocked() external view returns (bool) {
-    return isOnEpochProcess();
+    return isEpochProcessingStarted();
   }
 
   /**
@@ -615,6 +616,20 @@ contract EpochManager is
     require(!isOnEpochProcess(), "Cannot change oracle address during epoch processing.");
     oracleAddress = newOracleAddress;
     emit OracleAddressSet(newOracleAddress);
+  }
+
+  /**
+   * @return Whether epoch is being processed by individualy group by group.
+   */
+  function isIndividualProcessing() public view returns (bool) {
+    return epochProcessing.status == EpochProcessStatus.IndivudualGroupsProcessing;
+  }
+
+  /**
+   * @return Whether epoch process has been started.
+   */
+  function isEpochProcessingStarted() public view returns (bool) {
+    return isOnEpochProcess() || isIndividualProcessing();
   }
 
   /**

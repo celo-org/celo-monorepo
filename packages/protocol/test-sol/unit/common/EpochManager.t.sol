@@ -716,6 +716,24 @@ contract EpochManagerTest_setToProcessGroups is EpochManagerTest {
     assertEq(EpochManager(address(epochManager)).toProcessGroups(), groups.length);
   }
 
+  function test_blocksChilds() public {
+    epochManager.startNextEpochProcess();
+    epochManager.setToProcessGroups();
+    assertTrue(epochManager.isBlocked());
+  }
+
+  function test_Reverts_startEpochAgain() public {
+    epochManager.startNextEpochProcess();
+    epochManager.setToProcessGroups();
+    vm.expectRevert("Epoch process is already started");
+    epochManager.startNextEpochProcess();
+  }
+
+  function test_Reverts_WhenSetToProcessGroups() public {
+    vm.expectRevert("Epoch process is not started");
+    epochManager.setToProcessGroups();
+  }
+
   function test_setsGroupRewards() public {
     (address[] memory groups, , ) = getGroupsWithLessersAndGreaters();
     epochManager.startNextEpochProcess();
