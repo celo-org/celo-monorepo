@@ -16,6 +16,20 @@ contract FeeCurrencyDirectory is
   mapping(address => CurrencyConfig) public currencies;
   address[] private currencyList;
 
+  /**
+   * @notice Emitted when currency config is set.
+   * @param token Address of the added currency token.
+   * @param oracle Address of the currency token oracle.
+   * @param intrinsicGas The intrinsic gas value for transactions.
+   */
+  event CurrencyConfigSet(address indexed token, address indexed oracle, uint256 intrinsicGas);
+
+  /**
+   * @notice Emitted when currency is removed.
+   * @param token Address of the removed currency token.
+   */
+  event CurrencyRemoved(address indexed token);
+
   constructor(bool test) Initializable(test) {}
 
   /**
@@ -43,6 +57,7 @@ contract FeeCurrencyDirectory is
 
     currencies[token] = CurrencyConfig({ oracle: oracle, intrinsicGas: intrinsicGas });
     currencyList.push(token);
+    emit CurrencyConfigSet(token, oracle, intrinsicGas);
   }
 
   /**
@@ -58,6 +73,7 @@ contract FeeCurrencyDirectory is
     delete currencies[token];
     currencyList[index] = currencyList[currencyList.length - 1];
     currencyList.pop();
+    emit CurrencyRemoved(token);
   }
 
   /**

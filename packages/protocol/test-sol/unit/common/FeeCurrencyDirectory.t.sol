@@ -12,6 +12,8 @@ contract FeeCurrencyDirectoryTest is Utils08 {
   MockOracle oracle;
   address nonOwner;
   address owner;
+  event CurrencyConfigSet(address indexed token, address indexed oracle, uint256 intrinsicGas);
+  event CurrencyRemoved(address indexed token);
 
   function setUp() public virtual {
     super.setUp();
@@ -36,6 +38,16 @@ contract TestSetCurrencyConfig is FeeCurrencyDirectoryTest {
     assertEq(directory.getCurrencies().length, 1);
     assertEq(config.oracle, address(oracle));
     assertEq(config.intrinsicGas, intrinsicGas);
+  }
+
+  function test_Emits_CurrencyConfigSetEvent() public {
+    address token = address(1);
+    uint256 intrinsicGas = 21000;
+
+    vm.expectEmit(true, true, true, true);
+    emit CurrencyConfigSet(token, address(oracle), intrinsicGas);
+
+    directory.setCurrencyConfig(token, address(oracle), intrinsicGas);
   }
 
   function test_Reverts_WhenNonOwnerSetsCurrencyConfig() public {
@@ -81,6 +93,13 @@ contract TestRemoveCurrencies is FeeCurrencyDirectoryTest {
     IFeeCurrencyDirectory.CurrencyConfig memory config = directory.getCurrencyConfig(token);
     assertEq(directory.getCurrencies().length, 0);
     assertEq(config.oracle, address(0));
+  }
+
+  function test_Emits_CurrencyRemovedEvent() public {
+    address token = address(4);
+    vm.expectEmit(true, true, true, true);
+    emit CurrencyRemoved(token);
+    directory.removeCurrencies(token, 0);
   }
 
   function test_Reverts_WhenNonOwnerRemovesCurrencies() public {

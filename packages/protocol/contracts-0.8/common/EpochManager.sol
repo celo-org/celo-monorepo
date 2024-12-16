@@ -112,6 +112,20 @@ contract EpochManager is
   );
 
   /**
+   * @notice Emitted when group is marked for processing.
+   * @param group Address of the group to be processed.
+   * @param epochNumber The epoch number for which the group gets marked for processing.
+   */
+  event GroupMarkedForProcessing(address indexed group, uint256 indexed epochNumber);
+
+  /**
+   * @notice Emitted when group is processed.
+   * @param group Address of the processed group.
+   * @param epochNumber The epoch number for which the group gets processed.
+   */
+  event GroupProcessed(address indexed group, uint256 indexed epochNumber);
+
+  /**
    * @notice Throws if called by other than EpochManagerEnabler contract.
    */
   modifier onlyEpochManagerEnabler() {
@@ -191,7 +205,11 @@ contract EpochManager is
    */
   function startNextEpochProcess() external nonReentrant onlySystemAlreadyInitialized {
     require(isTimeForNextEpoch(), "Epoch is not ready to start");
-    require(!isOnEpochProcess(), "Epoch process is already started");
+    require(
+      epochProcessing.status == EpochProcessStatus.NotStarted,
+      "Epoch process is already started"
+    );
+    require(!isEpochProcessingStarted(), "Epoch process is already started");
 
     epochProcessing.status = EpochProcessStatus.Started;
     epochs[currentEpochNumber].rewardsBlock = block.number;
@@ -245,6 +263,7 @@ contract EpochManager is
           groupScore
         );
         processedGroups[group] = epochRewards == 0 ? type(uint256).max : epochRewards;
+        emit GroupMarkedForProcessing(group, currentEpochNumber);
       }
     }
   }
@@ -273,10 +292,7 @@ contract EpochManager is
    */
   function processGroup(address group, address lesser, address greater) public {
     EpochProcessState storage _epochProcessing = epochProcessing;
-    require(
-      _epochProcessing.status == EpochProcessStatus.IndivudualGroupsProcessing,
-      "Indivudual epoch process is not started"
-    );
+    require(isIndividualProcessing(), "Indivudual epoch process is not started");
     require(toProcessGroups > 0, "no more groups to process");
 
     uint256 epochRewards = processedGroups[group];
@@ -290,6 +306,8 @@ contract EpochManager is
 
     delete processedGroups[group];
     toProcessGroups--;
+
+    emit GroupProcessed(group, currentEpochNumber);
 
     if (toProcessGroups == 0) {
       _finishEpochHelper(_epochProcessing, election);
@@ -348,6 +366,7 @@ contract EpochManager is
       }
 
       delete processedGroups[groups[i]];
+      emit GroupProcessed(groups[i], currentEpochNumber);
     }
 
     _finishEpochHelper(_epochProcessing, election);
@@ -452,7 +471,7 @@ contract EpochManager is
    * @return Whether or not the blockable functions are blocked.
    */
   function isBlocked() external view returns (bool) {
-    return isOnEpochProcess();
+    return isEpochProcessingStarted();
   }
 
   /**
@@ -597,6 +616,20 @@ contract EpochManager is
     require(!isOnEpochProcess(), "Cannot change oracle address during epoch processing.");
     oracleAddress = newOracleAddress;
     emit OracleAddressSet(newOracleAddress);
+  }
+
+  /**
+   * @return Whether epoch is being processed by individualy group by group.
+   */
+  function isIndividualProcessing() public view returns (bool) {
+    return epochProcessing.status == EpochProcessStatus.IndivudualGroupsProcessing;
+  }
+
+  /**
+   * @return Whether epoch process has been started.
+   */
+  function isEpochProcessingStarted() public view returns (bool) {
+    return isOnEpochProcess() || isIndividualProcessing();
   }
 
   /**
