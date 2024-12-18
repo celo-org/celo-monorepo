@@ -167,7 +167,7 @@ export function getClusterConfigForContext(context: string) {
 }
 
 /**
- * yargs argv type for an command that requires a context
+ * yargs argv type for a command that requires a context
  */
 export interface ContextArgv {
   context: string
