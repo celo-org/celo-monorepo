@@ -15,7 +15,7 @@ contract FeeCurrencyDirectoryTest is Utils08 {
   event CurrencyConfigSet(address indexed token, address indexed oracle, uint256 intrinsicGas);
   event CurrencyRemoved(address indexed token);
 
-  function setUp() public virtual {
+  function setUp() public virtual override {
     super.setUp();
     owner = address(this);
     nonOwner = actor("nonOwner");
@@ -26,7 +26,11 @@ contract FeeCurrencyDirectoryTest is Utils08 {
   }
 }
 
-contract FeeCurrencyDirectoryTest_L2 is FeeCurrencyDirectoryTest, WhenL2 {}
+contract FeeCurrencyDirectoryTest_L2 is FeeCurrencyDirectoryTest, WhenL2 {
+  function setUp() public override(FeeCurrencyDirectoryTest, WhenL2) {
+    super.setUp();
+  }
+}
 
 contract TestSetCurrencyConfig is FeeCurrencyDirectoryTest {
   function test_ShouldAllowOwnerSetCurrencyConfig() public {

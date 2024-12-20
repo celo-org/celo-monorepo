@@ -11,7 +11,8 @@ contract ProxyFactoryTest is Utils08 {
   bytes proxyInitCode;
   address constant owner = address(0xAA963FC97281d9632d96700aB62A4D1340F9a28a);
 
-  function setUp() public {
+  function setUp() public override {
+    super.setUp();
     proxyFactory08 = new ProxyFactory08();
     proxyInitCode = vm.getCode("Proxy.sol");
   }
