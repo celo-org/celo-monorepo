@@ -33,8 +33,9 @@ for LIB_PATH in "${LIBRARY_DEPENDENCIES_PATH[@]}"; do
     cp $SOURCE_DIR/$LIB_PATH $DEST_DIR/$LIB_PATH
 done
 
-# Copy foundry config to the temporary directory
+# Copy foundry config and remappings to the temporary directory
 cp $SOURCE_DIR/foundry.toml $DEST_DIR/foundry.toml
+cp $SOURCE_DIR/remappings.txt $DEST_DIR/remappings.txt
 
 # Move into the temporary directory
 pushd $TEMP_DIR
