@@ -1,8 +1,13 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.0 <0.8.20;
 
+// Note: This is not an exact copy of UsingRegistry or UsingRegistryV2 in the contract's folder
+// because Mento's interfaces still don't support Solidity 0.8
+
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
+
+import "./interfaces/IScoreReader.sol";
 
 import "../../contracts/common/interfaces/IAccounts.sol";
 import "../../contracts/common/interfaces/IEpochManager.sol";
@@ -27,7 +32,7 @@ import "../../contracts/identity/interfaces/IFederatedAttestations.sol";
 // import "../../lib/mento-core/contracts/interfaces/IStableToken.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
 
-contract UsingRegistryV2 {
+contract UsingRegistryV2NoMento {
   address internal constant registryAddress = 0x000000000000000000000000000000000000ce10;
   IRegistry public constant registryContract = IRegistry(registryAddress);
 
@@ -71,6 +76,7 @@ contract UsingRegistryV2 {
   bytes32 internal constant EPOCH_MANAGER_ENABLER_REGISTRY_ID =
     keccak256(abi.encodePacked("EpochManagerEnabler"));
   bytes32 internal constant EPOCH_MANAGER_REGISTRY_ID = keccak256(abi.encodePacked("EpochManager"));
+  bytes32 internal constant SCORE_MANAGER_REGISTRY_ID = keccak256(abi.encodePacked("ScoreManager"));
 
   modifier onlyRegisteredContract(bytes32 identifierHash) {
     require(
@@ -196,5 +202,9 @@ contract UsingRegistryV2 {
 
   function getEpochManager() internal view returns (IEpochManager) {
     return IEpochManager(registryContract.getAddressForOrDie(EPOCH_MANAGER_REGISTRY_ID));
+  }
+
+  function getScoreReader() internal view returns (IScoreReader) {
+    return IScoreReader(registryContract.getAddressForOrDie(SCORE_MANAGER_REGISTRY_ID));
   }
 }
