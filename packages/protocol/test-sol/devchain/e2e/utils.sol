@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.8.20;
 
-import "@celo-contracts-8/common/UsingRegistry.sol";
+// import "@celo-contracts-8/common/UsingRegistry2.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.sol";
 import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
@@ -15,9 +15,10 @@ import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 
-import { TestConstants } from "@test-sol/constants.sol";
+// import { TestConstants } from "@test-sol/constants.sol";
+import "@test-sol/utils08.sol";
 
-contract Devchain is UsingRegistry, TestConstants {
+contract Devchain is Utils08 {
   // Used in exceptional circumstances when a contract is not in UsingRegistry.sol
   IRegistry devchainRegistry = IRegistry(REGISTRY_ADDRESS);
 

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.0 <0.8.20;
 
-import "celo-foundry-8/Test.sol";
+// import "celo-foundry-8/Test.sol";
 
-import { Utils08 } from "@test-sol/utils08.sol";
-import { TestConstants } from "@test-sol/constants.sol";
+// import { Utils08 } from "@test-sol/utils08.sol";
+// import { TestConstants } from "@test-sol/constants.sol";
 import { MigrationsConstants } from "@migrations-sol/constants.sol";
 import { FeeCurrencyDirectory } from "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 

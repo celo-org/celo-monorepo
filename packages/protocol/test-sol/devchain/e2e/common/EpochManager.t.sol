@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry-8/Test.sol";
+// import "celo-foundry-8/Test.sol";
 import { Devchain } from "@test-sol/devchain/e2e/utils.sol";
-import { Utils08 } from "@test-sol/utils08.sol";
+// import { Utils08 } from "@test-sol/utils08.sol";
 
 import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.sol";
 
@@ -12,7 +12,7 @@ import "@test-sol/utils/ECDSAHelper08.sol";
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
 import { console } from "forge-std/console.sol";
 
-contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
+contract E2E_EpochManager is Devchain, ECDSAHelper08 {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   struct VoterWithPK {

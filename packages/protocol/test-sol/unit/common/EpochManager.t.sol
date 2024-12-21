@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry-8/Test.sol";
+// import "celo-foundry-8/Test.sol";
 import "@celo-contracts-8/common/mocks/EpochManager_WithMocks.sol";
 import "@celo-contracts-8/stability/test/MockStableToken.sol";
 import "@celo-contracts-8/common/test/MockCeloToken.sol";
@@ -9,7 +9,7 @@ import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts-8/common/ScoreManager.sol";
 import { ICeloUnreleasedTreasury } from "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 
-import { TestConstants } from "@test-sol/constants.sol";
+// import { TestConstants } from "@test-sol/constants.sol";
 import { Utils08 } from "@test-sol/utils08.sol";
 
 import "@celo-contracts/stability/test/MockSortedOracles.sol";
@@ -26,7 +26,7 @@ import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/Valid
 import { MockCeloUnreleasedTreasury } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasury.sol";
 import { console } from "forge-std/console.sol";
 
-contract EpochManagerTest is Test, TestConstants, Utils08 {
+contract EpochManagerTest is Utils08 {
   EpochManager_WithMocks epochManager;
   MockSortedOracles sortedOracles;
 
