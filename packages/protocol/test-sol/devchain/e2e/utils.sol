@@ -19,13 +19,10 @@ import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 import "@test-sol/utils08.sol";
 
 contract Devchain is Utils08 {
-  // Used in exceptional circumstances when a contract is not in UsingRegistry.sol
-  IRegistry devchainRegistry = IRegistry(REGISTRY_ADDRESS);
-
   // All core contracts that are expected to be in the Registry on the devchain
   ISortedOracles sortedOracles;
   FeeCurrencyDirectory feeCurrencyDirectory;
-  IEpochManager epochManager;
+  IEpochManager epochManagerContract;
   ICeloUnreleasedTreasury celoUnreleasedTreasury;
   IValidators validators;
   IAccounts accounts;
@@ -34,16 +31,13 @@ contract Devchain is Utils08 {
   ILockedCelo lockedCelo;
 
   constructor() {
-    // The following line is required by UsingRegistry.sol
-    setRegistry(REGISTRY_ADDRESS);
-
     // Fetch all core contracts that are expeceted to be in the Registry on the devchain
     sortedOracles = getSortedOracles();
     feeCurrencyDirectory = FeeCurrencyDirectory(
-      devchainRegistry.getAddressForStringOrDie("FeeCurrencyDirectory")
+      registryContract.getAddressForStringOrDie("FeeCurrencyDirectory")
     ); // FeeCurrencyDirectory is not in UsingRegistry.sol
 
-    epochManager = getEpochManager();
+    epochManagerContract = getEpochManager();
     celoUnreleasedTreasury = getCeloUnreleasedTreasury();
     validators = getValidators();
     accounts = getAccounts();

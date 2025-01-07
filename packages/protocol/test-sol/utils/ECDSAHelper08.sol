@@ -1,8 +1,8 @@
 pragma solidity >=0.5.13 <0.8.20;
-import "celo-foundry-8/Test.sol";
+import { Utils08 } from "@test-sol/utils08.sol";
 import "@test-sol/utils/SECP256K1.sol";
 
-contract ECDSAHelper08 is Test {
+contract ECDSAHelper08 is Utils08 {
   ISECP256K1 sECP256K1;
 
   function addressToPublicKey(

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.8.20;
 
-// import "celo-foundry-8/Test.sol";
 import { Devchain } from "@test-sol/devchain/e2e/utils.sol";
 
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
