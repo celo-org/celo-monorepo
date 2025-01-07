@@ -1,23 +1,28 @@
 pragma solidity >=0.5.13 <0.9.0;
 
-// import "celo-foundry-8/Test.sol";
 import { Test as ForgeTest } from "@lib/celo-foundry-8/lib/forge-std/src/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
+import { PrecompileHandler } from "@test-sol/utils/PrecompileHandler.sol";
 
-// import "@celo-contracts-8/common/EpochManager.sol";
-import "@test-sol/unit/common/mocks/MockEpochManager.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
+
+import "@celo-contracts-8/common/mocks/EpochManager_WithMocks.sol";
 import "@celo-contracts-8/common/IsL2Check.sol";
 import "@celo-contracts-8/common/PrecompilesOverrideV2.sol";
 
 contract Utils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOverrideV2 {
-  // contract Utils08 is Test, TestConstants, IsL2Check, PrecompilesOverrideV2 {
   IRegistry registry;
-  MockEpochManager public epochManager;
+  PrecompileHandler ph;
+  EpochManager_WithMocks public epochManager;
+
+  address public epochManagerEnabler;
   uint256 public constant secondsInOneBlock = 5;
 
   function setUp() public virtual {
+    ph = new PrecompileHandler();
     setupRegistry();
+    epochManagerEnabler = actor("EpochManagerEnabler");
+    registry.setAddressFor(EpochManagerEnablerContract, epochManagerEnabler);
     setupEpochManager();
   }
 
@@ -27,7 +32,7 @@ contract Utils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOverrideV2 {
   }
 
   function setupEpochManager() public {
-    epochManager = new MockEpochManager();
+    epochManager = new EpochManager_WithMocks();
 
     registry.setAddressFor(EpochManagerContract, address(epochManager));
   }
@@ -88,8 +93,6 @@ contract Utils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOverrideV2 {
 
   function whenL2WithEpochManagerInitialization() internal {
     uint256 l1EpochNumber = getEpochNumber();
-    address epochManagerEnabler = actor("EpochManagerEnabler");
-    registry.setAddressFor(EpochManagerContract, address(epochManager));
 
     address[] memory _elected = new address[](2);
     _elected[0] = actor("validator");
