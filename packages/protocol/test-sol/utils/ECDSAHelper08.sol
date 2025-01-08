@@ -1,8 +1,8 @@
 pragma solidity >=0.5.13 <0.8.20;
-import { Utils08 } from "@test-sol/utils08.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 import "@test-sol/utils/SECP256K1.sol";
 
-contract ECDSAHelper08 is Utils08 {
+contract ECDSAHelper08 is TestWithUtils08 {
   ISECP256K1 sECP256K1;
 
   function addressToPublicKey(

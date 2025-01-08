@@ -14,9 +14,9 @@ import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 
-import "@test-sol/utils08.sol";
+import "@test-sol/TestWithUtils08.sol";
 
-contract Devchain is Utils08 {
+contract Devchain is TestWithUtils08 {
   // All core contracts that are expected to be in the Registry on the devchain
   ISortedOracles sortedOracles;
   FeeCurrencyDirectory feeCurrencyDirectory;

@@ -10,7 +10,7 @@ import "@celo-contracts-8/common/mocks/EpochManager_WithMocks.sol";
 import "@celo-contracts-8/common/IsL2Check.sol";
 import "@celo-contracts-8/common/PrecompilesOverrideV2.sol";
 
-contract Utils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOverrideV2 {
+contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOverrideV2 {
   IRegistry registry;
   PrecompileHandler ph;
   EpochManager_WithMocks public epochManager;

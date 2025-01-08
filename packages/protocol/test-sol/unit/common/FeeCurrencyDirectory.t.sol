@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.8.20;
 
-import { Utils08 } from "@test-sol/utils08.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 import "@test-sol/utils/WhenL2-08.sol";
 
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/mocks/MockOracle.sol";
 
-contract FeeCurrencyDirectoryTest is Utils08 {
+contract FeeCurrencyDirectoryTest is TestWithUtils08 {
   FeeCurrencyDirectory directory;
   MockOracle oracle;
   address nonOwner;

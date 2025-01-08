@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.0 <0.8.20;
 
-import { Utils08 } from "@test-sol/utils08.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
 import { MigrationsConstants } from "@migrations-sol/constants.sol";
 
@@ -23,7 +23,7 @@ import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
 import { console2 } from "forge-std-8/console2.sol";
 
-contract IntegrationTest is Utils08 {
+contract IntegrationTest is TestWithUtils08 {
   uint256 constant RESERVE_BALANCE = 69411663406170917420347916; // current as of 08/20/24
 
   function setUp() public virtual override {

@@ -15,10 +15,10 @@ import { IMockValidators } from "@celo-contracts-8/governance/test/IMockValidato
 import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
 import "@celo-contracts-8/stability/test/MockStableToken.sol";
 
-import { Utils08 } from "@test-sol/utils08.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
 
-contract EpochManagerTest is Utils08 {
+contract EpochManagerTest is TestWithUtils08 {
   EpochManager_WithMocks epochManagerContract;
   MockSortedOracles sortedOracles;
 

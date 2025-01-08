@@ -9,11 +9,11 @@ import "@celo-contracts-8/common/test/MockCeloToken.sol";
 import { MockCeloUnreleasedTreasury } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasury.sol";
 import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
 
-import { Utils08 } from "@test-sol/utils08.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 import { EpochManagerEnablerMock } from "@test-sol/mocks/EpochManagerEnablerMock.sol";
 import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
 
-contract EpochManagerEnablerTest is Utils08 {
+contract EpochManagerEnablerTest is TestWithUtils08 {
   EpochManagerEnablerMock epochManagerEnablerContract;
   MockCeloUnreleasedTreasury celoUnreleasedTreasury;
   MockCeloToken08 celoToken;
