@@ -39,7 +39,7 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
 
   EnumerableSet.AddressSet internal electedGroupsHelper;
 
-  function setUp() public virtual override {
+  function setUp() public virtual override(Devchain, Utils08) {
     epochManagerOwner = Ownable(address(epochManagerContract)).owner();
     epochManagerEnabler = registryContract.getAddressForOrDie(EPOCH_MANAGER_ENABLER_REGISTRY_ID);
     firstElected = getValidators().getRegisteredValidators();

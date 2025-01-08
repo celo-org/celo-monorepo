@@ -147,7 +147,6 @@ contract EpochManagerTest is Utils08 {
 
     election.setElectedValidators(members);
 
-    // deployCodeTo("MockRegistry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
     vm.prank(epochManagerEnabler);
     epochManagerContract.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 

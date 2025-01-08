@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.8.20;
 
-// import "@celo-contracts-8/common/UsingRegistry2.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.sol";
 import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
@@ -15,7 +14,6 @@ import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 
-// import { TestConstants } from "@test-sol/constants.sol";
 import "@test-sol/utils08.sol";
 
 contract Devchain is Utils08 {
@@ -48,5 +46,8 @@ contract Devchain is Utils08 {
     // TODO: Add missing core contracts below (see list in migrations_sol/constants.sol)
     // TODO: Consider asserting that all contracts we expect are available in the Devchain class
     // (see list in migrations_sol/constants.sol)
+  }
+  function setUp() public virtual override {
+    // Added to avoid adding a setup function in each e2e test, when its not required.
   }
 }

@@ -5,7 +5,6 @@ import { Utils08 } from "@test-sol/utils08.sol";
 
 import { MigrationsConstants } from "@migrations-sol/constants.sol";
 
-import { FeeCurrencyDirectory } from "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
 import "@celo-contracts/common/interfaces/ICeloToken.sol";
@@ -16,6 +15,7 @@ import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 import "@celo-contracts/governance/interfaces/IElection.sol";
 import "@celo-contracts/governance/interfaces/IValidators.sol";
 
+import { FeeCurrencyDirectory } from "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 import "@celo-contracts-8/common/interfaces/IScoreManager.sol";
 
@@ -23,7 +23,6 @@ import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
 import { console2 } from "forge-std-8/console2.sol";
 
-// contract IntegrationTest is Test, TestConstants, Utils08 {
 contract IntegrationTest is Utils08 {
   uint256 constant RESERVE_BALANCE = 69411663406170917420347916; // current as of 08/20/24
 
@@ -65,16 +64,6 @@ contract IntegrationTest is Utils08 {
 
 contract RegistryIntegrationTest is IntegrationTest, MigrationsConstants {
   IProxy proxy;
-
-  function test_shouldHaveAddressInRegistry() public view {
-    for (uint256 i = 0; i < contractsInRegistry.length; i++) {
-      string memory contractName = contractsInRegistry[i];
-      console2.log("### current contract", contractName);
-      address contractAddress = registry.getAddressFor(keccak256(abi.encodePacked(contractName)));
-      console2.log(contractName, "address in Registry is: ", contractAddress);
-      assert(contractAddress != address(0));
-    }
-  }
 
   function test_shouldHaveCorrectBytecode() public {
     // Converting contract names to hashes for comparison
@@ -139,6 +128,15 @@ contract RegistryIntegrationTest is IntegrationTest, MigrationsConstants {
           "Bytecode does not match"
         );
       }
+    }
+  }
+
+  function test_shouldHaveAddressInRegistry() public view {
+    for (uint256 i = 0; i < contractsInRegistry.length; i++) {
+      string memory contractName = contractsInRegistry[i];
+      address contractAddress = registry.getAddressFor(keccak256(abi.encodePacked(contractName)));
+      console2.log(contractName, "address in Registry is: ", contractAddress);
+      assert(contractAddress != address(0));
     }
   }
 }
