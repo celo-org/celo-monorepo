@@ -143,10 +143,9 @@ contract RegistryIntegrationTest is IntegrationTest, MigrationsConstants {
 
 contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   ICeloToken celoToken;
-  IAccounts accountsContract;
   IValidators validatorsContract;
   IEpochManager epochManagerContract;
-  IEpochManagerEnabler epochManagerEnablerContrtact;
+  IEpochManagerEnabler epochManagerEnablerContract;
   IScoreManager scoreManager;
   IElection election;
   ICeloUnreleasedTreasury celoUnreleasedTreasury;
@@ -189,7 +188,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     celoToken.mint(randomAddress, L1_MINTED_CELO_SUPPLY - RESERVE_BALANCE); // mint outstanding l1 supply before L2.
 
     epochManagerContract = IEpochManager(registry.getAddressForStringOrDie("EpochManager"));
-    epochManagerEnablerContrtact = IEpochManagerEnabler(
+    epochManagerEnablerContract = IEpochManagerEnabler(
       registry.getAddressForStringOrDie("EpochManagerEnabler")
     );
   }
@@ -224,7 +223,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
 
     uint256 l1EpochNumber = IPrecompiles(address(validatorsContract)).getEpochNumber();
 
-    vm.prank(address(epochManagerEnablerContrtact));
+    vm.prank(address(epochManagerEnablerContract));
     epochManagerContract.initializeSystem(l1EpochNumber, block.number, validatorsList);
 
     vm.expectRevert("Epoch is not ready to start");
@@ -234,7 +233,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   function test_Reverts_whenAlreadyInitialized() public {
     _MockL2Migration(validatorsList);
 
-    vm.prank(address(epochManagerEnablerContrtact));
+    vm.prank(address(epochManagerEnablerContract));
     vm.expectRevert("Epoch system already initialized");
     epochManagerContract.initializeSystem(100, block.number, firstElected);
   }
@@ -281,7 +280,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     whenL2();
     _setValidatorL2Score();
 
-    vm.prank(address(epochManagerEnablerContrtact));
+    vm.prank(address(epochManagerEnablerContract));
 
     epochManagerContract.initializeSystem(l1EpochNumber, block.number, firstElected);
   }

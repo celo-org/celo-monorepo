@@ -24,6 +24,7 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
   }
 
   address epochManagerOwner;
+  address epochManagerEnablerAddress;
   address[] firstElected;
 
   uint256 epochDuration;
@@ -39,9 +40,11 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
 
   EnumerableSet.AddressSet internal electedGroupsHelper;
 
-  function setUp() public virtual override(Devchain, TestWithUtils08) {
+  function setUp() public virtual override(TestWithUtils08, Devchain) {
     epochManagerOwner = Ownable(address(epochManagerContract)).owner();
-    epochManagerEnabler = registryContract.getAddressForOrDie(EPOCH_MANAGER_ENABLER_REGISTRY_ID);
+    epochManagerEnablerAddress = registryContract.getAddressForOrDie(
+      EPOCH_MANAGER_ENABLER_REGISTRY_ID
+    );
     firstElected = getValidators().getRegisteredValidators();
 
     epochDuration = epochManagerContract.epochDuration();
@@ -319,7 +322,7 @@ contract E2E_EpochManager_InitializeSystem is E2E_EpochManager {
   }
 
   function test_ShouldInitializeSystem() public {
-    vm.prank(epochManagerEnabler);
+    vm.prank(epochManagerEnablerAddress);
     epochManagerContract.initializeSystem(42, 43, firstElected);
 
     assertEq(epochManagerContract.firstKnownEpoch(), 42);
@@ -340,7 +343,7 @@ contract E2E_EpochManager_GetCurrentEpoch is E2E_EpochManager {
   }
 
   function test_ReturnExpectedValues() public {
-    vm.prank(epochManagerEnabler);
+    vm.prank(epochManagerEnablerAddress);
     epochManagerContract.initializeSystem(42, 43, firstElected);
 
     assertEq(epochManagerContract.firstKnownEpoch(), 42);
@@ -384,7 +387,7 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
 
     vm.stopPrank();
 
-    vm.prank(epochManagerEnabler);
+    vm.prank(epochManagerEnablerAddress);
     epochManagerContract.initializeSystem(1, 1, firstElected);
   }
 
@@ -437,7 +440,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     activateValidators();
     whenL2();
 
-    vm.prank(epochManagerEnabler);
+    vm.prank(epochManagerEnablerAddress);
     epochManagerContract.initializeSystem(1, 1, firstElected);
 
     validatorsArray = getValidators().getRegisteredValidators();
@@ -583,7 +586,7 @@ contract E2E_GasTest_Setup is E2E_EpochManager {
     activateValidators();
     whenL2();
 
-    vm.prank(epochManagerEnabler);
+    vm.prank(epochManagerEnablerAddress);
     epochManagerContract.initializeSystem(1, 1, firstElected);
 
     validatorsArray = getValidators().getRegisteredValidators();
@@ -736,7 +739,7 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
     activateValidators();
     whenL2();
 
-    vm.prank(epochManagerEnabler);
+    vm.prank(epochManagerEnablerAddress);
     epochManagerContract.initializeSystem(1, 1, firstElected);
 
     validatorsArray = getValidators().getRegisteredValidators();
