@@ -195,10 +195,8 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
 
   function activateValidators() public {
     address[] memory registeredValidators = validatorsContract.getRegisteredValidators();
-    travelEpochL1();
-    travelEpochL1();
-    travelEpochL1();
-    travelEpochL1();
+    travelNEpochL1(4);
+
     for (uint256 i = 0; i < registeredValidators.length; i++) {
       (, , address validatorGroup, , ) = validatorsContract.getValidator(registeredValidators[i]);
       if (election.getPendingVotesForGroup(validatorGroup) == 0) {

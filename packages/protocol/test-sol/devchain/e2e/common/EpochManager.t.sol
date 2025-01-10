@@ -70,10 +70,8 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
     }
 
     address[] memory registeredValidators = getValidators().getRegisteredValidators();
-    travelEpochL1();
-    travelEpochL1();
-    travelEpochL1();
-    travelEpochL1();
+    travelNEpochL1(4);
+
     for (uint256 i = 0; i < registeredValidators.length; i++) {
       (, , address validatorGroup, , ) = getValidators().getValidator(registeredValidators[i]);
       if (getElection().getPendingVotesForGroup(validatorGroup) == 0) {
