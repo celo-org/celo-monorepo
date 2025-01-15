@@ -55,6 +55,11 @@ contract EpochManagerTest is TestWithUtils08 {
 
   address group = actor("group");
 
+  address validator3 = actor("validator3");
+  address validator4 = actor("validator4");
+
+  address group2 = actor("group2");
+
   event ValidatorEpochPaymentDistributed(
     address indexed validator,
     uint256 validatorPayment,
@@ -138,19 +143,30 @@ contract EpochManagerTest is TestWithUtils08 {
     // TODO(soloseng): rename function
     validators.setValidatorGroup(group);
     validators.setValidator(validator1);
-    // accountss.setValidatorSigner(validator1, validator1);
+
     validators.setValidator(validator2);
-    // accountss.setValidatorSigner(validator2, validator2);
+
+    validators.setValidatorGroup(group2);
+    validators.setValidator(validator3);
+    validators.setValidator(validator4);
 
     address[] memory members = new address[](100);
+    address[] memory group2Members = new address[](3);
     members[0] = validator1;
     members[1] = validator2;
+
+    for (uint256 i = 2; i < numberValidators; i++) {
+      address _currentValidator = vm.addr(i + 1);
+      members[i] = _currentValidator;
+    }
+
     validators.setMembers(group, members);
 
-    election.setElectedValidators(members);
+    group2Members[0] = validator3;
+    group2Members[1] = validator4;
+    validators.setMembers(group2, group2Members);
 
-    // vm.prank(address(epochManagerEnabler));
-    // epochManagerContract.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
+    election.setElectedValidators(members);
 
     travelNL2Epoch(1);
   }
@@ -662,48 +678,14 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
 }
 
 contract EpochManagerTest_finishNextEpochProcess_L2 is EpochManagerTest_L2 {
-  address validator3 = actor("validator3");
-  address validator4 = actor("validator4");
-
-  address group2 = actor("group2");
-
-  address[] elected;
-
   uint256 groupEpochRewards = 44e18;
 
   function setUp() public override(EpochManagerTest_L2) {
     super.setUp();
 
-    validators.setValidatorGroup(group);
-    validators.setValidator(validator1);
-    validators.setValidator(validator2);
-
-    validators.setValidatorGroup(group2);
-    validators.setValidator(validator3);
-    validators.setValidator(validator4);
-
-    address[] memory members = new address[](100);
-    address[] memory group2Members = new address[](3);
-    members[0] = validator1;
-    members[1] = validator2;
-
-    for (uint256 i = 2; i < numberValidators; i++) {
-      address _currentValidator = vm.addr(i + 1);
-      members[i] = _currentValidator;
-    }
-
-    validators.setMembers(group, members);
-
-    group2Members[0] = validator3;
-    group2Members[1] = validator4;
-    validators.setMembers(group2, group2Members);
-
     initializeEpochManagerSystem();
 
-    elected = epochManagerContract.getElectedAccounts();
-    console.log("### electead accounts length", elected.length);
     election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
-    travelNL2Epoch(1);
   }
 
   function test_Reverts_WhenNotStarted() public {
@@ -797,8 +779,8 @@ contract EpochManagerTest_finishNextEpochProcess_L2 is EpochManagerTest_L2 {
 }
 
 // contract EpochManagerTest_setToProcessGroups is EpochManagerTest {
-//   address signer1 = actor("signer1");
-//   address signer2 = actor("signer2");
+//   // address signer1 = actor("signer1");
+//   // address signer2 = actor("signer2");
 
 //   address validator3 = actor("validator3");
 //   address validator4 = actor("validator4");
@@ -814,9 +796,9 @@ contract EpochManagerTest_finishNextEpochProcess_L2 is EpochManagerTest_L2 {
 
 //     validators.setValidatorGroup(group);
 //     validators.setValidator(validator1);
-//     accountss.setValidatorSigner(validator1, signer1);
+//     // accountss.setValidatorSigner(validator1, signer1);
 //     validators.setValidator(validator2);
-//     accountss.setValidatorSigner(validator2, signer2);
+//     // accountss.setValidatorSigner(validator2, signer2);
 
 //     validators.setValidatorGroup(group2);
 //     validators.setValidator(validator3);
