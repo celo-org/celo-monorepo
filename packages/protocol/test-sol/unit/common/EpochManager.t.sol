@@ -142,7 +142,7 @@ contract EpochManagerTest is TestWithUtils08 {
     validators.setValidator(validator2);
     // accountss.setValidatorSigner(validator2, validator2);
 
-    address[] memory members = new address[](2);
+    address[] memory members = new address[](100);
     members[0] = validator1;
     members[1] = validator2;
     validators.setMembers(group, members);
@@ -652,137 +652,149 @@ contract EpochManagerTest_sendValidatorPayment_L2 is EpochManagerTest_L2 {
   }
 }
 
-// contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
-//   address signer1 = actor("signer1");
-//   address signer2 = actor("signer2");
+contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
+  function test_Reverts_onL1() public {
+    address[] memory groups = new address[](0);
 
-//   address validator3 = actor("validator3");
-//   address validator4 = actor("validator4");
+    vm.expectRevert("Epoch process is not started");
+    epochManagerContract.finishNextEpochProcess(groups, groups, groups);
+  }
+}
 
-//   address group2 = actor("group2");
+contract EpochManagerTest_finishNextEpochProcess_L2 is EpochManagerTest_L2 {
+  address validator3 = actor("validator3");
+  address validator4 = actor("validator4");
 
-//   address[] elected;
+  address group2 = actor("group2");
 
-//   uint256 groupEpochRewards = 44e18;
+  address[] elected;
 
-//   function setUp() public override {
-//     super.setUp();
+  uint256 groupEpochRewards = 44e18;
 
-//     validators.setValidatorGroup(group);
-//     validators.setValidator(validator1);
-//     accountss.setValidatorSigner(validator1, signer1);
-//     validators.setValidator(validator2);
-//     accountss.setValidatorSigner(validator2, signer2);
+  function setUp() public override(EpochManagerTest_L2) {
+    super.setUp();
 
-//     validators.setValidatorGroup(group2);
-//     validators.setValidator(validator3);
-//     validators.setValidator(validator4);
+    validators.setValidatorGroup(group);
+    validators.setValidator(validator1);
+    validators.setValidator(validator2);
 
-//     address[] memory members = new address[](3);
-//     members[0] = validator1;
-//     members[1] = validator2;
-//     validators.setMembers(group, members);
-//     members[0] = validator3;
-//     members[1] = validator4;
-//     validators.setMembers(group2, members);
+    validators.setValidatorGroup(group2);
+    validators.setValidator(validator3);
+    validators.setValidator(validator4);
 
-//     vm.prank(address(epochManagerEnabler));
-//     initializeEpochManagerSystem();
+    address[] memory members = new address[](100);
+    address[] memory group2Members = new address[](3);
+    members[0] = validator1;
+    members[1] = validator2;
 
-//     elected = epochManagerContract.getElectedAccounts();
+    for (uint256 i = 2; i < numberValidators; i++) {
+      address _currentValidator = vm.addr(i + 1);
+      members[i] = _currentValidator;
+    }
 
-//     election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
-//   }
+    validators.setMembers(group, members);
 
-//   function test_Reverts_WhenNotStarted() public {
-//     address[] memory groups = new address[](0);
+    group2Members[0] = validator3;
+    group2Members[1] = validator4;
+    validators.setMembers(group2, group2Members);
 
-//     vm.expectRevert("Epoch process is not started");
-//     epochManagerContract.finishNextEpochProcess(groups, groups, groups);
-//   }
+    initializeEpochManagerSystem();
 
-//   function test_Reverts_WhenGroupsDoNotMatch() public {
-//     address[] memory groups = new address[](0);
-//     epochManagerContract.startNextEpochProcess();
-//     vm.expectRevert("number of groups does not match");
-//     epochManagerContract.finishNextEpochProcess(groups, groups, groups);
-//   }
+    elected = epochManagerContract.getElectedAccounts();
+    console.log("### electead accounts length", elected.length);
+    election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
+    travelNL2Epoch(1);
+  }
 
-//   function test_Reverts_WhenGroupsNotFromElected() public {
-//     address[] memory groups = new address[](1);
-//     groups[0] = group2;
-//     epochManagerContract.startNextEpochProcess();
-//     vm.expectRevert("group not from current elected set");
-//     epochManagerContract.finishNextEpochProcess(groups, groups, groups);
-//   }
+  function test_Reverts_WhenNotStarted() public {
+    address[] memory groups = new address[](0);
 
-//   function test_TransfersToCommunityAndCarbonOffsetting() public {
-//     (
-//       address[] memory groups,
-//       address[] memory lessers,
-//       address[] memory greaters
-//     ) = getGroupsWithLessersAndGreaters();
+    vm.expectRevert("Epoch process is not started");
+    epochManagerContract.finishNextEpochProcess(groups, groups, groups);
+  }
 
-//     epochManagerContract.startNextEpochProcess();
-//     epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+  function test_Reverts_WhenGroupsDoNotMatch() public {
+    address[] memory groups = new address[](0);
+    epochManagerContract.startNextEpochProcess();
+    vm.expectRevert("number of groups does not match");
+    epochManagerContract.finishNextEpochProcess(groups, groups, groups);
+  }
 
-//     assertEq(celoToken.balanceOf(communityRewardFund), epochRewards.totalRewardsCommunity());
-//     assertEq(celoToken.balanceOf(carbonOffsettingPartner), epochRewards.totalRewardsCarbonFund());
-//   }
+  function test_Reverts_WhenGroupsNotFromElected() public {
+    address[] memory groups = new address[](1);
+    groups[0] = group2;
+    epochManagerContract.startNextEpochProcess();
+    vm.expectRevert("group not from current elected set");
+    epochManagerContract.finishNextEpochProcess(groups, groups, groups);
+  }
 
-//   function test_TransfersToValidatorGroup() public {
-//     (
-//       address[] memory groups,
-//       address[] memory lessers,
-//       address[] memory greaters
-//     ) = getGroupsWithLessersAndGreaters();
+  function test_TransfersToCommunityAndCarbonOffsetting() public {
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
 
-//     epochManagerContract.startNextEpochProcess();
-//     epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
 
-//     assertEq(election.distributedEpochRewards(group), groupEpochRewards);
-//   }
+    assertEq(celoToken.balanceOf(communityRewardFund), epochRewards.totalRewardsCommunity());
+    assertEq(celoToken.balanceOf(carbonOffsettingPartner), epochRewards.totalRewardsCarbonFund());
+  }
 
-//   function test_SetsNewlyElectedCorrectly() public {
-//     (
-//       address[] memory groups,
-//       address[] memory lessers,
-//       address[] memory greaters
-//     ) = getGroupsWithLessersAndGreaters();
+  function test_TransfersToValidatorGroup() public {
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
 
-//     epochManagerContract.startNextEpochProcess();
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
 
-//     address[] memory newElected = new address[](2);
-//     newElected[0] = validator3;
-//     newElected[1] = validator4;
-//     election.setElectedValidators(newElected);
+    assertEq(election.distributedEpochRewards(group), groupEpochRewards);
+  }
 
-//     epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+  function test_SetsNewlyElectedCorrectly() public {
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
 
-//     address[] memory afterElected = epochManagerContract.getElectedAccounts();
+    epochManagerContract.startNextEpochProcess();
 
-//     for (uint256 i = 0; i < newElected.length; i++) {
-//       assertEq(newElected[i], afterElected[i]);
-//     }
-//   }
+    address[] memory newElected = new address[](2);
+    newElected[0] = validator3;
+    newElected[1] = validator4;
+    election.setElectedValidators(newElected);
 
-//   function test_Emits_GroupProcessedEvent() public {
-//     (
-//       address[] memory groups,
-//       address[] memory lessers,
-//       address[] memory greaters
-//     ) = getGroupsWithLessersAndGreaters();
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
 
-//     epochManagerContract.startNextEpochProcess();
+    address[] memory afterElected = epochManagerContract.getElectedAccounts();
 
-//     for (uint i = 0; i < groups.length; i++) {
-//       vm.expectEmit(true, true, true, true);
-//       emit GroupProcessed(groups[i], firstEpochNumber);
-//     }
+    for (uint256 i = 0; i < newElected.length; i++) {
+      assertEq(newElected[i], afterElected[i]);
+    }
+  }
 
-//     epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
-//   }
-// }
+  function test_Emits_GroupProcessedEvent() public {
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
+
+    epochManagerContract.startNextEpochProcess();
+
+    for (uint i = 0; i < groups.length; i++) {
+      vm.expectEmit(true, true, true, true);
+      emit GroupProcessed(groups[i], firstEpochNumber);
+    }
+
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+  }
+}
 
 // contract EpochManagerTest_setToProcessGroups is EpochManagerTest {
 //   address signer1 = actor("signer1");
