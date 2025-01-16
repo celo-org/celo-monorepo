@@ -5,8 +5,10 @@ set -euo pipefail
 # MultiSig contracts, and the ReleaseGold contract.
 CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles|CeloFeeCurrencyAdapterOwnable|FeeCurrencyAdapter|FeeCurrencyAdapterOwnable"
 
+echo "BRANCH: $BRANCH"
+
 # Before CR7, UsingRegistry and UsingRegistryV2 had been deployed, they need to keep getting deployed to keep the release reports without changes.
-VERSION_NUMBER=$(echo "$BRANCH" | tr -dc '0-9')
+VERSION_NUMBER=$(echo "$BRANCH" | grep -o 'v[0-9]\+' | tr -dc '0-9')
 
 echo "VERSION_NUMBER: $VERSION_NUMBER"
 
@@ -35,5 +37,8 @@ fi
 if [ $VERSION_NUMBER -eq 12 ]
   then
   # FeeHandlerSeller is not deployed, only its children
-  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|\\bFeeHandlerSeller\\b"
+  # CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|\\bFeeHandlerSeller\\b|MockElection"
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|MockElection|\\bFeeHandlerSeller\\b|"
 fi
+
+echo "FULL CONTRACT_EXCLUSION_REGEX: $CONTRACT_EXCLUSION_REGEX"

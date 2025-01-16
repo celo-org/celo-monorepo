@@ -194,10 +194,15 @@ const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLay
 export const generateCompatibilityReport = (oldArtifact: Artifact, oldArtifacts: BuildArtifacts,
   newArtifact: Artifact, newArtifacts: BuildArtifacts)
   : { contract: string, compatible: boolean, errors: any[], expanded?: boolean } => {
-  const oldLayout = getLayout(oldArtifact, oldArtifacts)
+    console.log("generateCompatibilityReport1");
+    const oldLayout = getLayout(oldArtifact, oldArtifacts)
+    console.log("generateCompatibilityReport2");
   const newLayout = getLayout(newArtifact, newArtifacts)
+  console.log("generateCompatibilityReport3");
   const layoutReport = generateLayoutCompatibilityReport(oldLayout, newLayout)
+  console.log("generateCompatibilityReport4");
   const structsReport = generateStructsCompatibilityReport(oldLayout, newLayout)
+  console.log("generateCompatibilityReport5");
 
   if (!layoutReport.compatible) {
     console.log(newArtifact.contractName, "layoutReport incompatible", JSON.stringify(layoutReport.errors));
@@ -221,10 +226,13 @@ export const reportLayoutIncompatibilities = (oldArtifactsSet: BuildArtifacts[],
     const reports = newArtifacts.listArtifacts().map((newArtifact) => {
 
       for (const oldArtifacts of oldArtifactsSet) {
+        console.log("lala, here")
         const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
+        console.log("1?", newArtifact.contractName, oldArtifact? oldArtifact.contractName: "undefined")
         if (oldArtifact !== undefined) {
           return generateCompatibilityReport(oldArtifact, oldArtifacts, newArtifact, newArtifacts)
         }
+        console.log("made it here?")
       }
 
       // Generate an empty report for new contracts, which are, by definition, backwards
