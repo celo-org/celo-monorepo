@@ -35,8 +35,8 @@ contract EpochManagerTest is TestWithUtils08 {
   address scoreManagerAddress;
 
   uint256 firstEpochNumber = 3;
-  // uint256 firstEpochNumber = 100;
-  uint256 firstEpochBlock = 100;
+
+  // uint256 firstEpochBlock = 100;
   uint256 epochDuration = DAY;
   address[] firstElected;
 
@@ -133,8 +133,6 @@ contract EpochManagerTest is TestWithUtils08 {
     epochManagerContract.initialize(REGISTRY_ADDRESS, 10);
     epochRewards.setCarbonOffsettingPartner(carbonOffsettingPartner);
 
-    blockTravel(firstEpochBlock);
-
     validators.setEpochRewards(validator1, validator1Reward);
     validators.setEpochRewards(validator2, validator2Reward);
   }
@@ -229,9 +227,27 @@ contract EpochManagerTest_initialize is EpochManagerTest {
 }
 
 contract EpochManagerTest_initializeSystem is EpochManagerTest {
+  uint256 lastKnownEpochNumber;
+  uint256 lastKnownFirstBlockOfEpoch;
+  address[] lastKnownElectedAccounts;
+
+  function setUp() public override {
+    super.setUp();
+    _registerAndElectValidatorsForL2();
+    epochManagerEnabler.captureEpochAndValidators();
+
+    lastKnownEpochNumber = epochManagerEnabler.lastKnownEpochNumber();
+    lastKnownFirstBlockOfEpoch = epochManagerEnabler.lastKnownFirstBlockOfEpoch();
+    lastKnownElectedAccounts = epochManagerEnabler.getlastKnownElectedAccounts();
+  }
   function test_processCanBeStarted() public virtual {
     vm.prank(address(epochManagerEnabler));
-    epochManagerContract.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
+
+    epochManagerContract.initializeSystem(
+      lastKnownEpochNumber,
+      lastKnownFirstBlockOfEpoch,
+      lastKnownElectedAccounts
+    );
     (
       uint256 _firstEpochBlock,
       uint256 _lastEpochBlock,
@@ -239,35 +255,47 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
       uint256 _currentRewardsBlock
     ) = epochManagerContract.getCurrentEpoch();
     assertGt(epochManagerContract.getElectedAccounts().length, 0);
-    assertEq(epochManagerContract.firstKnownEpoch(), firstEpochNumber);
-    assertEq(_firstEpochBlock, firstEpochBlock);
+    assertEq(epochManagerContract.firstKnownEpoch(), lastKnownEpochNumber);
+    assertEq(_firstEpochBlock, lastKnownFirstBlockOfEpoch);
     assertEq(_lastEpochBlock, 0);
     assertEq(_startTimestamp, block.timestamp);
     assertEq(_currentRewardsBlock, 0);
-    assertEq(epochManagerContract.getElectedAccounts(), firstElected);
+    assertEq(epochManagerContract.getElectedAccounts(), lastKnownElectedAccounts);
   }
 
   function test_Reverts_processCannotBeStartedAgain() public virtual {
     vm.prank(address(epochManagerEnabler));
-    epochManagerContract.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
+    epochManagerContract.initializeSystem(
+      lastKnownEpochNumber,
+      lastKnownFirstBlockOfEpoch,
+      lastKnownElectedAccounts
+    );
     vm.prank(address(epochManagerEnabler));
     vm.expectRevert("Epoch system already initialized");
-    epochManagerContract.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
+    epochManagerContract.initializeSystem(
+      lastKnownEpochNumber,
+      lastKnownFirstBlockOfEpoch,
+      lastKnownElectedAccounts
+    );
   }
 
   function test_Reverts_WhenSystemInitializedByOtherContract() public virtual {
     vm.expectRevert("msg.sender is not Enabler");
-    epochManagerContract.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
+    epochManagerContract.initializeSystem(
+      lastKnownEpochNumber,
+      lastKnownFirstBlockOfEpoch,
+      lastKnownElectedAccounts
+    );
   }
 }
-contract EpochManagerTest_initializeSystem_L2 is
-  EpochManagerTest_L2_NoInit,
-  EpochManagerTest_initializeSystem
-{
-  function setUp() public override(EpochManagerTest, EpochManagerTest_L2_NoInit) {
-    super.setUp();
-  }
-} // XXX(soloseng):is this needed, since it would be calling epochmanagerEnabler.
+// contract EpochManagerTest_initializeSystem_L2 is
+//   EpochManagerTest_L2_NoInit,
+//   EpochManagerTest_initializeSystem
+// {
+//   function setUp() public override(EpochManagerTest, EpochManagerTest_L2_NoInit) {
+//     super.setUp();
+//   }
+// } // XXX(soloseng):is this needed, since it would be calling epochmanagerEnabler.
 
 contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
   function test_Reverts_onL1() public {
@@ -282,15 +310,7 @@ contract EpochManagerTest_startNextEpochProcess_L2_NoInit is EpochManagerTest_L2
   }
 }
 contract EpochManagerTest_startNextEpochProcess_L2 is EpochManagerTest_L2 {
-  // function test_Reverts_whenSystemNotInitialized() public {
-  //   vm.expectRevert("Epoch system not initialized");
-  //   epochManagerContract.startNextEpochProcess();
-  // }
-
   function test_Reverts_WhenEndOfEpochHasNotBeenReached() public {
-    // vm.prank(address(epochManagerEnabler));
-    // epochManagerContract.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
-
     vm.expectRevert("Epoch is not ready to start");
     epochManagerContract.startNextEpochProcess();
   }
@@ -499,17 +519,12 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
     _registerAndElectValidatorsForL2();
     validators.setValidatorGroup(group);
     validators.setValidator(validator1);
-    // accountss.setValidatorSigner(validator1, signer1);
     validators.setValidator(validator2);
-    // accountss.setValidatorSigner(validator2, signer2);
 
     address[] memory members = new address[](2);
     members[0] = validator1;
     members[1] = validator2;
     validators.setMembers(group, members);
-
-    // vm.prank(address(epochManagerEnabler));
-    // epochManagerContract.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
     stableToken.mint(address(epochManagerContract), paymentAmount * 2);
     epochManagerBalanceBefore = stableToken.balanceOf(address(epochManagerContract));
@@ -546,17 +561,12 @@ contract EpochManagerTest_sendValidatorPayment_L2 is EpochManagerTest_L2 {
 
     validators.setValidatorGroup(group);
     validators.setValidator(validator1);
-    // accountss.setValidatorSigner(validator1, signer1);
     validators.setValidator(validator2);
-    // accountss.setValidatorSigner(validator2, signer2);
 
     address[] memory members = new address[](2);
     members[0] = validator1;
     members[1] = validator2;
     validators.setMembers(group, members);
-
-    // vm.prank(address(epochManagerEnabler));
-    // epochManagerContract.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
     stableToken.mint(address(epochManagerContract), paymentAmount * 2);
     epochManagerBalanceBefore = stableToken.balanceOf(address(epochManagerContract));
@@ -778,313 +788,295 @@ contract EpochManagerTest_finishNextEpochProcess_L2 is EpochManagerTest_L2 {
   }
 }
 
-// contract EpochManagerTest_setToProcessGroups is EpochManagerTest {
-//   // address signer1 = actor("signer1");
-//   // address signer2 = actor("signer2");
-
-//   address validator3 = actor("validator3");
-//   address validator4 = actor("validator4");
-
-//   address group2 = actor("group2");
-
-//   address[] elected;
-
-//   uint256 groupEpochRewards = 44e18;
-
-//   function setUp() public override {
-//     super.setUp();
-
-//     validators.setValidatorGroup(group);
-//     validators.setValidator(validator1);
-//     // accountss.setValidatorSigner(validator1, signer1);
-//     validators.setValidator(validator2);
-//     // accountss.setValidatorSigner(validator2, signer2);
-
-//     validators.setValidatorGroup(group2);
-//     validators.setValidator(validator3);
-//     validators.setValidator(validator4);
-
-//     address[] memory members = new address[](3);
-//     members[0] = validator1;
-//     members[1] = validator2;
-//     validators.setMembers(group, members);
-//     members[0] = validator3;
-//     members[1] = validator4;
-//     validators.setMembers(group2, members);
-
-//     vm.prank(address(epochManagerEnabler));
-//     initializeEpochManagerSystem();
-
-//     elected = epochManagerContract.getElectedAccounts();
-
-//     election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
-//   }
-
-//   function test_Reverts_WhenNotStarted() public {
-//     vm.expectRevert("Epoch process is not started");
-//     epochManagerContract.setToProcessGroups();
-//   }
-
-//   function test_setsToProcessGroups() public {
-//     (address[] memory groups, , ) = getGroupsWithLessersAndGreaters();
-
-//     epochManagerContract.startNextEpochProcess();
-//     epochManagerContract.setToProcessGroups();
-
-//     assertEq(EpochManager(address(epochManagerContract)).toProcessGroups(), groups.length);
-//   }
-
-//   function test_blocksChilds() public {
-//     epochManagerContract.startNextEpochProcess();
-//     epochManagerContract.setToProcessGroups();
-//     assertTrue(epochManagerContract.isBlocked());
-//   }
-
-//   function test_Reverts_startEpochAgain() public {
-//     epochManagerContract.startNextEpochProcess();
-//     epochManagerContract.setToProcessGroups();
-//     vm.expectRevert("Epoch process is already started");
-//     epochManagerContract.startNextEpochProcess();
-//   }
-
-//   function test_Reverts_WhenSetToProcessGroups() public {
-//     vm.expectRevert("Epoch process is not started");
-//     epochManagerContract.setToProcessGroups();
-//   }
-
-//   function test_setsGroupRewards() public {
-//     (address[] memory groups, , ) = getGroupsWithLessersAndGreaters();
-//     epochManagerContract.startNextEpochProcess();
-//     epochManagerContract.setToProcessGroups();
-
-//     for (uint256 i = 0; i < groups.length; i++) {
-//       assertEq(
-//         EpochManager(address(epochManagerContract)).processedGroups(group),
-//         groupEpochRewards
-//       );
-//     }
-//   }
-
-//   function test_Emits_GroupMarkedForProcessingEvent() public {
-//     (address[] memory groups, , ) = getGroupsWithLessersAndGreaters();
-
-//     epochManagerContract.startNextEpochProcess();
-
-//     for (uint i = 0; i < groups.length; i++) {
-//       vm.expectEmit(true, true, true, true);
-//       emit GroupMarkedForProcessing(groups[i], firstEpochNumber);
-//     }
-
-//     epochManagerContract.setToProcessGroups();
-//   }
-// }
-
-// contract EpochManagerTest_processGroup is EpochManagerTest {
-//   address signer1 = actor("signer1");
-//   address signer2 = actor("signer2");
-//   address signer3 = actor("signer3");
-//   address signer4 = actor("signer4");
-
-//   address validator3 = actor("validator3");
-//   address validator4 = actor("validator4");
-
-//   address group2 = actor("group2");
-
-//   address[] elected;
-
-//   uint256 groupEpochRewards = 44e18;
-
-//   function setUp() public override {
-//     super.setUp();
-
-//     validators.setValidatorGroup(group);
-//     validators.setValidator(validator1);
-//     accountss.setValidatorSigner(validator1, signer1);
-//     validators.setValidator(validator2);
-//     accountss.setValidatorSigner(validator2, signer2);
-
-//     validators.setValidatorGroup(group2);
-//     validators.setValidator(validator3);
-//     validators.setValidator(validator4);
-
-//     address[] memory members = new address[](3);
-//     members[0] = validator1;
-//     members[1] = validator2;
-//     validators.setMembers(group, members);
-//     members[0] = validator3;
-//     members[1] = validator4;
-//     validators.setMembers(group2, members);
-
-//     vm.prank(address(epochManagerEnabler));
-//     initializeEpochManagerSystem();
-
-//     elected = epochManagerContract.getElectedAccounts();
-
-//     election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
-//   }
-
-//   function test_Reverts_WhenNotStarted() public {
-//     vm.expectRevert("Indivudual epoch process is not started");
-//     epochManagerContract.processGroup(group, address(0), address(0));
-//   }
-
-//   function test_Reverts_WhenGroupNotInToProcessGroups() public {
-//     epochManagerContract.startNextEpochProcess();
-//     epochManagerContract.setToProcessGroups();
-//     vm.expectRevert("group not from current elected set");
-//     epochManagerContract.processGroup(group2, address(0), address(0));
-//   }
-
-//   function test_ProcessesGroup() public {
-//     epochManagerContract.startNextEpochProcess();
-//     epochManagerContract.setToProcessGroups();
-//     epochManagerContract.processGroup(group, address(0), address(0));
-
-//     (uint256 status, , , , ) = epochManagerContract.getEpochProcessingState();
-//     assertEq(status, 0);
-//   }
-
-//   function test_TransfersToCommunityAndCarbonOffsetting() public {
-//     epochManagerContract.startNextEpochProcess();
-//     epochManagerContract.setToProcessGroups();
-//     epochManagerContract.processGroup(group, address(0), address(0));
-
-//     assertEq(celoToken.balanceOf(communityRewardFund), epochRewards.totalRewardsCommunity());
-//     assertEq(celoToken.balanceOf(carbonOffsettingPartner), epochRewards.totalRewardsCarbonFund());
-//   }
-
-//   function test_TransfersToValidatorGroup() public {
-//     epochManagerContract.startNextEpochProcess();
-//     epochManagerContract.setToProcessGroups();
-//     epochManagerContract.processGroup(group, address(0), address(0));
-
-//     assertEq(election.distributedEpochRewards(group), groupEpochRewards);
-//   }
-
-//   function test_SetsNewlyElectedCorrectly() public {
-//     (
-//       address[] memory groups,
-//       address[] memory lessers,
-//       address[] memory greaters
-//     ) = getGroupsWithLessersAndGreaters();
-
-//     epochManagerContract.startNextEpochProcess();
-
-//     address[] memory newElected = new address[](2);
-//     newElected[0] = validator3;
-//     newElected[1] = validator4;
-//     election.setElectedValidators(newElected);
-
-//     address[] memory signers = new address[](2);
-//     signers[0] = signer3;
-//     signers[1] = signer4;
-//     accountss.setValidatorSigner(validator3, signer3);
-//     accountss.setValidatorSigner(validator4, signer4);
-
-//     epochManagerContract.setToProcessGroups();
-
-//     for (uint256 i = 0; i < groups.length; i++) {
-//       epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
-//     }
-
-//     address[] memory afterElected = epochManagerContract.getElectedAccounts();
-
-//     for (uint256 i = 0; i < newElected.length; i++) {
-//       assertEq(newElected[i], afterElected[i]);
-//     }
-
-//     address[] memory afterSigners = epochManagerContract.getElectedSigners();
-//     assertEq(afterSigners.length, signers.length);
-//     for (uint256 i = 0; i < signers.length; i++) {
-//       assertEq(signers[i], afterSigners[i]);
-//     }
-//   }
-
-//   function test_Emits_GroupProcessed() public {
-//     epochManagerContract.startNextEpochProcess();
-//     epochManagerContract.setToProcessGroups();
-//     vm.expectEmit(true, true, true, true);
-//     emit GroupProcessed(group, firstEpochNumber);
-//     epochManagerContract.processGroup(group, address(0), address(0));
-//   }
-// }
-
-// contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
-//   function test_shouldReturnTheEpochInfoOfSpecifiedEpoch() public {
-//     uint256 numberOfEpochsToTravel = 9;
-
-//     initializeEpochManagerSystem();
-//     uint256 _startingEpochNumber = epochManagerContract.getCurrentEpochNumber();
-
-//     (
-//       uint256 startingEpochFirstBlock,
-//       ,
-//       uint256 startingEpochStartTimestamp,
-
-//     ) = epochManagerContract.getCurrentEpoch();
-
-//     _travelAndProcess_N_L2Epoch(numberOfEpochsToTravel);
-
-//     (
-//       uint256 _firstBlock,
-//       uint256 _lastBlock,
-//       uint256 _startTimestamp,
-//       uint256 _rewardBlock
-//     ) = epochManagerContract.getEpochByNumber(_startingEpochNumber + numberOfEpochsToTravel);
-
-//     assertEq(
-//       startingEpochFirstBlock + (L2_BLOCK_IN_EPOCH * (numberOfEpochsToTravel + 1)) + 1,
-//       _firstBlock
-//     );
-//     assertEq(_lastBlock, 0);
-//     assertEq(startingEpochStartTimestamp + (DAY * (numberOfEpochsToTravel + 1)), _startTimestamp);
-//     assertEq(_rewardBlock, 0);
-//   }
-
-//   function test_ReturnsHistoricalEpochInfoAfter_N_Epochs() public {
-//     initializeEpochManagerSystem();
-//     uint256 _startingEpochNumber = epochManagerContract.getCurrentEpochNumber();
-//     uint256 numberOfEpochsToTravel = 7;
-//     (
-//       uint256 _startingEpochFirstBlock,
-//       uint256 _startingLastBlock,
-//       uint256 _startingStartTimestamp,
-//       uint256 _startingRewardBlock
-//     ) = epochManagerContract.getCurrentEpoch();
-
-//     _travelAndProcess_N_L2Epoch(numberOfEpochsToTravel);
-
-//     (
-//       uint256 _initialFirstBlock,
-//       uint256 _initialLastBlock,
-//       uint256 _initialStartTimestamp,
-//       uint256 _initialRewardBlock
-//     ) = epochManagerContract.getEpochByNumber(_startingEpochNumber);
-
-//     assertEq(_initialFirstBlock, _startingEpochFirstBlock);
-//     assertEq(_initialLastBlock, _startingLastBlock + (L2_BLOCK_IN_EPOCH * 2) + firstEpochBlock);
-//     assertEq(_initialStartTimestamp, _startingStartTimestamp);
-//     assertEq(
-//       _initialRewardBlock,
-//       _startingRewardBlock + (L2_BLOCK_IN_EPOCH * 2) + firstEpochBlock + 1
-//     );
-//   }
-
-//   function test_ReturnsZeroForFutureEpochs() public {
-//     initializeEpochManagerSystem();
-//     (
-//       uint256 _firstBlock,
-//       uint256 _lastBlock,
-//       uint256 _startTimestamp,
-//       uint256 _rewardBlock
-//     ) = epochManagerContract.getEpochByNumber(500);
-
-//     assertEq(_firstBlock, 0);
-//     assertEq(_lastBlock, 0);
-//     assertEq(_startTimestamp, 0);
-//     assertEq(_rewardBlock, 0);
-//   }
-// }
+contract EpochManagerTest_setToProcessGroups is EpochManagerTest {
+  function test_Reverts_onL1() public {
+    vm.expectRevert("Epoch process is not started");
+    epochManagerContract.setToProcessGroups();
+  }
+}
+
+contract EpochManagerTest_setToProcessGroups_L2 is EpochManagerTest_L2 {
+  uint256 groupEpochRewards = 44e18;
+
+  function setUp() public override(EpochManagerTest_L2) {
+    super.setUp();
+
+    initializeEpochManagerSystem();
+
+    election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
+  }
+
+  function test_Reverts_WhenNotStarted() public {
+    vm.expectRevert("Epoch process is not started");
+    epochManagerContract.setToProcessGroups();
+  }
+
+  function test_setsToProcessGroups() public {
+    (address[] memory groups, , ) = getGroupsWithLessersAndGreaters();
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+
+    assertEq(EpochManager(address(epochManagerContract)).toProcessGroups(), groups.length);
+  }
+
+  function test_blocksChilds() public {
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+    assertTrue(epochManagerContract.isBlocked());
+  }
+
+  function test_Reverts_startEpochAgain() public {
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+    vm.expectRevert("Epoch process is already started");
+    epochManagerContract.startNextEpochProcess();
+  }
+
+  function test_Reverts_WhenSetToProcessGroups() public {
+    vm.expectRevert("Epoch process is not started");
+    epochManagerContract.setToProcessGroups();
+  }
+
+  function test_setsGroupRewards() public {
+    (address[] memory groups, , ) = getGroupsWithLessersAndGreaters();
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+
+    for (uint256 i = 0; i < groups.length; i++) {
+      assertEq(
+        EpochManager(address(epochManagerContract)).processedGroups(group),
+        groupEpochRewards
+      );
+    }
+  }
+
+  function test_Emits_GroupMarkedForProcessingEvent() public {
+    (address[] memory groups, , ) = getGroupsWithLessersAndGreaters();
+
+    epochManagerContract.startNextEpochProcess();
+
+    for (uint i = 0; i < groups.length; i++) {
+      vm.expectEmit(true, true, true, true);
+      emit GroupMarkedForProcessing(groups[i], firstEpochNumber);
+    }
+
+    epochManagerContract.setToProcessGroups();
+  }
+}
+
+contract EpochManagerTest_processGroup is EpochManagerTest {
+  // function setUp() public override {
+  //   super.setUp();
+  // }
+
+  function test_Reverts_onL1() public {
+    vm.expectRevert("Indivudual epoch process is not started");
+    epochManagerContract.processGroup(group, address(0), address(0));
+  }
+}
+
+contract EpochManagerTest_processGroup_L2 is EpochManagerTest_L2 {
+  uint256 groupEpochRewards = 44e18;
+
+  function setUp() public override(EpochManagerTest_L2) {
+    super.setUp();
+
+    initializeEpochManagerSystem();
+
+    election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
+  }
+
+  function test_Reverts_WhenNotStarted() public {
+    vm.expectRevert("Indivudual epoch process is not started");
+    epochManagerContract.processGroup(group, address(0), address(0));
+  }
+
+  function test_Reverts_WhenGroupNotInToProcessGroups() public {
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+    vm.expectRevert("group not from current elected set");
+    epochManagerContract.processGroup(group2, address(0), address(0));
+  }
+
+  function test_ProcessesGroup() public {
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+    epochManagerContract.processGroup(group, address(0), address(0));
+
+    (uint256 status, , , , ) = epochManagerContract.getEpochProcessingState();
+    assertEq(status, 0);
+  }
+
+  function test_TransfersToCommunityAndCarbonOffsetting() public {
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+    epochManagerContract.processGroup(group, address(0), address(0));
+
+    assertEq(celoToken.balanceOf(communityRewardFund), epochRewards.totalRewardsCommunity());
+    assertEq(celoToken.balanceOf(carbonOffsettingPartner), epochRewards.totalRewardsCarbonFund());
+  }
+
+  function test_TransfersToValidatorGroup() public {
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+    epochManagerContract.processGroup(group, address(0), address(0));
+
+    assertEq(election.distributedEpochRewards(group), groupEpochRewards);
+  }
+
+  function test_SetsNewlyElectedCorrectly() public {
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
+
+    epochManagerContract.startNextEpochProcess();
+
+    address[] memory newElected = new address[](2);
+    newElected[0] = validator3;
+    newElected[1] = validator4;
+
+    vm.prank(newElected[0]);
+    accountsContract.createAccount();
+    vm.prank(newElected[1]);
+    accountsContract.createAccount();
+
+    election.setElectedValidators(newElected);
+
+    address[] memory signers = new address[](2);
+    signers[0] = validator3;
+    signers[1] = validator4;
+
+    epochManagerContract.setToProcessGroups();
+
+    for (uint256 i = 0; i < groups.length; i++) {
+      epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
+    }
+
+    address[] memory afterElected = epochManagerContract.getElectedAccounts();
+
+    for (uint256 i = 0; i < newElected.length; i++) {
+      assertEq(newElected[i], afterElected[i]);
+    }
+
+    address[] memory afterSigners = epochManagerContract.getElectedSigners();
+    assertEq(afterSigners.length, signers.length);
+    for (uint256 i = 0; i < signers.length; i++) {
+      assertEq(signers[i], afterSigners[i]);
+    }
+  }
+
+  function test_Emits_GroupProcessed() public {
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+    vm.expectEmit(true, true, true, true);
+    emit GroupProcessed(group, firstEpochNumber);
+    epochManagerContract.processGroup(group, address(0), address(0));
+  }
+}
+
+contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
+  function test_Reverts_onL1() public {
+    uint256 numberOfEpochsToTravel = 9;
+    vm.expectRevert("Epoch system not initialized");
+
+    (
+      uint256 _firstBlock,
+      uint256 _lastBlock,
+      uint256 _startTimestamp,
+      uint256 _rewardBlock
+    ) = epochManagerContract.getEpochByNumber(9);
+  }
+}
+contract EpochManagerTest_getEpochByNumber_L2 is EpochManagerTest_L2 {
+  function setUp() public override(EpochManagerTest_L2) {
+    super.setUp();
+
+    initializeEpochManagerSystem();
+  }
+  function test_shouldReturnTheEpochInfoOfSpecifiedEpoch() public {
+    uint256 numberOfEpochsToTravel = 9;
+
+    uint256 _startingEpochNumber = epochManagerContract.getCurrentEpochNumber();
+
+    (
+      uint256 startingEpochFirstBlock,
+      ,
+      uint256 startingEpochStartTimestamp,
+
+    ) = epochManagerContract.getCurrentEpoch();
+
+    _travelAndProcess_N_L2Epoch(numberOfEpochsToTravel);
+
+    (
+      uint256 _firstBlock,
+      uint256 _lastBlock,
+      uint256 _startTimestamp,
+      uint256 _rewardBlock
+    ) = epochManagerContract.getEpochByNumber(_startingEpochNumber + numberOfEpochsToTravel);
+
+    assertEq(
+      startingEpochFirstBlock + (L2_BLOCK_IN_EPOCH * (numberOfEpochsToTravel + 1)) + 1,
+      _firstBlock
+    );
+    assertEq(_lastBlock, 0);
+    assertEq(startingEpochStartTimestamp + (DAY * (numberOfEpochsToTravel + 1)), _startTimestamp);
+    assertEq(_rewardBlock, 0);
+  }
+
+  function test_ReturnsHistoricalEpochInfoAfter_N_Epochs() public {
+    uint256 _startingEpochNumber = epochManagerContract.getCurrentEpochNumber();
+    console.log("current block", block.number);
+    uint256 numberOfEpochsToTravel = 7;
+    (
+      uint256 _startingEpochFirstBlock,
+      uint256 _startingLastBlock,
+      uint256 _startingStartTimestamp,
+      uint256 _startingRewardBlock
+    ) = epochManagerContract.getCurrentEpoch();
+
+    _travelAndProcess_N_L2Epoch(numberOfEpochsToTravel);
+
+    (
+      uint256 _initialFirstBlock,
+      uint256 _initialLastBlock,
+      uint256 _initialStartTimestamp,
+      uint256 _initialRewardBlock
+    ) = epochManagerContract.getEpochByNumber(_startingEpochNumber);
+
+    assertEq(_initialFirstBlock, _startingEpochFirstBlock, "Starting block does not match");
+
+    assertEq(
+      _initialLastBlock,
+      _startingEpochFirstBlock + (L2_BLOCK_IN_EPOCH * 2),
+      "Last block does not match"
+    );
+
+    assertEq(_initialStartTimestamp, _startingStartTimestamp, "Timestamp does not match");
+    assertEq(
+      _initialRewardBlock,
+      _startingEpochFirstBlock + (L2_BLOCK_IN_EPOCH * 2) + 1,
+      "Reward block does not match"
+    );
+  }
+
+  function test_ReturnsZeroForFutureEpochs() public {
+    initializeEpochManagerSystem();
+    (
+      uint256 _firstBlock,
+      uint256 _lastBlock,
+      uint256 _startTimestamp,
+      uint256 _rewardBlock
+    ) = epochManagerContract.getEpochByNumber(500);
+
+    assertEq(_firstBlock, 0);
+    assertEq(_lastBlock, 0);
+    assertEq(_startTimestamp, 0);
+    assertEq(_rewardBlock, 0);
+  }
+}
 
 // contract EpochManagerTest_getEpochNumberOfBlock is EpochManagerTest {
 //   function test_ShouldRetreiveTheCorrectBlockNumberOfTheEpoch() public {
