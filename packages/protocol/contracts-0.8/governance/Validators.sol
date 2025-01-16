@@ -15,7 +15,7 @@ import "../common/linkedlists/AddressLinkedList.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
-import "../../lib/openzeppelin-contracts8-copy/security/ReentrancyGuard8.sol";
+import "../lib/openzeppelin-contracts8-copy/security/ReentrancyGuard8.sol";
 import "../common/interfaces/IStableToken.sol";
 
 import "../../contracts/common/interfaces/IAccounts.sol";
