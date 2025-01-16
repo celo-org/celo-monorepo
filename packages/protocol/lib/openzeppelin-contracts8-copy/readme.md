@@ -1,0 +1,1 @@
+This file exist only because trufle compatibility can't handle contracts with the same name.

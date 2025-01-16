@@ -2,7 +2,7 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts8/security/ReentrancyGuard.sol";
+import "../../lib/openzeppelin-contracts8-copy/security/ReentrancyGuard8.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "./interfaces/IOracle.sol";
@@ -18,7 +18,7 @@ contract EpochManager is
   Initializable,
   UsingRegistry,
   IEpochManager,
-  ReentrancyGuard,
+  ReentrancyGuard8,
   ICeloVersionedContract,
   IEpochManagerInitializer
 {
