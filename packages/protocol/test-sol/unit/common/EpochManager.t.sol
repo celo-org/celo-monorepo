@@ -979,15 +979,9 @@ contract EpochManagerTest_processGroup_L2 is EpochManagerTest_L2 {
 
 contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
   function test_Reverts_onL1() public {
-    uint256 numberOfEpochsToTravel = 9;
     vm.expectRevert("Epoch system not initialized");
 
-    (
-      uint256 _firstBlock,
-      uint256 _lastBlock,
-      uint256 _startTimestamp,
-      uint256 _rewardBlock
-    ) = epochManagerContract.getEpochByNumber(9);
+    epochManagerContract.getEpochByNumber(9);
   }
 }
 contract EpochManagerTest_getEpochByNumber_L2 is EpochManagerTest_L2 {
@@ -1030,12 +1024,8 @@ contract EpochManagerTest_getEpochByNumber_L2 is EpochManagerTest_L2 {
     uint256 _startingEpochNumber = epochManagerContract.getCurrentEpochNumber();
     console.log("current block", block.number);
     uint256 numberOfEpochsToTravel = 7;
-    (
-      uint256 _startingEpochFirstBlock,
-      uint256 _startingLastBlock,
-      uint256 _startingStartTimestamp,
-      uint256 _startingRewardBlock
-    ) = epochManagerContract.getCurrentEpoch();
+    (uint256 _startingEpochFirstBlock, , uint256 _startingStartTimestamp, ) = epochManagerContract
+      .getCurrentEpoch();
 
     _travelAndProcess_N_L2Epoch(numberOfEpochsToTravel);
 
@@ -1078,97 +1068,145 @@ contract EpochManagerTest_getEpochByNumber_L2 is EpochManagerTest_L2 {
   }
 }
 
-// contract EpochManagerTest_getEpochNumberOfBlock is EpochManagerTest {
-//   function test_ShouldRetreiveTheCorrectBlockNumberOfTheEpoch() public {
-//     initializeEpochManagerSystem();
-//     assertEq(epochManagerContract.getEpochNumberOfBlock(firstEpochBlock), firstEpochNumber);
-//   }
+contract EpochManagerTest_getEpochNumberOfBlock is EpochManagerTest {
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("Epoch system not initialized");
+    epochManagerContract.getEpochNumberOfBlock(75);
+  }
+}
+contract EpochManagerTest_getEpochNumberOfBlock_L2 is EpochManagerTest_L2 {
+  function setUp() public override(EpochManagerTest_L2) {
+    super.setUp();
+  }
 
-//   function test_Reverts_WhenL1() public {
-//     vm.expectRevert("Epoch system not initialized");
-//     epochManagerContract.getEpochNumberOfBlock(firstEpochBlock);
-//   }
-// }
+  function test_ShouldRetreiveTheCorrectBlockNumberOfTheEpoch() public {
+    assertEq(
+      epochManagerContract.getEpochNumberOfBlock(epochManagerEnabler.lastKnownFirstBlockOfEpoch()),
+      firstEpochNumber
+    );
+  }
+}
 
-// contract EpochManagerTest_getEpochByBlockNumber is EpochManagerTest {
-//   function test_ShouldRetreiveTheCorrectEpochInfoOfGivenBlock() public {
-//     initializeEpochManagerSystem();
+contract EpochManagerTest_getEpochByBlockNumber is EpochManagerTest {
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("Epoch system not initialized");
+    epochManagerContract.getEpochNumberOfBlock(1000);
+  }
+}
+contract EpochManagerTest_getEpochByBlockNumber_L2 is EpochManagerTest_L2 {
+  function setUp() public override(EpochManagerTest_L2) {
+    super.setUp();
+    initializeEpochManagerSystem();
+    _travelAndProcess_N_L2Epoch(2);
+  }
+  function test_ShouldRetreiveTheCorrectEpochInfoOfGivenBlock() public {
+    (uint256 _firstBlock, uint256 _lastBlock, , ) = epochManagerContract.getEpochByBlockNumber(
+      epochManagerEnabler.lastKnownFirstBlockOfEpoch() + (3 * L2_BLOCK_IN_EPOCH)
+    );
+    assertEq(
+      _firstBlock,
+      epochManagerEnabler.lastKnownFirstBlockOfEpoch() + 1 + (2 * L2_BLOCK_IN_EPOCH)
+    );
+    assertEq(
+      _lastBlock,
+      epochManagerEnabler.lastKnownFirstBlockOfEpoch() + 1 + (3 * L2_BLOCK_IN_EPOCH) - 1
+    );
+  }
+}
 
-//     _travelAndProcess_N_L2Epoch(2);
+contract EpochManagerTest_numberOfElectedInCurrentSet is EpochManagerTest {
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("Epoch system not initialized");
+    epochManagerContract.numberOfElectedInCurrentSet();
+  }
+}
+contract EpochManagerTest_numberOfElectedInCurrentSet_L2 is EpochManagerTest_L2 {
+  function setUp() public override(EpochManagerTest_L2) {
+    super.setUp();
+    initializeEpochManagerSystem();
+  }
+  function test_ShouldRetreiveTheNumberOfElected() public {
+    assertEq(
+      epochManagerContract.numberOfElectedInCurrentSet(),
+      epochManagerEnabler.getlastKnownElectedAccounts().length
+    );
+  }
+}
 
-//     (uint256 _firstBlock, uint256 _lastBlock, , ) = epochManagerContract.getEpochByBlockNumber(
-//       firstEpochBlock + (3 * L2_BLOCK_IN_EPOCH)
-//     );
-//     assertEq(_firstBlock, firstEpochBlock + 1 + (2 * L2_BLOCK_IN_EPOCH));
-//     assertEq(_lastBlock, firstEpochBlock + 1 + (3 * L2_BLOCK_IN_EPOCH) - 1);
-//   }
+contract EpochManagerTest_getElectedAccounts is EpochManagerTest {
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("Epoch system not initialized");
+    epochManagerContract.getElectedAccounts();
+  }
+}
 
-//   function test_Reverts_WhenL1() public {
-//     vm.expectRevert("Epoch system not initialized");
-//     epochManagerContract.getEpochNumberOfBlock(firstEpochBlock);
-//   }
-// }
+contract EpochManagerTest_getElectedAccounts_L2 is EpochManagerTest_L2 {
+  function setUp() public override(EpochManagerTest_L2) {
+    super.setUp();
+    initializeEpochManagerSystem();
+  }
+  function test_ShouldRetreiveThelistOfElectedAccounts() public {
+    assertEq(
+      epochManagerContract.getElectedAccounts(),
+      epochManagerEnabler.getlastKnownElectedAccounts()
+    );
+  }
+}
 
-// contract EpochManagerTest_numberOfElectedInCurrentSet is EpochManagerTest {
-//   function test_ShouldRetreiveTheNumberOfElected() public {
-//     initializeEpochManagerSystem();
-//     assertEq(epochManagerContract.numberOfElectedInCurrentSet(), 2);
-//   }
+contract EpochManagerTest_getElectedAccountByIndex is EpochManagerTest {
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("Epoch system not initialized");
+    epochManagerContract.getElectedAccountByIndex(0);
+  }
+}
+contract EpochManagerTest_getElectedAccountByIndex_L2 is EpochManagerTest_L2 {
+  function setUp() public override(EpochManagerTest_L2) {
+    super.setUp();
+    initializeEpochManagerSystem();
+  }
+  function test_ShouldRetreiveThecorrectValidator() public {
+    assertEq(epochManagerContract.getElectedAccountByIndex(0), validator1);
+  }
+}
 
-//   function test_Reverts_WhenL1() public {
-//     vm.expectRevert("Epoch system not initialized");
-//     epochManagerContract.numberOfElectedInCurrentSet();
-//   }
-// }
+contract EpochManagerTest_getElectedSigners is EpochManagerTest {
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("Epoch system not initialized");
+    epochManagerContract.getElectedSigners();
+  }
+}
+contract EpochManagerTest_getElectedSigners_L2 is EpochManagerTest_L2 {
+  function setUp() public override(EpochManagerTest_L2) {
+    super.setUp();
+    initializeEpochManagerSystem();
+  }
 
-// contract EpochManagerTest_getElectedAccounts is EpochManagerTest {
-//   function test_ShouldRetreiveThelistOfElectedAccounts() public {
-//     initializeEpochManagerSystem();
-//     assertEq(epochManagerContract.getElectedAccounts(), firstElected);
-//   }
+  function test_ShouldRetreiveTheElectedSigners() public {
+    address[] memory knownElectedAccounts = epochManagerEnabler.getlastKnownElectedAccounts();
+    address[] memory electedSigners = new address[](knownElectedAccounts.length);
+    for (uint256 i = 0; i < knownElectedAccounts.length; i++) {
+      electedSigners[i] = accountsContract.getValidatorSigner(knownElectedAccounts[i]);
+    }
+    assertEq(epochManagerContract.getElectedSigners(), electedSigners);
+  }
+}
 
-//   function test_Reverts_WhenL1() public {
-//     vm.expectRevert("Epoch system not initialized");
-//     epochManagerContract.getElectedAccounts();
-//   }
-// }
+contract EpochManagerTest_getElectedSignerByIndex is EpochManagerTest {
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("Epoch system not initialized");
+    epochManagerContract.getElectedSignerByIndex(1);
+  }
+}
+contract EpochManagerTest_getElectedSignerByIndex_L2 is EpochManagerTest_L2 {
+  function setUp() public override(EpochManagerTest_L2) {
+    super.setUp();
+    initializeEpochManagerSystem();
+  }
+  function test_ShouldRetreiveThecorrectElectedSigner() public {
+    address[] memory knownElectedAccounts = epochManagerEnabler.getlastKnownElectedAccounts();
+    address[] memory electedSigners = new address[](knownElectedAccounts.length);
 
-// contract EpochManagerTest_getElectedAccountByIndex is EpochManagerTest {
-//   function test_ShouldRetreiveThecorrectValidator() public {
-//     initializeEpochManagerSystem();
-//     assertEq(epochManagerContract.getElectedAccountByIndex(0), validator1);
-//   }
-
-//   function test_Reverts_WhenL1() public {
-//     vm.expectRevert("Epoch system not initialized");
-//     epochManagerContract.getElectedAccountByIndex(0);
-//   }
-// }
-// contract EpochManagerTest_getElectedSigners is EpochManagerTest {
-//   function test_ShouldRetreiveTheElectedSigners() public {
-//     initializeEpochManagerSystem();
-//     address[] memory electedSigners = new address[](firstElected.length);
-//     electedSigners[0] = accountss.getValidatorSigner(firstElected[0]);
-//     electedSigners[1] = accountss.getValidatorSigner(firstElected[1]);
-//     assertEq(epochManagerContract.getElectedSigners(), electedSigners);
-//   }
-
-//   function test_Reverts_WhenL1() public {
-//     vm.expectRevert("Epoch system not initialized");
-//     epochManagerContract.getElectedSigners();
-//   }
-// }
-// contract EpochManagerTest_getElectedSignerByIndex is EpochManagerTest {
-//   function test_ShouldRetreiveThecorrectElectedSigner() public {
-//     initializeEpochManagerSystem();
-//     address[] memory electedSigners = new address[](firstElected.length);
-
-//     electedSigners[1] = accountss.getValidatorSigner(firstElected[1]);
-//     assertEq(epochManagerContract.getElectedSignerByIndex(1), electedSigners[1]);
-//   }
-
-//   function test_Reverts_WhenL1() public {
-//     vm.expectRevert("Epoch system not initialized");
-//     epochManagerContract.getElectedSignerByIndex(1);
-//   }
-// }
+    electedSigners[1] = accountsContract.getValidatorSigner(knownElectedAccounts[1]);
+    assertEq(epochManagerContract.getElectedSignerByIndex(1), electedSigners[1]);
+  }
+}
