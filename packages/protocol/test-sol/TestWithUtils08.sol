@@ -10,7 +10,6 @@ import "@celo-contracts/common/interfaces/IRegistry.sol";
 import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
 
 import "@celo-contracts-8/common/mocks/EpochManager_WithMocks.sol";
-import { MockAccounts } from "@celo-contracts-8/common/mocks/MockAccounts.sol";
 import "@celo-contracts-8/common/IsL2Check.sol";
 import "@celo-contracts-8/common/PrecompilesOverrideV2.sol";
 import { console } from "forge-std-8/console.sol";
@@ -20,7 +19,6 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
   PrecompileHandler ph;
   EpochManager_WithMocks public epochManager;
   EpochManagerEnablerMock epochManagerEnabler;
-  MockAccounts accountss;
 
   IAccounts accountsContract;
   IEpochManagerEnablerMock epochManagerEnablerMockInterface;
@@ -51,12 +49,7 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
     deployCodeTo("Accounts.sol", abi.encode(false), accountsAddress);
     accountsContract = IAccounts(accountsAddress);
 
-    // accountss = new MockAccounts();
-
-    // registry.setAddressFor(AccountsContract, address(accountss));
-    // console.log("### Accounts address: ", address(accountss));
     registry.setAddressFor(AccountsContract, accountsAddress);
-    console.log("### Accounts address: ", accountsAddress);
   }
 
   function setupEpochManager() public {
@@ -137,19 +130,16 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
 
     vm.prank(_elected[0]);
     accountsContract.createAccount();
-    // accountss.setValidatorSigner(_elected[0], _elected[0]);
     epochManagerEnablerMockInterface.addValidator(_elected[0]);
 
     vm.prank(_elected[1]);
     accountsContract.createAccount();
-    // accountss.setValidatorSigner(_elected[1], _elected[1]);
     epochManagerEnablerMockInterface.addValidator(_elected[1]);
 
     for (uint256 i = 2; i < numberValidators; i++) {
       address _currentValidator = vm.addr(i + 1);
       vm.prank(_currentValidator);
       accountsContract.createAccount();
-      // accountss.setValidatorSigner(_currentValidator, _currentValidator);
 
       epochManagerEnablerMockInterface.addValidator(_currentValidator);
     }
@@ -164,7 +154,6 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
     whenL2();
 
     epochManagerEnabler.initEpochManager();
-    console.log("### Done initEpochManager");
   }
 
   function whenL2WithoutEpochManagerInitialization() internal {
