@@ -7,7 +7,6 @@ import { MockElection } from "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/stability/test/MockSortedOracles.sol";
 
 import "@celo-contracts-8/common/ScoreManager.sol";
-// import { MockAccounts } from "@celo-contracts-8/common/mocks/MockAccounts.sol";
 import "@celo-contracts-8/common/mocks/EpochManager_WithMocks.sol";
 import "@celo-contracts-8/common/test/MockCeloToken.sol";
 import { MockCeloUnreleasedTreasury } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasury.sol";
@@ -26,7 +25,6 @@ contract EpochManagerTest is TestWithUtils08 {
   MockStableToken08 stableToken;
   EpochRewardsMock08 epochRewards;
   MockElection election;
-  // MockAccounts accountss;
   IMockValidators validators;
 
   address carbonOffsettingPartner;
@@ -35,8 +33,6 @@ contract EpochManagerTest is TestWithUtils08 {
   address scoreManagerAddress;
 
   uint256 firstEpochNumber = 3;
-
-  // uint256 firstEpochBlock = 100;
   uint256 epochDuration = DAY;
   address[] firstElected;
 
@@ -84,7 +80,6 @@ contract EpochManagerTest is TestWithUtils08 {
     celoToken = new MockCeloToken08();
     celoUnreleasedTreasury = new MockCeloUnreleasedTreasury();
     election = new MockElection();
-    // accountss = new MockAccounts();
 
     validator1 = actor("validator");
     validator2 = actor("otherValidator");
@@ -93,7 +88,6 @@ contract EpochManagerTest is TestWithUtils08 {
     firstElected.push(validator2);
 
     scoreManagerAddress = actor("scoreManagerAddress");
-    // accountsAddress = actor("accountsAddress");
 
     reserveAddress = actor("reserve");
 
@@ -102,7 +96,6 @@ contract EpochManagerTest is TestWithUtils08 {
 
     deployCodeTo("MockRegistry.sol", abi.encode(false), REGISTRY_ADDRESS);
     deployCodeTo("ScoreManager.sol", abi.encode(false), scoreManagerAddress);
-    // deployCodeTo("Accounts.sol", abi.encode(false), accountsAddress);
     deployCodeTo("MockValidators.sol", abi.encode(false), address(validators));
 
     scoreManager = ScoreManager(scoreManagerAddress);
@@ -118,7 +111,6 @@ contract EpochManagerTest is TestWithUtils08 {
     registry.setAddressFor(CeloTokenContract, address(celoToken));
     registry.setAddressFor(ReserveContract, reserveAddress);
     registry.setAddressFor(ElectionContract, address(election));
-    // registry.setAddressFor(AccountsContract, address(accountss)); // XXX this overrides the accountss address from utils
 
     celoToken.setTotalSupply(CELO_SUPPLY_CAP);
     vm.deal(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
@@ -140,9 +132,7 @@ contract EpochManagerTest is TestWithUtils08 {
   function setupAndElectValidators() public {
     validators.setValidatorGroup(group);
     validators.setValidator(validator1);
-
     validators.setValidator(validator2);
-
     validators.setValidatorGroup(group2);
     validators.setValidator(validator3);
     validators.setValidator(validator4);
@@ -206,6 +196,7 @@ contract EpochManagerTest_L2_NoInit is EpochManagerTest, WhenL2NoInitialization 
     super.setUp();
   }
 }
+
 contract EpochManagerTest_L2 is EpochManagerTest, WhenL2 {
   function setUp() public virtual override(EpochManagerTest, WhenL2) {
     super.setUp();
@@ -428,13 +419,6 @@ contract EpochManagerTest_setOracleAddress is EpochManagerTest {
     epochManagerContract.setOracleAddress(newOracleAddress);
   }
 
-  // function test_Reverts_WhenIsOnEpochProcess() public {
-  //   setupAndElectValidators();
-  //   epochManagerContract.startNextEpochProcess();
-  //   vm.expectRevert("Cannot change oracle address during epoch processing.");
-  //   epochManagerContract.setOracleAddress(newOracleAddress);
-  // }
-
   function test_Reverts_WhenNewOracleAddressIsZero() public {
     setupAndElectValidators();
 
@@ -457,21 +441,6 @@ contract EpochManagerTest_setOracleAddress_L2 is
   function setUp() public override(EpochManagerTest_L2, EpochManagerTest) {
     super.setUp();
   }
-  // address newOracleAddress = actor("newOarcle");
-
-  // function test_setsNewOracleAddress() public {
-  //   setupAndElectValidators();
-  //   epochManagerContract.setOracleAddress(newOracleAddress);
-  //   assertEq(epochManagerContract.oracleAddress(), newOracleAddress);
-  // }
-
-  // function test_Emits_OracleAddressSetEvent() public {
-  //   setupAndElectValidators();
-
-  //   vm.expectEmit(true, true, true, true);
-  //   emit OracleAddressSet(newOracleAddress);
-  //   epochManagerContract.setOracleAddress(newOracleAddress);
-  // }
 
   function test_Reverts_WhenIsOnEpochProcess() public {
     setupAndElectValidators();
@@ -479,25 +448,9 @@ contract EpochManagerTest_setOracleAddress_L2 is
     vm.expectRevert("Cannot change oracle address during epoch processing.");
     epochManagerContract.setOracleAddress(newOracleAddress);
   }
-
-  // function test_Reverts_WhenNewOracleAddressIsZero() public {
-  //   setupAndElectValidators();
-
-  //   vm.expectRevert("Cannot set address zero as the Oracle.");
-  //   epochManagerContract.setOracleAddress(address(0));
-  // }
-
-  // function test_Reverts_WhenNewOracleAddressIsunchanged() public {
-  //   setupAndElectValidators();
-
-  //   vm.expectRevert("Oracle address cannot be the same.");
-  //   epochManagerContract.setOracleAddress(address(sortedOracles));
-  // }
 }
 
 contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
-  // address signer1 = actor("signer1");
-  // address signer2 = actor("signer2");
   address beneficiary = actor("beneficiary");
 
   uint256 paymentAmount = 4 ether;
@@ -538,8 +491,6 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
 }
 
 contract EpochManagerTest_sendValidatorPayment_L2 is EpochManagerTest_L2 {
-  // address signer1 = actor("signer1");
-  // address signer2 = actor("signer2");
   address beneficiary = actor("beneficiary");
 
   uint256 paymentAmount = 4 ether;
@@ -593,7 +544,6 @@ contract EpochManagerTest_sendValidatorPayment_L2 is EpochManagerTest_L2 {
   }
 
   function test_sendsCUsdFromEpochManagerToValidatorAndBeneficiary() public {
-    // accountss.setPaymentDelegationFor(validator1, beneficiary, twentyFivePercent);
     vm.prank(validator1);
     accountsContract.setPaymentDelegation(beneficiary, twentyFivePercent);
 
@@ -861,10 +811,6 @@ contract EpochManagerTest_setToProcessGroups_L2 is EpochManagerTest_L2 {
 }
 
 contract EpochManagerTest_processGroup is EpochManagerTest {
-  // function setUp() public override {
-  //   super.setUp();
-  // }
-
   function test_Reverts_onL1() public {
     vm.expectRevert("Indivudual epoch process is not started");
     epochManagerContract.processGroup(group, address(0), address(0));
@@ -1018,7 +964,6 @@ contract EpochManagerTest_getEpochByNumber_L2 is EpochManagerTest_L2 {
 
   function test_ReturnsHistoricalEpochInfoAfter_N_Epochs() public {
     uint256 _startingEpochNumber = epochManagerContract.getCurrentEpochNumber();
-    console.log("current block", block.number);
     uint256 numberOfEpochsToTravel = 7;
     (uint256 _startingEpochFirstBlock, , uint256 _startingStartTimestamp, ) = epochManagerContract
       .getCurrentEpoch();
