@@ -718,6 +718,11 @@ contract EpochManager is
     }
   }
 
+  // public TODO delete me after fixing
+  function setElectedSigners(address[] memory _elected) public {
+    _setElectedSigners(_elected);
+  }
+
   /**
    * @notice Finishes processing an epoch and releasing funds to the beneficiaries.
    * @param _epochProcessing The current epoch processing state.
