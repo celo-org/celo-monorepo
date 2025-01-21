@@ -5,6 +5,8 @@ import { TestConstants } from "@test-sol/constants.sol";
 import { PrecompileHandler } from "@test-sol/utils/PrecompileHandler.sol";
 import { IEpochManagerEnablerMock } from "@test-sol/unit/common/interfaces/IEpochManagerEnablerMock.sol";
 import { EpochManagerEnablerMock } from "@test-sol/mocks/EpochManagerEnablerMock.sol";
+import { MockCeloUnreleasedTreasury } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasury.sol";
+import "@celo-contracts-8/common/test/MockCeloToken.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
@@ -18,6 +20,8 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
   PrecompileHandler ph;
   EpochManager_WithMocks public epochManager;
   EpochManagerEnablerMock epochManagerEnabler;
+  MockCeloUnreleasedTreasury celoUnreleasedTreasury;
+  MockCeloToken08 celoToken;
 
   IAccounts accountsContract;
   IEpochManagerEnablerMock epochManagerEnablerMockInterface;
@@ -33,9 +37,11 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
     ph = new PrecompileHandler();
     ph.setEpochSize(L1_BLOCK_IN_EPOCH);
     setupRegistry();
+    setupCeloToken();
     setupAccounts();
     setupEpochManagerEnabler();
     setupEpochManager();
+    setupCeloUnreleasedTreasury();
   }
 
   function setupRegistry() public {
@@ -62,6 +68,23 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
     epochManagerEnabler = new EpochManagerEnablerMock();
     epochManagerEnabler.initialize(REGISTRY_ADDRESS);
     registry.setAddressFor(EpochManagerEnablerContract, address(epochManagerEnabler));
+  }
+
+  function setupCeloToken() public {
+    celoToken = new MockCeloToken08();
+    registry.setAddressFor(CeloTokenContract, address(celoToken));
+    celoToken.setTotalSupply(CELO_SUPPLY_CAP);
+  }
+
+  function setupCeloUnreleasedTreasury() public {
+    celoUnreleasedTreasury = new MockCeloUnreleasedTreasury();
+    celoUnreleasedTreasury.setRegistry(REGISTRY_ADDRESS);
+    registry.setAddressFor(CeloUnreleasedTreasuryContract, address(celoUnreleasedTreasury));
+  }
+
+  function setCeloUnreleasedTreasuryBalance() public {
+    celoToken.setBalanceOf(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
+    vm.deal(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
   }
 
   function timeTravel(uint256 timeDelta) public {
@@ -150,6 +173,7 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
     epochManagerEnabler.captureEpochAndValidators();
 
     whenL2();
+    setCeloUnreleasedTreasuryBalance();
 
     epochManagerEnabler.initEpochManager();
   }
@@ -160,6 +184,7 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
     epochManagerEnablerMockInterface.captureEpochAndValidators();
 
     whenL2();
+    setCeloUnreleasedTreasuryBalance();
   }
   function whenL2WithoutEpochCapture() internal {
     _registerAndElectValidatorsForL2();

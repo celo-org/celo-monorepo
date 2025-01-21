@@ -21,7 +21,7 @@ contract Devchain is TestWithUtils08 {
   ISortedOracles sortedOracles;
   FeeCurrencyDirectory feeCurrencyDirectory;
   IEpochManager epochManagerContract;
-  ICeloUnreleasedTreasury celoUnreleasedTreasury;
+  ICeloUnreleasedTreasury celoUnreleasedTreasuryContract;
   IValidators validators;
   IAccounts accounts;
   IScoreManager scoreManager;
@@ -36,7 +36,7 @@ contract Devchain is TestWithUtils08 {
     ); // FeeCurrencyDirectory is not in UsingRegistry.sol
 
     epochManagerContract = getEpochManager();
-    celoUnreleasedTreasury = getCeloUnreleasedTreasury();
+    celoUnreleasedTreasuryContract = getCeloUnreleasedTreasury();
     validators = getValidators();
     accounts = getAccounts();
     scoreManager = IScoreManager(address(getScoreReader()));
