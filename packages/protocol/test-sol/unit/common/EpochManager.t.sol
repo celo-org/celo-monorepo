@@ -103,14 +103,8 @@ contract EpochManagerTest is TestWithUtils08 {
     registry.setAddressFor(ValidatorsContract, address(validators));
     registry.setAddressFor(ScoreManagerContract, address(scoreManager));
     registry.setAddressFor(StableTokenContract, address(stableToken));
-    // registry.setAddressFor(CeloUnreleasedTreasuryContract, address(celoUnreleasedTreasury));
-    // registry.setAddressFor(CeloTokenContract, address(celoToken));
     registry.setAddressFor(ReserveContract, reserveAddress);
     registry.setAddressFor(ElectionContract, address(election));
-
-    // celoToken.setTotalSupply(CELO_SUPPLY_CAP);
-    // vm.deal(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
-    // celoToken.setBalanceOf(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
 
     celoUnreleasedTreasury.setRegistry(REGISTRY_ADDRESS);
 
