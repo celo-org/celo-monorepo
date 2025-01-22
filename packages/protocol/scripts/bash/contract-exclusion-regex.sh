@@ -38,7 +38,7 @@ if [ $VERSION_NUMBER -eq 12 ]
   then
   # FeeHandlerSeller is not deployed, only its children
   # CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|\\bFeeHandlerSeller\\b|MockElection"
-  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|MockElection|\\bFeeHandlerSeller\\b|ScoreManager|FeeCurrencyDirectory|EpochManager|EpochManagerEnabler|CeloUnreleasedTreasury"
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|MockElection|\\bFeeHandlerSeller\\b"
 fi
 
 echo "FULL CONTRACT_EXCLUSION_REGEX: $CONTRACT_EXCLUSION_REGEX"
