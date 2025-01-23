@@ -153,7 +153,7 @@ contract EpochManagerTest is TestWithUtils08 {
     travelNL2Epoch(1);
   }
 
-  function _travelAndProcess_N_L2Epoch(uint256 n) public {
+  function _travelAndProcess_N_L2Epoch(uint256 n) internal {
     for (uint256 i = 0; i < n; i++) {
       travelNL2Epoch(1);
       epochManagerContract.startNextEpochProcess();
