@@ -29,7 +29,7 @@ import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import "@celo-contracts/common/interfaces/IAccounts.sol";
 import "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
 import "@celo-contracts/governance/interfaces/ILockedGoldInitializer.sol";
-import "@celo-contracts/governance/interfaces/IValidatorsInitializer.sol";
+import "@celo-contracts-8/governance/interfaces/IValidatorsInitializer.sol";
 import "@celo-contracts/governance/interfaces/IElectionInitializer.sol";
 import "@celo-contracts/governance/interfaces/IEpochRewardsInitializer.sol";
 import "@celo-contracts/governance/interfaces/IBlockchainParametersInitializer.sol";
@@ -1069,7 +1069,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         }
 
         console.log(string.concat("Setting constitution thresholds for: ", contractName));
-        IRegistry registry = IRegistry(REGISTRY_ADDRESS);
+        registry = IRegistry(REGISTRY_ADDRESS);
 
         address contractAddress = registry.getAddressForString(contractName);
 

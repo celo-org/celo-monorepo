@@ -1,12 +1,11 @@
 pragma solidity ^0.8.15;
 
-// import "celo-foundry-8/Test.sol";
 import "@celo-contracts-8/common/ProxyFactory08.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
 
-import { Utils08 } from "@test-sol/utils08.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
-contract ProxyFactoryTest is Utils08 {
+contract ProxyFactoryTest is TestWithUtils08 {
   ProxyFactory08 proxyFactory08;
   bytes proxyInitCode;
   address constant owner = address(0xAA963FC97281d9632d96700aB62A4D1340F9a28a);
