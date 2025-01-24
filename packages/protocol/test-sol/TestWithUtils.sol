@@ -7,14 +7,20 @@ import "@test-sol/unit/common/mocks/MockEpochManager.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 import "@celo-contracts/governance/interfaces/IValidators.sol";
-import "@celo-contracts/common/PrecompilesOverride.sol";
+import "@celo-contracts-8/common/IsL2Check.sol";
+import "@celo-contracts/common/PrecompilesOverrideV2.sol";
 
-contract Utils is Test, TestConstants, IsL2Check {
+contract TestWithUtils is Test, TestConstants, IsL2Check, PrecompilesOverrideV2 {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   EnumerableSet.AddressSet addressSet;
   IRegistry registry;
   MockEpochManager public epochManager;
+
+  function setUp() public {
+    setupRegistry();
+    setupEpochManager();
+  }
 
   function setupRegistry() public {
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
@@ -54,6 +60,18 @@ contract Utils is Test, TestConstants, IsL2Check {
 
   function _whenL2() public {
     deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+  }
+
+  function whenL2WithEpochManagerInitialization() internal {
+    uint256 l1EpochNumber = getEpochNumber();
+
+    address[] memory _elected = new address[](2);
+    _elected[0] = actor("validator");
+    _elected[1] = actor("otherValidator");
+
+    _whenL2();
+
+    epochManager.initializeSystem(l1EpochNumber, block.number, _elected);
   }
 
   function assertAlmostEqual(uint256 actual, uint256 expected, uint256 margin) public {
@@ -119,5 +137,37 @@ contract Utils is Test, TestConstants, IsL2Check {
   // This function can be also found in OpenZeppelin's library, but in a newer version than the one
   function compareStrings(string memory a, string memory b) public pure returns (bool) {
     return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
+  }
+
+  function containsLog(
+    Vm.Log[] memory logs,
+    string memory signatureString
+  ) private view returns (bool) {
+    bytes32 signature = keccak256(abi.encodePacked(signatureString));
+    for (uint256 i = 0; i < logs.length; i++) {
+      bytes32 logSignature = logs[i].topics[0];
+      if (logSignature == signature) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function emitsLog(function() action, string memory signatureString) private returns (bool) {
+    vm.recordLogs();
+    action();
+    Vm.Log[] memory entries = vm.getRecordedLogs();
+    return containsLog(entries, signatureString);
+  }
+
+  /**
+   * @notice Counterpart to the `expectEmit` cheatcode: asserts that a given log was *not* emitted.
+   * @param action Function that, when called, performs the action to be tested.
+   * @param signatureString The string representation of the event signature
+   * that should not be emitted (e.g. "Transfer(address,address,uint256)").
+   */
+  function assertDoesNotEmit(function() action, string memory signatureString) internal {
+    assertFalse(emitsLog(action, signatureString));
   }
 }

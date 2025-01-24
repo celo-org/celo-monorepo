@@ -1,186 +1,166 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.0 <0.8.20;
 
-import "celo-foundry-8/Test.sol";
-import "@celo-contracts-8/common/EpochManager.sol";
-
-import { EpochManagerEnablerMock } from "@test-sol/mocks/EpochManagerEnablerMock.sol";
+import { ICeloUnreleasedTreasury } from "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 
 import { CeloUnreleasedTreasury } from "@celo-contracts-8/common/CeloUnreleasedTreasury.sol";
-import { ICeloUnreleasedTreasury } from "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
-import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
-
-import { TestConstants } from "@test-sol/constants.sol";
-import { Utils08 } from "@test-sol/utils08.sol";
-
-import "@celo-contracts/common/interfaces/IRegistry.sol";
-
-import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
-import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
-import { MockCeloUnreleasedTreasury } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasury.sol";
 import "@celo-contracts-8/common/test/MockCeloToken.sol";
+import { MockCeloUnreleasedTreasury } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasury.sol";
+import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
 
-contract EpochManagerEnablerTest is Test, TestConstants, Utils08 {
-  EpochManager epochManager;
-  EpochManagerEnablerMock epochManagerEnabler;
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
+import { EpochManagerEnablerMock } from "@test-sol/mocks/EpochManagerEnablerMock.sol";
+import "@celo-contracts-8/common/mocks/EpochManager_WithMocks.sol";
+import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
+import "@test-sol/utils/WhenL2-08.sol";
+
+contract EpochManagerEnablerTest is TestWithUtils08 {
+  EpochManagerEnablerMock epochManagerEnablerContract;
+  EpochManager_WithMocks public epochManagerContract;
   MockCeloUnreleasedTreasury celoUnreleasedTreasury;
   MockCeloToken08 celoToken;
 
-  IRegistry registry;
-  IAccounts accounts;
-
-  address accountsAddress;
   address nonOwner;
-  address oracle;
-
-  uint256 epochDuration = DAY;
-  uint256 numberValidators = 100;
 
   event LastKnownEpochNumberSet(uint256 lastKnownEpochNumber);
   event LastKnownFirstBlockOfEpochSet(uint256 lastKnownFirstBlockOfEpoch);
   event LastKnownElectedAccountsSet();
 
-  function setUp() public virtual {
-    ph.setEpochSize(17280);
-    epochManager = new EpochManager(true);
-    epochManagerEnabler = new EpochManagerEnablerMock();
+  function setUp() public virtual override {
+    super.setUp();
+
+    epochManagerEnablerContract = new EpochManagerEnablerMock();
     celoToken = new MockCeloToken08();
 
     celoUnreleasedTreasury = new MockCeloUnreleasedTreasury();
 
-    accountsAddress = actor("accountsAddress");
-
     nonOwner = actor("nonOwner");
-    oracle = actor("oracle");
 
-    deployCodeTo("MockRegistry.sol", abi.encode(false), REGISTRY_ADDRESS);
-    deployCodeTo("Accounts.sol", abi.encode(false), accountsAddress);
-
-    registry = IRegistry(REGISTRY_ADDRESS);
-    accounts = IAccounts(accountsAddress);
-
-    registry.setAddressFor(EpochManagerContract, address(epochManager));
-    registry.setAddressFor(EpochManagerEnablerContract, address(epochManagerEnabler));
-    registry.setAddressFor(AccountsContract, address(accounts));
+    registry.setAddressFor(EpochManagerEnablerContract, address(epochManagerEnablerContract));
     registry.setAddressFor(CeloTokenContract, address(celoToken));
-    registry.setAddressFor(SortedOraclesContract, oracle);
     registry.setAddressFor(CeloUnreleasedTreasuryContract, address(celoUnreleasedTreasury));
 
     celoToken.setTotalSupply(CELO_SUPPLY_CAP);
     celoToken.setBalanceOf(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
 
-    epochManagerEnabler.initialize(REGISTRY_ADDRESS);
-    epochManager.initialize(REGISTRY_ADDRESS, epochDuration);
-
-    _setupValidators();
-    travelEpochL1(vm);
-    travelEpochL1(vm);
+    epochManagerEnablerContract.initialize(REGISTRY_ADDRESS);
   }
+}
 
-  function _setupValidators() internal {
-    for (uint256 i = 0; i < numberValidators; i++) {
-      vm.prank(vm.addr(i + 1));
-      accounts.createAccount();
-
-      epochManagerEnabler.addValidator(vm.addr(i + 1));
-    }
+contract EpochManagerEnablerTest_L2 is EpochManagerEnablerTest, WhenL2NoInitialization {
+  function setUp() public override(EpochManagerEnablerTest, WhenL2NoInitialization) {
+    super.setUp();
+  }
+}
+contract EpochManagerEnablerTest_L2_NoCapture is EpochManagerEnablerTest, WhenL2NoCapture {
+  function setUp() public override(EpochManagerEnablerTest, WhenL2NoCapture) {
+    super.setUp();
   }
 }
 
 contract EpochManagerEnablerTest_initialize is EpochManagerEnablerTest {
   function test_initialize() public {
-    assertEq(address(epochManagerEnabler.registry()), REGISTRY_ADDRESS);
+    assertEq(address(epochManagerEnablerContract.registry()), REGISTRY_ADDRESS);
   }
 
   function test_Reverts_WhenAlreadyInitialized() public virtual {
     vm.expectRevert("contract already initialized");
-    epochManagerEnabler.initialize(REGISTRY_ADDRESS);
+    epochManagerEnablerContract.initialize(REGISTRY_ADDRESS);
   }
 }
 
 contract EpochManagerEnablerTest_initEpochManager is EpochManagerEnablerTest {
-  function test_CanBeCalledByAnyone() public {
-    epochManagerEnabler.captureEpochAndValidators();
+  function test_Reverts_whenL1() public {
+    vm.expectRevert("This method is not supported in L1.");
 
-    whenL2(vm);
+    epochManagerEnablerContract.initEpochManager();
+  }
+}
+
+contract EpochManagerEnablerTest_initEpochManager_L2 is EpochManagerEnablerTest_L2 {
+  function test_CanBeCalledByAnyone() public {
     vm.prank(nonOwner);
-    epochManagerEnabler.initEpochManager();
+    epochManagerEnablerContract.initEpochManager();
 
     assertGt(epochManager.getElectedAccounts().length, 0);
     assertTrue(epochManager.systemAlreadyInitialized());
   }
+}
 
+contract EpochManagerEnablerTest_initEpochManager_L2_NoCapture is
+  EpochManagerEnablerTest_L2_NoCapture
+{
   function test_Reverts_ifEpochAndValidatorsAreNotCaptured() public {
-    whenL2(vm);
     vm.expectRevert("lastKnownEpochNumber not set.");
 
-    epochManagerEnabler.initEpochManager();
-  }
-
-  function test_Reverts_whenL1() public {
-    vm.expectRevert("This method is not supported in L1.");
-
-    epochManagerEnabler.initEpochManager();
+    epochManagerEnablerContract.initEpochManager();
   }
 }
 
 contract EpochManagerEnablerTest_captureEpochAndValidators is EpochManagerEnablerTest {
-  function test_Reverts_whenL2() public {
-    whenL2(vm);
-    vm.expectRevert("This method is no longer supported in L2.");
-    epochManagerEnabler.captureEpochAndValidators();
+  function setUp() public override {
+    super.setUp();
+    _registerAndElectValidatorsForL2();
   }
 
   function test_shouldSetLastKnownElectedAccounts() public {
-    epochManagerEnabler.captureEpochAndValidators();
+    epochManagerEnablerContract.captureEpochAndValidators();
 
-    assertEq(epochManagerEnabler.getlastKnownElectedAccounts().length, numberValidators);
+    assertEq(epochManagerEnablerContract.getlastKnownElectedAccounts().length, numberValidators);
   }
 
   function test_shouldSetLastKnownEpochNumber() public {
-    epochManagerEnabler.captureEpochAndValidators();
+    epochManagerEnablerContract.captureEpochAndValidators();
 
-    assertEq(epochManagerEnabler.lastKnownEpochNumber(), 3);
+    assertEq(epochManagerEnablerContract.lastKnownEpochNumber(), 3);
   }
 
   function test_shouldSetLastKnownFirstBlockOfEpoch() public {
-    epochManagerEnabler.captureEpochAndValidators();
+    epochManagerEnablerContract.captureEpochAndValidators();
 
-    assertEq(epochManagerEnabler.lastKnownFirstBlockOfEpoch(), 17280 * 2);
+    assertEq(epochManagerEnablerContract.lastKnownFirstBlockOfEpoch(), 17280 * 2);
   }
 
   function test_Emits_LastKnownEpochNumberSet() public {
     vm.expectEmit(true, true, true, true);
     emit LastKnownEpochNumberSet(3);
 
-    epochManagerEnabler.captureEpochAndValidators();
+    epochManagerEnablerContract.captureEpochAndValidators();
   }
 
   function test_Emits_LastKnownElectedAccountsSet() public {
     vm.expectEmit(true, true, true, true);
     emit LastKnownElectedAccountsSet();
 
-    epochManagerEnabler.captureEpochAndValidators();
+    epochManagerEnablerContract.captureEpochAndValidators();
   }
 
   function test_Emits_LastKnownFirstBlockOfEpochSet() public {
     vm.expectEmit(true, true, true, true);
     emit LastKnownFirstBlockOfEpochSet(34560);
 
-    epochManagerEnabler.captureEpochAndValidators();
+    epochManagerEnablerContract.captureEpochAndValidators();
+  }
+}
+
+contract EpochManagerEnablerTest_captureEpochAndValidators_L2 is EpochManagerEnablerTest_L2 {
+  function test_Reverts_whenL2() public {
+    whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    epochManagerEnablerContract.captureEpochAndValidators();
   }
 }
 
 contract EpochManagerEnablerTest_getFirstBlockOfEpoch is EpochManagerEnablerTest {
   function test_blockIsEpockBlock() public {
     vm.roll(27803520);
-    epochManagerEnabler.setFirstBlockOfEpoch();
-    assertEq(epochManagerEnabler.lastKnownFirstBlockOfEpoch(), 27803520);
+    epochManagerEnablerContract.setFirstBlockOfEpoch();
+    assertEq(epochManagerEnablerContract.lastKnownFirstBlockOfEpoch(), 27803520);
   }
 
   function test_blockIsNotEpochBlock() public {
     vm.roll(27817229);
-    epochManagerEnabler.setFirstBlockOfEpoch();
-    assertEq(epochManagerEnabler.lastKnownFirstBlockOfEpoch(), 27803520);
+    epochManagerEnablerContract.setFirstBlockOfEpoch();
+    assertEq(epochManagerEnablerContract.lastKnownFirstBlockOfEpoch(), 27803520);
   }
 }

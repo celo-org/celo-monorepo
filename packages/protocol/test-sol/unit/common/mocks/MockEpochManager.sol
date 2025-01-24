@@ -36,6 +36,7 @@ contract MockEpochManager is IEpochManager {
   uint256 private currentEpochNumber;
   address[] public electedAccounts;
   address[] public electedSigners;
+  uint256 numberOfElectedAccounts;
   address public epochManagerEnabler;
   bool systemInitialized;
 
@@ -95,6 +96,10 @@ contract MockEpochManager is IEpochManager {
     isProcessingEpoch = _isProcessing;
   }
 
+  function setNumberOfElectedInCurrentSet(uint256 value) external {
+    numberOfElectedAccounts = value;
+  }
+
   function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256) {
     return getEpochByNumber(currentEpochNumber);
   }
@@ -104,7 +109,7 @@ contract MockEpochManager is IEpochManager {
   }
 
   function numberOfElectedInCurrentSet() external view returns (uint256) {
-    return electedAccounts.length;
+    return numberOfElectedAccounts;
   }
 
   function getElectedAccounts() external view returns (address[] memory) {
