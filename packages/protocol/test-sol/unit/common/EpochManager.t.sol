@@ -32,7 +32,6 @@ contract EpochManagerTest is TestWithUtils08 {
   address communityRewardFund;
   address reserveAddress;
   address scoreManagerAddress;
-  address accountsAddress;
 
   uint256 firstEpochNumber = 100;
   uint256 firstEpochBlock = 100;
@@ -147,13 +146,13 @@ contract EpochManagerTest is TestWithUtils08 {
 
     election.setElectedValidators(members);
 
-    vm.prank(epochManagerEnabler);
+    vm.prank(address(epochManagerEnabler));
     epochManagerContract.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
     travelNL2Epoch(1);
   }
 
-  function _travelAndProcess_N_L2Epoch(uint256 n) internal {
+  function _travelAndProcess_N_L2Epoch(uint256 n) public {
     for (uint256 i = 0; i < n; i++) {
       travelNL2Epoch(1);
       epochManagerContract.startNextEpochProcess();
@@ -201,7 +200,7 @@ contract EpochManagerTest_initialize is EpochManagerTest {
 
 contract EpochManagerTest_initializeSystem is EpochManagerTest {
   function test_processCanBeStarted() public virtual {
-    vm.prank(epochManagerEnabler);
+    vm.prank(address(epochManagerEnabler));
     epochManagerContract.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
     (
       uint256 _firstEpochBlock,
@@ -219,9 +218,9 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
   }
 
   function test_Reverts_processCannotBeStartedAgain() public virtual {
-    vm.prank(epochManagerEnabler);
+    vm.prank(address(epochManagerEnabler));
     epochManagerContract.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
-    vm.prank(epochManagerEnabler);
+    vm.prank(address(epochManagerEnabler));
     vm.expectRevert("Epoch system already initialized");
     epochManagerContract.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
   }
@@ -239,7 +238,7 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
   }
 
   function test_Reverts_WhenEndOfEpochHasNotBeenReached() public {
-    vm.prank(epochManagerEnabler);
+    vm.prank(address(epochManagerEnabler));
     epochManagerContract.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
     vm.expectRevert("Epoch is not ready to start");
@@ -405,7 +404,7 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
     members[1] = validator2;
     validators.setMembers(group, members);
 
-    vm.prank(epochManagerEnabler);
+    vm.prank(address(epochManagerEnabler));
     epochManagerContract.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
     stableToken.mint(address(epochManagerContract), paymentAmount * 2);
@@ -547,7 +546,7 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
     members[1] = validator4;
     validators.setMembers(group2, members);
 
-    vm.prank(epochManagerEnabler);
+    vm.prank(address(epochManagerEnabler));
     initializeEpochManagerSystem();
 
     elected = epochManagerContract.getElectedAccounts();
@@ -679,7 +678,7 @@ contract EpochManagerTest_setToProcessGroups is EpochManagerTest {
     members[1] = validator4;
     validators.setMembers(group2, members);
 
-    vm.prank(epochManagerEnabler);
+    vm.prank(address(epochManagerEnabler));
     initializeEpochManagerSystem();
 
     elected = epochManagerContract.getElectedAccounts();
@@ -782,7 +781,7 @@ contract EpochManagerTest_processGroup is EpochManagerTest {
     members[1] = validator4;
     validators.setMembers(group2, members);
 
-    vm.prank(epochManagerEnabler);
+    vm.prank(address(epochManagerEnabler));
     initializeEpochManagerSystem();
 
     elected = epochManagerContract.getElectedAccounts();
