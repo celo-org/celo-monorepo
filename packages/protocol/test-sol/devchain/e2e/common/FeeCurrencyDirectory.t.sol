@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry-8/Test.sol";
 import { Devchain } from "@test-sol/devchain/e2e/utils.sol";
 
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 
-contract E2EDemo is Test, Devchain {
+contract E2EDemo is Devchain {
   function test_ShouldAllowOwnerSetCurrencyConfig() public {
     address token = address(1);
     uint256 intrinsicGas = 21000;
