@@ -10,6 +10,7 @@ contract TestConstants {
   uint256 public constant MONTH = 30 * DAY_IN_SECONDS;
   uint256 constant WEEK = 7 * DAY_IN_SECONDS;
   uint256 public constant YEAR = 365 * DAY_IN_SECONDS;
+  uint256 public constant L1_BLOCK_IN_EPOCH = 17280;
   uint256 public constant L2_BLOCK_IN_EPOCH = 43200;
 
   // Contract names

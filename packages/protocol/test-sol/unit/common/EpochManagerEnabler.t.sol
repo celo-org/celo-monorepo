@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.0 <0.8.20;
 
-import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
 import { ICeloUnreleasedTreasury } from "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 
 import { CeloUnreleasedTreasury } from "@celo-contracts-8/common/CeloUnreleasedTreasury.sol";
@@ -11,21 +10,17 @@ import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewar
 
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 import { EpochManagerEnablerMock } from "@test-sol/mocks/EpochManagerEnablerMock.sol";
+import "@celo-contracts-8/common/mocks/EpochManager_WithMocks.sol";
 import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
+import "@test-sol/utils/WhenL2-08.sol";
 
 contract EpochManagerEnablerTest is TestWithUtils08 {
   EpochManagerEnablerMock epochManagerEnablerContract;
+  EpochManager_WithMocks public epochManagerContract;
   MockCeloUnreleasedTreasury celoUnreleasedTreasury;
   MockCeloToken08 celoToken;
 
-  IAccounts accounts;
-
-  address accountsAddress;
   address nonOwner;
-  address oracle;
-
-  uint256 epochDuration = DAY;
-  uint256 numberValidators = 100;
 
   event LastKnownEpochNumberSet(uint256 lastKnownEpochNumber);
   event LastKnownFirstBlockOfEpochSet(uint256 lastKnownFirstBlockOfEpoch);
@@ -33,46 +28,33 @@ contract EpochManagerEnablerTest is TestWithUtils08 {
 
   function setUp() public virtual override {
     super.setUp();
-    // used by test that uses L1 epochSize()
-    ph.setEpochSize(17280);
 
     epochManagerEnablerContract = new EpochManagerEnablerMock();
     celoToken = new MockCeloToken08();
 
     celoUnreleasedTreasury = new MockCeloUnreleasedTreasury();
 
-    accountsAddress = actor("accountsAddress");
-
     nonOwner = actor("nonOwner");
-    oracle = actor("oracle");
-
-    deployCodeTo("Accounts.sol", abi.encode(false), accountsAddress);
-    accounts = IAccounts(accountsAddress);
 
     registry.setAddressFor(EpochManagerEnablerContract, address(epochManagerEnablerContract));
-    registry.setAddressFor(AccountsContract, address(accounts));
     registry.setAddressFor(CeloTokenContract, address(celoToken));
-    registry.setAddressFor(SortedOraclesContract, oracle);
     registry.setAddressFor(CeloUnreleasedTreasuryContract, address(celoUnreleasedTreasury));
 
     celoToken.setTotalSupply(CELO_SUPPLY_CAP);
     celoToken.setBalanceOf(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
 
     epochManagerEnablerContract.initialize(REGISTRY_ADDRESS);
-    epochManager.initialize(REGISTRY_ADDRESS, epochDuration);
-
-    _setupValidators();
-    travelEpochL1();
-    travelEpochL1();
   }
+}
 
-  function _setupValidators() internal {
-    for (uint256 i = 0; i < numberValidators; i++) {
-      vm.prank(vm.addr(i + 1));
-      accounts.createAccount();
-
-      epochManagerEnablerContract.addValidator(vm.addr(i + 1));
-    }
+contract EpochManagerEnablerTest_L2 is EpochManagerEnablerTest, WhenL2NoInitialization {
+  function setUp() public override(EpochManagerEnablerTest, WhenL2NoInitialization) {
+    super.setUp();
+  }
+}
+contract EpochManagerEnablerTest_L2_NoCapture is EpochManagerEnablerTest, WhenL2NoCapture {
+  function setUp() public override(EpochManagerEnablerTest, WhenL2NoCapture) {
+    super.setUp();
   }
 }
 
@@ -88,24 +70,6 @@ contract EpochManagerEnablerTest_initialize is EpochManagerEnablerTest {
 }
 
 contract EpochManagerEnablerTest_initEpochManager is EpochManagerEnablerTest {
-  function test_CanBeCalledByAnyone() public {
-    epochManagerEnablerContract.captureEpochAndValidators();
-
-    whenL2();
-    vm.prank(nonOwner);
-    epochManagerEnablerContract.initEpochManager();
-
-    assertGt(epochManager.getElectedAccounts().length, 0);
-    assertTrue(epochManager.systemAlreadyInitialized());
-  }
-
-  function test_Reverts_ifEpochAndValidatorsAreNotCaptured() public {
-    whenL2();
-    vm.expectRevert("lastKnownEpochNumber not set.");
-
-    epochManagerEnablerContract.initEpochManager();
-  }
-
   function test_Reverts_whenL1() public {
     vm.expectRevert("This method is not supported in L1.");
 
@@ -113,11 +77,30 @@ contract EpochManagerEnablerTest_initEpochManager is EpochManagerEnablerTest {
   }
 }
 
+contract EpochManagerEnablerTest_initEpochManager_L2 is EpochManagerEnablerTest_L2 {
+  function test_CanBeCalledByAnyone() public {
+    vm.prank(nonOwner);
+    epochManagerEnablerContract.initEpochManager();
+
+    assertGt(epochManager.getElectedAccounts().length, 0);
+    assertTrue(epochManager.systemAlreadyInitialized());
+  }
+}
+
+contract EpochManagerEnablerTest_initEpochManager_L2_NoCapture is
+  EpochManagerEnablerTest_L2_NoCapture
+{
+  function test_Reverts_ifEpochAndValidatorsAreNotCaptured() public {
+    vm.expectRevert("lastKnownEpochNumber not set.");
+
+    epochManagerEnablerContract.initEpochManager();
+  }
+}
+
 contract EpochManagerEnablerTest_captureEpochAndValidators is EpochManagerEnablerTest {
-  function test_Reverts_whenL2() public {
-    whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    epochManagerEnablerContract.captureEpochAndValidators();
+  function setUp() public override {
+    super.setUp();
+    _registerAndElectValidatorsForL2();
   }
 
   function test_shouldSetLastKnownElectedAccounts() public {
@@ -156,6 +139,14 @@ contract EpochManagerEnablerTest_captureEpochAndValidators is EpochManagerEnable
     vm.expectEmit(true, true, true, true);
     emit LastKnownFirstBlockOfEpochSet(34560);
 
+    epochManagerEnablerContract.captureEpochAndValidators();
+  }
+}
+
+contract EpochManagerEnablerTest_captureEpochAndValidators_L2 is EpochManagerEnablerTest_L2 {
+  function test_Reverts_whenL2() public {
+    whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
     epochManagerEnablerContract.captureEpochAndValidators();
   }
 }
