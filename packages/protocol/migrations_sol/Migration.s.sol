@@ -1069,7 +1069,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         }
 
         console.log(string.concat("Setting constitution thresholds for: ", contractName));
-        IRegistry registry = IRegistry(REGISTRY_ADDRESS);
+        registry = IRegistry(REGISTRY_ADDRESS);
 
         address contractAddress = registry.getAddressForString(contractName);
 

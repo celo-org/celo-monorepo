@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.8.20;
 
-import "@celo-contracts-8/common/UsingRegistry.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.sol";
 import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
@@ -15,16 +14,13 @@ import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 
-import { TestConstants } from "@test-sol/constants.sol";
+import "@test-sol/TestWithUtils08.sol";
 
-contract Devchain is UsingRegistry, TestConstants {
-  // Used in exceptional circumstances when a contract is not in UsingRegistry.sol
-  IRegistry devchainRegistry = IRegistry(REGISTRY_ADDRESS);
-
+contract Devchain is TestWithUtils08 {
   // All core contracts that are expected to be in the Registry on the devchain
   ISortedOracles sortedOracles;
   FeeCurrencyDirectory feeCurrencyDirectory;
-  IEpochManager epochManager;
+  IEpochManager epochManagerContract;
   ICeloUnreleasedTreasury celoUnreleasedTreasury;
   IValidators validators;
   IAccounts accounts;
@@ -33,16 +29,13 @@ contract Devchain is UsingRegistry, TestConstants {
   ILockedCelo lockedCelo;
 
   constructor() {
-    // The following line is required by UsingRegistry.sol
-    setRegistry(REGISTRY_ADDRESS);
-
     // Fetch all core contracts that are expeceted to be in the Registry on the devchain
     sortedOracles = getSortedOracles();
     feeCurrencyDirectory = FeeCurrencyDirectory(
-      devchainRegistry.getAddressForStringOrDie("FeeCurrencyDirectory")
+      registryContract.getAddressForStringOrDie("FeeCurrencyDirectory")
     ); // FeeCurrencyDirectory is not in UsingRegistry.sol
 
-    epochManager = getEpochManager();
+    epochManagerContract = getEpochManager();
     celoUnreleasedTreasury = getCeloUnreleasedTreasury();
     validators = getValidators();
     accounts = getAccounts();
@@ -53,5 +46,9 @@ contract Devchain is UsingRegistry, TestConstants {
     // TODO: Add missing core contracts below (see list in migrations_sol/constants.sol)
     // TODO: Consider asserting that all contracts we expect are available in the Devchain class
     // (see list in migrations_sol/constants.sol)
+  }
+  function setUp() public virtual override {
+    // Added to avoid adding a setup function in each e2e test, when its not required.
+    // Note: This function does not call `super.setUp()`, because we dont want to run the parent's setup.
   }
 }
