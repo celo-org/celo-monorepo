@@ -12,7 +12,7 @@ import "./UsingRegistryV2NoMento.sol";
  * @notice This contract allows for a smoother transition from L1 to L2
  * by abstracting away the usingPrecompile contract, and taking care of the L1 to L2 swtiching logic.
  **/
-contract PrecompilesOverrideV2 is UsingPrecompiles, UsingRegistryV2NoMento {
+abstract contract PrecompilesOverrideV2 is UsingPrecompiles, UsingRegistryV2NoMento {
   /**
    * @notice Returns the epoch number at a block.
    * @param blockNumber Block number where epoch number is calculated.

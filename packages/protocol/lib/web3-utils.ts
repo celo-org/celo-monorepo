@@ -271,9 +271,9 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
 }
 
 
-export const makeTruffleContractForMigrationWithoutSingleton = (contractName: string, network: any, contractPath: string, web3: Web3) => {
-
-  const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath}/${contractName}.json`)
+export const makeTruffleContractForMigrationWithoutSingleton = (contractName: string, network: any, contractPath: string, web3: Web3, buildDir?:string) => {
+  const buildDirPath = buildDir ? `../${buildDir}` : "../build/"
+  const artifact = require(`${path.join(__dirname, buildDirPath)}/contracts-${contractPath}/${contractName}.json`)
   const Contract = truffleContract({
     contractName: artifact.contractName,
     abi: artifact.abi,

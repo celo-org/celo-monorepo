@@ -27,7 +27,7 @@ contract FeeCurrencyDirectoryTest is TestWithUtils08 {
 }
 
 contract FeeCurrencyDirectoryTest_L2 is FeeCurrencyDirectoryTest, WhenL2 {
-  function setUp() public override(FeeCurrencyDirectoryTest, WhenL2) {
+  function setUp() public virtual override(FeeCurrencyDirectoryTest, WhenL2) {
     super.setUp();
   }
 }
@@ -84,8 +84,14 @@ contract TestSetCurrencyConfig is FeeCurrencyDirectoryTest {
   }
 }
 
+contract TestSetCurrencyConfig_L2 is FeeCurrencyDirectoryTest_L2, TestSetCurrencyConfig {
+  function setUp() public override(FeeCurrencyDirectoryTest, FeeCurrencyDirectoryTest_L2) {
+    super.setUp();
+  }
+}
+
 contract TestRemoveCurrencies is FeeCurrencyDirectoryTest {
-  function setUp() public override {
+  function setUp() public virtual override {
     super.setUp();
     address token = address(4);
     directory.setCurrencyConfig(token, address(oracle), 21000);
@@ -127,10 +133,16 @@ contract TestRemoveCurrencies is FeeCurrencyDirectoryTest {
   }
 }
 
+contract TestRemoveCurrencies_L2 is FeeCurrencyDirectoryTest_L2, TestRemoveCurrencies {
+  function setUp() public override(TestRemoveCurrencies, FeeCurrencyDirectoryTest_L2) {
+    super.setUp();
+  }
+}
+
 contract TestGetExchangeRate is FeeCurrencyDirectoryTest {
   address token;
 
-  function setUp() public override {
+  function setUp() public virtual override {
     super.setUp();
     token = address(3);
     oracle.setExchangeRate(token, 200, 4); // 50:1 ratio
@@ -146,5 +158,11 @@ contract TestGetExchangeRate is FeeCurrencyDirectoryTest {
   function test_Reverts_WhenTokenDoesntExist() public {
     vm.expectRevert("Currency not in the directory");
     directory.getExchangeRate(address(4));
+  }
+}
+
+contract TestGetExchangeRate_L2 is FeeCurrencyDirectoryTest_L2, TestGetExchangeRate {
+  function setUp() public override(TestGetExchangeRate, FeeCurrencyDirectoryTest_L2) {
+    super.setUp();
   }
 }
