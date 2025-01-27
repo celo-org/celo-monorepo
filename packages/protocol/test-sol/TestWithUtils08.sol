@@ -135,10 +135,11 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
     epochManagerEnablerMockInterface.addValidator(_elected[1]);
 
     for (uint256 i = 2; i < numberValidators; i++) {
-      vm.prank(vm.addr(i + 1));
+      address _currentValidator = vm.addr(i + 1);
+      vm.prank(_currentValidator);
       accountsContract.createAccount();
 
-      epochManagerEnablerMockInterface.addValidator(vm.addr(i + 1));
+      epochManagerEnablerMockInterface.addValidator(_currentValidator);
     }
     travelNEpochL1(2);
   }
