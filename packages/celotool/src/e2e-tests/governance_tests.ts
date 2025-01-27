@@ -477,6 +477,7 @@ describe('governance tests', () => {
             // 1. Swap validator0 and validator1 so one is a member of the group and the other is not.
             // 2. Rotate keys for validator 2 by authorizing a new validating key.
             await memberSwapper.swap()
+            console.log(`### swapped members at block: ${header.number}`)
           }
         } catch (e: any) {
           console.error(e)
