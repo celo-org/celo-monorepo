@@ -108,11 +108,11 @@ const deployImplementation = async (
   from: string,
   requireVersion = true
 ) => {
-  // const testingDeployment = false
+  const testingDeployment = false
   if (from) {
     Contract.defaults({ from }) // override truffle with provided from address
   }
-  console.info(`Deploying ${contractName}`)
+  console.info(`Deploying implementation: ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
 
   // without this delay it sometimes fails with ProviderError
@@ -123,9 +123,10 @@ const deployImplementation = async (
 
   const contract = await (dryRun
     ? Contract.at(celoRegistryAddress)
-    : Contract.new({
-        gas: 5000000, // Setting the gas limit
-      }))
+    : Contract.new(testingDeployment))
+  // : Contract.new({
+  //     gas: 5000000, // Setting the gas limit
+  //   }))
 
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(
@@ -188,6 +189,7 @@ const deployCoreContract = async (
   isDryRun: boolean,
   from: string
 ) => {
+  console.log(`Deploying core contract: ${contractName}`)
   const contract = await deployImplementation(contractName, instance, isDryRun, from)
   const setImplementationTx: ProposalTx = {
     contract: `${contractName}Proxy`,
@@ -210,6 +212,8 @@ const deployCoreContract = async (
       value: '0',
       description: `Registry: ${contractName} -> ${proxy.address}`,
     })
+
+    console.log(`propose set to registry`)
 
     // If the implementation has an initialize function, add it to the proposal
     const initializeAbi = (contract as any).abi.find(
