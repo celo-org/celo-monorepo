@@ -20,9 +20,11 @@ fi
 mkdir -p $TMP_FOLDER
 
 # Start a local anvil instance
-source $PWD/scripts/foundry/start_anvil.sh
+#source $PWD/scripts/foundry/start_anvil.sh
 
 # Deploy libraries to the anvil instance
+ANVIL_PORT=9545
+ANVIL_RPC_URL="http://127.0.0.1:9545"
 source $PWD/scripts/foundry/deploy_libraries.sh
 echo "Library flags are: $LIBRARY_FLAGS"
 
@@ -33,18 +35,18 @@ echo "Compiling with libraries..."
 time FOUNDRY_PROFILE=devchain forge build $LIBRARY_FLAGS
 
 # Deploy precompile contracts
-source $PWD/scripts/foundry/deploy_precompiles.sh
+#source $PWD/scripts/foundry/deploy_precompiles.sh
 
-echo "Setting Registry Proxy"
-PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode.object' ./out/Proxy.sol/Proxy.json)
-cast rpc anvil_setCode $REGISTRY_ADDRESS $PROXY_DEPLOYED_BYTECODE --rpc-url $ANVIL_RPC_URL
+#echo "Setting Registry Proxy"
+#PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode.object' ./out/Proxy.sol/Proxy.json)
+#cast rpc anvil_setCode $REGISTRY_ADDRESS $PROXY_DEPLOYED_BYTECODE --rpc-url $ANVIL_RPC_URL
 
 # Sets the storage of the registry so that it has an owner we control
-echo "Setting Registry owner"
-cast rpc \
-anvil_setStorageAt \
-$REGISTRY_ADDRESS $REGISTRY_STORAGE_LOCATION "0x000000000000000000000000$REGISTRY_OWNER_ADDRESS" \
---rpc-url $ANVIL_RPC_URL
+# echo "Setting Registry owner"
+# cast rpc \
+# anvil_setStorageAt \
+# $REGISTRY_ADDRESS $REGISTRY_STORAGE_LOCATION "0x000000000000000000000000$REGISTRY_OWNER_ADDRESS" \
+# --rpc-url $ANVIL_RPC_URL
 
 # Run migrations
 echo "Running migration script... "

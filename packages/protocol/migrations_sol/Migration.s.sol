@@ -27,6 +27,7 @@ import "@celo-contracts/common/interfaces/IFeeHandler.sol";
 import "@celo-contracts/common/interfaces/IFeeHandlerInitializer.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import "@celo-contracts/common/interfaces/IAccounts.sol";
+import "@celo-contracts/common/interfaces/IEpochManager.sol";
 import "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
 import "@celo-contracts/governance/interfaces/ILockedGoldInitializer.sol";
 import "@celo-contracts/governance/interfaces/IValidatorsInitializer.sol";
@@ -122,11 +123,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function addToRegistry(string memory contractName, address proxyAddress) public {
-    IProxy proxy = IProxy(REGISTRY_ADDRESS);
-    if (proxy._getImplementation() == address(0)) {
-      console.log("Can't add to registry because implementation not set");
-      return;
-    }
+    // IProxy proxy = IProxy(REGISTRY_ADDRESS);
+    // if (proxy._getImplementation() == address(0)) {
+    //   console.log("Can't add to registry because implementation not set");
+    //   return;
+    // }
     registry = IRegistry(REGISTRY_ADDRESS);
     console.log(" Setting on the registry contract:", contractName);
     registry.setAddressFor(contractName, proxyAddress);
@@ -215,23 +216,23 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateFeeCurrencyDirectory();
     migrateCeloToken(json);
     migrateSortedOracles(json);
-    migrateGasPriceMinimum(json);
+    // migrateGasPriceMinimum(json);
     migrateReserveSpenderMultiSig(json);
     migrateReserve(json);
     migrateStableToken(json);
     migrateExchange(json);
     migrateAccount();
     migrateLockedCelo(json);
-    migrateValidators(json); // this triggers a revert, the deploy after the json reads
+    migrateValidators(json);
     migrateElection(json);
     migrateEpochRewards(json);
-    migrateRandom(json);
+    // migrateRandom(json);
     migrateEscrow();
     // attestation not migrated
-    migrateBlockchainParameters(json);
+    // migrateBlockchainParameters(json);
     migrateGovernanceSlasher();
-    migrateDoubleSigningSlasher(json);
-    migrateDowntimeSlasher(json);
+    // migrateDoubleSigningSlasher(json);
+    // migrateDowntimeSlasher(json);
     migrateGovernanceApproverMultiSig(json);
     // GrandaMento not migrated
     migrateFederatedAttestations();
@@ -240,11 +241,16 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateFeeHandler(json);
     migrateOdisPayments();
     migrateCeloUnreleasedTreasury();
+    vm.stopBroadcast();
+
+    // needs to broadcast from a pre-funded account
+    fundCeloUnreleasedTreasury();
+
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
     migrateEpochManagerEnabler();
     migrateEpochManager(json);
     migrateScoreManager();
     migrateGovernance(json);
-
     vm.stopBroadcast();
 
     // Functions with broadcast with different addresses
@@ -253,7 +259,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     vm.startBroadcast(DEPLOYER_ACCOUNT);
 
-    captureEpochManagerEnablerValidators();
+    // captureEpochManagerEnablerValidators();
 
     vm.stopBroadcast();
   }
@@ -267,13 +273,13 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateRegistry() public {
-    setImplementationOnProxy(
-      IProxy(REGISTRY_ADDRESS),
-      "Registry",
-      abi.encodeWithSelector(IRegistryInitializer.initialize.selector)
-    );
+    // setImplementationOnProxy(
+    //   IProxy(REGISTRY_ADDRESS),
+    //   "Registry",
+    //   abi.encodeWithSelector(IRegistryInitializer.initialize.selector)
+    // );
     // set registry in registry itself
-    console.log("Owner of the Registry Proxy is", IProxy(REGISTRY_ADDRESS)._getOwner());
+    // console.log("Owner of the Registry Proxy is", IProxy(REGISTRY_ADDRESS)._getOwner());
     addToRegistry("Registry", REGISTRY_ADDRESS);
     console.log("Done migration registry");
   }
@@ -466,14 +472,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     getSortedOracles().addOracle(stableTokenProxyAddress, DEPLOYER_ACCOUNT);
 
     if (celoPrice != 0) {
-      console.log("before report");
       getSortedOracles().report(stableTokenProxyAddress, celoPrice * 1e24, address(0), address(0)); // TODO use fixidity
-      console.log("After report report");
     }
 
     IReserve(registry.getAddressForStringOrDie("Reserve")).addToken(stableTokenProxyAddress);
 
-    getFeeCurrencyWhitelist().addToken(stableTokenProxyAddress);
+    // getFeeCurrencyWhitelist().addToken(stableTokenProxyAddress);
 
     /*
     Arbitrary intrinsic gas number take from existing `FeeCurrencyDirectory.t.sol` tests
@@ -936,13 +940,21 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateCeloUnreleasedTreasury() public {
-    deployProxiedContract(
+    address celoUnreleasedTreasury = deployProxiedContract(
       "CeloUnreleasedTreasury",
       abi.encodeWithSelector(
         ICeloUnreleasedTreasuryInitializer.initialize.selector,
         REGISTRY_ADDRESS
       )
     );
+  }
+
+  function fundCeloUnreleasedTreasury() public {
+    console.log("Funding CeloUnreleasedTreasury");
+    address celoUnreleasedTreasury = address(getCeloUnreleasedTreasury());
+    vm.startBroadcast(0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d);
+    getCeloToken().transfer(celoUnreleasedTreasury, 400_000_000 ether);
+    vm.stopBroadcast();
   }
 
   function migrateEpochManagerEnabler() public {
@@ -965,7 +977,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       (address)
     );
 
-    deployProxiedContract(
+    address epochManager = deployProxiedContract(
       "EpochManager",
       abi.encodeWithSelector(
         IEpochManagerInitializer.initialize.selector,
@@ -973,6 +985,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         newEpochDuration
       )
     );
+
+    address[] memory signers = new address[](0);
+    IEpochManager(epochManager).initializeSystem(0, 0, signers); // TODO fix signers
   }
 
   function migrateGovernance(string memory json) public {
@@ -1127,7 +1142,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     );
 
     (bytes memory ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(accountAddress, validatorKey);
-    getValidators().registerValidator(ecdsaPubKey, newBlsPublicKey, newBlsPop);
+    getValidators().registerValidatorNoBls(ecdsaPubKey);
     getValidators().affiliate(groupToAffiliate);
     console.log("Done registering validators");
 
