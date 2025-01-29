@@ -12,6 +12,7 @@ import "./interfaces/ICeloToken.sol";
 import "./interfaces/ICeloTokenInitializer.sol";
 import "./interfaces/ICeloVersionedContract.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
+import { console } from "forge-std/console.sol";
 
 /**
  * @title ERC20 interface for the CELO token.
@@ -303,11 +304,13 @@ contract GoldToken is
    * @return True if the transaction succeeds.
    */
   function _transfer(address to, uint256 value) internal returns (bool) {
+    console.log("GoldToken.sol", "here");
     require(value <= balanceOf(msg.sender), "transfer value exceeded balance of sender");
 
     bool success;
     (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(msg.sender, to, value));
     require(success, "CELO transfer failed");
+    console.log("GoldToken.sol", success);
     emit Transfer(msg.sender, to, value);
     return true;
   }

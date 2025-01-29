@@ -313,6 +313,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     );
 
     addToRegistry("CeloToken", celoProxyAddress);
+    addToRegistry("GoldToken", celoProxyAddress);
     bool frozen = abi.decode(json.parseRaw(".goldToken.frozen"), (bool));
     if (frozen) {
       getFreezer().freeze(celoProxyAddress);
@@ -952,9 +953,17 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function fundCeloUnreleasedTreasury() public {
     console.log("Funding CeloUnreleasedTreasury");
     address celoUnreleasedTreasury = address(getCeloUnreleasedTreasury());
+
     vm.startBroadcast(0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d);
+
     getCeloToken().transfer(celoUnreleasedTreasury, 400_000_000 ether);
+
     vm.stopBroadcast();
+
+    console.log(
+      "Balance of CeloUnreleasedTreasury is",
+      getCeloToken().balanceOf(celoUnreleasedTreasury)
+    );
   }
 
   function migrateEpochManagerEnabler() public {
