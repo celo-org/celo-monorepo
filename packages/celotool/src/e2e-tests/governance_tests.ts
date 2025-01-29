@@ -532,7 +532,7 @@ describe('governance tests', () => {
       for (const blockNumber of blockNumbers) {
         console.log(`### here`)
         const minElected = await election.methods.electableValidators().call({}, blockNumber)
-        console.log(`### minElected: ${minElected}`)
+        console.log(`### minElected: ${JSON.stringify(minElected, null, 2)}`)
 
         const lastEpochBlock = getLastEpochBlock(blockNumber, epoch)
         const memberAccounts = await getValidatorGroupMembers(lastEpochBlock)
