@@ -54,13 +54,22 @@ forge script \
   $MIGRATION_SCRIPT_PATH \
   --target-contract $MIGRATION_TARGET_CONTRACT \
   --sender $FROM_ACCOUNT \
-  --unlocked \
+  --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
   $VERBOSITY_LEVEL \
   $BROADCAST \
   $SKIP_SIMULATION \
   $NON_INTERACTIVE \
   $LIBRARY_FLAGS \
+  --slow \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
+  # --gas-price 4331510 \
+  # --legacy \ 
+
+
+cast send 0x471EcE3750Da237f93B8E339c536989b8978a438 "function transfer(address to, uint256 value) external returns (bool)" 0xB76D502Ad168F9D545661ea628179878DcA92FD5 390000000000000000000000000 --rpc-url  http://localhost:9545 --private-key 59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+
+
+exit 0
 
 CELO_EPOCH_REWARDS_ADDRESS=$(
   cast call \
