@@ -1477,7 +1477,7 @@ export async function writeGenesisWithMigrations(
   const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
 
   if (verbose) {
-    console.info('writing genesis with migrations')
+    console.info('writing genesis')
   }
 
   fs.writeFileSync(genesisPath, genesis)

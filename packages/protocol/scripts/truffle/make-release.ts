@@ -112,7 +112,7 @@ const deployImplementation = async (
   if (from) {
     Contract.defaults({ from }) // override truffle with provided from address
   }
-  console.info(`Deploying implementation: ${contractName}`)
+  console.info(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
 
   // without this delay it sometimes fails with ProviderError
@@ -188,7 +188,6 @@ const deployCoreContract = async (
   isDryRun: boolean,
   from: string
 ) => {
-  console.log(`Deploying core contract: ${contractName}`)
   const contract = await deployImplementation(contractName, instance, isDryRun, from)
   const setImplementationTx: ProposalTx = {
     contract: `${contractName}Proxy`,
@@ -211,8 +210,6 @@ const deployCoreContract = async (
       value: '0',
       description: `Registry: ${contractName} -> ${proxy.address}`,
     })
-
-    console.log(`propose set to registry`)
 
     // If the implementation has an initialize function, add it to the proposal
     const initializeAbi = (contract as any).abi.find(

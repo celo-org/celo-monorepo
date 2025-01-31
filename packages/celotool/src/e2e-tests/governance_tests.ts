@@ -287,12 +287,10 @@ describe('governance tests', () => {
       const groupInfo = await validators.methods
         .getValidatorGroup(groupAddress)
         .call({}, blockNumber)
-      console.log(`### Got memberAccounts when given blockNumber: ${groupInfo[0]}`)
       return groupInfo[0]
     } else {
       const [groupAddress] = await validators.methods.getRegisteredValidatorGroups().call()
       const groupInfo = await validators.methods.getValidatorGroup(groupAddress).call()
-      console.log(`### Got memberAccounts without blockNumber: ${groupInfo[0]}`)
       return groupInfo[0]
     }
   }
@@ -450,17 +448,12 @@ describe('governance tests', () => {
         await txo.sendAndWaitForReceipt({ from: group })
       }
 
-      const validatorSetSigners0 = await election.methods.getCurrentValidatorSigners().call()
-      console.log(`### current block: ${await groupKit.connection.getBlockNumber()}`)
-      console.log(`### Got _validatorSetSigners0: ${validatorSetSigners0}`)
       validators = await groupKit._web3Contracts.getValidators()
       const membersToSwap = [validatorAccounts[0], validatorAccounts[1]]
       const memberSwapper = await newMemberSwapper(groupKit, membersToSwap)
       // The memberSwapper makes a change when it's created, so we wait for epoch change so it takes effect
       await waitForEpochTransition(web3, epoch)
-      const validatorSetSigners1 = await election.methods.getCurrentValidatorSigners().call()
-      console.log(`### Got _validatorSetSigners1: ${validatorSetSigners1}`)
-      console.log(`### current block: ${await groupKit.connection.getBlockNumber()}`)
+
       const handled: any = {}
 
       let errorWhileChangingValidatorSet = ''
@@ -477,7 +470,6 @@ describe('governance tests', () => {
             // 1. Swap validator0 and validator1 so one is a member of the group and the other is not.
             // 2. Rotate keys for validator 2 by authorizing a new validating key.
             await memberSwapper.swap()
-            console.log(`### swapped members at block: ${header.number}`)
           }
         } catch (e: any) {
           console.error(e)
@@ -493,7 +485,6 @@ describe('governance tests', () => {
         // Prepare for member swapping.
         await sleep(epoch)
       }
-      console.log(`### current block after 40 block: ${await groupKit.connection.getBlockNumber()}`)
       ;(subscription as any).unsubscribe()
 
       // Wait for the current epoch to complete.
@@ -507,7 +498,6 @@ describe('governance tests', () => {
 
     const getValidatorSetAccountsAtBlock = async (blockNumber: number) => {
       const signingKeys = await getValidatorSetSignersAtBlock(blockNumber)
-      console.log(`### Got signingKeys: ${signingKeys}`)
       return Promise.all(
         signingKeys.map((address: string) =>
           accounts.methods.signerToAccount(address).call({}, blockNumber)
@@ -517,7 +507,6 @@ describe('governance tests', () => {
 
     it('should always return a validator set size equal to the number of group members at the end of the last epoch', async () => {
       for (const blockNumber of blockNumbers) {
-        console.log(`### blockNumber: ${blockNumber}`)
         const lastEpochBlock = getLastEpochBlock(blockNumber, epoch)
         const validatorSetSize = await election.methods
           .numberValidatorsInCurrentSet()
@@ -526,39 +515,17 @@ describe('governance tests', () => {
         assert.equal(validatorSetSize, groupMembership.length)
       }
     })
-    // TODO (soloseng) fix test such that it returns expected validators
+
     it('should always return a validator set equal to the signing keys of the group members at the end of the last epoch', async function (this: any) {
       this.timeout(0)
       for (const blockNumber of blockNumbers) {
-        console.log(`### here`)
-        const minElected = await election.methods.electableValidators().call({}, blockNumber)
-        console.log(`### minElected: ${JSON.stringify(minElected, null, 2)}`)
-
         const lastEpochBlock = getLastEpochBlock(blockNumber, epoch)
         const memberAccounts = await getValidatorGroupMembers(lastEpochBlock)
-        console.log(`### Got memberAccounts: ${memberAccounts}`)
-
-        const signer0 = await election.methods
-          .validatorSignerAddressFromCurrentSet(0)
-          .call({}, blockNumber)
-
-        const signer1 = await election.methods
-          .validatorSignerAddressFromCurrentSet(1)
-          .call({}, blockNumber)
-
-        console.log(`### Got signer0: ${signer0}`)
-        console.log(`### Got signer1: ${signer1}`)
         const memberSigners = await Promise.all(
           memberAccounts.map((v: string) => getValidatorSigner(v, lastEpochBlock))
         )
-        console.log(`### Got memberSigners: ${memberSigners}`)
-
         const validatorSetSigners = await getValidatorSetSignersAtBlock(blockNumber)
-        console.log(`### Got validatorSetSigners at ${blockNumber}: ${validatorSetSigners}`)
-
         const validatorSetAccounts = await getValidatorSetAccountsAtBlock(blockNumber)
-        console.log(`### Got validatorSetAccounts: ${validatorSetAccounts}`)
-
         assert.sameMembers(memberSigners, validatorSetSigners)
         assert.sameMembers(memberAccounts, validatorSetAccounts)
       }
@@ -571,13 +538,11 @@ describe('governance tests', () => {
         // Fetch the round robin order if it hasn't already been set for this epoch.
         if (roundRobinOrder.length === 0 || blockNumber === lastEpochBlock + 1) {
           const validatorSet = await getValidatorSetSignersAtBlock(blockNumber)
-          console.log(`### validatorSet: ${validatorSet}`)
           roundRobinOrder = await Promise.all(
             validatorSet.map(
               async (_, i) => (await web3.eth.getBlock(lastEpochBlock + i + 1)).miner
             )
           )
-          console.log(`### roundRobinOrder: ${roundRobinOrder}`)
           assert.sameMembers(roundRobinOrder, validatorSet)
         }
         const indexInEpoch = blockNumber - lastEpochBlock - 1
