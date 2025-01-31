@@ -5,7 +5,6 @@ import { toFixed } from '@celo/utils/lib/fixidity'
 import { ElectionInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
-  console.log(`### minElectableValidators deployed: ${config.election.minElectableValidators}`)
   return [
     config.registry.predeployedProxyAddress,
     config.election.minElectableValidators,

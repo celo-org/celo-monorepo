@@ -279,9 +279,6 @@ module.exports = async (_deployer: any, networkName: string) => {
   // * Validator 1-n holds funds needed for their own stake
   const validator0Key = valKeys[0]
 
-  console.log(`min elect val: ${parseInt(config.election.minElectableValidators, 10)}`)
-  console.log(`val keys length: ${valKeys.length}`)
-
   if (valKeys.length < parseInt(config.election.minElectableValidators, 10)) {
     console.info(
       `  Warning: Have ${valKeys.length} Validator keys but require a minimum of ${config.election.minElectableValidators} Validators in order for a new validator set to be elected.`

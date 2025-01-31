@@ -39,7 +39,7 @@ env:
   # Git Tag for contract release to use
   RELEASE_TAG: core-contracts.v11
   # CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
-  CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.7.x
+  CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.8.x
 
 # EXAMPLE on debug ssh step
 #  - name: Setup tmate session
@@ -329,7 +329,7 @@ jobs:
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 30
-          max_attempts: 1
+          max_attempts: 3
           command: |
             ${{ matrix.command }}
 
