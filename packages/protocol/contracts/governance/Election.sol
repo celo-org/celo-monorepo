@@ -917,7 +917,7 @@ contract Election is
    * @notice Returns get current validator signers using the precompiles.
    * @return List of current validator signers.
    */
-  function getCurrentValidatorSigners() public view onlyL1 returns (address[] memory) {
+  function getCurrentValidatorSigners() public view returns (address[] memory) {
     uint256 n = numberValidatorsInCurrentSet();
     address[] memory res = new address[](n);
     for (uint256 i = 0; i < n; i = i.add(1)) {
