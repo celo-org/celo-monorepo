@@ -235,7 +235,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateLockedCelo(json);
     migrateValidators(json);
 
-    // migrateElection(json); // fails here
+    migrateElection(json); // fails here
 
     migrateEpochRewards(json);
     // // migrateRandom(json);
@@ -247,33 +247,50 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // // migrateDowntimeSlasher(json);
     migrateGovernanceApproverMultiSig(json);
     // GrandaMento not migrated
-    // migrateFederatedAttestations();
-    // migrateMentoFeeHandlerSeller();
-    // migrateUniswapFeeHandlerSeller();
-    // migrateFeeHandler(json);
-    // migrateOdisPayments();
+    migrateFederatedAttestations();
+    migrateMentoFeeHandlerSeller();
+    migrateUniswapFeeHandlerSeller();
+    migrateFeeHandler(json); // TODO check which contracts have predeploys
+    migrateOdisPayments();
     migrateCeloUnreleasedTreasury();
-    // vm.stopBroadcast();
+    vm.stopBroadcast();
 
     // // needs to broadcast from a pre-funded account
     // fundCeloUnreleasedTreasury();
 
-    // vm.startBroadcast(DEPLOYER_ACCOUNT);
-    // migrateEpochManagerEnabler();
-    // migrateEpochManager(json);
-    // migrateScoreManager();
-    // migrateGovernance(json);
-    // vm.stopBroadcast();
-
     // // Functions with broadcast with different addresses
     // // Validators needs to lock, which can be only used by the msg.sender
-    // electValidators(json);
+  }
+  function run2() public {
+    proxyFactory = IProxyFactory(
+      create2deploy(0, vm.getCode("./out/ProxyFactory.sol/ProxyFactory.json"))
+    );
+    string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
+
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
+
+    setupUsingRegistry();
+    console.log("Account owner:", IProxy(address(getAccounts()))._getOwner());
+
+    // Proxy for Registry is already set, just deploy implementation
+    migrateEpochManagerEnabler();
+    migrateEpochManager(json);
+    migrateScoreManager();
+    vm.stopBroadcast();
+
+    initializeEpochManager(json);
+
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
+    migrateGovernance(json);
+    vm.stopBroadcast();
+
+    electValidators(json);
 
     // vm.startBroadcast(DEPLOYER_ACCOUNT);
 
     // captureEpochManagerEnablerValidators();
 
-    vm.stopBroadcast();
+    // vm.stopBroadcast();
   }
 
   /**
@@ -694,8 +711,15 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       (uint256)
     );
 
-    deployProxiedContract(
-      "Election",
+    address proxyAddress = proxyFactory.deployProxy();
+
+    IProxy proxy = IProxy(proxyAddress);
+    console.log(" Proxy deployed to:", address(proxy));
+
+    address implementation = address(0x8464135c8F25Da09e49BC8782676a84730C318bC);
+
+    proxy._setAndInitializeImplementation(
+      implementation,
       abi.encodeWithSelector(
         IElectionInitializer.initialize.selector,
         REGISTRY_ADDRESS,
@@ -705,6 +729,10 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         electabilityThreshold
       )
     );
+    addToRegistry("Election", address(proxy));
+
+    console.log(" Done deploying:", "Election");
+    console.log("------------------------------");
   }
 
   function migrateEpochRewards(string memory json) public {
@@ -1011,6 +1039,39 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     );
   }
 
+  function initializeEpochManager(string memory json) public {
+    console.log("Initialize epoch manager...");
+    // TODO will not be initialized because it's not funded
+    uint256[] memory valKeys = abi.decode(json.parseRaw(".validators.valKeys"), (uint256[]));
+    uint256 maxGroupSize = abi.decode(json.parseRaw(".validators.maxGroupSize"), (uint256));
+    uint256 groupCount = 3;
+    address[] memory signers = new address[](maxGroupSize * groupCount);
+    // TODO check no signer is left with 0x0
+
+    for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
+      // address groupAddress = groups[groupIndex];
+      // console.log("Getting keys for members of group: ", groupAddress);
+      for (uint256 validatorIndex = 0; validatorIndex < maxGroupSize; validatorIndex++) {
+        uint256 validatorKeyIndex = getValidatorKeyIndex(
+          groupCount,
+          groupIndex,
+          validatorIndex,
+          maxGroupSize
+        );
+
+        vm.startBroadcast(valKeys[validatorKeyIndex]);
+        address accountAddress = (new ForceTx()).identity();
+        address signer = accountAddress;
+        // signers[validatorKeyIndex] = signer;
+        vm.stopBroadcast();
+
+        // console.log("Registering validator #: ", validatorIndex);
+      }
+    }
+
+    IEpochManager(getEpochManager()).initializeSystem(1, block.number, signers); // TODO fix signers
+  }
+
   function migrateEpochManager(string memory json) public {
     address newEpochDuration = abi.decode(
       json.parseRaw(".epochManager.newEpochDuration"),
@@ -1026,8 +1087,20 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       )
     );
 
-    address[] memory signers = new address[](0);
-    IEpochManager(epochManager).initializeSystem(0, 0, signers); // TODO fix signers
+    //  for (uint256 validatorIndex = 0; validatorIndex < maxGroupSize; validatorIndex++) {
+    //     vm.startBroadcast(validatorKey);
+    //     address accountAddress = (new ForceTx()).identity();
+    //     address signer;
+    //     vm.stopBroadcast();
+
+    //     uint256 validatorKeyIndex = getValidatorKeyIndex(
+    //       groupCount,
+    //       groupIndex,
+    //       validatorIndex,
+    //       maxGroupSize
+    //     );
+    //     console.log("Registering validator #: ", validatorIndex);
+    //  }
   }
 
   function migrateGovernance(string memory json) public {
@@ -1292,8 +1365,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       );
     }
 
-    uint256 groupCount = 3;
-    console.log("groupCount", groupCount);
+    uint256 groupCount = 3; // TODO add to config
 
     address[] memory groups = new address[](groupCount);
 

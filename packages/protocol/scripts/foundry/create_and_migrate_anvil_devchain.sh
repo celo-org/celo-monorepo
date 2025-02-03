@@ -6,6 +6,28 @@ set -euo pipefail
 # Read environment variables and constants
 source $PWD/scripts/foundry/constants.sh
 
+
+ANVIL_PORT=9545
+ANVIL_RPC_URL="http://127.0.0.1:9545"
+
+
+forge script \
+  $MIGRATION_SCRIPT_PATH \
+  --target-contract $MIGRATION_TARGET_CONTRACT \
+  --sender $FROM_ACCOUNT \
+  --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
+  $VERBOSITY_LEVEL \
+  $BROADCAST \
+  $SKIP_SIMULATION \
+  --sig "run2()" \
+  $NON_INTERACTIVE \
+  --libraries contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian:0xa722bdA6968F50778B973Ae2701e90200C564B49 --libraries contracts/common/Signatures.sol:Signatures:0xc7cDb7A2E5dDa1B7A0E792Fe1ef08ED20A6F56D4 --libraries contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList:0x967AB65ef14c58bD4DcfFeaAA1ADb40a022140E5 --libraries contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList:0xe1708FA6bb2844D5384613ef0846F9Bc1e8eC55E --libraries contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList:0x0aec7c174554AF8aEc3680BB58431F6618311510 --libraries contracts/governance/Proposals.sol:Proposals:0x8e264821AFa98DD104eEcfcfa7FD9f8D8B320adA \
+  --slow \
+  --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
+exit 1
+
+
+
 # Keeping track of start time to measure how long it takes to run the script entirely
 START_TIME=$SECONDS
 
@@ -27,7 +49,8 @@ ANVIL_PORT=9545
 ANVIL_RPC_URL="http://127.0.0.1:9545"
 source $PWD/scripts/foundry/deploy_libraries.sh
 echo "Library flags are: $LIBRARY_FLAGS"
-
+echo $LIBRARY_FLAGS > $TMP_FOLDER/library_flags.txt
+# exit 1
 # Build all contracts with deployed libraries
 # Including contracts that depend on libraries. This step replaces the library placeholder
 # in the bytecode with the address of the actually deployed library.
@@ -47,6 +70,15 @@ time FOUNDRY_PROFILE=devchain forge build $LIBRARY_FLAGS
 # anvil_setStorageAt \
 # $REGISTRY_ADDRESS $REGISTRY_STORAGE_LOCATION "0x000000000000000000000000$REGISTRY_OWNER_ADDRESS" \
 # --rpc-url $ANVIL_RPC_URL
+
+# pre-deploy election.sol?
+forge create Election --constructor-args false --rpc-url  http://localhost:9545 --private-key 59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d $LIBRARY_FLAGS
+# [⠊] Compiling...
+# No files changed, compilation skipped
+# Deployer: 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+# Deployed to: 0x71C95911E9a5D330f4D621842EC243EE1343292e
+# Transaction hash: 0x8c19e2eacd9a036cfc8e3c3a48c0685db8e99719f8b400319bf08d9abd016327
+# exit 1
 
 # Run migrations
 echo "Running migration script... "
@@ -68,8 +100,22 @@ forge script \
 
 cast send 0x471EcE3750Da237f93B8E339c536989b8978a438 "function transfer(address to, uint256 value) external returns (bool)" 0xB76D502Ad168F9D545661ea628179878DcA92FD5 390000000000000000000000000 --rpc-url  http://localhost:9545 --private-key 59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
 
+# Change the entryPoint of the contract
+# --sig signature
 
-exit 0
+forge script \
+  $MIGRATION_SCRIPT_PATH \
+  --target-contract $MIGRATION_TARGET_CONTRACT \
+  --sender $FROM_ACCOUNT \
+  --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
+  $VERBOSITY_LEVEL \
+  $BROADCAST \
+  $SKIP_SIMULATION \
+  --sig "run2()" \
+  $NON_INTERACTIVE \
+  --libraries contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian:0xa722bdA6968F50778B973Ae2701e90200C564B49 --libraries contracts/common/Signatures.sol:Signatures:0xc7cDb7A2E5dDa1B7A0E792Fe1ef08ED20A6F56D4 --libraries contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList:0x967AB65ef14c58bD4DcfFeaAA1ADb40a022140E5 --libraries contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList:0xe1708FA6bb2844D5384613ef0846F9Bc1e8eC55E --libraries contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList:0x0aec7c174554AF8aEc3680BB58431F6618311510 --libraries contracts/governance/Proposals.sol:Proposals:0x8e264821AFa98DD104eEcfcfa7FD9f8D8B320adA \
+  --slow \
+  --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
 
 CELO_EPOCH_REWARDS_ADDRESS=$(
   cast call \
