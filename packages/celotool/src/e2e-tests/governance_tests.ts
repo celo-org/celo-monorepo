@@ -442,7 +442,7 @@ describe('governance tests', () => {
 
       // groupKit uses a different node than kit does, so wait a second in case kit's node
       // got the new block before groupKit's node did.
-      await sleep(5)
+      await sleep(1)
       const txos = await (await groupKit.contracts.getElection()).activate(group)
       for (const txo of txos) {
         await txo.sendAndWaitForReceipt({ from: group })
