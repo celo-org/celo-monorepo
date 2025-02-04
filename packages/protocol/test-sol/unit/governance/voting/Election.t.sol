@@ -13,7 +13,7 @@ import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/linkedlists/AddressSortedLinkedList.sol";
 import "@celo-contracts/identity/test/MockRandom.sol";
 import "@celo-contracts/common/Freezer.sol";
-import "@test-sol/unit/common/mocks/MockEpochManager.sol";
+// import "@test-sol/unit/common/mocks/MockEpochManager.sol";
 import "@test-sol/utils/WhenL2.sol";
 
 import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";
@@ -57,7 +57,7 @@ contract ElectionTest is TestWithUtils {
   address account9 = actor("account9");
   address account10 = actor("account10");
 
-  address epochManagerAddress = actor("epochManagerAddress");
+  // address epochManagerAddress = actor("epochManagerAddress");
 
   address[] accountsArray;
 
@@ -1936,6 +1936,22 @@ contract ElectionTest_ElectValidatorsAccountsL2 is
   ElectionTest_ElectValidatorsAccounts,
   ElectionTest_L2
 {}
+
+contract ElectionTest_GetCurrentValidatorSigners_L2 is
+  ElectionTest_L2,
+  ElectionTest_ElectValidatorsAbstract
+{
+  function test_ShouldReturnValidatorSigners() public {
+    WhenThereIsALargeNumberOfGroups();
+    address[] memory elected = election.electValidatorAccounts();
+    epochManager.setElectedAccounts(elected);
+    epochManager.setElectedSigners(elected);
+    epochManager.setNumberOfElectedInCurrentSet(epochManager.getElectedAccounts().length);
+    address[] memory electedInCurrentSet = election.getCurrentValidatorSigners();
+
+    assertEq(elected, electedInCurrentSet);
+  }
+}
 
 contract ElectionTest_GetGroupEpochRewards is ElectionTest {
   address voter = address(this);
