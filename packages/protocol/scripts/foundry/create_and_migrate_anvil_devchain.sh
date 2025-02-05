@@ -10,18 +10,32 @@ source $PWD/scripts/foundry/constants.sh
 ANVIL_PORT=9545
 ANVIL_RPC_URL="http://127.0.0.1:9545"
 
-
+CACHED_LIBRARIES_FLAG=`cat $TMP_FOLDER/library_flags.txt`
+echo "Library flags are: $CACHED_LIBRARIES_FLAG"
 # forge script \
 #   $MIGRATION_SCRIPT_PATH \
 #   --target-contract $MIGRATION_TARGET_CONTRACT \
 #   --sender $FROM_ACCOUNT \
 #   --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
 #   $VERBOSITY_LEVEL \
+#   --sig "run3()" \
+#   $NON_INTERACTIVE \
+#   --rpc-url $ANVIL_RPC_URL \
 #   $BROADCAST \
 #   $SKIP_SIMULATION \
-#   --sig "run2()" \
+#   --slow
+
+  # `cat $TMP_FOLDER/library_flags.txt` \ 
+# forge script \
+#   $MIGRATION_SCRIPT_PATH \
+#   --target-contract $MIGRATION_TARGET_CONTRACT \
+#   --sender $FROM_ACCOUNT \
+#   --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
+#   $VERBOSITY_LEVEL \
+#   --sig "run3()" \
 #   $NON_INTERACTIVE \
-#   --libraries contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian:0xa722bdA6968F50778B973Ae2701e90200C564B49 --libraries contracts/common/Signatures.sol:Signatures:0xc7cDb7A2E5dDa1B7A0E792Fe1ef08ED20A6F56D4 --libraries contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList:0x967AB65ef14c58bD4DcfFeaAA1ADb40a022140E5 --libraries contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList:0xe1708FA6bb2844D5384613ef0846F9Bc1e8eC55E --libraries contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList:0x0aec7c174554AF8aEc3680BB58431F6618311510 --libraries contracts/governance/Proposals.sol:Proposals:0x8e264821AFa98DD104eEcfcfa7FD9f8D8B320adA \
+#   $BROADCAST \
+#   $SKIP_SIMULATION \
 #   --slow \
 #   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
 # exit 1
@@ -111,12 +125,25 @@ forge script \
   $VERBOSITY_LEVEL \
   --sig "run2()" \
   $NON_INTERACTIVE \
-  --libraries contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian:0xa722bdA6968F50778B973Ae2701e90200C564B49 --libraries contracts/common/Signatures.sol:Signatures:0xc7cDb7A2E5dDa1B7A0E792Fe1ef08ED20A6F56D4 --libraries contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList:0x967AB65ef14c58bD4DcfFeaAA1ADb40a022140E5 --libraries contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList:0xe1708FA6bb2844D5384613ef0846F9Bc1e8eC55E --libraries contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList:0x0aec7c174554AF8aEc3680BB58431F6618311510 --libraries contracts/governance/Proposals.sol:Proposals:0x8e264821AFa98DD104eEcfcfa7FD9f8D8B320adA \
+  $LIBRARY_FLAGS \
   --slow \
   $BROADCAST \
   $SKIP_SIMULATION \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
-exit 0
+
+forge script \
+  $MIGRATION_SCRIPT_PATH \
+  --target-contract $MIGRATION_TARGET_CONTRACT \
+  --sender $FROM_ACCOUNT \
+  --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
+  $VERBOSITY_LEVEL \
+  --sig "run3()" \
+  $NON_INTERACTIVE \
+  $BROADCAST \
+  $SKIP_SIMULATION \
+  --slow \
+  --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
+
 
 CELO_EPOCH_REWARDS_ADDRESS=$(
   cast call \

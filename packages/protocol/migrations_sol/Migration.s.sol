@@ -262,12 +262,15 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // // Validators needs to lock, which can be only used by the msg.sender
   }
   function run2() public {
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
+
     proxyFactory = IProxyFactory(
-      create2deploy(0, vm.getCode("./out/ProxyFactory.sol/ProxyFactory.json"))
+      create2deploy(
+        bytes32(uint256(block.number)),
+        vm.getCode("./out/ProxyFactory.sol/ProxyFactory.json")
+      )
     );
     string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
-
-    vm.startBroadcast(DEPLOYER_ACCOUNT);
 
     setupUsingRegistry();
     console.log("Account owner:", IProxy(address(getAccounts()))._getOwner());
@@ -291,6 +294,15 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // captureEpochManagerEnablerValidators();
 
     // vm.stopBroadcast();
+  }
+
+  function run3() public {
+    registry = IRegistry(REGISTRY_ADDRESS);
+    console.log("Implementation of registry is", IProxy(REGISTRY_ADDRESS)._getImplementation());
+    string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
+
+    // setupUsingRegistry();
+    electValidators(json);
   }
 
   /**
@@ -716,6 +728,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     IProxy proxy = IProxy(proxyAddress);
     console.log(" Proxy deployed to:", address(proxy));
 
+    // TODO read from a json
     address implementation = address(0x8464135c8F25Da09e49BC8782676a84730C318bC);
 
     proxy._setAndInitializeImplementation(
@@ -1069,7 +1082,10 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       }
     }
 
+    //
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
     IEpochManager(getEpochManager()).initializeSystem(1, block.number, signers); // TODO fix signers
+    vm.stopBroadcast();
   }
 
   function migrateEpochManager(string memory json) public {
