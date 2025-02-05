@@ -154,6 +154,23 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     proxy._setAndInitializeImplementation(implementation, initializeCalldata);
   }
 
+  function setImplementationOnProxyNotInitialize(IProxy proxy, string memory contractName) public {
+    bytes memory implementationBytecode = vm.getCode(
+      string.concat("out/", contractName, ".sol/", contractName, ".json")
+    );
+    bool testingDeployment = false;
+    bytes memory initialCode = abi.encodePacked(
+      implementationBytecode,
+      abi.encode(testingDeployment)
+    );
+    address implementation = create2deploy(bytes32(proxyNonce), initialCode);
+    // nonce to avoid having the same address to deploy to, likely won't needed but just in case
+    proxyNonce++;
+    console.log(" Implementation deployed to:", address(implementation));
+    console.log(" Calling initialize(..)");
+    proxy._setImplementation(implementation);
+  }
+
   function deployProxiedContract(
     string memory contractName,
     address toProxy,
@@ -267,10 +284,13 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     );
     string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
 
+    setupUsingRegistry();
+
     vm.startBroadcast(DEPLOYER_ACCOUNT);
 
-    setupUsingRegistry();
-    console.log("Account owner:", IProxy(address(getAccounts()))._getOwner());
+    // upgradeValidators(); // TODO remove
+    // upgradeEpochManager(); // TODO remove
+    // console.log("Account owner:", IProxy(address(getAccounts()))._getOwner());
 
     // Proxy for Registry is already set, just deploy implementation
     migrateEpochManagerEnabler();
@@ -284,13 +304,30 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateGovernance(json);
     vm.stopBroadcast();
 
-    electValidators(json);
+    //   electValidators(json);
 
     // vm.startBroadcast(DEPLOYER_ACCOUNT);
 
     // captureEpochManagerEnablerValidators();
 
     // vm.stopBroadcast();
+  }
+
+  // function run3() public {
+  //   string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
+  //   setupUsingRegistry();
+  //   electValidators(json);
+
+  // }
+
+  function upgradeValidators() public {
+    IProxy proxy = IProxy(address(getValidators()));
+    setImplementationOnProxyNotInitialize(proxy, "Validators");
+  }
+
+  function upgradeEpochManager() public {
+    IProxy proxy = IProxy(address(getEpochManager()));
+    setImplementationOnProxyNotInitialize(proxy, "EpochManager");
   }
 
   /**
@@ -716,7 +753,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     IProxy proxy = IProxy(proxyAddress);
     console.log(" Proxy deployed to:", address(proxy));
 
-    address implementation = address(0x8464135c8F25Da09e49BC8782676a84730C318bC);
+    address implementation = address(0x8464135c8F25Da09e49BC8782676a84730C318bC); // FIXMEEE
 
     proxy._setAndInitializeImplementation(
       implementation,
@@ -1069,7 +1106,14 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       }
     }
 
-    IEpochManager(getEpochManager()).initializeSystem(1, block.number, signers); // TODO fix signers
+    getEpochManager().initializeSystem(1, block.number - 1, signers); // TODO fix signers
+    console.log(
+      "systemAlreadyInitialized",
+      IEpochManager(getEpochManager()).systemAlreadyInitialized()
+    );
+    console.log("Epoch is #", getEpochManager().getEpochNumberOfBlock(1473));
+
+    console.log("Address of EpochManager is", address(getEpochManager()));
   }
 
   function migrateEpochManager(string memory json) public {
@@ -1255,8 +1299,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     );
 
     (bytes memory ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(accountAddress, validatorKey);
+    console.log("Can call epoch manager from here?", getEpochManager().isBlocked());
     getValidators().registerValidatorNoBls(ecdsaPubKey);
-    getValidators().affiliate(groupToAffiliate);
+    // getValidators().affiliate(groupToAffiliate);
     console.log("Done registering validators");
 
     vm.stopBroadcast();
@@ -1353,6 +1398,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       json.parseRaw(".validators.validatorLockedGoldRequirements.value"),
       (uint256)
     );
+
     // attestationKeys not migrated
 
     if (valKeys.length == 0) {
@@ -1365,7 +1411,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       );
     }
 
-    uint256 groupCount = 3; // TODO add to config
+    uint256 groupCount = 3; // TODO add to config // TODO I modified this
 
     address[] memory groups = new address[](groupCount);
 
@@ -1386,8 +1432,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     // TODO change name of variable amount of groups for amount in group
     for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
+      console.log("groupIndex = 0; group");
       address groupAddress = groups[groupIndex];
-      console.log("Registering members for group: ", groupAddress);
+      console.log("Registering members for group: ", groupIndex, groupAddress);
       for (uint256 validatorIndex = 0; validatorIndex < maxGroupSize; validatorIndex++) {
         uint256 validatorKeyIndex = getValidatorKeyIndex(
           groupCount,
@@ -1396,27 +1443,36 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
           maxGroupSize
         );
         console.log("Registering validator #: ", validatorIndex);
+
         address validator = registerValidator(
           validatorIndex,
           valKeys[validatorKeyIndex],
           validatorLockedGoldRequirements,
           groupAddress
         );
-        // TODO start broadcast
-        console.log("Adding to group...");
+        // // TODO start broadcast
+        // console.log("Adding to group...");
 
-        vm.startBroadcast(groups[groupIndex]);
-        address greater = groupIndex == 0 ? address(0) : groups[groupIndex - 1];
+        // vm.startBroadcast(groups[groupIndex]);
+        // address greater = groupIndex == 0 ? address(0) : groups[groupIndex - 1];
+        // console.log("getParsedSignatureOfAddress1");
 
-        if (validatorIndex == 0) {
-          getValidators().addFirstMember(validator, address(0), greater);
-          console.log("Making group vote for itself");
-        } else {
-          getValidators().addMember(validator);
-        }
-        getElection().vote(groupAddress, validatorLockedGoldRequirements, address(0), greater);
+        // if (validatorIndex == 0) {
+        //   console.log("getParsedSignatureOfAddress2");
+        //   getValidators().addFirstMember(validator, address(0), greater);
+        //   console.log("Making group vote for itself");
+        // } else {
+        //   console.log("getParsedSignatureOfAddress3");
+        //   getValidators().addMember(validator);
+        //   console.log("getParsedSignatureOfAddress4");
+        // }
+        // console.log("getParsedSignatureOfAddress5");
+        // console.log("Owner is:", getElection().owner());
+        // console.log("getParsedSignatureOfAddress5.2");
+        // getElection().vote(groupAddress, validatorLockedGoldRequirements, address(0), greater);
+        // console.log("getParsedSignatureOfAddress6");
 
-        vm.stopBroadcast();
+        // vm.stopBroadcast();
       }
     }
   }

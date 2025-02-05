@@ -296,6 +296,10 @@ contract Validators is
   function registerValidatorNoBls(
     bytes calldata ecdsaPublicKey
   ) external nonReentrant onlyL2 returns (bool) {
+    console.log(
+      "registerValidatorNoBls Can call epoch manager from here?",
+      getEpochManager().isBlocked()
+    );
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     _isRegistrationAllowed(account);
     require(!isValidator(account) && !isValidatorGroup(account), "Already registered");
@@ -1456,37 +1460,49 @@ contract Validators is
    */
   function updateMembershipHistory(address account, address group) private returns (bool) {
     MembershipHistory storage history = validators[account].membershipHistory;
+    console.log("updateMembershipHistory0");
     uint256 epochNumber = getEpochNumber();
+    console.log("updateMembershipHistory1");
 
     uint256 head = history.numEntries == 0 ? 0 : history.tail.add(history.numEntries.sub(1));
 
     if (history.numEntries > 0 && group == address(0)) {
       history.lastRemovedFromGroupTimestamp = block.timestamp;
     }
+    console.log("updateMembershipHistory2");
 
     if (history.numEntries > 0 && history.entries[head].epochNumber == epochNumber) {
       // There have been no elections since the validator last changed membership, overwrite the
       // previous entry.
+      console.log("updateMembershipHistory3");
       history.entries[head] = MembershipHistoryEntry(epochNumber, group);
       return true;
     }
 
+    console.log("updateMembershipHistory4");
     // There have been elections since the validator last changed membership, create a new entry.
     uint256 index = history.numEntries == 0 ? 0 : head.add(1);
     history.entries[index] = MembershipHistoryEntry(epochNumber, group);
+    console.log("updateMembershipHistory5");
     if (history.numEntries < membershipHistoryLength) {
       // Not enough entries, don't remove any.
+      console.log("updateMembershipHistory6");
       history.numEntries = history.numEntries.add(1);
+      console.log("updateMembershipHistory7");
     } else if (history.numEntries == membershipHistoryLength) {
+      console.log("updateMembershipHistory8");
       // Exactly enough entries, delete the oldest one to account for the one we added.
       delete history.entries[history.tail];
       history.tail = history.tail.add(1);
+      console.log("updateMembershipHistory9");
     } else {
+      console.log("updateMembershipHistory10");
       // Too many entries, delete the oldest two to account for the one we added.
       delete history.entries[history.tail];
       delete history.entries[history.tail.add(1)];
       history.numEntries = history.numEntries.sub(1);
       history.tail = history.tail.add(2);
+      console.log("updateMembershipHistory11");
     }
     return true;
   }

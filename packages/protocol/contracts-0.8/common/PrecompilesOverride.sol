@@ -6,6 +6,7 @@ import "../../contracts-0.8/common/IsL2Check.sol";
 
 import "./UsingPrecompiles.sol";
 import "./UsingRegistry.sol";
+import "forge-std/console.sol";
 
 /**
  * @title PrecompilesOverride Contract
@@ -19,10 +20,16 @@ contract PrecompilesOverride is UsingPrecompiles, UsingRegistry {
    * @return Epoch number.
    */
   function getEpochNumberOfBlock(uint256 blockNumber) public view override returns (uint256) {
+    console.log("PrecompilesOverride.getEpochNumberOfBlock0");
     if (isL2()) {
+      getEpochManager().isBlocked();
+      console.log("PrecompilesOverride.getEpochNumberOfBlock1");
       return getEpochManager().getEpochNumberOfBlock(blockNumber);
+      console.log("getEpochNumberOfBlock1_");
     } else {
+      console.log("PrecompilesOverride.getEpochNumberOfBlock2");
       return epochNumberOfBlock(blockNumber, getEpochSize());
+      console.log("getEpochNumberOfBlock2_");
     }
   }
 

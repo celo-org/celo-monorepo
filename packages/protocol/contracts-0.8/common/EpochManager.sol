@@ -13,6 +13,7 @@ import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/IEpochManager.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IEpochManagerInitializer.sol";
+import "forge-std/console.sol";
 
 /**
  * @title Contract used for managing CELO L2 epoch and elections.
@@ -140,7 +141,8 @@ contract EpochManager is
    * @notice Throws if called when EpochManager system has not yet been initalized.
    */
   modifier onlySystemAlreadyInitialized() {
-    require(systemAlreadyInitialized(), "Epoch system not initialized");
+    console.log("onlySystemAlreadyInitialized", _systemAlreadyInitialized());
+    require(_systemAlreadyInitialized(), "Epoch system not initialized");
     _;
   }
 
@@ -170,15 +172,14 @@ contract EpochManager is
   function initializeSystem(
     uint256 firstEpochNumber,
     uint256 firstEpochBlock,
-    address[] memory firstElected
-  ) external // onlyEpochManagerEnabler  // TODO fixme
-  {
+    address[] memory firstElected // onlyEpochManagerEnabler  // TODO fixme
+  ) external {
     require(
       getCeloToken().balanceOf(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURY_REGISTRY_ID)) >
         0,
       "CeloUnreleasedTreasury not yet funded."
     );
-    require(!systemAlreadyInitialized(), "Epoch system already initialized");
+    require(!_systemAlreadyInitialized(), "Epoch system already initialized");
     require(firstEpochNumber > 0, "First epoch number must be greater than 0");
     require(firstEpochBlock > 0, "First epoch block must be greater than 0");
     require(
@@ -558,9 +559,18 @@ contract EpochManager is
   function getEpochNumberOfBlock(
     uint256 _blockNumber
   ) external view onlySystemAlreadyInitialized returns (uint256) {
+    console.log("EpochManager.getEpochNumberOfBlock1");
+    return 1;
     (uint256 _epochNumber, , , , ) = _getEpochByBlockNumber(_blockNumber);
+    console.log("EpochManager.getEpochNumberOfBlock2");
     return _epochNumber;
   }
+
+  //   function getEpochNumberOfBlock(
+  //   uint256 _blockNumber
+  // ) external view  returns (uint256) {
+  //   return 1;
+  // }
 
   /**
    * @notice Returns the epoch info of a specified blockNumber.
@@ -650,7 +660,11 @@ contract EpochManager is
   /**
    * @return Whether or not the EpochManager contract has been activated to start processing epochs.
    */
-  function systemAlreadyInitialized() public view returns (bool) {
+  function systemAlreadyInitialized() external view returns (bool) {
+    return _systemAlreadyInitialized();
+  }
+
+  function _systemAlreadyInitialized() internal view returns (bool) {
     return initialized && isSystemInitialized;
   }
 
@@ -777,13 +791,19 @@ contract EpochManager is
     onlySystemAlreadyInitialized
     returns (uint256, uint256, uint256, uint256, uint256)
   {
+    console.log("EpochManager1");
+    console.log("block.numbe", block.number);
+    console.log("_blockNumber", _blockNumber);
     require(_blockNumber <= block.number, "Invalid blockNumber. Value too high.");
-
+    console.log("EpochManager2");
     (uint256 _firstBlockOfFirstEpoch, , , ) = getEpochByNumber(firstKnownEpoch);
+    console.log("_firstBlockOfFirstEpoch", _firstBlockOfFirstEpoch);
 
+    console.log("EpochManager4");
     require(_blockNumber >= _firstBlockOfFirstEpoch, "Invalid blockNumber. Value too low.");
-
+    console.log("EpochManager5");
     uint256 _firstBlockOfCurrentEpoch = epochs[currentEpochNumber].firstBlock;
+    console.log("EpochManager6");
 
     if (_blockNumber >= _firstBlockOfCurrentEpoch) {
       (
@@ -792,9 +812,11 @@ contract EpochManager is
         uint256 _startTimestamp,
         uint256 _rewardsBlock
       ) = getEpochByNumber(currentEpochNumber);
+      console.log("EpochManager7");
       return (currentEpochNumber, _firstBlock, _lastBlock, _startTimestamp, _rewardsBlock);
     }
 
+    console.log("EpochManager8");
     uint256 left = firstKnownEpoch;
     uint256 right = currentEpochNumber - 1;
 
