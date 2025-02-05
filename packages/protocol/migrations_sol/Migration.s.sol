@@ -284,7 +284,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateGovernance(json);
     vm.stopBroadcast();
 
-    electValidators(json);
+    // electValidators(json);
 
     // vm.startBroadcast(DEPLOYER_ACCOUNT);
 
