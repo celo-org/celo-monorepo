@@ -10,7 +10,7 @@ source $PWD/scripts/foundry/constants.sh
 ANVIL_PORT=9545
 ANVIL_RPC_URL="http://127.0.0.1:9545"
 
-CACHED_LIBRARIES_FLAG=`cat $TMP_FOLDER/library_flags.txt`
+CACHED_LIBRARIES_FLAG=`cat $TMP_FOLDER/library_flags.txt || echo ""`
 echo "Library flags are: $CACHED_LIBRARIES_FLAG"
 # forge script \
 #   $MIGRATION_SCRIPT_PATH \
@@ -108,14 +108,15 @@ forge script \
   $LIBRARY_FLAGS \
   --slow \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
-  # --gas-price 4331510 \
-  # --legacy \ 
+  
 
-
-cast send 0x471EcE3750Da237f93B8E339c536989b8978a438 "function transfer(address to, uint256 value) external returns (bool)" 0xB76D502Ad168F9D545661ea628179878DcA92FD5 390000000000000000000000000 --rpc-url  http://localhost:9545 --private-key 59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
-
-# Change the entryPoint of the contract
-# --sig signature
+echo "transfering funds to UNRELEASE_TREASURY"
+CELO_TOKEN_ADDRESS=`cast call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string calldata identifier) external view returns (address)" "CeloToken" --rpc-url $ANVIL_RPC_URL`
+CELO_UNRELEASED_TREASURY_ADDRESS=0xB76D502Ad168F9D545661ea628179878DcA92FD5
+#CELO_UNRELEASED_TREASURY=`cast call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string calldata identifier) external view returns (address)" "CeloUnreleasedTreasury" --rpc-url $ANVIL_RPC_URL`
+UNRELEASE_TREASURY_PRE_MINT=390000000000000000000000000
+cast send $CELO_TOKEN_ADDRESS "function transfer(address to, uint256 value) external returns (bool)" $CELO_UNRELEASED_TREASURY_ADDRESS $UNRELEASE_TREASURY_PRE_MINT --rpc-url  $ANVIL_RPC_URL --private-key 59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+# libraries flag somehow breaks the next script?
 
 forge script \
   $MIGRATION_SCRIPT_PATH \
@@ -125,24 +126,11 @@ forge script \
   $VERBOSITY_LEVEL \
   --sig "run2()" \
   $NON_INTERACTIVE \
-  $LIBRARY_FLAGS \
   --slow \
   $BROADCAST \
   $SKIP_SIMULATION \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
 
-forge script \
-  $MIGRATION_SCRIPT_PATH \
-  --target-contract $MIGRATION_TARGET_CONTRACT \
-  --sender $FROM_ACCOUNT \
-  --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
-  $VERBOSITY_LEVEL \
-  --sig "run3()" \
-  $NON_INTERACTIVE \
-  $BROADCAST \
-  $SKIP_SIMULATION \
-  --slow \
-  --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
 
 
 CELO_EPOCH_REWARDS_ADDRESS=$(

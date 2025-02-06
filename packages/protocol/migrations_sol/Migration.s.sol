@@ -222,7 +222,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     setupUsingRegistry();
 
     migrateFreezer();
-    migrateFeeCurrencyWhitelist();
+    // migrateFeeCurrencyWhitelist();
     migrateFeeCurrencyDirectory();
     migrateCeloToken(json);
     migrateSortedOracles(json);
@@ -250,7 +250,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateFederatedAttestations();
     migrateMentoFeeHandlerSeller();
     migrateUniswapFeeHandlerSeller();
-    migrateFeeHandler(json); // TODO check which contracts have predeploys
+    migrateFeeHandler(json);
     migrateOdisPayments();
     migrateCeloUnreleasedTreasury();
     vm.stopBroadcast();
@@ -287,6 +287,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateGovernance(json);
     vm.stopBroadcast();
 
+    electValidators(json);
     // electValidators(json);
 
     // vm.startBroadcast(DEPLOYER_ACCOUNT);
@@ -294,15 +295,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // captureEpochManagerEnablerValidators();
 
     // vm.stopBroadcast();
-  }
-
-  function run3() public {
-    registry = IRegistry(REGISTRY_ADDRESS);
-    console.log("Implementation of registry is", IProxy(REGISTRY_ADDRESS)._getImplementation());
-    string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
-
-    // setupUsingRegistry();
-    electValidators(json);
   }
 
   /**
@@ -345,10 +337,14 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateFeeCurrencyDirectory() public {
-    deployProxiedContract(
+    address feeCurrencyDirectoryProxyAddress = 0x9212Fb72ae65367A7c887eC4Ad9bE310BAC611BF;
+    deployImplementationAndAddToRegistry(
       "FeeCurrencyDirectory",
+      IProxy(feeCurrencyDirectoryProxyAddress),
       abi.encodeWithSelector(IFeeCurrencyDirectoryInitializer.initialize.selector)
     );
+
+    addToRegistry("FeeCurrencyDirectory", feeCurrencyDirectoryProxyAddress);
   }
 
   function migrateCeloToken(string memory json) public {
@@ -728,11 +724,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     IProxy proxy = IProxy(proxyAddress);
     console.log(" Proxy deployed to:", address(proxy));
 
-    // TODO read from a json
-    address implementation = address(0x8464135c8F25Da09e49BC8782676a84730C318bC);
-
-    proxy._setAndInitializeImplementation(
-      implementation,
+    deployProxiedContract(
+      "Election",
       abi.encodeWithSelector(
         IElectionInitializer.initialize.selector,
         REGISTRY_ADDRESS,
@@ -742,7 +735,22 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         electabilityThreshold
       )
     );
-    addToRegistry("Election", address(proxy));
+
+    // TODO read from a json
+    // address implementation = address(0x8464135c8F25Da09e49BC8782676a84730C318bC);
+
+    // proxy._setAndInitializeImplementation(
+    //   implementation,
+    //   abi.encodeWithSelector(
+    //     IElectionInitializer.initialize.selector,
+    //     REGISTRY_ADDRESS,
+    //     minElectableValidators,
+    //     maxElectableValidators,
+    //     maxNumGroupsVotedFor,
+    //     electabilityThreshold
+    //   )
+    // );
+    // addToRegistry("Election", address(proxy));
 
     console.log(" Done deploying:", "Election");
     console.log("------------------------------");
@@ -974,8 +982,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256[] memory newLimits;
     uint256[] memory newMaxSlippages;
 
-    address feeHandlerProxyAddress = deployProxiedContract(
+    address feeHandlerProxyAddress = 0xcD437749E43A154C07F3553504c68fBfD56B8778;
+
+    deployImplementationAndAddToRegistry(
       "FeeHandler",
+      IProxy(feeHandlerProxyAddress),
       abi.encodeWithSelector(
         IFeeHandlerInitializer.initialize.selector,
         REGISTRY_ADDRESS,
@@ -1012,14 +1023,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         REGISTRY_ADDRESS
       )
     );
-
-    // address celoUnreleasedTreasury = deployProxiedContract(
-    //   "CeloUnreleasedTreasury",
-    //   abi.encodeWithSelector(
-    //     ICeloUnreleasedTreasuryInitializer.initialize.selector,
-    //     REGISTRY_ADDRESS
-    //   )
-    // );
+    addToRegistry("CeloUnreleasedTreasury", celoUnreleasedTreasury);
   }
 
   function fundCeloUnreleasedTreasury() public {
@@ -1191,6 +1195,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         string memory contractToTransfer = contractsInRegistry[i];
         console.log("Transfering ownership of: ", contractToTransfer);
         IProxy proxy = IProxy(registry.getAddressForStringOrDie(contractToTransfer));
+        console.log("Previous owner was: ", proxy._getOwner());
         proxy._transferOwnership(governanceAddress);
       }
     }

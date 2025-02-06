@@ -20,7 +20,7 @@ contract MigrationsConstants is TestConstants {
     "EpochManager",
     "Escrow",
     "FederatedAttestations",
-    "FeeCurrencyWhitelist",
+    // "FeeCurrencyWhitelist",
     "FeeCurrencyDirectory",
     "Freezer",
     "FeeHandler",
