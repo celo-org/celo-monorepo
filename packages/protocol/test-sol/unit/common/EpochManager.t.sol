@@ -36,8 +36,6 @@ contract EpochManagerTest is TestWithUtils08 {
   uint256 epochDuration = DAY;
   address[] firstElected;
 
-  MockCeloToken08 celoToken;
-  MockCeloUnreleasedTreasury celoUnreleasedTreasury;
   ScoreManager scoreManager;
 
   uint256 celoAmountForRate = 1e24;
@@ -77,8 +75,6 @@ contract EpochManagerTest is TestWithUtils08 {
     epochRewards = new EpochRewardsMock08();
     validators = IMockValidators(actor("validators05"));
     stableToken = new MockStableToken08();
-    celoToken = new MockCeloToken08();
-    celoUnreleasedTreasury = new MockCeloUnreleasedTreasury();
     election = new MockElection();
 
     validator1 = actor("validator");
@@ -107,14 +103,8 @@ contract EpochManagerTest is TestWithUtils08 {
     registry.setAddressFor(ValidatorsContract, address(validators));
     registry.setAddressFor(ScoreManagerContract, address(scoreManager));
     registry.setAddressFor(StableTokenContract, address(stableToken));
-    registry.setAddressFor(CeloUnreleasedTreasuryContract, address(celoUnreleasedTreasury));
-    registry.setAddressFor(CeloTokenContract, address(celoToken));
     registry.setAddressFor(ReserveContract, reserveAddress);
     registry.setAddressFor(ElectionContract, address(election));
-
-    celoToken.setTotalSupply(CELO_SUPPLY_CAP);
-    vm.deal(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
-    celoToken.setBalanceOf(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
 
     celoUnreleasedTreasury.setRegistry(REGISTRY_ADDRESS);
 
@@ -227,6 +217,7 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
     super.setUp();
     _registerAndElectValidatorsForL2();
     epochManagerEnabler.captureEpochAndValidators();
+    setCeloUnreleasedTreasuryBalance();
 
     lastKnownEpochNumber = epochManagerEnabler.lastKnownEpochNumber();
     lastKnownFirstBlockOfEpoch = epochManagerEnabler.lastKnownFirstBlockOfEpoch();
