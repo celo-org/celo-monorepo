@@ -1,4 +1,4 @@
-// @ts-ignore
+import { StrongAddress } from '@celo/base'
 import * as bls12377js from '@celo/bls12377js'
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/cryptographic-utils/lib/bls'
 import BigNumber from 'bignumber.js'
@@ -145,8 +145,7 @@ export const privateKeyToPublicKey = (privateKey: string): string => {
 }
 
 export const privateKeyToAddress = (privateKey: string) => {
-  // @ts-ignore
-  return new Web3.modules.Eth().accounts.privateKeyToAccount(ensure0x(privateKey)).address
+  return new Web3().eth.accounts.privateKeyToAccount(ensure0x(privateKey)).address as StrongAddress
 }
 
 export const privateKeyToStrippedAddress = (privateKey: string) =>
