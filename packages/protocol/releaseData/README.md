@@ -25,5 +25,5 @@ standard release process.
 ### `releaseBRL.json`
 
 This file is the initialization data used when deploying the `cREAL`
-stable token. The release occured between Core Contracts releases 5 and 6 and
+stable token. The release occurred between Core Contracts releases 5 and 6 and
 didn't exactly follow the release process.
