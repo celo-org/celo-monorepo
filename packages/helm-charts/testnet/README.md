@@ -81,7 +81,7 @@ Docker images for Geth (and other services) are built automatically by [Google C
 
 To try out local changes to Geth, use `celotool`. Alternatively, to deploy a dev version of Geth to a Helm release without pushing commits, you can build your own Docker image locally.
 
-First, install [Docker](https://store.docker.com/editions/community/docker-ce-desktop-mac). You'll need to create an account with Docker to do this. It's a bit painful to install Docker via Homebrew.
+First, install [Docker](https://hub.docker.com/editions/community/docker-ce-desktop-mac). You'll need to create an account with Docker to do this. It's a bit painful to install Docker via Homebrew.
 
 Then run:
 
