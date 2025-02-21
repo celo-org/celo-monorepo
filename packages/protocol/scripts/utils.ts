@@ -4,6 +4,11 @@ import { SemVer } from 'semver'
 
 const DAILY_RELEASE_TAG = 'canary'
 const WORKING_RELEASE_BRANCH_PREFIX = 'release/core-contracts/'
+const TAG_REGEX = /^[a-zA-Z][a-zA-Z0-9-_]*[a-zA-Z0-9]$/
+
+// prerelease part extracted from official semver regex (can be found on https://semver.org/)
+const PRERELEASE_IDENTIFIER_REGEX =
+  /^(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*$/
 
 export type Exports = Record<
   string,
@@ -19,15 +24,19 @@ export const determineNextVersion = (
   npmTag: string
 ): SemVer | null => {
   let nextVersion: SemVer | null = null
-  const matchesReleaseTag = gitTag.match(/core-contracts.v(.+).post-audit/)
-  const matchesPreAuditTag = gitTag.match(/core-contracts.v(.+).pre-audit/)
+  const matchesReleaseTag = gitTag.match(/^core-contracts.v([0-9]+)$/)
+  const matchesAnyTag = gitTag.match(/core-contracts.v([0-9\.]+)\.(.+)/)
 
   if (matchesReleaseTag) {
     nextVersion = getVersionFromGitTag(matchesReleaseTag)
-  } else if (matchesPreAuditTag) {
-    const tempVersion = getVersionFromGitTag(matchesPreAuditTag)
+  } else if (matchesAnyTag && isValidNpmTag(matchesAnyTag[2])) {
+    const tagFromGitTag = matchesAnyTag[2]
+    const isSemverCompliantPreReleaseTag = isValidPrereleaseIdentifier(tagFromGitTag)
+    const tag = isSemverCompliantPreReleaseTag ? tagFromGitTag : 'alpha'
+    const tempVersion = getVersionFromGitTag(matchesAnyTag)
+
     nextVersion = new SemVer(
-      `${tempVersion.major}.${tempVersion.minor}.${tempVersion.patch}-pre-audit.0`
+      `${tempVersion.major}.${tempVersion.minor}.${tempVersion.patch}-${tag}.0`
     )
   } else if (gitBranch.startsWith(WORKING_RELEASE_BRANCH_PREFIX)) {
     const lastVersion = getPreviousVersion(npmPackage, DAILY_RELEASE_TAG, 'latest')
@@ -51,7 +60,11 @@ export const determineNextVersion = (
 }
 
 export function isValidNpmTag(tag?: string) {
-  return tag?.match(/^[a-zA-Z]{1,}[a-zA-Z-]*[a-zA-Z]{1,}$/) !== null
+  return tag?.match(TAG_REGEX) !== null
+}
+
+export function isValidPrereleaseIdentifier(identifier: string) {
+  return PRERELEASE_IDENTIFIER_REGEX.test(identifier)
 }
 
 // get the previous version for this tag or if not exists find the previous for the fallback
