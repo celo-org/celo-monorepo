@@ -177,7 +177,6 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
 
     setCeloUnreleasedTreasuryBalance();
     whenL2();
-    setCeloUnreleasedTreasuryBalance();
 
     epochManagerEnabler.initEpochManager();
   }
@@ -189,7 +188,6 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
 
     setCeloUnreleasedTreasuryBalance();
     whenL2();
-    setCeloUnreleasedTreasuryBalance();
   }
 
   function whenL2WithoutEpochCapture() internal {
