@@ -1,21 +1,23 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry-8/Test.sol";
-import { TestConstants } from "@test-sol/constants.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
+import { WhenL2, WhenL2NoInitialization } from "@test-sol/utils/WhenL2-08.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IScoreManagerGovernance.sol";
 import "@celo-contracts/common/interfaces/IScoreManager.sol";
 import { ScoreManager } from "@celo-contracts-8/common/ScoreManager.sol";
+import { MockCeloUnreleasedTreasury } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasury.sol";
+import "@celo-contracts-8/common/test/MockCeloToken.sol";
 
 // merging interfaces here because in 0.5 it can't be done
 // TODO remove this from here after moving everything to 0.8
 interface IScoreManagerTemp is IScoreManagerGovernance, IScoreManager {}
 
-contract ScoreManagerTest is Test, TestConstants {
-  IRegistry registry;
+contract ScoreManagerTest is TestWithUtils08 {
   IScoreManagerTemp public scoreManager;
+
   address owner;
   address nonOwner;
   address scoreManagerSetter;
@@ -26,25 +28,25 @@ contract ScoreManagerTest is Test, TestConstants {
 
   uint256 constant ZERO_SCORE = 1e24 + 1;
 
-  function setUp() public virtual {
+  function setUp() public virtual override {
+    super.setUp();
+
     owner = address(this);
     nonOwner = actor("nonOwner");
     scoreManagerSetter = actor("scoreManager");
 
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
-
     ScoreManager scoreManagerImpl = new ScoreManager(true);
     scoreManager = IScoreManagerTemp(address(scoreManagerImpl));
-
-    registry = IRegistry(REGISTRY_ADDRESS);
 
     registry.setAddressFor("ScoreManager", address(scoreManager));
 
     scoreManagerImpl.initialize();
   }
+}
 
-  function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+contract ScoreManagerTest_L2 is ScoreManagerTest, WhenL2 {
+  function setUp() public virtual override(ScoreManagerTest, WhenL2) {
+    super.setUp();
   }
 }
 
@@ -88,6 +90,11 @@ contract ScoreManagerTest_setGroupScore is ScoreManagerTest {
     assertEq(scoreManager.getGroupScore(owner), 42);
   }
 }
+contract ScoreManagerTest_setGroupScore_L2 is ScoreManagerTest_L2, ScoreManagerTest_setGroupScore {
+  function setUp() public override(ScoreManagerTest, ScoreManagerTest_L2) {
+    super.setUp();
+  }
+}
 
 contract ScoreManagerTest_setValidatorScore is ScoreManagerTest {
   function test_setValidatorScore() public {
@@ -129,6 +136,14 @@ contract ScoreManagerTest_setValidatorScore is ScoreManagerTest {
     assertEq(scoreManager.getValidatorScore(owner), 42);
   }
 }
+contract ScoreManagerTest_setValidatorScore_L2 is
+  ScoreManagerTest_L2,
+  ScoreManagerTest_setValidatorScore
+{
+  function setUp() public override(ScoreManagerTest, ScoreManagerTest_L2) {
+    super.setUp();
+  }
+}
 
 contract ScoreManagerTest_setScoreManagerSetter is ScoreManagerTest {
   function test_onlyOwnwerCanSetScoreManager() public {
@@ -146,5 +161,13 @@ contract ScoreManagerTest_setScoreManagerSetter is ScoreManagerTest {
     vm.expectEmit(false, false, false, true);
     emit ScoreManagerSetterSet(nonOwner);
     scoreManager.setScoreManagerSetter(nonOwner);
+  }
+}
+contract ScoreManagerTest_setScoreManagerSetter_L2 is
+  ScoreManagerTest_L2,
+  ScoreManagerTest_setScoreManagerSetter
+{
+  function setUp() public override(ScoreManagerTest, ScoreManagerTest_L2) {
+    super.setUp();
   }
 }
