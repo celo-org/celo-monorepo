@@ -25,7 +25,7 @@ export class ASTBackwardReport {
     logFunction: (msg: string) => void): ASTBackwardReport => {
 
     // Run reports
-    logFunction("Running storage report...")
+    logFunction("Running storage report...\n")
     const storage = reportLayoutIncompatibilities(oldArtifacts, newArtifacts)
     logFunction("Done\n")
 
