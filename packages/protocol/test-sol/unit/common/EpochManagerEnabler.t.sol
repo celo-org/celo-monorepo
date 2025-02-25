@@ -4,8 +4,6 @@ pragma solidity >=0.8.0 <0.8.20;
 import { ICeloUnreleasedTreasury } from "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 
 import { CeloUnreleasedTreasury } from "@celo-contracts-8/common/CeloUnreleasedTreasury.sol";
-import "@celo-contracts-8/common/test/MockCeloToken.sol";
-import { MockCeloUnreleasedTreasury } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasury.sol";
 import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
 
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
@@ -17,8 +15,6 @@ import "@test-sol/utils/WhenL2-08.sol";
 contract EpochManagerEnablerTest is TestWithUtils08 {
   EpochManagerEnablerMock epochManagerEnablerContract;
   EpochManager_WithMocks public epochManagerContract;
-  MockCeloUnreleasedTreasury celoUnreleasedTreasury;
-  MockCeloToken08 celoToken;
 
   address nonOwner;
 
@@ -30,18 +26,10 @@ contract EpochManagerEnablerTest is TestWithUtils08 {
     super.setUp();
 
     epochManagerEnablerContract = new EpochManagerEnablerMock();
-    celoToken = new MockCeloToken08();
-
-    celoUnreleasedTreasury = new MockCeloUnreleasedTreasury();
 
     nonOwner = actor("nonOwner");
 
     registry.setAddressFor(EpochManagerEnablerContract, address(epochManagerEnablerContract));
-    registry.setAddressFor(CeloTokenContract, address(celoToken));
-    registry.setAddressFor(CeloUnreleasedTreasuryContract, address(celoUnreleasedTreasury));
-
-    celoToken.setTotalSupply(CELO_SUPPLY_CAP);
-    celoToken.setBalanceOf(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
 
     epochManagerEnablerContract.initialize(REGISTRY_ADDRESS);
   }
