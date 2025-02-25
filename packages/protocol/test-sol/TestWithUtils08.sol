@@ -83,8 +83,11 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
   }
 
   function setCeloUnreleasedTreasuryBalance() public {
-    celoToken.setBalanceOf(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
-    vm.deal(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE);
+    address _currentCeloUnreleasedTreasuryAddress = registry.getAddressForStringOrDie(
+      CeloUnreleasedTreasuryContract
+    );
+    celoToken.setBalanceOf(_currentCeloUnreleasedTreasuryAddress, L2_INITIAL_STASH_BALANCE);
+    vm.deal(_currentCeloUnreleasedTreasuryAddress, L2_INITIAL_STASH_BALANCE);
   }
 
   function timeTravel(uint256 timeDelta) public {
@@ -172,8 +175,8 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
 
     epochManagerEnabler.captureEpochAndValidators();
 
-    whenL2();
     setCeloUnreleasedTreasuryBalance();
+    whenL2();
 
     epochManagerEnabler.initEpochManager();
   }
@@ -183,9 +186,10 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
 
     epochManagerEnablerMockInterface.captureEpochAndValidators();
 
-    whenL2();
     setCeloUnreleasedTreasuryBalance();
+    whenL2();
   }
+
   function whenL2WithoutEpochCapture() internal {
     _registerAndElectValidatorsForL2();
 
