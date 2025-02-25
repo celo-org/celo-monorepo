@@ -3,8 +3,6 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import { Devchain } from "@test-sol/devchain/e2e/utils.sol";
 
-import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.sol";
-
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@test-sol/utils/ECDSAHelper08.sol";
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
@@ -50,6 +48,8 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
     epochDuration = epochManagerContract.epochDuration();
 
     vm.deal(address(celoUnreleasedTreasuryContract), L2_INITIAL_STASH_BALANCE); // 80% of the total supply to the treasury - whis will be yet distributed
+    vm.prank(address(0));
+    celoTokenContract.mint(address(celoUnreleasedTreasuryContract), L2_INITIAL_STASH_BALANCE);
   }
 
   function activateValidators() public {
