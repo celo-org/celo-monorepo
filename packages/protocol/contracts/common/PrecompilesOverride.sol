@@ -42,7 +42,7 @@ contract PrecompilesOverride is UsingPrecompiles, UsingRegistry {
     if (isL2()) {
       return getEpochManager().getElectedSignerByIndex(index);
     } else {
-      super.validatorSignerAddressFromCurrentSet(index);
+      return super.validatorSignerAddressFromCurrentSet(index);
     }
   }
 
