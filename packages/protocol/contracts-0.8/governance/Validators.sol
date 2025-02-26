@@ -20,6 +20,8 @@ import "../common/interfaces/IStableToken.sol";
 
 import "../../contracts/common/interfaces/IAccounts.sol";
 
+import { console } from "forge-std/console.sol";
+
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
  */
@@ -205,12 +207,16 @@ contract Validators is
     setRegistry(registryAddress);
     setGroupLockedGoldRequirements(groupRequirementValue, groupRequirementDuration);
     setValidatorLockedGoldRequirements(validatorRequirementValue, validatorRequirementDuration);
-    setValidatorScoreParameters(validatorScoreExponent, validatorScoreAdjustmentSpeed);
+    if (!isL2()) {
+      setValidatorScoreParameters(validatorScoreExponent, validatorScoreAdjustmentSpeed);
+    }
     setMaxGroupSize(_maxGroupSize);
     setCommissionUpdateDelay(initParams.commissionUpdateDelay);
     setMembershipHistoryLength(_membershipHistoryLength);
     setSlashingMultiplierResetPeriod(_slashingMultiplierResetPeriod);
-    setDowntimeGracePeriod(initParams.downtimeGracePeriod);
+    if (!isL2()) {
+      setDowntimeGracePeriod(initParams.downtimeGracePeriod);
+    }
   }
 
   /**
