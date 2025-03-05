@@ -99,7 +99,7 @@ jobs:
       # Get workdir local changes and fail if there are any change
       - name: Verify Changed files
         id: verify-changed-files
-        uses: tj-actions/verify-changed-files@6ed7632824d235029086612d4330d659005af687
+        uses: tj-actions/verify-changed-files@f7c3c7390ed5c5435233c9bb76d8c0ad5f99ba26
         with:
           fail-if-changed: 'true'
           fail-message: 'Files changed during build. Please build locally and commit the changes.'
