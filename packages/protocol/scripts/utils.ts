@@ -35,6 +35,7 @@ export const determineNextVersion = (
 ): SemVer | null => {
   let nextVersion: SemVer | null = null
   const matchesReleaseTag = gitTag.match(/^core-contracts.v([0-9]+)$/)
+  // eslint-disable-next-line
   const matchesAnyTag = gitTag.match(/core-contracts.v([0-9\.]+)\.(.+)/)
 
   if (matchesReleaseTag) {
