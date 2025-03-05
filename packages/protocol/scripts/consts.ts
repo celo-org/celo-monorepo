@@ -41,7 +41,7 @@ export const ProxyContracts = [
   'CeloUnreleasedTreasuryProxy',
 ]
 
-export const CoreContracts = [
+export const CoreContracts: string[] = [
   // common
   CeloContractName.Accounts,
   CeloContractName.GasPriceMinimum,
