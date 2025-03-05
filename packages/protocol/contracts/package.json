@@ -5,7 +5,7 @@
   "private": "true",
   "repository": {
     "type": "git",
-    "url": "https://github.com/celo-org/celo-monorepo.git",
+    "url": "git+https://github.com/celo-org/celo-monorepo.git",
     "directory": "packages/protocol/contracts"
   },
   "scripts": {},
