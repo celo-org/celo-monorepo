@@ -1,4 +1,5 @@
 name: Publish ABIs and Solidity files to NPM
+
 on:
   push:
     tags:
@@ -11,9 +12,9 @@ on:
       - 'packages/protocol/contracts-0.8/**'
       - 'packages/protocol/lib/**'
       - 'packages/protocol/scripts/**'
-    paths-ignore: 
-      - 'packages/protocol/scripts/foundry/**'
-      - 'packages/protocol/scripts/truffle/**'  
+      - '!packages/protocol/scripts/foundry/**'  
+      - '!packages/protocol/scripts/truffle/**' 
+
   pull_request:
     branches: [release/core-contracts/*, master]
     paths:
@@ -22,9 +23,9 @@ on:
       - 'packages/protocol/contracts-0.8/**'
       - 'packages/protocol/lib/**'
       - 'packages/protocol/scripts/**'
-    paths-ignore: 
-      - 'packages/protocol/scripts/foundry/**'  
-      - 'packages/protocol/scripts/truffle/**'  
+      - '!packages/protocol/scripts/foundry/**'  
+      - '!packages/protocol/scripts/truffle/**'  
+     
   release:
     types: [released]
   workflow_dispatch:
