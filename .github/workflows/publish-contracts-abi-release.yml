@@ -92,24 +92,31 @@ jobs:
         shell: bash
         run: yarn validate_abis_exports
         working-directory: packages/protocol
+      - name: 'Get git commit hash'
+        id: get_COMMIT_HASH
+        run: echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
       - name: Publish @celo/contracts
         run: |
           cat package.json
           npm publish $RELEASE_TYPE $DRY_RUN
+          npm dist-tag add @celo/contracts@$RELEASE_VERSION $COMMIT_HASH          
         working-directory: packages/protocol/contracts
         env:
           RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
           NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
           DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
+          COMMIT_HASH: ${{ env.COMMIT_HASH }}
 
       - name: Publish @celo/abis
         run: |
           cat package.json
           npm publish $RELEASE_TYPE $DRY_RUN
+          npm dist-tag add @celo/abis@$RELEASE_VERSION $COMMIT_HASH          
         working-directory: packages/protocol/abis
         env:
           RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
           NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
           DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
+          COMMIT_HASH: ${{ env.COMMIT_HASH }}
