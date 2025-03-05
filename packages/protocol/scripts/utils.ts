@@ -17,6 +17,16 @@ export type Exports = Record<
 
 export type JSON = Record<string, string | boolean | Exports>
 
+// versioning is done by either
+// A Git tag of the form `core-contracts.vX` (e.g. `core-contracts.v12`) === latest release
+// Otherwise if on the release branch a canary tagged release well be created bumping
+// the canary version by one (e.g. `@celo/contracts@11.0.0-canary.1`)
+// if not on a release branch a dry-run will be done unless an NPM_TAG is provided
+// in which case we will try to fetch the last published version with that tag and bump or use the canary to get major and start versioning from there the new tag at 0
+//  (e.g. `@celo/contracts@11.0.0@custom-tag.0`)
+// It also supports git tags starting with core-contracts.vX-ANY to derive custom npm tags,
+// for example `core-contracts.v11.2.3.post-audit` will result in determining
+// the next version as `11.2.3-post-audit.0` and `post-audit` npm tag
 export const determineNextVersion = (
   gitTag: string,
   gitBranch: string,
