@@ -1,13 +1,30 @@
 name: Publish ABIs and Solidity files to NPM
 on:
   push:
-    branches: [release/core-contracts/*]
     tags:
       - core-contracts.v*
+    # If you define both branches/branches-ignore and paths/paths-ignore, the workflow will only run when both filters are satisfied.
+    branches: [release/core-contracts/*]
+    paths:
+      - 'packages/protocol/abis/**'
+      - 'packages/protocol/contracts/**'
+      - 'packages/protocol/contracts-0.8/**'
+      - 'packages/protocol/lib/**'
+      - 'packages/protocol/scripts/**'
+    paths-ignore: 
+      - 'packages/protocol/scripts/foundry/**'
+      - 'packages/protocol/scripts/truffle/**'  
   pull_request:
     branches: [release/core-contracts/*, master]
     paths:
-      - 'packages/protocol/**'
+      - 'packages/protocol/abis/**'
+      - 'packages/protocol/contracts/**'
+      - 'packages/protocol/contracts-0.8/**'
+      - 'packages/protocol/lib/**'
+      - 'packages/protocol/scripts/**'
+    paths-ignore: 
+      - 'packages/protocol/scripts/foundry/**'  
+      - 'packages/protocol/scripts/truffle/**'  
   release:
     types: [released]
   workflow_dispatch:
