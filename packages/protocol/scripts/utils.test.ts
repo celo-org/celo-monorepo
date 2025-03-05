@@ -24,7 +24,7 @@ describe('utils', () => {
   describe('determineNextVersion()', () => {
     const execSyncMock = execSync as jest.Mock
 
-    it('determines "latest" release type and extracts version from "post-audit" git tag directly for version 11.2.3', () => {
+    it('determines "latest" release type and extracts version from the git tag directly for generic v12', () => {
       const nextVersion = determineNextVersion(
         'core-contracts.v12',
         'release/core-contracts/12',
