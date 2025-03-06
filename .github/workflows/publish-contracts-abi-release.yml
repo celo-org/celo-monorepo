@@ -15,6 +15,7 @@ on:
       - '!packages/protocol/scripts/foundry/**'  
       - '!packages/protocol/scripts/truffle/**' 
 
+  # pull requests result in dry runs, since no git tag is present unless current branch folllows release branch pattern
   pull_request:
     branches: [release/core-contracts/*, master]
     paths:
@@ -100,7 +101,12 @@ jobs:
         run: |
           cat package.json
           npm publish $RELEASE_TYPE $DRY_RUN
-          npm dist-tag add @celo/contracts@$RELEASE_VERSION $COMMIT_HASH          
+          echo 'tagging version' $RELEASE_VERSION 'with commit hash' $COMMIT_HASH
+          if [ -n "$DRY_RUN" ]; then
+            echo "Dry run mode, exiting successfully."
+            exit 0
+          fi
+          npm dist-tag add @celo/contracts@$RELEASE_VERSION $COMMIT_HASH              
         working-directory: packages/protocol/contracts
         env:
           RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}
@@ -113,6 +119,11 @@ jobs:
         run: |
           cat package.json
           npm publish $RELEASE_TYPE $DRY_RUN
+          echo 'tagging version' $RELEASE_VERSION 'with commit hash' $COMMIT_HASH
+          if [ -n "$DRY_RUN" ]; then
+            echo "Dry run mode, exiting successfully."
+            exit 0
+          fi
           npm dist-tag add @celo/abis@$RELEASE_VERSION $COMMIT_HASH          
         working-directory: packages/protocol/abis
         env:
