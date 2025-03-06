@@ -35,17 +35,13 @@ on:
         required: true
         type: string
 jobs:
-  setup:
+  publish:
     runs-on: ['self-hosted', 'org', 'npm-publish']
     permissions:
       contents: write
       id-token: write
       pull-requests: write
       repository-projects: write
-    outputs:
-      RELEASE_TYPE: ${{ steps.determine_release.outputs.RELEASE_TYPE }}
-      RELEASE_VERSION: ${{ steps.determine_release.outputs.RELEASE_VERSION }}
-      COMMIT_HASH: ${{ steps.get_COMMIT_HASH.outputs.COMMIT_HASH }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -63,21 +59,21 @@ jobs:
         with:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
+          #scope: '@celo'
+
       - name: 'Setup yarn'
         shell: bash
         run: |
           npm install --global yarn
           source ~/.bashrc
+
       - name: 'Install packages'
         shell: bash
         run: yarn
+
       - name: Determine release type and version (or dry run)
         # This is what sets the RELEASE_TYPE and RELEASE_VERSION env variables
-        id: determine_release
-        run: |
-          yarn --silent determine-release-version >> "$GITHUB_ENV"
-          echo "::set-output name=RELEASE_TYPE::${{ env.RELEASE_TYPE }}"
-          echo "::set-output name=RELEASE_VERSION::${{ env.RELEASE_VERSION }}"
+        run: yarn --silent determine-release-version >> "$GITHUB_ENV"
         working-directory: packages/protocol
         env:
           GITHUB_TAG: ${{ github.ref_name }}
@@ -85,47 +81,43 @@ jobs:
           NPM_TAG: ${{ inputs.npm_tag }}
       - name: 'Build packages'
         shell: bash
-        run: yarn build --ignore @celo/celotool --ignore @celo/env-tests --include-dependencies
+        run:  yarn build --ignore @celo/celotool --ignore @celo/env-tests --include-dependencies
       - name: Compile solidity contracts and typescript files
         run: yarn prepare_contracts_and_abis_publishing
         working-directory: packages/protocol
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+        # a safety check especially useful if some package is upgraded
       - name: 'Validate ABIS Exports'
         shell: bash
         run: yarn validate_abis_exports
         working-directory: packages/protocol
       - name: 'Get git commit hash'
         id: get_COMMIT_HASH
-        run: echo "::set-output name=COMMIT_HASH::$(git rev-parse --short HEAD)"
-
-  publish:
-    needs: setup
-    runs-on: ['self-hosted', 'org', 'npm-publish']
-    strategy:
-      matrix:
-        package: [contracts, abis]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Publish packages
-        working-directory: packages/protocol/${{ matrix.package }}
-        env:
-          RELEASE_TYPE: --tag ${{ needs.setup.outputs.RELEASE_TYPE != '' && needs.setup.outputs.RELEASE_TYPE || 'canary' }}
-          RELEASE_VERSION: ${{ needs.setup.outputs.RELEASE_VERSION }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          DRY_RUN: ${{ needs.setup.outputs.RELEASE_VERSION == '' && '--dry-run' || '' }}
-          COMMIT_HASH: ${{ needs.setup.outputs.COMMIT_HASH }}
-        shell: bash
+        run: echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      - name: Publish @celo/contracts
         run: |
-          echo "Publishing @celo/${{ matrix.package }}"
           cat package.json
           npm publish $RELEASE_TYPE $DRY_RUN
-          if [ -n "$DRY_RUN" ]; then
-            echo "Dry run mode, exiting successfully."
-            exit 0
-          fi
-          echo 'tagging version' $RELEASE_VERSION 'with commit hash' $COMMIT_HASH
-          npm dist-tag add @celo/${{ matrix.package }}@$RELEASE_VERSION $COMMIT_HASH
+          npm dist-tag add @celo/contracts@$RELEASE_VERSION $COMMIT_HASH          
+        working-directory: packages/protocol/contracts
+        env:
+          RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}
+          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
+          DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
+          COMMIT_HASH: ${{ env.COMMIT_HASH }}
+
+      - name: Publish @celo/abis
+        run: |
+          cat package.json
+          npm publish $RELEASE_TYPE $DRY_RUN
+          npm dist-tag add @celo/abis@$RELEASE_VERSION $COMMIT_HASH          
+        working-directory: packages/protocol/abis
+        env:
+          RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}
+          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
+          DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
+          COMMIT_HASH: ${{ env.COMMIT_HASH }}
