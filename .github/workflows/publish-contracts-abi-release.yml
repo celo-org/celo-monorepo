@@ -1,13 +1,32 @@
 name: Publish ABIs and Solidity files to NPM
+
 on:
   push:
-    branches: [release/core-contracts/*]
     tags:
       - core-contracts.v*
+    # If you define both branches/branches-ignore and paths/paths-ignore, the workflow will only run when both filters are satisfied.
+    branches: [release/core-contracts/*]
+    paths:
+      - 'packages/protocol/abis/**'
+      - 'packages/protocol/contracts/**'
+      - 'packages/protocol/contracts-0.8/**'
+      - 'packages/protocol/lib/**'
+      - 'packages/protocol/scripts/**'
+      - '!packages/protocol/scripts/foundry/**'  
+      - '!packages/protocol/scripts/truffle/**' 
+
+  # pull requests result in dry runs, since no git tag is present unless current branch folllows release branch pattern
   pull_request:
     branches: [release/core-contracts/*, master]
     paths:
-      - 'packages/protocol/**'
+      - 'packages/protocol/abis/**'
+      - 'packages/protocol/contracts/**'
+      - 'packages/protocol/contracts-0.8/**'
+      - 'packages/protocol/lib/**'
+      - 'packages/protocol/scripts/**'
+      - '!packages/protocol/scripts/foundry/**'  
+      - '!packages/protocol/scripts/truffle/**'  
+     
   release:
     types: [released]
   workflow_dispatch:
@@ -79,24 +98,41 @@ jobs:
         shell: bash
         run: yarn validate_abis_exports
         working-directory: packages/protocol
+      - name: 'Get git commit hash'
+        id: get_COMMIT_HASH
+        run: echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
       - name: Publish @celo/contracts
         run: |
           cat package.json
           npm publish $RELEASE_TYPE $DRY_RUN
+          echo 'tagging version' $RELEASE_VERSION 'with commit hash' $COMMIT_HASH
+          if [ -n "$DRY_RUN" ]; then
+            echo "Dry run mode, exiting successfully."
+            exit 0
+          fi
+          npm dist-tag add @celo/contracts@$RELEASE_VERSION $COMMIT_HASH              
         working-directory: packages/protocol/contracts
         env:
           RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
           NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
           DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
+          COMMIT_HASH: ${{ env.COMMIT_HASH }}
 
       - name: Publish @celo/abis
         run: |
           cat package.json
           npm publish $RELEASE_TYPE $DRY_RUN
+          echo 'tagging version' $RELEASE_VERSION 'with commit hash' $COMMIT_HASH
+          if [ -n "$DRY_RUN" ]; then
+            echo "Dry run mode, exiting successfully."
+            exit 0
+          fi
+          npm dist-tag add @celo/abis@$RELEASE_VERSION $COMMIT_HASH          
         working-directory: packages/protocol/abis
         env:
           RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
           NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
           DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
+          COMMIT_HASH: ${{ env.COMMIT_HASH }}
