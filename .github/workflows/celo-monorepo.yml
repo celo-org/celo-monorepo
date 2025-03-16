@@ -130,7 +130,7 @@ jobs:
             code-${{ github.sha }}
       - name: Detect files changed in PR (or commit), and expose as output
         id: changed-files
-        uses: step-security/changed-files@48d8f15b2aaa3d255ca5af3eba4870f807ce6b3c
+        uses: step-security/changed-files@3dbe17c78367e7d60f00d78ae6781a35be47b4a1
         with:
           # Using comma as separator to be able to easily match full paths (using ,<path>)
           separator: ','
