@@ -26,11 +26,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Detect files changed in PR (or commit), and expose as output
         id: changed-files
-<<<<<<< HEAD
-        uses: tj-actions/changed-files@v41
-=======
         uses: step-security/changed-files@3dbe17c78367e7d60f00d78ae6781a35be47b4a1
->>>>>>> f47677a28 (use secure actions)
         with:
           # Using comma as separator to be able to easily match full paths (using ,<path>)
           separator: ','
