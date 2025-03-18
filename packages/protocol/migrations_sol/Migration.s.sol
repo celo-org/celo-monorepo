@@ -1064,6 +1064,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 groupCount = 3;
     address[] memory signers = new address[](maxGroupSize * groupCount);
     // TODO check no signer is left with 0x0
+    uint256 signerIndexCount = 0;
 
     for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
       // address groupAddress = groups[groupIndex];
@@ -1079,7 +1080,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         vm.startBroadcast(valKeys[validatorKeyIndex]);
         address accountAddress = (new ForceTx()).identity();
         address signer = accountAddress;
-        // signers[validatorKeyIndex] = signer;
+        signers[signerIndexCount] = signer;
+        signerIndexCount++;
         vm.stopBroadcast();
 
         // console.log("Registering validator #: ", validatorIndex);
