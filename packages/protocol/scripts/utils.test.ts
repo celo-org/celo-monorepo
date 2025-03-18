@@ -30,6 +30,27 @@ describe('utils', () => {
       expect(retrieveReleaseInformation(nextVersion)).toEqual(['11.2.3', 'latest'])
     })
 
+    describe('when release branch is on same major as latest version', () => {
+      beforeEach(() => {
+        execSyncMock.mockReturnValue('12.0.0')
+      })
+      it('determines version bump will be patch', () => {
+        const nextVersion = determineNextVersion(
+          '',
+          'release/core-contracts/12',
+          '@celo/abis',
+          'latest'
+        )
+        expect(execSyncMock).toHaveBeenCalledTimes(1)
+        expect(execSyncMock).toHaveBeenNthCalledWith(
+          1,
+          'npm view @celo/abis@latest version',
+          expect.anything()
+        )
+        expect(retrieveReleaseInformation(nextVersion as SemVer)).toEqual(['12.0.1', 'latest'])
+      })
+    })
+
     it('determines "pre-audit" release type and extracts version from "pre-audit" git tag directly', () => {
       const nextVersion = determineNextVersion(
         'core-contracts.v11.2.3.pre-audit',
