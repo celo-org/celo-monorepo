@@ -39,15 +39,16 @@ describe('utils', () => {
           '',
           'release/core-contracts/12',
           '@celo/abis',
-          'latest'
+          'random-tag'
         )
         expect(execSyncMock).toHaveBeenCalledTimes(1)
+
+        expect(retrieveReleaseInformation(nextVersion as SemVer)).toEqual(['12.0.1', 'latest'])
         expect(execSyncMock).toHaveBeenNthCalledWith(
           1,
           'npm view @celo/abis@latest version',
           expect.anything()
         )
-        expect(retrieveReleaseInformation(nextVersion as SemVer)).toEqual(['12.0.1', 'latest'])
       })
     })
 
@@ -75,10 +76,10 @@ describe('utils', () => {
       expect(execSyncMock).toHaveBeenCalledTimes(1)
       expect(execSyncMock).toHaveBeenNthCalledWith(
         1,
-        'npm view @celo/contracts@canary version',
+        'npm view @celo/contracts@latest version',
         expect.anything()
       )
-      expect(retrieveReleaseInformation(nextVersion)).toEqual(['11.2.4-canary.0', 'canary'])
+      expect(retrieveReleaseInformation(nextVersion)).toEqual(['11.2.4', 'latest'])
     })
 
     it("determines for release git branch when major version doesn't match", () => {
@@ -91,9 +92,14 @@ describe('utils', () => {
         'alpha'
       )
 
-      expect(execSyncMock).toHaveBeenCalledTimes(1)
+      expect(execSyncMock).toHaveBeenCalledTimes(2)
       expect(execSyncMock).toHaveBeenNthCalledWith(
         1,
+        'npm view @celo/contracts@latest version',
+        expect.anything()
+      )
+      expect(execSyncMock).toHaveBeenNthCalledWith(
+        2,
         'npm view @celo/contracts@canary version',
         expect.anything()
       )
