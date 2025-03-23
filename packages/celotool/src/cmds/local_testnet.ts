@@ -57,7 +57,7 @@ connected to it, rather than each other directly.
 
 By default, the celo-blockchain repository will be cloned to a temporary location and built from
 master to produce the geth binary to run for each node. The --branch flag can be used to control
-which branch is built in the cloned repository. Alternatively, a existing repository can be used
+which branch is built in the cloned repository. Alternatively, an existing repository can be used
 by specifying the --local-geth flag as the path to that repository root.`
 
 interface LocalTestnetArgs {

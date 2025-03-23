@@ -94,7 +94,7 @@ export const handler = async (argv: UpgradeFaucetArgs) => {
     console.info(
       `Done updating contract addresses and funding the faucet account for network ${argv.celoEnv} in ${argv.firebaseProject}`
     )
-    console.info('Please double check the TX node IP address to ensure it did not change.')
+    console.info('Please double-check the TX node IP address to ensure it did not change.')
     process.exit(0)
   } catch (error) {
     console.error(`Unable to upgrade faucet on ${argv.celoEnv}`)
