@@ -9,7 +9,6 @@ import "@celo-contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol
 import "@celo-contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
-
 contract SortedOraclesTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
   using AddressSortedLinkedListWithMedian for SortedLinkedListWithMedian.List;

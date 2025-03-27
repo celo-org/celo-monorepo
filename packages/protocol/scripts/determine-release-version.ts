@@ -1,5 +1,5 @@
-import { execSync } from 'child_process';
-import { determineNextVersion, getReleaseTypeFromSemVer } from './utils';
+import { execSync } from 'child_process'
+import { determineNextVersion, getReleaseTypeFromSemVer } from './utils'
 
 const npmPackage = process.env.NPM_PACKAGE?.trim() || ''
 const npmTag = process.env.NPM_TAG?.trim() || ''
