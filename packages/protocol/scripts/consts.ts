@@ -1,6 +1,6 @@
-import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import path from 'path'
-import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils';
+import path from 'path';
+import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages';
 
 export const ROOT_DIR = path.join(__dirname, '../')
 export const CONTRACTS_PACKAGE_SRC_DIR = path.join(__dirname, '../contracts')

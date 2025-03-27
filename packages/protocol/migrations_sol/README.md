@@ -18,7 +18,7 @@ Files in this package:
 
 ### Example
 
-1.  Make a test directory
+1. Make a test directory
 
     ```sh
     # Create a demo directory
@@ -28,13 +28,13 @@ Files in this package:
     $ cd ~/Documents/local-anvil-demo
     ```
 
-2.  Install the package
+2. Install the package
 
     ```sh
     $ npm install --save-dev @celo/devchain-anvil
     ```
 
-3.  Start an anvil instance with the state file from the package
+3. Start an anvil instance with the state file from the package
 
     ```sh
     $ anvil --state node_modules/@celo/devchain-anvil/devchain.json
@@ -58,14 +58,14 @@ Files in this package:
     Listening on 127.0.0.1:8545
     ```
 
-4.  Make RPC calls against the anvil instance serving at `http://127.0.0.1:8545`
+4. Make RPC calls against the anvil instance serving at `http://127.0.0.1:8545`
 
 ## Background
 
 [Foundry](https://book.getfoundry.sh/reference/anvil/) allows you to start anvil instances with state you read from `json` files.
 The idea is to save the state of an anvil instance at a certain point in time, and then load it back up later.
 
-```
+```sh
 $ anvil --state <PATH>
     This is an alias for both --load-state and --dump-state.
 
