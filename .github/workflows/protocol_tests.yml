@@ -4,18 +4,10 @@ on:
     branches:
       - master
       - 'release/**'
-      - 'feat/l2-epoch-system'
-      - 'martinvol/**'
-      - 'pahor167/**'
-      - 'soloseng/**'
   pull_request:
     branches:
       - master
       - 'release/**'
-      - 'feat/l2-epoch-system'
-      - 'martinvol/**'
-      - 'pahor167/**'
-      - 'soloseng/**'
 
 env:
   # Increment these to force cache rebuilding
