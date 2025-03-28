@@ -9,7 +9,7 @@ This devchain is useful for testing and development of the Celo protocol.
 
 ```sh
 $ yarn anvil-devchain:start-L1
-``` 
+```
 
 Starts a new anvil devchain serving at localhost (default port 8546).
 
@@ -25,7 +25,7 @@ cast block-number \
 
 ```sh
 $ yarn anvil-devchain:start-L2
-``` 
+```
 
 Starts a new anvil devchain serving at localhost (default port 8546).
 
