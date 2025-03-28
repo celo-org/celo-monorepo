@@ -1085,7 +1085,7 @@ contract Governance is
 
   /**
    * @notice Updates the number of proposals to dequeue at a time.
-   * @param _concurrentProposals The number of proposals to dequeue at at a time.
+   * @param _concurrentProposals The number of proposals to dequeue at a time.
    */
   function setConcurrentProposals(uint256 _concurrentProposals) public onlyOwner {
     require(_concurrentProposals != 0, "Number of proposals must be larger than zero");

@@ -41,6 +41,9 @@ env:
 #  with:
 #    limit-access-to-actor: true
 
+permissions:
+  contents: read
+
 jobs:
   install-dependencies:
     name: Install dependencies
@@ -97,7 +100,7 @@ jobs:
       # Get workdir local changes and fail if there are any change
       - name: Verify Changed files
         id: verify-changed-files
-        uses: tj-actions/verify-changed-files@v17
+        uses: tj-actions/verify-changed-files@6ed7632824d235029086612d4330d659005af687
         with:
           fail-if-changed: 'true'
           fail-message: 'Files changed during build. Please build locally and commit the changes.'
@@ -173,7 +176,7 @@ jobs:
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
       - name: Download protocol devchain artifact
-        uses: dawidd6/action-download-artifact@v3
+        uses: dawidd6/action-download-artifact@20319c5641d495c8a52e688b7dc5fada6c3a9fbc
         with:
           workflow: protocol-devchain.yml
           name: devchain-${{ env.RELEASE_TAG }}
@@ -233,7 +236,7 @@ jobs:
           rebuild-package: 'true'
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
       - name: Execute matrix command for test
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
         with:
           timeout_minutes: 40
           max_attempts: 3
@@ -318,7 +321,7 @@ jobs:
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
       - name: Execute matrix command for test
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
         with:
           timeout_minutes: 30
           max_attempts: 3

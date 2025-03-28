@@ -15,6 +15,9 @@ on:
       - 'packages/celotool/**'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   changed-files:
     runs-on: ubuntu-latest
