@@ -567,7 +567,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length - 1);
   }
 
-  function test_shouldFinishNextEpochProcessing_WhenValidatorDeaffiliates() public {
+  function test_shouldFinishNextEpochProcessing_WhenValidatorDeaffiliatesBeforeStart() public {
     address[] memory lessers;
     address[] memory greaters;
     GroupWithVotes[] memory groupWithVotes;
@@ -617,6 +617,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     );
 
     vm.prank(currentlyElected[0]);
+    console.log("deaffiliate");
     validators.deaffiliate();
 
     timeTravel(epochDuration + 1);
@@ -673,7 +674,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length - 1);
   }
 
-  function test_shouldFinishNextEpochProcessing_WhenValidatorGroupRemoved() public {
+    function test_shouldFinishNextEpochProcessing_WhenValidatorDeaffiliatesBeforeFinish() public {
     address[] memory lessers;
     address[] memory greaters;
     GroupWithVotes[] memory groupWithVotes;
@@ -722,11 +723,12 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
       1
     );
 
-    vm.prank(currentlyElected[0]);
-    validators.deaffiliate();
-
     timeTravel(epochDuration + 1);
     epochManagerContract.startNextEpochProcess();
+
+    vm.prank(currentlyElected[0]);
+    console.log("deaffiliate");
+    validators.deaffiliate();
 
     timeTravel(epochDuration / 2);
     blockTravel(100);
@@ -778,6 +780,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
     assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length - 1);
   }
+
 
   function clearElectedGroupsHelper() internal {
     address[] memory values = electedGroupsHelper.values();
