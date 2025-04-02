@@ -674,7 +674,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length - 1);
   }
 
-    function test_shouldFinishNextEpochProcessing_WhenValidatorDeaffiliatesBeforeFinish() public {
+  function test_shouldFinishNextEpochProcessing_WhenValidatorDeaffiliatesBeforeFinish() public {
     address[] memory lessers;
     address[] memory greaters;
     GroupWithVotes[] memory groupWithVotes;
@@ -727,7 +727,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     epochManagerContract.startNextEpochProcess();
 
     vm.prank(currentlyElected[0]);
-    console.log("deaffiliate");
+    console.log("deaffiliate", currentlyElected[0]);
     validators.deaffiliate();
 
     timeTravel(epochDuration / 2);
