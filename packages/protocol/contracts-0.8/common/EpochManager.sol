@@ -13,7 +13,6 @@ import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/IEpochManager.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IEpochManagerInitializer.sol";
-import {console} from "forge-std/console.sol";
 
 /**
  * @title Contract used for managing CELO L2 epoch and elections.
@@ -205,7 +204,6 @@ contract EpochManager is
    * @dev Can only be called once the system is initialized.
    */
   function startNextEpochProcess() external nonReentrant onlySystemAlreadyInitialized {
-    console.log("startNextEpochProcess");
     require(isTimeForNextEpoch(), "Epoch is not ready to start");
     require(
       epochProcessing.status == EpochProcessStatus.NotStarted,
@@ -254,7 +252,7 @@ contract EpochManager is
       "Elected accounts and signers of different lengths."
     );
     for (uint i = 0; i < electedAccounts.length; i++) {
-      address group = validators.getValidatorsGroup(electedAccounts[i]);
+      address group = validators.getMembershipInLastEpoch(electedAccounts[i]);
       if (processedGroups[group] == 0) {
         toProcessGroups++;
         uint256 groupScore = scoreReader.getGroupScore(group);
@@ -341,8 +339,8 @@ contract EpochManager is
       "Elected accounts and signers of different lengths."
     );
     for (uint i = 0; i < electedAccounts.length; i++) {
-      address group = validators.getValidatorsGroup(electedAccounts[i]);
-      if (group != address(0) && processedGroups[group] == 0) {
+      address group = validators.getMembershipInLastEpoch(electedAccounts[i]);
+      if (processedGroups[group] == 0) {
         _toProcessGroups++;
         uint256 groupScore = scoreReader.getGroupScore(group);
         // We need to precompute epoch rewards for each group since computation depends on total active votes for all groups.
@@ -681,10 +679,7 @@ contract EpochManager is
     EpochProcessState storage _epochProcessing = epochProcessing;
 
     for (uint i = 0; i < electedAccounts.length; i++) {
-      address group = validators.getValidatorsGroup(electedAccounts[i]);
-      if (group == address(0)) {
-        continue;
-      }
+      address group = validators.getMembershipInLastEpoch(electedAccounts[i]);
       uint256 validatorScore = scoreReader.getValidatorScore(electedAccounts[i]);
       uint256 validatorReward = validators.computeEpochReward(
         electedAccounts[i],
@@ -745,14 +740,6 @@ contract EpochManager is
     address[] memory _newlyElected = election.electValidatorAccounts();
     electedAccounts = _newlyElected;
     _setElectedSigners(_newlyElected);
-
-    console.log("");
-    console.log("******************* Newly elected");
-    for (uint i = 0; i < _newlyElected.length; i++) {
-      console.log(_newlyElected[i]);
-    }
-    console.log("*******************");
-    console.log("");
 
     ICeloUnreleasedTreasury celoUnreleasedTreasury = getCeloUnreleasedTreasury();
     celoUnreleasedTreasury.release(

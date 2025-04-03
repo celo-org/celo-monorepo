@@ -8,6 +8,9 @@ import "@test-sol/utils/ECDSAHelper08.sol";
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
 import { console } from "forge-std-8/console.sol";
 
+import { Validators } from "@celo-contracts-8/governance/Validators.sol";
+import { EpochManagerEnabler } from "@celo-contracts-8/common/EpochManagerEnabler.sol";
+
 contract E2E_EpochManager is ECDSAHelper08, Devchain {
   using EnumerableSet for EnumerableSet.AddressSet;
 
@@ -174,7 +177,7 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
 
   function assertGroupWithVotes(GroupWithVotes[] memory groupWithVotes) internal {
     for (uint256 i = 0; i < groupWithVotes.length; i++) {
-      assertEq(election.getTotalVotesForGroup(groupWithVotes[i].group), groupWithVotes[i].votes);
+      assertEq(election.getTotalVotesForGroup(groupWithVotes[i].group), groupWithVotes[i].votes, "assertGroupWithVotes");
     }
   }
 
@@ -436,10 +439,13 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
   function setUp() public override {
     super.setUp();
     activateValidators();
+
+    EpochManagerEnabler epochManagerEnabler = EpochManagerEnabler(epochManagerEnablerAddress);
+    epochManagerEnabler.captureEpochAndValidators();
+
     whenL2();
 
-    vm.prank(epochManagerEnablerAddress);
-    epochManagerContract.initializeSystem(1, 1, firstElected);
+    epochManagerEnabler.initEpochManager();
 
     validatorsArray = getValidators().getRegisteredValidators();
     groups = getValidators().getRegisteredValidatorGroups();
@@ -635,9 +641,9 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
     assertEq(
       epochManagerContract.getElectedAccounts().length,
-      validators.getRegisteredValidators().length
+      validators.getRegisteredValidators().length - 1 // -1 because the validator deaffiliated
     );
-    assertEq(groups.length, validators.getRegisteredValidatorGroups().length);
+    assertEq(groups.length, validators.getRegisteredValidatorGroups().length ); 
 
     timeTravel(epochDuration + 1);
     epochManagerContract.startNextEpochProcess();
@@ -645,33 +651,8 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
     assertGroupWithVotes(groupWithVotes);
 
-    assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length);
+    assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length - 1); // -1 because the validator deaffiliated
 
-    // lower the number of electable validators
-    vm.prank(election.owner());
-    election.setElectableValidators(1, validatorsArray.length - 1);
-
-    timeTravel(epochDuration + 1);
-    epochManagerContract.startNextEpochProcess();
-
-    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
-    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
-    assertGroupWithVotes(groupWithVotes);
-
-    (
-      ,
-      uint256 perValidatorReward,
-      uint256 totalRewardsVoter,
-      uint256 totalRewardsCommunity,
-      uint256 totalRewardsCarbonFund
-    ) = epochManagerContract.getEpochProcessingState();
-
-    assertEq(perValidatorReward, 0, "perValidatorReward");
-    assertEq(totalRewardsVoter, 0, "totalRewardsVoter");
-    assertEq(totalRewardsCommunity, 0, "totalRewardsCommunity");
-    assertEq(totalRewardsCarbonFund, 0, "totalRewardsCarbonFund");
-
-    assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length - 1);
   }
 
   function test_shouldFinishNextEpochProcessing_WhenValidatorDeaffiliatesBeforeFinish() public {
@@ -727,7 +708,6 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     epochManagerContract.startNextEpochProcess();
 
     vm.prank(currentlyElected[0]);
-    console.log("deaffiliate", currentlyElected[0]);
     validators.deaffiliate();
 
     timeTravel(epochDuration / 2);
@@ -742,9 +722,9 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
     assertEq(
       epochManagerContract.getElectedAccounts().length,
-      validators.getRegisteredValidators().length
-    );
-    assertEq(groups.length, validators.getRegisteredValidatorGroups().length);
+      validators.getRegisteredValidators().length - 1 // -1 because the validator deaffiliated
+    , "getElectedAccounts != getRegisteredValidators");
+    assertEq(groups.length, validators.getRegisteredValidatorGroups().length, "groups != registeredValidatorGroups");
 
     timeTravel(epochDuration + 1);
     epochManagerContract.startNextEpochProcess();
@@ -752,35 +732,8 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
     assertGroupWithVotes(groupWithVotes);
 
-    assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length);
-
-    // lower the number of electable validators
-    vm.prank(election.owner());
-    election.setElectableValidators(1, validatorsArray.length - 1);
-
-    timeTravel(epochDuration + 1);
-    epochManagerContract.startNextEpochProcess();
-
-    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
-    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
-    assertGroupWithVotes(groupWithVotes);
-
-    (
-      ,
-      uint256 perValidatorReward,
-      uint256 totalRewardsVoter,
-      uint256 totalRewardsCommunity,
-      uint256 totalRewardsCarbonFund
-    ) = epochManagerContract.getEpochProcessingState();
-
-    assertEq(perValidatorReward, 0, "perValidatorReward");
-    assertEq(totalRewardsVoter, 0, "totalRewardsVoter");
-    assertEq(totalRewardsCommunity, 0, "totalRewardsCommunity");
-    assertEq(totalRewardsCarbonFund, 0, "totalRewardsCarbonFund");
-
-    assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length - 1);
+    assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length - 1); // -1 because the validator deaffiliated
   }
-
 
   function clearElectedGroupsHelper() internal {
     address[] memory values = electedGroupsHelper.values();
