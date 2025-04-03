@@ -8,7 +8,6 @@ import "@test-sol/utils/ECDSAHelper08.sol";
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
 import { console } from "forge-std-8/console.sol";
 
-import { Validators } from "@celo-contracts-8/governance/Validators.sol";
 import { EpochManagerEnabler } from "@celo-contracts-8/common/EpochManagerEnabler.sol";
 
 contract E2E_EpochManager is ECDSAHelper08, Devchain {
