@@ -260,8 +260,8 @@ contract MockValidators is IValidators, IsL2Check {
     revert("Method not implemented in mock");
   }
 
-  function getMembershipInLastEpoch(address) external view returns (address) {
-    revert("Method not implemented in mock");
+  function getMembershipInLastEpoch(address validator) external view returns (address) {
+    return affiliations[validator];
   }
 
   function getMembershipHistoryLength() external view returns (uint256) {
