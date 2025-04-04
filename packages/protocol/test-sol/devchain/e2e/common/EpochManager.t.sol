@@ -307,7 +307,7 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
     address[] memory currentlyElected = epochManagerContract.getElectedAccounts();
 
     for (uint256 i = 0; i < currentlyElected.length; i++) {
-      (, , address group, , ) = validators.getValidator(currentlyElected[i]);
+      address group = validators.getMembershipInLastEpoch(currentlyElected[i]);
       electedGroupsHelper.add(group);
     }
     return electedGroupsHelper.values();
@@ -626,7 +626,6 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     );
 
     vm.prank(currentlyElected[0]);
-    console.log("deaffiliate");
     validators.deaffiliate();
 
     timeTravel(epochDuration + 1);
@@ -910,10 +909,13 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
     super.setUp();
 
     activateValidators();
+
+    EpochManagerEnabler epochManagerEnabler = EpochManagerEnabler(epochManagerEnablerAddress);
+    epochManagerEnabler.captureEpochAndValidators();
+
     whenL2();
 
-    vm.prank(epochManagerEnablerAddress);
-    epochManagerContract.initializeSystem(1, 1, firstElected);
+    epochManagerEnabler.initEpochManager();
 
     validatorsArray = getValidators().getRegisteredValidators();
     groups = getValidators().getRegisteredValidatorGroups();
@@ -1003,14 +1005,6 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
     }
 
     activateValidators();
-
-    timeTravel(epochDuration + 1);
-    epochManagerContract.startNextEpochProcess();
-
-    groups = getCurrentlyElectedGroups();
-
-    timeTravel(epochDuration / 2);
-    blockTravel(100);
   }
 
   /**
@@ -1020,6 +1014,73 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
     FinishNextEpochProcess is called twice, first time with going from 6 -> 110 validators which consumes approx. 6M gas and the second time with going from 110 -> 110 validators which consumes approx. 19M gas. 
      */
   function test_shouldFinishNextEpochProcessing_GasTest_Split() public {
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
+
+    groups = getCurrentlyElectedGroups();
+
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
+
+    address[] memory lessers;
+    address[] memory greaters;
+    GroupWithVotes[] memory groupWithVotes;
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManagerContract.setToProcessGroups();
+
+    for (uint256 i = 0; i < groups.length; i++) {
+      uint256 gasLeftBefore1 = gasleft();
+      epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
+      uint256 gasLeftAfter1 = gasleft();
+      console.log("processGroup gas used: ", gasLeftBefore1 - gasLeftAfter1);
+    }
+  }
+
+  function test_shouldFinishNextEpochProcessing_GasTest_Split_DeaffiliateBeforeStart() public {
+    timeTravel(epochDuration + 1);
+
+    address[] memory currentlyElected = epochManagerContract.getElectedAccounts();
+
+    vm.prank(currentlyElected[0]);
+    validators.deaffiliate();
+
+    epochManagerContract.startNextEpochProcess();
+
+    groups = getCurrentlyElectedGroups();
+
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
+
+    address[] memory lessers;
+    address[] memory greaters;
+    GroupWithVotes[] memory groupWithVotes;
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManagerContract.setToProcessGroups();
+
+    console.log("3");
+    for (uint256 i = 0; i < groups.length; i++) {
+      uint256 gasLeftBefore1 = gasleft();
+      epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
+      uint256 gasLeftAfter1 = gasleft();
+      console.log("processGroup gas used: ", gasLeftBefore1 - gasLeftAfter1);
+    }
+  }
+
+  function test_shouldFinishNextEpochProcessing_GasTest_Split_DeaffiliateBeforeFinish() public {
+    timeTravel(epochDuration + 1);
+
+    address[] memory currentlyElected = epochManagerContract.getElectedAccounts();
+
+    epochManagerContract.startNextEpochProcess();
+
+    vm.prank(currentlyElected[0]);
+    validators.deaffiliate();
+
+    groups = getCurrentlyElectedGroups();
+
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
+
     address[] memory lessers;
     address[] memory greaters;
     GroupWithVotes[] memory groupWithVotes;
