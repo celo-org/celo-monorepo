@@ -252,7 +252,7 @@ contract EpochManager is
       "Elected accounts and signers of different lengths."
     );
     for (uint i = 0; i < electedAccounts.length; i++) {
-      address group = validators.getValidatorsGroup(electedAccounts[i]);
+      address group = validators.getMembershipInLastEpoch(electedAccounts[i]);
       if (processedGroups[group] == 0) {
         toProcessGroups++;
         uint256 groupScore = scoreReader.getGroupScore(group);
@@ -339,7 +339,7 @@ contract EpochManager is
       "Elected accounts and signers of different lengths."
     );
     for (uint i = 0; i < electedAccounts.length; i++) {
-      address group = validators.getValidatorsGroup(electedAccounts[i]);
+      address group = validators.getMembershipInLastEpoch(electedAccounts[i]);
       if (processedGroups[group] == 0) {
         _toProcessGroups++;
         uint256 groupScore = scoreReader.getGroupScore(group);
@@ -679,6 +679,7 @@ contract EpochManager is
     EpochProcessState storage _epochProcessing = epochProcessing;
 
     for (uint i = 0; i < electedAccounts.length; i++) {
+      address group = validators.getMembershipInLastEpoch(electedAccounts[i]);
       uint256 validatorScore = scoreReader.getValidatorScore(electedAccounts[i]);
       uint256 validatorReward = validators.computeEpochReward(
         electedAccounts[i],
