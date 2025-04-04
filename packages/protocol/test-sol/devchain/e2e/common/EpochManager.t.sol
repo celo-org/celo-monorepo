@@ -176,7 +176,11 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
 
   function assertGroupWithVotes(GroupWithVotes[] memory groupWithVotes) internal {
     for (uint256 i = 0; i < groupWithVotes.length; i++) {
-      assertEq(election.getTotalVotesForGroup(groupWithVotes[i].group), groupWithVotes[i].votes, "assertGroupWithVotes");
+      assertEq(
+        election.getTotalVotesForGroup(groupWithVotes[i].group),
+        groupWithVotes[i].votes,
+        "assertGroupWithVotes"
+      );
     }
   }
 
@@ -642,7 +646,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
       epochManagerContract.getElectedAccounts().length,
       validators.getRegisteredValidators().length - 1 // -1 because the validator deaffiliated
     );
-    assertEq(groups.length, validators.getRegisteredValidatorGroups().length ); 
+    assertEq(groups.length, validators.getRegisteredValidatorGroups().length);
 
     timeTravel(epochDuration + 1);
     epochManagerContract.startNextEpochProcess();
@@ -651,7 +655,6 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     assertGroupWithVotes(groupWithVotes);
 
     assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length - 1); // -1 because the validator deaffiliated
-
   }
 
   function test_shouldFinishNextEpochProcessing_WhenValidatorDeaffiliatesBeforeFinish() public {
@@ -721,9 +724,14 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
     assertEq(
       epochManagerContract.getElectedAccounts().length,
-      validators.getRegisteredValidators().length - 1 // -1 because the validator deaffiliated
-    , "getElectedAccounts != getRegisteredValidators");
-    assertEq(groups.length, validators.getRegisteredValidatorGroups().length, "groups != registeredValidatorGroups");
+      validators.getRegisteredValidators().length - 1, // -1 because the validator deaffiliated
+      "getElectedAccounts != getRegisteredValidators"
+    );
+    assertEq(
+      groups.length,
+      validators.getRegisteredValidatorGroups().length,
+      "groups != registeredValidatorGroups"
+    );
 
     timeTravel(epochDuration + 1);
     epochManagerContract.startNextEpochProcess();
