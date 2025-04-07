@@ -308,3 +308,34 @@ PRs that made these changes:
 
 16442165a Deactivate BlochainParameters Contract on L2 (#11008)
 198f6215a SortedLinkedList Foundry Migration (#10846)
+
+
+# Anvil Devchain e2e Testing
+
+## npm Scripts
+
+- **anvil-devchain:e2e-tests**  
+  Runs the tests without additional flags.
+
+- **anvil-devchain:e2e:start-anvil**  
+  Starts Anvil and creates a fresh devchain.
+
+- **anvil-devchain:e2e:run-from-snapshot**  
+  Takes a snapshot, runs tests, and restores the devchain state (expects devchain already running - for that use **anvil-devchain:e2e:start-anvil** ).
+
+## Usage
+
+- For one time use
+  ```bash
+  npm run anvil-devchain:e2e-tests
+  ```
+
+- For first-time setup:
+  ```bash
+  npm run anvil-devchain:e2e:start-anvil
+  ```
+
+- For first-time setup:
+  ```bash
+  npm run anvil-devchain:e2e:run-from-snapshot
+  ```
