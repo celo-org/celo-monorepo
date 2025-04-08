@@ -1,23 +1,24 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "./interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
-import "./UsingRegistry.sol";
 
 import "./UsingPrecompiles.sol";
+import "./UsingRegistryV2NoMento.sol";
 
 /**
  * @title PrecompilesOverride Contract
  * @notice This contract allows for a smoother transition from L1 to L2
- * by abstracting away the usingPrecompile contract, and taking care of the L1 to L2 switching logic.
+ * by abstracting away the usingPrecompile contract, and taking care of the L1 to L2 swtiching logic.
  **/
-contract PrecompilesOverride is UsingPrecompiles, UsingRegistry {
+abstract contract PrecompilesOverrideV2 is UsingPrecompiles, UsingRegistryV2NoMento {
   /**
    * @notice Returns the epoch number at a block.
    * @param blockNumber Block number where epoch number is calculated.
    * @return Epoch number.
    */
-  function getEpochNumberOfBlock(uint256 blockNumber) public view returns (uint256) {
+  function getEpochNumberOfBlock(uint256 blockNumber) public view override returns (uint256) {
     if (isL2()) {
       return getEpochManager().getEpochNumberOfBlock(blockNumber);
     } else {
@@ -29,7 +30,7 @@ contract PrecompilesOverride is UsingPrecompiles, UsingRegistry {
    * @notice Returns the epoch number at a block.
    * @return Current epoch number.
    */
-  function getEpochNumber() public view returns (uint256) {
+  function getEpochNumber() public view override returns (uint256) {
     return getEpochNumberOfBlock(block.number);
   }
 
@@ -38,7 +39,9 @@ contract PrecompilesOverride is UsingPrecompiles, UsingRegistry {
    * @param index Index of requested validator in the validator set.
    * @return Address of validator signer at the requested index.
    */
-  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
+  function validatorSignerAddressFromCurrentSet(
+    uint256 index
+  ) public view override returns (address) {
     if (isL2()) {
       return getEpochManager().getElectedSignerByIndex(index);
     } else {
@@ -59,7 +62,7 @@ contract PrecompilesOverride is UsingPrecompiles, UsingRegistry {
    * @notice Gets the size of the current elected validator set.
    * @return Size of the current elected validator set.
    */
-  function numberValidatorsInCurrentSet() public view returns (uint256) {
+  function numberValidatorsInCurrentSet() public view override returns (uint256) {
     if (isL2()) {
       return getEpochManager().numberOfElectedInCurrentSet();
     } else {

@@ -1,12 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.0 <0.8.20;
 
-import "celo-foundry-8/Test.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
-import { Utils08 } from "@test-sol/utils08.sol";
-import { TestConstants } from "@test-sol/constants.sol";
 import { MigrationsConstants } from "@migrations-sol/constants.sol";
-import { FeeCurrencyDirectory } from "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
@@ -16,20 +13,22 @@ import "@celo-contracts/common/interfaces/IEpochManager.sol";
 import "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
 import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 import "@celo-contracts/governance/interfaces/IElection.sol";
-
 import "@celo-contracts/governance/interfaces/IValidators.sol";
 
+import { FeeCurrencyDirectory } from "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 import "@celo-contracts-8/common/interfaces/IScoreManager.sol";
 
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
-contract IntegrationTest is Test, TestConstants, Utils08 {
-  IRegistry registry = IRegistry(REGISTRY_ADDRESS);
+import { console2 } from "forge-std-8/console2.sol";
 
+contract IntegrationTest is TestWithUtils08 {
   uint256 constant RESERVE_BALANCE = 69411663406170917420347916; // current as of 08/20/24
 
-  // function setUp() public virtual {}
+  function setUp() public virtual override {
+    registry = IRegistry(REGISTRY_ADDRESS);
+  }
 
   /**
    * @notice Removes CBOR encoded metadata from the tail of the deployedBytecode.
@@ -65,15 +64,6 @@ contract IntegrationTest is Test, TestConstants, Utils08 {
 
 contract RegistryIntegrationTest is IntegrationTest, MigrationsConstants {
   IProxy proxy;
-
-  function test_shouldHaveAddressInRegistry() public view {
-    for (uint256 i = 0; i < contractsInRegistry.length; i++) {
-      string memory contractName = contractsInRegistry[i];
-      address contractAddress = registry.getAddressFor(keccak256(abi.encodePacked(contractName)));
-      console2.log(contractName, "address in Registry is: ", contractAddress);
-      assert(contractAddress != address(0));
-    }
-  }
 
   function test_shouldHaveCorrectBytecode() public {
     // Converting contract names to hashes for comparison
@@ -140,17 +130,25 @@ contract RegistryIntegrationTest is IntegrationTest, MigrationsConstants {
       }
     }
   }
+
+  function test_shouldHaveAddressInRegistry() public view {
+    for (uint256 i = 0; i < contractsInRegistry.length; i++) {
+      string memory contractName = contractsInRegistry[i];
+      address contractAddress = registry.getAddressFor(keccak256(abi.encodePacked(contractName)));
+      console2.log(contractName, "address in Registry is: ", contractAddress);
+      assert(contractAddress != address(0));
+    }
+  }
 }
 
 contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
-  ICeloToken celoToken;
-  IAccounts accountsContract;
+  ICeloToken celoTokenContract;
   IValidators validatorsContract;
-  IEpochManager epochManager;
-  IEpochManagerEnabler epochManagerEnabler;
+  IEpochManager epochManagerContract;
+  IEpochManagerEnabler epochManagerEnablerContract;
   IScoreManager scoreManager;
   IElection election;
-  ICeloUnreleasedTreasury celoUnreleasedTreasury;
+  ICeloUnreleasedTreasury celoUnreleasedTreasuryContract;
 
   address reserveAddress;
   address unreleasedTreasury;
@@ -165,7 +163,8 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   uint256[] groupScore = [5e23, 7e23, 1e24];
   uint256[] validatorScore = [1e23, 1e23, 1e23, 1e23, 1e23, 1e23];
 
-  function setUp() public {
+  function setUp() public override {
+    super.setUp();
     randomAddress = actor("randomAddress");
 
     validatorsContract = IValidators(registry.getAddressForStringOrDie("Validators"));
@@ -179,27 +178,25 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     groupList = validatorsContract.getRegisteredValidatorGroups();
 
     // mint to the reserve
-    celoToken = ICeloToken(registry.getAddressForStringOrDie("GoldToken"));
+    celoTokenContract = ICeloToken(registry.getAddressForStringOrDie("GoldToken"));
 
     vm.deal(address(0), CELO_SUPPLY_CAP);
     vm.prank(address(0));
-    celoToken.mint(reserveAddress, RESERVE_BALANCE);
+    celoTokenContract.mint(reserveAddress, RESERVE_BALANCE);
 
     vm.prank(address(0));
-    celoToken.mint(randomAddress, L1_MINTED_CELO_SUPPLY - RESERVE_BALANCE); // mint outstanding l1 supply before L2.
+    celoTokenContract.mint(randomAddress, L1_MINTED_CELO_SUPPLY - RESERVE_BALANCE); // mint outstanding l1 supply before L2.
 
-    epochManager = IEpochManager(registry.getAddressForStringOrDie("EpochManager"));
-    epochManagerEnabler = IEpochManagerEnabler(
+    epochManagerContract = IEpochManager(registry.getAddressForStringOrDie("EpochManager"));
+    epochManagerEnablerContract = IEpochManagerEnabler(
       registry.getAddressForStringOrDie("EpochManagerEnabler")
     );
   }
 
   function activateValidators() public {
     address[] memory registeredValidators = validatorsContract.getRegisteredValidators();
-    travelEpochL1(vm);
-    travelEpochL1(vm);
-    travelEpochL1(vm);
-    travelEpochL1(vm);
+    travelNEpochL1(4);
+
     for (uint256 i = 0; i < registeredValidators.length; i++) {
       (, , address validatorGroup, , ) = validatorsContract.getValidator(registeredValidators[i]);
       if (election.getPendingVotesForGroup(validatorGroup) == 0) {
@@ -213,36 +210,37 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
 
   function test_Reverts_whenSystemNotInitialized() public {
     vm.expectRevert("Epoch system not initialized");
-    epochManager.startNextEpochProcess();
+    epochManagerContract.startNextEpochProcess();
   }
 
   function test_Reverts_WhenEndOfEpochHasNotBeenReached() public {
     // fund treasury
     vm.prank(address(0));
-    celoToken.mint(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
+    celoTokenContract.mint(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
+    vm.deal(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
 
     uint256 l1EpochNumber = IPrecompiles(address(validatorsContract)).getEpochNumber();
 
-    vm.prank(address(epochManagerEnabler));
-    epochManager.initializeSystem(l1EpochNumber, block.number, validatorsList);
+    vm.prank(address(epochManagerEnablerContract));
+    epochManagerContract.initializeSystem(l1EpochNumber, block.number, validatorsList);
 
     vm.expectRevert("Epoch is not ready to start");
-    epochManager.startNextEpochProcess();
+    epochManagerContract.startNextEpochProcess();
   }
 
   function test_Reverts_whenAlreadyInitialized() public {
     _MockL2Migration(validatorsList);
 
-    vm.prank(address(epochManagerEnabler));
+    vm.prank(address(epochManagerEnablerContract));
     vm.expectRevert("Epoch system already initialized");
-    epochManager.initializeSystem(100, block.number, firstElected);
+    epochManagerContract.initializeSystem(100, block.number, firstElected);
   }
 
   function test_Reverts_whenTransferingCeloToUnreleasedTreasury() public {
     _MockL2Migration(validatorsList);
 
-    blockTravel(vm, 43200);
-    timeTravel(vm, DAY);
+    blockTravel(43200);
+    timeTravel(DAY);
 
     vm.prank(randomAddress);
 
@@ -253,13 +251,13 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   function test_SetsCurrentRewardBlock() public {
     _MockL2Migration(validatorsList);
 
-    blockTravel(vm, L2_BLOCK_IN_EPOCH);
-    timeTravel(vm, DAY);
+    blockTravel(L2_BLOCK_IN_EPOCH);
+    timeTravel(DAY);
 
-    epochManager.startNextEpochProcess();
+    epochManagerContract.startNextEpochProcess();
 
-    (, , , uint256 _currentRewardsBlock) = epochManager.getCurrentEpoch();
-    (uint256 status, , , , ) = epochManager.getEpochProcessingState();
+    (, , , uint256 _currentRewardsBlock) = epochManagerContract.getCurrentEpoch();
+    (uint256 status, , , , ) = epochManagerContract.getEpochProcessingState();
     assertEq(_currentRewardsBlock, block.number);
     assertEq(status, 1);
   }
@@ -275,14 +273,14 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     vm.deal(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
 
     vm.prank(address(0));
-    celoToken.mint(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
+    celoTokenContract.mint(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
 
-    whenL2(vm);
+    whenL2();
     _setValidatorL2Score();
 
-    vm.prank(address(epochManagerEnabler));
+    vm.prank(address(epochManagerEnablerContract));
 
-    epochManager.initializeSystem(l1EpochNumber, block.number, firstElected);
+    epochManagerContract.initializeSystem(l1EpochNumber, block.number, firstElected);
   }
 
   function _setValidatorL2Score() internal {

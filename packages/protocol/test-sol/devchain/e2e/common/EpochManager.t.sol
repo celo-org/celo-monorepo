@@ -1,18 +1,14 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry-8/Test.sol";
 import { Devchain } from "@test-sol/devchain/e2e/utils.sol";
-import { Utils08 } from "@test-sol/utils08.sol";
-
-import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.sol";
 
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@test-sol/utils/ECDSAHelper08.sol";
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
-import { console } from "forge-std/console.sol";
+import { console } from "forge-std-8/console.sol";
 
-contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
+contract E2E_EpochManager is ECDSAHelper08, Devchain {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   struct VoterWithPK {
@@ -26,7 +22,7 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
   }
 
   address epochManagerOwner;
-  address epochManagerEnabler;
+  address epochManagerEnablerAddress;
   address[] firstElected;
 
   uint256 epochDuration;
@@ -42,14 +38,18 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
 
   EnumerableSet.AddressSet internal electedGroupsHelper;
 
-  function setUp() public virtual {
-    epochManagerOwner = Ownable(address(epochManager)).owner();
-    epochManagerEnabler = registry.getAddressForOrDie(EPOCH_MANAGER_ENABLER_REGISTRY_ID);
+  function setUp() public virtual override(TestWithUtils08, Devchain) {
+    epochManagerOwner = Ownable(address(epochManagerContract)).owner();
+    epochManagerEnablerAddress = registryContract.getAddressForOrDie(
+      EPOCH_MANAGER_ENABLER_REGISTRY_ID
+    );
     firstElected = getValidators().getRegisteredValidators();
 
-    epochDuration = epochManager.epochDuration();
+    epochDuration = epochManagerContract.epochDuration();
 
-    vm.deal(address(celoUnreleasedTreasury), L2_INITIAL_STASH_BALANCE); // 80% of the total supply to the treasury - whis will be yet distributed
+    vm.deal(address(celoUnreleasedTreasuryContract), L2_INITIAL_STASH_BALANCE); // 80% of the total supply to the treasury - whis will be yet distributed
+    vm.prank(address(0));
+    celoTokenContract.mint(address(celoUnreleasedTreasuryContract), L2_INITIAL_STASH_BALANCE);
   }
 
   function activateValidators() public {
@@ -70,10 +70,8 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
     }
 
     address[] memory registeredValidators = getValidators().getRegisteredValidators();
-    travelEpochL1(vm);
-    travelEpochL1(vm);
-    travelEpochL1(vm);
-    travelEpochL1(vm);
+    travelNEpochL1(4);
+
     for (uint256 i = 0; i < registeredValidators.length; i++) {
       (, , address validatorGroup, , ) = getValidators().getValidator(registeredValidators[i]);
       if (getElection().getPendingVotesForGroup(validatorGroup) == 0) {
@@ -104,7 +102,7 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
       GroupWithVotes[] memory groupWithVotes
     )
   {
-    (, , uint256 maxTotalRewards, , ) = epochManager.getEpochProcessingState();
+    (, , uint256 maxTotalRewards, , ) = epochManagerContract.getEpochProcessingState();
     (, groupWithVotes) = getGroupsWithVotes();
 
     lessers = new address[](_groups.length);
@@ -235,7 +233,7 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
   }
 
   function getValidatorGroupsFromElected() internal view returns (address[] memory) {
-    address[] memory elected = epochManager.getElectedAccounts();
+    address[] memory elected = epochManagerContract.getElectedAccounts();
     address[] memory validatorGroups = new address[](elected.length);
     for (uint256 i = 0; i < elected.length; i++) {
       (, , address group, , ) = validators.getValidator(elected[i]);
@@ -300,9 +298,8 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
   }
 
   function getCurrentlyElectedGroups() internal returns (address[] memory) {
-    address[] memory currentlyElected = epochManager.getElectedAccounts();
+    address[] memory currentlyElected = epochManagerContract.getElectedAccounts();
 
-    // clearElectedGroupsHelper();
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       (, , address group, , ) = validators.getValidator(currentlyElected[i]);
       electedGroupsHelper.add(group);
@@ -314,48 +311,48 @@ contract E2E_EpochManager is Test, Devchain, Utils08, ECDSAHelper08 {
 contract E2E_EpochManager_InitializeSystem is E2E_EpochManager {
   function setUp() public override {
     super.setUp();
-    whenL2(vm);
+    whenL2();
   }
 
   function test_shouldRevert_WhenCalledByNonEnabler() public {
     vm.expectRevert("msg.sender is not Enabler");
-    epochManager.initializeSystem(1, 1, firstElected);
+    epochManagerContract.initializeSystem(1, 1, firstElected);
   }
 
   function test_ShouldInitializeSystem() public {
-    vm.prank(epochManagerEnabler);
-    epochManager.initializeSystem(42, 43, firstElected);
+    vm.prank(epochManagerEnablerAddress);
+    epochManagerContract.initializeSystem(42, 43, firstElected);
 
-    assertEq(epochManager.firstKnownEpoch(), 42);
-    assertEq(epochManager.getCurrentEpochNumber(), 42);
+    assertEq(epochManagerContract.firstKnownEpoch(), 42);
+    assertEq(epochManagerContract.getCurrentEpochNumber(), 42);
 
-    assertTrue(epochManager.systemAlreadyInitialized());
+    assertTrue(epochManagerContract.systemAlreadyInitialized());
   }
 }
 contract E2E_EpochManager_GetCurrentEpoch is E2E_EpochManager {
   function setUp() public override {
     super.setUp();
-    whenL2(vm);
+    whenL2();
   }
 
   function test_Revert_WhenSystemNotInitialized() public {
     vm.expectRevert("Epoch system not initialized");
-    epochManager.getCurrentEpoch();
+    epochManagerContract.getCurrentEpoch();
   }
 
   function test_ReturnExpectedValues() public {
-    vm.prank(epochManagerEnabler);
-    epochManager.initializeSystem(42, 43, firstElected);
+    vm.prank(epochManagerEnablerAddress);
+    epochManagerContract.initializeSystem(42, 43, firstElected);
 
-    assertEq(epochManager.firstKnownEpoch(), 42);
-    assertEq(epochManager.getCurrentEpochNumber(), 42);
+    assertEq(epochManagerContract.firstKnownEpoch(), 42);
+    assertEq(epochManagerContract.getCurrentEpochNumber(), 42);
 
     (
       uint256 firstBlock,
       uint256 lastBlock,
       uint256 startTimestamp,
       uint256 rewardsBlock
-    ) = epochManager.getCurrentEpoch();
+    ) = epochManagerContract.getCurrentEpoch();
     assertEq(firstBlock, 43);
     assertEq(lastBlock, 0);
     assertEq(startTimestamp, block.timestamp);
@@ -367,7 +364,7 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
   function setUp() public override {
     super.setUp();
     activateValidators();
-    whenL2(vm);
+    whenL2();
 
     validatorsArray = getValidators().getRegisteredValidators();
     groups = getValidators().getRegisteredValidatorGroups();
@@ -388,13 +385,13 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
 
     vm.stopPrank();
 
-    vm.prank(epochManagerEnabler);
-    epochManager.initializeSystem(1, 1, firstElected);
+    vm.prank(epochManagerEnablerAddress);
+    epochManagerContract.initializeSystem(1, 1, firstElected);
   }
 
   function test_shouldHaveInitialValues() public {
-    assertEq(epochManager.firstKnownEpoch(), 1);
-    assertEq(epochManager.getCurrentEpochNumber(), 1);
+    assertEq(epochManagerContract.firstKnownEpoch(), 1);
+    assertEq(epochManagerContract.getCurrentEpochNumber(), 1);
 
     // get getEpochProcessingState
     (
@@ -403,7 +400,7 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
       uint256 totalRewardsVote,
       uint256 totalRewardsCommunity,
       uint256 totalRewardsCarbonFund
-    ) = epochManager.getEpochProcessingState();
+    ) = epochManagerContract.getEpochProcessingState();
     assertEq(status, 0); // Not started
     assertEq(perValidatorReward, 0);
     assertEq(totalRewardsVote, 0);
@@ -412,9 +409,9 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
   }
 
   function test_shouldStartNextEpochProcessing() public {
-    timeTravel(vm, epochDuration + 1);
+    timeTravel(epochDuration + 1);
 
-    epochManager.startNextEpochProcess();
+    epochManagerContract.startNextEpochProcess();
 
     (
       uint256 status,
@@ -422,7 +419,7 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
       uint256 totalRewardsVote,
       uint256 totalRewardsCommunity,
       uint256 totalRewardsCarbonFund
-    ) = epochManager.getEpochProcessingState();
+    ) = epochManagerContract.getEpochProcessingState();
     assertEq(status, 1); // Started
     assertGt(perValidatorReward, 0, "perValidatorReward");
     assertGt(totalRewardsVote, 0, "totalRewardsVote");
@@ -439,10 +436,10 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
   function setUp() public override {
     super.setUp();
     activateValidators();
-    whenL2(vm);
+    whenL2();
 
-    vm.prank(epochManagerEnabler);
-    epochManager.initializeSystem(1, 1, firstElected);
+    vm.prank(epochManagerEnablerAddress);
+    epochManagerContract.initializeSystem(1, 1, firstElected);
 
     validatorsArray = getValidators().getRegisteredValidators();
     groups = getValidators().getRegisteredValidatorGroups();
@@ -463,8 +460,8 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
     vm.stopPrank();
 
-    timeTravel(vm, epochDuration + 1);
-    epochManager.startNextEpochProcess();
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
   }
 
   function test_shouldFinishNextEpochProcessing() public {
@@ -473,38 +470,38 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     GroupWithVotes[] memory groupWithVotes;
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
 
-    uint256 currentEpoch = epochManager.getCurrentEpochNumber();
-    address[] memory currentlyElected = epochManager.getElectedAccounts();
+    uint256 currentEpoch = epochManagerContract.getCurrentEpochNumber();
+    address[] memory currentlyElected = epochManagerContract.getElectedAccounts();
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       originalyElected.add(currentlyElected[i]);
     }
 
     // wait some time before finishing
-    timeTravel(vm, epochDuration / 2);
-    blockTravel(vm, 100);
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
 
-    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
 
-    assertEq(currentEpoch + 1, epochManager.getCurrentEpochNumber());
+    assertEq(currentEpoch + 1, epochManagerContract.getCurrentEpochNumber());
 
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       assertEq(originalyElected.contains(currentlyElected[i]), true);
     }
 
-    timeTravel(vm, epochDuration + 1);
-    epochManager.startNextEpochProcess();
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
 
     // wait some time before finishing
-    timeTravel(vm, epochDuration / 2);
-    blockTravel(vm, 100);
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
 
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
-    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
     assertGroupWithVotes(groupWithVotes);
 
-    assertEq(currentEpoch + 2, epochManager.getCurrentEpochNumber());
+    assertEq(currentEpoch + 2, epochManagerContract.getCurrentEpochNumber());
 
-    address[] memory newlyElected2 = epochManager.getElectedAccounts();
+    address[] memory newlyElected2 = epochManagerContract.getElectedAccounts();
 
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       assertEq(originalyElected.contains(newlyElected2[i]), true);
@@ -516,39 +513,42 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
       1
     );
 
-    timeTravel(vm, epochDuration + 1);
-    epochManager.startNextEpochProcess();
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
 
-    timeTravel(vm, epochDuration / 2);
-    blockTravel(vm, 100);
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
 
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
-    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
     assertGroupWithVotes(groupWithVotes);
 
     groups.push(newValidatorGroup);
     validatorsArray.push(newValidator);
 
-    assertEq(epochManager.getElectedAccounts().length, validators.getRegisteredValidators().length);
+    assertEq(
+      epochManagerContract.getElectedAccounts().length,
+      validators.getRegisteredValidators().length
+    );
     assertEq(groups.length, validators.getRegisteredValidatorGroups().length);
 
-    timeTravel(vm, epochDuration + 1);
-    epochManager.startNextEpochProcess();
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
-    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
     assertGroupWithVotes(groupWithVotes);
 
-    assertEq(epochManager.getElectedAccounts().length, validatorsArray.length);
+    assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length);
 
     // lower the number of electable validators
     vm.prank(election.owner());
     election.setElectableValidators(1, validatorsArray.length - 1);
 
-    timeTravel(vm, epochDuration + 1);
-    epochManager.startNextEpochProcess();
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
 
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
-    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
     assertGroupWithVotes(groupWithVotes);
 
     (
@@ -557,14 +557,14 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
       uint256 totalRewardsVoter,
       uint256 totalRewardsCommunity,
       uint256 totalRewardsCarbonFund
-    ) = epochManager.getEpochProcessingState();
+    ) = epochManagerContract.getEpochProcessingState();
 
     assertEq(perValidatorReward, 0, "perValidatorReward");
     assertEq(totalRewardsVoter, 0, "totalRewardsVoter");
     assertEq(totalRewardsCommunity, 0, "totalRewardsCommunity");
     assertEq(totalRewardsCarbonFund, 0, "totalRewardsCarbonFund");
 
-    assertEq(epochManager.getElectedAccounts().length, validatorsArray.length - 1);
+    assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length - 1);
   }
 
   function clearElectedGroupsHelper() internal {
@@ -582,10 +582,10 @@ contract E2E_GasTest_Setup is E2E_EpochManager {
 
   function setUpHelper(uint256 validatorGroupCount, uint256 validatorPerGroupCount) internal {
     activateValidators();
-    whenL2(vm);
+    whenL2();
 
-    vm.prank(epochManagerEnabler);
-    epochManager.initializeSystem(1, 1, firstElected);
+    vm.prank(epochManagerEnablerAddress);
+    epochManagerContract.initializeSystem(1, 1, firstElected);
 
     validatorsArray = getValidators().getRegisteredValidators();
     groups = getValidators().getRegisteredValidatorGroups();
@@ -604,46 +604,46 @@ contract E2E_GasTest_Setup is E2E_EpochManager {
 
     vm.stopPrank();
 
-    timeTravel(vm, epochDuration + 1);
-    epochManager.startNextEpochProcess();
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
 
     address[] memory lessers;
     address[] memory greaters;
     GroupWithVotes[] memory groupWithVotes;
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
 
-    uint256 currentEpoch = epochManager.getCurrentEpochNumber();
-    address[] memory currentlyElected = epochManager.getElectedAccounts();
+    uint256 currentEpoch = epochManagerContract.getCurrentEpochNumber();
+    address[] memory currentlyElected = epochManagerContract.getElectedAccounts();
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       originalyElected.add(currentlyElected[i]);
     }
 
     // wait some time before finishing
-    timeTravel(vm, epochDuration / 2);
-    blockTravel(vm, 100);
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
 
-    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
 
-    assertEq(currentEpoch + 1, epochManager.getCurrentEpochNumber());
+    assertEq(currentEpoch + 1, epochManagerContract.getCurrentEpochNumber());
 
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       assertEq(originalyElected.contains(currentlyElected[i]), true);
     }
 
-    timeTravel(vm, epochDuration + 1);
-    epochManager.startNextEpochProcess();
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
 
     // wait some time before finishing
-    timeTravel(vm, epochDuration / 2);
-    blockTravel(vm, 100);
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
 
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
-    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
     assertGroupWithVotes(groupWithVotes);
 
-    assertEq(currentEpoch + 2, epochManager.getCurrentEpochNumber());
+    assertEq(currentEpoch + 2, epochManagerContract.getCurrentEpochNumber());
 
-    address[] memory newlyElected2 = epochManager.getElectedAccounts();
+    address[] memory newlyElected2 = epochManagerContract.getElectedAccounts();
 
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       assertEq(originalyElected.contains(newlyElected2[i]), true);
@@ -653,24 +653,24 @@ contract E2E_GasTest_Setup is E2E_EpochManager {
       registerNewValidatorGroupWithValidator(i, validatorPerGroupCount);
     }
 
-    timeTravel(vm, epochDuration + 1);
-    epochManager.startNextEpochProcess();
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
 
-    timeTravel(vm, epochDuration / 2);
-    blockTravel(vm, 100);
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
 
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
-    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
 
     activateValidators();
 
-    timeTravel(vm, epochDuration + 1);
-    epochManager.startNextEpochProcess();
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
 
     groups = getCurrentlyElectedGroups();
 
-    timeTravel(vm, epochDuration / 2);
-    blockTravel(vm, 100);
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
   }
 }
 
@@ -692,12 +692,12 @@ contract E2E_GasTest1_FinishNextEpochProcess is E2E_GasTest_Setup {
     GroupWithVotes[] memory groupWithVotes;
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
     uint256 gasLeftBefore1 = gasleft();
-    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
     uint256 gasLeftAfter1 = gasleft();
     console.log("validator groups: 120");
     console.log("validators per group: 2");
     console.log("finishNextEpochProcess gas used 2: ", gasLeftBefore1 - gasLeftAfter1);
-    console.log("elected count2: ", epochManager.getElectedAccounts().length);
+    console.log("elected count2: ", epochManagerContract.getElectedAccounts().length);
   }
 }
 
@@ -719,12 +719,12 @@ contract E2E_GasTest2_FinishNextEpochProcess is E2E_GasTest_Setup {
     GroupWithVotes[] memory groupWithVotes;
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
     uint256 gasLeftBefore1 = gasleft();
-    epochManager.finishNextEpochProcess(groups, lessers, greaters);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
     uint256 gasLeftAfter1 = gasleft();
     console.log("validator groups: 60");
     console.log("validators per group: 2");
     console.log("finishNextEpochProcess gas used 2: ", gasLeftBefore1 - gasLeftAfter1);
-    console.log("elected count2: ", epochManager.getElectedAccounts().length);
+    console.log("elected count2: ", epochManagerContract.getElectedAccounts().length);
   }
 }
 
@@ -735,10 +735,10 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
     super.setUp();
 
     activateValidators();
-    whenL2(vm);
+    whenL2();
 
-    vm.prank(epochManagerEnabler);
-    epochManager.initializeSystem(1, 1, firstElected);
+    vm.prank(epochManagerEnablerAddress);
+    epochManagerContract.initializeSystem(1, 1, firstElected);
 
     validatorsArray = getValidators().getRegisteredValidators();
     groups = getValidators().getRegisteredValidatorGroups();
@@ -757,53 +757,52 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
 
     vm.stopPrank();
 
-    timeTravel(vm, epochDuration + 1);
-    epochManager.startNextEpochProcess();
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
 
     address[] memory lessers;
     address[] memory greaters;
     GroupWithVotes[] memory groupWithVotes;
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
 
-    uint256 currentEpoch = epochManager.getCurrentEpochNumber();
-    address[] memory currentlyElected = epochManager.getElectedAccounts();
+    uint256 currentEpoch = epochManagerContract.getCurrentEpochNumber();
+    address[] memory currentlyElected = epochManagerContract.getElectedAccounts();
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       originalyElected.add(currentlyElected[i]);
     }
 
     // wait some time before finishing
-    timeTravel(vm, epochDuration / 2);
-    blockTravel(vm, 100);
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
 
-    epochManager.setToProcessGroups();
+    epochManagerContract.setToProcessGroups();
     for (uint256 i = 0; i < groups.length; i++) {
-      epochManager.processGroup(groups[i], lessers[i], greaters[i]);
+      epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
     }
 
-    assertEq(currentEpoch + 1, epochManager.getCurrentEpochNumber());
+    assertEq(currentEpoch + 1, epochManagerContract.getCurrentEpochNumber());
 
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       assertEq(originalyElected.contains(currentlyElected[i]), true);
     }
 
-    timeTravel(vm, epochDuration + 1);
-    epochManager.startNextEpochProcess();
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
 
     // wait some time before finishing
-    timeTravel(vm, epochDuration / 2);
-    blockTravel(vm, 100);
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
 
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
-    epochManager.setToProcessGroups();
+    epochManagerContract.setToProcessGroups();
     for (uint256 i = 0; i < groups.length; i++) {
-      epochManager.processGroup(groups[i], lessers[i], greaters[i]);
+      epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
     }
-    // epochManager.finishNextEpochProcess(groups, lessers, greaters);
     assertGroupWithVotes(groupWithVotes);
 
-    assertEq(currentEpoch + 2, epochManager.getCurrentEpochNumber());
+    assertEq(currentEpoch + 2, epochManagerContract.getCurrentEpochNumber());
 
-    address[] memory newlyElected2 = epochManager.getElectedAccounts();
+    address[] memory newlyElected2 = epochManagerContract.getElectedAccounts();
 
     for (uint256 i = 0; i < currentlyElected.length; i++) {
       assertEq(originalyElected.contains(newlyElected2[i]), true);
@@ -815,28 +814,28 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
       registerNewValidatorGroupWithValidator(i, validatorPerGroupCount);
     }
 
-    timeTravel(vm, epochDuration + 1);
-    epochManager.startNextEpochProcess();
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
 
-    timeTravel(vm, epochDuration / 2);
-    blockTravel(vm, 100);
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
 
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
 
-    epochManager.setToProcessGroups();
+    epochManagerContract.setToProcessGroups();
     for (uint256 i = 0; i < groups.length; i++) {
-      epochManager.processGroup(groups[i], lessers[i], greaters[i]);
+      epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
     }
 
     activateValidators();
 
-    timeTravel(vm, epochDuration + 1);
-    epochManager.startNextEpochProcess();
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
 
     groups = getCurrentlyElectedGroups();
 
-    timeTravel(vm, epochDuration / 2);
-    blockTravel(vm, 100);
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
   }
 
   /**
@@ -850,11 +849,11 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
     address[] memory greaters;
     GroupWithVotes[] memory groupWithVotes;
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
-    epochManager.setToProcessGroups();
+    epochManagerContract.setToProcessGroups();
 
     for (uint256 i = 0; i < groups.length; i++) {
       uint256 gasLeftBefore1 = gasleft();
-      epochManager.processGroup(groups[i], lessers[i], greaters[i]);
+      epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
       uint256 gasLeftAfter1 = gasleft();
       console.log("processGroup gas used: ", gasLeftBefore1 - gasLeftAfter1);
     }

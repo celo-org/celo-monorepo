@@ -92,7 +92,7 @@ export async function uploadEnvFileToGoogleStorage(networkName: string) {
   const metaData =
     `# .env file for network "${networkName}"\n` +
     `# Last modified by "${userInfo}"\n` +
-    `# Last modified on on ${Date()}\n` +
+    `# Last modified on ${Date()}\n` +
     `# Base commit: "https://github.com/${repo}/commit/${commitHash}"\n`
   const fullData = metaData + '\n' + envFileData
   await uploadDataToGoogleStorage(

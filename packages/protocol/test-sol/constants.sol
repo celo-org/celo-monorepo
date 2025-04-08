@@ -6,10 +6,11 @@ contract TestConstants {
   uint256 public constant FIXED1 = 1e24;
   uint256 public constant MINUTE = 60;
   uint256 public constant HOUR = 60 * MINUTE;
-  uint256 public constant DAY = 24 * HOUR;
-  uint256 public constant MONTH = 30 * DAY;
-  uint256 constant WEEK = 7 * DAY;
-  uint256 public constant YEAR = 365 * DAY;
+  uint256 public constant DAY_IN_SECONDS = 86400;
+  uint256 public constant MONTH = 30 * DAY_IN_SECONDS;
+  uint256 constant WEEK = 7 * DAY_IN_SECONDS;
+  uint256 public constant YEAR = 365 * DAY_IN_SECONDS;
+  uint256 public constant L1_BLOCK_IN_EPOCH = 17280;
   uint256 public constant L2_BLOCK_IN_EPOCH = 43200;
 
   // Contract names

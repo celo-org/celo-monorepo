@@ -587,7 +587,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   /**
-   * @notice A wrapper setter function for the for the data encryption key
+   * @notice A wrapper setter function for the data encryption key
    *         and version of an account.
    * @param dataEncryptionKey Secp256k1 public key for data encryption.
    *                          Preferably compressed.

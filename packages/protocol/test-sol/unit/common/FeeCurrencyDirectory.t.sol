@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry-8/Test.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
+import "@test-sol/utils/WhenL2-08.sol";
+
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/mocks/MockOracle.sol";
 
-contract FeeCurrencyDirectoryTestBase is Test {
+contract FeeCurrencyDirectoryTest is TestWithUtils08 {
   FeeCurrencyDirectory directory;
   MockOracle oracle;
   address nonOwner;
@@ -13,7 +15,8 @@ contract FeeCurrencyDirectoryTestBase is Test {
   event CurrencyConfigSet(address indexed token, address indexed oracle, uint256 intrinsicGas);
   event CurrencyRemoved(address indexed token);
 
-  function setUp() public virtual {
+  function setUp() public virtual override {
+    super.setUp();
     owner = address(this);
     nonOwner = actor("nonOwner");
     oracle = new MockOracle();
@@ -23,7 +26,13 @@ contract FeeCurrencyDirectoryTestBase is Test {
   }
 }
 
-contract TestSetCurrencyConfig is FeeCurrencyDirectoryTestBase {
+contract FeeCurrencyDirectoryTest_L2 is FeeCurrencyDirectoryTest, WhenL2 {
+  function setUp() public virtual override(FeeCurrencyDirectoryTest, WhenL2) {
+    super.setUp();
+  }
+}
+
+contract TestSetCurrencyConfig is FeeCurrencyDirectoryTest {
   function test_ShouldAllowOwnerSetCurrencyConfig() public {
     address token = address(1);
     uint256 intrinsicGas = 21000;
@@ -75,8 +84,14 @@ contract TestSetCurrencyConfig is FeeCurrencyDirectoryTestBase {
   }
 }
 
-contract TestRemoveCurrencies is FeeCurrencyDirectoryTestBase {
-  function setUp() public override {
+contract TestSetCurrencyConfig_L2 is FeeCurrencyDirectoryTest_L2, TestSetCurrencyConfig {
+  function setUp() public override(FeeCurrencyDirectoryTest, FeeCurrencyDirectoryTest_L2) {
+    super.setUp();
+  }
+}
+
+contract TestRemoveCurrencies is FeeCurrencyDirectoryTest {
+  function setUp() public virtual override {
     super.setUp();
     address token = address(4);
     directory.setCurrencyConfig(token, address(oracle), 21000);
@@ -118,10 +133,16 @@ contract TestRemoveCurrencies is FeeCurrencyDirectoryTestBase {
   }
 }
 
-contract TestGetExchangeRate is FeeCurrencyDirectoryTestBase {
+contract TestRemoveCurrencies_L2 is FeeCurrencyDirectoryTest_L2, TestRemoveCurrencies {
+  function setUp() public override(TestRemoveCurrencies, FeeCurrencyDirectoryTest_L2) {
+    super.setUp();
+  }
+}
+
+contract TestGetExchangeRate is FeeCurrencyDirectoryTest {
   address token;
 
-  function setUp() public override {
+  function setUp() public virtual override {
     super.setUp();
     token = address(3);
     oracle.setExchangeRate(token, 200, 4); // 50:1 ratio
@@ -137,5 +158,11 @@ contract TestGetExchangeRate is FeeCurrencyDirectoryTestBase {
   function test_Reverts_WhenTokenDoesntExist() public {
     vm.expectRevert("Currency not in the directory");
     directory.getExchangeRate(address(4));
+  }
+}
+
+contract TestGetExchangeRate_L2 is FeeCurrencyDirectoryTest_L2, TestGetExchangeRate {
+  function setUp() public override(TestGetExchangeRate, FeeCurrencyDirectoryTest_L2) {
+    super.setUp();
   }
 }
