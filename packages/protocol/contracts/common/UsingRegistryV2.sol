@@ -4,13 +4,17 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./interfaces/IAccounts.sol";
+import "./interfaces/IEpochManager.sol";
 import "./interfaces/IFeeCurrencyWhitelist.sol";
 import "./interfaces/IFreezer.sol";
 import "./interfaces/IRegistry.sol";
+import "./interfaces/ICeloUnreleasedTreasury.sol";
 
 import "../governance/interfaces/IElection.sol";
+import "../governance/interfaces/IEpochRewards.sol";
 import "../governance/interfaces/IGovernance.sol";
 import "../governance/interfaces/ILockedGold.sol";
+import "../governance/interfaces/ILockedCelo.sol";
 import "../governance/interfaces/IValidators.sol";
 
 import "../identity/interfaces/IRandom.sol";
@@ -57,6 +61,15 @@ contract UsingRegistryV2 {
   bytes32 internal constant STABLE_REAL_TOKEN_REGISTRY_ID =
     keccak256(abi.encodePacked("StableTokenBRL"));
   bytes32 internal constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
+  bytes32 internal constant CELO_UNRELEASED_TREASURY_REGISTRY_ID =
+    keccak256(abi.encodePacked("CeloUnreleasedTreasury"));
+
+  bytes32 internal constant CELO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("CeloToken"));
+  bytes32 internal constant LOCKED_CELO_REGISTRY_ID = keccak256(abi.encodePacked("LockedCelo"));
+  bytes32 internal constant EPOCH_REWARDS_REGISTRY_ID = keccak256(abi.encodePacked("EpochRewards"));
+  bytes32 internal constant EPOCH_MANAGER_ENABLER_REGISTRY_ID =
+    keccak256(abi.encodePacked("EpochManagerEnabler"));
+  bytes32 internal constant EPOCH_MANAGER_REGISTRY_ID = keccak256(abi.encodePacked("EpochManager"));
 
   modifier onlyRegisteredContract(bytes32 identifierHash) {
     require(
@@ -121,12 +134,20 @@ contract UsingRegistryV2 {
     return IERC20(registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
 
+  function getCeloToken() internal view returns (IERC20) {
+    return IERC20(registryContract.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID));
+  }
+
   function getGovernance() internal view returns (IGovernance) {
     return IGovernance(registryContract.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));
   }
 
   function getLockedGold() internal view returns (ILockedGold) {
     return ILockedGold(registryContract.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
+  }
+
+  function getLockedCelo() internal view returns (ILockedCelo) {
+    return ILockedCelo(registryContract.getAddressForOrDie(LOCKED_CELO_REGISTRY_ID));
   }
 
   function getRandom() internal view returns (IRandom) {
@@ -159,5 +180,20 @@ contract UsingRegistryV2 {
 
   function getValidators() internal view returns (IValidators) {
     return IValidators(registryContract.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
+  }
+
+  function getCeloUnreleasedTreasury() internal view returns (ICeloUnreleasedTreasury) {
+    return
+      ICeloUnreleasedTreasury(
+        registryContract.getAddressForOrDie(CELO_UNRELEASED_TREASURY_REGISTRY_ID)
+      );
+  }
+
+  function getEpochRewards() internal view returns (IEpochRewards) {
+    return IEpochRewards(registryContract.getAddressForOrDie(EPOCH_REWARDS_REGISTRY_ID));
+  }
+
+  function getEpochManager() internal view returns (IEpochManager) {
+    return IEpochManager(registryContract.getAddressForOrDie(EPOCH_MANAGER_REGISTRY_ID));
   }
 }

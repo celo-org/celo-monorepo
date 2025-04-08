@@ -7,6 +7,7 @@ interface IValidators {
     bytes calldata,
     bytes calldata
   ) external returns (bool);
+  function registerValidatorNoBls(bytes calldata ecdsaPublicKey) external returns (bool);
   function deregisterValidator(uint256) external returns (bool);
   function affiliate(address) external returns (bool);
   function deaffiliate() external returns (bool);
@@ -29,6 +30,7 @@ interface IValidators {
   function setGroupLockedGoldRequirements(uint256, uint256) external returns (bool);
   function setValidatorLockedGoldRequirements(uint256, uint256) external returns (bool);
   function setSlashingMultiplierResetPeriod(uint256) external;
+  function setDowntimeGracePeriod(uint256 value) external;
 
   // only registered contract
   function updateEcdsaPublicKey(address, address, bytes calldata) external returns (bool);
@@ -39,6 +41,7 @@ interface IValidators {
     bytes calldata,
     bytes calldata
   ) external returns (bool);
+  function mintStableToEpochManager(uint256 amount) external;
 
   // only VM
   function updateValidatorScoreFromSigner(address, uint256) external;
@@ -49,6 +52,8 @@ interface IValidators {
   function halveSlashingMultiplier(address) external;
 
   // view functions
+  function maxGroupSize() external view returns (uint256);
+  function downtimeGracePeriod() external view returns (uint256);
   function getCommissionUpdateDelay() external view returns (uint256);
   function getValidatorScoreParameters() external view returns (uint256, uint256);
   function getMembershipHistory(
@@ -62,6 +67,7 @@ interface IValidators {
   function getValidator(
     address account
   ) external view returns (bytes memory, bytes memory, address, uint256, address);
+  function getValidatorsGroup(address account) external view returns (address affiliation);
   function getValidatorGroup(
     address
   )
@@ -70,6 +76,7 @@ interface IValidators {
     returns (address[] memory, uint256, uint256, uint256, uint256[] memory, uint256, uint256);
   function getGroupNumMembers(address) external view returns (uint256);
   function getTopGroupValidators(address, uint256) external view returns (address[] memory);
+  function getTopGroupValidatorsAccounts(address, uint256) external view returns (address[] memory);
   function getGroupsNumMembers(
     address[] calldata accounts
   ) external view returns (uint256[] memory);
@@ -85,4 +92,10 @@ interface IValidators {
   function getValidatorGroupSlashingMultiplier(address) external view returns (uint256);
   function getMembershipInLastEpoch(address) external view returns (address);
   function getMembershipInLastEpochFromSigner(address) external view returns (address);
+  function computeEpochReward(
+    address account,
+    uint256 score,
+    uint256 maxPayment
+  ) external view returns (uint256);
+  function getMembershipHistoryLength() external view returns (uint256);
 }

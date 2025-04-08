@@ -1,22 +1,28 @@
 pragma solidity ^0.5.13;
 
-// import "@celo-contracts/common/interfaces/IProxy.sol";
 import "./Proxy.sol";
 import "./interfaces/IProxyFactory.sol";
-// import "forge-std/console.sol";
 
+/**
+ * @title Used for deploying Proxy contracts.
+ */
 contract ProxyFactory is IProxyFactory {
-  function deployProxy(address owner) external returns (address) {
-    return _deployProxy(owner);
-  }
-
+  /**
+   * @notice Deploys a new proxy contract and transfers ownership to the sender
+   * @return Address of the deployed proxy.
+   */
   function deployProxy() external returns (address) {
-    return _deployProxy(msg.sender);
+    return deployProxy(msg.sender);
   }
 
-  function _deployProxy(address owner) private returns (address) {
+  /**
+   * @notice Deploys a new proxy contract and transfers ownership to the provided address
+   * @param owner The address to transfer ownership to.
+   * @return Address of the deployed proxy.
+   */
+  function deployProxy(address owner) public returns (address) {
     Proxy proxy = new Proxy();
-    proxy._transferOwnership(msg.sender);
+    proxy._transferOwnership(owner);
     return address(proxy);
   }
 }

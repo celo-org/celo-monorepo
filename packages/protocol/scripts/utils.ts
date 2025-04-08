@@ -50,18 +50,26 @@ export const determineNextVersion = (
       `${tempVersion.major}.${tempVersion.minor}.${tempVersion.patch}-${tag}.0`
     )
   } else if (gitBranch.startsWith(WORKING_RELEASE_BRANCH_PREFIX)) {
+    const latestVersion = getPreviousVersion(npmPackage, 'latest')
+    const latestVersionSemVer = new SemVer(latestVersion)
+    // since branch names are of the form release/core-contracts.XX we can check the major from the branch name
+    const major = parseInt(gitBranch.split(WORKING_RELEASE_BRANCH_PREFIX)[1], 10)
+
+    // if release for this release branch has been made treat further pushes as patches
+    if (latestVersionSemVer.major === major) {
+      nextVersion = latestVersionSemVer.inc('patch')
+      return nextVersion
+    }
+
     const lastVersion = getPreviousVersion(npmPackage, DAILY_RELEASE_TAG, 'latest')
     const lastVersionSemVer = new SemVer(lastVersion)
 
-    // since branch names are of the form release/core-contracts.XX we can check the major from the branch name
-    const major = gitBranch.split(WORKING_RELEASE_BRANCH_PREFIX)[1]
-
-    const firstCanaryOfMajor = lastVersionSemVer.major !== parseInt(major, 10)
+    const firstCanaryOfMajor = lastVersionSemVer.major !== major
     nextVersion = lastVersionSemVer.inc(
       firstCanaryOfMajor ? 'premajor' : 'prerelease',
       DAILY_RELEASE_TAG
     )
-    nextVersion.major = parseInt(major, 10)
+    nextVersion.major = major
   } else if (isValidNpmTag(npmTag)) {
     const lastVersion = getPreviousVersion(npmPackage, npmTag, DAILY_RELEASE_TAG)
     nextVersion = new SemVer(lastVersion).inc('prerelease', npmTag)
