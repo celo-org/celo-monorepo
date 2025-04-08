@@ -13,7 +13,6 @@ import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/linkedlists/AddressSortedLinkedList.sol";
 import "@celo-contracts/identity/test/MockRandom.sol";
 import "@celo-contracts/common/Freezer.sol";
-// import "@test-sol/unit/common/mocks/MockEpochManager.sol";
 import "@test-sol/utils/WhenL2.sol";
 
 import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";

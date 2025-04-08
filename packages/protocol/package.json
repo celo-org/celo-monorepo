@@ -59,7 +59,8 @@
     "anvil-devchain:integration-tests": "./scripts/foundry/run_integration_tests_in_anvil.sh",
     "view-tags": "git for-each-ref 'refs/tags/core-contracts.*' --sort=-committerdate --format='%(color:magenta)%(committerdate:short) %(color:blue)%(tree) %(color:green)github.com/celo-org/celo-monorepo/releases/tag/%(color:yellow)%(refname:short)'",
     "generate-stabletoken-files": "yarn ts-node ./scripts/generate-stabletoken-files.ts",
-    "truffle-verify": "yarn truffle run verify"
+    "truffle-verify": "yarn truffle run verify",
+    "compare-git-tags": "./scripts/bash/compare-git-tags.sh"
   },
   "dependencies": {
     "@0x/sol-compiler": "^4.8.3",
@@ -81,7 +82,7 @@
     "@summa-tx/memview.sol": "^1.1.0",
     "@truffle/artifactor": "4.0.180",
     "@truffle/contract": "4.6.10",
-    "@truffle/resolver": "9.0.27",
+    "@truffle/resolver": "9.0.53",
     "bignumber.js": "9.1.0",
     "bip39": "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2",
     "bn.js": "^5.1.0",
@@ -124,7 +125,7 @@
     "@tsconfig/recommended": "^1.0.3",
     "@celo/dev-utils":"^0.0.3",
     "@celo/typechain-target-web3-v1-celo": "^1.0.0",
-    "@celo/typescript": "0.0.1",
+    "@celo/typescript": "0.0.2",
     "@jest/globals": "^29.5.0",
     "@types/bn.js": "^5.1.0",
     "@types/chai": "^4.1.3",

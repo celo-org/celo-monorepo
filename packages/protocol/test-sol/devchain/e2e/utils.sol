@@ -8,6 +8,7 @@ import { IScoreManager } from "@celo-contracts-8/common/interfaces/IScoreManager
 import { IValidators } from "@celo-contracts/governance/interfaces/IValidators.sol";
 import { IElection } from "@celo-contracts/governance/interfaces/IElection.sol";
 import { ILockedCelo } from "@celo-contracts/governance/interfaces/ILockedCelo.sol";
+import { ICeloToken } from "@celo-contracts/common/interfaces/ICeloToken.sol";
 
 // All core contracts that are expected to be in the Registry on the devchain
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
@@ -21,12 +22,13 @@ contract Devchain is TestWithUtils08 {
   ISortedOracles sortedOracles;
   FeeCurrencyDirectory feeCurrencyDirectory;
   IEpochManager epochManagerContract;
-  ICeloUnreleasedTreasury celoUnreleasedTreasury;
+  ICeloUnreleasedTreasury celoUnreleasedTreasuryContract;
   IValidators validators;
   IAccounts accounts;
   IScoreManager scoreManager;
   IElection election;
   ILockedCelo lockedCelo;
+  ICeloToken celoTokenContract;
 
   constructor() {
     // Fetch all core contracts that are expeceted to be in the Registry on the devchain
@@ -36,12 +38,13 @@ contract Devchain is TestWithUtils08 {
     ); // FeeCurrencyDirectory is not in UsingRegistry.sol
 
     epochManagerContract = getEpochManager();
-    celoUnreleasedTreasury = getCeloUnreleasedTreasury();
+    celoUnreleasedTreasuryContract = getCeloUnreleasedTreasury();
     validators = getValidators();
     accounts = getAccounts();
     scoreManager = IScoreManager(address(getScoreReader()));
     election = getElection();
     lockedCelo = getLockedCelo();
+    celoTokenContract = ICeloToken(registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
 
     // TODO: Add missing core contracts below (see list in migrations_sol/constants.sol)
     // TODO: Consider asserting that all contracts we expect are available in the Devchain class

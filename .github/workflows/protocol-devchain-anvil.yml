@@ -23,6 +23,9 @@ env:
   # Supported Foundry version defined at celo-org (GitHub organisation) level, for consistency across workflows.
   SUPPORTED_FOUNDRY_VERSION: ${{ vars.SUPPORTED_FOUNDRY_VERSION }}
 
+permissions:
+  contents: read
+
 jobs:
   build:
     defaults:
@@ -90,7 +93,7 @@ jobs:
           echo "Pull Request Number: ${{ env.PR_NUMBER }}"
 
       - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
+        uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
         with:
           version: 'nightly-fa0e0c2ca3ae75895dd19173a02faf88509c0608'
 
@@ -171,7 +174,6 @@ jobs:
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4
         with:
