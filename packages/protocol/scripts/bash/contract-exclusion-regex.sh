@@ -12,8 +12,6 @@ VERSION_NUMBER=$(echo "$BRANCH" | grep -o 'v[0-9]\+' | tr -dc '0-9')
 
 echo "VERSION_NUMBER: $VERSION_NUMBER"
 
-echo "VERSION_NUMBER: $VERSION_NUMBER"
-
 if [ $VERSION_NUMBER -gt 6 ]
   then
   CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|^UsingRegistry"
