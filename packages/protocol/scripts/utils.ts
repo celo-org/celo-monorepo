@@ -1,6 +1,6 @@
-import { execSync } from 'child_process';
-import * as fs from 'fs';
-import { SemVer } from 'semver';
+import { execSync } from 'child_process'
+import * as fs from 'fs'
+import { SemVer } from 'semver'
 
 const DAILY_RELEASE_TAG = 'canary'
 const WORKING_RELEASE_BRANCH_PREFIX = 'release/core-contracts/'

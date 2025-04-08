@@ -1,12 +1,12 @@
-import { expect } from '@jest/globals';
-import { execSync } from 'child_process';
-import { SemVer } from 'semver';
+import { expect } from '@jest/globals'
+import { execSync } from 'child_process'
+import { SemVer } from 'semver'
 import {
   determineNextVersion,
   getReleaseTypeFromSemVer,
   isValidNpmTag,
   isValidPrereleaseIdentifier,
-} from './utils';
+} from './utils'
 
 jest.mock('child_process', () => ({
   execSync: jest.fn(),
