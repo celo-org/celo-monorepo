@@ -164,8 +164,11 @@ contract EpochRewards is
    * @notice Determines if the reserve is low enough to demand a diversion from
    *    the community reward. Targets initial critical ratio of 2 with a linear
    *    decline until 25 years have passed where the critical ratio will be 1.
+   * @dev This function is called by L1 celo-blockchain during epoch reward
+   * distribution.
+   * @dev TODO Remove this after the L2 transition.
    */
-  function isReserveLow() external view returns (bool) {
+  function isReserveLow() external view onlyL1 returns (bool) {
     // critical reserve ratio = 2 - time in second / 25 years
     FixidityLib.Fraction memory timeSinceInitialization = FixidityLib.newFixed(now.sub(startTime));
     FixidityLib.Fraction memory m = FixidityLib.newFixed(25 * 365 * 1 days);

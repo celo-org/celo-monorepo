@@ -1028,4 +1028,9 @@ contract EpochRewardsTest_isReserveLow is EpochRewardsTest {
   }
 }
 
-contract EpochRewardsTest_isReserveLow_L2 is EpochRewardsTest_L2, EpochRewardsTest_isReserveLow {}
+contract EpochRewardsTest_isReserveLow_L2 is EpochRewardsTest_L2 {
+  function test_ShouldRevert() public {
+    vm.expectRevert("This method is no longer supported in L2.");
+    epochRewards.isReserveLow();
+  }
+}
