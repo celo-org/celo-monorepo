@@ -56,8 +56,6 @@ contract ElectionTest is TestWithUtils {
   address account9 = actor("account9");
   address account10 = actor("account10");
 
-  // address epochManagerAddress = actor("epochManagerAddress");
-
   address[] accountsArray;
 
   TestBlocker blocker;
