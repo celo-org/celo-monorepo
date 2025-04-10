@@ -7,8 +7,6 @@ import "./interfaces/IStandardBridge.sol";
 import "./interfaces/IWETH.sol";
 
 contract SuperBridgeETHWrapper is Initializable, Ownable {
-  uint32 internal constant DEFAULT_GAS_LIMIT = 200_000;
-
   IWETH public wethLocal;
   address public wethAddressRemote;
   IStandardBridge public standardBridge;
@@ -36,7 +34,12 @@ contract SuperBridgeETHWrapper is Initializable, Ownable {
     _transferOwnership(msg.sender);
   }
 
-  function wrapAndBridge() public payable {
+  /**
+   * @notice Wraps the ETH and bridges it to the recipient.
+   * @param to The address of the recipient on the other chain.
+   * @param minGasLimit The minimum gas limit for the bridge transaction.
+   */
+  function wrapAndBridge(address to, uint32 minGasLimit) public payable {
     require(msg.value > 0, "No ETH sent");
 
     // Wrap the ETH
@@ -49,9 +52,9 @@ contract SuperBridgeETHWrapper is Initializable, Ownable {
     standardBridge.bridgeERC20To(
       address(wethLocal),
       address(wethAddressRemote),
-      msg.sender,
+      to,
       msg.value,
-      DEFAULT_GAS_LIMIT,
+      minGasLimit,
       ""
     );
     emit WrappedAndBridged(msg.sender, msg.value);

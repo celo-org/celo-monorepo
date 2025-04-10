@@ -89,18 +89,18 @@ contract SuperBridgeETHWrapper_WrapAndBridge is SuperBridgeETHWrapperTestBase {
     vm.expectEmit(true, true, false, true);
     emit WrappedAndBridged(user, amountToSend);
     vm.prank(user);
-    wrapper.wrapAndBridge{ value: amountToSend }();
+    wrapper.wrapAndBridge{ value: amountToSend }(user, 200_000);
 
     assertEq(address(user).balance, userBalanceBefore - amountToSend);
     assertEq(mockWethLocal.balanceOf(address(wrapper)), 0);
     assertEq(mockWethLocal.balanceOf(bridgeAddr), amountToSend);
 
-    assertEq(mockBridge.lastAmount(), amountToSend);
-    assertEq(mockBridge.lastLocalToken(), wethLocalAddr);
-    assertEq(mockBridge.lastRemoteToken(), wethRemoteAddr);
-    assertEq(mockBridge.lastTo(), user);
-    assertEq(mockBridge.lastMinGasLimit(), 200_000);
-    assertEq(mockBridge.lastExtraData(), bytes(""));
+    assertEq(mockBridge.lastAmount(), amountToSend, "amount to send");
+    assertEq(mockBridge.lastLocalToken(), wethLocalAddr, "local token");
+    assertEq(mockBridge.lastRemoteToken(), wethRemoteAddr, "remote token");
+    assertEq(mockBridge.lastTo(), user, "to");
+    assertEq(mockBridge.lastMinGasLimit(), 200_000, "gas limit");
+    assertEq(mockBridge.lastExtraData(), bytes(""), "bytes");
 
     assertEq(mockWethLocal.allowance(address(wrapper), bridgeAddr), 0);
   }
@@ -108,7 +108,7 @@ contract SuperBridgeETHWrapper_WrapAndBridge is SuperBridgeETHWrapperTestBase {
   function test_Revert_WhenNoValueSent() public {
     vm.prank(user);
     vm.expectRevert("No ETH sent");
-    wrapper.wrapAndBridge{ value: 0 }();
+    wrapper.wrapAndBridge{ value: 0 }(user, 200_000);
   }
 }
 
