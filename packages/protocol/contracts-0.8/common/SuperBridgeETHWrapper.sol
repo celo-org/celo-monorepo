@@ -6,29 +6,26 @@ import "@openzeppelin/contracts8/access/Ownable.sol";
 import "./interfaces/IStandardBridge.sol";
 import "./interfaces/IWETH.sol";
 
-
-contract SuperBridgeWETHWrapper is Initializable, Ownable{
+contract SuperBridgeETHWrapper is Initializable, Ownable {
+  uint32 internal constant DEFAULT_GAS_LIMIT = 200_000;
 
   IWETH public wethAddressLocal;
   address public wethAddressRemote;
   IStandardBridge public standardBridge;
 
-  event WrappedAndBridged(
-    address indexed sender,
-    uint256 amount
-  );
+  event WrappedAndBridged(address indexed sender, uint256 amount);
 
-   /**
+  /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
   constructor(bool test) Initializable(test) {}
 
   /**
-    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
-    * @param _wethAddressLocal The address of the registry core smart contract.
-    * @param _wethAddressRemote The address of the registry core smart contract.
-    * @param _standardBridge The address of the standard bridge contract.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param _wethAddressLocal The address of the registry core smart contract.
+   * @param _wethAddressRemote The address of the registry core smart contract.
+   * @param _standardBridge The address of the standard bridge contract.
    */
   function initialize(
     address _wethAddressLocal,
@@ -51,10 +48,10 @@ contract SuperBridgeWETHWrapper is Initializable, Ownable{
     require(msg.value > 0, "No ETH sent");
 
     // Wrap the ETH
-    wethAddressLocal.deposit{value: msg.value}();
+    wethAddressLocal.deposit{ value: msg.value }();
 
     // Approve the Standard Bridge to spend the WETH
-    wethAddressLocal.approve(address(standardBridge), msg.value); // TODO: Should we approve max instead from time to time?
+    wethAddressLocal.approve(address(standardBridge), msg.value);
 
     // Bridge the WETH to the recipient
     standardBridge.bridgeERC20To(
@@ -62,10 +59,9 @@ contract SuperBridgeWETHWrapper is Initializable, Ownable{
       address(wethAddressRemote),
       msg.sender,
       msg.value,
-      0,
+      DEFAULT_GAS_LIMIT,
       ""
     );
     emit WrappedAndBridged(msg.sender, msg.value);
   }
-
 }
