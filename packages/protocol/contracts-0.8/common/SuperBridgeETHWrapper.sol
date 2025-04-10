@@ -6,7 +6,7 @@ import "@openzeppelin/contracts8/access/Ownable.sol";
 import "./interfaces/IStandardBridge.sol";
 import "./interfaces/IWETH.sol";
 
-contract SuperBridgeETHWrapper is Initializable, Ownable {
+contract SuperBridgeETHWrapper {
   IWETH public wethLocal;
   address public wethAddressRemote;
   IStandardBridge public standardBridge;
@@ -14,24 +14,17 @@ contract SuperBridgeETHWrapper is Initializable, Ownable {
   event WrappedAndBridged(address indexed sender, uint256 amount);
 
   /**
-   * @notice Sets initialized == true on implementation contracts
-   * @param test Set to true to skip implementation initialization
+   * @notice Creates the contract with the WETH and Standard Bridge addresses.
+   * @param _wethAddressLocal The address of the local WETH contract.
+   * @param _wethAddressRemote The address of the remote WETH contract.
+   * @param _standardBridgeAddress The address of the Standard Bridge contract.
    */
-  constructor(bool test) Initializable(test) {}
-
-  /**
-   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
-   * @param _wethAddressLocal The address of the registry core smart contract.
-   * @param _wethAddressRemote The address of the registry core smart contract.
-   * @param _standardBridgeAddress The address of the standard bridge contract.
-   */
-  function initialize(
+  constructor(
     address _wethAddressLocal,
     address _wethAddressRemote,
     address _standardBridgeAddress
-  ) external initializer {
+  ) {
     _setAddresses(_wethAddressLocal, _wethAddressRemote, _standardBridgeAddress);
-    _transferOwnership(msg.sender);
   }
 
   /**
@@ -58,20 +51,6 @@ contract SuperBridgeETHWrapper is Initializable, Ownable {
       ""
     );
     emit WrappedAndBridged(msg.sender, msg.value);
-  }
-
-  /*
-   * @notice Set the addresses of the WETH and Standard Bridge contracts.
-   * @param wethLocal The address of the local WETH contract.
-   * @param _wethAddressRemote The address of the remote WETH contract.
-   * @param _standardBridgeAddress The address of the Standard Bridge contract.
-   */
-  function setAddresses(
-    address wethLocal,
-    address _wethAddressRemote,
-    address _standardBridgeAddress
-  ) external onlyOwner {
-    _setAddresses(wethLocal, _wethAddressRemote, _standardBridgeAddress);
   }
 
   function _setAddresses(
