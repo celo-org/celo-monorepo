@@ -43,7 +43,7 @@ contract SuperBridgeETHWrapperTestBase is Test {
 
 contract SuperBridgeETHWrapper_Initialize is SuperBridgeETHWrapperTestBase {
   function test_SetsCorrectValues() public {
-    assertEq(address(wrapper.wethAddressLocal()), wethLocalAddr);
+    assertEq(address(wrapper.wethLocal()), wethLocalAddr);
     assertEq(wrapper.wethAddressRemote(), wethRemoteAddr);
     assertEq(address(wrapper.standardBridge()), bridgeAddr);
     assertEq(wrapper.owner(), owner);
@@ -109,5 +109,44 @@ contract SuperBridgeETHWrapper_WrapAndBridge is SuperBridgeETHWrapperTestBase {
     vm.prank(user);
     vm.expectRevert("No ETH sent");
     wrapper.wrapAndBridge{ value: 0 }();
+  }
+}
+
+contract SuperBridgeETHWrapper_SetAddresses is SuperBridgeETHWrapperTestBase {
+  address newWethLocal = address(0x1111111111111111111111111111111111111111);
+  address newWethRemote = address(0x2222222222222222222222222222222222222222);
+  address newBridge = address(0x3333333333333333333333333333333333333333);
+
+  function test_ShouldUpdateAddresses() public {
+    vm.prank(owner);
+    wrapper.setAddresses(newWethLocal, newWethRemote, newBridge);
+
+    assertEq(address(wrapper.wethLocal()), newWethLocal);
+    assertEq(wrapper.wethAddressRemote(), newWethRemote);
+    assertEq(address(wrapper.standardBridge()), newBridge);
+  }
+
+  function test_Revert_IfNotOwner() public {
+    vm.prank(user);
+    vm.expectRevert("Ownable: caller is not the owner");
+    wrapper.setAddresses(newWethLocal, newWethRemote, newBridge);
+  }
+
+  function test_Revert_ZeroAddress_WethLocal() public {
+    vm.prank(owner);
+    vm.expectRevert("Invalid address");
+    wrapper.setAddresses(address(0), newWethRemote, newBridge);
+  }
+
+  function test_Revert_ZeroAddress_WethRemote() public {
+    vm.prank(owner);
+    vm.expectRevert("Invalid address");
+    wrapper.setAddresses(newWethLocal, address(0), newBridge);
+  }
+
+  function test_Revert_ZeroAddress_Bridge() public {
+    vm.prank(owner);
+    vm.expectRevert("Invalid address");
+    wrapper.setAddresses(newWethLocal, newWethRemote, address(0));
   }
 }

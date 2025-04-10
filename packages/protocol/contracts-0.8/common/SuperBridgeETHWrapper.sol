@@ -9,7 +9,7 @@ import "./interfaces/IWETH.sol";
 contract SuperBridgeETHWrapper is Initializable, Ownable {
   uint32 internal constant DEFAULT_GAS_LIMIT = 200_000;
 
-  IWETH public wethAddressLocal;
+  IWETH public wethLocal;
   address public wethAddressRemote;
   IStandardBridge public standardBridge;
 
@@ -25,37 +25,29 @@ contract SuperBridgeETHWrapper is Initializable, Ownable {
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param _wethAddressLocal The address of the registry core smart contract.
    * @param _wethAddressRemote The address of the registry core smart contract.
-   * @param _standardBridge The address of the standard bridge contract.
+   * @param _standardBridgeAddress The address of the standard bridge contract.
    */
   function initialize(
     address _wethAddressLocal,
     address _wethAddressRemote,
-    address _standardBridge
+    address _standardBridgeAddress
   ) external initializer {
-    require(
-      _wethAddressLocal != address(0) &&
-        _wethAddressRemote != address(0) &&
-        _standardBridge != address(0),
-      "Invalid address"
-    );
+    _setAddresses(_wethAddressLocal, _wethAddressRemote, _standardBridgeAddress);
     _transferOwnership(msg.sender);
-    wethAddressLocal = IWETH(_wethAddressLocal);
-    wethAddressRemote = _wethAddressRemote;
-    standardBridge = IStandardBridge(_standardBridge);
   }
 
   function wrapAndBridge() public payable {
     require(msg.value > 0, "No ETH sent");
 
     // Wrap the ETH
-    wethAddressLocal.deposit{ value: msg.value }();
+    wethLocal.deposit{ value: msg.value }();
 
     // Approve the Standard Bridge to spend the WETH
-    wethAddressLocal.approve(address(standardBridge), msg.value);
+    wethLocal.approve(address(standardBridge), msg.value);
 
     // Bridge the WETH to the recipient
     standardBridge.bridgeERC20To(
-      address(wethAddressLocal),
+      address(wethLocal),
       address(wethAddressRemote),
       msg.sender,
       msg.value,
@@ -63,5 +55,35 @@ contract SuperBridgeETHWrapper is Initializable, Ownable {
       ""
     );
     emit WrappedAndBridged(msg.sender, msg.value);
+  }
+
+  /*
+   * @notice Set the addresses of the WETH and Standard Bridge contracts.
+   * @param wethLocal The address of the local WETH contract.
+   * @param _wethAddressRemote The address of the remote WETH contract.
+   * @param _standardBridgeAddress The address of the Standard Bridge contract.
+   */
+  function setAddresses(
+    address wethLocal,
+    address _wethAddressRemote,
+    address _standardBridgeAddress
+  ) external onlyOwner {
+    _setAddresses(wethLocal, _wethAddressRemote, _standardBridgeAddress);
+  }
+
+  function _setAddresses(
+    address _wethAddressLocal,
+    address _wethAddressRemote,
+    address _standardBridgeAddress
+  ) internal {
+    require(
+      _wethAddressLocal != address(0) &&
+        _wethAddressRemote != address(0) &&
+        _standardBridgeAddress != address(0),
+      "Invalid address"
+    );
+    wethLocal = IWETH(_wethAddressLocal);
+    wethAddressRemote = _wethAddressRemote;
+    standardBridge = IStandardBridge(_standardBridgeAddress);
   }
 }
