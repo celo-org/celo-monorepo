@@ -6,7 +6,6 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./UsingRegistry.sol";
-import "./CalledByVm.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
 import "./interfaces/ICeloTokenInitializer.sol";
@@ -24,7 +23,6 @@ import "../../contracts-0.8/common/IsL2Check.sol";
  */
 contract GoldToken is
   Initializable,
-  CalledByVm,
   UsingRegistry,
   IERC20,
   ICeloToken,
@@ -177,38 +175,6 @@ contract GoldToken is
   }
 
   /**
-   * @notice Mints new CELO and gives it to 'to'.
-   * @param to The account for which to mint tokens.
-   * @param value The amount of CELO to mint.
-   * @dev This function will be deprecated in L2.
-   */
-  function mint(address to, uint256 value) external onlyL1 onlyVm returns (bool) {
-    if (value == 0) {
-      return true;
-    }
-
-    require(to != address(0), "mint attempted to reserved address 0x0");
-    totalSupply_ = totalSupply_.add(value);
-
-    bool success;
-    (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(address(0), to, value));
-    require(success, "CELO transfer failed");
-
-    emit Transfer(address(0), to, value);
-    return true;
-  }
-
-  /**
-   * @notice Increases the variable for total amount of CELO in existence.
-   * @param amount The amount to increase counter by
-   * @dev This function will be deprecated in L2. The onlyway to increase
-   * the supply is with the mint function.
-   */
-  function increaseSupply(uint256 amount) external onlyL1 onlyVm {
-    totalSupply_ = totalSupply_.add(amount);
-  }
-
-  /**
    * @return The name of the CELO token.
    */
   function name() external view returns (string memory) {
@@ -278,22 +244,14 @@ contract GoldToken is
    * @return The total amount of allocated CELO.
    */
   function allocatedSupply() public view returns (uint256) {
-    if (isL2()) {
-      return CELO_SUPPLY_CAP - getCeloUnreleasedTreasury().getRemainingBalanceToRelease();
-    } else {
-      return totalSupply();
-    }
+    return CELO_SUPPLY_CAP - getCeloUnreleasedTreasury().getRemainingBalanceToRelease();
   }
 
   /**
    * @return The total amount of CELO in existence, including what the burn address holds.
    */
   function totalSupply() public view returns (uint256) {
-    if (isL2()) {
-      return CELO_SUPPLY_CAP;
-    } else {
-      return totalSupply_;
-    }
+    return CELO_SUPPLY_CAP;
   }
 
   /**

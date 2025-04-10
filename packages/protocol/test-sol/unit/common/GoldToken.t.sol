@@ -34,13 +34,6 @@ contract CeloTokenTest is TestWithUtils {
     sender = actor("sender");
     randomAddress = actor("random");
 
-    vm.prank(address(0));
-    celoToken.mint(receiver, ONE_CELOTOKEN); // Increase total supply.
-    vm.prank(address(0));
-    celoToken.mint(sender, ONE_CELOTOKEN);
-    vm.prank(address(0));
-    celoToken.mint(randomAddress, L1_MINTED_CELO_SUPPLY - (2 * ONE_CELOTOKEN)); // Increase total supply.
-
     vm.deal(receiver, ONE_CELOTOKEN);
     vm.deal(sender, ONE_CELOTOKEN);
     vm.deal(randomAddress, L1_MINTED_CELO_SUPPLY - (2 * ONE_CELOTOKEN)); // Increases balance.
@@ -55,8 +48,6 @@ contract CeloTokenTest_PreL2 is CeloTokenTest {
   function setUp() public {
     super.setUp();
 
-    vm.prank(address(0));
-    celoToken.mint(celoUnreleasedTreasuryAddress, L2_INITIAL_STASH_BALANCE);
     vm.deal(celoUnreleasedTreasuryAddress, L2_INITIAL_STASH_BALANCE);
 
     vm.deal(address(0), 0);
@@ -245,92 +236,20 @@ contract CeloTokenTest_burn is CeloTokenTest {
 
 contract CeloTokenTest_burn_L2 is CeloTokenTest_L2, CeloTokenTest_burn {}
 
-contract CeloTokenTest_mint is CeloTokenTest {
-  function test_Reverts_whenCalledByOtherThanVm() public {
-    vm.prank(celoTokenOwner);
-    vm.expectRevert("Only VM can call");
-    celoToken.mint(receiver, ONE_CELOTOKEN);
-
-    vm.prank(celoUnreleasedTreasuryAddress);
-    vm.expectRevert("Only VM can call");
-    celoToken.mint(receiver, ONE_CELOTOKEN);
+contract CeloTokenTest_circulatingSupply_L2 is CeloTokenTest_L2 {
+  function test_ShouldBeLessThanTheTotalSupply() public {
+    assertLt(celoToken.circulatingSupply(), celoToken.totalSupply());
   }
 
-  function test_Should_increaseCeloTokenTotalSupplyWhencalledByVm() public {
-    uint256 celoTokenSupplyBefore = celoToken.totalSupply();
-    vm.prank(address(0));
-    celoToken.mint(receiver, ONE_CELOTOKEN);
-    uint256 celoTokenSupplyAfter = celoToken.totalSupply();
-    assertGt(celoTokenSupplyAfter, celoTokenSupplyBefore);
-  }
-
-  function test_Emits_TransferEvent() public {
-    vm.prank(address(0));
-    vm.expectEmit(true, true, true, true);
-    emit Transfer(address(0), receiver, ONE_CELOTOKEN);
-    celoToken.mint(receiver, ONE_CELOTOKEN);
-  }
-}
-
-contract CeloTokenTest_mint_L2 is CeloTokenTest_L2 {
-  function test_Reverts_whenL2() public {
-    vm.expectRevert("This method is no longer supported in L2.");
-    vm.prank(celoUnreleasedTreasuryAddress);
-    celoToken.mint(receiver, ONE_CELOTOKEN);
-    vm.expectRevert("This method is no longer supported in L2.");
-    vm.prank(address(0));
-    celoToken.mint(receiver, ONE_CELOTOKEN);
-  }
-}
-
-contract CeloTokenTest_increaseSupply is CeloTokenTest {
-  function test_ShouldIncreaseTotalSupply() public {
-    uint256 celoTokenSupplyBefore = celoToken.totalSupply();
-    vm.prank(address(0));
-    celoToken.increaseSupply(ONE_CELOTOKEN);
-    uint256 celoTokenSupplyAfter = celoToken.totalSupply();
-    assertGt(celoTokenSupplyAfter, celoTokenSupplyBefore);
-  }
-
-  function test_Reverts_WhenCalledByOtherThanVm() public {
-    vm.prank(celoTokenOwner);
-    vm.expectRevert("Only VM can call");
-    celoToken.increaseSupply(ONE_CELOTOKEN);
-  }
-}
-
-contract CeloTokenTest_increaseSupply_L2 is CeloTokenTest_L2 {
-  function test_Reverts_WhenL2() public {
-    vm.prank(celoTokenOwner);
-    vm.expectRevert("This method is no longer supported in L2.");
-    celoToken.increaseSupply(ONE_CELOTOKEN);
-  }
-}
-
-contract CeloTokenTest_circulatingSupply is CeloTokenTest {
-  function test_ShouldMatchCirculatingSupply_WhenNoBurn() public {
+  function test_ShouldMatchAllocatedSupply_WhenNoBurn() public {
     assertEq(celoToken.circulatingSupply(), celoToken.allocatedSupply());
-    assertEq(celoToken.circulatingSupply(), L1_MINTED_CELO_SUPPLY);
   }
 
   function test_ShouldDecreaseCirculatingSupply_WhenThereWasBurn() public {
     vm.prank(randomAddress);
     celoToken.burn(ONE_CELOTOKEN);
-    assertEq(celoToken.circulatingSupply(), L1_MINTED_CELO_SUPPLY - ONE_CELOTOKEN);
+    // assertEq(celoToken.circulatingSupply(), L1_MINTED_CELO_SUPPLY - ONE_CELOTOKEN);
     assertEq(celoToken.circulatingSupply(), celoToken.allocatedSupply() - ONE_CELOTOKEN);
-  }
-}
-
-contract CeloTokenTest_circulatingSupply_L2 is CeloTokenTest_L2, CeloTokenTest_circulatingSupply {
-  function test_ShouldBeLessThanTheTotalSupply() public {
-    assertLt(celoToken.circulatingSupply(), celoToken.totalSupply());
-  }
-}
-
-contract CeloTokenTest_AllocatedSupply is CeloTokenTest {
-  function test_ShouldReturnTotalSupply() public {
-    assertEq(celoToken.allocatedSupply(), L1_MINTED_CELO_SUPPLY);
-    assertEq(celoToken.allocatedSupply(), celoToken.totalSupply());
   }
 }
 
@@ -343,12 +262,6 @@ contract CeloTokenTest_AllocatedSupply_L2 is CeloTokenTest_L2 {
   function test_ShouldReturnTotalSupplyWhenCeloUnreleasedTreasuryHasReleasedAllBalance() public {
     deal(celoUnreleasedTreasuryAddress, 0);
     assertEq(celoToken.allocatedSupply(), celoToken.totalSupply());
-  }
-}
-
-contract CeloTokenTest_TotalSupply is CeloTokenTest {
-  function test_ShouldReturnL1MintedSupply() public {
-    assertEq(celoToken.totalSupply(), L1_MINTED_CELO_SUPPLY);
   }
 }
 
