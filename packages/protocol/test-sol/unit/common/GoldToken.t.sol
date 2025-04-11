@@ -55,7 +55,7 @@ contract CeloTokenTest_PreL2 is CeloTokenTest {
 }
 contract CeloTokenTest_L2 is CeloTokenTest_PreL2, WhenL2 {}
 
-contract CeloTokenTest_general is CeloTokenTest {
+contract CeloTokenTest_general is CeloTokenTest_L2 {
   function test_name() public {
     assertEq(celoToken.name(), "Celo native asset");
   }
@@ -101,9 +101,7 @@ contract CeloTokenTest_general is CeloTokenTest {
   }
 }
 
-contract CeloTokenTest_general_L2 is CeloTokenTest_L2, CeloTokenTest_general {}
-
-contract CeloTokenTest_transfer is CeloTokenTest {
+contract CeloTokenTest_transfer is CeloTokenTest_L2 {
   function setUp() public {
     super.setUp();
   }
@@ -158,9 +156,7 @@ contract CeloTokenTest_transfer is CeloTokenTest {
   }
 }
 
-contract CeloTokenTest_transfer_L2 is CeloTokenTest_L2, CeloTokenTest_transfer {}
-
-contract CeloTokenTest_transferFrom is CeloTokenTest {
+contract CeloTokenTest_transferFrom is CeloTokenTest_L2 {
   function setUp() public {
     super.setUp();
     vm.prank(sender);
@@ -205,9 +201,7 @@ contract CeloTokenTest_transferFrom is CeloTokenTest {
   }
 }
 
-contract CeloTokenTest_transferFrom_L2 is CeloTokenTest_L2, CeloTokenTest_transferFrom {}
-
-contract CeloTokenTest_burn is CeloTokenTest {
+contract CeloTokenTest_burn is CeloTokenTest_L2 {
   uint256 startBurn;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
 
@@ -234,8 +228,6 @@ contract CeloTokenTest_burn is CeloTokenTest {
   }
 }
 
-contract CeloTokenTest_burn_L2 is CeloTokenTest_L2, CeloTokenTest_burn {}
-
 contract CeloTokenTest_circulatingSupply_L2 is CeloTokenTest_L2 {
   function test_ShouldBeLessThanTheTotalSupply() public {
     assertLt(celoToken.circulatingSupply(), celoToken.totalSupply());
@@ -248,7 +240,6 @@ contract CeloTokenTest_circulatingSupply_L2 is CeloTokenTest_L2 {
   function test_ShouldDecreaseCirculatingSupply_WhenThereWasBurn() public {
     vm.prank(randomAddress);
     celoToken.burn(ONE_CELOTOKEN);
-    // assertEq(celoToken.circulatingSupply(), L1_MINTED_CELO_SUPPLY - ONE_CELOTOKEN);
     assertEq(celoToken.circulatingSupply(), celoToken.allocatedSupply() - ONE_CELOTOKEN);
   }
 }
