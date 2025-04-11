@@ -1428,7 +1428,6 @@ contract ReleaseGoldTest_RefundAndFinalize_L2 is
   ReleaseGoldTest_RefundAndFinalize
 {}
 
-/*
 contract ReleaseGoldTest_ExpireSelfDestructTest is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
@@ -1441,6 +1440,9 @@ contract ReleaseGoldTest_ExpireSelfDestructTest is ReleaseGoldTest {
     releaseGold.refundAndFinalize();
   }
 
+  // This test fails at the same call depth as expectRevert, since it fails due to the contract no
+  // longer existing. Same with other selfdestruct tests in this suite.
+  /// forge-config: default.allow_internal_expect_revert = true
   function test_ShouldDestructReleaseGoldInstanceAfterFinalizingAndPreventCallingFurtherActions_WhenRevoked()
     public
   {
@@ -1449,11 +1451,11 @@ contract ReleaseGoldTest_ExpireSelfDestructTest is ReleaseGoldTest {
   }
 }
 
+/// forge-config: default.allow_internal_expect_revert = true
 contract ReleaseGoldTest_ExpireSelfDestructTest_L2 is
   ReleaseGoldTest_L2,
   ReleaseGoldTest_ExpireSelfDestructTest
 {}
-*/
 
 contract ReleaseGoldTest_LockGold is ReleaseGoldTest {
   uint256 lockAmount;
@@ -2045,7 +2047,6 @@ contract ReleaseGoldTest_Withdraw is ReleaseGoldTest {
 
 contract ReleaseGoldTest_Withdraw_L2 is ReleaseGoldTest_L2, ReleaseGoldTest_Withdraw {}
 
-/*
 contract ReleaseGoldTest_WithdrawSelfDestruct_WhenNotRevoked is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
 
@@ -2066,12 +2067,14 @@ contract ReleaseGoldTest_WithdrawSelfDestruct_WhenNotRevoked is ReleaseGoldTest 
     releaseGold.withdraw(expectedWithdrawalAmount);
   }
 
+  /// forge-config: default.allow_internal_expect_revert = true
   function test_ShouldSelfDestructIfBeneficiaryWithdrawsTheEntireAmount() public {
     vm.expectRevert();
     releaseGold.totalWithdrawn();
   }
 }
 
+/// forge-config: default.allow_internal_expect_revert = true
 contract ReleaseGoldTest_WithdrawSelfDestruct_WhenNotRevoked_L2 is
   ReleaseGoldTest_L2,
   ReleaseGoldTest_WithdrawSelfDestruct_WhenNotRevoked
@@ -2099,17 +2102,18 @@ contract ReleaseGoldTest_WithdrawSelfDestruct_WhenRevoked is ReleaseGoldTest {
     releaseGold.withdraw(expectedWithdrawalAmount);
   }
 
+  /// forge-config: default.allow_internal_expect_revert = true
   function test_ShouldSelfDestructIfBeneficiaryWithdrawsTheEntireAmount() public {
     vm.expectRevert();
     releaseGold.totalWithdrawn();
   }
 }
 
+/// forge-config: default.allow_internal_expect_revert = true
 contract ReleaseGoldTest_WithdrawSelfDestruct_WhenRevoked_L2 is
   ReleaseGoldTest_L2,
   ReleaseGoldTest_WithdrawSelfDestruct_WhenRevoked
 {}
-*/
 
 contract ReleaseGoldTest_GetCurrentReleasedTotalAmount is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
