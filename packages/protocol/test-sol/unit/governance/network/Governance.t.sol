@@ -3561,7 +3561,6 @@ contract GovernanceTest_resetHotfix is GovernanceTest_resetHotfix_setup {
     vm.prank(validator1);
     governance.whitelistHotfix(HOTFIX_HASH);
 
-
     governance.prepareHotfix(HOTFIX_HASH);
 
     timeTravel(DAY + 1);
