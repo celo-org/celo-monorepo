@@ -142,7 +142,7 @@ contract TestWithUtils is Test, TestConstants, IsL2Check, PrecompilesOverrideV2 
   function containsLog(
     Vm.Log[] memory logs,
     string memory signatureString
-  ) private view returns (bool) {
+  ) private pure returns (bool) {
     bytes32 signature = keccak256(abi.encodePacked(signatureString));
     for (uint256 i = 0; i < logs.length; i++) {
       bytes32 logSignature = logs[i].topics[0];
