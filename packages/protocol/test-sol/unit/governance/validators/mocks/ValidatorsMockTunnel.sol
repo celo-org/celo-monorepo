@@ -45,7 +45,7 @@ contract ValidatorsMockTunnel is ForgeTest {
    * See https://docs.soliditylang.org/en/v0.5.17/control-structures.html#revert
    * for details.
    */
-  function recoverErrorString(bytes memory errorData) internal returns (string memory) {
+  function recoverErrorString(bytes memory errorData) internal pure returns (string memory) {
     // Offset in `errorData` due to it starting with the signature for Error(string)
     uint256 signatureLength = 4;
     uint256 stringEncodingLength = errorData.length - signatureLength;
