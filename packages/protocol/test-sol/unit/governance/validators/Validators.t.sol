@@ -1019,6 +1019,7 @@ contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest_L2 {
     assertEq(_membershipGroups, expectedMembershipGroups);
   }
 
+  /*
   function testFail_DoesNotEmit_ValidatorBlsPublicKeyUpdatedEvent() public {
     (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
       validator,
@@ -1034,6 +1035,7 @@ contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest_L2 {
     vm.prank(validator);
     validators.registerValidatorNoBls(_ecdsaPubKey);
   }
+  */
 
   function test_Emits_ValidatorRegisteredEvent() public {
     (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(

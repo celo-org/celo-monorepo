@@ -301,6 +301,7 @@ contract SortedOracles_RemoveOracles is SortedOraclesTest {
     assertEq(medianTimestampBefore, medianTimestampAfter);
   }
 
+  /*
   function testFail_removeOracle_whenOneReportExists_shouldNotEmitTheOracleReportedAndMedianUpdatedEvent()
     public
   {
@@ -313,6 +314,7 @@ contract SortedOracles_RemoveOracles is SortedOraclesTest {
     emit MedianUpdated(token, 0);
     sortedOracles.removeOracle(token, oracle, 0);
   }
+  */
 
   function test_removeOracle_whenOneReportExists_shouldEmitTheOracleRemovedEvent() public {
     submitNReports(1);

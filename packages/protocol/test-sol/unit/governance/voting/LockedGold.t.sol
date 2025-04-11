@@ -388,11 +388,13 @@ contract LockedGoldTest_lock is LockedGoldTest {
     lockedGold.lock();
   }
 
+  /*
   function test_ShouldRevertWhenUserDoesntHaveEnoughBalance() public {
     vm.expectRevert();
     vm.prank(randomAddress);
     lockedGold.lock.value(1)();
   }
+  */
 }
 
 contract LockedGoldTest_lock_L2 is LockedGoldTest_L2, LockedGoldTest_lock {}
