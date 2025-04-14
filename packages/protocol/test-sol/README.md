@@ -6,13 +6,7 @@ You can build this project by simply running
 forge build
 ```
 
-
-**Note**: Due to a regression in Foundry, you might need to use an older
-version. You can install the most recent version verified to work by running
-
-```bash
-foundryup --version nightly-f625d0fa7c51e65b4bf1e8f7931cd1c6e2e285e9
-```
+These test suites are verified to work with Foundry version 1.0.0-stable.
 
 ### Testing
 
