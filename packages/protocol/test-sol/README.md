@@ -48,8 +48,6 @@ You can read more about the `forge test` command [here](https://book.getfoundry.
 
 To skip a specific test, you can add `vm.skip(true);` as the first line of the test.
 
-If a test name begins with `testFail` rather than `test`, foundry will expect the test to fail / revert.
-
 Please follow the naming convention `test_NameOfTest` / `testFail_NameOfTest`.
 
 If you're new to Forge / Foundry, we recommend looking through the [Cheatcode Reference](https://book.getfoundry.sh/cheatcodes/) for a list of useful commands that make writing tests easier.
