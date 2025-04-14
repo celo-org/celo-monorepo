@@ -51,6 +51,3 @@ To skip a specific test, you can add `vm.skip(true);` as the first line of the t
 Please follow the naming convention `test_NameOfTest` / `testFail_NameOfTest`.
 
 If you're new to Forge / Foundry, we recommend looking through the [Cheatcode Reference](https://book.getfoundry.sh/cheatcodes/) for a list of useful commands that make writing tests easier.
-
-
-
