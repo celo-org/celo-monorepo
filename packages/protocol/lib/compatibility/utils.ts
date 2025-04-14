@@ -26,8 +26,6 @@ export class ASTBackwardReport {
 
     // Run reports
     logFunction("Running storage report...\n")
-    logFunction(`old artifacts: ${oldArtifacts}`)
-    logFunction(`new artifacts: ${newArtifacts}`)
     const storage = reportLayoutIncompatibilities(oldArtifacts, newArtifacts)
     logFunction("Done\n")
 

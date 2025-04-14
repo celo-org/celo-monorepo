@@ -40,4 +40,10 @@ if [ $VERSION_NUMBER -eq 12 ]
   CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|MockElection|\\bFeeHandlerSeller\\b"
 fi
 
+if [ $VERSION_NUMBER -eq 13 ]
+  then
+  # FeeHandlerSeller is not deployed, only its children
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|MockElection|\\bFeeHandlerSeller\\b"
+fi
+
 echo "FULL CONTRACT_EXCLUSION_REGEX: $CONTRACT_EXCLUSION_REGEX"
