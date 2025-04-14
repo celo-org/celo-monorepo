@@ -91,7 +91,7 @@ try {
 
   try {
     const version = getReleaseVersion(argv.new_branch)
-    if (version === 11) {
+    if (version === 12) {
       // force redeploy of AddressSortedLinkedListWithMedian for CR11
       // since it was deployed by Mento team with different settings and bytecode
       backward.report.libraries.AddressSortedLinkedListWithMedian = {} as CategorizedChanges
