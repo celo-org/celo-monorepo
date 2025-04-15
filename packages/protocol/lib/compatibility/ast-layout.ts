@@ -25,12 +25,13 @@ const addSchemaForLayoutChecking = (web3Contract: Web3Contract, artifact: any): 
   contract.schema = {}
   contract.schema.ast = artifact.ast
   contract.schema.contractName = artifact.contractName
+  console.log("addedSchemaForLayoutChecking", artifact.contractName);
   return contract
 }
 
 const makeZContract = (artifact: any): ZContract => {
   const contract = new web3.eth.Contract(artifact.abi)
-
+console.log("new web3.eth.Contract");
   return addSchemaForLayoutChecking(contract, artifact)
 }
 
