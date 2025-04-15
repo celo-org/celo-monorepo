@@ -388,6 +388,10 @@ contract LockedGoldTest_lock is LockedGoldTest {
     lockedGold.lock();
   }
 
+  // This test fails at the same call depth as expectRevert, since it fails due to not having enough
+  // CELO to call with a non-0 value.
+  // See https://book.getfoundry.sh/cheatcodes/expect-revert#description
+  /// forge-config: default.allow_internal_expect_revert = true
   function test_ShouldRevertWhenUserDoesntHaveEnoughBalance() public {
     vm.expectRevert();
     vm.prank(randomAddress);
@@ -395,6 +399,7 @@ contract LockedGoldTest_lock is LockedGoldTest {
   }
 }
 
+/// forge-config: default.allow_internal_expect_revert = true
 contract LockedGoldTest_lock_L2 is LockedGoldTest_L2, LockedGoldTest_lock {}
 
 contract LockedGoldTest_unlock is LockedGoldTest {
