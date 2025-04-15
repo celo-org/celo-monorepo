@@ -36,7 +36,7 @@ const makeZContract = (artifact: any): ZContract => {
 
 export const getLayout = (artifact: Artifact, artifacts: BuildArtifacts) => {
   const contract = makeZContract(artifact)
-
+console.log("makeZContract");
   return getStorageLayout(contract, artifacts)
 }
 
