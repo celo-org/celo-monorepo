@@ -195,7 +195,9 @@ export const generateCompatibilityReport = (oldArtifact: Artifact, oldArtifacts:
   newArtifact: Artifact, newArtifacts: BuildArtifacts)
   : { contract: string, compatible: boolean, errors: any[], expanded?: boolean } => {
   const oldLayout = getLayout(oldArtifact, oldArtifacts)
+  console.log("got old layout");
   const newLayout = getLayout(newArtifact, newArtifacts)
+  console.log("got new layout");
   const layoutReport = generateLayoutCompatibilityReport(oldLayout, newLayout)
   console.log("got layout report", JSON.stringify(layoutReport));
   const structsReport = generateStructsCompatibilityReport(oldLayout, newLayout)
