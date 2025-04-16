@@ -10,7 +10,6 @@ import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
 import "./interfaces/ICeloTokenInitializer.sol";
 import "./interfaces/ICeloVersionedContract.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
 
 /**
  * @title ERC20 interface for the CELO token.
@@ -27,8 +26,7 @@ contract GoldToken is
   IERC20,
   ICeloToken,
   ICeloTokenInitializer,
-  ICeloVersionedContract,
-  IsL2Check
+  ICeloVersionedContract
 {
   using SafeMath for uint256;
 
