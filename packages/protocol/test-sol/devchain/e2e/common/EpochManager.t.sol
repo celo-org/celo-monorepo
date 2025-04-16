@@ -48,8 +48,6 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
     epochDuration = epochManagerContract.epochDuration();
 
     vm.deal(address(celoUnreleasedTreasuryContract), L2_INITIAL_STASH_BALANCE); // 80% of the total supply to the treasury - whis will be yet distributed
-    vm.prank(address(0));
-    celoTokenContract.mint(address(celoUnreleasedTreasuryContract), L2_INITIAL_STASH_BALANCE);
   }
 
   function activateValidators() public {
