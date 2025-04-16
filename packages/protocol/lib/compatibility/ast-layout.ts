@@ -229,6 +229,11 @@ export const reportLayoutIncompatibilities = (oldArtifactsSet: BuildArtifacts[],
         const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
         if (oldArtifact !== undefined) {
           console.log(`running report for: ${newArtifact.contractName}`)
+          console.log("######")
+          console.log("oldArtifact", oldArtifact);
+          console.log("newArtifact", newArtifact);
+          console.log("oldArtifacts", oldArtifacts);
+          console.log("newArtifacts", newArtifacts);
           return generateCompatibilityReport(oldArtifact, oldArtifacts, newArtifact, newArtifacts)
         }
       }
