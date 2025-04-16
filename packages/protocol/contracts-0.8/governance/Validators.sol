@@ -15,8 +15,8 @@ import "../common/linkedlists/AddressLinkedList.sol";
 import "../common/UsingRegistry.sol";
 import "../common/PrecompilesOverride.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/libraries/ReentrancyGuard.sol";
 import "../common/interfaces/IStableToken.sol";
-import "../common/libraries/ReentrancyGuard08.sol";
 
 import "../../contracts/common/interfaces/IAccounts.sol";
 
@@ -27,7 +27,7 @@ contract Validators is
   IValidators,
   ICeloVersionedContract,
   Ownable,
-  ReentrancyGuard08,
+  ReentrancyGuard,
   Initializable,
   UsingRegistry,
   PrecompilesOverride,
