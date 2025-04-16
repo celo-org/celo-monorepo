@@ -37,7 +37,7 @@ fi
 if [ $VERSION_NUMBER -eq 12 ]
   then
   # FeeHandlerSeller is not deployed, only its children
-  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|MockElection|CeloUnreleasedTreasury|\\bFeeHandlerSeller\\b"
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|MockElection|\\bFeeHandlerSeller\\b"
 fi
 
 if [ $VERSION_NUMBER -eq 13 ]

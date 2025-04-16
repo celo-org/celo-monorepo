@@ -37,7 +37,7 @@ console.log("new web3.eth.Contract");
 
 export const getLayout = (artifact: Artifact, artifacts: BuildArtifacts) => {
   const contract = makeZContract(artifact)
-console.log("makeZContract");
+console.log("makeZContract", JSON.stringify(artifact));
   return getStorageLayout(contract, artifacts)
 }
 
