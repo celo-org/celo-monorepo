@@ -195,7 +195,7 @@ contract AccountsTest is TestWithUtils {
 
 contract AccountsTest_L2 is AccountsTest, WhenL2 {}
 
-contract AccountsTest_createAccount is AccountsTest {
+contract AccountsTest_createAccount is AccountsTest_L2 {
   function setUp() public {
     super.setUp();
   }
@@ -213,9 +213,7 @@ contract AccountsTest_createAccount is AccountsTest {
   }
 }
 
-contract AccountsTest_createAccount_L2 is AccountsTest_L2, AccountsTest_createAccount {}
-
-contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
+contract AccountsTest_setAccountDataEncryptionKey is AccountsTest_L2 {
   function setUp() public {
     super.setUp();
   }
@@ -250,12 +248,7 @@ contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
   }
 }
 
-contract AccountsTest_setAccountDataEncryptionKey_L2 is
-  AccountsTest_L2,
-  AccountsTest_setAccountDataEncryptionKey
-{}
-
-contract AccountsTest_setAccount is AccountsTest {
+contract AccountsTest_setAccount is AccountsTest_L2 {
   function setUp() public {
     super.setUp();
   }
@@ -341,9 +334,7 @@ contract AccountsTest_setAccount is AccountsTest {
   }
 }
 
-contract AccountsTest_setAccount_L2 is AccountsTest_L2, AccountsTest_setAccount {}
-
-contract AccountsTest_setWalletAddress is AccountsTest {
+contract AccountsTest_setWalletAddress is AccountsTest_L2 {
   function setUp() public {
     super.setUp();
   }
@@ -393,9 +384,7 @@ contract AccountsTest_setWalletAddress is AccountsTest {
   }
 }
 
-contract AccountsTest_setWalletAddress_L2 is AccountsTest_L2, AccountsTest_setWalletAddress {}
-
-contract AccountsTest_setMetadataURL is AccountsTest {
+contract AccountsTest_setMetadataURL is AccountsTest_L2 {
   function setUp() public {
     super.setUp();
   }
@@ -419,9 +408,7 @@ contract AccountsTest_setMetadataURL is AccountsTest {
   }
 }
 
-contract AccountsTest_setMetadataURL_L2 is AccountsTest_L2, AccountsTest_setMetadataURL {}
-
-contract AccountsTest_batchGetMetadataURL is AccountsTest {
+contract AccountsTest_batchGetMetadataURL is AccountsTest_L2 {
   function setUp() public {
     super.setUp();
   }
@@ -471,9 +458,7 @@ contract AccountsTest_batchGetMetadataURL is AccountsTest {
   }
 }
 
-contract AccountsTest_batchGetMetadataURL_L2 is AccountsTest_L2, AccountsTest_batchGetMetadataURL {}
-
-contract AccountsTest_addStorageRoot is AccountsTest {
+contract AccountsTest_addStorageRoot is AccountsTest_L2 {
   function setUp() public {
     super.setUp();
   }
@@ -519,9 +504,7 @@ contract AccountsTest_addStorageRoot is AccountsTest {
   }
 }
 
-contract AccountsTest_addStorageRoot_L2 is AccountsTest_L2, AccountsTest_addStorageRoot {}
-
-contract AccountsTest_removeStorageRoot is AccountsTest {
+contract AccountsTest_removeStorageRoot is AccountsTest_L2 {
   function setUp() public {
     super.setUp();
   }
@@ -597,9 +580,7 @@ contract AccountsTest_removeStorageRoot is AccountsTest {
   }
 }
 
-contract AccountsTest_removeStorageRoot_L2 is AccountsTest_L2, AccountsTest_removeStorageRoot {}
-
-contract AccountsTest_setPaymentDelegation is AccountsTest {
+contract AccountsTest_setPaymentDelegation is AccountsTest_L2 {
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
   uint256 badFraction = FixidityLib.newFixedFraction(12, 10).unwrap();
@@ -641,12 +622,7 @@ contract AccountsTest_setPaymentDelegation is AccountsTest {
   }
 }
 
-contract AccountsTest_setPaymentDelegation_L2 is
-  AccountsTest_L2,
-  AccountsTest_setPaymentDelegation
-{}
-
-contract AccountsTest_deletePaymentDelegation is AccountsTest {
+contract AccountsTest_deletePaymentDelegation is AccountsTest_L2 {
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
 
@@ -676,12 +652,7 @@ contract AccountsTest_deletePaymentDelegation is AccountsTest {
   }
 }
 
-contract AccountsTest_deletePaymentDelegation_L2 is
-  AccountsTest_L2,
-  AccountsTest_deletePaymentDelegation
-{}
-
-contract AccountsTest_setName is AccountsTest {
+contract AccountsTest_setName is AccountsTest_L2 {
   function setUp() public {
     super.setUp();
   }
@@ -705,9 +676,7 @@ contract AccountsTest_setName is AccountsTest {
   }
 }
 
-contract AccountsTest_setName_L2 is AccountsTest_L2, AccountsTest_setName {}
-
-contract AccountsTest_GenericAuthorization is AccountsTest {
+contract AccountsTest_GenericAuthorization is AccountsTest_L2 {
   address account2 = actor("account2");
   address signer;
   uint256 signerPK;
@@ -891,12 +860,7 @@ contract AccountsTest_GenericAuthorization is AccountsTest {
   }
 }
 
-contract AccountsTest_GenericAuthorization_L2 is
-  AccountsTest_L2,
-  AccountsTest_GenericAuthorization
-{}
-
-contract AccountsTest_BackwardCompatibility is AccountsTest {
+contract AccountsTest_BackwardCompatibility is AccountsTest_L2 {
   address account = address(this);
   address otherAccount = actor("otherAccount");
 
@@ -1563,8 +1527,3 @@ contract AccountsTest_BackwardCompatibility is AccountsTest {
     helper_ShouldRemoveSigner(Role.Validator, false, true);
   }
 }
-
-contract AccountsTest_BackwardCompatibility_L2 is
-  AccountsTest_L2,
-  AccountsTest_BackwardCompatibility
-{}

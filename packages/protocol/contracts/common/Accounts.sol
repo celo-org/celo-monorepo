@@ -11,7 +11,6 @@ import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
 import "../common/libraries/ReentrancyGuard.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
 
 contract Accounts is
   IAccounts,
@@ -19,8 +18,7 @@ contract Accounts is
   Ownable,
   ReentrancyGuard,
   Initializable,
-  UsingRegistry,
-  IsL2Check
+  UsingRegistry
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -498,7 +496,7 @@ contract Accounts is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 4, 2);
+    return (1, 1, 4, 3);
   }
 
   /**
