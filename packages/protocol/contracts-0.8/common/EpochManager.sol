@@ -2,7 +2,6 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts8/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "./interfaces/IOracle.sol";
@@ -13,6 +12,7 @@ import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/IEpochManager.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IEpochManagerInitializer.sol";
+import "./libraries/ReentrancyGuard08.sol";
 
 /**
  * @title Contract used for managing CELO L2 epoch and elections.
@@ -24,7 +24,7 @@ contract EpochManager is
   Initializable,
   UsingRegistry,
   IEpochManager,
-  ReentrancyGuard,
+  ReentrancyGuard08,
   ICeloVersionedContract,
   IEpochManagerInitializer
 {
