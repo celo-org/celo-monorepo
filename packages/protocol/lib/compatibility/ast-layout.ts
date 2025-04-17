@@ -25,19 +25,18 @@ const addSchemaForLayoutChecking = (web3Contract: Web3Contract, artifact: any): 
   contract.schema = {}
   contract.schema.ast = artifact.ast
   contract.schema.contractName = artifact.contractName
-  console.log("addedSchemaForLayoutChecking", artifact.contractName);
   return contract
 }
 
 const makeZContract = (artifact: any): ZContract => {
   const contract = new web3.eth.Contract(artifact.abi)
-console.log("new web3.eth.Contract");
+
   return addSchemaForLayoutChecking(contract, artifact)
 }
 
 export const getLayout = (artifact: Artifact, artifacts: BuildArtifacts) => {
   const contract = makeZContract(artifact)
-console.log("makeZContract", JSON.stringify(artifact));
+
   return getStorageLayout(contract, artifacts)
 }
 
@@ -196,13 +195,9 @@ export const generateCompatibilityReport = (oldArtifact: Artifact, oldArtifacts:
   newArtifact: Artifact, newArtifacts: BuildArtifacts)
   : { contract: string, compatible: boolean, errors: any[], expanded?: boolean } => {
   const oldLayout = getLayout(oldArtifact, oldArtifacts)
-  console.log("got old layout");
   const newLayout = getLayout(newArtifact, newArtifacts)
-  console.log("got new layout");
   const layoutReport = generateLayoutCompatibilityReport(oldLayout, newLayout)
-  console.log("got layout report", JSON.stringify(layoutReport));
   const structsReport = generateStructsCompatibilityReport(oldLayout, newLayout)
-  console.log("got structs report", JSON.stringify(structsReport));
 
   if (!layoutReport.compatible) {
     console.log(newArtifact.contractName, "layoutReport incompatible", JSON.stringify(layoutReport.errors));
@@ -228,12 +223,6 @@ export const reportLayoutIncompatibilities = (oldArtifactsSet: BuildArtifacts[],
       for (const oldArtifacts of oldArtifactsSet) {
         const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
         if (oldArtifact !== undefined) {
-          console.log(`running report for: ${newArtifact.contractName}`)
-          console.log("######")
-          console.log("oldArtifact", oldArtifact);
-          console.log("newArtifact", newArtifact);
-          console.log("oldArtifacts", oldArtifacts);
-          console.log("newArtifacts", newArtifacts);
           return generateCompatibilityReport(oldArtifact, oldArtifacts, newArtifact, newArtifacts)
         }
       }
