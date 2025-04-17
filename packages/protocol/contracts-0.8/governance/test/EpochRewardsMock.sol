@@ -25,9 +25,6 @@ contract EpochRewardsMock08 is IEpochRewards {
     return 0;
   }
 
-  function isReserveLow() external pure returns (bool) {
-    return false;
-  }
   function calculateTargetEpochRewards()
     external
     view
