@@ -107,6 +107,21 @@ contract ElectionTest is TestWithUtils {
   }
 
   function setUp() public {
+    preElectionSetup();
+
+    election.initialize(
+      REGISTRY_ADDRESS,
+      electableValidatorsMin,
+      electableValidatorsMax,
+      maxNumGroupsVotedFor,
+      electabilityThreshold
+    );
+
+    blocker = new TestBlocker();
+    election.setBlockedByContract(address(blocker));
+  }
+
+  function preElectionSetup() public {
     ph.setEpochSize(DAY / 5);
     setupRegistry();
     setupEpochManager();
@@ -141,6 +156,14 @@ contract ElectionTest is TestWithUtils {
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("Random", address(random));
+  }
+}
+
+contract ElectionTest_L2 is ElectionTest, WhenL2 {}
+
+contract ElectionTest_Initialize is ElectionTest_L2 {
+  function setUp() public {
+    preElectionSetup();
 
     election.initialize(
       REGISTRY_ADDRESS,
@@ -153,11 +176,7 @@ contract ElectionTest is TestWithUtils {
     blocker = new TestBlocker();
     election.setBlockedByContract(address(blocker));
   }
-}
 
-contract ElectionTest_L2 is ElectionTest, WhenL2 {}
-
-contract ElectionTest_Initialize is ElectionTest {
   function test_shouldHaveSetOwner() public {
     assertEq(election.owner(), owner);
   }
