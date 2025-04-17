@@ -6,16 +6,9 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "./interfaces/IValidators.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
-contract GovernanceSlasher is
-  Ownable,
-  Initializable,
-  UsingRegistry,
-  ICeloVersionedContract,
-  IsL2Check
-{
+contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, ICeloVersionedContract {
   using SafeMath for uint256;
   // Maps a slashed address to the amount to be slashed.
   // Note that there is no reward paid when slashing via governance.
@@ -58,7 +51,7 @@ contract GovernanceSlasher is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 1, 1);
   }
 
   function setSlasherExecuter(address _slasherExecuter) external onlyOwner {
@@ -84,42 +77,13 @@ contract GovernanceSlasher is
    * @param electionGreaters Greater pointers for slashing locked election gold.
    * @param electionIndices Indices of groups voted by slashed account.
    */
-  function slash(
-    address account,
-    address[] calldata electionLessers,
-    address[] calldata electionGreaters,
-    uint256[] calldata electionIndices
-  ) external onlyL1 returns (bool) {
-    uint256 penalty = slashed[account];
-    require(penalty > 0, "No penalty given by governance");
-    slashed[account] = 0;
-    getLockedGold().slash(
-      account,
-      penalty,
-      address(0),
-      0,
-      electionLessers,
-      electionGreaters,
-      electionIndices
-    );
-    emit GovernanceSlashPerformed(account, penalty);
-    return true;
-  }
-
-  /**
-   * @notice Calls `LockedGold.slash` on `account` if `account` has an entry in `slashed`.
-   * @param account Account to slash
-   * @param electionLessers Lesser pointers for slashing locked election gold.
-   * @param electionGreaters Greater pointers for slashing locked election gold.
-   * @param electionIndices Indices of groups voted by slashed account.
-   */
   function slashL2(
     address account,
     address group,
     address[] calldata electionLessers,
     address[] calldata electionGreaters,
     uint256[] calldata electionIndices
-  ) external onlyL2 onlyAuthorizedToSlash returns (bool) {
+  ) external onlyAuthorizedToSlash returns (bool) {
     uint256 penalty = slashed[account];
     require(penalty > 0, "No penalty given by governance");
     slashed[account] = 0;
