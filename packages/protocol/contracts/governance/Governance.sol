@@ -682,53 +682,26 @@ contract Governance is
     if (msg.sender == approver) {
       hotfixes[hash].approved = true;
     } else {
-      if (isL2()) {
-        hotfixes[hash].councilApproved = true;
-      } else {
-        revert("Hotfix approval by security council is not available on L1.");
-      }
+      hotfixes[hash].councilApproved = true;
     }
     emit HotfixApproved(hash, msg.sender);
   }
 
   /**
-   * @notice Whitelists the hash of a hotfix transaction(s).
-   * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
-   */
-  function whitelistHotfix(bytes32 hash) external hotfixNotExecuted(hash) onlyL1 {
-    hotfixes[hash].deprecated_whitelisted[msg.sender] = true;
-    emit HotfixWhitelisted(hash, msg.sender);
-  }
-
-  /**
-   * @notice Gives hotfix a prepared epoch for execution on L1.
-   * @notice Gives hotfix a time limit for execution on L2.
+   * @notice Gives hotfix a time limit for execution.
    * @param hash The hash of the hotfix to be prepared.
    */
   function prepareHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
     HotfixRecord storage _currentHotfix = hotfixes[hash];
-    if (isL2()) {
-      uint256 _currentTime = now;
-      require(hotfixExecutionTimeWindow > 0, "Hotfix execution time window not set");
-      require(
-        _currentHotfix.executionTimeLimit == 0,
-        "Hotfix already prepared for this timeframe."
-      );
-      require(_currentHotfix.approved, "Hotfix not approved by approvers.");
-      require(_currentHotfix.councilApproved, "Hotfix not approved by security council.");
 
-      _currentHotfix.executionTimeLimit = _currentTime.add(hotfixExecutionTimeWindow);
-      emit HotfixPrepared(hash, _currentTime.add(hotfixExecutionTimeWindow));
-    } else {
-      require(isHotfixPassing(hash), "hotfix not whitelisted by 2f+1 validators");
-      uint256 epoch = getEpochNumber();
-      require(
-        _currentHotfix.deprecated_preparedEpoch < epoch,
-        "hotfix already prepared for this epoch"
-      );
-      _currentHotfix.deprecated_preparedEpoch = epoch;
-      emit HotfixPrepared(hash, epoch);
-    }
+    uint256 _currentTime = now;
+    require(hotfixExecutionTimeWindow > 0, "Hotfix execution time window not set");
+    require(_currentHotfix.executionTimeLimit == 0, "Hotfix already prepared for this timeframe.");
+    require(_currentHotfix.approved, "Hotfix not approved by approvers.");
+    require(_currentHotfix.councilApproved, "Hotfix not approved by security council.");
+
+    _currentHotfix.executionTimeLimit = _currentTime.add(hotfixExecutionTimeWindow);
+    emit HotfixPrepared(hash, _currentTime.add(hotfixExecutionTimeWindow));
   }
 
   /**
@@ -747,36 +720,22 @@ contract Governance is
     uint256[] calldata dataLengths,
     bytes32 salt
   ) external {
-    if (isL2()) {
-      bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths, salt));
+    bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths, salt));
 
-      (
-        bool approved,
-        bool councilApproved,
-        bool executed,
-        uint256 executionTimeLimit
-      ) = getL2HotfixRecord(hash);
-      require(!executed, "hotfix already executed");
-      require(approved, "hotfix not approved");
-      require(councilApproved, "hotfix not approved by security council");
-      require(executionTimeLimit >= now, "Execution time limit has already been reached.");
-      Proposals.makeMem(values, destinations, data, dataLengths, msg.sender, 0).executeMem();
+    (
+      bool approved,
+      bool councilApproved,
+      bool executed,
+      uint256 executionTimeLimit
+    ) = getL2HotfixRecord(hash);
+    require(!executed, "hotfix already executed");
+    require(approved, "hotfix not approved");
+    require(councilApproved, "hotfix not approved by security council");
+    require(executionTimeLimit >= now, "Execution time limit has already been reached.");
+    Proposals.makeMem(values, destinations, data, dataLengths, msg.sender, 0).executeMem();
 
-      hotfixes[hash].executed = true;
-      emit HotfixExecuted(hash);
-    } else {
-      bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths, salt));
-
-      (bool approved, bool executed, uint256 preparedEpoch) = getL1HotfixRecord(hash);
-      require(!executed, "hotfix already executed");
-      require(approved, "hotfix not approved");
-      require(preparedEpoch == getEpochNumber(), "hotfix must be prepared for this epoch");
-
-      Proposals.makeMem(values, destinations, data, dataLengths, msg.sender, 0).executeMem();
-
-      hotfixes[hash].executed = true;
-      emit HotfixExecuted(hash);
-    }
+    hotfixes[hash].executed = true;
+    emit HotfixExecuted(hash);
   }
 
   /**
@@ -1291,65 +1250,6 @@ contract Governance is
   }
 
   /**
-   * @notice Returns number of validators from current set which have whitelisted the given hotfix.
-   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
-   * @return Whitelist tally
-   */
-  function hotfixWhitelistValidatorTally(bytes32 hash) public view onlyL1 returns (uint256) {
-    uint256 tally = 0;
-    uint256 n = numberValidatorsInCurrentSet();
-    IAccounts accounts = getAccounts();
-    for (uint256 i = 0; i < n; i = i.add(1)) {
-      address validatorSigner = validatorSignerAddressFromCurrentSet(i);
-      address validatorAccount = accounts.signerToAccount(validatorSigner);
-      if (
-        isHotfixWhitelistedBy(hash, validatorSigner) ||
-        isHotfixWhitelistedBy(hash, validatorAccount)
-      ) {
-        tally = tally.add(1);
-      }
-    }
-    return tally;
-  }
-
-  /**
-   * @notice Checks if a byzantine quorum of validators has whitelisted the given hotfix.
-   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
-   * @return Whether validator whitelist tally >= validator byzantine quorum
-   */
-  function isHotfixPassing(bytes32 hash) public view onlyL1 returns (bool) {
-    return hotfixWhitelistValidatorTally(hash) >= minQuorumSizeInCurrentSet();
-  }
-
-  /**
-   * @notice Gets information about a L1 hotfix.
-   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
-   * @return Hotfix approved.
-   * @return Hotfix executed.
-   * @return Hotfix preparedEpoch.
-   */
-  function getL1HotfixRecord(bytes32 hash) public view onlyL1 returns (bool, bool, uint256) {
-    return (
-      hotfixes[hash].approved,
-      hotfixes[hash].executed,
-      hotfixes[hash].deprecated_preparedEpoch
-    );
-  }
-
-  /**
-   * @notice Gets information about a L1 hotfix.
-   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
-   * @return Hotfix approved.
-   * @return Hotfix executed.
-   * @return Hotfix preparedEpoch.
-   * @dev Provided for API backwards compatibility. Prefer the explicitly named
-   * `getL1HotfixRecord`/`getL2HotfixRecord` functions.
-   */
-  function getHotfixRecord(bytes32 hash) public view returns (bool, bool, uint256) {
-    return getL1HotfixRecord(hash);
-  }
-
-  /**
    * @notice Gets information about a L2 hotfix.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
    * @return Hotfix approved by approver.
@@ -1357,7 +1257,7 @@ contract Governance is
    * @return Hotfix executed.
    * @return Hotfix exection time limit.
    */
-  function getL2HotfixRecord(bytes32 hash) public view onlyL2 returns (bool, bool, bool, uint256) {
+  function getL2HotfixRecord(bytes32 hash) public view returns (bool, bool, bool, uint256) {
     return (
       hotfixes[hash].approved,
       hotfixes[hash].councilApproved,
@@ -1374,18 +1274,6 @@ contract Governance is
    */
   function isQueued(uint256 proposalId) public view returns (bool) {
     return queue.contains(proposalId);
-  }
-
-  /**
-   * @notice Returns whether given hotfix hash has been whitelisted by given address.
-   * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
-   * @param whitelister Address to check whitelist status of.
-   */
-  function isHotfixWhitelistedBy(
-    bytes32 hash,
-    address whitelister
-  ) public view onlyL1 returns (bool) {
-    return hotfixes[hash].deprecated_whitelisted[whitelister];
   }
 
   /**
