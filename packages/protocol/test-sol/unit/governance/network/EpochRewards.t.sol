@@ -61,6 +61,24 @@ contract EpochRewardsTest is TestWithUtils {
 
   function setUp() public {
     super.setUp();
+    preEpochRewardsSetup();
+
+    epochRewards.initialize(
+      address(registry),
+      targetVotingYieldParamsInitial,
+      targetVotingYieldParamsMax,
+      targetVotingYieldParamsAdjustmentFactor,
+      rewardsMultiplierMax,
+      rewardsMultiplierAdjustmentsUnderspend,
+      rewardsMultiplierAdjustmentsOverspend,
+      targetVotingGoldFraction,
+      targetValidatorEpochPayment,
+      communityRewardFraction,
+      address(0),
+      carbonOffsettingFraction
+    );
+  }
+  function preEpochRewardsSetup() public {
     // Mocked contracts
     epochRewards = new EpochRewardsMock();
     election = new MockElection();
@@ -87,21 +105,6 @@ contract EpochRewardsTest is TestWithUtils {
     mockSortedOracles.setMedianRate(
       address(mockStableToken),
       sortedOraclesDenominator * exchangeRate
-    );
-
-    epochRewards.initialize(
-      address(registry),
-      targetVotingYieldParamsInitial,
-      targetVotingYieldParamsMax,
-      targetVotingYieldParamsAdjustmentFactor,
-      rewardsMultiplierMax,
-      rewardsMultiplierAdjustmentsUnderspend,
-      rewardsMultiplierAdjustmentsOverspend,
-      targetVotingGoldFraction,
-      targetValidatorEpochPayment,
-      communityRewardFraction,
-      address(0),
-      carbonOffsettingFraction
     );
   }
 
@@ -132,7 +135,25 @@ contract EpochRewardsTest is TestWithUtils {
 
 contract EpochRewardsTest_L2 is WhenL2, EpochRewardsTest {}
 
-contract EpochRewardsTest_initialize is EpochRewardsTest {
+contract EpochRewardsTest_initialize is EpochRewardsTest_L2 {
+  function setUp() public {
+    super.setUp();
+    preEpochRewardsSetup();
+    epochRewards.initialize(
+      address(registry),
+      targetVotingYieldParamsInitial,
+      targetVotingYieldParamsMax,
+      targetVotingYieldParamsAdjustmentFactor,
+      rewardsMultiplierMax,
+      rewardsMultiplierAdjustmentsUnderspend,
+      rewardsMultiplierAdjustmentsOverspend,
+      targetVotingGoldFraction,
+      targetValidatorEpochPayment,
+      communityRewardFraction,
+      address(0),
+      carbonOffsettingFraction
+    );
+  }
   function test_ShouldHaveSetOwner() public {
     assertEq(epochRewards.owner(), caller);
   }
