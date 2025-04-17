@@ -157,16 +157,12 @@ contract Election is
   event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
 
   /**
-   * @notice - On L1, ensures the function is called via the consensus client.
-   *         - On L2, ensures the function is called by the permitted address.
+   * @notice - Ensures the function is called by the permitted address.
    * @param permittedAddress The address permitted to call permissioned
-   * functions on L2.
+   * functions.
    */
-  modifier onlyVmOrPermitted(address permittedAddress) {
-    if (isL2()) require(msg.sender == permittedAddress, "Only permitted address can call");
-    else {
-      require(msg.sender == address(0), "Only VM can call");
-    }
+  modifier onlyPermitted(address permittedAddress) {
+    require(msg.sender == permittedAddress, "Only permitted address can call");
     _;
   }
 
@@ -357,7 +353,7 @@ contract Election is
     uint256 value,
     address lesser,
     address greater
-  ) external onlyVmOrPermitted(registry.getAddressFor(EPOCH_MANAGER_REGISTRY_ID)) {
+  ) external onlyPermitted(registry.getAddressFor(EPOCH_MANAGER_REGISTRY_ID)) {
     _distributeEpochRewards(group, value, lesser, greater);
   }
 
@@ -568,44 +564,6 @@ contract Election is
    * @notice Returns the amount of rewards that voters for `group` are due at the end of an epoch.
    * @param group The group to calculate epoch rewards for.
    * @param totalEpochRewards The total amount of rewards going to all voters.
-   * @param uptimes Array of Fixidity representations of the validators' uptimes, between 0 and 1.
-   * @return The amount of rewards that voters for `group` are due at the end of an epoch.
-   * @dev Eligible groups that have received their maximum number of votes cannot receive more.
-   */
-  function getGroupEpochRewards(
-    address group,
-    uint256 totalEpochRewards,
-    uint256[] calldata uptimes
-  ) external view onlyL1 returns (uint256) {
-    IValidators validators = getValidators();
-    // The group must meet the balance requirements for their voters to receive epoch rewards.
-    if (!validators.meetsAccountLockedGoldRequirements(group) || votes.active.total <= 0) {
-      return 0;
-    }
-
-    FixidityLib.Fraction memory votePortion = FixidityLib.newFixedFraction(
-      votes.active.forGroup[group].total,
-      votes.active.total
-    );
-    FixidityLib.Fraction memory score = FixidityLib.wrap(
-      validators.calculateGroupEpochScore(uptimes)
-    );
-    FixidityLib.Fraction memory slashingMultiplier = FixidityLib.wrap(
-      validators.getValidatorGroupSlashingMultiplier(group)
-    );
-    return
-      FixidityLib
-        .newFixed(totalEpochRewards)
-        .multiply(votePortion)
-        .multiply(score)
-        .multiply(slashingMultiplier)
-        .fromFixed();
-  }
-
-  /**
-   * @notice Returns the amount of rewards that voters for `group` are due at the end of an epoch.
-   * @param group The group to calculate epoch rewards for.
-   * @param totalEpochRewards The total amount of rewards going to all voters.
    * @param groupScore The score of the group.
    * @return The amount of rewards that voters for `group` are due at the end of an epoch.
    * @dev Eligible groups that have received their maximum number of votes cannot receive more.
@@ -614,7 +572,7 @@ contract Election is
     address group,
     uint256 totalEpochRewards,
     uint256 groupScore
-  ) external view onlyL2 returns (uint256) {
+  ) external view returns (uint256) {
     IValidators validators = getValidators();
     // The group must meet the balance requirements for their voters to receive epoch rewards.
     if (!validators.meetsAccountLockedGoldRequirements(group) || votes.active.total <= 0) {
@@ -676,7 +634,7 @@ contract Election is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 4, 0);
+    return (1, 1, 4, 1);
   }
 
   /**
