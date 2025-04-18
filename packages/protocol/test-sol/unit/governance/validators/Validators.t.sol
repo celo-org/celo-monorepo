@@ -2,39 +2,51 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "celo-foundry/Test.sol";
+// This test file is in 0.5 although the contract is in 0.8
+
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 
-import "@celo-contracts/governance/Election.sol";
-import "@celo-contracts/governance/LockedGold.sol";
+import "@celo-contracts/governance/interfaces/IValidators.sol";
 
 import "@celo-contracts/stability/test/MockStableToken.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 
-import "@celo-contracts/governance/test/ValidatorsMock.sol";
-import "@test-sol/constants.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
-import { Utils } from "@test-sol/utils.sol";
-import { Test as ForgeTest } from "forge-std/Test.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
-contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
+import "@test-sol/utils/WhenL2.sol";
+
+contract ValidatorsTest is TestWithUtils, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
+  struct ValidatorLockedGoldRequirements {
+    uint256 value;
+    uint256 duration;
+  }
 
-  Registry registry;
+  struct GroupLockedGoldRequirements {
+    uint256 value;
+    uint256 duration;
+  }
+
+  struct ValidatorScoreParameters {
+    uint256 exponent;
+    FixidityLib.Fraction adjustmentSpeed;
+  }
+
   Accounts accounts;
   MockStableToken stableToken;
   MockElection election;
   ValidatorsMockTunnel public validatorsMockTunnel;
-  ValidatorsMock public validators;
+  IValidators public validators;
   MockLockedGold lockedGold;
 
   address owner;
@@ -68,28 +80,6 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
 
   FixidityLib.Fraction public commission = FixidityLib.newFixedFraction(1, 100);
 
-  event AccountSlashed(
-    address indexed slashed,
-    uint256 penalty,
-    address indexed reporter,
-    uint256 reward
-  );
-
-  struct ValidatorLockedGoldRequirements {
-    uint256 value;
-    uint256 duration;
-  }
-
-  struct GroupLockedGoldRequirements {
-    uint256 value;
-    uint256 duration;
-  }
-
-  struct ValidatorScoreParameters {
-    uint256 exponent;
-    FixidityLib.Fraction adjustmentSpeed;
-  }
-
   ValidatorLockedGoldRequirements public originalValidatorLockedGoldRequirements;
   GroupLockedGoldRequirements public originalGroupLockedGoldRequirements;
   ValidatorScoreParameters public originalValidatorScoreParameters;
@@ -103,6 +93,12 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
   ValidatorsMockTunnel.InitParams public initParams;
   ValidatorsMockTunnel.InitParams2 public initParams2;
 
+  event AccountSlashed(
+    address indexed slashed,
+    uint256 penalty,
+    address indexed reporter,
+    uint256 reward
+  );
   event MaxGroupSizeSet(uint256 size);
   event CommissionUpdateDelaySet(uint256 delay);
   event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
@@ -134,7 +130,10 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     uint256 groupPayment
   );
 
+  event SendValidatorPaymentCalled(address validator);
+
   function setUp() public {
+    super.setUp();
     owner = address(this);
     group = actor("group");
     nonValidator = actor("nonValidator");
@@ -160,16 +159,15 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
       adjustmentSpeed: FixidityLib.newFixedFraction(5, 20)
     });
 
-    address registryAddress = 0x000000000000000000000000000000000000ce10;
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
-    registry = Registry(registryAddress);
-
     accounts = new Accounts(true);
-    accounts.initialize(registryAddress);
+    accounts.initialize(REGISTRY_ADDRESS);
 
     lockedGold = new MockLockedGold();
     election = new MockElection();
-    validators = new ValidatorsMock();
+    address validatorsAddress = actor("Validators");
+
+    deployCodeTo("ValidatorsMock.sol", validatorsAddress);
+    validators = IValidators(validatorsAddress);
     validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
 
     stableToken = new MockStableToken();
@@ -181,7 +179,7 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     registry.setAddressFor(StableTokenContract, address(stableToken));
 
     initParams = ValidatorsMockTunnel.InitParams({
-      registryAddress: registryAddress,
+      registryAddress: REGISTRY_ADDRESS,
       groupRequirementValue: originalGroupLockedGoldRequirements.value,
       groupRequirementDuration: originalGroupLockedGoldRequirements.duration,
       validatorRequirementValue: originalValidatorLockedGoldRequirements.value,
@@ -212,90 +210,6 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     accounts.createAccount();
   }
 
-  function getParsedSignatureOfAddress(
-    address _address,
-    uint256 privateKey
-  ) public pure returns (uint8, bytes32, bytes32) {
-    bytes32 addressHash = keccak256(abi.encodePacked(_address));
-    bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
-    return vm.sign(privateKey, prefixedHash);
-  }
-
-  function _generateEcdsaPubKeyWithSigner(
-    address _validator,
-    uint256 _signerPk
-  ) internal returns (bytes memory ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) {
-    (v, r, s) = getParsedSignatureOfAddress(_validator, _signerPk);
-
-    bytes32 addressHash = keccak256(abi.encodePacked(_validator));
-
-    ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
-  }
-
-  function _registerValidatorWithSignerHelper() internal returns (bytes memory) {
-    lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
-
-    (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
-      validator,
-      signerPk
-    );
-
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
-
-    vm.prank(validator);
-    accounts.authorizeValidatorSigner(signer, v, r, s);
-
-    vm.prank(validator);
-    validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
-    validatorRegistrationEpochNumber = validators.getEpochNumber();
-    return _ecdsaPubKey;
-  }
-
-  function _generateEcdsaPubKey(
-    address _account,
-    uint256 _accountPk
-  ) internal returns (bytes memory ecdsaPubKey) {
-    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(_account, _accountPk);
-    bytes32 addressHash = keccak256(abi.encodePacked(_account));
-
-    ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
-  }
-
-  function _registerValidatorHelper(
-    address _validator,
-    uint256 _validatorPk
-  ) internal returns (bytes memory) {
-    if (!accounts.isAccount(_validator)) {
-      vm.prank(_validator);
-      accounts.createAccount();
-    }
-
-    lockedGold.setAccountTotalLockedGold(_validator, originalValidatorLockedGoldRequirements.value);
-    bytes memory _ecdsaPubKey = _generateEcdsaPubKey(_validator, _validatorPk);
-
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(_validator, blsPublicKey, blsPop));
-
-    vm.prank(_validator);
-    validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
-    validatorRegistrationEpochNumber = validators.getEpochNumber();
-    return _ecdsaPubKey;
-  }
-
-  function _registerValidatorGroupHelper(address _group, uint256 numMembers) internal {
-    if (!accounts.isAccount(_group)) {
-      vm.prank(_group);
-      accounts.createAccount();
-    }
-
-    lockedGold.setAccountTotalLockedGold(
-      _group,
-      originalGroupLockedGoldRequirements.value.mul(numMembers)
-    );
-
-    vm.prank(_group);
-    validators.registerValidatorGroup(commission.unwrap());
-  }
-
   function _registerValidatorGroupWithMembers(address _group, uint256 _numMembers) public {
     _registerValidatorGroupHelper(_group, _numMembers);
 
@@ -324,6 +238,156 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     }
   }
 
+  function _registerValidatorGroupWithMembersHavingSigners(
+    address _group,
+    uint256 _numMembers
+  ) public {
+    _registerValidatorGroupHelper(_group, _numMembers);
+
+    for (uint256 i = 0; i < _numMembers; i++) {
+      if (i == 0) {
+        _registerValidatorWithSignerHelper(validator, signer, signerPk);
+
+        vm.prank(validator);
+        validators.affiliate(_group);
+
+        vm.prank(_group);
+        validators.addFirstMember(validator, address(0), address(0));
+      } else {
+        uint256 _validator1Pk = i;
+        address _validator1 = vm.addr(_validator1Pk);
+        uint256 _signer1Pk = i + _numMembers;
+        address _signer1 = vm.addr(_signer1Pk);
+
+        vm.prank(_validator1);
+        accounts.createAccount();
+        _registerValidatorWithSignerHelper(_validator1, _signer1, _signer1Pk);
+        vm.prank(_validator1);
+        validators.affiliate(_group);
+
+        vm.prank(_group);
+        validators.addMember(_validator1);
+      }
+    }
+  }
+
+  function getParsedSignatureOfAddress(
+    address _address,
+    uint256 privateKey
+  ) public pure returns (uint8, bytes32, bytes32) {
+    bytes32 addressHash = keccak256(abi.encodePacked(_address));
+    bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
+    return vm.sign(privateKey, prefixedHash);
+  }
+
+  function _generateEcdsaPubKeyWithSigner(
+    address _validator,
+    uint256 _signerPk
+  ) internal returns (bytes memory ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) {
+    (v, r, s) = getParsedSignatureOfAddress(_validator, _signerPk);
+
+    bytes32 addressHash = keccak256(abi.encodePacked(_validator));
+
+    ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
+  }
+
+  function _registerValidatorWithSignerHelper(
+    address _validator,
+    address _signer,
+    uint256 _signerPk
+  ) internal returns (bytes memory) {
+    lockedGold.setAccountTotalLockedGold(_validator, originalValidatorLockedGoldRequirements.value);
+
+    (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
+      _validator,
+      _signerPk
+    );
+
+    vm.prank(_validator);
+    accounts.authorizeValidatorSigner(_signer, v, r, s);
+
+    if (isL2()) {
+      vm.prank(_validator);
+      validators.registerValidatorNoBls(_ecdsaPubKey);
+    } else {
+      ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(_validator, blsPublicKey, blsPop));
+
+      vm.prank(_validator);
+      validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
+    }
+
+    validatorRegistrationEpochNumber = getEpochNumber();
+    return _ecdsaPubKey;
+  }
+
+  function _registerValidatorWithSignerHelper_noBls() internal returns (bytes memory) {
+    lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
+
+    (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
+      validator,
+      signerPk
+    );
+
+    vm.prank(validator);
+    accounts.authorizeValidatorSigner(signer, v, r, s);
+
+    vm.prank(validator);
+    validators.registerValidatorNoBls(_ecdsaPubKey);
+    validatorRegistrationEpochNumber = epochManager.getCurrentEpochNumber();
+    return _ecdsaPubKey;
+  }
+
+  function _generateEcdsaPubKey(
+    address _account,
+    uint256 _accountPk
+  ) internal returns (bytes memory ecdsaPubKey) {
+    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(_account, _accountPk);
+    bytes32 addressHash = keccak256(abi.encodePacked(_account));
+
+    ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
+  }
+
+  function _registerValidatorHelper(
+    address _validator,
+    uint256 _validatorPk
+  ) internal returns (bytes memory) {
+    if (!accounts.isAccount(_validator)) {
+      vm.prank(_validator);
+      accounts.createAccount();
+    }
+
+    lockedGold.setAccountTotalLockedGold(_validator, originalValidatorLockedGoldRequirements.value);
+    bytes memory _ecdsaPubKey = _generateEcdsaPubKey(_validator, _validatorPk);
+
+    if (isL2()) {
+      vm.prank(_validator);
+      validators.registerValidatorNoBls(_ecdsaPubKey);
+    } else {
+      ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(_validator, blsPublicKey, blsPop));
+
+      vm.prank(_validator);
+      validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
+    }
+
+    validatorRegistrationEpochNumber = getEpochNumber();
+    return _ecdsaPubKey;
+  }
+
+  function _registerValidatorGroupHelper(address _group, uint256 numMembers) internal {
+    if (!accounts.isAccount(_group)) {
+      vm.prank(_group);
+      accounts.createAccount();
+    }
+
+    lockedGold.setAccountTotalLockedGold(
+      _group,
+      originalGroupLockedGoldRequirements.value.mul(numMembers)
+    );
+
+    vm.prank(_group);
+    validators.registerValidatorGroup(commission.unwrap());
+  }
+
   function _removeMemberAndTimeTravel(
     address _group,
     address _validator,
@@ -332,6 +396,14 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     vm.prank(_group);
     validators.removeMember(_validator);
     timeTravel(_duration);
+  }
+
+  function _calculateScore(uint256 _uptime, uint256 _gracePeriod) internal view returns (uint256) {
+    return
+      _safeExponent(
+        _max1(_uptime.add(_gracePeriod)),
+        FixidityLib.wrap(originalValidatorScoreParameters.exponent)
+      );
   }
 
   function _max1(uint256 num) internal pure returns (FixidityLib.Fraction memory) {
@@ -352,29 +424,20 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
 
       result = FixidityLib.multiply(result, base);
     }
+
     return result.unwrap();
-  }
-
-  function _calculateScore(uint256 _uptime, uint256 _gracePeriod) internal view returns (uint256) {
-    return
-      _safeExponent(
-        _max1(_uptime.add(_gracePeriod)),
-        FixidityLib.wrap(originalValidatorScoreParameters.exponent)
-      );
-  }
-
-  function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
   }
 }
 
+contract ValidatorsTest_L2 is ValidatorsTest, WhenL2 {}
+
 contract ValidatorsTest_Initialize is ValidatorsTest {
   function test_ShouldhaveSetTheOwner() public {
-    assertEq(validators.owner(), owner, "Incorrect Owner.");
+    assertEq(Ownable(address(validators)).owner(), owner, "Incorrect Owner.");
   }
 
   function test_Reverts_WhenCalledMoreThanOnce() public {
-    vm.expectRevert();
+    vm.expectRevert("contract already initialized");
     validatorsMockTunnel.MockInitialize(owner, initParams, initParams2);
   }
 
@@ -421,7 +484,7 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
   }
 
   function test_shouldHaveSetMembershipHistory() public {
-    uint256 actual = validators.membershipHistoryLength();
+    uint256 actual = validators.getMembershipHistoryLength();
     assertEq(actual, membershipHistoryLength, "Wrong membershipHistoryLength.");
   }
 
@@ -435,21 +498,38 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
     assertEq(actual, commissionUpdateDelay, "Wrong commissionUpdateDelay.");
   }
 
-  function test_Reverts_setCommissionUpdateDelay_WhenL2() public {
-    _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.setCommissionUpdateDelay(commissionUpdateDelay);
-  }
-
   function test_shouldHaveSetDowntimeGracePeriod() public {
     uint256 actual = validators.downtimeGracePeriod();
     assertEq(actual, downtimeGracePeriod, "Wrong downtimeGracePeriod.");
   }
+}
 
-  function test_Reverts_SetDowntimeGracePeriod_WhenL2() public {
-    _whenL2();
+contract ValidatorsTest_setCommissionUpdateDelay is ValidatorsTest {
+  function test_shouldSetCommissionUpdateDelay() public {
+    validators.setCommissionUpdateDelay(5);
+
+    uint256 actual = validators.getCommissionUpdateDelay();
+    assertEq(actual, 5, "Wrong commissionUpdateDelay.");
+  }
+}
+
+contract ValidatorsTest_setCommissionUpdateDelay_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_setCommissionUpdateDelay
+{}
+
+contract ValidatorsTest_setDowntimeGracePeriod is ValidatorsTest {
+  function test_shouldSetDowntimeGracePeriod() public {
+    validators.setDowntimeGracePeriod(downtimeGracePeriod + 1);
+    uint256 actual = validators.downtimeGracePeriod();
+    assertEq(actual, downtimeGracePeriod + 1, "Wrong downtime grace period.");
+  }
+}
+
+contract ValidatorsTest_setDowntimeGracePeriod_L2 is ValidatorsTest_L2 {
+  function test_shouldRevert() public {
     vm.expectRevert("This method is no longer supported in L2.");
-    validators.setDowntimeGracePeriod(downtimeGracePeriod);
+    validators.setDowntimeGracePeriod(downtimeGracePeriod + 1);
   }
 }
 
@@ -463,13 +543,7 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
 
   function test_shouldSetTheMembershipHistoryLength() public {
     validators.setMembershipHistoryLength(newLength);
-    assertEq(validators.membershipHistoryLength(), newLength);
-  }
-
-  function test_Reverts_SetTheMembershipHistoryLength_WhenL2() public {
-    _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.setMembershipHistoryLength(newLength);
+    assertEq(validators.getMembershipHistoryLength(), newLength);
   }
 
   function test_Emits_MembershipHistoryLengthSet() public {
@@ -485,16 +559,15 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
   }
 }
 
+contract ValidatorsTest_SetMembershipHistoryLength_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_SetMembershipHistoryLength
+{}
+
 contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
   uint256 newSize = maxGroupSize + 1;
 
   event MaxGroupSizeSet(uint256 size);
-
-  function test_Reverts_SetMaxGroupSize_WhenL2() public {
-    _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.setMaxGroupSize(newSize);
-  }
 
   function test_Emits_MaxGroupSizeSet() public {
     vm.expectEmit(true, true, true, true);
@@ -513,6 +586,8 @@ contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
     validators.setMaxGroupSize(maxGroupSize);
   }
 }
+
+contract ValidatorsTest_SetMaxGroupSize_L2 is ValidatorsTest_L2, ValidatorsTest_SetMaxGroupSize {}
 
 contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
   GroupLockedGoldRequirements private newRequirements =
@@ -549,6 +624,11 @@ contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
   }
 }
 
+contract ValidatorsTest_SetGroupLockedGoldRequirements_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_SetGroupLockedGoldRequirements
+{}
+
 contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
   ValidatorLockedGoldRequirements private newRequirements =
     ValidatorLockedGoldRequirements({
@@ -584,7 +664,12 @@ contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
+contract ValidatorsTest_SetValidatorLockedGoldRequirements_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_SetValidatorLockedGoldRequirements
+{}
+
+contract ValidatorsTest_SetValidatorScoreParameters_Setup is ValidatorsTest {
   ValidatorScoreParameters newParams =
     ValidatorScoreParameters({
       exponent: originalValidatorScoreParameters.exponent + 1,
@@ -592,18 +677,16 @@ contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
     });
 
   event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
+}
 
+contract ValidatorsTest_SetValidatorScoreParameters_L1 is
+  ValidatorsTest_SetValidatorScoreParameters_Setup
+{
   function test_ShouldSetExponentAndAdjustmentSpeed() public {
     validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
     (uint256 _exponent, uint256 _adjustmentSpeed) = validators.getValidatorScoreParameters();
     assertEq(_exponent, newParams.exponent, "Incorrect Exponent");
     assertEq(_adjustmentSpeed, newParams.adjustmentSpeed.unwrap(), "Incorrect AdjustmentSpeed");
-  }
-
-  function test_Reverts_SetExponentAndAdjustmentSpeed_WhenL2() public {
-    _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
   }
 
   function test_Emits_ValidatorScoreParametersSet() public {
@@ -624,6 +707,16 @@ contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
       originalValidatorScoreParameters.exponent,
       originalValidatorScoreParameters.adjustmentSpeed.unwrap()
     );
+  }
+}
+
+contract ValidatorsTest_SetValidatorScoreParameters_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_SetValidatorScoreParameters_Setup
+{
+  function test_Reverts() public {
+    vm.expectRevert("This method is no longer supported in L2.");
+    validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
   }
 }
 
@@ -662,63 +755,46 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
   }
 
   function test_ShouldMarkAccountAsValidator_WhenAccountHasAuthorizedValidatorSigner() public {
-    _registerValidatorWithSignerHelper();
+    _registerValidatorWithSignerHelper(validator, signer, signerPk);
 
     assertTrue(validators.isValidator(validator));
-  }
-
-  function test_ShouldRevert_WhenInL2_WhenAccountHasAuthorizedValidatorSigner() public {
-    lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
-
-    (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
-      validator,
-      signerPk
-    );
-
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
-
-    vm.prank(validator);
-    accounts.authorizeValidatorSigner(signer, v, r, s);
-
-    _whenL2();
-
-    vm.expectRevert("This method is no longer supported in L2.");
-    vm.prank(validator);
-    validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
-    validatorRegistrationEpochNumber = validators.getEpochNumber();
   }
 
   function test_ShouldAddAccountToValidatorList_WhenAccountHasAuthorizedValidatorSigner() public {
     address[] memory ExpectedRegisteredValidators = new address[](1);
     ExpectedRegisteredValidators[0] = validator;
-    _registerValidatorWithSignerHelper();
+    _registerValidatorWithSignerHelper(validator, signer, signerPk);
     assertEq(validators.getRegisteredValidators().length, ExpectedRegisteredValidators.length);
     assertEq(validators.getRegisteredValidators()[0], ExpectedRegisteredValidators[0]);
   }
 
   function test_ShouldSetValidatorEcdsaPublicKey_WhenAccountHasAuthorizedValidatorSigner() public {
-    bytes memory _registeredEcdsaPubKey = _registerValidatorWithSignerHelper();
+    bytes memory _registeredEcdsaPubKey = _registerValidatorWithSignerHelper(
+      validator,
+      signer,
+      signerPk
+    );
     (bytes memory actualEcdsaPubKey, , , , ) = validators.getValidator(validator);
 
     assertEq(actualEcdsaPubKey, _registeredEcdsaPubKey);
   }
 
   function test_ShouldSetValidatorBlsPublicKey_WhenAccountHasAuthorizedValidatorSigner() public {
-    _registerValidatorWithSignerHelper();
+    _registerValidatorWithSignerHelper(validator, signer, signerPk);
     (, bytes memory actualBlsPubKey, , , ) = validators.getValidator(validator);
 
     assertEq(actualBlsPubKey, blsPublicKey);
   }
 
   function test_ShouldSetValidatorSigner_WhenAccountHasAuthorizedValidatorSigner() public {
-    _registerValidatorWithSignerHelper();
+    _registerValidatorWithSignerHelper(validator, signer, signerPk);
     (, , , , address ActualSigner) = validators.getValidator(validator);
 
     assertEq(ActualSigner, signer);
   }
 
   function test_ShouldSetLockGoldRequirements_WhenAccountHasAuthorizedValidatorSigner() public {
-    _registerValidatorWithSignerHelper();
+    _registerValidatorWithSignerHelper(validator, signer, signerPk);
     uint256 _lockedGoldReq = validators.getAccountLockedGoldRequirement(validator);
 
     assertEq(_lockedGoldReq, originalValidatorLockedGoldRequirements.value);
@@ -727,7 +803,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
   function test_ShouldSetValidatorMembershipHistory_WhenAccountHasAuthorizedValidatorSigner()
     public
   {
-    _registerValidatorWithSignerHelper();
+    _registerValidatorWithSignerHelper(validator, signer, signerPk);
     (uint256[] memory _epoch, address[] memory _membershipGroups, , ) = validators
       .getMembershipHistory(validator);
 
@@ -777,7 +853,11 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
   }
 
   function test_Reverts_WhenAccountAlreadyRegisteredAsValidator() public {
-    bytes memory _registeredEcdsaPubKey = _registerValidatorWithSignerHelper();
+    bytes memory _registeredEcdsaPubKey = _registerValidatorWithSignerHelper(
+      validator,
+      signer,
+      signerPk
+    );
     vm.expectRevert("Already registered");
     vm.prank(validator);
     validators.registerValidator(_registeredEcdsaPubKey, blsPublicKey, blsPop);
@@ -809,6 +889,197 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
   }
 }
 
+contract ValidatorsTest_RegisterValidator_L2 is ValidatorsTest_L2 {
+  function test_shouldRevert() public {
+    lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
+
+    (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
+      validator,
+      signerPk
+    );
+
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
+
+    vm.prank(validator);
+    accounts.authorizeValidatorSigner(signer, v, r, s);
+
+    vm.prank(validator);
+    vm.expectRevert("This method is no longer supported in L2.");
+    validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
+  }
+}
+
+contract ValidatorsTest_RegisterValidatorNoBls is ValidatorsTest {
+  function test_ShouldRevert_WhenInL1() public {
+    lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
+
+    (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
+      validator,
+      signerPk
+    );
+
+    vm.prank(validator);
+    accounts.authorizeValidatorSigner(signer, v, r, s);
+
+    vm.expectRevert("This method is not supported in L1.");
+    vm.prank(validator);
+    validators.registerValidatorNoBls(_ecdsaPubKey);
+  }
+}
+
+contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest_L2 {
+  function setUp() public {
+    super.setUp();
+
+    lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
+  }
+
+  function test_Reverts_WhenVoteOverMaxNumberOfGroupsSetToTrue() public {
+    vm.prank(validator);
+    election.setAllowedToVoteOverMaxNumberOfGroups(validator, true);
+
+    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
+
+    vm.prank(validator);
+    accounts.authorizeValidatorSigner(signer, v, r, s);
+    bytes memory pubKey = addressToPublicKey("random msg", v, r, s);
+
+    vm.expectRevert("Cannot vote for more than max number of groups");
+    vm.prank(validator);
+    validators.registerValidatorNoBls(pubKey);
+  }
+
+  function test_Reverts_WhenDelagatingCELO() public {
+    lockedGold.setAccountTotalDelegatedAmountInPercents(validator, 10);
+    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
+    vm.prank(validator);
+    accounts.authorizeValidatorSigner(signer, v, r, s);
+    bytes memory pubKey = addressToPublicKey("random msg", v, r, s);
+
+    vm.expectRevert("Cannot delegate governance power");
+    vm.prank(validator);
+    validators.registerValidatorNoBls(pubKey);
+  }
+
+  function test_ShouldMarkAccountAsValidator_WhenAccountHasAuthorizedValidatorSigner() public {
+    _registerValidatorWithSignerHelper_noBls();
+
+    assertTrue(validators.isValidator(validator));
+  }
+
+  function test_ShouldAddAccountToValidatorList_WhenAccountHasAuthorizedValidatorSigner() public {
+    address[] memory ExpectedRegisteredValidators = new address[](1);
+    ExpectedRegisteredValidators[0] = validator;
+    _registerValidatorWithSignerHelper_noBls();
+    assertEq(validators.getRegisteredValidators().length, ExpectedRegisteredValidators.length);
+    assertEq(validators.getRegisteredValidators()[0], ExpectedRegisteredValidators[0]);
+  }
+
+  function test_ShouldSetValidatorEcdsaPublicKey_WhenAccountHasAuthorizedValidatorSigner() public {
+    bytes memory _registeredEcdsaPubKey = _registerValidatorWithSignerHelper_noBls();
+    (bytes memory actualEcdsaPubKey, , , , ) = validators.getValidator(validator);
+
+    assertEq(actualEcdsaPubKey, _registeredEcdsaPubKey);
+  }
+
+  function test_ShouldNotSetValidatorBlsPublicKey_WhenAccountHasAuthorizedValidatorSigner() public {
+    _registerValidatorWithSignerHelper_noBls();
+    (, bytes memory actualBlsPubKey, , , ) = validators.getValidator(validator);
+
+    assertEq(actualBlsPubKey, "");
+  }
+
+  function test_ShouldSetValidatorSigner_WhenAccountHasAuthorizedValidatorSigner() public {
+    _registerValidatorWithSignerHelper_noBls();
+    (, , , , address ActualSigner) = validators.getValidator(validator);
+
+    assertEq(ActualSigner, signer);
+  }
+
+  function test_ShouldSetLockGoldRequirements_WhenAccountHasAuthorizedValidatorSigner() public {
+    _registerValidatorWithSignerHelper_noBls();
+    uint256 _lockedGoldReq = validators.getAccountLockedGoldRequirement(validator);
+
+    assertEq(_lockedGoldReq, originalValidatorLockedGoldRequirements.value);
+  }
+
+  function test_ShouldSetValidatorMembershipHistory_WhenAccountHasAuthorizedValidatorSigner()
+    public
+  {
+    _registerValidatorWithSignerHelper_noBls();
+    (uint256[] memory _epoch, address[] memory _membershipGroups, , ) = validators
+      .getMembershipHistory(validator);
+
+    uint256[] memory validatorRegistrationEpochNumberList = new uint256[](1);
+    validatorRegistrationEpochNumberList[0] = validatorRegistrationEpochNumber;
+    address[] memory expectedMembershipGroups = new address[](1);
+    expectedMembershipGroups[0] = address(0);
+
+    assertEq(_epoch, validatorRegistrationEpochNumberList);
+    assertEq(_membershipGroups, expectedMembershipGroups);
+  }
+
+  function testFail_DoesNotEmit_ValidatorBlsPublicKeyUpdatedEvent() public {
+    (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
+      validator,
+      signerPk
+    );
+
+    vm.prank(validator);
+    accounts.authorizeValidatorSigner(signer, v, r, s);
+
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorBlsPublicKeyUpdated(validator, blsPublicKey);
+
+    vm.prank(validator);
+    validators.registerValidatorNoBls(_ecdsaPubKey);
+  }
+
+  function test_Emits_ValidatorRegisteredEvent() public {
+    (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
+      validator,
+      signerPk
+    );
+
+    vm.prank(validator);
+    accounts.authorizeValidatorSigner(signer, v, r, s);
+
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorRegistered(validator);
+
+    vm.prank(validator);
+    validators.registerValidatorNoBls(_ecdsaPubKey);
+  }
+
+  function test_Reverts_WhenAccountAlreadyRegisteredAsValidator() public {
+    bytes memory _registeredEcdsaPubKey = _registerValidatorWithSignerHelper_noBls();
+    vm.prank(validator);
+    vm.expectRevert("Already registered");
+    validators.registerValidatorNoBls(_registeredEcdsaPubKey);
+  }
+
+  function test_Reverts_WhenAccountAlreadyRegisteredAsValidatorGroup() public {
+    _registerValidatorGroupHelper(validator, 1);
+    vm.prank(validator);
+    vm.expectRevert("Already registered");
+    validators.registerValidatorNoBls(
+      abi.encodePacked(bytes32(0x0101010101010101010101010101010101010101010101010101010101010101))
+    );
+  }
+
+  function test_Reverts_WhenAccountDoesNotMeetLockedGoldRequirements() public {
+    lockedGold.setAccountTotalLockedGold(
+      validator,
+      originalValidatorLockedGoldRequirements.value.sub(11)
+    );
+    vm.expectRevert("Deposit too small");
+    vm.prank(validator);
+    validators.registerValidatorNoBls(
+      abi.encodePacked(bytes32(0x0101010101010101010101010101010101010101010101010101010101010101))
+    );
+  }
+}
+
 contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValidatorGroup is
   ValidatorsTest
 {
@@ -820,11 +1091,6 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValid
     _registerValidatorHelper(validator, validatorPk);
 
     timeTravel(originalValidatorLockedGoldRequirements.duration);
-  }
-
-  function _deregisterValidator(address _validator) internal {
-    vm.prank(_validator);
-    validators.deregisterValidator(INDEX);
   }
 
   function test_ShouldMarkAccountAsNotValidator_WhenAccountHasNeverBeenMemberOfValidatorGroup()
@@ -875,7 +1141,17 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValid
     vm.prank(validator);
     validators.deregisterValidator(INDEX + 1);
   }
+
+  function _deregisterValidator(address _validator) internal {
+    vm.prank(_validator);
+    validators.deregisterValidator(INDEX);
+  }
 }
+
+contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValidatorGroup_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValidatorGroup
+{}
 
 contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorGroup is
   ValidatorsTest
@@ -894,11 +1170,6 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
 
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
-  }
-
-  function _deregisterValidator(address _validator) internal {
-    vm.prank(_validator);
-    validators.deregisterValidator(INDEX);
   }
 
   function test_ShouldMarkAccountAsNotValidator_WhenValidatorNoLongerMemberOfValidatorGroup()
@@ -970,7 +1241,17 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
     vm.expectRevert("Has been group member recently");
     _deregisterValidator(validator);
   }
+
+  function _deregisterValidator(address _validator) internal {
+    vm.prank(_validator);
+    validators.deregisterValidator(INDEX);
+  }
 }
+
+contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorGroup_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorGroup
+{}
 
 contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirements is
   ValidatorsTest
@@ -992,13 +1273,6 @@ contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirement
     (, , address affiliation, , ) = validators.getValidator(validator);
 
     assertEq(affiliation, group);
-  }
-
-  function test_Reverts_WhenL2_WhenAffiliatingWithRegisteredValidatorGroup() public {
-    _whenL2();
-    vm.prank(validator);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.affiliate(group);
   }
 
   function test_Emits_ValidatorAffiliatedEvent() public {
@@ -1042,7 +1316,12 @@ contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirement
   }
 }
 
-contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup is
+contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirements_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirements
+{}
+
+contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup_Setup is
   ValidatorsTest
 {
   address otherGroup;
@@ -1065,19 +1344,16 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
     vm.prank(validator);
     validators.affiliate(group);
   }
+}
 
+contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup is
+  ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup_Setup
+{
   function test_ShouldSetAffiliate_WhenValidatorNotMemberOfThatValidatorGroup() public {
     vm.prank(validator);
     validators.affiliate(otherGroup);
     (, , address affiliation, , ) = validators.getValidator(validator);
     assertEq(affiliation, otherGroup);
-  }
-
-  function test_ShouldRevert_WhenL2_WhenValidatorNotMemberOfThatValidatorGroup() public {
-    _whenL2();
-    vm.prank(validator);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.affiliate(otherGroup);
   }
 
   function test_Emits_ValidatorDeaffiliatedEvent_WhenValidatorNotMemberOfThatValidatorGroup()
@@ -1115,13 +1391,12 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
 
-    validatorAdditionEpochNumber = validators.getEpochNumber();
-
+    validatorAdditionEpochNumber = getEpochNumber();
     timeTravel(10);
 
     vm.prank(validator);
     validators.affiliate(otherGroup);
-    validatorAffiliationEpochNumber = validators.getEpochNumber();
+    validatorAffiliationEpochNumber = getEpochNumber();
 
     (
       uint256[] memory epochs,
@@ -1168,7 +1443,32 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
   }
 }
 
-contract ValidatorsTest_Deaffiliate is ValidatorsTest {
+contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup_L1 is
+  ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup_Setup
+{
+  function _performAffiliation() internal {
+    vm.prank(validator);
+    validators.affiliate(group);
+  }
+
+  function test_ShouldNotTryToSendValidatorPayment() public {
+    assertDoesNotEmit(_performAffiliation, "SendValidatorPaymentCalled(address)");
+  }
+}
+
+contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup
+{
+  function test_ShouldSendValidatorPayment() public {
+    vm.expectEmit(true, true, true, true);
+    emit SendValidatorPaymentCalled(validator);
+    vm.prank(validator);
+    validators.affiliate(group);
+  }
+}
+
+contract ValidatorsTest_Deaffiliate_Setup is ValidatorsTest {
   uint256 additionEpoch;
   uint256 deaffiliationEpoch;
 
@@ -1184,7 +1484,9 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
 
     require(_affiliation == group, "Affiliation failed.");
   }
+}
 
+contract ValidatorsTest_Deaffiliate is ValidatorsTest_Deaffiliate_Setup {
   function test_ShouldClearAffiliate() public {
     vm.prank(validator);
     validators.deaffiliate();
@@ -1222,11 +1524,11 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
 
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
-    additionEpoch = validators.getEpochNumber();
+    additionEpoch = getEpochNumber();
 
     vm.prank(validator);
     validators.deaffiliate();
-    deaffiliationEpoch = validators.getEpochNumber();
+    deaffiliationEpoch = getEpochNumber();
 
     (address[] memory members, , , , , , ) = validators.getValidatorGroup(group);
     assertEq(members, expectedMembersList);
@@ -1238,13 +1540,13 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
 
-    additionEpoch = validators.getEpochNumber();
+    additionEpoch = getEpochNumber();
 
     timeTravel(10);
 
     vm.prank(validator);
     validators.deaffiliate();
-    deaffiliationEpoch = validators.getEpochNumber();
+    deaffiliationEpoch = getEpochNumber();
 
     (
       uint256[] memory epochs,
@@ -1272,7 +1574,7 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
 
-    additionEpoch = validators.getEpochNumber();
+    additionEpoch = getEpochNumber();
 
     timeTravel(10);
 
@@ -1290,6 +1592,26 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
     vm.prank(validator);
     validators.deaffiliate();
     assertTrue(election.isIneligible(group));
+  }
+}
+
+contract ValidatorsTest_Deaffiliate_L1 is ValidatorsTest_Deaffiliate_Setup {
+  function _performDeaffiliation() internal {
+    vm.prank(validator);
+    validators.deaffiliate();
+  }
+
+  function test_ShouldNotTryToSendValidatorPayment() public {
+    assertDoesNotEmit(_performDeaffiliation, "SendValidatorPaymentCalled(address)");
+  }
+}
+
+contract ValidatorsTest_Deaffiliate_L2 is ValidatorsTest_Deaffiliate, ValidatorsTest_L2 {
+  function test_ShouldSendValidatorPayment() public {
+    vm.expectEmit(true, true, true, true);
+    emit SendValidatorPaymentCalled(validator);
+    vm.prank(validator);
+    validators.deaffiliate();
   }
 }
 
@@ -1312,23 +1634,8 @@ contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
     );
     vm.prank(address(accounts));
     validators.updateEcdsaPublicKey(validator, signer, _newEcdsaPubKey);
-
     (bytes memory actualEcdsaPubKey, , , , ) = validators.getValidator(validator);
-
     assertEq(actualEcdsaPubKey, _newEcdsaPubKey);
-  }
-
-  function test_Reverts_SetValidatorEcdsaPubKey_WhenCalledByRegisteredAccountsContract_WhenL2()
-    public
-  {
-    _whenL2();
-    (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
-      address(accounts),
-      signerPk
-    );
-    vm.prank(address(accounts));
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.updateEcdsaPublicKey(validator, signer, _newEcdsaPubKey);
   }
 
   function test_Emits_ValidatorEcdsaPublicKeyUpdatedEvent_WhenCalledByRegisteredAccountsContract()
@@ -1368,7 +1675,12 @@ contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
+contract ValidatorsTest_UpdateEcdsaPublicKey_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_UpdateEcdsaPublicKey
+{}
+
+contract ValidatorsTest_UpdatePublicKeys_Setup is ValidatorsTest {
   bytes validatorEcdsaPubKey;
 
   bytes public constant newBlsPublicKey =
@@ -1392,7 +1704,9 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
 
     validatorEcdsaPubKey = _registerValidatorHelper(validator, validatorPk);
   }
+}
 
+contract ValidatorsTest_UpdatePublicKeys_L1 is ValidatorsTest_UpdatePublicKeys_Setup {
   function test_ShouldSetValidatorNewBlsPubKeyAndEcdsaPubKey_WhenCalledByRegisteredAccountsContract()
     public
   {
@@ -1414,25 +1728,6 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
 
     assertEq(actualEcdsaPubKey, _newEcdsaPubKey);
     assertEq(actualBlsPublicKey, newBlsPublicKey);
-  }
-
-  function test_Reverts_SetValidatorNewBlsPubKeyAndEcdsaPubKey_WhenCalledByRegisteredAccountsContract_WhenL2()
-    public
-  {
-    _whenL2();
-    (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
-      address(accounts),
-      signerPk
-    );
-
-    ph.mockSuccess(
-      ph.PROOF_OF_POSSESSION(),
-      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
-    );
-
-    vm.prank(address(accounts));
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.updatePublicKeys(validator, signer, _newEcdsaPubKey, newBlsPublicKey, newBlsPop);
   }
 
   function test_Emits_ValidatorEcdsaPublicKeyUpdatedAndValidatorBlsPublicKeyUpdatedEvent_WhenCalledByRegisteredAccountsContract()
@@ -1487,7 +1782,23 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
+contract ValidatorsTest_UpdatePublicKeys_L2 is
+  ValidatorsTest_UpdatePublicKeys_Setup,
+  ValidatorsTest_L2
+{
+  function test_Reverts() public {
+    (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
+      address(accounts),
+      signerPk
+    );
+
+    vm.expectRevert("This method is no longer supported in L2.");
+    vm.prank(address(accounts));
+    validators.updatePublicKeys(validator, signer, _newEcdsaPubKey, newBlsPublicKey, newBlsPop);
+  }
+}
+
+contract ValidatorsTest_UpdateBlsPublicKey_Setup is ValidatorsTest {
   bytes validatorEcdsaPubKey;
 
   bytes public constant newBlsPublicKey =
@@ -1523,7 +1834,9 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
 
     validatorEcdsaPubKey = _registerValidatorHelper(validator, validatorPk);
   }
+}
 
+contract ValidatorsTest_UpdateBlsPublicKey_L1 is ValidatorsTest_UpdateBlsPublicKey_Setup {
   function test_ShouldSetNewValidatorBlsPubKey() public {
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
@@ -1536,18 +1849,6 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
     (, bytes memory actualBlsPublicKey, , , ) = validators.getValidator(validator);
 
     assertEq(actualBlsPublicKey, newBlsPublicKey);
-  }
-
-  function test_Reverts_SetNewValidatorBlsPubKey_WhenL2() public {
-    _whenL2();
-    ph.mockSuccess(
-      ph.PROOF_OF_POSSESSION(),
-      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
-    );
-
-    vm.prank(validator);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.updateBlsPublicKey(newBlsPublicKey, newBlsPop);
   }
 
   function test_Emits_ValidatorValidatorBlsPublicKeyUpdatedEvent() public {
@@ -1583,6 +1884,18 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
     vm.expectRevert("Wrong BLS PoP length");
     vm.prank(validator);
     validators.updateBlsPublicKey(newBlsPublicKey, wrongBlsPop);
+  }
+}
+
+contract ValidatorsTest_UpdateBlsPublicKey_L2 is
+  ValidatorsTest_UpdateBlsPublicKey_Setup,
+  ValidatorsTest_L2
+{
+  function test_Reverts() public {
+    vm.expectRevert("This method is no longer supported in L2.");
+
+    vm.prank(validator);
+    validators.updateBlsPublicKey(newBlsPublicKey, newBlsPop);
   }
 }
 
@@ -1678,6 +1991,11 @@ contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
   }
 }
 
+contract ValidatorsTest_RegisterValidatorGroup_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_RegisterValidatorGroup
+{}
+
 contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers is ValidatorsTest {
   uint256 public constant INDEX = 0;
 
@@ -1729,6 +2047,11 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers is 
     validators.deregisterValidatorGroup(INDEX);
   }
 }
+
+contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers
+{}
 
 contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is ValidatorsTest {
   uint256 public constant INDEX = 0;
@@ -1824,9 +2147,16 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
   }
 }
 
+contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers
+{}
+
 contract ValidatorsTest_AddMember is ValidatorsTest {
   uint256 _registrationEpoch;
   uint256 _additionEpoch;
+
+  uint256[] expectedSizeHistory;
 
   function setUp() public {
     super.setUp();
@@ -1834,7 +2164,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
     _registerValidatorGroupHelper(group, 1);
 
     _registerValidatorHelper(validator, validatorPk);
-    _registrationEpoch = validators.getEpochNumber();
+    _registrationEpoch = getEpochNumber();
 
     vm.prank(validator);
     validators.affiliate(group);
@@ -1848,37 +2178,18 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
 
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
-    _additionEpoch = validators.getEpochNumber();
+    _additionEpoch = getEpochNumber();
 
     (address[] memory members, , , , , , ) = validators.getValidatorGroup(group);
 
     assertEq(members, expectedMembersList);
   }
 
-  function test_Reverts_AddFirstMemberToTheList_WhenL2() public {
-    _whenL2();
-    address[] memory expectedMembersList = new address[](1);
-    expectedMembersList[0] = validator;
-
-    vm.prank(group);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.addFirstMember(validator, address(0), address(0));
-  }
-
-  function test_Reverts_AddMemberToTheList_WhenL2() public {
-    _whenL2();
-    address[] memory expectedMembersList = new address[](1);
-    expectedMembersList[0] = validator;
-
-    vm.prank(group);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.addMember(validator);
-  }
-
   function test_ShouldUpdateGroupSizeHistory() public {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
-    _additionEpoch = validators.getEpochNumber();
+    _additionEpoch = getEpochNumber();
+
     (, , , , uint256[] memory _sizeHistory, , ) = validators.getValidatorGroup(group);
 
     assertEq(_sizeHistory.length, 1);
@@ -1888,7 +2199,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
   function test_ShouldUpdateMembershipHistoryOfMember() public {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
-    _additionEpoch = validators.getEpochNumber();
+    _additionEpoch = getEpochNumber();
 
     uint256 expectedEntries = 1;
 
@@ -1908,7 +2219,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
   function test_ShouldMarkGroupAsEligible() public {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
-    _additionEpoch = validators.getEpochNumber();
+    _additionEpoch = getEpochNumber();
     assertTrue(election.isEligible(group));
   }
 
@@ -1934,8 +2245,6 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
     vm.prank(group);
     validators.addMember(otherValidator);
   }
-
-  uint256[] expectedSizeHistory;
 
   function test_ShouldUpdateGroupsSizeHistoryAndBalanceRequirements_WhenAddingManyValidatorsAffiliatedWithGroup()
     public
@@ -2040,7 +2349,12 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
   }
 }
 
+contract ValidatorsTest_AddMember_L2 is ValidatorsTest_L2, ValidatorsTest_AddMember {}
+
 contract ValidatorsTest_RemoveMember is ValidatorsTest {
+  uint256 _registrationEpoch;
+  uint256 _additionEpoch;
+
   function setUp() public {
     super.setUp();
     _registerValidatorGroupWithMembers(group, 1);
@@ -2058,14 +2372,10 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
     assertEq(members.length, expectedMembersList.length);
   }
 
-  uint256 _registrationEpoch;
-  uint256 _additionEpoch;
-
   function test_ShouldUpdateMemberMembershipHistory() public {
     vm.prank(group);
     validators.removeMember(validator);
-    uint256 _expectedEpoch = validators.getEpochNumber();
-
+    uint256 _expectedEpoch = getEpochNumber();
     (
       uint256[] memory _epochs,
       address[] memory _membershipGroups,
@@ -2129,6 +2439,8 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
   }
 }
 
+contract ValidatorsTest_RemoveMember_L2 is ValidatorsTest_L2, ValidatorsTest_RemoveMember {}
+
 contract ValidatorsTest_ReorderMember is ValidatorsTest {
   function setUp() public {
     super.setUp();
@@ -2146,17 +2458,6 @@ contract ValidatorsTest_ReorderMember is ValidatorsTest {
 
     assertEq(expectedMembersList, members);
     assertEq(expectedMembersList.length, members.length);
-  }
-
-  function test_Reverts_ReorderGroupMemberList_WhenL2() public {
-    _whenL2();
-    address[] memory expectedMembersList = new address[](2);
-    expectedMembersList[0] = vm.addr(1);
-    expectedMembersList[1] = validator;
-
-    vm.prank(group);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.reorderMember(vm.addr(1), validator, address(0));
   }
 
   function test_Emits_ValidatorGroupMemberReorderedEvent() public {
@@ -2189,6 +2490,8 @@ contract ValidatorsTest_ReorderMember is ValidatorsTest {
   }
 }
 
+contract ValidatorsTest_ReorderMember_L2 is ValidatorsTest_L2, ValidatorsTest_ReorderMember {}
+
 contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
   uint256 newCommission = commission.unwrap().add(1);
 
@@ -2204,13 +2507,6 @@ contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
     (, uint256 _commission, , , , , ) = validators.getValidatorGroup(group);
 
     assertEq(_commission, commission.unwrap());
-  }
-
-  function test_Reverts_SetValidatorGroupCommission_WhenL2() public {
-    _whenL2();
-    vm.prank(group);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.setNextCommissionUpdate(newCommission);
   }
 
   function test_ShouldSetValidatorGroupNextCommission() public {
@@ -2247,15 +2543,36 @@ contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_UpdateCommission is ValidatorsTest {
+contract ValidatorsTest_SetNextCommissionUpdate_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_SetNextCommissionUpdate
+{}
+
+contract ValidatorsTest_UpdateCommission_Setup is ValidatorsTest {
   uint256 newCommission = commission.unwrap().add(1);
 
   function setUp() public {
     super.setUp();
 
-    _registerValidatorGroupHelper(group, 1);
-  }
+    _registerValidatorGroupHelper(group, 2);
 
+    _registerValidatorHelper(validator, validatorPk);
+    _registerValidatorHelper(otherValidator, otherValidatorPk);
+
+    vm.prank(validator);
+    validators.affiliate(group);
+    (, , address _affiliation1, , ) = validators.getValidator(validator);
+
+    vm.prank(otherValidator);
+    validators.affiliate(group);
+    (, , address _affiliation2, , ) = validators.getValidator(otherValidator);
+
+    require(_affiliation1 == group, "Affiliation failed.");
+    require(_affiliation2 == group, "Affiliation failed.");
+  }
+}
+
+contract ValidatorsTest_UpdateCommission is ValidatorsTest_UpdateCommission_Setup {
   function test_ShouldSetValidatorGroupCommission() public {
     vm.prank(group);
     validators.setNextCommissionUpdate(newCommission);
@@ -2268,13 +2585,6 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
     (, uint256 _commission, , , , , ) = validators.getValidatorGroup(group);
 
     assertEq(_commission, newCommission);
-  }
-
-  function test_Reverts_SetValidatorGroupCommission_WhenL2() public {
-    _whenL2();
-    vm.prank(group);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.setNextCommissionUpdate(newCommission);
   }
 
   function test_Emits_ValidatorGroupCommissionUpdated() public {
@@ -2299,7 +2609,7 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
     validators.updateCommission();
   }
 
-  function test_Reverts_WhennoCommissionHasBeenQueued() public {
+  function test_Reverts_WhenNoCommissionHasBeenQueued() public {
     vm.expectRevert("No commission update queued");
 
     vm.prank(group);
@@ -2316,6 +2626,43 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
 
     vm.expectRevert("No commission update queued");
 
+    vm.prank(group);
+    validators.updateCommission();
+  }
+}
+
+contract ValidatorsTest_UpdateCommission_L1 is ValidatorsTest_UpdateCommission_Setup {
+  function _performCommissionUpdate() internal {
+    vm.prank(group);
+    validators.addFirstMember(validator, address(0), address(0));
+
+    vm.prank(group);
+    validators.setNextCommissionUpdate(newCommission);
+    blockTravel(commissionUpdateDelay);
+
+    vm.prank(group);
+    validators.updateCommission();
+  }
+
+  function test_ShouldNotTryTodSendMultipleValidatorPayments_WhenL1() public {
+    assertDoesNotEmit(_performCommissionUpdate, "SendValidatorPaymentCalled(address)");
+  }
+}
+
+contract ValidatorsTest_UpdateCommission_L2 is ValidatorsTest_L2, ValidatorsTest_UpdateCommission {
+  function test_ShouldSendMultipleValidatorPayments_WhenL2() public {
+    vm.prank(group);
+    validators.addFirstMember(validator, address(0), address(0));
+    vm.prank(group);
+    validators.addMember(otherValidator);
+    vm.prank(group);
+    validators.setNextCommissionUpdate(newCommission);
+    blockTravel(commissionUpdateDelay);
+
+    vm.expectEmit(true, true, true, true);
+    emit SendValidatorPaymentCalled(validator);
+    vm.expectEmit(true, true, true, true);
+    emit SendValidatorPaymentCalled(otherValidator);
     vm.prank(group);
     validators.updateCommission();
   }
@@ -2412,7 +2759,14 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_CalculateGroupEpochScore is ValidatorsTest {
+contract ValidatorsTest_CalculateEpochScore_L2 is ValidatorsTest_L2 {
+  function test_Reverts_WhenL2() public {
+    vm.expectRevert("This method is no longer supported in L2.");
+    validators.calculateEpochScore(1);
+  }
+}
+
+contract ValidatorsTest_CalculateGroupEpochScore_Setup is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
@@ -2454,7 +2808,11 @@ contract ValidatorsTest_CalculateGroupEpochScore is ValidatorsTest {
 
     return (unwrapedUptimes, expectedScore);
   }
+}
 
+contract ValidatorsTest_CalculateGroupEpochScore_L1 is
+  ValidatorsTest_CalculateGroupEpochScore_Setup
+{
   function test_ShouldCalculateGroupScoreCorrectly_WhenThereIs1ValidatorGroup() public {
     FixidityLib.Fraction[] memory uptimes = new FixidityLib.Fraction[](1);
     uptimes[0] = FixidityLib.newFixedFraction(969, 1000);
@@ -2557,7 +2915,24 @@ contract ValidatorsTest_CalculateGroupEpochScore is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
+contract ValidatorsTest_CalculateGroupEpochScore_L2 is
+  ValidatorsTest_CalculateGroupEpochScore_Setup,
+  ValidatorsTest_L2
+{
+  function test_Reverts() public {
+    FixidityLib.Fraction[] memory uptimes = new FixidityLib.Fraction[](5);
+    uptimes[0] = FixidityLib.newFixedFraction(9, 10);
+    uptimes[1] = FixidityLib.newFixedFraction(9, 10);
+    uptimes[3] = FixidityLib.newFixedFraction(9, 10);
+    uptimes[4] = FixidityLib.newFixedFraction(9, 10);
+
+    (uint256[] memory unwrapedUptimes, ) = _computeGroupUptimeCalculation(uptimes);
+    vm.expectRevert("This method is no longer supported in L2.");
+    validators.calculateGroupEpochScore(unwrapedUptimes);
+  }
+}
+
+contract ValidatorsTest_UpdateValidatorScoreFromSigner_Setup is ValidatorsTest {
   FixidityLib.Fraction public gracePeriod;
   FixidityLib.Fraction public uptime;
   uint256 public _epochScore;
@@ -2585,7 +2960,11 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
       abi.encodePacked(_epochScore, FixidityLib.fixed1().unwrap())
     );
   }
+}
 
+contract ValidatorsTest_UpdateValidatorScoreFromSigner_L1 is
+  ValidatorsTest_UpdateValidatorScoreFromSigner_Setup
+{
   function test_ShouldUpdateValidatorScore_WhenUptimeInRange0And1() public {
     uint256 _expectedScore = FixidityLib
       .multiply(
@@ -2594,6 +2973,7 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
       )
       .unwrap();
 
+    vm.prank(address(0));
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
 
     (, , , uint256 _actualScore, ) = validators.getValidator(validator);
@@ -2602,6 +2982,7 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
   }
 
   function test_ShouldUpdateValidatorScore_WhenValidatorHasNonZeroScore() public {
+    vm.prank(address(0));
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
 
     uint256 _expectedScore = FixidityLib
@@ -2624,6 +3005,7 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
       )
       .unwrap();
 
+    vm.prank(address(0));
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
     (, , , uint256 _actualScore, ) = validators.getValidator(validator);
 
@@ -2632,12 +3014,31 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
 
   function test_Reverts_WhenUptimeGreaterThan1() public {
     uptime = FixidityLib.add(FixidityLib.fixed1(), FixidityLib.newFixedFraction(1, 10));
+    vm.prank(address(0));
     vm.expectRevert("Uptime cannot be larger than one");
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
   }
 }
 
+contract ValidatorsTest_UpdateValidatorScoreFromSigner is
+  ValidatorsTest_UpdateValidatorScoreFromSigner_Setup,
+  ValidatorsTest_L2
+{
+  function test_Reverts_WhenL2() public {
+    vm.expectRevert("This method is no longer supported in L2.");
+
+    vm.prank(address(0));
+    validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
+  }
+}
+
 contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
+  address[] public expectedMembershipHistoryGroups;
+  uint256[] public expectedMembershipHistoryEpochs;
+
+  address[] public actualMembershipHistoryGroups;
+  uint256[] public actualMembershipHistoryEpochs;
+
   function setUp() public {
     super.setUp();
     _registerValidatorHelper(validator, validatorPk);
@@ -2648,12 +3049,6 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
     }
   }
 
-  address[] public expectedMembershipHistoryGroups;
-  uint256[] public expectedMembershipHistoryEpochs;
-
-  address[] public actualMembershipHistoryGroups;
-  uint256[] public actualMembershipHistoryEpochs;
-
   function test_ShouldOverwritePreviousEntry_WhenChangingGroupsInSameEpoch() public {
     uint256 numTest = 10;
 
@@ -2661,8 +3056,8 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
     expectedMembershipHistoryEpochs.push(validatorRegistrationEpochNumber);
 
     for (uint256 i = 0; i < numTest; i++) {
-      blockTravel(ph.epochSize());
-      uint256 epochNumber = validators.getEpochNumber();
+      travelNEpoch(1);
+      uint256 epochNumber = getEpochNumber();
 
       vm.prank(validator);
       validators.affiliate(group);
@@ -2711,9 +3106,8 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
     expectedMembershipHistoryEpochs.push(validatorRegistrationEpochNumber);
 
     for (uint256 i = 0; i < membershipHistoryLength.add(1); i++) {
-      blockTravel(ph.epochSize());
-      uint256 epochNumber = validators.getEpochNumber();
-
+      travelNEpoch(1);
+      uint256 epochNumber = getEpochNumber();
       vm.prank(validator);
       validators.affiliate(vm.addr(i + 1));
       vm.prank(vm.addr(i + 1));
@@ -2742,7 +3136,12 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
+contract ValidatorsTest_UpdateMembershipHistory_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_UpdateMembershipHistory
+{}
+
+contract ValidatorsTest_GetMembershipInLastEpoch_Setup is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
@@ -2753,12 +3152,14 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
       _registerValidatorGroupHelper(vm.addr(i), 1);
     }
   }
+}
 
+contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest_GetMembershipInLastEpoch_Setup {
   function test_ShouldAlwaysReturnCorrectMembershipForLastEpoch_WhenChangingMoreTimesThanMembershipHistoryLength()
     public
   {
     for (uint256 i = 0; i < membershipHistoryLength.add(1); i++) {
-      blockTravel(ph.epochSize());
+      travelNEpoch(1);
 
       vm.prank(validator);
       validators.affiliate(vm.addr(i + 1));
@@ -2772,24 +3173,87 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
       }
     }
   }
+}
 
-  function test_Reverts_getMembershipInLastEpoch_WhenL2() public {
-    blockTravel(ph.epochSize());
+contract ValidatorsTest_GetMembershipInLastEpoch_L1 is
+  ValidatorsTest_GetMembershipInLastEpoch_Setup
+{
+  function test_MaintainsMembershipAfterL2Transition() public {
+    address lastValidatorGroup;
+    address nextValidatorGroup;
+    for (uint256 i = 0; i < membershipHistoryLength.add(1); i++) {
+      blockTravel(ph.epochSize());
 
-    vm.prank(validator);
-    validators.affiliate(vm.addr(1));
-    vm.prank(vm.addr(1));
-    validators.addFirstMember(validator, address(0), address(0));
+      vm.prank(validator);
+      validators.affiliate(vm.addr(i + 1));
+      vm.prank(vm.addr(i + 1));
+      validators.addFirstMember(validator, address(0), address(0));
 
-    _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.getMembershipInLastEpoch(validator);
+      if (i == 0) {
+        assertEq(validators.getMembershipInLastEpoch(validator), address(0));
+      } else {
+        lastValidatorGroup = vm.addr(i);
+        nextValidatorGroup = vm.addr(i + 1);
+        assertEq(validators.getMembershipInLastEpoch(validator), vm.addr(i));
+      }
+    }
+
+    whenL2WithEpochManagerInitialization();
+
+    assertEq(validators.getMembershipInLastEpoch(validator), lastValidatorGroup);
+    epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + 1);
+    assertEq(validators.getMembershipInLastEpoch(validator), nextValidatorGroup);
   }
 }
 
+contract ValidatorsTest_GetMembershipInLastEpoch_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_GetMembershipInLastEpoch
+{}
+
+contract ValidatorsTest_GetTopGroupValidators is ValidatorsTest {
+  function setUp() public {
+    super.setUp();
+
+    _registerValidatorGroupWithMembersHavingSigners(group, 5);
+  }
+
+  function test_ShouldReturnTheSigner() public {
+    address[] memory _validatorSigner = validators.getTopGroupValidators(group, 3);
+    assertEq(_validatorSigner[0], accounts.getValidatorSigner(validator));
+    assertEq(_validatorSigner[1], accounts.getValidatorSigner(vm.addr(1)));
+    assertFalse(_validatorSigner[0] == validator);
+  }
+}
+
+contract ValidatorsTest_GetTopGroupValidators_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_GetTopGroupValidators
+{}
+
+contract ValidatorsTest_GetTopGroupValidatorsAccounts is ValidatorsTest {
+  function setUp() public {
+    super.setUp();
+
+    _registerValidatorGroupWithMembersHavingSigners(group, 5);
+  }
+
+  function test_ShouldReturnTheAccount() public {
+    address[] memory validatorAccount = validators.getTopGroupValidatorsAccounts(group, 3);
+    assertEq(validatorAccount[0], validator);
+    assertEq(validatorAccount[1], vm.addr(1));
+    assertFalse(validatorAccount[0] == accounts.getValidatorSigner(validator));
+  }
+}
+
+contract ValidatorsTest_GetTopGroupValidatorsAccounts_L2 is
+  ValidatorsTest_GetTopGroupValidatorsAccounts,
+  ValidatorsTest_L2
+{}
+
 contract ValidatorsTest_GetEpochSize is ValidatorsTest {
   function test_ShouldReturn17280() public {
-    assertEq(validators.getEpochSize(), 17280);
+    assertEq(IPrecompiles(address(validators)).getEpochSize(), 17280);
   }
 }
 
@@ -2853,6 +3317,11 @@ contract ValidatorsTest_GetAccountLockedGoldRequirement is ValidatorsTest {
     }
   }
 }
+
+contract ValidatorsTest_GetAccountLockedGoldRequirement_L2 is
+  ValidatorsTest_L2,
+  ValidatorsTest_GetAccountLockedGoldRequirement
+{}
 
 contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
   uint256 public numMembers = 5;
@@ -2949,26 +3418,24 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       )
     );
 
+    vm.prank(address(0));
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
   }
 
-  function test_Reverts_WhenL2_WhenValidatorAndGroupMeetBalanceRequirements() public {
-    _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
-  }
-
   function test_ShouldPayValidator_WhenValidatorAndGroupMeetBalanceRequirements() public {
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(validator), expectedValidatorPayment);
   }
 
   function test_ShouldPayGroup_WhenValidatorAndGroupMeetBalanceRequirements() public {
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(group), expectedGroupPayment);
   }
 
   function test_ShouldPayDelegatee_WhenValidatorAndGroupMeetBalanceRequirements() public {
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(paymentDelegatee), expectedDelegatedPayment);
   }
@@ -2976,7 +3443,8 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
   function test_ShouldReturnTheExpectedTotalPayment_WhenValidatorAndGroupMeetBalanceRequirements()
     public
   {
-    validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
+    // validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
+    vm.prank(address(0));
     assertEq(
       validators.distributeEpochPaymentsFromSigner(validator, maxPayment),
       expectedTotalPayment
@@ -2992,6 +3460,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
     vm.prank(validator);
     accounts.deletePaymentDelegation();
 
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(validator), expectedValidatorPayment);
   }
@@ -3005,7 +3474,8 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
     vm.prank(validator);
     accounts.deletePaymentDelegation();
 
-    validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
+    // validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
+    vm.prank(address(0));
     assertEq(
       validators.distributeEpochPaymentsFromSigner(validator, maxPayment),
       expectedTotalPayment
@@ -3021,6 +3491,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
     vm.prank(validator);
     accounts.deletePaymentDelegation();
 
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(group), expectedGroupPayment);
   }
@@ -3028,6 +3499,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
   function test_shouldPayValidatorOnlyHalf_WhenSlashingMultiplierIsHalved() public {
     vm.prank(paymentDelegatee);
     validators.halveSlashingMultiplier(group);
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
 
     assertEq(stableToken.balanceOf(validator), halfExpectedValidatorPayment);
@@ -3036,6 +3508,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
   function test_shouldPayGroupOnlyHalf_WhenSlashingMultiplierIsHalved() public {
     vm.prank(paymentDelegatee);
     validators.halveSlashingMultiplier(group);
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
 
     assertEq(stableToken.balanceOf(group), halfExpectedGroupPayment);
@@ -3044,6 +3517,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
   function test_shouldPayDelegateeOnlyHalf_WhenSlashingMultiplierIsHalved() public {
     vm.prank(paymentDelegatee);
     validators.halveSlashingMultiplier(group);
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
 
     assertEq(stableToken.balanceOf(paymentDelegatee), halfExpectedDelegatedPayment);
@@ -3052,8 +3526,8 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
   function test_shouldReturnHalfExpectedTotalPayment_WhenSlashingMultiplierIsHalved() public {
     vm.prank(paymentDelegatee);
     validators.halveSlashingMultiplier(group);
-    validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
 
+    vm.prank(address(0));
     assertEq(
       validators.distributeEpochPaymentsFromSigner(validator, maxPayment),
       halfExpectedTotalPayment
@@ -3066,6 +3540,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       originalValidatorLockedGoldRequirements.value.sub(11)
     );
 
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(validator), 0);
   }
@@ -3076,6 +3551,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       originalValidatorLockedGoldRequirements.value.sub(11)
     );
 
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(group), 0);
   }
@@ -3086,6 +3562,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       originalValidatorLockedGoldRequirements.value.sub(11)
     );
 
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(paymentDelegatee), 0);
   }
@@ -3096,6 +3573,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       originalValidatorLockedGoldRequirements.value.sub(11)
     );
 
+    vm.prank(address(0));
     assertEq(validators.distributeEpochPaymentsFromSigner(validator, maxPayment), 0);
   }
 
@@ -3105,6 +3583,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       originalGroupLockedGoldRequirements.value.sub(11)
     );
 
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(validator), 0);
   }
@@ -3115,6 +3594,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       originalGroupLockedGoldRequirements.value.sub(11)
     );
 
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(group), 0);
   }
@@ -3125,6 +3605,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       originalGroupLockedGoldRequirements.value.sub(11)
     );
 
+    vm.prank(address(0));
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
     assertEq(stableToken.balanceOf(paymentDelegatee), 0);
   }
@@ -3135,11 +3616,45 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
       originalGroupLockedGoldRequirements.value.sub(11)
     );
 
+    vm.prank(address(0));
     assertEq(validators.distributeEpochPaymentsFromSigner(validator, maxPayment), 0);
   }
 }
 
-contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
+contract ValidatorsTest_DistributeEpochPaymentsFromSigner_L2 is ValidatorsTest_L2 {
+  function test_Reverts_WhenL2() public {
+    vm.prank(address(0));
+    vm.expectRevert("This method is no longer supported in L2.");
+    validators.distributeEpochPaymentsFromSigner(validator, 100);
+  }
+}
+
+contract ValidatorsTest_MintStableToEpochManager_L1 is ValidatorsTest {
+  function test_Reverts_WhenL1() public {
+    vm.expectRevert("This method is not supported in L1.");
+    validators.mintStableToEpochManager(5);
+  }
+}
+
+contract ValidatorsTest_MintStableToEpochManager_L2 is ValidatorsTest_L2 {
+  function test_Reverts_WhenCalledByOtherThanEpochManager() public {
+    vm.expectRevert("only registered contract");
+    validators.mintStableToEpochManager(5);
+  }
+
+  function test_WhenMintAmountIsZero() public {
+    vm.prank(address(epochManager));
+    validators.mintStableToEpochManager(0);
+  }
+
+  function test_ShouldMintStableToEpochManager() public {
+    vm.prank(address(epochManager));
+    validators.mintStableToEpochManager(5);
+    assertEq(stableToken.balanceOf(address(epochManager)), 5);
+  }
+}
+
+contract ValidatorsTest_ForceDeaffiliateIfValidator_Setup is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
@@ -3151,19 +3666,16 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
 
     lockedGold.addSlasherTest(paymentDelegatee);
   }
+}
 
+contract ValidatorsTest_ForceDeaffiliateIfValidator is
+  ValidatorsTest_ForceDeaffiliateIfValidator_Setup
+{
   function test_ShouldSucceed_WhenSenderIsWhitelistedSlashingAddress() public {
     vm.prank(paymentDelegatee);
     validators.forceDeaffiliateIfValidator(validator);
     (, , address affiliation, , ) = validators.getValidator(validator);
     assertEq(affiliation, address(0));
-  }
-
-  function test_Reverts_WhenSenderIsWhitelistedSlashingAddress_WhenL2() public {
-    _whenL2();
-    vm.prank(paymentDelegatee);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.forceDeaffiliateIfValidator(validator);
   }
 
   function test_Reverts_WhenSenderNotApprovedAddress() public {
@@ -3172,17 +3684,42 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
   }
 }
 
+contract ValidatorsTest_ForceDeaffiliateIfValidator_L1 is
+  ValidatorsTest_ForceDeaffiliateIfValidator_Setup
+{
+  function _performForcedDeaffiliation() internal {
+    vm.prank(paymentDelegatee);
+    validators.forceDeaffiliateIfValidator(validator);
+  }
+
+  function test_ShouldNotTryToSendValidatorPayment_WhenL1() public {
+    assertDoesNotEmit(_performForcedDeaffiliation, "SendValidatorPaymentCalled(address)");
+  }
+}
+
+contract ValidatorsTest_ForceDeaffiliateIfValidator_L2 is
+  ValidatorsTest_ForceDeaffiliateIfValidator,
+  ValidatorsTest_L2
+{
+  function test_ShouldSendValidatorPayment_WhenL2() public {
+    vm.expectEmit(true, true, true, true);
+    emit SendValidatorPaymentCalled(validator);
+    vm.prank(paymentDelegatee);
+    validators.forceDeaffiliateIfValidator(validator);
+  }
+}
+
 contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
+  struct EpochInfo {
+    uint256 epochNumber;
+    address groupy;
+  }
+
   uint256 totalEpochs = 24;
   uint256 gapSize = 3;
   uint256 contractIndex;
 
   EpochInfo[] public epochInfoList;
-
-  struct EpochInfo {
-    uint256 epochNumber;
-    address groupy;
-  }
 
   function setUp() public {
     super.setUp();
@@ -3197,7 +3734,7 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
     for (uint256 i = 1; i < totalEpochs; i++) {
       blockTravel(ph.epochSize());
 
-      uint256 epochNumber = validators.getEpochNumber();
+      uint256 epochNumber = getEpochNumber();
 
       if (i % gapSize == 0) {
         address _group = (i % gapSize.mul(gapSize)) != 0
@@ -3246,29 +3783,6 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
     }
   }
 
-  function test_Reverts_GroupMembershipInEpoch_WhenL2() public {
-    _whenL2();
-    for (uint256 i = 0; i < epochInfoList.length; i++) {
-      address _group = epochInfoList[i].groupy;
-
-      if (epochInfoList.length.sub(i) <= membershipHistoryLength) {
-        vm.expectRevert("This method is no longer supported in L2.");
-        validators.groupMembershipInEpoch(
-          validator,
-          epochInfoList[i].epochNumber,
-          uint256(1).add(i)
-        );
-      } else {
-        vm.expectRevert("This method is no longer supported in L2.");
-        validators.groupMembershipInEpoch(
-          validator,
-          epochInfoList[i].epochNumber,
-          uint256(1).add(i)
-        );
-      }
-    }
-  }
-
   function test_Reverts_WhenEpochNumberAtGivenIndexIsGreaterThanProvidedEpochNumber() public {
     vm.expectRevert("index out of bounds");
     validators.groupMembershipInEpoch(
@@ -3288,13 +3802,13 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
   }
 
   function test_Reverts_WhenProvidedEpochNumberGreaterThanCurrentEpochNumber() public {
-    uint256 _epochNumber = validators.getEpochNumber();
+    uint256 _epochNumber = getEpochNumber();
     vm.expectRevert("Epoch cannot be larger than current");
     validators.groupMembershipInEpoch(validator, _epochNumber.add(1), contractIndex);
   }
 
   function test_Reverts_WhenProvidedIndexGreaterThanIndexOnChain() public {
-    uint256 _epochNumber = validators.getEpochNumber();
+    uint256 _epochNumber = getEpochNumber();
     vm.expectRevert("index out of bounds");
     validators.groupMembershipInEpoch(validator, _epochNumber, contractIndex.add(1));
   }
@@ -3308,6 +3822,11 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
     );
   }
 }
+
+contract ValidatorsTest_GroupMembershipInEpoch_L2 is
+  ValidatorsTest_GroupMembershipInEpoch,
+  ValidatorsTest_L2
+{}
 
 contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
   function setUp() public {
@@ -3330,14 +3849,6 @@ contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
     }
   }
 
-  function test_Reverts_HalveSlashingMultiplier_WhenL2() public {
-    _whenL2();
-    FixidityLib.Fraction memory expectedMultiplier = FixidityLib.fixed1();
-    vm.prank(paymentDelegatee);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.halveSlashingMultiplier(group);
-  }
-
   function test_ShouldUpdateLastSlashedTimestamp() public {
     (, , , , , , uint256 initialLastSlashed) = validators.getValidatorGroup(group);
 
@@ -3353,6 +3864,11 @@ contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
     validators.halveSlashingMultiplier(group);
   }
 }
+
+contract ValidatorsTest_HalveSlashingMultiplier_L2 is
+  ValidatorsTest_HalveSlashingMultiplier,
+  ValidatorsTest_L2
+{}
 
 contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
   function setUp() public {
@@ -3385,15 +3901,6 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
     assertEq(actualMultiplier, FixidityLib.fixed1().unwrap());
   }
 
-  function test_Reverts_WhenSlashingMultiplierIsResetAfterResetPeriod_WhenL2() public {
-    _whenL2();
-    timeTravel(slashingMultiplierResetPeriod);
-
-    vm.prank(group);
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.resetSlashingMultiplier();
-  }
-
   function test_Reverts_WhenSlashingMultiplierIsResetBeforeResetPeriod() public {
     vm.expectRevert("`resetSlashingMultiplier` called before resetPeriod expired");
     vm.prank(group);
@@ -3409,11 +3916,9 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
     (, , , , , uint256 actualMultiplier, ) = validators.getValidatorGroup(group);
     assertEq(actualMultiplier, FixidityLib.fixed1().unwrap());
   }
-
-  function test_Reverts_SetSlashingMultiplierResetPeriod_WhenL2() public {
-    _whenL2();
-    uint256 newResetPeriod = 10 * DAY;
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.setSlashingMultiplierResetPeriod(newResetPeriod);
-  }
 }
+
+contract ValidatorsTest_ResetSlashingMultiplier_L2 is
+  ValidatorsTest_ResetSlashingMultiplier,
+  ValidatorsTest_L2
+{}

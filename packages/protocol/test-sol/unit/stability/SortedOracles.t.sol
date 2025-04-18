@@ -7,10 +7,9 @@ import { SortedOracles } from "@celo-contracts/stability/SortedOracles.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "@celo-contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
-import { Constants } from "@test-sol/constants.sol";
-import "forge-std/console.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 
-contract SortedOraclesTest is Test, Constants {
+contract SortedOraclesTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
   using AddressSortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
 

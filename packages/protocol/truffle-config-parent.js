@@ -23,15 +23,13 @@ const INTEGRATION_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const INTEGRATION_TESTING_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const ALFAJORESSTAGING_FROM = '0xf4314cb9046bece6aa54bb9533155434d0c76909'
 const ALFAJORES_FROM = '0x456f41406B32c45D59E539e4BBA3D7898c3584dA'
-const PILOT_FROM = '0x387bCb16Bfcd37AccEcF5c9eB2938E30d3aB8BF2'
-const PILOTSTAGING_FROM = '0x545DEBe3030B570731EDab192640804AC8Cf65CA'
 const RC0_FROM = '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C'
 const BAKLAVA_FROM = '0x0Cc59Ed03B3e763c02d54D695FFE353055f1502D'
 const BAKLAVASTAGING_FROM = '0x4588ABb84e1BBEFc2BcF4b2296F785fB7AD9F285'
 const STAGING_FROM = '0x4e3d385ecdee402da395a3b18575b05cc5e8ff21'
 const CANNOLI_FROM = '0x8C174E896A85E487aa895865657b78Ea64879dC7' // validator zero
 
-const gasLimit = 13000000
+const gasLimit = 20000000
 const hostAddress = process.env.CELO_NODE_ADDRESS || '127.0.0.1'
 const hostPort = parseInt(process.env.CELO_NODE_PORT || '8545')
 
@@ -139,7 +137,11 @@ const networks = {
     },
   },
   testnet_prod: defaultConfig,
-
+  anvil: {
+    ...defaultConfig,
+    network_id: 31337,
+    from: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
+  },
   // New testnets
   integration: {
     ...defaultConfig,
@@ -150,9 +152,6 @@ const networks = {
     from: INTEGRATION_TESTING_FROM,
     network_id: 1101,
   },
-  argentinastaging: freeGasConfig,
-  argentinaproduction: freeGasConfig,
-
   alfajoresstaging: {
     ...defaultConfig,
     from: ALFAJORESSTAGING_FROM,
@@ -170,14 +169,6 @@ const networks = {
     from: CANNOLI_FROM,
   },
 
-  pilot: {
-    ...defaultConfig,
-    from: PILOT_FROM,
-  },
-  pilotstaging: {
-    ...defaultConfig,
-    from: PILOTSTAGING_FROM,
-  },
   baklava: {
     ...defaultConfig,
     from: BAKLAVA_FROM,

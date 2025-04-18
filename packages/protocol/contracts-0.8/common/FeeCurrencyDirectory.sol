@@ -4,13 +4,33 @@ pragma solidity ^0.8.0;
 import "../../contracts/common/Initializable.sol";
 import "./interfaces/IOracle.sol";
 import "./interfaces/IFeeCurrencyDirectory.sol";
+import "./interfaces/IFeeCurrencyDirectoryInitializer.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
-contract FeeCurrencyDirectory is IFeeCurrencyDirectory, Initializable, Ownable {
+contract FeeCurrencyDirectory is
+  IFeeCurrencyDirectory,
+  IFeeCurrencyDirectoryInitializer,
+  Initializable,
+  Ownable
+{
   mapping(address => CurrencyConfig) public currencies;
   address[] private currencyList;
 
-  constructor(bool test) public Initializable(test) {}
+  /**
+   * @notice Emitted when currency config is set.
+   * @param token Address of the added currency token.
+   * @param oracle Address of the currency token oracle.
+   * @param intrinsicGas The intrinsic gas value for transactions.
+   */
+  event CurrencyConfigSet(address indexed token, address indexed oracle, uint256 intrinsicGas);
+
+  /**
+   * @notice Emitted when currency is removed.
+   * @param token Address of the removed currency token.
+   */
+  event CurrencyRemoved(address indexed token);
+
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Initializes the contract with the owner set.
@@ -37,6 +57,7 @@ contract FeeCurrencyDirectory is IFeeCurrencyDirectory, Initializable, Ownable {
 
     currencies[token] = CurrencyConfig({ oracle: oracle, intrinsicGas: intrinsicGas });
     currencyList.push(token);
+    emit CurrencyConfigSet(token, oracle, intrinsicGas);
   }
 
   /**
@@ -52,6 +73,7 @@ contract FeeCurrencyDirectory is IFeeCurrencyDirectory, Initializable, Ownable {
     delete currencies[token];
     currencyList[index] = currencyList[currencyList.length - 1];
     currencyList.pop();
+    emit CurrencyRemoved(token);
   }
 
   /**

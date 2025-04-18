@@ -132,6 +132,9 @@ contract Accounts is
     _setEip712DomainSeparator();
   }
 
+  /**
+   * @notice Sets the EIP712 domain separator for the Celo Accounts abstraction.
+   */
   function setEip712DomainSeparator() external {
     _setEip712DomainSeparator();
   }
@@ -495,7 +498,7 @@ contract Accounts is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 5, 0);
+    return (1, 1, 4, 2);
   }
 
   /**
@@ -567,7 +570,7 @@ contract Accounts is
    * be greater than 1.
    * @dev Use `deletePaymentDelegation` to unset the payment delegation.
    */
-  function setPaymentDelegation(address beneficiary, uint256 fraction) public onlyL1 {
+  function setPaymentDelegation(address beneficiary, uint256 fraction) public {
     require(isAccount(msg.sender), "Must first register address with Account.createAccount");
     require(beneficiary != address(0), "Beneficiary cannot be address 0x0");
     FixidityLib.Fraction memory f = FixidityLib.wrap(fraction);
