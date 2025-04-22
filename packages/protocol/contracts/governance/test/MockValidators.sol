@@ -312,14 +312,6 @@ contract MockValidators is IValidators, IsL2Check {
     epochRewards[account] = reward;
   }
 
-  function registerValidator(
-    bytes calldata,
-    bytes calldata,
-    bytes calldata
-  ) external returns (bool) {
-    revert("Method not implemented in mock");
-  }
-
   function getMembershipHistory(
     address
   ) external view returns (uint256[] memory, address[] memory, uint256, uint256) {

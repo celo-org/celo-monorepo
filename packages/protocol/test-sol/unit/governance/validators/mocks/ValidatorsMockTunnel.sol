@@ -26,8 +26,6 @@ contract ValidatorsMockTunnel is ForgeTest {
     uint256 groupRequirementDuration;
     uint256 validatorRequirementValue;
     uint256 validatorRequirementDuration;
-    uint256 validatorScoreExponent;
-    uint256 validatorScoreAdjustmentSpeed;
   }
 
   struct InitParams2 {
@@ -77,14 +75,12 @@ contract ValidatorsMockTunnel is ForgeTest {
     });
 
     bytes memory data = abi.encodeWithSignature(
-      "initialize(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,(uint256,uint256))",
+      "initialize(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,(uint256,uint256))",
       params.registryAddress,
       params.groupRequirementValue,
       params.groupRequirementDuration,
       params.validatorRequirementValue,
       params.validatorRequirementDuration,
-      params.validatorScoreExponent,
-      params.validatorScoreAdjustmentSpeed,
       params2._membershipHistoryLength,
       params2._slashingMultiplierResetPeriod,
       params2._maxGroupSize,

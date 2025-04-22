@@ -59,19 +59,6 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
   address authorizedVoteSigner2;
   uint256 authorizedVoteSignerPK2;
 
-  bytes public constant blsPublicKey =
-    abi.encodePacked(
-      bytes32(0x0101010101010101010101010101010101010101010101010101010101010101),
-      bytes32(0x0202020202020202020202020202020202020202020202020202020202020202),
-      bytes32(0x0303030303030303030303030303030303030303030303030303030303030303)
-    );
-  bytes public constant blsPop =
-    abi.encodePacked(
-      bytes16(0x04040404040404040404040404040404),
-      bytes16(0x05050505050505050505050505050505),
-      bytes16(0x06060606060606060606060606060606)
-    );
-
   struct ValidatorLockedGoldRequirements {
     uint256 value;
     uint256 duration;
@@ -118,7 +105,6 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
   uint256 validatorRegistrationEpochNumber;
 
   function setUp() public {
-    ph.setEpochSize(DAY / 5);
     owner = address(this);
     accApprover = actor("approver");
     group = actor("group");
@@ -238,19 +224,12 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
       duration: 100 * DAY
     });
 
-    originalValidatorScoreParameters = ValidatorScoreParameters({
-      exponent: 5,
-      adjustmentSpeed: FixidityLib.newFixedFraction(5, 20)
-    });
-
     initParams = ValidatorsMockTunnel.InitParams({
       registryAddress: REGISTRY_ADDRESS,
       groupRequirementValue: originalGroupLockedGoldRequirements.value,
       groupRequirementDuration: originalGroupLockedGoldRequirements.duration,
       validatorRequirementValue: originalValidatorLockedGoldRequirements.value,
-      validatorRequirementDuration: originalValidatorLockedGoldRequirements.duration,
-      validatorScoreExponent: originalValidatorScoreParameters.exponent,
-      validatorScoreAdjustmentSpeed: originalValidatorScoreParameters.adjustmentSpeed.unwrap()
+      validatorRequirementDuration: originalValidatorLockedGoldRequirements.duration
     });
     initParams2 = ValidatorsMockTunnel.InitParams2({
       _membershipHistoryLength: membershipHistoryLength,
@@ -283,7 +262,7 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
   }
 
   function _whenL2() public {
-    uint256 l1EpochNumber = IPrecompiles(address(validators)).getEpochNumber();
+    uint256 l1EpochNumber = 100;
 
     deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
 
@@ -347,10 +326,8 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
 
     bytes memory _ecdsaPubKey = _generateEcdsaPubKey(_validator, _validatorPk);
 
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(_validator, blsPublicKey, blsPop));
-
     vm.prank(_validator);
-    validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
+    validators.registerValidatorNoBls(_ecdsaPubKey);
     validatorRegistrationEpochNumber = IPrecompiles(address(validators)).getEpochNumber();
     return _ecdsaPubKey;
   }
@@ -478,10 +455,8 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
   ) internal returns (bytes memory) {
     (bytes memory _ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(_validator, signerPk);
 
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(_validator, blsPublicKey, blsPop));
-
     vm.prank(_validator);
-    validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
+    validators.registerValidatorNoBls(_ecdsaPubKey);
     validatorRegistrationEpochNumber = IPrecompiles(address(validators)).getEpochNumber();
     return _ecdsaPubKey;
   }

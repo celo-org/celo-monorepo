@@ -1113,21 +1113,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     lockGold(amountToLock);
     address accountAddress = (new ForceTx()).identity();
 
-    // these blobs are not checked in the contract
-    // TODO make this configurable
-    bytes memory newBlsPublicKey = abi.encodePacked(
-      bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
-      bytes32(0x0202020202020202020202020202020202020202020202020202020202020203),
-      bytes32(0x0303030303030303030303030303030303030303030303030303030303030304)
-    );
-    bytes memory newBlsPop = abi.encodePacked(
-      bytes16(0x04040404040404040404040404040405),
-      bytes16(0x05050505050505050505050505050506),
-      bytes16(0x06060606060606060606060606060607)
-    );
-
     (bytes memory ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(accountAddress, validatorKey);
-    getValidators().registerValidator(ecdsaPubKey, newBlsPublicKey, newBlsPop);
+    getValidators().registerValidatorNoBls(ecdsaPubKey);
     getValidators().affiliate(groupToAffiliate);
     console.log("Done registering validators");
 
