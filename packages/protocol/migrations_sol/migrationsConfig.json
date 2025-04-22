@@ -73,10 +73,6 @@
       "duration": 5184000,
       "duration_help": "60 * DAY"
     },
-    "validatorScoreParameters": {
-      "exponent": 10,
-      "adjustmentSpeed": 100000000000000000000000
-    },
     "membershipHistoryLength": 60,
     "commissionUpdateDelay": 51840,
     "commissionUpdateDelay_help": "(3 * DAY) / 5",

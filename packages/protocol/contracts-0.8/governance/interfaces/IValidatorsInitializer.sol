@@ -8,8 +8,6 @@ interface IValidatorsInitializer {
     uint256 groupRequirementDuration,
     uint256 validatorRequirementValue,
     uint256 validatorRequirementDuration,
-    uint256 validatorScoreExponent,
-    uint256 validatorScoreAdjustmentSpeed,
     uint256 _membershipHistoryLength,
     uint256 _slashingMultiplierResetPeriod,
     uint256 _maxGroupSize,
@@ -21,6 +19,6 @@ library InitParamsLib {
   struct InitParams {
     // The number of blocks to delay a ValidatorGroup's commission
     uint256 commissionUpdateDelay;
-    uint256 downtimeGracePeriod;
+    uint256 deprecated_downtimeGracePeriod;
   }
 }

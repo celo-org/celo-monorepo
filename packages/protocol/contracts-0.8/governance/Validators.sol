@@ -115,7 +115,7 @@ contract Validators is
   struct InitParams {
     // The number of blocks to delay a ValidatorGroup's commission
     uint256 commissionUpdateDelay;
-    uint256 downtimeGracePeriod;
+    uint256 deprecated_downtimeGracePeriod;
   }
 
   mapping(address => ValidatorGroup) private groups;
@@ -130,11 +130,10 @@ contract Validators is
   // The number of blocks to delay a ValidatorGroup's commission update
   uint256 public commissionUpdateDelay;
   uint256 public slashingMultiplierResetPeriod;
-  uint256 public downtimeGracePeriod;
+  uint256 public deprecated_downtimeGracePeriod; // deprecated
 
   event MaxGroupSizeSet(uint256 size);
   event CommissionUpdateDelaySet(uint256 delay);
-  event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event ValidatorLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event MembershipHistoryLengthSet(uint256 length);
@@ -143,8 +142,6 @@ contract Validators is
   event ValidatorAffiliated(address indexed validator, address indexed group);
   event ValidatorDeaffiliated(address indexed validator, address indexed group);
   event ValidatorEcdsaPublicKeyUpdated(address indexed validator, bytes ecdsaPublicKey);
-  event ValidatorBlsPublicKeyUpdated(address indexed validator, bytes blsPublicKey);
-  event ValidatorScoreUpdated(address indexed validator, uint256 score, uint256 epochScore);
   event ValidatorGroupRegistered(address indexed group, uint256 commission);
   event ValidatorGroupDeregistered(address indexed group);
   event ValidatorGroupMemberAdded(address indexed group, address indexed validator);
@@ -1128,30 +1125,6 @@ contract Validators is
     updateMembershipHistory(validator, group);
     updateSizeHistory(group, numMembers.sub(1));
     emit ValidatorGroupMemberAdded(group, validator);
-    return true;
-  }
-
-  /**
-   * @notice Updates a validator's BLS key.
-   * @param validator The validator whose BLS public key should be updated.
-   * @param account The address under which the validator is registered.
-   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
-   *   proof of possession. 96 bytes.
-   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
-   *   account address. 48 bytes.
-   * @return True upon success.
-   */
-  function _updateBlsPublicKey(
-    Validator storage validator,
-    address account,
-    bytes memory blsPublicKey,
-    bytes memory blsPop
-  ) private returns (bool) {
-    require(blsPublicKey.length == 96, "Wrong BLS public key length");
-    require(blsPop.length == 48, "Wrong BLS PoP length");
-    require(checkProofOfPossession(account, blsPublicKey, blsPop), "Invalid BLS PoP");
-    validator.publicKeys.bls = blsPublicKey;
-    emit ValidatorBlsPublicKeyUpdated(account, blsPublicKey);
     return true;
   }
 

@@ -76,7 +76,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   struct InitParamsTunnel {
     // The number of blocks to delay a ValidatorGroup's commission
     uint256 commissionUpdateDelay;
-    uint256 downtimeGracePeriod;
+    uint256 deprecated_downtimeGracePeriod;
   }
 
   IProxyFactory proxyFactory;
@@ -601,14 +601,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       json.parseRaw(".validators.validatorLockedGoldRequirements.duration"),
       (uint256)
     );
-    uint256 validatorScoreExponent = abi.decode(
-      json.parseRaw(".validators.validatorScoreParameters.exponent"),
-      (uint256)
-    );
-    uint256 validatorScoreAdjustmentSpeed = abi.decode(
-      json.parseRaw(".validators.validatorScoreParameters.adjustmentSpeed"),
-      (uint256)
-    );
     uint256 membershipHistoryLength = abi.decode(
       json.parseRaw(".validators.membershipHistoryLength"),
       (uint256)
@@ -629,7 +621,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     InitParamsTunnel memory initParamsTunnel = InitParamsTunnel({
       commissionUpdateDelay: commissionUpdateDelay,
-      downtimeGracePeriod: downtimeGracePeriod
+      deprecated_downtimeGracePeriod: downtimeGracePeriod
     });
 
     deployProxiedContract(
@@ -641,8 +633,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         groupRequirementDuration,
         validatorRequirementValue,
         validatorRequirementDuration,
-        validatorScoreExponent,
-        validatorScoreAdjustmentSpeed,
         membershipHistoryLength,
         slashingMultiplierResetPeriod,
         maxGroupSize,

@@ -292,10 +292,6 @@ contract MockValidators is IValidators, IsL2Check {
     revert("Method not implemented in mock");
   }
 
-  function downtimeGracePeriod() external view returns (uint256) {
-    revert("Method not implemented in mock");
-  }
-
   function getCommissionUpdateDelay() external view returns (uint256) {
     revert("Method not implemented in mock");
   }

@@ -34,7 +34,6 @@ interface IValidators {
 
   // view functions
   function maxGroupSize() external view returns (uint256);
-  function downtimeGracePeriod() external view returns (uint256);
   function getCommissionUpdateDelay() external view returns (uint256);
   function getValidatorScoreParameters() external view returns (uint256, uint256);
   function getMembershipHistory(

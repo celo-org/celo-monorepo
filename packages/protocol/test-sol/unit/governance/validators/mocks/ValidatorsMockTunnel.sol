@@ -12,7 +12,7 @@ contract ValidatorsMockTunnel is ForgeTest {
   struct InitParamsTunnel {
     // The number of blocks to delay a ValidatorGroup's commission
     uint256 commissionUpdateDelay;
-    uint256 downtimeGracePeriod;
+    uint256 deprecated_downtimeGracePeriod;
   }
 
   constructor(address _validatorContractAddress) public {
@@ -71,7 +71,7 @@ contract ValidatorsMockTunnel is ForgeTest {
   ) external returns (bool, bytes memory) {
     InitParamsTunnel memory initParamsTunnel = InitParamsTunnel({
       commissionUpdateDelay: params2._commissionUpdateDelay,
-      downtimeGracePeriod: params2._downtimeGracePeriod
+      deprecated_downtimeGracePeriod: params2._downtimeGracePeriod
     });
 
     bytes memory data = abi.encodeWithSignature(
