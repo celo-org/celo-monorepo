@@ -209,9 +209,6 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   }
 
   function test_Reverts_WhenEndOfEpochHasNotBeenReached() public {
-    // fund treasury
-    // vm.prank(address(0));
-    // celoTokenContract.mint(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
     vm.deal(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
 
     uint256 l1EpochNumber = IPrecompiles(address(validatorsContract)).getEpochNumber();
@@ -266,9 +263,6 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
 
     activateValidators();
     vm.deal(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
-
-    // vm.prank(address(0));
-    // celoTokenContract.mint(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
 
     whenL2();
     _setValidatorL2Score();
