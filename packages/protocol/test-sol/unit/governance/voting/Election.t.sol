@@ -119,6 +119,7 @@ contract ElectionTest is TestWithUtils {
 
     blocker = new TestBlocker();
     election.setBlockedByContract(address(blocker));
+    whenL2WithEpochManagerInitialization();
   }
 
   function preElectionSetup() public {
@@ -159,9 +160,7 @@ contract ElectionTest is TestWithUtils {
   }
 }
 
-contract ElectionTest_L2 is ElectionTest, WhenL2 {}
-
-contract ElectionTest_Initialize is ElectionTest_L2 {
+contract ElectionTest_Initialize is ElectionTest {
   function setUp() public {
     preElectionSetup();
 
@@ -207,7 +206,7 @@ contract ElectionTest_Initialize is ElectionTest_L2 {
   }
 }
 
-contract ElectionTest_SetElectabilityThreshold is ElectionTest_L2 {
+contract ElectionTest_SetElectabilityThreshold is ElectionTest {
   function test_shouldSetElectabilityThreshold() public {
     uint256 newElectabilityThreshold = FixidityLib.newFixedFraction(1, 200).unwrap();
     election.setElectabilityThreshold(newElectabilityThreshold);
@@ -220,7 +219,7 @@ contract ElectionTest_SetElectabilityThreshold is ElectionTest_L2 {
   }
 }
 
-contract ElectionTest_SetElectableValidators is ElectionTest_L2 {
+contract ElectionTest_SetElectableValidators is ElectionTest {
   function test_shouldSetElectableValidators() public {
     uint256 newElectableValidatorsMin = 2;
     uint256 newElectableValidatorsMax = 4;
@@ -260,7 +259,7 @@ contract ElectionTest_SetElectableValidators is ElectionTest_L2 {
   }
 }
 
-contract ElectionTest_SetMaxNumGroupsVotedFor is ElectionTest_L2 {
+contract ElectionTest_SetMaxNumGroupsVotedFor is ElectionTest {
   function test_shouldSetMaxNumGroupsVotedFor() public {
     uint256 newMaxNumGroupsVotedFor = 4;
     election.setMaxNumGroupsVotedFor(newMaxNumGroupsVotedFor);
@@ -286,7 +285,7 @@ contract ElectionTest_SetMaxNumGroupsVotedFor is ElectionTest_L2 {
   }
 }
 
-contract ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest_L2 {
+contract ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
   function test_shouldSetAllowedToVoteOverMaxNumberOfGroups() public {
     election.setAllowedToVoteOverMaxNumberOfGroups(true);
     assertEq(election.allowedToVoteOverMaxNumberOfGroups(address(this)), true);
@@ -325,7 +324,7 @@ contract ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest_L2 {
   }
 }
 
-contract ElectionTest_MarkGroupEligible is ElectionTest_L2 {
+contract ElectionTest_MarkGroupEligible is ElectionTest {
   function setUp() public {
     super.setUp();
 
@@ -361,7 +360,7 @@ contract ElectionTest_MarkGroupEligible is ElectionTest_L2 {
   }
 }
 
-contract ElectionTest_MarkGroupInEligible is ElectionTest_L2 {
+contract ElectionTest_MarkGroupInEligible is ElectionTest {
   function setUp() public {
     super.setUp();
 
@@ -397,7 +396,7 @@ contract ElectionTest_MarkGroupInEligible is ElectionTest_L2 {
   }
 }
 
-contract ElectionTest_Vote_WhenGroupEligible is ElectionTest_L2 {
+contract ElectionTest_Vote_WhenGroupEligible is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
@@ -596,7 +595,7 @@ contract ElectionTest_Vote_WhenGroupEligible is ElectionTest_L2 {
   }
 }
 
-contract ElectionTest_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes is ElectionTest_L2 {
+contract ElectionTest_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
@@ -750,7 +749,7 @@ contract ElectionTest_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes is Electio
   }
 }
 
-contract ElectionTest_Vote_GroupNotEligible is ElectionTest_L2 {
+contract ElectionTest_Vote_GroupNotEligible is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
@@ -773,7 +772,7 @@ contract ElectionTest_Vote_GroupNotEligible is ElectionTest_L2 {
   }
 }
 
-contract ElectionTest_Activate is ElectionTest_L2 {
+contract ElectionTest_Activate is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
@@ -937,7 +936,7 @@ contract ElectionTest_Activate is ElectionTest_L2 {
   }
 }
 
-contract ElectionTest_ActivateForAccount is ElectionTest_L2 {
+contract ElectionTest_ActivateForAccount is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
@@ -1091,7 +1090,7 @@ contract ElectionTest_ActivateForAccount is ElectionTest_L2 {
   }
 }
 
-contract ElectionTest_RevokePending is ElectionTest_L2 {
+contract ElectionTest_RevokePending is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
@@ -1247,7 +1246,7 @@ contract ElectionTest_RevokePending is ElectionTest_L2 {
   }
 }
 
-contract ElectionTest_RevokeActive is ElectionTest_L2 {
+contract ElectionTest_RevokeActive is ElectionTest {
   address voter0 = address(this);
   address voter1 = account1;
   address group = account2;
@@ -1525,7 +1524,7 @@ contract ElectionTest_RevokeActive is ElectionTest_L2 {
   }
 }
 
-contract ElectionTest_ElectValidatorsAbstract is ElectionTest_L2 {
+contract ElectionTest_ElectValidatorsAbstract is ElectionTest {
   struct MemberWithVotes {
     address member;
     uint256 votes;
@@ -1785,11 +1784,6 @@ contract ElectionTest_ElectValidatorSigners is ElectionTest_ElectValidatorsAbstr
   }
 }
 
-// contract ElectionTest_ElectValidatorSignersL2 is
-//   ElectionTest_ElectValidatorSigners,
-//   ElectionTest_L2
-// {}
-
 contract ElectionTest_ElectValidatorsAccounts is ElectionTest_ElectValidatorsAbstract {
   function test_ShouldElectCorrectValidators_WhenThereIsALargeNumberOfGroups() public {
     WhenThereIsALargeNumberOfGroups();
@@ -1901,11 +1895,6 @@ contract ElectionTest_ElectValidatorsAccounts is ElectionTest_ElectValidatorsAbs
   }
 }
 
-// contract ElectionTest_ElectValidatorsAccountsL2 is
-//   ElectionTest_ElectValidatorsAccounts,
-//   ElectionTest_L2
-// {}
-
 contract ElectionTest_GetCurrentValidatorSigners_L2 is ElectionTest_ElectValidatorsAbstract {
   function test_ShouldReturnValidatorSigners() public {
     WhenThereIsALargeNumberOfGroups();
@@ -1919,7 +1908,7 @@ contract ElectionTest_GetCurrentValidatorSigners_L2 is ElectionTest_ElectValidat
   }
 }
 
-contract ElectionTest_DistributeEpochRewards is ElectionTest_L2 {
+contract ElectionTest_DistributeEpochRewards is ElectionTest {
   address voter = address(this);
   address voter2 = account4;
   address group = account2;
@@ -2077,7 +2066,7 @@ contract ElectionTest_DistributeEpochRewards is ElectionTest_L2 {
   }
 }
 
-contract ElectionTest_ForceDecrementVotes is ElectionTest_L2 {
+contract ElectionTest_ForceDecrementVotes is ElectionTest {
   address voter = address(this);
   address group = account2;
   address group2 = account7;
@@ -2502,7 +2491,7 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest_L2 {
   }
 }
 
-contract ElectionTest_ConsistencyChecks is ElectionTest_L2 {
+contract ElectionTest_ConsistencyChecks is ElectionTest {
   struct AccountStruct {
     address account;
     uint256 active;
@@ -2730,7 +2719,7 @@ contract ElectionTest_ConsistencyChecks is ElectionTest_L2 {
   }
 }
 
-contract ElectionTest_HasActivatablePendingVotes is ElectionTest_L2 {
+contract ElectionTest_HasActivatablePendingVotes is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
