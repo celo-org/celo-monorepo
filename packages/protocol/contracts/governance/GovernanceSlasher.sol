@@ -51,7 +51,7 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, ICeloVersio
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 1);
+    return (1, 2, 0, 0);
   }
 
   function setSlasherExecuter(address _slasherExecuter) external onlyOwner {
