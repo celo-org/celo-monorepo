@@ -43,17 +43,6 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, ICeloVersio
     setRegistry(registryAddress);
   }
 
-  /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 0);
-  }
-
   function setSlasherExecuter(address _slasherExecuter) external onlyOwner {
     slasherExecuter = _slasherExecuter;
     emit SlasherExecuterSet(_slasherExecuter);
@@ -130,5 +119,16 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, ICeloVersio
 
   function getSlasherExecuter() external view returns (address) {
     return slasherExecuter;
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 2, 0, 0);
   }
 }
