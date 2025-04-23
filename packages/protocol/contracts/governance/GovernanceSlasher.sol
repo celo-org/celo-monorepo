@@ -77,7 +77,7 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, ICeloVersio
    * @param electionGreaters Greater pointers for slashing locked election gold.
    * @param electionIndices Indices of groups voted by slashed account.
    */
-  function slashL2(
+  function slash(
     address account,
     address group,
     address[] calldata electionLessers,
