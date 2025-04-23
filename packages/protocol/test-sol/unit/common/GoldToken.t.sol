@@ -37,25 +37,16 @@ contract CeloTokenTest is TestWithUtils {
     vm.deal(receiver, ONE_CELOTOKEN);
     vm.deal(sender, ONE_CELOTOKEN);
     vm.deal(randomAddress, L1_MINTED_CELO_SUPPLY - (2 * ONE_CELOTOKEN)); // Increases balance.
+    vm.deal(celoUnreleasedTreasuryAddress, L2_INITIAL_STASH_BALANCE);
 
     // This step is required, as `vm.prank` funds the address,
     // and causes a safeMath overflow when getting the circulating supply.
     vm.deal(address(0), 0);
+    whenL2WithEpochManagerInitialization();
   }
 }
 
-contract CeloTokenTest_PreL2 is CeloTokenTest {
-  function setUp() public {
-    super.setUp();
-
-    vm.deal(celoUnreleasedTreasuryAddress, L2_INITIAL_STASH_BALANCE);
-
-    vm.deal(address(0), 0);
-  }
-}
-contract CeloTokenTest_L2 is CeloTokenTest_PreL2, WhenL2 {}
-
-contract CeloTokenTest_general is CeloTokenTest_L2 {
+contract CeloTokenTest_general is CeloTokenTest {
   function test_name() public {
     assertEq(celoToken.name(), "Celo native asset");
   }
@@ -101,7 +92,7 @@ contract CeloTokenTest_general is CeloTokenTest_L2 {
   }
 }
 
-contract CeloTokenTest_transfer is CeloTokenTest_L2 {
+contract CeloTokenTest_transfer is CeloTokenTest {
   function setUp() public {
     super.setUp();
   }
@@ -156,7 +147,7 @@ contract CeloTokenTest_transfer is CeloTokenTest_L2 {
   }
 }
 
-contract CeloTokenTest_transferFrom is CeloTokenTest_L2 {
+contract CeloTokenTest_transferFrom is CeloTokenTest {
   function setUp() public {
     super.setUp();
     vm.prank(sender);
@@ -201,7 +192,7 @@ contract CeloTokenTest_transferFrom is CeloTokenTest_L2 {
   }
 }
 
-contract CeloTokenTest_burn is CeloTokenTest_L2 {
+contract CeloTokenTest_burn is CeloTokenTest {
   uint256 startBurn;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
 
@@ -228,7 +219,7 @@ contract CeloTokenTest_burn is CeloTokenTest_L2 {
   }
 }
 
-contract CeloTokenTest_circulatingSupply_L2 is CeloTokenTest_L2 {
+contract CeloTokenTest_circulatingSupply_L2 is CeloTokenTest {
   function test_ShouldBeLessThanTheTotalSupply() public {
     assertLt(celoToken.circulatingSupply(), celoToken.totalSupply());
   }
@@ -244,7 +235,7 @@ contract CeloTokenTest_circulatingSupply_L2 is CeloTokenTest_L2 {
   }
 }
 
-contract CeloTokenTest_AllocatedSupply_L2 is CeloTokenTest_L2 {
+contract CeloTokenTest_AllocatedSupply_L2 is CeloTokenTest {
   function test_ShouldReturnTotalSupplyMinusCeloUnreleasedTreasuryBalance() public {
     assertEq(celoToken.allocatedSupply(), CELO_SUPPLY_CAP - L2_INITIAL_STASH_BALANCE);
     assertEq(celoToken.allocatedSupply(), celoToken.totalSupply() - L2_INITIAL_STASH_BALANCE);
@@ -256,7 +247,7 @@ contract CeloTokenTest_AllocatedSupply_L2 is CeloTokenTest_L2 {
   }
 }
 
-contract CeloTokenTest_TotalSupply_L2 is CeloTokenTest_L2 {
+contract CeloTokenTest_TotalSupply_L2 is CeloTokenTest {
   function test_ShouldReturnSupplyCap_WhenL2() public {
     assertEq(celoToken.totalSupply(), CELO_SUPPLY_CAP);
   }
