@@ -727,7 +727,7 @@ contract Governance is
       bool councilApproved,
       bool executed,
       uint256 executionTimeLimit
-    ) = getL2HotfixRecord(hash);
+    ) = getHotfixRecord(hash);
     require(!executed, "hotfix already executed");
     require(approved, "hotfix not approved");
     require(councilApproved, "hotfix not approved by security council");
@@ -1250,14 +1250,14 @@ contract Governance is
   }
 
   /**
-   * @notice Gets information about a L2 hotfix.
+   * @notice Gets information about a hotfix.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
    * @return Hotfix approved by approver.
    * @return Hotfix approved by SecurityCouncil.
    * @return Hotfix executed.
    * @return Hotfix exection time limit.
    */
-  function getL2HotfixRecord(bytes32 hash) public view returns (bool, bool, bool, uint256) {
+  function getHotfixRecord(bytes32 hash) public view returns (bool, bool, bool, uint256) {
     return (
       hotfixes[hash].approved,
       hotfixes[hash].councilApproved,

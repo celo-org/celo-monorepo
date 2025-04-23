@@ -2993,7 +2993,7 @@ contract GovernanceTest_approveHotfix_L2 is GovernanceTest_L2 {
     vm.prank(accApprover);
     governance.approveHotfix(HOTFIX_HASH);
 
-    (bool approved, , , ) = governance.getL2HotfixRecord(HOTFIX_HASH);
+    (bool approved, , , ) = governance.getHotfixRecord(HOTFIX_HASH);
     assertTrue(approved);
   }
   function test_markHotfixRecordApprovedWhenCalledBySecurityCouncil() public {
@@ -3003,7 +3003,7 @@ contract GovernanceTest_approveHotfix_L2 is GovernanceTest_L2 {
     vm.prank(accCouncil);
     governance.approveHotfix(HOTFIX_HASH);
 
-    (, bool approved, , ) = governance.getL2HotfixRecord(HOTFIX_HASH);
+    (, bool approved, , ) = governance.getHotfixRecord(HOTFIX_HASH);
     assertTrue(approved);
   }
 
@@ -3059,7 +3059,7 @@ contract GovernanceTest_prepareHotfix_L2 is GovernanceTest_L2 {
     governance.approveHotfix(HOTFIX_HASH);
 
     governance.prepareHotfix(HOTFIX_HASH);
-    (, , , uint256 preparedTimeLimit) = governance.getL2HotfixRecord(HOTFIX_HASH);
+    (, , , uint256 preparedTimeLimit) = governance.getHotfixRecord(HOTFIX_HASH);
 
     assertEq(preparedTimeLimit, block.timestamp + DAY);
   }
@@ -3081,7 +3081,7 @@ contract GovernanceTest_prepareHotfix_L2 is GovernanceTest_L2 {
     timeTravel(DAY + 3600);
     governance.resetHotFixRecord(HOTFIX_HASH);
 
-    (_approved, _councilApproved, , _preparedTimeLimit) = governance.getL2HotfixRecord(HOTFIX_HASH);
+    (_approved, _councilApproved, , _preparedTimeLimit) = governance.getHotfixRecord(HOTFIX_HASH);
 
     assertFalse(_approved);
     assertFalse(_councilApproved);
@@ -3093,7 +3093,7 @@ contract GovernanceTest_prepareHotfix_L2 is GovernanceTest_L2 {
     governance.approveHotfix(HOTFIX_HASH);
 
     governance.prepareHotfix(HOTFIX_HASH);
-    (_approved, _councilApproved, , _preparedTimeLimit) = governance.getL2HotfixRecord(HOTFIX_HASH);
+    (_approved, _councilApproved, , _preparedTimeLimit) = governance.getHotfixRecord(HOTFIX_HASH);
 
     assertTrue(_approved);
     assertTrue(_councilApproved);
@@ -3183,7 +3183,7 @@ contract GovernanceTest_resetHotfix_L2 is GovernanceTest_L2, GovernanceTest_rese
     governance.approveHotfix(HOTFIX_HASH);
 
     (bool approved, bool councilApproved, , uint256 _preparedTimeLimit) = governance
-      .getL2HotfixRecord(HOTFIX_HASH);
+      .getHotfixRecord(HOTFIX_HASH);
 
     assertTrue(approved);
     assertTrue(councilApproved);
@@ -3192,7 +3192,7 @@ contract GovernanceTest_resetHotfix_L2 is GovernanceTest_L2, GovernanceTest_rese
     timeTravel(DAY + 1);
     governance.resetHotFixRecord(HOTFIX_HASH);
 
-    (approved, councilApproved, , _preparedTimeLimit) = governance.getL2HotfixRecord(HOTFIX_HASH);
+    (approved, councilApproved, , _preparedTimeLimit) = governance.getHotfixRecord(HOTFIX_HASH);
     assertFalse(approved);
     assertFalse(councilApproved);
   }
@@ -3296,7 +3296,7 @@ contract GovernanceTest_executeHotfix_L2 is GovernanceTest_L2 {
     approveAndPrepareHotfix();
 
     executeHotfixTx();
-    (, , bool executed, ) = governance.getL2HotfixRecord(hotfixHash);
+    (, , bool executed, ) = governance.getHotfixRecord(hotfixHash);
     assertTrue(executed);
   }
 
