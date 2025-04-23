@@ -100,6 +100,14 @@ contract MockEpochManager is IEpochManager {
     numberOfElectedAccounts = value;
   }
 
+  function setElectedAccounts(address[] calldata _electedAccounts) external {
+    electedAccounts = _electedAccounts;
+  }
+
+  function setElectedSigners(address[] calldata _electedSigners) external {
+    electedSigners = _electedSigners;
+  }
+
   function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256) {
     return getEpochByNumber(currentEpochNumber);
   }
