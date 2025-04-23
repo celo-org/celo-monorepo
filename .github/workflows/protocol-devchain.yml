@@ -23,6 +23,8 @@ jobs:
             node-version: 12
           - tag: core-contracts.v12
             node-version: 18
+          - tag: core-contracts.v12-renamed
+            node-version: 18
     steps:
       - uses: actions/checkout@v4
         with:
