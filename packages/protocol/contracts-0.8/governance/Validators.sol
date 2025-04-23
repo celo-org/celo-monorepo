@@ -130,7 +130,7 @@ contract Validators is
   // The number of blocks to delay a ValidatorGroup's commission update
   uint256 public commissionUpdateDelay;
   uint256 public slashingMultiplierResetPeriod;
-  uint256 public deprecated_downtimeGracePeriod; // deprecated
+  uint256 public deprecated_downtimeGracePeriod;
 
   event MaxGroupSizeSet(uint256 size);
   event CommissionUpdateDelaySet(uint256 delay);
@@ -584,7 +584,6 @@ contract Validators is
    * @param account The address of the validator group.
    * @param n The number of members to return.
    * @return The signers of the top n group members for a particular group.
-   * @dev Returns the account instead of signer.
    */
   function getTopGroupValidators(
     address account,
