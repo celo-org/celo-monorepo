@@ -219,7 +219,7 @@ contract CeloTokenTest_burn is CeloTokenTest {
   }
 }
 
-contract CeloTokenTest_circulatingSupply_L2 is CeloTokenTest {
+contract CeloTokenTest_circulatingSupply is CeloTokenTest {
   function test_ShouldBeLessThanTheTotalSupply() public {
     assertLt(celoToken.circulatingSupply(), celoToken.totalSupply());
   }
@@ -235,7 +235,7 @@ contract CeloTokenTest_circulatingSupply_L2 is CeloTokenTest {
   }
 }
 
-contract CeloTokenTest_AllocatedSupply_L2 is CeloTokenTest {
+contract CeloTokenTest_AllocatedSupply is CeloTokenTest {
   function test_ShouldReturnTotalSupplyMinusCeloUnreleasedTreasuryBalance() public {
     assertEq(celoToken.allocatedSupply(), CELO_SUPPLY_CAP - L2_INITIAL_STASH_BALANCE);
     assertEq(celoToken.allocatedSupply(), celoToken.totalSupply() - L2_INITIAL_STASH_BALANCE);
@@ -247,7 +247,7 @@ contract CeloTokenTest_AllocatedSupply_L2 is CeloTokenTest {
   }
 }
 
-contract CeloTokenTest_TotalSupply_L2 is CeloTokenTest {
+contract CeloTokenTest_TotalSupply is CeloTokenTest {
   function test_ShouldReturnSupplyCap_WhenL2() public {
     assertEq(celoToken.totalSupply(), CELO_SUPPLY_CAP);
   }
