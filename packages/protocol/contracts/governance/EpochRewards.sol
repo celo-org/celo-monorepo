@@ -9,6 +9,7 @@ import "../common/Freezable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/PrecompilesOverride.sol";
+import "../common/Permissioned.sol";
 import "../common/interfaces/ICeloToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
@@ -22,7 +23,8 @@ contract EpochRewards is
   Initializable,
   UsingRegistry,
   PrecompilesOverride,
-  Freezable
+  Freezable,
+  Permissioned
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -84,11 +86,6 @@ contract EpochRewards is
   );
 
   event TargetVotingYieldUpdated(uint256 fraction);
-
-  modifier onlyPermitted(address permittedAddress) {
-    require(msg.sender == permittedAddress, "Only permitted address can call");
-    _;
-  }
 
   /**
    * @notice Sets initialized == true on implementation contracts
