@@ -1,7 +1,6 @@
 pragma solidity ^0.5.13;
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-import "@test-sol/utils/WhenL2.sol";
 
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
@@ -131,6 +130,7 @@ contract GovernanceTest is TestWithUtils {
     setUpVoterAccount();
 
     setUpProposalStubs();
+    whenL2WithEpochManagerInitialization();
   }
 
   function assertNotEq(uint256 a, uint256 b) internal {
@@ -263,9 +263,7 @@ contract GovernanceTest is TestWithUtils {
   }
 }
 
-contract GovernanceTest_L2 is GovernanceTest, WhenL2 {}
-
-contract GovernanceTest_initialize is GovernanceTest_L2 {
+contract GovernanceTest_initialize is GovernanceTest {
   function setUp() public {
     super.setUp();
 
@@ -333,7 +331,7 @@ contract GovernanceTest_initialize is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_setApprover is GovernanceTest_L2 {
+contract GovernanceTest_setApprover is GovernanceTest {
   address NEW_APPROVER = address(7777);
 
   event ApproverSet(address indexed approver);
@@ -379,7 +377,7 @@ contract GovernanceTest_setApprover is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_setMinDeposit is GovernanceTest_L2 {
+contract GovernanceTest_setMinDeposit is GovernanceTest {
   uint256 NEW_MINDEPOSIT = 45;
   event MinDepositSet(uint256 minDeposit);
 
@@ -409,7 +407,7 @@ contract GovernanceTest_setMinDeposit is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_setConcurrentProposals is GovernanceTest_L2 {
+contract GovernanceTest_setConcurrentProposals is GovernanceTest {
   uint256 NEW_CONCURRENT_PROPOSALS = 45;
   event ConcurrentProposalsSet(uint256 concurrentProposals);
 
@@ -445,7 +443,7 @@ contract GovernanceTest_setConcurrentProposals is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_setQueueExpiry is GovernanceTest_L2 {
+contract GovernanceTest_setQueueExpiry is GovernanceTest {
   event QueueExpirySet(uint256 queueExpiry);
 
   function test_SetsValue() public {
@@ -480,7 +478,7 @@ contract GovernanceTest_setQueueExpiry is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_setDequeueFrequency is GovernanceTest_L2 {
+contract GovernanceTest_setDequeueFrequency is GovernanceTest {
   event DequeueFrequencySet(uint256 dequeueFrequency);
 
   function test_SetsValue() public {
@@ -515,7 +513,7 @@ contract GovernanceTest_setDequeueFrequency is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_setReferendumStageDuration is GovernanceTest_L2 {
+contract GovernanceTest_setReferendumStageDuration is GovernanceTest {
   event ReferendumStageDurationSet(uint256 value);
 
   function test_SetsValue() public {
@@ -550,7 +548,7 @@ contract GovernanceTest_setReferendumStageDuration is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_setExecutionStageDuration is GovernanceTest_L2 {
+contract GovernanceTest_setExecutionStageDuration is GovernanceTest {
   event ExecutionStageDurationSet(uint256 dequeueFrequency);
 
   function test_SetsValue() public {
@@ -585,7 +583,7 @@ contract GovernanceTest_setExecutionStageDuration is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_setParticipationFloor is GovernanceTest_L2 {
+contract GovernanceTest_setParticipationFloor is GovernanceTest {
   event ParticipationFloorSet(uint256 value);
 
   function test_SetsValue() public {
@@ -615,7 +613,7 @@ contract GovernanceTest_setParticipationFloor is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_setBaselineUpdateFactor is GovernanceTest_L2 {
+contract GovernanceTest_setBaselineUpdateFactor is GovernanceTest {
   event ParticipationBaselineUpdateFactorSet(uint256 value);
 
   function test_SetsValue() public {
@@ -645,7 +643,7 @@ contract GovernanceTest_setBaselineUpdateFactor is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_setBaselineQuorumFactor is GovernanceTest_L2 {
+contract GovernanceTest_setBaselineQuorumFactor is GovernanceTest {
   event ParticipationBaselineQuorumFactorSet(uint256 value);
 
   function test_SetsValue() public {
@@ -675,7 +673,7 @@ contract GovernanceTest_setBaselineQuorumFactor is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_setConstitution is GovernanceTest_L2 {
+contract GovernanceTest_setConstitution is GovernanceTest {
   event ConstitutionSet(address indexed destination, bytes4 indexed functionId, uint256 threshold);
 
   function test_RevertIf_DestinationIsZeroAddress() public {
@@ -751,7 +749,7 @@ contract GovernanceTest_setConstitution is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_setSecurityCouncil is GovernanceTest_L2 {
+contract GovernanceTest_setSecurityCouncil is GovernanceTest {
   event SecurityCouncilSet(address indexed council);
 
   function test_ShouldSetSecurityCouncil() public {
@@ -796,7 +794,7 @@ contract GovernanceTest_setSecurityCouncil is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_setHotfixExecutionTimeWindow is GovernanceTest_L2 {
+contract GovernanceTest_setHotfixExecutionTimeWindow is GovernanceTest {
   event HotfixExecutionTimeWindowSet(uint256 timeDelta);
 
   function test_ShouldSetHotfixExecutionTimeWindow() public {
@@ -826,7 +824,7 @@ contract GovernanceTest_setHotfixExecutionTimeWindow is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_propose is GovernanceTest_L2 {
+contract GovernanceTest_propose is GovernanceTest {
   event ProposalQueued(
     uint256 indexed proposalId,
     address indexed proposer,
@@ -1000,7 +998,7 @@ contract GovernanceTest_propose is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_upvote is GovernanceTest_L2 {
+contract GovernanceTest_upvote is GovernanceTest {
   event ProposalUpvoted(uint256 indexed proposalId, address indexed account, uint256 upvotes);
   event ProposalExpired(uint256 indexed proposalId);
 
@@ -1199,7 +1197,7 @@ contract GovernanceTest_upvote is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_revokeUpvote is GovernanceTest_L2 {
+contract GovernanceTest_revokeUpvote is GovernanceTest {
   event ProposalExpired(uint256 indexed proposalId);
   event ProposalUpvoteRevoked(
     uint256 indexed proposalId,
@@ -1288,7 +1286,7 @@ contract GovernanceTest_revokeUpvote is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_withdraw is GovernanceTest_L2 {
+contract GovernanceTest_withdraw is GovernanceTest {
   address accProposer;
 
   function setUp() public {
@@ -1325,7 +1323,7 @@ contract GovernanceTest_withdraw is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_approve is GovernanceTest_L2 {
+contract GovernanceTest_approve is GovernanceTest {
   uint256 INDEX = 0; // first proposal index
 
   event ProposalDequeued(uint256 indexed proposalId, uint256 timestamp);
@@ -1499,7 +1497,7 @@ contract GovernanceTest_approve is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_revokeVotes is GovernanceTest_L2 {
+contract GovernanceTest_revokeVotes is GovernanceTest {
   uint256 numVoted;
 
   event ProposalVoteRevokedV2(
@@ -1627,7 +1625,7 @@ contract GovernanceTest_revokeVotes is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest_L2 {
+contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest {
   event ProposalVotedV2(
     uint256 indexed proposalId,
     address indexed account,
@@ -1865,7 +1863,7 @@ contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_vote_WhenProposalIsApprovedAndHaveSigner is GovernanceTest_L2 {
+contract GovernanceTest_vote_WhenProposalIsApprovedAndHaveSigner is GovernanceTest {
   address accSigner;
 
   event ProposalVotedV2(
@@ -1944,7 +1942,7 @@ contract GovernanceTest_vote_WhenProposalIsApprovedAndHaveSigner is GovernanceTe
   }
 }
 
-contract GovernanceTest_vote_WhenProposalIsNotApproved is GovernanceTest_L2 {
+contract GovernanceTest_vote_WhenProposalIsNotApproved is GovernanceTest {
   event ProposalVotedV2(
     uint256 indexed proposalId,
     address indexed account,
@@ -2024,7 +2022,7 @@ contract GovernanceTest_vote_WhenProposalIsNotApproved is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_vote_WhenVotingOnDifferentProposalWithSameIndex is GovernanceTest_L2 {
+contract GovernanceTest_vote_WhenVotingOnDifferentProposalWithSameIndex is GovernanceTest {
   function test_IgnoreVotesFromPreviousProposal() public {
     uint256 proposalId1 = makeValidProposal();
 
@@ -2074,7 +2072,7 @@ contract GovernanceTest_vote_WhenVotingOnDifferentProposalWithSameIndex is Gover
   }
 }
 
-contract GovernanceTest_vote_PartiallyWhenProposalIsApproved is GovernanceTest_L2 {
+contract GovernanceTest_vote_PartiallyWhenProposalIsApproved is GovernanceTest {
   event ProposalVotedV2(
     uint256 indexed proposalId,
     address indexed account,
@@ -2302,7 +2300,7 @@ contract GovernanceTest_vote_PartiallyWhenProposalIsApproved is GovernanceTest_L
   }
 }
 
-contract GovernanceTest_votePartially_WhenProposalIsApprovedAndHaveSigner is GovernanceTest_L2 {
+contract GovernanceTest_votePartially_WhenProposalIsApprovedAndHaveSigner is GovernanceTest {
   address accSigner;
 
   event ProposalVotedV2(
@@ -2416,7 +2414,7 @@ contract GovernanceTest_votePartially_WhenProposalIsApprovedAndHaveSigner is Gov
   }
 }
 
-contract GovernanceTest_votePartially_WhenProposalIsNotApproved is GovernanceTest_L2 {
+contract GovernanceTest_votePartially_WhenProposalIsNotApproved is GovernanceTest {
   event ProposalVotedV2(
     uint256 indexed proposalId,
     address indexed account,
@@ -2496,9 +2494,7 @@ contract GovernanceTest_votePartially_WhenProposalIsNotApproved is GovernanceTes
   }
 }
 
-contract GovernanceTest_votePartially_WhenVotingOnDifferentProposalWithSameIndex is
-  GovernanceTest_L2
-{
+contract GovernanceTest_votePartially_WhenVotingOnDifferentProposalWithSameIndex is GovernanceTest {
   function test_IgnoreVotesFromPreviousProposal() public {
     uint256 proposalId1 = makeValidProposal();
 
@@ -2548,7 +2544,7 @@ contract GovernanceTest_votePartially_WhenVotingOnDifferentProposalWithSameIndex
   }
 }
 
-contract GovernanceTest_execute is GovernanceTest_L2 {
+contract GovernanceTest_execute is GovernanceTest {
   event ParticipationBaselineUpdated(uint256 participationBaseline);
   event ProposalExecuted(uint256 indexed proposalId);
 
@@ -2979,7 +2975,7 @@ contract GovernanceTest_execute is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_approveHotfix_L2 is GovernanceTest_L2 {
+contract GovernanceTest_approveHotfi is GovernanceTest {
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
   event HotfixApproved(bytes32 indexed hash, address approver);
   function setUp() public {
@@ -3038,7 +3034,7 @@ contract GovernanceTest_approveHotfix_L2 is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_prepareHotfix_L2 is GovernanceTest_L2 {
+contract GovernanceTest_prepareHotfix is GovernanceTest {
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
   event HotfixPrepared(bytes32 indexed hash, uint256 indexed epoch);
 
@@ -3171,7 +3167,7 @@ contract GovernanceTest_resetHotfix_setup is GovernanceTest {
   }
 }
 
-contract GovernanceTest_resetHotfix_L2 is GovernanceTest_L2, GovernanceTest_resetHotfix_setup {
+contract GovernanceTest_resetHotfix is GovernanceTest, GovernanceTest_resetHotfix_setup {
   function test_ShouldResetHotfixRecordWhenExecutionTimeLimitHasPassed() public {
     vm.prank(accOwner);
     governance.setHotfixExecutionTimeWindow(DAY);
@@ -3260,7 +3256,7 @@ contract GovernanceTest_resetHotfix_L2 is GovernanceTest_L2, GovernanceTest_rese
   }
 }
 
-contract GovernanceTest_executeHotfix_L2 is GovernanceTest_L2 {
+contract GovernanceTest_executeHotfix is GovernanceTest {
   bytes32 SALT = 0x657ed9d64e84fa3d1af43b3a307db22aba2d90a158015df1c588c02e24ca08f0;
   bytes32 hotfixHash;
 
@@ -3363,7 +3359,7 @@ contract GovernanceTest_executeHotfix_L2 is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_isVoting is GovernanceTest_L2 {
+contract GovernanceTest_isVoting is GovernanceTest {
   function setUp() public {
     super.setUp();
     proposalId = makeValidProposal();
@@ -3417,7 +3413,7 @@ contract GovernanceTest_isVoting is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_isProposalPassing is GovernanceTest_L2 {
+contract GovernanceTest_isProposalPassing is GovernanceTest {
   address accSndVoter;
 
   function setUp() public {
@@ -3459,7 +3455,7 @@ contract GovernanceTest_isProposalPassing is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_dequeueProposalsIfReady is GovernanceTest_L2 {
+contract GovernanceTest_dequeueProposalsIfReady is GovernanceTest {
   function test_notUpdateLastDequeueWhenThereAreNoQueuedProposals() public {
     uint256 originalLastDequeue = governance.lastDequeue();
     vm.warp(block.timestamp + governance.dequeueFrequency());
@@ -3492,7 +3488,7 @@ contract GovernanceTest_dequeueProposalsIfReady is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_getProposalStage is GovernanceTest_L2 {
+contract GovernanceTest_getProposalStage is GovernanceTest {
   function test_returnNoneStageWhenProposalDoesNotExists() public {
     assertEq(uint256(governance.getProposalStage(0)), uint256(Proposals.Stage.None));
     assertEq(uint256(governance.getProposalStage(1)), uint256(Proposals.Stage.None));
@@ -3624,7 +3620,7 @@ contract GovernanceTest_getProposalStage is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_getAmountOfGoldUsedForVoting is GovernanceTest_L2 {
+contract GovernanceTest_getAmountOfGoldUsedForVoting is GovernanceTest {
   function test_showCorrectNumberOfVotes_whenVotingOn1ConcurrentProposal() public {
     makeAndApprove3ConcurrentProposals();
 
@@ -3752,7 +3748,7 @@ contract GovernanceTest_getAmountOfGoldUsedForVoting is GovernanceTest_L2 {
   }
 }
 
-contract GovernanceTest_removeVotesWhenRevokingDelegatedVotes is GovernanceTest_L2 {
+contract GovernanceTest_removeVotesWhenRevokingDelegatedVotes is GovernanceTest {
   uint256[] proposalIds;
 
   function test_RevertWhen_NotCalledByStakedCeloContract() public {
