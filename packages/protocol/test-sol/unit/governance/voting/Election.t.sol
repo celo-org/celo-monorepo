@@ -13,7 +13,6 @@ import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/linkedlists/AddressSortedLinkedList.sol";
 import "@celo-contracts/identity/test/MockRandom.sol";
 import "@celo-contracts/common/Freezer.sol";
-import "@test-sol/utils/WhenL2.sol";
 
 import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";
 
@@ -1895,7 +1894,7 @@ contract ElectionTest_ElectValidatorsAccounts is ElectionTest_ElectValidatorsAbs
   }
 }
 
-contract ElectionTest_GetCurrentValidatorSigners_L2 is ElectionTest_ElectValidatorsAbstract {
+contract ElectionTest_GetCurrentValidatorSigners is ElectionTest_ElectValidatorsAbstract {
   function test_ShouldReturnValidatorSigners() public {
     WhenThereIsALargeNumberOfGroups();
     address[] memory elected = election.electValidatorAccounts();
@@ -2618,11 +2617,7 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
         checkVoterInvariants(_accounts[j], 0);
         checkGroupInvariants(0);
 
-        if (isL2()) {
-          epochManager.setCurrentEpochNumber(i + 1);
-        } else {
-          vm.roll((i + 1) * ph.epochSize() + (i + 1));
-        }
+        epochManager.setCurrentEpochNumber(i + 1);
       }
     }
     revokeAllAndCheckInvariants(0);
@@ -2658,11 +2653,8 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
       }
 
       distributeEpochRewards(i);
-      if (isL2()) {
-        epochManager.setCurrentEpochNumber(i + 1);
-      } else {
-        vm.roll((i + 1) * ph.epochSize() + (i + 1));
-      }
+
+      epochManager.setCurrentEpochNumber(i + 1);
 
       for (uint256 j = 0; j < _accounts.length; j++) {
         checkVoterInvariants(_accounts[j], 100);
