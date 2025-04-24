@@ -7,7 +7,6 @@ import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-import "@test-sol/utils/WhenL2.sol";
 
 contract AccountsTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
@@ -91,6 +90,7 @@ contract AccountsTest is TestWithUtils {
 
     (caller, callerPK) = actorWithPK("caller");
     (caller2, caller2PK) = actorWithPK("caller2");
+    whenL2WithEpochManagerInitialization();
   }
 
   function getParsedSignatureOfAddress(
@@ -193,9 +193,7 @@ contract AccountsTest is TestWithUtils {
   }
 }
 
-contract AccountsTest_L2 is AccountsTest, WhenL2 {}
-
-contract AccountsTest_createAccount is AccountsTest_L2 {
+contract AccountsTest_createAccount is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -213,7 +211,7 @@ contract AccountsTest_createAccount is AccountsTest_L2 {
   }
 }
 
-contract AccountsTest_setAccountDataEncryptionKey is AccountsTest_L2 {
+contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -248,7 +246,7 @@ contract AccountsTest_setAccountDataEncryptionKey is AccountsTest_L2 {
   }
 }
 
-contract AccountsTest_setAccount is AccountsTest_L2 {
+contract AccountsTest_setAccount is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -334,7 +332,7 @@ contract AccountsTest_setAccount is AccountsTest_L2 {
   }
 }
 
-contract AccountsTest_setWalletAddress is AccountsTest_L2 {
+contract AccountsTest_setWalletAddress is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -384,7 +382,7 @@ contract AccountsTest_setWalletAddress is AccountsTest_L2 {
   }
 }
 
-contract AccountsTest_setMetadataURL is AccountsTest_L2 {
+contract AccountsTest_setMetadataURL is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -408,7 +406,7 @@ contract AccountsTest_setMetadataURL is AccountsTest_L2 {
   }
 }
 
-contract AccountsTest_batchGetMetadataURL is AccountsTest_L2 {
+contract AccountsTest_batchGetMetadataURL is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -458,7 +456,7 @@ contract AccountsTest_batchGetMetadataURL is AccountsTest_L2 {
   }
 }
 
-contract AccountsTest_addStorageRoot is AccountsTest_L2 {
+contract AccountsTest_addStorageRoot is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -504,7 +502,7 @@ contract AccountsTest_addStorageRoot is AccountsTest_L2 {
   }
 }
 
-contract AccountsTest_removeStorageRoot is AccountsTest_L2 {
+contract AccountsTest_removeStorageRoot is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -580,7 +578,7 @@ contract AccountsTest_removeStorageRoot is AccountsTest_L2 {
   }
 }
 
-contract AccountsTest_setPaymentDelegation is AccountsTest_L2 {
+contract AccountsTest_setPaymentDelegation is AccountsTest {
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
   uint256 badFraction = FixidityLib.newFixedFraction(12, 10).unwrap();
@@ -622,7 +620,7 @@ contract AccountsTest_setPaymentDelegation is AccountsTest_L2 {
   }
 }
 
-contract AccountsTest_deletePaymentDelegation is AccountsTest_L2 {
+contract AccountsTest_deletePaymentDelegation is AccountsTest {
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
 
@@ -652,7 +650,7 @@ contract AccountsTest_deletePaymentDelegation is AccountsTest_L2 {
   }
 }
 
-contract AccountsTest_setName is AccountsTest_L2 {
+contract AccountsTest_setName is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -676,7 +674,7 @@ contract AccountsTest_setName is AccountsTest_L2 {
   }
 }
 
-contract AccountsTest_GenericAuthorization is AccountsTest_L2 {
+contract AccountsTest_GenericAuthorization is AccountsTest {
   address account2 = actor("account2");
   address signer;
   uint256 signerPK;
@@ -860,7 +858,7 @@ contract AccountsTest_GenericAuthorization is AccountsTest_L2 {
   }
 }
 
-contract AccountsTest_BackwardCompatibility is AccountsTest_L2 {
+contract AccountsTest_BackwardCompatibility is AccountsTest {
   address account = address(this);
   address otherAccount = actor("otherAccount");
 
