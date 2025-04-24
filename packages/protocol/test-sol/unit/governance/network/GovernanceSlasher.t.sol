@@ -54,8 +54,6 @@ contract GovernanceSlasherTest is TestWithUtils {
   }
 }
 
-
-
 contract GovernanceSlasherTest_initialize is GovernanceSlasherTest {
   function setUp() public {
     super.setUp();
