@@ -42,7 +42,7 @@ contract MockGovernance is IGovernance {
     removeVotesCalledFor[account] = maxAmountAllowed;
   }
 
-  function setConstitution(address, bytes4, uint256) external {
+  function setConstitution(address, bytes4, uint256) external pure {
     revert("not implemented");
   }
 
