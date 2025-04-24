@@ -13,7 +13,6 @@ import { MockStableToken } from "@celo-contracts/stability/test/MockStableToken.
 import { CeloTokenMock } from "@test-sol/unit/common/CeloTokenMock.sol";
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-import "@test-sol/utils/WhenL2.sol";
 
 contract EpochRewardsTest is TestWithUtils {
   uint256 constant targetVotingYieldParamsInitial = 0.00016e24; // 0.00016
@@ -77,6 +76,7 @@ contract EpochRewardsTest is TestWithUtils {
       address(0),
       carbonOffsettingFraction
     );
+    whenL2WithEpochManagerInitialization();
   }
   function preEpochRewardsSetup() public {
     // Mocked contracts
@@ -109,21 +109,12 @@ contract EpochRewardsTest is TestWithUtils {
   }
 
   function _setNumberOfElectedInCurrentSetBaseOnLayer(uint256 numberValidators) internal {
-    if (isL2()) {
-      epochManager.setNumberOfElectedInCurrentSet(numberValidators);
-    } else {
-      epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
-    }
+    epochManager.setNumberOfElectedInCurrentSet(numberValidators);
   }
 
   function _updateTargetVotingYieldBasedOnLayer() internal {
-    if (isL2()) {
-      vm.prank(address(epochManager));
-      epochRewards.updateTargetVotingYield();
-    } else {
-      vm.prank(address(0));
-      epochRewards.updateTargetVotingYield();
-    }
+    vm.prank(address(epochManager));
+    epochRewards.updateTargetVotingYield();
   }
 
   function getExpectedTargetTotalSupply(uint256 timeDelta) internal pure returns (uint256) {
@@ -133,9 +124,7 @@ contract EpochRewardsTest is TestWithUtils {
   }
 }
 
-contract EpochRewardsTest_L2 is WhenL2, EpochRewardsTest {}
-
-contract EpochRewardsTest_initialize is EpochRewardsTest_L2 {
+contract EpochRewardsTest_initialize is EpochRewardsTest {
   function setUp() public {
     super.setUp();
     preEpochRewardsSetup();
@@ -203,7 +192,7 @@ contract EpochRewardsTest_initialize is EpochRewardsTest_L2 {
   }
 }
 
-contract EpochRewardsTest_setTargetVotingGoldFraction is EpochRewardsTest_L2 {
+contract EpochRewardsTest_setTargetVotingGoldFraction is EpochRewardsTest {
   uint256 newFraction;
 
   function setUp() public {
@@ -238,7 +227,7 @@ contract EpochRewardsTest_setTargetVotingGoldFraction is EpochRewardsTest_L2 {
   }
 }
 
-contract EpochRewardsTest_setCommunityRewardFraction is EpochRewardsTest_L2 {
+contract EpochRewardsTest_setCommunityRewardFraction is EpochRewardsTest {
   uint256 newFraction = communityRewardFraction + 1;
 
   function test_ShouldSetTargetVotingGoldFraction_WhenFractionIsDifferent_WhenCalledByOwner()
@@ -277,7 +266,7 @@ contract EpochRewardsTest_setCommunityRewardFraction is EpochRewardsTest_L2 {
   }
 }
 
-contract EpochRewardsTest_setTargetValidatorEpochPayment is EpochRewardsTest_L2 {
+contract EpochRewardsTest_setTargetValidatorEpochPayment is EpochRewardsTest {
   uint256 newPayment = targetValidatorEpochPayment + 1;
 
   function test_ShouldSetTargetVotingGoldFraction_WhenPaymentIsDifferent_WhenCalledByOwner()
@@ -307,7 +296,7 @@ contract EpochRewardsTest_setTargetValidatorEpochPayment is EpochRewardsTest_L2 
   }
 }
 
-contract EpochRewardsTest_setRewardsMultiplierParameters is EpochRewardsTest_L2 {
+contract EpochRewardsTest_setRewardsMultiplierParameters is EpochRewardsTest {
   uint256 newRewardsMultiplierAdjustmentsUnderspend = rewardsMultiplierAdjustmentsUnderspend + 1;
 
   function test_ShouldSetNewRewardsMultiplierAdjustmentsOverspend_WhenCalledByOwner() public {
@@ -359,7 +348,7 @@ contract EpochRewardsTest_setRewardsMultiplierParameters is EpochRewardsTest_L2 
   }
 }
 
-contract EpochRewardsTest_setTargetVotingYieldParameters is EpochRewardsTest_L2 {
+contract EpochRewardsTest_setTargetVotingYieldParameters is EpochRewardsTest {
   uint256 newTargetVotingYieldParamsMax = targetVotingYieldParamsMax + 1;
   uint256 newTargetVotingYieldParamsAdjustmentFactor = targetVotingYieldParamsAdjustmentFactor + 1;
 
@@ -405,7 +394,7 @@ contract EpochRewardsTest_setTargetVotingYieldParameters is EpochRewardsTest_L2 
   }
 }
 
-contract EpochRewardsTest_setTargetVotingYield is EpochRewardsTest_L2 {
+contract EpochRewardsTest_setTargetVotingYield is EpochRewardsTest {
   uint256 constant newTargetVotingYieldParamsInitial = targetVotingYieldParamsInitial + 1;
 
   function test_ShouldSetNewTargetVotingYieldParamsInitial_WhenCalledByOwner() public {
@@ -428,7 +417,7 @@ contract EpochRewardsTest_setTargetVotingYield is EpochRewardsTest_L2 {
   }
 }
 
-contract EpochRewardsTest_getTargetGoldTotalSupply is EpochRewardsTest_L2 {
+contract EpochRewardsTest_getTargetGoldTotalSupply is EpochRewardsTest {
   function test_ShouldReturn1B_WhenLessThan15YearsSinceGenesis() public {
     uint256 timeDelta = YEAR * 10;
     timeTravel(timeDelta);
@@ -436,7 +425,7 @@ contract EpochRewardsTest_getTargetGoldTotalSupply is EpochRewardsTest_L2 {
   }
 }
 
-contract EpochRewardsTest_getTargetVoterRewards is EpochRewardsTest_L2 {
+contract EpochRewardsTest_getTargetVoterRewards is EpochRewardsTest {
   function test_ShouldReturnAPercentageOfActiveVotes_WhenThereAreActiveVotes() public {
     uint256 activeVotes = 1000000;
     election.setActiveVotes(activeVotes);
@@ -446,7 +435,7 @@ contract EpochRewardsTest_getTargetVoterRewards is EpochRewardsTest_L2 {
   }
 }
 
-contract EpochRewardsTest_getTargetTotalEpochPaymentsInGold is EpochRewardsTest_L2 {
+contract EpochRewardsTest_getTargetTotalEpochPaymentsInGold is EpochRewardsTest {
   function test_ShouldgetTargetTotalEpochPaymentsInGold_WhenExchangeRateIsSet() public {
     uint256 numberValidators = 100;
     _setNumberOfElectedInCurrentSetBaseOnLayer(numberValidators);
@@ -456,7 +445,7 @@ contract EpochRewardsTest_getTargetTotalEpochPaymentsInGold is EpochRewardsTest_
   }
 }
 
-contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest_L2 {
+contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
   uint256 constant timeDelta = YEAR * 10;
   uint256 expectedTargetTotalSupply;
   uint256 expectedTargetRemainingSupply;
@@ -505,7 +494,7 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest_L2 {
   }
 }
 
-contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest_L2 {
+contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
   uint256 constant totalSupplyL1 = 6000000 ether;
   uint256 constant celoUnreleasedTreasuryBalance = SUPPLY_CAP - totalSupplyL1;
   uint256 constant reserveBalance = 1000000 ether;
@@ -758,7 +747,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest_L2 {
 }
 
 contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAndTheActualRemainingSupplyIs10pMoreThanTheTargetRemainingSupplyAfterRewards_calculateTargetEpochRewards is
-  EpochRewardsTest_L2
+  EpochRewardsTest
 {
   uint256 constant numberValidators = 100;
   uint256 constant activeVotes = 102398474 ether;
