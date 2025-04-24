@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.8.20;
 
-import "@openzeppelin/contracts8/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 import "./UsingRegistry.sol";
 
 import "../../contracts/common/Initializable.sol";
+import "./libraries/ReentrancyGuard08.sol";
 import "./interfaces/ICeloUnreleasedTreasuryInitializer.sol";
 
 /**
@@ -18,7 +18,7 @@ import "./interfaces/ICeloUnreleasedTreasuryInitializer.sol";
 contract CeloUnreleasedTreasury is
   ICeloUnreleasedTreasuryInitializer,
   UsingRegistry,
-  ReentrancyGuard,
+  ReentrancyGuard08,
   Initializable
 {
   bool internal hasAlreadyReleased;
