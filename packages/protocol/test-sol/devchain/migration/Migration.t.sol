@@ -181,11 +181,6 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     celoTokenContract = ICeloToken(registry.getAddressForStringOrDie("GoldToken"));
 
     vm.deal(address(0), CELO_SUPPLY_CAP);
-    vm.prank(address(0));
-    celoTokenContract.mint(reserveAddress, RESERVE_BALANCE);
-
-    vm.prank(address(0));
-    celoTokenContract.mint(randomAddress, L1_MINTED_CELO_SUPPLY - RESERVE_BALANCE); // mint outstanding l1 supply before L2.
 
     epochManagerContract = IEpochManager(registry.getAddressForStringOrDie("EpochManager"));
     epochManagerEnablerContract = IEpochManagerEnabler(
@@ -214,9 +209,6 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   }
 
   function test_Reverts_WhenEndOfEpochHasNotBeenReached() public {
-    // fund treasury
-    vm.prank(address(0));
-    celoTokenContract.mint(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
     vm.deal(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
 
     uint256 l1EpochNumber = IPrecompiles(address(validatorsContract)).getEpochNumber();
@@ -271,9 +263,6 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
 
     activateValidators();
     vm.deal(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
-
-    vm.prank(address(0));
-    celoTokenContract.mint(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
 
     whenL2();
     _setValidatorL2Score();
