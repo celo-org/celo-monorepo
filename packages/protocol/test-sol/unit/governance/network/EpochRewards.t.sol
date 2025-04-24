@@ -474,12 +474,8 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest_L2 {
   }
 
   function test_ShouldReturnOne_WhenTheTargetSupplyIsEqualToTheActualSupplyAfterRewards() public {
-    if (isL2()) {
-      uint256 celoUnreleasedTreasuryBalance = SUPPLY_CAP - expectedTargetTotalSupply;
-      vm.deal(celoUnreleasedTreasuryAddress, celoUnreleasedTreasuryBalance - targetEpochReward);
-    } else {
-      mockCeloToken.setTotalSupply(expectedTargetTotalSupply - targetEpochReward);
-    }
+    uint256 celoUnreleasedTreasuryBalance = SUPPLY_CAP - expectedTargetTotalSupply;
+    vm.deal(celoUnreleasedTreasuryAddress, celoUnreleasedTreasuryBalance - targetEpochReward);
 
     assertEq(epochRewards.getRewardsMultiplier(), FIXED1);
   }
@@ -489,12 +485,7 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest_L2 {
   {
     uint256 actualRemainingSupply = uint256((expectedTargetRemainingSupply * 11) / 10);
 
-    if (isL2()) {
-      vm.deal(celoUnreleasedTreasuryAddress, actualRemainingSupply - targetEpochReward);
-    } else {
-      uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - targetEpochReward;
-      mockCeloToken.setTotalSupply(totalSupply);
-    }
+    vm.deal(celoUnreleasedTreasuryAddress, actualRemainingSupply - targetEpochReward);
 
     uint256 actual = epochRewards.getRewardsMultiplier();
     uint256 expected = uint256((FIXED1 + (rewardsMultiplierAdjustmentsUnderspend / 10)));
@@ -506,12 +497,7 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest_L2 {
   {
     uint256 actualRemainingSupply = uint256((expectedTargetRemainingSupply * 9) / 10);
 
-    if (isL2()) {
-      vm.deal(celoUnreleasedTreasuryAddress, actualRemainingSupply - targetEpochReward);
-    } else {
-      uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - targetEpochReward;
-      mockCeloToken.setTotalSupply(totalSupply);
-    }
+    vm.deal(celoUnreleasedTreasuryAddress, actualRemainingSupply - targetEpochReward);
 
     uint256 actual = epochRewards.getRewardsMultiplier();
     uint256 expected = uint256((FIXED1 - (rewardsMultiplierAdjustmentsOverspend / 10)));
@@ -549,11 +535,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest_L2 {
       2 * FIXED1
     );
 
-    if (isL2()) {
-      vm.deal(celoUnreleasedTreasuryAddress, celoUnreleasedTreasuryBalance);
-    } else {
-      mockCeloToken.setTotalSupply(totalSupplyL1);
-    }
+    vm.deal(celoUnreleasedTreasuryAddress, celoUnreleasedTreasuryBalance);
     vm.deal(address(reserve), reserveBalance);
   }
 
@@ -802,15 +784,10 @@ contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAn
     uint256 expectedTargetRemainingSupply = SUPPLY_CAP - expectedTargetTotalSupply;
     uint256 actualRemainingSupply = (expectedTargetRemainingSupply * 11) / 10;
 
-    if (isL2()) {
-      vm.deal(
-        celoUnreleasedTreasuryAddress,
-        actualRemainingSupply + expectedTargetGoldSupplyIncrease
-      );
-    } else {
-      uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - expectedTargetGoldSupplyIncrease;
-      mockCeloToken.setTotalSupply(totalSupply);
-    }
+    vm.deal(
+      celoUnreleasedTreasuryAddress,
+      actualRemainingSupply + expectedTargetGoldSupplyIncrease
+    );
     expectedMultiplier = (FIXED1 + rewardsMultiplierAdjustmentsUnderspend / 10);
 
     validatorReward = (targetValidatorEpochPayment * numberValidators) / exchangeRate;
