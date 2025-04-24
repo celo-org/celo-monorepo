@@ -46,11 +46,6 @@ interface IElection {
   function getActiveVotesForGroup(address) external view returns (uint256);
   function getPendingVotesForGroup(address) external view returns (uint256);
   function getGroupEligibility(address) external view returns (bool);
-  function getGroupEpochRewards(
-    address,
-    uint256,
-    uint256[] calldata
-  ) external view returns (uint256);
   function getGroupEpochRewardsBasedOnScore(
     address group,
     uint256 totalEpochRewards,
