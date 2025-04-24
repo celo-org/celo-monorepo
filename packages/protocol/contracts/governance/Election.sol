@@ -16,6 +16,7 @@ import "../common/libraries/Heap.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 import "../common/Blockable.sol";
 import "../common/PrecompilesOverride.sol";
+import "../common/Permissioned.sol";
 
 /**
  * @title Manages the validator election process.
@@ -29,7 +30,8 @@ contract Election is
   UsingRegistry,
   PrecompilesOverride,
   CalledByVm,
-  Blockable
+  Blockable,
+  Permissioned
 {
   using AddressSortedLinkedList for SortedLinkedList.List;
   using FixidityLib for FixidityLib.Fraction;
@@ -155,16 +157,6 @@ contract Election is
     uint256 units
   );
   event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
-
-  /**
-   * @notice - Ensures the function is called by the permitted address.
-   * @param permittedAddress The address permitted to call permissioned
-   * functions.
-   */
-  modifier onlyPermitted(address permittedAddress) {
-    require(msg.sender == permittedAddress, "Only permitted address can call");
-    _;
-  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
