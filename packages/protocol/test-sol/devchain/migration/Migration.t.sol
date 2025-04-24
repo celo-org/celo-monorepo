@@ -181,11 +181,6 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     celoTokenContract = ICeloToken(registry.getAddressForStringOrDie("GoldToken"));
 
     vm.deal(address(0), CELO_SUPPLY_CAP);
-    vm.prank(address(0));
-    celoTokenContract.mint(reserveAddress, RESERVE_BALANCE);
-
-    vm.prank(address(0));
-    celoTokenContract.mint(randomAddress, L1_MINTED_CELO_SUPPLY - RESERVE_BALANCE); // mint outstanding l1 supply before L2.
 
     epochManagerContract = IEpochManager(registry.getAddressForStringOrDie("EpochManager"));
     epochManagerEnablerContract = IEpochManagerEnabler(
@@ -193,51 +188,19 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     );
   }
 
-  function activateValidators() public {
-    address[] memory registeredValidators = validatorsContract.getRegisteredValidators();
-    travelNEpochL1(4);
-
-    for (uint256 i = 0; i < registeredValidators.length; i++) {
-      (, , address validatorGroup, , ) = validatorsContract.getValidator(registeredValidators[i]);
-      if (election.getPendingVotesForGroup(validatorGroup) == 0) {
-        continue;
-      }
-      vm.startPrank(validatorGroup);
-      election.activate(validatorGroup);
-      vm.stopPrank();
-    }
-  }
-
-  function test_Reverts_whenSystemNotInitialized() public {
-    vm.expectRevert("Epoch system not initialized");
-    epochManagerContract.startNextEpochProcess();
-  }
-
   function test_Reverts_WhenEndOfEpochHasNotBeenReached() public {
-    // fund treasury
-    vm.prank(address(0));
-    celoTokenContract.mint(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
-    vm.deal(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
-
-    uint256 l1EpochNumber = IPrecompiles(address(validatorsContract)).getEpochNumber();
-
-    vm.prank(address(epochManagerEnablerContract));
-    epochManagerContract.initializeSystem(l1EpochNumber, block.number, validatorsList);
-
     vm.expectRevert("Epoch is not ready to start");
     epochManagerContract.startNextEpochProcess();
   }
 
   function test_Reverts_whenAlreadyInitialized() public {
-    _MockL2Migration(validatorsList);
-
     vm.prank(address(epochManagerEnablerContract));
     vm.expectRevert("Epoch system already initialized");
     epochManagerContract.initializeSystem(100, block.number, firstElected);
   }
 
   function test_Reverts_whenTransferingCeloToUnreleasedTreasury() public {
-    _MockL2Migration(validatorsList);
+    _setValidatorL2Score();
 
     blockTravel(43200);
     timeTravel(DAY);
@@ -249,7 +212,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   }
 
   function test_SetsCurrentRewardBlock() public {
-    _MockL2Migration(validatorsList);
+    _setValidatorL2Score();
 
     blockTravel(L2_BLOCK_IN_EPOCH);
     timeTravel(DAY);
@@ -260,27 +223,6 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     (uint256 status, , , , ) = epochManagerContract.getEpochProcessingState();
     assertEq(_currentRewardsBlock, block.number);
     assertEq(status, 1);
-  }
-
-  function _MockL2Migration(address[] memory _validatorsList) internal {
-    for (uint256 i = 0; i < _validatorsList.length; i++) {
-      firstElected.push(_validatorsList[i]);
-    }
-
-    uint256 l1EpochNumber = IPrecompiles(address(validatorsContract)).getEpochNumber();
-
-    activateValidators();
-    vm.deal(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
-
-    vm.prank(address(0));
-    celoTokenContract.mint(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
-
-    whenL2();
-    _setValidatorL2Score();
-
-    vm.prank(address(epochManagerEnablerContract));
-
-    epochManagerContract.initializeSystem(l1EpochNumber, block.number, firstElected);
   }
 
   function _setValidatorL2Score() internal {

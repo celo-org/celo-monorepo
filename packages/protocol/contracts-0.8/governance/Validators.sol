@@ -153,12 +153,6 @@ contract Validators is
     uint256 activationBlock
   );
   event ValidatorGroupCommissionUpdated(address indexed group, uint256 commission);
-  event ValidatorEpochPaymentDistributed(
-    address indexed validator,
-    uint256 validatorPayment,
-    address indexed group,
-    uint256 groupPayment
-  );
 
   modifier onlySlasher() {
     require(getLockedGold().isSlasher(msg.sender), "Only registered slasher can call");
@@ -1034,50 +1028,6 @@ contract Validators is
    */
   function isValidator(address account) public view returns (bool) {
     return validators[account].publicKeys.ecdsa.length > 0;
-  }
-
-  /**
-   * @notice Distributes epoch payments to the account associated with `signer` and its group.
-   * @param signer The validator signer of the validator to distribute the epoch payment to.
-   * @param maxPayment The maximum payment to the validator. Actual payment is based on score and
-   *   group commission.
-   * @return The total payment paid to the validator and their group.
-   */
-  function _distributeEpochPaymentsFromSigner(
-    address signer,
-    uint256 maxPayment
-  ) internal returns (uint256) {
-    address account = getAccounts().signerToAccount(signer);
-    require(isValidator(account), "Not a validator");
-    // The group that should be paid is the group that the validator was a member of at the
-    // time it was elected.
-    address group = getMembershipInLastEpoch(account);
-    require(group != address(0), "Validator not registered with a group");
-    // Both the validator and the group must maintain the minimum locked gold balance in order to
-    // receive epoch payments.
-    if (meetsAccountLockedGoldRequirements(account) && meetsAccountLockedGoldRequirements(group)) {
-      FixidityLib.Fraction memory totalPayment = FixidityLib
-        .newFixed(maxPayment)
-        .multiply(validators[account].score)
-        .multiply(groups[group].slashInfo.multiplier);
-      uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
-      FixidityLib.Fraction memory remainingPayment = FixidityLib.newFixed(
-        totalPayment.fromFixed().sub(groupPayment)
-      );
-      (address beneficiary, uint256 fraction) = getAccounts().getPaymentDelegation(account);
-      uint256 delegatedPayment = remainingPayment.multiply(FixidityLib.wrap(fraction)).fromFixed();
-      uint256 validatorPayment = remainingPayment.fromFixed().sub(delegatedPayment);
-      IStableToken stableToken = IStableToken(getStableToken());
-      require(stableToken.mint(group, groupPayment), "mint failed to validator group");
-      require(stableToken.mint(account, validatorPayment), "mint failed to validator account");
-      if (fraction != 0) {
-        require(stableToken.mint(beneficiary, delegatedPayment), "mint failed to delegatee");
-      }
-      emit ValidatorEpochPaymentDistributed(account, validatorPayment, group, groupPayment);
-      return totalPayment.fromFixed();
-    } else {
-      return 0;
-    }
   }
 
   function _isRegistrationAllowed(address account) private {
