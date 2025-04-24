@@ -16,8 +16,7 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, ICeloVersio
   address internal slasherExecuter;
 
   event SlashingApproved(address indexed account, uint256 amount);
-  event GovernanceSlashPerformed(address indexed account, uint256 amount);
-  event GovernanceSlashL2Performed(address indexed account, address indexed group, uint256 amount);
+  event GovernanceSlashPerformed(address indexed account, address indexed group, uint256 amount);
   event SlasherExecuterSet(address slasherExecuter);
 
   modifier onlyAuthorizedToSlash() {
@@ -104,7 +103,7 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, ICeloVersio
       validators.halveSlashingMultiplier(group);
     }
 
-    emit GovernanceSlashL2Performed(account, group, penalty);
+    emit GovernanceSlashPerformed(account, group, penalty);
     return true;
   }
 
