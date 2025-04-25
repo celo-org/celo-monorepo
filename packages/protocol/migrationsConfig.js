@@ -223,10 +223,6 @@ const DefaultConfig = {
       // MUST BE KEPT IN SYNC WITH MEMBERSHIP HISTORY LENGTH
       duration: 60 * DAY,
     },
-    validatorScoreParameters: {
-      exponent: 10,
-      adjustmentSpeed: 0.1,
-    },
     // MUST BE KEPT IN SYNC WITH VALIDATOR LOCKED GOLD DURATION
     membershipHistoryLength: 60,
     commissionUpdateDelay: (3 * DAY) / 5, // Approximately 3 days with 5s block times
