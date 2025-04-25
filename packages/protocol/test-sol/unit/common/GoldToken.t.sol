@@ -4,7 +4,7 @@ pragma solidity ^0.5.13;
 import "@celo-contracts/common/GoldToken.sol";
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-import "@test-sol/utils/WhenL2.sol";
+
 
 contract CeloTokenTest is TestWithUtils {
   GoldToken celoToken;
@@ -248,7 +248,7 @@ contract CeloTokenTest_AllocatedSupply is CeloTokenTest {
 }
 
 contract CeloTokenTest_TotalSupply is CeloTokenTest {
-  function test_ShouldReturnSupplyCap_WhenL2() public {
+  function test_ShouldReturnSupplyCap() public {
     assertEq(celoToken.totalSupply(), CELO_SUPPLY_CAP);
   }
 }

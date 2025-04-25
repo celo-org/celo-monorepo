@@ -21,8 +21,6 @@ import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
-import "@test-sol/utils/WhenL2.sol";
-
 contract ValidatorsTest is TestWithUtils, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -161,19 +159,37 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
 
     lockedGold = new MockLockedGold();
     election = new MockElection();
-    address validatorsAddress = actor("Validators");
-
-    deployCodeTo("ValidatorsMock.sol", validatorsAddress);
-    validators = IValidators(validatorsAddress);
-    validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
 
     stableToken = new MockStableToken();
 
     registry.setAddressFor(AccountsContract, address(accounts));
     registry.setAddressFor(ElectionContract, address(election));
     registry.setAddressFor(LockedGoldContract, address(lockedGold));
-    registry.setAddressFor(ValidatorsContract, address(validators));
     registry.setAddressFor(StableTokenContract, address(stableToken));
+
+    address validatorsAddress = actor("Validators");
+    deployAndInitValidatorsContract(validatorsAddress);
+
+    vm.prank(validator);
+    accounts.createAccount();
+
+    vm.prank(otherValidator);
+    accounts.createAccount();
+
+    vm.prank(group);
+    accounts.createAccount();
+
+    vm.prank(nonValidator);
+    accounts.createAccount();
+
+    whenL2WithEpochManagerInitialization();
+  }
+
+  function deployAndInitValidatorsContract(address _validatorsContractAddress) public {
+    deployCodeTo("ValidatorsMock.sol", _validatorsContractAddress);
+    validators = IValidators(_validatorsContractAddress);
+    validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
+    registry.setAddressFor(ValidatorsContract, address(validators));
 
     initParams = ValidatorsMockTunnel.InitParams({
       registryAddress: REGISTRY_ADDRESS,
@@ -191,20 +207,7 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
     });
 
     validatorsMockTunnel.MockInitialize(owner, initParams, initParams2);
-
-    vm.prank(validator);
-    accounts.createAccount();
-
-    vm.prank(otherValidator);
-    accounts.createAccount();
-
-    vm.prank(group);
-    accounts.createAccount();
-
-    vm.prank(nonValidator);
-    accounts.createAccount();
   }
-
   function _registerValidatorGroupWithMembers(address _group, uint256 _numMembers) public {
     _registerValidatorGroupHelper(_group, _numMembers);
 
@@ -393,9 +396,12 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
   }
 }
 
-contract ValidatorsTest_L2 is ValidatorsTest, WhenL2 {}
-
 contract ValidatorsTest_Initialize is ValidatorsTest {
+  function setUp() public {
+    super.setUp();
+    address newValidatorsContractAddress = actor("ValidatorsContract");
+    deployAndInitValidatorsContract(newValidatorsContractAddress);
+  }
   function test_ShouldhaveSetTheOwner() public {
     assertEq(Ownable(address(validators)).owner(), owner, "Incorrect Owner.");
   }
@@ -449,7 +455,7 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_setCommissionUpdateDelay is ValidatorsTest_L2 {
+contract ValidatorsTest_setCommissionUpdateDelay is ValidatorsTest {
   function test_shouldSetCommissionUpdateDelay() public {
     validators.setCommissionUpdateDelay(5);
 
@@ -458,7 +464,7 @@ contract ValidatorsTest_setCommissionUpdateDelay is ValidatorsTest_L2 {
   }
 }
 
-contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest_L2 {
+contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
   uint256 newLength = membershipHistoryLength + 1;
 
   function test_Reverts_WhenLengthIsSame() public {
@@ -484,7 +490,7 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest_L2 {
   }
 }
 
-contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest_L2 {
+contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
   uint256 newSize = maxGroupSize + 1;
 
   event MaxGroupSizeSet(uint256 size);
@@ -507,7 +513,7 @@ contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest_L2 {
   }
 }
 
-contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest_L2 {
+contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
   GroupLockedGoldRequirements private newRequirements =
     GroupLockedGoldRequirements({
       value: originalGroupLockedGoldRequirements.value + 1,
@@ -542,7 +548,7 @@ contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest_L2 {
   }
 }
 
-contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest_L2 {
+contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
   ValidatorLockedGoldRequirements private newRequirements =
     ValidatorLockedGoldRequirements({
       value: originalValidatorLockedGoldRequirements.value + 1,
@@ -577,7 +583,7 @@ contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest_L2 
   }
 }
 
-contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest_L2 {
+contract ValidatorsTest_RegisterValidatorNoBls is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
@@ -739,7 +745,7 @@ contract ValidatorsTest_RegisterValidatorNoBls_L2 is ValidatorsTest_L2 {
 }
 
 contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValidatorGroup is
-  ValidatorsTest_L2
+  ValidatorsTest
 {
   uint256 public constant INDEX = 0;
 
@@ -807,7 +813,7 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValid
 }
 
 contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorGroup is
-  ValidatorsTest_L2
+  ValidatorsTest
 {
   uint256 public constant INDEX = 0;
 
@@ -902,7 +908,7 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
 }
 
 contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirements is
-  ValidatorsTest_L2
+  ValidatorsTest
 {
   address nonRegisteredGroup;
 
@@ -964,8 +970,8 @@ contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirement
   }
 }
 
-contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup_Setup is
-  ValidatorsTest_L2
+contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup is
+  ValidatorsTest
 {
   address otherGroup;
 
@@ -987,11 +993,6 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
     vm.prank(validator);
     validators.affiliate(group);
   }
-}
-
-contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup is
-  ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup_Setup
-{
   function test_ShouldSetAffiliate_WhenValidatorNotMemberOfThatValidatorGroup() public {
     vm.prank(validator);
     validators.affiliate(otherGroup);
@@ -1084,12 +1085,7 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
 
     assertTrue(election.isIneligible(group));
   }
-}
 
-contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup_L2 is
-  ValidatorsTest_L2,
-  ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup
-{
   function test_ShouldSendValidatorPayment() public {
     vm.expectEmit(true, true, true, true);
     emit SendValidatorPaymentCalled(validator);
@@ -1098,7 +1094,7 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
   }
 }
 
-contract ValidatorsTest_Deaffiliate_Setup is ValidatorsTest_L2 {
+contract ValidatorsTest_Deaffiliate is ValidatorsTest {
   uint256 additionEpoch;
   uint256 deaffiliationEpoch;
 
@@ -1114,9 +1110,6 @@ contract ValidatorsTest_Deaffiliate_Setup is ValidatorsTest_L2 {
 
     require(_affiliation == group, "Affiliation failed.");
   }
-}
-
-contract ValidatorsTest_Deaffiliate is ValidatorsTest_Deaffiliate_Setup {
   function test_ShouldClearAffiliate() public {
     vm.prank(validator);
     validators.deaffiliate();
@@ -1223,9 +1216,7 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest_Deaffiliate_Setup {
     validators.deaffiliate();
     assertTrue(election.isIneligible(group));
   }
-}
 
-contract ValidatorsTest_Deaffiliate_L2 is ValidatorsTest_Deaffiliate {
   function test_ShouldSendValidatorPayment() public {
     vm.expectEmit(true, true, true, true);
     emit SendValidatorPaymentCalled(validator);
@@ -1234,7 +1225,7 @@ contract ValidatorsTest_Deaffiliate_L2 is ValidatorsTest_Deaffiliate {
   }
 }
 
-contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest_L2 {
+contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
   bytes validatorEcdsaPubKey;
 
   function setUp() public {
@@ -1294,7 +1285,7 @@ contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest_L2 {
   }
 }
 
-contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest_L2 {
+contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
   function setUp() public {
     super.setUp();
   }
@@ -1386,7 +1377,7 @@ contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest_L2 {
   }
 }
 
-contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers is ValidatorsTest_L2 {
+contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers is ValidatorsTest {
   uint256 public constant INDEX = 0;
 
   function setUp() public {
@@ -1438,7 +1429,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers is 
   }
 }
 
-contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is ValidatorsTest_L2 {
+contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is ValidatorsTest {
   uint256 public constant INDEX = 0;
 
   function setUp() public {
@@ -1532,7 +1523,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
   }
 }
 
-contract ValidatorsTest_AddMember is ValidatorsTest_L2 {
+contract ValidatorsTest_AddMember is ValidatorsTest {
   uint256 _registrationEpoch;
   uint256 _additionEpoch;
 
@@ -1729,7 +1720,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest_L2 {
   }
 }
 
-contract ValidatorsTest_RemoveMember is ValidatorsTest_L2 {
+contract ValidatorsTest_RemoveMember is ValidatorsTest {
   uint256 _registrationEpoch;
   uint256 _additionEpoch;
 
@@ -1817,7 +1808,7 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest_L2 {
   }
 }
 
-contract ValidatorsTest_ReorderMember is ValidatorsTest_L2 {
+contract ValidatorsTest_ReorderMember is ValidatorsTest {
   function setUp() public {
     super.setUp();
     _registerValidatorGroupWithMembers(group, 2);
@@ -1866,7 +1857,7 @@ contract ValidatorsTest_ReorderMember is ValidatorsTest_L2 {
   }
 }
 
-contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest_L2 {
+contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
   uint256 newCommission = commission.unwrap().add(1);
 
   function setUp() public {
@@ -1917,7 +1908,9 @@ contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest_L2 {
   }
 }
 
-contract ValidatorsTest_UpdateCommission_Setup is ValidatorsTest_L2 {
+contract ValidatorsTest_UpdateCommission_Setup is ValidatorsTest {}
+
+contract ValidatorsTest_UpdateCommission is ValidatorsTest {
   uint256 newCommission = commission.unwrap().add(1);
 
   function setUp() public {
@@ -1939,9 +1932,7 @@ contract ValidatorsTest_UpdateCommission_Setup is ValidatorsTest_L2 {
     require(_affiliation1 == group, "Affiliation failed.");
     require(_affiliation2 == group, "Affiliation failed.");
   }
-}
 
-contract ValidatorsTest_UpdateCommission is ValidatorsTest_UpdateCommission_Setup {
   function test_ShouldSetValidatorGroupCommission() public {
     vm.prank(group);
     validators.setNextCommissionUpdate(newCommission);
@@ -1998,10 +1989,8 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest_UpdateCommission_Setu
     vm.prank(group);
     validators.updateCommission();
   }
-}
 
-contract ValidatorsTest_UpdateCommission_L2 is ValidatorsTest_L2, ValidatorsTest_UpdateCommission {
-  function test_ShouldSendMultipleValidatorPayments_WhenL2() public {
+  function test_ShouldSendMultipleValidatorPayments() public {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
     vm.prank(group);
@@ -2019,7 +2008,7 @@ contract ValidatorsTest_UpdateCommission_L2 is ValidatorsTest_L2, ValidatorsTest
   }
 }
 
-contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest_L2 {
+contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
   address[] public expectedMembershipHistoryGroups;
   uint256[] public expectedMembershipHistoryEpochs;
 
@@ -2123,7 +2112,7 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest_L2 {
   }
 }
 
-contract ValidatorsTest_GetMembershipInLastEpoch_Setup is ValidatorsTest_L2 {
+contract ValidatorsTest_GetMembershipInLastEpoch_Setup is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
@@ -2157,7 +2146,7 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest_GetMembership
   }
 }
 
-contract ValidatorsTest_GetTopGroupValidators is ValidatorsTest_L2 {
+contract ValidatorsTest_GetTopGroupValidators is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
@@ -2172,7 +2161,7 @@ contract ValidatorsTest_GetTopGroupValidators is ValidatorsTest_L2 {
   }
 }
 
-contract ValidatorsTest_GetTopGroupValidatorsAccounts is ValidatorsTest_L2 {
+contract ValidatorsTest_GetTopGroupValidatorsAccounts is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
@@ -2187,7 +2176,7 @@ contract ValidatorsTest_GetTopGroupValidatorsAccounts is ValidatorsTest_L2 {
   }
 }
 
-contract ValidatorsTest_GetAccountLockedGoldRequirement is ValidatorsTest_L2 {
+contract ValidatorsTest_GetAccountLockedGoldRequirement is ValidatorsTest {
   uint256 public numMembers = 5;
   uint256[] public actualRequirements;
   uint256[] removalTimestamps;
@@ -2248,7 +2237,7 @@ contract ValidatorsTest_GetAccountLockedGoldRequirement is ValidatorsTest_L2 {
   }
 }
 
-contract ValidatorsTest_MintStableToEpochManager_L2 is ValidatorsTest_L2 {
+contract ValidatorsTest_MintStableToEpochManager is ValidatorsTest {
   function test_Reverts_WhenCalledByOtherThanEpochManager() public {
     vm.expectRevert("only registered contract");
     validators.mintStableToEpochManager(5);
@@ -2266,7 +2255,7 @@ contract ValidatorsTest_MintStableToEpochManager_L2 is ValidatorsTest_L2 {
   }
 }
 
-contract ValidatorsTest_ForceDeaffiliateIfValidator_Setup is ValidatorsTest_L2 {
+contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
@@ -2278,11 +2267,7 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator_Setup is ValidatorsTest_L2 {
 
     lockedGold.addSlasherTest(paymentDelegatee);
   }
-}
 
-contract ValidatorsTest_ForceDeaffiliateIfValidator is
-  ValidatorsTest_ForceDeaffiliateIfValidator_Setup
-{
   function test_ShouldSucceed_WhenSenderIsWhitelistedSlashingAddress() public {
     vm.prank(paymentDelegatee);
     validators.forceDeaffiliateIfValidator(validator);
@@ -2294,12 +2279,8 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is
     vm.expectRevert("Only registered slasher can call");
     validators.forceDeaffiliateIfValidator(validator);
   }
-}
 
-contract ValidatorsTest_ForceDeaffiliateIfValidator_L2 is
-  ValidatorsTest_ForceDeaffiliateIfValidator
-{
-  function test_ShouldSendValidatorPayment_WhenL2() public {
+  function test_ShouldSendValidatorPayment() public {
     vm.expectEmit(true, true, true, true);
     emit SendValidatorPaymentCalled(validator);
     vm.prank(paymentDelegatee);
@@ -2307,7 +2288,7 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator_L2 is
   }
 }
 
-contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest_L2 {
+contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
   struct EpochInfo {
     uint256 epochNumber;
     address groupy;
@@ -2420,7 +2401,7 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest_L2 {
   }
 }
 
-contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest_L2 {
+contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
@@ -2457,7 +2438,7 @@ contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest_L2 {
   }
 }
 
-contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest_L2 {
+contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
