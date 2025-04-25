@@ -200,7 +200,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   }
 
   function test_Reverts_whenTransferingCeloToUnreleasedTreasury() public {
-    _setValidatorL2Score();
+    _setValidatorScore();
 
     blockTravel(43200);
     timeTravel(DAY);
@@ -212,7 +212,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   }
 
   function test_SetsCurrentRewardBlock() public {
-    _setValidatorL2Score();
+    _setValidatorScore();
 
     blockTravel(L2_BLOCK_IN_EPOCH);
     timeTravel(DAY);
@@ -225,7 +225,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     assertEq(status, 1);
   }
 
-  function _setValidatorL2Score() internal {
+  function _setValidatorScore() internal {
     address scoreManagerOwner = scoreManager.owner();
     vm.startPrank(scoreManagerOwner);
     scoreManager.setGroupScore(groupList[0], groupScore[0]);

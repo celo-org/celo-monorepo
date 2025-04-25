@@ -418,7 +418,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     // TODO this should be a transfer from the deployer rather than a deal
     vm.deal(reserveProxyAddress, initialBalance);
-    console.log("### balance of reserve:", address(reserveProxyAddress).balance);
+
     // Adds ReserveSpenderMultiSig to Reserve
     bool useSpender = abi.decode(json.parseRaw(".reserveSpenderMultiSig.required"), (bool));
     address spender = useSpender
@@ -1272,8 +1272,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function captureEpochManagerEnablerValidators() public {
-    console.log("### Capturing Epoch info");
-    console.log("### current BN:", block.number);
     address numberValidatorsInCurrentSetPrecompileAddress = 0x00000000000000000000000000000000000000f9;
     numberValidatorsInCurrentSetPrecompileAddress.call(
       abi.encodeWithSignature("setNumberOfValidators()")

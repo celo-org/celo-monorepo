@@ -102,8 +102,4 @@ contract MockElection {
   function distributeEpochRewards(address group, uint256 value, address, address) external {
     distributedEpochRewards[group] = value;
   }
-
-  function electValidatorAccounts() external view returns (address[] memory) {
-    return electedValidators;
-  }
 }

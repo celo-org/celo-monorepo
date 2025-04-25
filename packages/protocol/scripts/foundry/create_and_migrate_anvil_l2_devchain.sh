@@ -13,13 +13,6 @@ export KEEP_DEVCHAIN_FOLDER=true
 echo "Generating and running L1 devchain before activating L2..."
 source $PWD/scripts/foundry/create_and_migrate_anvil_devchain.sh
 
-# # Activate L2 by deploying arbitrary bytecode to the proxy admin address.
-# # Note: This can't be done from the migration script
-# ARBITRARY_BYTECODE=$(cast format-bytes32-string "L2 is activated")
-# cast rpc anvil_setCode \
-#   $PROXY_ADMIN_ADDRESS $ARBITRARY_BYTECODE \
-#   --rpc-url $ANVIL_RPC_URL
-
 # Fetch address
 CELO_UNRELEASED_TREASURY_ADDRESS=$(
   cast call \
@@ -36,6 +29,7 @@ RESERVE_ADDRESS=$(
     "Reserve" \
     --rpc-url $ANVIL_RPC_URL
 )
+
 VALIDATORS_ADDRESS=$(
   cast call \
     $REGISTRY_ADDRESS \
@@ -64,12 +58,6 @@ echo "### registered_validators: $registered_validators"
 # Increase the block number using anvil cast rpc
 BLOCKS_TO_ADVANCE=17280
 cast rpc anvil_mine $BLOCKS_TO_ADVANCE --rpc-url $ANVIL_RPC_URL --rpc-timeout 30000
-
-active_votes=$(cast call \
-  $ELECTIONS_ADDRESS \
-  "getActiveVotes()(uint256)" \
-  --rpc-url $ANVIL_RPC_URL)
-echo "### active votes: $active_votes"
 
 # Check if registered_validators is empty or invalid
 if [ -z "$registered_validators" ] || [ "$registered_validators" == "[]" ]; then
@@ -123,24 +111,12 @@ for validator in $registered_validators; do
     continue
   fi
 
-  # cast rpc anvil_impersonateAccount $validator_group --rpc-url $ANVIL_RPC_URL
   cast send $ELECTIONS_ADDRESS "activate(address)" $validator_group --private-key ${FIRST_THREE_KEYS[$key_index]} --rpc-url $ANVIL_RPC_URL
   key_index=$((key_index + 1))
-  # cast send $ELECTIONS_ADDRESS "activate(address)" $validator_group --from $validator_group --rpc-url $ANVIL_RPC_URL
-  # cast rpc anvil_stopImpersonatingAccount $validator_group --rpc-url $ANVIL_RPC_URL
 
   echo "### activated validator group: $validator_group with pending votes: $pending_votes"
 
-  # current_block=$(cast block-number --rpc-url $ANVIL_RPC_URL)
-  # echo "### current BN: $current_block"
 done
-
-cast rpc anvil_mine $BLOCKS_TO_ADVANCE --rpc-url $ANVIL_RPC_URL --rpc-timeout 30000
-
-# distributeEpochRewards=$(cast call \
-#   $CELO_EPOCH_REWARDS_ADDRESS \
-#   "distributeEpochRewards()()" \
-#   --rpc-url $ANVIL_RPC_URL)
 
 active_votes=$(cast call \
   $ELECTIONS_ADDRESS \
@@ -167,15 +143,14 @@ cast rpc \
   $CELO_UNRELEASED_TREASURY_ADDRESS $HEX_CELO_UNRELEASED_TREASURY_INITIAL_BALANCE \
   --rpc-url $ANVIL_RPC_URL
 
+# Set the balance of the Reserve For some reason, the balance that is set in the anvil_L1_devchain
+# migration script does not get carried over to anvil_L2_devchain.
 echo "Setting reserve balance..."
 HEX_RESERVE_INITIAL_BALANCE=$(cast to-hex $RESERVE_INITIAL_BALANCE"000000000000000000")
 cast rpc \
   anvil_setBalance \
   $RESERVE_ADDRESS $HEX_RESERVE_INITIAL_BALANCE \
   --rpc-url $ANVIL_RPC_URL
-
-# activating validators
-echo "activating validators..."
 
 # Run L2 migrations
 echo "Running L2 migration script... "
@@ -188,7 +163,6 @@ forge script \
   $BROADCAST \
   $SKIP_SIMULATION \
   $NON_INTERACTIVE \
-  --timeout 30000 \
   --rpc-url $ANVIL_RPC_URL || {
   echo "Migration script failed"
   exit 1
@@ -197,7 +171,7 @@ forge script \
 # Give anvil enough time to save the state
 sleep $SLEEP_DURATION
 
-# # Save L2 state so it can published to NPM
+# Save L2 state so it can published to NPM
 mv $ANVIL_FOLDER/state.json $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME
 echo "Saved anvil L2 state to $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME"
 

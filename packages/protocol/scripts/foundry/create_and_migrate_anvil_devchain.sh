@@ -57,7 +57,6 @@ forge script \
   $BROADCAST \
   $SKIP_SIMULATION \
   $NON_INTERACTIVE \
-  --timeout 30000 \
   $LIBRARY_FLAGS \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
 
