@@ -2,7 +2,7 @@
 
 This package connects to Blockscout database, get all the metadata urls, 
 verify the metadata claims and update the database if the user claims
-could be verified succesfully.
+could be verified successfully.
 
 For this package to work properly, the software must have SELECT and UPDATE 
 access to the Blockscout database.
