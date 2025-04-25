@@ -17,9 +17,4 @@ contract EpochRewardsMock is EpochRewards(true) {
   ) external view returns (uint256) {
     return _getRewardsMultiplier(targetGoldTotalSupplyIncrease).unwrap();
   }
-
-  // mocks the precompile
-  function numberValidatorsInCurrentSet() public view returns (uint256) {
-    return numValidatorsInCurrentSet;
-  }
 }

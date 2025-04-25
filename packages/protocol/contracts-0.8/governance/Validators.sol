@@ -13,7 +13,6 @@ import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
 import "../common/UsingRegistry.sol";
-import "../common/PrecompilesOverride.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "../../contracts/common/libraries/ReentrancyGuard.sol";
 import "../common/interfaces/IStableToken.sol";
@@ -30,7 +29,6 @@ contract Validators is
   ReentrancyGuard,
   Initializable,
   UsingRegistry,
-  PrecompilesOverride,
   CalledByVm
 {
   using FixidityLib for FixidityLib.Fraction;
@@ -699,7 +697,10 @@ contract Validators is
     uint256 index
   ) external view returns (address) {
     require(isValidator(account), "Not a validator");
-    require(epochNumber <= getEpochNumber(), "Epoch cannot be larger than current");
+    require(
+      epochNumber <= getEpochManager().getEpochNumberOfBlock(block.number),
+      "Epoch cannot be larger than current"
+    );
     MembershipHistory storage history = validators[account].membershipHistory;
     require(index < history.tail.add(history.numEntries), "index out of bounds");
     require(index >= history.tail && history.numEntries > 0, "index out of bounds");
@@ -910,7 +911,7 @@ contract Validators is
    * @return The group that `account` was a member of at the end of the last epoch.
    */
   function getMembershipInLastEpoch(address account) public view returns (address) {
-    uint256 epochNumber = getEpochNumber();
+    uint256 epochNumber = getEpochManager().getEpochNumberOfBlock(block.number);
 
     MembershipHistory storage history = validators[account].membershipHistory;
     uint256 head = history.numEntries == 0 ? 0 : history.tail.add(history.numEntries.sub(1));
@@ -1127,7 +1128,7 @@ contract Validators is
    */
   function updateMembershipHistory(address account, address group) private returns (bool) {
     MembershipHistory storage history = validators[account].membershipHistory;
-    uint256 epochNumber = getEpochNumber();
+    uint256 epochNumber = getEpochManager().getEpochNumberOfBlock(block.number);
 
     uint256 head = history.numEntries == 0 ? 0 : history.tail.add(history.numEntries.sub(1));
 

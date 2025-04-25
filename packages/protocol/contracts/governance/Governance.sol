@@ -13,7 +13,6 @@ import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
-import "../common/PrecompilesOverride.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
@@ -26,8 +25,7 @@ contract Governance is
   Ownable,
   Initializable,
   ReentrancyGuard,
-  UsingRegistry,
-  PrecompilesOverride
+  UsingRegistry
 {
   using Proposals for Proposals.Proposal;
   using FixidityLib for FixidityLib.Fraction;
@@ -721,7 +719,7 @@ contract Governance is
       emit HotfixPrepared(hash, _currentTime.add(hotfixExecutionTimeWindow));
     } else {
       require(isHotfixPassing(hash), "hotfix not whitelisted by 2f+1 validators");
-      uint256 epoch = getEpochNumber();
+      uint256 epoch = getEpochManager().getEpochNumberOfBlock(block.number);
       require(
         _currentHotfix.deprecated_preparedEpoch < epoch,
         "hotfix already prepared for this epoch"
@@ -770,7 +768,10 @@ contract Governance is
       (bool approved, bool executed, uint256 preparedEpoch) = getL1HotfixRecord(hash);
       require(!executed, "hotfix already executed");
       require(approved, "hotfix not approved");
-      require(preparedEpoch == getEpochNumber(), "hotfix must be prepared for this epoch");
+      require(
+        preparedEpoch == getEpochManager().getEpochNumberOfBlock(block.number),
+        "hotfix must be prepared for this epoch"
+      );
 
       Proposals.makeMem(values, destinations, data, dataLengths, msg.sender, 0).executeMem();
 
@@ -1297,10 +1298,10 @@ contract Governance is
    */
   function hotfixWhitelistValidatorTally(bytes32 hash) public view onlyL1 returns (uint256) {
     uint256 tally = 0;
-    uint256 n = numberValidatorsInCurrentSet();
+    uint256 n = getEpochManager().numberOfElectedInCurrentSet();
     IAccounts accounts = getAccounts();
     for (uint256 i = 0; i < n; i = i.add(1)) {
-      address validatorSigner = validatorSignerAddressFromCurrentSet(i);
+      address validatorSigner = getEpochManager().getElectedSignerByIndex(i);
       address validatorAccount = accounts.signerToAccount(validatorSigner);
       if (
         isHotfixWhitelistedBy(hash, validatorSigner) ||

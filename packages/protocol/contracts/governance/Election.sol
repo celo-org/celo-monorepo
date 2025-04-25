@@ -15,7 +15,6 @@ import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/Heap.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 import "../common/Blockable.sol";
-import "../common/PrecompilesOverride.sol";
 import "../common/Permissioned.sol";
 
 /**
@@ -28,7 +27,6 @@ contract Election is
   ReentrancyGuard,
   Initializable,
   UsingRegistry,
-  PrecompilesOverride,
   CalledByVm,
   Blockable,
   Permissioned
@@ -598,7 +596,9 @@ contract Election is
    */
   function hasActivatablePendingVotes(address account, address group) external view returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
-    return pendingVote.epoch < getEpochNumber() && pendingVote.value > 0;
+    return
+      pendingVote.epoch < getEpochManager().getEpochNumberOfBlock(block.number) &&
+      pendingVote.value > 0;
   }
 
   /**
@@ -779,10 +779,10 @@ contract Election is
    * @return List of current validator signers.
    */
   function getCurrentValidatorSigners() public view returns (address[] memory) {
-    uint256 n = numberValidatorsInCurrentSet();
+    uint256 n = getEpochManager().numberOfElectedInCurrentSet();
     address[] memory res = new address[](n);
     for (uint256 i = 0; i < n; i = i.add(1)) {
-      res[i] = validatorSignerAddressFromCurrentSet(i);
+      res[i] = getEpochManager().getElectedSignerByIndex(i);
     }
     return res;
   }
@@ -880,7 +880,10 @@ contract Election is
   function _activate(address group, address account) internal onlyWhenNotBlocked returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
 
-    require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
+    require(
+      pendingVote.epoch < getEpochManager().getEpochNumberOfBlock(block.number),
+      "Pending vote epoch not passed"
+    );
 
     uint256 value = pendingVote.value;
     require(value > 0, "Vote value cannot be zero");
@@ -1118,7 +1121,7 @@ contract Election is
 
     PendingVote storage pendingVote = groupPending.byAccount[account];
     pendingVote.value = pendingVote.value.add(value);
-    pendingVote.epoch = getEpochNumber();
+    pendingVote.epoch = getEpochManager().getEpochNumberOfBlock(block.number);
   }
 
   /**
