@@ -16,7 +16,7 @@ const initializeArgs = async (): Promise<any[]> => {
     config.validators.maxGroupSize,
     {
       commissionUpdateDelay: config.validators.commissionUpdateDelay,
-      downtimeGracePeriod: config.validators.downtimeGracePeriod,
+      deprecated_downtimeGracePeriod: config.validators.downtimeGracePeriod,
     },
   ]
 }

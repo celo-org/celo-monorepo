@@ -62,7 +62,7 @@ export async function setAndInitializeImplementation(
         ])
         console.log("web3.eth.sendTransaction done")
       }
-      console.log("initializing contract",callData.toString())
+      console.log("initializing contract")
       return retryTx(proxy._setAndInitializeImplementation, [
         implementationAddress,
         callData as any,
