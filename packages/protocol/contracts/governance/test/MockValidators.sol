@@ -3,7 +3,6 @@ pragma solidity ^0.5.13;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "../interfaces/IValidators.sol";
-import "../../../contracts-0.8/common/IsL2Check.sol";
 
 // Mocks Validators, compatible with 0.5
 // For forge tests, can be avoided with calls to deployCodeTo
@@ -11,7 +10,7 @@ import "../../../contracts-0.8/common/IsL2Check.sol";
 /**
  * @title Holds a list of addresses of validators
  */
-contract MockValidators is IValidators, IsL2Check {
+contract MockValidators is IValidators {
   using SafeMath for uint256;
 
   event HavelSlashingMultiplierHalved(address validator);
@@ -102,7 +101,6 @@ contract MockValidators is IValidators, IsL2Check {
   }
 
   function getValidatorGroupSlashingMultiplier(address) external view returns (uint256) {
-    allowOnlyL1();
     return FIXED1_UINT;
   }
 
@@ -205,15 +203,7 @@ contract MockValidators is IValidators, IsL2Check {
     revert("Method not implemented in mock");
   }
 
-  function getValidatorScoreParameters() external view returns (uint256, uint256) {
-    revert("Method not implemented in mock");
-  }
-
   function getValidatorLockedGoldRequirements() external view returns (uint256, uint256) {
-    revert("Method not implemented in mock");
-  }
-
-  function getValidatorBlsPublicKeyFromSigner(address) external view returns (bytes memory) {
     revert("Method not implemented in mock");
   }
 

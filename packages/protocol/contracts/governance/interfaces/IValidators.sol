@@ -35,13 +35,11 @@ interface IValidators {
   // view functions
   function maxGroupSize() external view returns (uint256);
   function getCommissionUpdateDelay() external view returns (uint256);
-  function getValidatorScoreParameters() external view returns (uint256, uint256);
   function getMembershipHistory(
     address
   ) external view returns (uint256[] memory, address[] memory, uint256, uint256);
   function getAccountLockedGoldRequirement(address) external view returns (uint256);
   function meetsAccountLockedGoldRequirements(address) external view returns (bool);
-  function getValidatorBlsPublicKeyFromSigner(address) external view returns (bytes memory);
   function getValidator(
     address account
   ) external view returns (bytes memory, bytes memory, address, uint256, address);
