@@ -49,13 +49,13 @@ yarn run init-network -n $NAME
 You can then share the contract build artifacts by running:
 
 ```bash
-yarn run upload-artifacts -n $NAME
+yarn run artifacts:upload -n $NAME
 ```
 
 This will upload the build artifacts to the cluster, and can be consequently downloaded via:
 
 ```bash
-yarn run download-artifacts -n $NAME
+yarn run artifacts:download -n $NAME
 ```
 
 This will download the build artifacts to your build folder, as if you deployed the contracts yourself.

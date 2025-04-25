@@ -169,7 +169,7 @@ jobs:
           NPM_TAG: ${{ inputs.npm_tag }}
 
       - name: Prepare package for publishing
-        run: yarn prepare_devchain_anvil_publishing
+        run: yarn prepare-devchain-anvil-publishing
         working-directory: packages/protocol
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}

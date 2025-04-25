@@ -31,7 +31,7 @@ done
 
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
 
-yarn run download-artifacts -n $NETWORK && \
+yarn run artifacts:download -n $NETWORK && \
 yarn run build && \
 yarn run truffle exec ./scripts/truffle/set_exchange_rate.js \
   --network $NETWORK --stableValue $STABLE_VALUE --goldValue $GOLD_VALUE \

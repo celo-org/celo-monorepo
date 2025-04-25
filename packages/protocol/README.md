@@ -54,7 +54,7 @@ yarn run govern -n NETWORK -c "stableToken.setMinter(0x1234)"
 When interacting with one of our Kubernetes-deployed networks, you can download the build artifacts to a local directory using:
 
 ```bash
-yarn run download-artifacts -n NAME
+yarn run artifacts:download -n NAME
 ```
 
 You must run this before interacting with one of these networks to have the build artifacts available locally.
@@ -62,7 +62,7 @@ You must run this before interacting with one of these networks to have the buil
 If you changed the build artifacts (e.g. by running the `init-network`, `migrate`, or `upgrade` script), upload the new build artifacts with:
 
 ```bash
-yarn run upload-artifacts -n NAME
+yarn run artifacts:upload -n NAME
 ```
 
 By default, `NAME` will be set as `RELEASE_NAME`, `NAMESPACE_NAME`, `TESTNET_NAME` which you should have used with the same name in prior instructions. If you used separate names for the above, you can customize the run with the `-r -n -t` flags respectively.
@@ -126,16 +126,16 @@ Adding the optional `--gas` flag will print out a report of contract gas usage.
 For quick test iterations run:
 
 ```bash
-yarn run quicktest
+yarn run test:quicktest
 ```
 
 or for a single contract:
 
 ```bash
-yarn run quicktest ${contract name}
+yarn run test:quicktest ${contract name}
 ```
 
-For `quicktest` to work correctly a contract's migration dependencies have to be uncommented in `scripts/bash/backupmigrations.sh`.
+For `test:quicktest` to work correctly a contract's migration dependencies have to be uncommented in `scripts/bash/backupmigrations.sh`.
 
 Compared to the normal test command, quicktest will:
 
@@ -148,13 +148,13 @@ Compared to the normal test command, quicktest will:
 2. Run verification command
 
 ```bash
-yarn truffle-verify [ContractName]@[Contract address]  --network [network] --forno [network rpc url]
+yarn truffle:verify [ContractName]@[Contract address]  --network [network] --forno [network rpc url]
 ```
 
 example:
 
 ```bash
-yarn truffle-verify MentoFeeHandlerSeller@0x4efa274b7e33476c961065000d58ee09f7921a74 --network mainnet --forno https://forno.celo.org
+yarn truffle:verify MentoFeeHandlerSeller@0x4efa274b7e33476c961065000d58ee09f7921a74 --network mainnet --forno https://forno.celo.org
 ```
 
 ### Possible problems
@@ -164,7 +164,7 @@ yarn truffle-verify MentoFeeHandlerSeller@0x4efa274b7e33476c961065000d58ee09f792
 2.  Bytecode differs because of missing library addresses on CeloScan. Json file that will be manually uploaded to CeloScan needs to have libraries root element updated. Library addresses is possible to get either manually or with command which will generate libraries.json.
 
     ```bash
-    yarn verify-deployed -n $NETWORK -b $PREVIOUS_RELEASE -f
+    yarn verify:deployed -n $NETWORK -b $PREVIOUS_RELEASE -f
     ```
 
     ```javascript
@@ -293,13 +293,13 @@ Output: The output is a CSV file named `onchain_bytecode_sizes_<timestamp>.csv`
 To get the list of PRs that changed smart contracts between two releases, run:
 
 ```sh
-yarn compare-git-tags [git_tag/branch] [git_tag/branch]
+yarn tags:compare [git_tag/branch] [git_tag/branch]
 ```
 
 Example:
 
 ```sh
-yarn compare-git-tags release/core-contracts/11 release/core-contracts/12
+yarn tags:compare release/core-contracts/11 release/core-contracts/12
 ```
 
 Example output:

@@ -88,7 +88,7 @@ jobs:
         shell: bash
         run:  yarn build --ignore @celo/celotool --ignore @celo/env-tests --include-dependencies
       - name: Compile solidity contracts and typescript files
-        run: yarn prepare_contracts_and_abis_publishing
+        run: yarn prepare-contracts-and-abis-publishing
         working-directory: packages/protocol
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
@@ -96,7 +96,7 @@ jobs:
         # a safety check especially useful if some package is upgraded
       - name: 'Validate ABIS Exports'
         shell: bash
-        run: yarn validate_abis_exports
+        run: yarn validate-abis-exports
         working-directory: packages/protocol
       - name: 'Get git commit hash'
         id: get_COMMIT_HASH

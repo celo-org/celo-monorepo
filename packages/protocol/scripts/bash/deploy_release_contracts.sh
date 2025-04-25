@@ -46,7 +46,7 @@ done
 CONTRACT_ARTIFACTS_DIR="$PWD/build"
 
 if [[ ! -d "$CONTRACT_ARTIFACTS_DIR" ]]; then
-  echo "Error: no contract artifacts found in $CONTRACT_ARTIFACTS_DIR. Use download-artifacts to obtain them, or build them locally." >&2
+  echo "Error: no contract artifacts found in $CONTRACT_ARTIFACTS_DIR. Use artifacts:download to obtain them, or build them locally." >&2
   exit 1
 fi
 
