@@ -124,7 +124,7 @@ contract Validators is
   address[] private registeredValidators;
   LockedGoldRequirements public validatorLockedGoldRequirements;
   LockedGoldRequirements public groupLockedGoldRequirements;
-  ValidatorScoreParameters private validatorScoreParameters;
+  ValidatorScoreParameters private deprecated_validatorScoreParameters;
   uint256 public membershipHistoryLength;
   uint256 public maxGroupSize;
   // The number of blocks to delay a ValidatorGroup's commission update
@@ -525,19 +525,6 @@ contract Validators is
     );
   }
 
-  /**
-   * @notice Returns the validator BLS key.
-   * @param signer The account that registered the validator or its authorized signing address.
-   * @return blsPublicKey The validator BLS key.
-   */
-  function getValidatorBlsPublicKeyFromSigner(
-    address signer
-  ) external view returns (bytes memory blsPublicKey) {
-    address account = getAccounts().signerToAccount(signer);
-    require(isValidator(account), "Not a validator");
-    return validators[account].publicKeys.bls;
-  }
-
   function getMembershipHistoryLength() external view returns (uint256) {
     return membershipHistoryLength;
   }
@@ -725,15 +712,6 @@ contract Validators is
       "provided index does not match provided epochNumber at index in history."
     );
     return history.entries[index].group;
-  }
-
-  /**
-   * @notice Returns the parameters that govern how a validator's score is calculated.
-   * @return The exponent that governs how a validator's score is calculated.
-   * @return The adjustment speed that governs how a validator's score is calculated.
-   */
-  function getValidatorScoreParameters() external view returns (uint256, uint256) {
-    return (validatorScoreParameters.exponent, validatorScoreParameters.adjustmentSpeed.unwrap());
   }
 
   /**

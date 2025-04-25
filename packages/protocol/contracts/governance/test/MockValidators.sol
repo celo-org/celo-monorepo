@@ -35,17 +35,6 @@ contract MockValidators is IValidators, IsL2Check {
     return true;
   }
 
-  function updatePublicKeys(
-    address,
-    address,
-    bytes calldata,
-    bytes calldata,
-    bytes calldata
-  ) external returns (bool) {
-    allowOnlyL1();
-    return true;
-  }
-
   function setValidator(address account) external {
     isValidator[account] = true;
   }
@@ -129,10 +118,6 @@ contract MockValidators is IValidators, IsL2Check {
     return lockedGoldRequirements[account];
   }
 
-  function calculateGroupEpochScore(uint256[] calldata uptimes) external view returns (uint256) {
-    return uptimes[0];
-  }
-
   function getGroupsNumMembers(address[] calldata groups) external view returns (uint256[] memory) {
     uint256[] memory numMembers = new uint256[](groups.length);
     for (uint256 i = 0; i < groups.length; i = i.add(1)) {
@@ -192,23 +177,11 @@ contract MockValidators is IValidators, IsL2Check {
     revert("Method not implemented in mock");
   }
 
-  function updateBlsPublicKey(bytes calldata, bytes calldata) external returns (bool) {
-    revert("Method not implemented in mock");
-  }
-
-  function setValidatorScoreParameters(uint256, uint256) external returns (bool) {
-    revert("Method not implemented in mock");
-  }
-
   function setValidatorLockedGoldRequirements(uint256, uint256) external returns (bool) {
     revert("Method not implemented in mock");
   }
 
   function setMaxGroupSize(uint256) external returns (bool) {
-    revert("Method not implemented in mock");
-  }
-
-  function setDowntimeGracePeriod(uint256) external {
     revert("Method not implemented in mock");
   }
 
@@ -221,10 +194,6 @@ contract MockValidators is IValidators, IsL2Check {
   }
 
   function reorderMember(address, address, address) external returns (bool) {
-    revert("Method not implemented in mock");
-  }
-
-  function updateValidatorScoreFromSigner(address, uint256) external {
     revert("Method not implemented in mock");
   }
 
@@ -272,10 +241,6 @@ contract MockValidators is IValidators, IsL2Check {
     revert("Method not implemented in mock");
   }
 
-  function calculateEpochScore(uint256) external view returns (uint256) {
-    revert("Method not implemented in mock");
-  }
-
   function deaffiliate() external returns (bool) {
     revert("Method not implemented in mock");
   }
@@ -285,10 +250,6 @@ contract MockValidators is IValidators, IsL2Check {
   }
 
   function deregisterValidatorGroup(uint256) external returns (bool) {
-    revert("Method not implemented in mock");
-  }
-
-  function distributeEpochPaymentsFromSigner(address, uint256) external onlyL1 returns (uint256) {
     revert("Method not implemented in mock");
   }
 
