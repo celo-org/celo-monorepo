@@ -1355,7 +1355,7 @@ contract Governance is
    * @return Hotfix approved by approver.
    * @return Hotfix approved by SecurityCouncil.
    * @return Hotfix executed.
-   * @return Hotfix exection time limit.
+   * @return Hotfix execution time limit.
    */
   function getL2HotfixRecord(bytes32 hash) public view onlyL2 returns (bool, bool, bool, uint256) {
     return (
