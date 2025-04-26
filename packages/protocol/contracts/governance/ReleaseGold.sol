@@ -218,7 +218,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     );
     require(
       _beneficiary != address(0),
-      "The release schedule beneficiary cannot be the zero addresss"
+      "The release schedule beneficiary cannot be the zero address"
     );
     require(registryAddress != address(0), "The registry address cannot be the zero address");
     require(!(revocable && _canValidate), "Revocable contracts cannot validate");
