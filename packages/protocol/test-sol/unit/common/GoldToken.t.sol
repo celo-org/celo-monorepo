@@ -5,7 +5,6 @@ import "@celo-contracts/common/GoldToken.sol";
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
-
 contract CeloTokenTest is TestWithUtils {
   GoldToken celoToken;
 
