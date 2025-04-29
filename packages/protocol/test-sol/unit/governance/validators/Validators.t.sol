@@ -86,7 +86,6 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
   uint256 public membershipHistoryLength = 5;
   uint256 public maxGroupSize = 5;
   uint256 public commissionUpdateDelay = 3;
-  uint256 public downtimeGracePeriod = 0;
 
   ValidatorsMockTunnel.InitParams public initParams;
   ValidatorsMockTunnel.InitParams2 public initParams2;
@@ -202,8 +201,7 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
       _membershipHistoryLength: membershipHistoryLength,
       _slashingMultiplierResetPeriod: slashingMultiplierResetPeriod,
       _maxGroupSize: maxGroupSize,
-      _commissionUpdateDelay: commissionUpdateDelay,
-      _downtimeGracePeriod: downtimeGracePeriod
+      _commissionUpdateDelay: commissionUpdateDelay
     });
 
     validatorsMockTunnel.MockInitialize(owner, initParams, initParams2);
