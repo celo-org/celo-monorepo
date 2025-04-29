@@ -42,6 +42,7 @@ export REGISTRY_STORAGE_LOCATION="0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee
 GOLD_TOKEN_CELO_SUPPLY_CAP=1000000000 # `GoldToken.CELO_SUPPLY_CAP()`
 GOLD_TOKEN_TOTAL_SUPPLY=700000000 # Arbitrary amount chosen to be approximately equal to `GoldToken.totalSupply()` on the L1 Mainnet (695,313,643 CELO as of this commit).
 export CELO_UNRELEASED_TREASURY_INITIAL_BALANCE="$(($GOLD_TOKEN_CELO_SUPPLY_CAP - $GOLD_TOKEN_TOTAL_SUPPLY))" # During the real L2 genesis, the VM will calculate and set an appropriate balance.
+export RESERVE_INITIAL_BALANCE="5000000" # setting this here because it gets overwritten in the L2 migration script
 
 # Contract libraries
 export LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"

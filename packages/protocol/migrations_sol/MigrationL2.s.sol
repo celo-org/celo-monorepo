@@ -5,6 +5,7 @@ import { MigrationsConstants } from "@migrations-sol/constants.sol";
 
 // Foundry imports
 import "forge-std/console.sol";
+import "forge-std/StdJson.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts-8/common/UsingRegistry.sol";
@@ -12,15 +13,22 @@ import "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
 
 contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
   using FixidityLib for FixidityLib.Fraction;
+  using stdJson for string;
 
   /**
    * Entry point of the script
    */
   function run() external {
+    string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
     vm.startBroadcast(DEPLOYER_ACCOUNT);
 
     setupUsingRegistry();
-    dealToCeloUnreleasedTreasury();
+
+    dealToCeloUnreleasedTreasuryAndReserve(json);
+
+    vm.stopBroadcast();
+
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
 
     initializeEpochManagerSystem();
 
@@ -32,14 +40,14 @@ contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
     setRegistry(REGISTRY_ADDRESS);
   }
 
-  function dealToCeloUnreleasedTreasury() public {
+  function dealToCeloUnreleasedTreasuryAndReserve(string memory json) public {
     vm.deal(address(getCeloUnreleasedTreasury()), L2_INITIAL_STASH_BALANCE);
+    uint256 initialBalance = abi.decode(json.parseRaw(".reserve.initialBalance"), (uint256));
+    vm.deal(registry.getAddressForOrDie(RESERVE_REGISTRY_ID), initialBalance);
   }
 
   function initializeEpochManagerSystem() public {
     console.log("Initializing EpochManager system");
-    address[] memory firstElected = getValidators().getRegisteredValidators();
-    IEpochManager epochManager = getEpochManager();
     address epochManagerEnablerAddress = registry.getAddressForOrDie(
       EPOCH_MANAGER_ENABLER_REGISTRY_ID
     );

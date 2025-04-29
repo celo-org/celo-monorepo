@@ -188,48 +188,19 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     );
   }
 
-  function activateValidators() public {
-    address[] memory registeredValidators = validatorsContract.getRegisteredValidators();
-    travelNEpochL1(4);
-
-    for (uint256 i = 0; i < registeredValidators.length; i++) {
-      (, , address validatorGroup, , ) = validatorsContract.getValidator(registeredValidators[i]);
-      if (election.getPendingVotesForGroup(validatorGroup) == 0) {
-        continue;
-      }
-      vm.startPrank(validatorGroup);
-      election.activate(validatorGroup);
-      vm.stopPrank();
-    }
-  }
-
-  function test_Reverts_whenSystemNotInitialized() public {
-    vm.expectRevert("Epoch system not initialized");
-    epochManagerContract.startNextEpochProcess();
-  }
-
   function test_Reverts_WhenEndOfEpochHasNotBeenReached() public {
-    vm.deal(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
-
-    uint256 l1EpochNumber = IPrecompiles(address(validatorsContract)).getEpochNumber();
-
-    vm.prank(address(epochManagerEnablerContract));
-    epochManagerContract.initializeSystem(l1EpochNumber, block.number, validatorsList);
-
     vm.expectRevert("Epoch is not ready to start");
     epochManagerContract.startNextEpochProcess();
   }
 
   function test_Reverts_whenAlreadyInitialized() public {
-    _MockL2Migration(validatorsList);
-
     vm.prank(address(epochManagerEnablerContract));
     vm.expectRevert("Epoch system already initialized");
     epochManagerContract.initializeSystem(100, block.number, firstElected);
   }
 
   function test_Reverts_whenTransferingCeloToUnreleasedTreasury() public {
-    _MockL2Migration(validatorsList);
+    _setValidatorScore();
 
     blockTravel(43200);
     timeTravel(DAY);
@@ -241,7 +212,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   }
 
   function test_SetsCurrentRewardBlock() public {
-    _MockL2Migration(validatorsList);
+    _setValidatorScore();
 
     blockTravel(L2_BLOCK_IN_EPOCH);
     timeTravel(DAY);
@@ -254,25 +225,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     assertEq(status, 1);
   }
 
-  function _MockL2Migration(address[] memory _validatorsList) internal {
-    for (uint256 i = 0; i < _validatorsList.length; i++) {
-      firstElected.push(_validatorsList[i]);
-    }
-
-    uint256 l1EpochNumber = IPrecompiles(address(validatorsContract)).getEpochNumber();
-
-    activateValidators();
-    vm.deal(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
-
-    whenL2();
-    _setValidatorL2Score();
-
-    vm.prank(address(epochManagerEnablerContract));
-
-    epochManagerContract.initializeSystem(l1EpochNumber, block.number, firstElected);
-  }
-
-  function _setValidatorL2Score() internal {
+  function _setValidatorScore() internal {
     address scoreManagerOwner = scoreManager.owner();
     vm.startPrank(scoreManagerOwner);
     scoreManager.setGroupScore(groupList[0], groupScore[0]);
