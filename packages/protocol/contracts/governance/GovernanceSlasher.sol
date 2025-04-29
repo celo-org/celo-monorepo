@@ -60,7 +60,8 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, ICeloVersio
 
   /**
    * @notice Calls `LockedGold.slash` on `account` if `account` has an entry in `slashed`.
-   * @param account Account to slash
+   * @param account Account to slash.
+   * @param group Validators group of the account to slash.
    * @param electionLessers Lesser pointers for slashing locked election gold.
    * @param electionGreaters Greater pointers for slashing locked election gold.
    * @param electionIndices Indices of groups voted by slashed account.
@@ -76,8 +77,33 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, ICeloVersio
   }
 
   /**
+   * @notice Gets account penalty.
+   * @param account Address that is punished.
+   * @return Amount slashed.
+   */
+  function getApprovedSlashing(address account) external view returns (uint256) {
+    return slashed[account];
+  }
+
+  function getSlasherExecuter() external view returns (address) {
+    return slasherExecuter;
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 2, 0, 0);
+  }
+
+  /**
    * @notice Calls `LockedGold.slash` on `account` if `account` has an entry in `slashed`.
-   * @param account Account to slash
+   * @param account Account to slash.
+   * @param group Validators group of the account to slash.
    * @param electionLessers Lesser pointers for slashing locked election gold.
    * @param electionGreaters Greater pointers for slashing locked election gold.
    * @param electionIndices Indices of groups voted by slashed account.
@@ -85,10 +111,10 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, ICeloVersio
   function slashL2(
     address account,
     address group,
-    address[] calldata electionLessers,
-    address[] calldata electionGreaters,
-    uint256[] calldata electionIndices
-  ) external onlyAuthorizedToSlash returns (bool) {
+    address[] memory electionLessers,
+    address[] memory electionGreaters,
+    uint256[] memory electionIndices
+  ) public onlyAuthorizedToSlash returns (bool) {
     uint256 penalty = slashed[account];
     require(penalty > 0, "No penalty given by governance");
     slashed[account] = 0;
@@ -122,29 +148,5 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, ICeloVersio
 
     emit GovernanceSlashPerformed(account, group, penalty);
     return true;
-  }
-
-  /**
-   * @notice Gets account penalty.
-   * @param account Address that is punished.
-   * @return Amount slashed.
-   */
-  function getApprovedSlashing(address account) external view returns (uint256) {
-    return slashed[account];
-  }
-
-  function getSlasherExecuter() external view returns (address) {
-    return slasherExecuter;
-  }
-
-  /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 0);
   }
 }

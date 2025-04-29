@@ -14,6 +14,7 @@ import {
   makeTruffleContractForMigration,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
+import { ValidatorsInstance } from '@celo/protocol/types/typechain-0.8'
 import { linkedListChanges, zip } from '@celo/utils/lib/collections'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
@@ -129,6 +130,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
   const dequeuedIndex = 0
   let lockedGold: LockedGoldInstance
   let election: ElectionInstance
+  let validators: ValidatorsInstance
   let multiSig: GovernanceApproverMultiSigInstance
   let governance: GovernanceInstance
   let governanceSlasher: GovernanceSlasherInstance
@@ -141,6 +143,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
   before(async () => {
     lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
     election = await getDeployedProxiedContract('Election', artifacts)
+    validators = await getDeployedProxiedContract('Validators', artifacts)
     // @ts-ignore
     await lockedGold.lock({ value: '10000000000000000000000000' })
 
@@ -241,7 +244,8 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
         lockedGold,
         election
       )
-      await governanceSlasher.slash(slashedAccount, lessers, greaters, indices)
+      let group = await validators.getMembershipInLastEpochFromSigner(slashedAccount)
+      await governanceSlasher.slash(slashedAccount, group, lessers, greaters, indices)
     })
 
     it('should set approved slashing to zero', async () => {
