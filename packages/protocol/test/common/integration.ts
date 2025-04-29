@@ -1,4 +1,5 @@
 import { ensureLeading0x, NULL_ADDRESS } from '@celo/base/lib/address'
+import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { constitution } from '@celo/protocol/governanceConstitution'
 import {
   addressMinedLatestBlock,
@@ -141,9 +142,10 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
   const slashedAccount = accounts[9]
 
   before(async () => {
+    const artifacts08 = ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE, artifacts)
     lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
     election = await getDeployedProxiedContract('Election', artifacts)
-    validators = await getDeployedProxiedContract('Validators', artifacts)
+    validators = await getDeployedProxiedContract('Validators', artifacts08)
     // @ts-ignore
     await lockedGold.lock({ value: '10000000000000000000000000' })
 
@@ -160,6 +162,17 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
           stripHexEncoding(
             // @ts-ignore
             governanceSlasher.contract.methods.approveSlashing(slashedAccount, 100).encodeABI()
+          ),
+          'hex'
+        ),
+      },
+      {
+        value: 0,
+        destination: governanceSlasher.address,
+        data: Buffer.from(
+          stripHexEncoding(
+            // @ts-ignore
+            governanceSlasher.contract.methods.setSlasherExecuter(accounts[0]).encodeABI()
           ),
           'hex'
         ),
@@ -245,7 +258,10 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
         election
       )
       let group = await validators.getMembershipInLastEpochFromSigner(slashedAccount)
-      await governanceSlasher.slash(slashedAccount, group, lessers, greaters, indices)
+
+      await governanceSlasher.slash(slashedAccount, group, lessers, greaters, indices, {
+        from: accounts[0],
+      })
     })
 
     it('should set approved slashing to zero', async () => {
