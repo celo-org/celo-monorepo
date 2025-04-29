@@ -235,8 +235,7 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
       _membershipHistoryLength: membershipHistoryLength,
       _slashingMultiplierResetPeriod: slashingMultiplierResetPeriod,
       _maxGroupSize: maxGroupSize,
-      _commissionUpdateDelay: commissionUpdateDelay,
-      _downtimeGracePeriod: downtimeGracePeriod
+      _commissionUpdateDelay: commissionUpdateDelay
     });
 
     validatorsMockTunnel.MockInitialize(owner, initParams, initParams2);
