@@ -152,9 +152,14 @@ contract MockValidators is IValidators {
     revert("Method not implemented in mock");
   }
 
+  function registerValidator(bytes calldata) external returns (bool) {
+    revert("Method not implemented in mock");
+  }
+
   function registerValidatorNoBls(bytes calldata) external returns (bool) {
     revert("Method not implemented in mock");
   }
+
   function removeMember(address) external returns (bool) {
     revert("Method not implemented in mock");
   }
