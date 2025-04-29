@@ -32,7 +32,6 @@ contract ValidatorsMockTunnel is ForgeTest {
     uint256 _slashingMultiplierResetPeriod;
     uint256 _maxGroupSize;
     uint256 _commissionUpdateDelay;
-    uint256 _downtimeGracePeriod;
   }
 
   // TODO move this to a generic Tunnel helper contract, add to other tunnels.
@@ -73,7 +72,7 @@ contract ValidatorsMockTunnel is ForgeTest {
     });
 
     bytes memory data = abi.encodeWithSignature(
-      "initialize(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,(uint256,uint256))",
+      "initialize(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,(uint256))",
       params.registryAddress,
       params.groupRequirementValue,
       params.groupRequirementDuration,
