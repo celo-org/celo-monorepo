@@ -786,6 +786,7 @@ contract Validators is
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient Locked Gold.
+   * @dev Will be deprecated in favor of `registerValidator(bytes calldata ecdsaPublicKey)`.
    */
   function registerValidatorNoBls(
     bytes calldata ecdsaPublicKey
