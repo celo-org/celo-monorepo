@@ -2,6 +2,7 @@
 pragma solidity >=0.5.13 <0.9.0;
 
 interface IValidators {
+  function registerValidator(bytes calldata) external returns (bool);
   function registerValidatorNoBls(bytes calldata ecdsaPublicKey) external returns (bool);
   function deregisterValidator(uint256) external returns (bool);
   function affiliate(address) external returns (bool);
