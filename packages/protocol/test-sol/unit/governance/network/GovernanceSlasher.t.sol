@@ -89,7 +89,7 @@ contract GovernanceSlasherTest_approveSlashing is GovernanceSlasherTest {
     governanceSlasher.approveSlashing(slashedAddress, 1000);
   }
 
-  function test_EmitsSlashingApprovedEvent() public {
+  function test_Emits_SlashingApprovedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit SlashingApproved(slashedAddress, 1000);
     governanceSlasher.approveSlashing(slashedAddress, 1000);
@@ -119,11 +119,18 @@ contract GovernanceSlasherTest_slash_WhenNotGroup is GovernanceSlasherTest {
     assertEq(governanceSlasher.getApprovedSlashing(validator), 0);
   }
 
-  function test_EmitsGovernanceSlashPerformedEvent() public {
+  function test_Emits_GovernanceSlashPerformedEventWhenCallingSlashL2() public {
     governanceSlasher.approveSlashing(validator, 1000);
     vm.expectEmit(true, true, true, true);
     emit GovernanceSlashPerformed(validator, group, 1000);
     governanceSlasher.slashL2(validator, group, lessers, greaters, indices);
+  }
+
+  function test_Emits_GovernanceSlashPerformedEventWhenCallingSlash() public {
+    governanceSlasher.approveSlashing(validator, 1000);
+    vm.expectEmit(true, true, true, true);
+    emit GovernanceSlashPerformed(validator, group, 1000);
+    governanceSlasher.slash(validator, group, lessers, greaters, indices);
   }
 }
 
@@ -164,11 +171,18 @@ contract GovernanceSlasherTest_slash_WhenGroup is GovernanceSlasherTest {
     assertEq(governanceSlasher.getApprovedSlashing(validator), 0);
   }
 
-  function test_EmitsGovernanceSlashPerformedEvent() public {
+  function test_Emits_GovernanceSlashPerformedEvent() public {
     governanceSlasher.approveSlashing(validator, 1000);
     vm.expectEmit(true, true, true, true);
     emit GovernanceSlashPerformed(validator, group, 1000);
     governanceSlasher.slashL2(validator, group, lessers, greaters, indices);
+  }
+
+  function test_Emits_GovernanceSlashPerformedEventWhenCallingSlash() public {
+    governanceSlasher.approveSlashing(validator, 1000);
+    vm.expectEmit(true, true, true, true);
+    emit GovernanceSlashPerformed(validator, group, 1000);
+    governanceSlasher.slash(validator, group, lessers, greaters, indices);
   }
 
   function test_validatorDeAffiliatedAndScoreReduced() public {

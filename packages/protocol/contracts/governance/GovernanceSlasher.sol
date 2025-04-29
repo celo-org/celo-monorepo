@@ -71,6 +71,23 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, ICeloVersio
     address[] calldata electionLessers,
     address[] calldata electionGreaters,
     uint256[] calldata electionIndices
+  ) external returns (bool) {
+    return slashL2(account, group, electionLessers, electionGreaters, electionIndices);
+  }
+
+  /**
+   * @notice Calls `LockedGold.slash` on `account` if `account` has an entry in `slashed`.
+   * @param account Account to slash
+   * @param electionLessers Lesser pointers for slashing locked election gold.
+   * @param electionGreaters Greater pointers for slashing locked election gold.
+   * @param electionIndices Indices of groups voted by slashed account.
+   */
+  function slashL2(
+    address account,
+    address group,
+    address[] calldata electionLessers,
+    address[] calldata electionGreaters,
+    uint256[] calldata electionIndices
   ) external onlyAuthorizedToSlash returns (bool) {
     uint256 penalty = slashed[account];
     require(penalty > 0, "No penalty given by governance");
