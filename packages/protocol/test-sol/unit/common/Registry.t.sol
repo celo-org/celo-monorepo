@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 
-import "@test-sol/utils/WhenL2.sol";
+// import "@test-sol/utils/WhenL2.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 import "@celo-contracts/common/Registry.sol";
 
-contract RegistryTest is Test {
+contract RegistryTest is TestWithUtils {
   event RegistryUpdated(string identifier, bytes32 indexed identifierHash, address indexed addr);
 
   address constant SOME_ADDRESS = address(0x06012c8cf97BEaD5deAe237070F9587f8E7A266d);
@@ -18,17 +19,12 @@ contract RegistryTest is Test {
   address owner;
 
   function setUp() public {
+    super.setUp();
+    whenL2WithEpochManagerInitialization();
     owner = address(this);
     vm.prank(owner);
     _registry = new Registry(true);
     _registry.initialize();
-  }
-}
-
-contract RegistryTest_L2 is WhenL2, RegistryTest {
-  function setUp() public {
-    super.setUp();
-    registry = IRegistry(address(_registry));
   }
 }
 
@@ -64,8 +60,6 @@ contract RegistryTest_setAddressFor is RegistryTest {
   }
 }
 
-contract RegistryTest_setAddressFor_L2 is RegistryTest_L2, RegistryTest_setAddressFor {}
-
 contract RegistryTest_getAddressFor is RegistryTest {
   function test_GetsRightAddress() public {
     _registry.setAddressFor(SOME_ID, SOME_ADDRESS);
@@ -77,8 +71,6 @@ contract RegistryTest_getAddressFor is RegistryTest {
   }
 }
 
-contract RegistryTest_getAddressFor_L2 is RegistryTest_L2, RegistryTest_getAddressFor {}
-
 contract RegistryTest_getAddressForString is RegistryTest {
   function test_GetsRightAddress() public {
     _registry.setAddressFor(SOME_ID, SOME_ADDRESS);
@@ -89,8 +81,6 @@ contract RegistryTest_getAddressForString is RegistryTest {
     _registry.getAddressForString(SOME_ID);
   }
 }
-
-contract RegistryTest_getAddressForString_L2 is RegistryTest_L2, RegistryTest_getAddressForString {}
 
 contract RegistryTest_getAddressForOrDie is RegistryTest {
   function test_GetsRightAddress() public {
@@ -104,8 +94,6 @@ contract RegistryTest_getAddressForOrDie is RegistryTest {
   }
 }
 
-contract RegistryTest_getAddressForOrDie_L2 is RegistryTest_L2, RegistryTest_getAddressForOrDie {}
-
 contract RegistryTest_getAddressForStringOrDie is RegistryTest {
   function test_GetAddressForStringOrDie_gets_address() public {
     _registry.setAddressFor(SOME_ID, SOME_ADDRESS);
@@ -117,8 +105,3 @@ contract RegistryTest_getAddressForStringOrDie is RegistryTest {
     _registry.getAddressForStringOrDie(SOME_ID);
   }
 }
-
-contract RegistryTest_getAddressForStringOrDie_L2 is
-  RegistryTest_L2,
-  RegistryTest_getAddressForStringOrDie
-{}
