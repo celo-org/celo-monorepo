@@ -80,7 +80,6 @@
     "maxGroupSize": 2,
     "slashingMultiplierResetPeriod": 2592000,
     "slashingPenaltyResetPeriod_help": "30 * DAY",
-    "downtimeGracePeriod": 0,
     "validatorKeys": [],
     "attestationKeys": [],
     "groupName": "cLabs",

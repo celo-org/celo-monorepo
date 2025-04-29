@@ -115,7 +115,6 @@ contract Validators is
   struct InitParams {
     // The number of blocks to delay a ValidatorGroup's commission
     uint256 commissionUpdateDelay;
-    uint256 deprecated_downtimeGracePeriod;
   }
 
   mapping(address => ValidatorGroup) private groups;
