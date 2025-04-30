@@ -129,7 +129,8 @@ jobs:
 
       - name: Generate L2 migration and run migration tests
         if: success() || failure()
-        run: ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
+        run: source ./scripts/foundry/constants.sh
+          ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
 
           FOUNDRY_PROFILE=devchain forge test \
           --match-path "test-sol/devchain/migration/*" \
