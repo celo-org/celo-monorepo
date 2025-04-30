@@ -24,6 +24,7 @@ export const handler = async (argv: RevokeArgv) => {
   await switchToClusterFromEnv(argv.celoEnv, true, false)
   console.info(`Sending invitation code to ${argv.phone}`)
   const cb = async () => {
+    // FIXME: revoke was removed in package.json due to underlaying revoke.sh script was missing
     await execCmd(`yarn --cwd ../protocol run revoke -n ${argv.celoEnv} -p ${argv.phone}`)
   }
   try {
