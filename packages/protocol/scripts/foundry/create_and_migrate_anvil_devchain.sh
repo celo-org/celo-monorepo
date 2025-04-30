@@ -53,7 +53,6 @@ forge script \
   --target-contract $MIGRATION_TARGET_CONTRACT \
   --sender $FROM_ACCOUNT \
   --unlocked \
-  $VERBOSITY_LEVEL \
   $BROADCAST \
   $SKIP_SIMULATION \
   $NON_INTERACTIVE \
