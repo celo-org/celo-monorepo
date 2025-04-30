@@ -131,7 +131,7 @@ jobs:
         if: success() || failure()
         run: ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
 
-          FOUNDRY_PROFILE=devchain forge test -vvv \
+          FOUNDRY_PROFILE=devchain forge test \
           --match-path "test-sol/devchain/migration/*" \
           --fork-url $ANVIL_RPC_URL
 
