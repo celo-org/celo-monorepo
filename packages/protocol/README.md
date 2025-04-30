@@ -13,7 +13,7 @@ See the [testnet helm chart README](../helm-charts/testnet/README.md) for how to
 Then, to deploy contracts to a network run:
 
 ```bash
-yarn run init-network -n NETWORK
+yarn run devchain:init-network -n NETWORK
 ```
 
 This will deploy the contracts to the network specified in `truffle-config.js` and save the artifacts to `build/NETWORK`.
@@ -26,19 +26,21 @@ If a new contract needs to be deployed, create a migration file in the `migratio
 To apply any new migrations to a network, run:
 
 ```bash
-yarn run migrate -n NETWORK
+yarn run devchain:migrate -n NETWORK
 ```
 
 ### Accounts
 
 To give an account some gold, wrapped gold, and stable token, run:
 
+[//]: <> (FIXME: faucet does not exist)
 ```bash
 yarn run faucet -n NETWORK -a ACCOUNT_ADDRESS
 ```
 
 You can check balances by running:
 
+[//]: <> (FIXME: get-balances does not exist)
 ```bash
 yarn run get-balances -n NETWORK -a ACCOUNT_ADDRESS
 ```
@@ -46,7 +48,7 @@ yarn run get-balances -n NETWORK -a ACCOUNT_ADDRESS
 You can run 'onlyOwner' methods via the [MultiSig](contracts/common/MultiSig.sol) by running:
 
 ```bash
-yarn run govern -n NETWORK -c "stableToken.setMinter(0x1234)"
+yarn run truffle:govern -n NETWORK -c "stableToken.setMinter(0x1234)"
 ```
 
 ### Build artifacts
@@ -59,7 +61,7 @@ yarn run artifacts:download -n NAME
 
 You must run this before interacting with one of these networks to have the build artifacts available locally.
 
-If you changed the build artifacts (e.g. by running the `init-network`, `migrate`, or `upgrade` script), upload the new build artifacts with:
+If you changed the build artifacts (e.g. by running the `devchain:init-network` or `devchain:migrate` script), upload the new build artifacts with:
 
 ```bash
 yarn run artifacts:upload -n NAME
@@ -72,7 +74,7 @@ By default, `NAME` will be set as `RELEASE_NAME`, `NAMESPACE_NAME`, `TESTNET_NAM
 To start a truffle console run:
 
 ```
-yarn console -f -n rc1
+yarn truffle:console -f -n rc1
 ```
 
 Options:
@@ -110,7 +112,7 @@ Warning / TODO: We are migrating our tests to Foundry, so this section may be ou
 To test the smart contracts, run:
 
 ```bash
-yarn run test
+yarn run test:truffle
 ```
 
 Adding the optional `--gas` flag will print out a report of contract gas usage.
@@ -118,7 +120,7 @@ Adding the optional `--gas` flag will print out a report of contract gas usage.
 To test a single smart contract, run:
 
 ```bash
-yarn run test ${contract name}
+yarn run test:truffle ${contract name}
 ```
 
 Adding the optional `--gas` flag will print out a report of contract gas usage.
@@ -164,7 +166,7 @@ yarn truffle:verify MentoFeeHandlerSeller@0x4efa274b7e33476c961065000d58ee09f792
 2.  Bytecode differs because of missing library addresses on CeloScan. Json file that will be manually uploaded to CeloScan needs to have libraries root element updated. Library addresses is possible to get either manually or with command which will generate libraries.json.
 
     ```bash
-    yarn verify:deployed -n $NETWORK -b $PREVIOUS_RELEASE -f
+    yarn release:verify-deployed -n $NETWORK -b $PREVIOUS_RELEASE -f
     ```
 
     ```javascript

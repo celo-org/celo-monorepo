@@ -78,7 +78,7 @@ jobs:
 
       - name: Determine release type and version (or dry run)
         # This is what sets the RELEASE_TYPE and RELEASE_VERSION env variables
-        run: yarn --silent determine-release-version >> "$GITHUB_ENV"
+        run: yarn --silent release:determine-release-version >> "$GITHUB_ENV"
         working-directory: packages/protocol
         env:
           GITHUB_TAG: ${{ github.ref_name }}
@@ -88,7 +88,7 @@ jobs:
         shell: bash
         run:  yarn build --ignore @celo/celotool --ignore @celo/env-tests --include-dependencies
       - name: Compile solidity contracts and typescript files
-        run: yarn prepare-contracts-and-abis-publishing
+        run: yarn utils:prepare-contracts-and-abis-publishing
         working-directory: packages/protocol
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
@@ -96,7 +96,7 @@ jobs:
         # a safety check especially useful if some package is upgraded
       - name: 'Validate ABIS Exports'
         shell: bash
-        run: yarn validate-abis-exports
+        run: yarn utils:validate-abis-exports
         working-directory: packages/protocol
       - name: 'Get git commit hash'
         id: get_COMMIT_HASH

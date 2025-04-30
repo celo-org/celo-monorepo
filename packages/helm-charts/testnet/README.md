@@ -43,7 +43,7 @@ So a contract deploy as per [protocol README](../../protocol/README.md) would lo
 # pwd: .../packages/protocol
 # portforward is active
 # Don't forget to set $NAME in the new terminal
-yarn run init-network -n $NAME
+yarn run devchain:init-network -n $NAME
 ```
 
 You can then share the contract build artifacts by running:
@@ -64,6 +64,8 @@ You should be sure to update the appropriate yaml file in `packages/blockchain-a
 
 The last step is to update the contract ABIs and addresses for use in the mobile app as per [mobile README](../../mobile/README.md)
 
+
+[//]: <> (FIXME: packages/mobile does not exist)
 ```bash
 # pwd: .../packages/mobile
 yarn run update-contracts --testnets=testnet_prod,integration,argentinastaging,argentinaproduction,$NAME
