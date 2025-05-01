@@ -26,7 +26,6 @@ contract Election is
   ReentrancyGuard,
   Initializable,
   UsingRegistry,
-  PrecompilesOverride,
   Blockable,
   Permissioned
 {

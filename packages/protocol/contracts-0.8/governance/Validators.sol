@@ -27,8 +27,7 @@ contract Validators is
   Ownable,
   ReentrancyGuard,
   Initializable,
-  UsingRegistry,
-  PrecompilesOverride
+  UsingRegistry
 {
   using FixidityLib for FixidityLib.Fraction;
   using AddressLinkedList for LinkedList.List;
