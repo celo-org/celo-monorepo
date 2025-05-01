@@ -8,7 +8,6 @@ import "solidity-bytes-utils-8/contracts/BytesLib.sol";
 
 import "../../contracts/governance/interfaces/IValidators.sol";
 
-import "../../contracts/common/CalledByVm.sol";
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
@@ -30,8 +29,7 @@ contract Validators is
   ReentrancyGuard,
   Initializable,
   UsingRegistry,
-  PrecompilesOverride,
-  CalledByVm
+  PrecompilesOverride
 {
   using FixidityLib for FixidityLib.Fraction;
   using AddressLinkedList for LinkedList.List;
@@ -115,7 +113,6 @@ contract Validators is
   struct InitParams {
     // The number of blocks to delay a ValidatorGroup's commission
     uint256 commissionUpdateDelay;
-    uint256 downtimeGracePeriod;
   }
 
   mapping(address => ValidatorGroup) private groups;
@@ -124,17 +121,16 @@ contract Validators is
   address[] private registeredValidators;
   LockedGoldRequirements public validatorLockedGoldRequirements;
   LockedGoldRequirements public groupLockedGoldRequirements;
-  ValidatorScoreParameters private validatorScoreParameters;
+  ValidatorScoreParameters private deprecated_validatorScoreParameters;
   uint256 public membershipHistoryLength;
   uint256 public maxGroupSize;
   // The number of blocks to delay a ValidatorGroup's commission update
   uint256 public commissionUpdateDelay;
   uint256 public slashingMultiplierResetPeriod;
-  uint256 public downtimeGracePeriod;
+  uint256 public deprecated_downtimeGracePeriod;
 
   event MaxGroupSizeSet(uint256 size);
   event CommissionUpdateDelaySet(uint256 delay);
-  event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event ValidatorLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event MembershipHistoryLengthSet(uint256 length);
@@ -143,8 +139,6 @@ contract Validators is
   event ValidatorAffiliated(address indexed validator, address indexed group);
   event ValidatorDeaffiliated(address indexed validator, address indexed group);
   event ValidatorEcdsaPublicKeyUpdated(address indexed validator, bytes ecdsaPublicKey);
-  event ValidatorBlsPublicKeyUpdated(address indexed validator, bytes blsPublicKey);
-  event ValidatorScoreUpdated(address indexed validator, uint256 score, uint256 epochScore);
   event ValidatorGroupRegistered(address indexed group, uint256 commission);
   event ValidatorGroupDeregistered(address indexed group);
   event ValidatorGroupMemberAdded(address indexed group, address indexed validator);
@@ -156,12 +150,6 @@ contract Validators is
     uint256 activationBlock
   );
   event ValidatorGroupCommissionUpdated(address indexed group, uint256 commission);
-  event ValidatorEpochPaymentDistributed(
-    address indexed validator,
-    uint256 validatorPayment,
-    address indexed group,
-    uint256 groupPayment
-  );
 
   modifier onlySlasher() {
     require(getLockedGold().isSlasher(msg.sender), "Only registered slasher can call");
@@ -181,8 +169,6 @@ contract Validators is
    * @param groupRequirementDuration The Locked Gold requirement duration for groups.
    * @param validatorRequirementValue The Locked Gold requirement amount for validators.
    * @param validatorRequirementDuration The Locked Gold requirement duration for validators.
-   * @param validatorScoreExponent The exponent used in calculating validator scores.
-   * @param validatorScoreAdjustmentSpeed The speed at which validator scores are adjusted.
    * @param _membershipHistoryLength The max number of entries for validator membership history.
    * @param _maxGroupSize The maximum group size.
    * update.
@@ -194,8 +180,6 @@ contract Validators is
     uint256 groupRequirementDuration,
     uint256 validatorRequirementValue,
     uint256 validatorRequirementDuration,
-    uint256 validatorScoreExponent,
-    uint256 validatorScoreAdjustmentSpeed,
     uint256 _membershipHistoryLength,
     uint256 _slashingMultiplierResetPeriod,
     uint256 _maxGroupSize,
@@ -205,78 +189,10 @@ contract Validators is
     setRegistry(registryAddress);
     setGroupLockedGoldRequirements(groupRequirementValue, groupRequirementDuration);
     setValidatorLockedGoldRequirements(validatorRequirementValue, validatorRequirementDuration);
-    setValidatorScoreParameters(validatorScoreExponent, validatorScoreAdjustmentSpeed);
     setMaxGroupSize(_maxGroupSize);
     setCommissionUpdateDelay(initParams.commissionUpdateDelay);
     setMembershipHistoryLength(_membershipHistoryLength);
     setSlashingMultiplierResetPeriod(_slashingMultiplierResetPeriod);
-    setDowntimeGracePeriod(initParams.downtimeGracePeriod);
-  }
-
-  /**
-   * @notice Updates a validator's score based on its uptime for the epoch.
-   * @param signer The validator signer of the validator account whose score needs updating.
-   * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
-   */
-  function updateValidatorScoreFromSigner(
-    address signer,
-    uint256 uptime
-  ) external virtual onlyVm onlyL1 {
-    _updateValidatorScoreFromSigner(signer, uptime);
-  }
-
-  /**
-   * @notice Distributes epoch payments to the account associated with `signer` and its group.
-   * @param signer The validator signer of the account to distribute the epoch payment to.
-   * @param maxPayment The maximum payment to the validator. Actual payment is based on score and
-   *   group commission.
-   * @return distributeEpochPaymentsFromSigner The total payment paid to the validator and their group.
-   */
-  function distributeEpochPaymentsFromSigner(
-    address signer,
-    uint256 maxPayment
-  ) external virtual onlyVm onlyL1 returns (uint256) {
-    return _distributeEpochPaymentsFromSigner(signer, maxPayment);
-  }
-
-  /**
-   * @notice Registers a validator unaffiliated with any validator group.
-   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus, should
-   *   match the validator signer. 64 bytes.
-   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
-   *   proof of possession. 96 bytes.
-   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
-   *   account address. 48 bytes.
-   * @return True upon success.
-   * @dev Fails if the account is already a validator or validator group.
-   * @dev Fails if the account does not have sufficient Locked Gold.
-   * @dev Fails on L2. Use registerValidatorNoBls instead.
-   */
-  function registerValidator(
-    bytes calldata ecdsaPublicKey,
-    bytes calldata blsPublicKey,
-    bytes calldata blsPop
-  ) external nonReentrant onlyL1 returns (bool) {
-    address account = getAccounts().validatorSignerToAccount(msg.sender);
-    _isRegistrationAllowed(account);
-    require(!isValidator(account) && !isValidatorGroup(account), "Already registered");
-    uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
-    require(lockedGoldBalance >= validatorLockedGoldRequirements.value, "Deposit too small");
-    Validator storage validator = validators[account];
-    address signer = getAccounts().getValidatorSigner(account);
-    require(
-      _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey),
-      "Error updating ECDSA public key"
-    );
-    // TODO double check blob
-    require(
-      _updateBlsPublicKey(validator, account, blsPublicKey, blsPop),
-      "Error updating BLS public key"
-    );
-    registeredValidators.push(account);
-    updateMembershipHistory(account, address(0));
-    emit ValidatorRegistered(account);
-    return true;
   }
 
   /**
@@ -287,24 +203,8 @@ contract Validators is
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient Locked Gold.
    */
-  function registerValidatorNoBls(
-    bytes calldata ecdsaPublicKey
-  ) external nonReentrant onlyL2 returns (bool) {
-    address account = getAccounts().validatorSignerToAccount(msg.sender);
-    _isRegistrationAllowed(account);
-    require(!isValidator(account) && !isValidatorGroup(account), "Already registered");
-    uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
-    require(lockedGoldBalance >= validatorLockedGoldRequirements.value, "Deposit too small");
-    Validator storage validator = validators[account];
-    address signer = getAccounts().getValidatorSigner(account);
-    require(
-      _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey),
-      "Error updating ECDSA public key"
-    );
-    registeredValidators.push(account);
-    updateMembershipHistory(account, address(0));
-    emit ValidatorRegistered(account);
-    return true;
+  function registerValidator(bytes calldata ecdsaPublicKey) external nonReentrant returns (bool) {
+    return registerValidatorNoBls(ecdsaPublicKey);
   }
 
   /**
@@ -375,28 +275,6 @@ contract Validators is
   }
 
   /**
-   * @notice Updates a validator's BLS key.
-   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
-   *   proof of possession. 48 bytes.
-   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
-   *   account address. 48 bytes.
-   * @return True upon success.
-   */
-  function updateBlsPublicKey(
-    bytes calldata blsPublicKey,
-    bytes calldata blsPop
-  ) external onlyL1 returns (bool) {
-    address account = getAccounts().validatorSignerToAccount(msg.sender);
-    require(isValidator(account), "Not a validator");
-    Validator storage validator = validators[account];
-    require(
-      _updateBlsPublicKey(validator, account, blsPublicKey, blsPop),
-      "Error updating BLS public key"
-    );
-    return true;
-  }
-
-  /**
    * @notice Updates a validator's ECDSA key.
    * @param account The address under which the validator is registered.
    * @param signer The address which the validator is using to sign consensus messages.
@@ -440,37 +318,6 @@ contract Validators is
     delete groups[account];
     deleteElement(registeredGroups, account, index);
     emit ValidatorGroupDeregistered(account);
-    return true;
-  }
-
-  /**
-   * @notice Updates a validator's ECDSA and BLS keys.
-   * @param account The address under which the validator is registered.
-   * @param signer The address which the validator is using to sign consensus messages.
-   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
-   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
-   *   proof of possession. 96 bytes.
-   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
-   *   account address. 48 bytes.
-   * @return True upon success.
-   */
-  function updatePublicKeys(
-    address account,
-    address signer,
-    bytes calldata ecdsaPublicKey,
-    bytes calldata blsPublicKey,
-    bytes calldata blsPop
-  ) external onlyL1 onlyRegisteredContract(ACCOUNTS_REGISTRY_ID) returns (bool) {
-    require(isValidator(account), "Not a validator");
-    Validator storage validator = validators[account];
-    require(
-      _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey),
-      "Error updating ECDSA public key"
-    );
-    require(
-      _updateBlsPublicKey(validator, account, blsPublicKey, blsPop),
-      "Error updating BLS public key"
-    );
     return true;
   }
 
@@ -652,24 +499,11 @@ contract Validators is
    */
   function mintStableToEpochManager(
     uint256 amount
-  ) external onlyL2 nonReentrant onlyRegisteredContract(EPOCH_MANAGER_REGISTRY_ID) {
+  ) external nonReentrant onlyRegisteredContract(EPOCH_MANAGER_REGISTRY_ID) {
     require(
       IStableToken(getStableToken()).mint(msg.sender, amount),
       "mint failed to epoch manager"
     );
-  }
-
-  /**
-   * @notice Returns the validator BLS key.
-   * @param signer The account that registered the validator or its authorized signing address.
-   * @return blsPublicKey The validator BLS key.
-   */
-  function getValidatorBlsPublicKeyFromSigner(
-    address signer
-  ) external view returns (bytes memory blsPublicKey) {
-    address account = getAccounts().signerToAccount(signer);
-    require(isValidator(account), "Not a validator");
-    return validators[account].publicKeys.bls;
   }
 
   function getMembershipHistoryLength() external view returns (uint256) {
@@ -712,7 +546,6 @@ contract Validators is
    * @param account The address of the validator group.
    * @param n The number of members to return.
    * @return The signers of the top n group members for a particular group.
-   * @dev Returns the account instead of signer on L2.
    */
   function getTopGroupValidators(
     address account,
@@ -863,15 +696,6 @@ contract Validators is
   }
 
   /**
-   * @notice Returns the parameters that govern how a validator's score is calculated.
-   * @return The exponent that governs how a validator's score is calculated.
-   * @return The adjustment speed that governs how a validator's score is calculated.
-   */
-  function getValidatorScoreParameters() external view returns (uint256, uint256) {
-    return (validatorScoreParameters.exponent, validatorScoreParameters.adjustmentSpeed.unwrap());
-  }
-
-  /**
    * @notice Returns the group membership history of a validator.
    * @param account The validator whose membership history to return.
    * @return epochs The epochs of a validator.
@@ -891,22 +715,6 @@ contract Validators is
       membershipGroups[i] = history.entries[index].group;
     }
     return (epochs, membershipGroups, history.lastRemovedFromGroupTimestamp, history.tail);
-  }
-
-  /**
-   * @notice Calculates the aggregate score of a group for an epoch from individual uptimes.
-   * @param uptimes Array of Fixidity representations of the validators' uptimes, between 0 and 1.
-   * @dev group_score = average(uptimes ** exponent)
-   * @return Fixidity representation of the group epoch score between 0 and 1.
-   */
-  function calculateGroupEpochScore(uint256[] calldata uptimes) external view returns (uint256) {
-    require(uptimes.length > 0, "Uptime array empty");
-    require(uptimes.length <= maxGroupSize, "Uptime array larger than maximum group size");
-    FixidityLib.Fraction memory sum;
-    for (uint256 i = 0; i < uptimes.length; i = i.add(1)) {
-      sum = sum.add(FixidityLib.wrap(calculateEpochScore(uptimes[i])));
-    }
-    return sum.divide(FixidityLib.newFixed(uptimes.length)).unwrap();
   }
 
   /**
@@ -966,7 +774,36 @@ contract Validators is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 3, 0, 0);
+    return (1, 4, 0, 0);
+  }
+
+  /**
+   * @notice Registers a validator unaffiliated with any validator group.
+   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus, should
+   *   match the validator signer. 64 bytes.
+   * @return True upon success.
+   * @dev Fails if the account is already a validator or validator group.
+   * @dev Fails if the account does not have sufficient Locked Gold.
+   * @dev Will be deprecated in favor of `registerValidator(bytes calldata ecdsaPublicKey)`.
+   */
+  function registerValidatorNoBls(
+    bytes calldata ecdsaPublicKey
+  ) public nonReentrant returns (bool) {
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
+    _isRegistrationAllowed(account);
+    require(!isValidator(account) && !isValidatorGroup(account), "Already registered");
+    uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
+    require(lockedGoldBalance >= validatorLockedGoldRequirements.value, "Deposit too small");
+    Validator storage validator = validators[account];
+    address signer = getAccounts().getValidatorSigner(account);
+    require(
+      _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey),
+      "Error updating ECDSA public key"
+    );
+    registeredValidators.push(account);
+    updateMembershipHistory(account, address(0));
+    emit ValidatorRegistered(account);
+    return true;
   }
 
   /**
@@ -1002,33 +839,6 @@ contract Validators is
     require(length != membershipHistoryLength, "Membership history length not changed");
     membershipHistoryLength = length;
     emit MembershipHistoryLengthSet(length);
-    return true;
-  }
-
-  /**
-   * @notice Updates the validator score parameters.
-   * @param exponent The exponent used in calculating the score.
-   * @param adjustmentSpeed The speed at which the score is adjusted.
-   * @return True upon success.
-   */
-  function setValidatorScoreParameters(
-    uint256 exponent,
-    uint256 adjustmentSpeed
-  ) public onlyOwner onlyL1 returns (bool) {
-    require(
-      adjustmentSpeed <= FixidityLib.fixed1().unwrap(),
-      "Adjustment speed cannot be larger than 1"
-    );
-    require(
-      exponent != validatorScoreParameters.exponent ||
-        !FixidityLib.wrap(adjustmentSpeed).equals(validatorScoreParameters.adjustmentSpeed),
-      "Adjustment speed and exponent not changed"
-    );
-    validatorScoreParameters = ValidatorScoreParameters(
-      exponent,
-      FixidityLib.wrap(adjustmentSpeed)
-    );
-    emit ValidatorScoreParametersSet(exponent, adjustmentSpeed);
     return true;
   }
 
@@ -1081,14 +891,6 @@ contract Validators is
   }
 
   /**
-   * @notice Sets the downtimeGracePeriod property if called by owner.
-   * @param value New downtime grace period for calculating epoch scores.
-   */
-  function setDowntimeGracePeriod(uint256 value) public nonReentrant onlyOwner onlyL1 {
-    downtimeGracePeriod = value;
-  }
-
-  /**
    * @notice Returns the current locked gold balance requirement for the supplied account.
    * @param account The account that may have to meet locked gold balance requirements.
    * @return The current locked gold balance requirement for the supplied account.
@@ -1130,28 +932,6 @@ contract Validators is
       }
     }
     return history.entries[head].group;
-  }
-
-  /**
-   * @notice Calculates the validator score for an epoch from the uptime value for the epoch.
-   * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
-   * @dev epoch_score = uptime ** exponent
-   * @return Fixidity representation of the epoch score between 0 and 1.
-   */
-  function calculateEpochScore(uint256 uptime) public view onlyL1 returns (uint256) {
-    require(uptime <= FixidityLib.fixed1().unwrap(), "Uptime cannot be larger than one");
-    uint256 numerator;
-    uint256 denominator;
-    uptime = Math.min(uptime.add(downtimeGracePeriod), FixidityLib.fixed1().unwrap());
-    (numerator, denominator) = fractionMulExp(
-      FixidityLib.fixed1().unwrap(),
-      FixidityLib.fixed1().unwrap(),
-      uptime,
-      FixidityLib.fixed1().unwrap(),
-      validatorScoreParameters.exponent,
-      18
-    );
-    return FixidityLib.newFixedFraction(numerator, denominator).unwrap();
   }
 
   /**
@@ -1238,75 +1018,6 @@ contract Validators is
     return validators[account].publicKeys.ecdsa.length > 0;
   }
 
-  /**
-   * @notice Distributes epoch payments to the account associated with `signer` and its group.
-   * @param signer The validator signer of the validator to distribute the epoch payment to.
-   * @param maxPayment The maximum payment to the validator. Actual payment is based on score and
-   *   group commission.
-   * @return The total payment paid to the validator and their group.
-   */
-  function _distributeEpochPaymentsFromSigner(
-    address signer,
-    uint256 maxPayment
-  ) internal returns (uint256) {
-    address account = getAccounts().signerToAccount(signer);
-    require(isValidator(account), "Not a validator");
-    // The group that should be paid is the group that the validator was a member of at the
-    // time it was elected.
-    address group = getMembershipInLastEpoch(account);
-    require(group != address(0), "Validator not registered with a group");
-    // Both the validator and the group must maintain the minimum locked gold balance in order to
-    // receive epoch payments.
-    if (meetsAccountLockedGoldRequirements(account) && meetsAccountLockedGoldRequirements(group)) {
-      FixidityLib.Fraction memory totalPayment = FixidityLib
-        .newFixed(maxPayment)
-        .multiply(validators[account].score)
-        .multiply(groups[group].slashInfo.multiplier);
-      uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
-      FixidityLib.Fraction memory remainingPayment = FixidityLib.newFixed(
-        totalPayment.fromFixed().sub(groupPayment)
-      );
-      (address beneficiary, uint256 fraction) = getAccounts().getPaymentDelegation(account);
-      uint256 delegatedPayment = remainingPayment.multiply(FixidityLib.wrap(fraction)).fromFixed();
-      uint256 validatorPayment = remainingPayment.fromFixed().sub(delegatedPayment);
-      IStableToken stableToken = IStableToken(getStableToken());
-      require(stableToken.mint(group, groupPayment), "mint failed to validator group");
-      require(stableToken.mint(account, validatorPayment), "mint failed to validator account");
-      if (fraction != 0) {
-        require(stableToken.mint(beneficiary, delegatedPayment), "mint failed to delegatee");
-      }
-      emit ValidatorEpochPaymentDistributed(account, validatorPayment, group, groupPayment);
-      return totalPayment.fromFixed();
-    } else {
-      return 0;
-    }
-  }
-
-  /**
-   * @notice Updates a validator's score based on its uptime for the epoch.
-   * @param signer The validator signer of the validator whose score needs updating.
-   * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
-   * @dev new_score = uptime ** exponent * adjustmentSpeed + old_score * (1 - adjustmentSpeed)
-   */
-  function _updateValidatorScoreFromSigner(address signer, uint256 uptime) internal {
-    address account = getAccounts().signerToAccount(signer);
-    require(isValidator(account), "Not a validator");
-
-    FixidityLib.Fraction memory epochScore = FixidityLib.wrap(calculateEpochScore(uptime));
-    FixidityLib.Fraction memory newComponent = validatorScoreParameters.adjustmentSpeed.multiply(
-      epochScore
-    );
-
-    FixidityLib.Fraction memory currentComponent = FixidityLib.fixed1().subtract(
-      validatorScoreParameters.adjustmentSpeed
-    );
-    currentComponent = currentComponent.multiply(validators[account].score);
-    validators[account].score = FixidityLib.wrap(
-      Math.min(epochScore.unwrap(), newComponent.add(currentComponent).unwrap())
-    );
-    emit ValidatorScoreUpdated(account, validators[account].score.unwrap(), epochScore.unwrap());
-  }
-
   function _isRegistrationAllowed(address account) private {
     require(
       !getElection().allowedToVoteOverMaxNumberOfGroups(account),
@@ -1351,30 +1062,6 @@ contract Validators is
     updateMembershipHistory(validator, group);
     updateSizeHistory(group, numMembers.sub(1));
     emit ValidatorGroupMemberAdded(group, validator);
-    return true;
-  }
-
-  /**
-   * @notice Updates a validator's BLS key.
-   * @param validator The validator whose BLS public key should be updated.
-   * @param account The address under which the validator is registered.
-   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
-   *   proof of possession. 96 bytes.
-   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
-   *   account address. 48 bytes.
-   * @return True upon success.
-   */
-  function _updateBlsPublicKey(
-    Validator storage validator,
-    address account,
-    bytes memory blsPublicKey,
-    bytes memory blsPop
-  ) private returns (bool) {
-    require(blsPublicKey.length == 96, "Wrong BLS public key length");
-    require(blsPop.length == 48, "Wrong BLS PoP length");
-    require(checkProofOfPossession(account, blsPublicKey, blsPop), "Invalid BLS PoP");
-    validator.publicKeys.bls = blsPublicKey;
-    emit ValidatorBlsPublicKeyUpdated(account, blsPublicKey);
     return true;
   }
 
@@ -1524,9 +1211,7 @@ contract Validators is
   }
 
   function _sendValidatorPaymentIfNecessary(address validator) private {
-    if (isL2()) {
-      getEpochManager().sendValidatorPayment(validator);
-    }
+    getEpochManager().sendValidatorPayment(validator);
   }
 
   function _sendValidatorGroupPaymentsIfNecessary(ValidatorGroup storage group) private {

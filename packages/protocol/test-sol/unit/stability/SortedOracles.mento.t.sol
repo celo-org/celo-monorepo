@@ -2,8 +2,10 @@
 // solhint-disable func-name-mixedcase, var-name-mixedcase, state-visibility
 // solhint-disable const-name-snakecase, max-states-count, contract-name-camelcase
 pragma solidity ^0.5.13;
+pragma experimental ABIEncoderV2;
 
-import { Test, console2 as console } from "celo-foundry/Test.sol";
+import { console2 as console } from "celo-foundry/Test.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 import { SortedLinkedListWithMedian } from "contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
 import { FixidityLib } from "contracts/common/FixidityLib.sol";
@@ -33,7 +35,7 @@ contract MockBreakerBox is IBreakerBox {
   function checkAndSetBreakers(address) external {}
 }
 
-contract SortedOraclesTest is Test {
+contract SortedOraclesTest is TestWithUtils {
   // Declare SortedOracles events for matching
   event ReportExpirySet(uint256 reportExpiry);
   event TokenReportExpirySet(address token, uint256 reportExpiry);
@@ -301,17 +303,18 @@ contract SortedOracles_RemoveOracles is SortedOraclesTest {
     assertEq(medianTimestampBefore, medianTimestampAfter);
   }
 
-  function testFail_removeOracle_whenOneReportExists_shouldNotEmitTheOracleReportedAndMedianUpdatedEvent()
-    public
-  {
-    // testFail feals impricise here.
-    // TODO: Better way of testing this case :)
-    submitNReports(1);
-    vm.expectEmit(true, true, true, true, address(sortedOracles));
-    emit OracleReportRemoved(token, oracle);
-    vm.expectEmit(true, true, true, true, address(sortedOracles));
-    emit MedianUpdated(token, 0);
+  function _performOracleRemoval() internal {
     sortedOracles.removeOracle(token, oracle, 0);
+  }
+
+  function test_removeOracle_whenOneReportExists_shouldNotEmitTheMedianUpdatedEvent() public {
+    submitNReports(1);
+    assertDoesNotEmit(_performOracleRemoval, "MedianUpdated(address,uint256)");
+  }
+
+  function test_removeOracle_whenOneReportExists_shouldNotEmitTheOracleReportedEvent() public {
+    submitNReports(1);
+    assertDoesNotEmit(_performOracleRemoval, "OracleReportRemoved(address,address)");
   }
 
   function test_removeOracle_whenOneReportExists_shouldEmitTheOracleRemovedEvent() public {

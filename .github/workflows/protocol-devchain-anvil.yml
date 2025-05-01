@@ -95,7 +95,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
         with:
-          version: 'nightly-fa0e0c2ca3ae75895dd19173a02faf88509c0608'
+          version: 'v1.0.0'
 
       - name: Install forge dependencies
         run: forge install
@@ -126,31 +126,18 @@ jobs:
       - name: 'Install packages'
         shell: bash
         run: yarn
-      
-      # Starting L1 from scratch instead of JSON state to circumvent this Anvil bug https://github.com/foundry-rs/foundry/issues/7502
-      # Install `lsof` dependency, because it's not readily available on CI, but is required by 
-      # `create_and_migrate_anvil_l2_devchain.sh`, because it uses `stop_anvil.sh` to kill 
-      # existing anvil servers.
-      - name: Generate L1 migrations and run migration tests against L1 devchain
+
+      - name: Generate L2 migration and run migration tests
         if: success() || failure()
         run: |
-          sudo apt-get update
-          sudo apt-get install -y lsof
-
           source ./scripts/foundry/constants.sh
 
-          echo "Starting L1 from scratch to circumvent Anvil bug"
-          source ./scripts/foundry/create_and_migrate_anvil_devchain.sh
+          echo "Starting L2 from scratch to circumvent Anvil bug"
+          ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
 
-          FOUNDRY_PROFILE=devchain forge test -vvv \
+          FOUNDRY_PROFILE=devchain forge test \
           --match-path "test-sol/devchain/migration/*" \
           --fork-url $ANVIL_RPC_URL
-
-          ./scripts/foundry/stop_anvil.sh
-          
-      - name: Generate L2 migration
-        if: success() || failure()
-        run: ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
 
       - name: Sanitize ref name
         id: sanitize-ref-name
