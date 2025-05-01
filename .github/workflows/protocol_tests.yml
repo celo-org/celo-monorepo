@@ -132,7 +132,7 @@ jobs:
 
       - name: Generate migrations and run devchain
         if: success() || failure()
-        run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
+        run: ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
       
       - name: Run migration tests against local anvil devchain
         run: |
