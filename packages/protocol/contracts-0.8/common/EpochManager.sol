@@ -679,7 +679,6 @@ contract EpochManager is
     EpochProcessState storage _epochProcessing = epochProcessing;
 
     for (uint i = 0; i < electedAccounts.length; i++) {
-      address group = validators.getMembershipInLastEpoch(electedAccounts[i]);
       uint256 validatorScore = scoreReader.getValidatorScore(electedAccounts[i]);
       uint256 validatorReward = validators.computeEpochReward(
         electedAccounts[i],
