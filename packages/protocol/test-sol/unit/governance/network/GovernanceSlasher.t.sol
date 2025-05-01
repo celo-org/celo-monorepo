@@ -2,7 +2,6 @@
 pragma solidity ^0.5.13;
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-import "@test-sol/utils/WhenL2.sol";
 
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/FixidityLib.sol";
@@ -13,8 +12,7 @@ import "@celo-contracts/governance/GovernanceSlasher.sol";
 
 contract GovernanceSlasherTest is TestWithUtils {
   event SlashingApproved(address indexed account, uint256 amount);
-  event GovernanceSlashPerformed(address indexed account, uint256 amount);
-  event GovernanceSlashL2Performed(address indexed account, address indexed group, uint256 amount);
+  event GovernanceSlashPerformed(address indexed account, address indexed group, uint256 amount);
   event HavelSlashingMultiplierHalved(address validator);
   event ValidatorDeaffiliatedCalled(address validator);
 
@@ -34,6 +32,13 @@ contract GovernanceSlasherTest is TestWithUtils {
 
   function setUp() public {
     super.setUp();
+    preSetup();
+    governanceSlasher.initialize(REGISTRY_ADDRESS);
+    mockLockedGold.setAccountTotalLockedGold(validator, 5000);
+    whenL2WithEpochManagerInitialization();
+  }
+
+  function preSetup() public {
     owner = address(this);
     nonOwner = actor("nonOwner");
     validator = actor("validator");
@@ -46,15 +51,16 @@ contract GovernanceSlasherTest is TestWithUtils {
 
     registry.setAddressFor("Accounts", address(accounts));
     registry.setAddressFor("LockedGold", address(mockLockedGold));
-
-    governanceSlasher.initialize(REGISTRY_ADDRESS);
-    mockLockedGold.setAccountTotalLockedGold(validator, 5000);
   }
 }
 
-contract GovernanceSlasherTest_L2 is GovernanceSlasherTest, WhenL2 {}
-
 contract GovernanceSlasherTest_initialize is GovernanceSlasherTest {
+  function setUp() public {
+    super.setUp();
+    preSetup();
+    governanceSlasher.initialize(REGISTRY_ADDRESS);
+    mockLockedGold.setAccountTotalLockedGold(validator, 5000);
+  }
   function test_shouldHaveSetOwner() public {
     assertEq(governanceSlasher.owner(), owner);
   }
@@ -83,7 +89,7 @@ contract GovernanceSlasherTest_approveSlashing is GovernanceSlasherTest {
     governanceSlasher.approveSlashing(slashedAddress, 1000);
   }
 
-  function test_EmitsSlashingApprovedEvent() public {
+  function test_Emits_SlashingApprovedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit SlashingApproved(slashedAddress, 1000);
     governanceSlasher.approveSlashing(slashedAddress, 1000);
@@ -96,61 +102,7 @@ contract GovernanceSlasherTest_approveSlashing is GovernanceSlasherTest {
   }
 }
 
-contract GovernanceSlasherTest_approveSlashing_L2 is
-  GovernanceSlasherTest_L2,
-  GovernanceSlasherTest_approveSlashing
-{}
-
-contract GovernanceSlasherTest_slash is GovernanceSlasherTest {
-  function test_ShouldFailIfThereIsNothingToSlash() public {
-    vm.expectRevert("No penalty given by governance");
-    governanceSlasher.slash(validator, lessers, greaters, indices);
-  }
-
-  function test_ShouldDecrementCelo() public {
-    governanceSlasher.approveSlashing(validator, 1000);
-    governanceSlasher.slash(validator, lessers, greaters, indices);
-    assertEq(mockLockedGold.accountTotalLockedGold(validator), 4000);
-  }
-
-  function test_ShouldHaveSetTheApprovedSlashingToZero() public {
-    governanceSlasher.approveSlashing(validator, 1000);
-    governanceSlasher.slash(validator, lessers, greaters, indices);
-    assertEq(governanceSlasher.getApprovedSlashing(validator), 0);
-  }
-
-  function test_EmitsGovernanceSlashPerformedEvent() public {
-    governanceSlasher.approveSlashing(validator, 1000);
-    vm.expectEmit(true, true, true, true);
-    emit GovernanceSlashPerformed(validator, 1000);
-    governanceSlasher.slash(validator, lessers, greaters, indices);
-  }
-}
-
-contract GovernanceSlasherTest_slash_L2 is GovernanceSlasherTest_L2 {
-  function test_Reverts_WhenL2() public {
-    governanceSlasher.approveSlashing(validator, 1000);
-    vm.expectRevert("This method is no longer supported in L2.");
-    governanceSlasher.slash(validator, lessers, greaters, indices);
-  }
-}
-
-contract GovernanceSlasherTest_slashL2_WhenL1 is GovernanceSlasherTest {
-  function test_Reverts() public {
-    governanceSlasher.approveSlashing(validator, 1000);
-    vm.expectRevert("This method is not supported in L1.");
-    governanceSlasher.slashL2(
-      validator,
-      validator,
-      new address[](0),
-      new address[](0),
-      new uint256[](0)
-    );
-  }
-}
-
-// should work just like the deprecated version
-contract GovernanceSlasherTest_slashL2_WhenNotGroup_L2 is GovernanceSlasherTest_L2 {
+contract GovernanceSlasherTest_slash_WhenNotGroup is GovernanceSlasherTest {
   address group = address(0);
 
   // only onwer or multisig can call
@@ -167,16 +119,23 @@ contract GovernanceSlasherTest_slashL2_WhenNotGroup_L2 is GovernanceSlasherTest_
     assertEq(governanceSlasher.getApprovedSlashing(validator), 0);
   }
 
-  function test_EmitsGovernanceSlashPerformedEvent() public {
+  function test_Emits_GovernanceSlashPerformedEventWhenCallingSlashL2() public {
     governanceSlasher.approveSlashing(validator, 1000);
     vm.expectEmit(true, true, true, true);
-    emit GovernanceSlashL2Performed(validator, group, 1000);
+    emit GovernanceSlashPerformed(validator, group, 1000);
     governanceSlasher.slashL2(validator, group, lessers, greaters, indices);
+  }
+
+  function test_Emits_GovernanceSlashPerformedEventWhenCallingSlash() public {
+    governanceSlasher.approveSlashing(validator, 1000);
+    vm.expectEmit(true, true, true, true);
+    emit GovernanceSlashPerformed(validator, group, 1000);
+    governanceSlasher.slash(validator, group, lessers, greaters, indices);
   }
 }
 
 // should work just like the deprecated version
-contract GovernanceSlasherTest_slashL2_WhenGroup_L2 is GovernanceSlasherTest_L2 {
+contract GovernanceSlasherTest_slash_WhenGroup is GovernanceSlasherTest {
   address group;
   MockValidators validators;
 
@@ -212,11 +171,18 @@ contract GovernanceSlasherTest_slashL2_WhenGroup_L2 is GovernanceSlasherTest_L2 
     assertEq(governanceSlasher.getApprovedSlashing(validator), 0);
   }
 
-  function test_EmitsGovernanceSlashPerformedEvent() public {
+  function test_Emits_GovernanceSlashPerformedEvent() public {
     governanceSlasher.approveSlashing(validator, 1000);
     vm.expectEmit(true, true, true, true);
-    emit GovernanceSlashL2Performed(validator, group, 1000);
+    emit GovernanceSlashPerformed(validator, group, 1000);
     governanceSlasher.slashL2(validator, group, lessers, greaters, indices);
+  }
+
+  function test_Emits_GovernanceSlashPerformedEventWhenCallingSlash() public {
+    governanceSlasher.approveSlashing(validator, 1000);
+    vm.expectEmit(true, true, true, true);
+    emit GovernanceSlashPerformed(validator, group, 1000);
+    governanceSlasher.slash(validator, group, lessers, greaters, indices);
   }
 
   function test_validatorDeAffiliatedAndScoreReduced() public {
@@ -255,8 +221,3 @@ contract GovernanceSlasherTest_setSlasherExecuter is GovernanceSlasherTest {
     assertEq(governanceSlasher.getSlasherExecuter(), nonOwner, "Score Manager not set");
   }
 }
-
-contract GovernanceSlasherTest_setSlasherExecuter_L2 is
-  GovernanceSlasherTest_L2,
-  GovernanceSlasherTest_setSlasherExecuter
-{}

@@ -6,7 +6,6 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IElection.sol";
 import "./interfaces/IValidators.sol";
-import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
@@ -27,7 +26,7 @@ contract Election is
   ReentrancyGuard,
   Initializable,
   UsingRegistry,
-  CalledByVm,
+  PrecompilesOverride,
   Blockable,
   Permissioned
 {

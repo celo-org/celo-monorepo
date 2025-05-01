@@ -8,7 +8,6 @@ import "solidity-bytes-utils-8/contracts/BytesLib.sol";
 
 import "../../contracts/governance/interfaces/IValidators.sol";
 
-import "../../contracts/common/CalledByVm.sol";
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
@@ -29,7 +28,7 @@ contract Validators is
   ReentrancyGuard,
   Initializable,
   UsingRegistry,
-  CalledByVm
+  PrecompilesOverride
 {
   using FixidityLib for FixidityLib.Fraction;
   using AddressLinkedList for LinkedList.List;

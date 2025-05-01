@@ -613,14 +613,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       json.parseRaw(".validators.commissionUpdateDelay"),
       (uint256)
     );
-    uint256 downtimeGracePeriod = abi.decode(
-      json.parseRaw(".validators.downtimeGracePeriod"),
-      (uint256)
-    );
 
     InitParamsTunnel memory initParamsTunnel = InitParamsTunnel({
-      commissionUpdateDelay: commissionUpdateDelay,
-      deprecated_downtimeGracePeriod: downtimeGracePeriod
+      commissionUpdateDelay: commissionUpdateDelay
     });
 
     deployProxiedContract(
