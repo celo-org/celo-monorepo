@@ -194,10 +194,6 @@ contract AccountsTest is TestWithUtils {
 }
 
 contract AccountsTest_createAccount is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldCreateTheAccount() public {
     assertEq(accounts.isAccount(address(this)), false);
     accounts.createAccount();
@@ -212,10 +208,6 @@ contract AccountsTest_createAccount is AccountsTest {
 }
 
 contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldSetDataEncryptionKey() public {
     accounts.setAccountDataEncryptionKey(dataEncryptionKey);
     assertEq(accounts.getDataEncryptionKey(address(this)), dataEncryptionKey);
@@ -247,10 +239,6 @@ contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
 }
 
 contract AccountsTest_setAccount is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldSetTheNameDataEncryptionKeyAndWalletAddress_WhenTheAccountHasBeenCreated()
     public
   {
@@ -333,10 +321,6 @@ contract AccountsTest_setAccount is AccountsTest {
 }
 
 contract AccountsTest_setWalletAddress is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldRevert_WhenAccountHasNotBeenCreated() public {
     vm.expectRevert("Unknown account");
     accounts.setWalletAddress(address(this), 0, 0x0, 0x0);
@@ -383,10 +367,6 @@ contract AccountsTest_setWalletAddress is AccountsTest {
 }
 
 contract AccountsTest_setMetadataURL is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldRevert_WhenAccountHasNotBeenCreated() public {
     vm.expectRevert("Unknown account");
     accounts.setMetadataURL(metadataURL);
@@ -407,10 +387,6 @@ contract AccountsTest_setMetadataURL is AccountsTest {
 }
 
 contract AccountsTest_batchGetMetadataURL is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function parseSolidityStringArray(
     uint256[] memory stringLengths,
     bytes memory data
@@ -457,10 +433,6 @@ contract AccountsTest_batchGetMetadataURL is AccountsTest {
 }
 
 contract AccountsTest_addStorageRoot is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldRevert_WhenAccountHasNotBeenCreated() public {
     vm.expectRevert("Unknown account");
     accounts.addStorageRoot(storageRoot);
@@ -503,10 +475,6 @@ contract AccountsTest_addStorageRoot is AccountsTest {
 }
 
 contract AccountsTest_removeStorageRoot is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldRevert_WhenAccountHasNotBeenCreated() public {
     vm.expectRevert("Unknown account");
     accounts.removeStorageRoot(0);
@@ -583,10 +551,6 @@ contract AccountsTest_setPaymentDelegation is AccountsTest {
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
   uint256 badFraction = FixidityLib.newFixedFraction(12, 10).unwrap();
 
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldNotBeCallableByNonAccount() public {
     vm.expectRevert("Must first register address with Account.createAccount");
     accounts.setPaymentDelegation((beneficiary), fraction);
@@ -651,10 +615,6 @@ contract AccountsTest_deletePaymentDelegation is AccountsTest {
 }
 
 contract AccountsTest_setName is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldNotBeCallableByNonAccount() public {
     vm.expectRevert("Register with createAccount to set account name");
     accounts.setName(name);

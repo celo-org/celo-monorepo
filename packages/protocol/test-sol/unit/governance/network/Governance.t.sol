@@ -2975,7 +2975,7 @@ contract GovernanceTest_execute is GovernanceTest {
   }
 }
 
-contract GovernanceTest_approveHotfi is GovernanceTest {
+contract GovernanceTest_approveHotfix is GovernanceTest {
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
   event HotfixApproved(bytes32 indexed hash, address approver);
   function setUp() public {
