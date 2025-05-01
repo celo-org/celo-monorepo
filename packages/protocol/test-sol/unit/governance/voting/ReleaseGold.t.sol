@@ -1106,38 +1106,6 @@ contract ReleaseGoldTest_AuthorizeWithPublicKeys is ReleaseGoldTest_AuthorizeWit
     assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
     assertEq(accounts.validatorSignerToAccount(authorized), address(releaseGold));
   }
-
-  function test_ShouldSetTheAuthorizedKeys_WhenUsingBLSKeys() public {
-    bytes32 newBlsPublicKeyPart1 = _randomBytes32();
-    bytes32 newBlsPublicKeyPart2 = _randomBytes32();
-    bytes32 newBlsPublicKeyPart3 = _randomBytes32();
-    bytes memory newBlsPublicKey = abi.encodePacked(
-      newBlsPublicKeyPart1,
-      newBlsPublicKeyPart2,
-      newBlsPublicKeyPart3
-    );
-    newBlsPublicKey = _truncateBytes(newBlsPublicKey, 96);
-
-    bytes32 newBlsPoPPart1 = _randomBytes32();
-    bytes32 newBlsPoPPart2 = _randomBytes32();
-    bytes memory newBlsPoP = abi.encodePacked(newBlsPoPPart1, newBlsPoPPart2);
-    newBlsPoP = _truncateBytes(newBlsPoP, 48);
-
-    vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSignerWithKeys(
-      address(uint160(authorized)),
-      v,
-      r,
-      s,
-      ecdsaPublicKey,
-      newBlsPublicKey,
-      newBlsPoP
-    );
-
-    assertEq(accounts.authorizedBy(authorized), address(releaseGold));
-    assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
-    assertEq(accounts.validatorSignerToAccount(authorized), address(releaseGold));
-  }
 }
 
 contract ReleaseGoldTest_AuthorizeWithPublicKeys_L2 is
@@ -1157,36 +1125,6 @@ contract ReleaseGoldTest_AuthorizeWithPublicKeys_L2 is
     assertEq(accounts.authorizedBy(authorized), address(releaseGold));
     assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
     assertEq(accounts.validatorSignerToAccount(authorized), address(releaseGold));
-  }
-
-  function test_Reverts_WhenAuthorizeValidatorSignerWithKeys() public {
-    bytes32 newBlsPublicKeyPart1 = _randomBytes32();
-    bytes32 newBlsPublicKeyPart2 = _randomBytes32();
-    bytes32 newBlsPublicKeyPart3 = _randomBytes32();
-    bytes memory newBlsPublicKey = abi.encodePacked(
-      newBlsPublicKeyPart1,
-      newBlsPublicKeyPart2,
-      newBlsPublicKeyPart3
-    );
-    newBlsPublicKey = _truncateBytes(newBlsPublicKey, 96);
-
-    bytes32 newBlsPoPPart1 = _randomBytes32();
-    bytes32 newBlsPoPPart2 = _randomBytes32();
-    bytes memory newBlsPoP = abi.encodePacked(newBlsPoPPart1, newBlsPoPPart2);
-    newBlsPoP = _truncateBytes(newBlsPoP, 48);
-
-    vm.expectRevert("This method is no longer supported in L2.");
-
-    vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSignerWithKeys(
-      address(uint160(authorized)),
-      v,
-      r,
-      s,
-      ecdsaPublicKey,
-      newBlsPublicKey,
-      newBlsPoP
-    );
   }
 }
 
