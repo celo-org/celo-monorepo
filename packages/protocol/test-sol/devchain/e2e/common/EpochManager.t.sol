@@ -48,39 +48,6 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
     epochDuration = epochManagerContract.epochDuration();
 
     vm.deal(address(celoUnreleasedTreasuryContract), L2_INITIAL_STASH_BALANCE); // 80% of the total supply to the treasury - whis will be yet distributed
-    vm.prank(address(0));
-    celoTokenContract.mint(address(celoUnreleasedTreasuryContract), L2_INITIAL_STASH_BALANCE);
-  }
-
-  function activateValidators() public {
-    uint256[] memory valKeys = new uint256[](9);
-    valKeys[0] = 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d;
-    valKeys[1] = 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a;
-    valKeys[2] = 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6;
-    valKeys[3] = 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a;
-    valKeys[4] = 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba;
-    valKeys[5] = 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e;
-    valKeys[6] = 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356;
-    valKeys[7] = 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97;
-    valKeys[8] = 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6;
-
-    for (uint256 i = 0; i < valKeys.length; i++) {
-      address account = vm.addr(valKeys[i]);
-      addressToPrivateKeys[account] = valKeys[i];
-    }
-
-    address[] memory registeredValidators = getValidators().getRegisteredValidators();
-    travelNEpochL1(4);
-
-    for (uint256 i = 0; i < registeredValidators.length; i++) {
-      (, , address validatorGroup, , ) = getValidators().getValidator(registeredValidators[i]);
-      if (getElection().getPendingVotesForGroup(validatorGroup) == 0) {
-        continue;
-      }
-      vm.startPrank(validatorGroup);
-      election.activate(validatorGroup);
-      vm.stopPrank();
-    }
   }
 
   function authorizeVoteSigner(uint256 signerPk, address account) internal {
@@ -318,34 +285,16 @@ contract E2E_EpochManager_InitializeSystem is E2E_EpochManager {
     vm.expectRevert("msg.sender is not Enabler");
     epochManagerContract.initializeSystem(1, 1, firstElected);
   }
-
-  function test_ShouldInitializeSystem() public {
+  function test_shouldRevert_WhenAlreadyInitialized() public {
     vm.prank(epochManagerEnablerAddress);
-    epochManagerContract.initializeSystem(42, 43, firstElected);
-
-    assertEq(epochManagerContract.firstKnownEpoch(), 42);
-    assertEq(epochManagerContract.getCurrentEpochNumber(), 42);
-
-    assertTrue(epochManagerContract.systemAlreadyInitialized());
+    vm.expectRevert("Epoch system already initialized");
+    epochManagerContract.initializeSystem(1, 1, firstElected);
   }
 }
 contract E2E_EpochManager_GetCurrentEpoch is E2E_EpochManager {
-  function setUp() public override {
-    super.setUp();
-    whenL2();
-  }
-
-  function test_Revert_WhenSystemNotInitialized() public {
-    vm.expectRevert("Epoch system not initialized");
-    epochManagerContract.getCurrentEpoch();
-  }
-
   function test_ReturnExpectedValues() public {
-    vm.prank(epochManagerEnablerAddress);
-    epochManagerContract.initializeSystem(42, 43, firstElected);
-
-    assertEq(epochManagerContract.firstKnownEpoch(), 42);
-    assertEq(epochManagerContract.getCurrentEpochNumber(), 42);
+    assertEq(epochManagerContract.firstKnownEpoch(), 4);
+    assertEq(epochManagerContract.getCurrentEpochNumber(), 4);
 
     (
       uint256 firstBlock,
@@ -353,7 +302,7 @@ contract E2E_EpochManager_GetCurrentEpoch is E2E_EpochManager {
       uint256 startTimestamp,
       uint256 rewardsBlock
     ) = epochManagerContract.getCurrentEpoch();
-    assertEq(firstBlock, 43);
+    assertEq(firstBlock, 300);
     assertEq(lastBlock, 0);
     assertEq(startTimestamp, block.timestamp);
     assertEq(rewardsBlock, 0);
@@ -363,8 +312,6 @@ contract E2E_EpochManager_GetCurrentEpoch is E2E_EpochManager {
 contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
   function setUp() public override {
     super.setUp();
-    activateValidators();
-    whenL2();
 
     validatorsArray = getValidators().getRegisteredValidators();
     groups = getValidators().getRegisteredValidatorGroups();
@@ -384,14 +331,11 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
     scoreManager.setValidatorScore(validatorsArray[5], validatorScore[5]);
 
     vm.stopPrank();
-
-    vm.prank(epochManagerEnablerAddress);
-    epochManagerContract.initializeSystem(1, 1, firstElected);
   }
 
   function test_shouldHaveInitialValues() public {
-    assertEq(epochManagerContract.firstKnownEpoch(), 1);
-    assertEq(epochManagerContract.getCurrentEpochNumber(), 1);
+    assertEq(epochManagerContract.firstKnownEpoch(), 4);
+    assertEq(epochManagerContract.getCurrentEpochNumber(), 4);
 
     // get getEpochProcessingState
     (
@@ -435,11 +379,6 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
   function setUp() public override {
     super.setUp();
-    activateValidators();
-    whenL2();
-
-    vm.prank(epochManagerEnablerAddress);
-    epochManagerContract.initializeSystem(1, 1, firstElected);
 
     validatorsArray = getValidators().getRegisteredValidators();
     groups = getValidators().getRegisteredValidatorGroups();
@@ -581,12 +520,6 @@ contract E2E_GasTest_Setup is E2E_EpochManager {
   EnumerableSet.AddressSet internal originalyElected;
 
   function setUpHelper(uint256 validatorGroupCount, uint256 validatorPerGroupCount) internal {
-    activateValidators();
-    whenL2();
-
-    vm.prank(epochManagerEnablerAddress);
-    epochManagerContract.initializeSystem(1, 1, firstElected);
-
     validatorsArray = getValidators().getRegisteredValidators();
     groups = getValidators().getRegisteredValidatorGroups();
 
@@ -662,8 +595,6 @@ contract E2E_GasTest_Setup is E2E_EpochManager {
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
     epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
 
-    activateValidators();
-
     timeTravel(epochDuration + 1);
     epochManagerContract.startNextEpochProcess();
 
@@ -733,12 +664,6 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
 
   function setUp() public override {
     super.setUp();
-
-    activateValidators();
-    whenL2();
-
-    vm.prank(epochManagerEnablerAddress);
-    epochManagerContract.initializeSystem(1, 1, firstElected);
 
     validatorsArray = getValidators().getRegisteredValidators();
     groups = getValidators().getRegisteredValidatorGroups();
@@ -826,8 +751,6 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
     for (uint256 i = 0; i < groups.length; i++) {
       epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
     }
-
-    activateValidators();
 
     timeTravel(epochDuration + 1);
     epochManagerContract.startNextEpochProcess();
