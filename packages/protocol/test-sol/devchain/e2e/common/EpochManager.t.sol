@@ -922,14 +922,6 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
     for (uint256 i = 0; i < groups.length; i++) {
       epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
     }
-
-    timeTravel(epochDuration + 1);
-    epochManagerContract.startNextEpochProcess();
-
-    groups = getCurrentlyElectedGroups();
-
-    timeTravel(epochDuration / 2);
-    blockTravel(100);
   }
 
   /**
