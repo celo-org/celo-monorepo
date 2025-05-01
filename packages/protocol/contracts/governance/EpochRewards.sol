@@ -8,7 +8,6 @@ import "../common/FixidityLib.sol";
 import "../common/Freezable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
-import "../common/PrecompilesOverride.sol";
 import "../common/Permissioned.sol";
 import "../common/interfaces/ICeloToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
@@ -22,7 +21,6 @@ contract EpochRewards is
   Ownable,
   Initializable,
   UsingRegistry,
-  PrecompilesOverride,
   Freezable,
   Permissioned
 {

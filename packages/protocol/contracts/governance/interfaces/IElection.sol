@@ -60,7 +60,5 @@ interface IElection {
   function getCurrentValidatorSigners() external view returns (address[] memory);
   function canReceiveVotes(address, uint256) external view returns (bool);
   function hasActivatablePendingVotes(address, address) external view returns (bool);
-  function validatorSignerAddressFromCurrentSet(uint256 index) external view returns (address);
-  function numberValidatorsInCurrentSet() external view returns (uint256);
   function owner() external view returns (address);
 }

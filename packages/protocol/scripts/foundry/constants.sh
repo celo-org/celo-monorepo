@@ -20,6 +20,7 @@ export BROADCAST="--broadcast" # Broadcasts the transactions. Enable: "--broadca
 export SKIP_SIMULATION="" # Skips on-chain simulation. Enable: "--skip-simulation" / Disable: ""
 export NON_INTERACTIVE="--non-interactive" # Remove interactive prompts which appear if the contract is near the EIP-170 size limit.
 export VERBOSITY_LEVEL="-vvv" # Pass multiple times to increase the verbosity (e.g. -v, -vv, -vvv).
+export TIMEOUT="30000" # Pass multiple times to increase the verbosity (e.g. -v, -vv, -vvv).
 export REGISTRY_OWNER_ADDRESS=$FROM_ACCOUNT_NO_ZERO
 
 # Foundry directories and file names
