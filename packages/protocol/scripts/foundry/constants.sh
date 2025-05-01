@@ -19,6 +19,7 @@ export MIGRATION_L2_TARGET_CONTRACT="MigrationL2" #  The name of the contract yo
 export BROADCAST="--broadcast" # Broadcasts the transactions. Enable: "--broadcast" / Disable: ""
 export SKIP_SIMULATION="" # Skips on-chain simulation. Enable: "--skip-simulation" / Disable: ""
 export NON_INTERACTIVE="--non-interactive" # Remove interactive prompts which appear if the contract is near the EIP-170 size limit.
+export TIMEOUT=30000 # set a timeout for the avil node
 export VERBOSITY_LEVEL="-vvv" # Pass multiple times to increase the verbosity (e.g. -v, -vv, -vvv).
 export REGISTRY_OWNER_ADDRESS=$FROM_ACCOUNT_NO_ZERO
 
