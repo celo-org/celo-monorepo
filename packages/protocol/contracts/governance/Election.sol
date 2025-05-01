@@ -779,10 +779,11 @@ contract Election is
    * @return List of current validator signers.
    */
   function getCurrentValidatorSigners() public view returns (address[] memory) {
-    uint256 n = getEpochManager().numberOfElectedInCurrentSet();
+    IEpochManager epochManager = getEpochManager();
+    uint256 n = epochManager.numberOfElectedInCurrentSet();
     address[] memory res = new address[](n);
     for (uint256 i = 0; i < n; i = i.add(1)) {
-      res[i] = getEpochManager().getElectedSignerByIndex(i);
+      res[i] = epochManager.getElectedSignerByIndex(i);
     }
     return res;
   }
