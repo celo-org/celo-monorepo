@@ -159,10 +159,10 @@ forge script \
   --target-contract $MIGRATION_L2_TARGET_CONTRACT \
   --sender $FROM_ACCOUNT \
   --unlocked \
-  $VERBOSITY_LEVEL \
   $BROADCAST \
   $SKIP_SIMULATION \
   $NON_INTERACTIVE \
+  --timeout $TIMEOUT \
   --rpc-url $ANVIL_RPC_URL || {
   echo "Migration script failed"
   exit 1

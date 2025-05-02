@@ -8,6 +8,8 @@ import "@test-sol/utils/ECDSAHelper08.sol";
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
 import { console } from "forge-std-8/console.sol";
 
+import { EpochManagerEnabler } from "@celo-contracts-8/common/EpochManagerEnabler.sol";
+
 contract E2E_EpochManager is ECDSAHelper08, Devchain {
   using EnumerableSet for EnumerableSet.AddressSet;
 
@@ -141,7 +143,11 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
 
   function assertGroupWithVotes(GroupWithVotes[] memory groupWithVotes) internal {
     for (uint256 i = 0; i < groupWithVotes.length; i++) {
-      assertEq(election.getTotalVotesForGroup(groupWithVotes[i].group), groupWithVotes[i].votes);
+      assertEq(
+        election.getTotalVotesForGroup(groupWithVotes[i].group),
+        groupWithVotes[i].votes,
+        "assertGroupWithVotes"
+      );
     }
   }
 
@@ -268,7 +274,7 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
     address[] memory currentlyElected = epochManagerContract.getElectedAccounts();
 
     for (uint256 i = 0; i < currentlyElected.length; i++) {
-      (, , address group, , ) = validators.getValidator(currentlyElected[i]);
+      address group = validators.getMembershipInLastEpoch(currentlyElected[i]);
       electedGroupsHelper.add(group);
     }
     return electedGroupsHelper.values();
@@ -504,6 +510,171 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     assertEq(totalRewardsCarbonFund, 0, "totalRewardsCarbonFund");
 
     assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length - 1);
+  }
+
+  function test_shouldFinishNextEpochProcessing_WhenValidatorDeaffiliatesBeforeStart() public {
+    address[] memory lessers;
+    address[] memory greaters;
+    GroupWithVotes[] memory groupWithVotes;
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+
+    uint256 currentEpoch = epochManagerContract.getCurrentEpochNumber();
+    address[] memory currentlyElected = epochManagerContract.getElectedAccounts();
+    for (uint256 i = 0; i < currentlyElected.length; i++) {
+      originalyElected.add(currentlyElected[i]);
+    }
+
+    // wait some time before finishing
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
+
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+
+    assertEq(currentEpoch + 1, epochManagerContract.getCurrentEpochNumber());
+
+    for (uint256 i = 0; i < currentlyElected.length; i++) {
+      assertEq(originalyElected.contains(currentlyElected[i]), true);
+    }
+
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
+
+    // wait some time before finishing
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
+
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
+
+    assertEq(currentEpoch + 2, epochManagerContract.getCurrentEpochNumber());
+
+    address[] memory newlyElected2 = epochManagerContract.getElectedAccounts();
+
+    for (uint256 i = 0; i < currentlyElected.length; i++) {
+      assertEq(originalyElected.contains(newlyElected2[i]), true);
+    }
+
+    // add new validator group and validator
+    (address newValidatorGroup, address newValidator) = registerNewValidatorGroupWithValidator(
+      0,
+      1
+    );
+
+    vm.prank(currentlyElected[0]);
+    validators.deaffiliate();
+
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
+
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
+
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
+
+    groups.push(newValidatorGroup);
+    validatorsArray.push(newValidator);
+
+    assertEq(
+      epochManagerContract.getElectedAccounts().length,
+      validators.getRegisteredValidators().length - 1 // -1 because the validator deaffiliated
+    );
+    assertEq(groups.length, validators.getRegisteredValidatorGroups().length);
+
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
+
+    assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length - 1); // -1 because the validator deaffiliated
+  }
+
+  function test_shouldFinishNextEpochProcessing_WhenValidatorDeaffiliatesBeforeFinish() public {
+    address[] memory lessers;
+    address[] memory greaters;
+    GroupWithVotes[] memory groupWithVotes;
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+
+    uint256 currentEpoch = epochManagerContract.getCurrentEpochNumber();
+    address[] memory currentlyElected = epochManagerContract.getElectedAccounts();
+    for (uint256 i = 0; i < currentlyElected.length; i++) {
+      originalyElected.add(currentlyElected[i]);
+    }
+
+    // wait some time before finishing
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
+
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+
+    assertEq(currentEpoch + 1, epochManagerContract.getCurrentEpochNumber());
+
+    for (uint256 i = 0; i < currentlyElected.length; i++) {
+      assertEq(originalyElected.contains(currentlyElected[i]), true);
+    }
+
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
+
+    // wait some time before finishing
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
+
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
+
+    assertEq(currentEpoch + 2, epochManagerContract.getCurrentEpochNumber());
+
+    address[] memory newlyElected2 = epochManagerContract.getElectedAccounts();
+
+    for (uint256 i = 0; i < currentlyElected.length; i++) {
+      assertEq(originalyElected.contains(newlyElected2[i]), true);
+    }
+
+    // add new validator group and validator
+    (address newValidatorGroup, address newValidator) = registerNewValidatorGroupWithValidator(
+      0,
+      1
+    );
+
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
+
+    vm.prank(currentlyElected[0]);
+    validators.deaffiliate();
+
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
+
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
+
+    groups.push(newValidatorGroup);
+    validatorsArray.push(newValidator);
+
+    assertEq(
+      epochManagerContract.getElectedAccounts().length,
+      validators.getRegisteredValidators().length - 1, // -1 because the validator deaffiliated
+      "getElectedAccounts != getRegisteredValidators"
+    );
+    assertEq(
+      groups.length,
+      validators.getRegisteredValidatorGroups().length,
+      "groups != registeredValidatorGroups"
+    );
+
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
+
+    assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length - 1); // -1 because the validator deaffiliated
   }
 
   function clearElectedGroupsHelper() internal {
@@ -751,14 +922,6 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
     for (uint256 i = 0; i < groups.length; i++) {
       epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
     }
-
-    timeTravel(epochDuration + 1);
-    epochManagerContract.startNextEpochProcess();
-
-    groups = getCurrentlyElectedGroups();
-
-    timeTravel(epochDuration / 2);
-    blockTravel(100);
   }
 
   /**
@@ -768,6 +931,73 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
     FinishNextEpochProcess is called twice, first time with going from 6 -> 110 validators which consumes approx. 6M gas and the second time with going from 110 -> 110 validators which consumes approx. 19M gas. 
      */
   function test_shouldFinishNextEpochProcessing_GasTest_Split() public {
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
+
+    groups = getCurrentlyElectedGroups();
+
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
+
+    address[] memory lessers;
+    address[] memory greaters;
+    GroupWithVotes[] memory groupWithVotes;
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManagerContract.setToProcessGroups();
+
+    for (uint256 i = 0; i < groups.length; i++) {
+      uint256 gasLeftBefore1 = gasleft();
+      epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
+      uint256 gasLeftAfter1 = gasleft();
+      console.log("processGroup gas used: ", gasLeftBefore1 - gasLeftAfter1);
+    }
+  }
+
+  function test_shouldFinishNextEpochProcessing_GasTest_Split_DeaffiliateBeforeStart() public {
+    timeTravel(epochDuration + 1);
+
+    address[] memory currentlyElected = epochManagerContract.getElectedAccounts();
+
+    vm.prank(currentlyElected[0]);
+    validators.deaffiliate();
+
+    epochManagerContract.startNextEpochProcess();
+
+    groups = getCurrentlyElectedGroups();
+
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
+
+    address[] memory lessers;
+    address[] memory greaters;
+    GroupWithVotes[] memory groupWithVotes;
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManagerContract.setToProcessGroups();
+
+    console.log("3");
+    for (uint256 i = 0; i < groups.length; i++) {
+      uint256 gasLeftBefore1 = gasleft();
+      epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
+      uint256 gasLeftAfter1 = gasleft();
+      console.log("processGroup gas used: ", gasLeftBefore1 - gasLeftAfter1);
+    }
+  }
+
+  function test_shouldFinishNextEpochProcessing_GasTest_Split_DeaffiliateBeforeFinish() public {
+    timeTravel(epochDuration + 1);
+
+    address[] memory currentlyElected = epochManagerContract.getElectedAccounts();
+
+    epochManagerContract.startNextEpochProcess();
+
+    vm.prank(currentlyElected[0]);
+    validators.deaffiliate();
+
+    groups = getCurrentlyElectedGroups();
+
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
+
     address[] memory lessers;
     address[] memory greaters;
     GroupWithVotes[] memory groupWithVotes;
