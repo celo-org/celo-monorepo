@@ -12,9 +12,10 @@ contract RandomTest_ is TestWithUtils {
   event RandomnessBlockRetentionWindowSet(uint256 value);
 
   function setUp() public {
+    super.setUp();
     random = new RandomTest();
     random.initialize(256);
-    _whenL2();
+    whenL2WithEpochManagerInitialization();
   }
 
   function commitmentFor(uint256 value) internal pure returns (bytes32) {

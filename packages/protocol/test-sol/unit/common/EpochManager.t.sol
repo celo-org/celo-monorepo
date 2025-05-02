@@ -16,7 +16,6 @@ import "@celo-contracts-8/stability/test/MockStableToken.sol";
 
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
-import { WhenL2, WhenL2NoInitialization } from "@test-sol/utils/WhenL2-08.sol";
 
 contract EpochManagerTest is TestWithUtils08 {
   EpochManager_WithMocks epochManagerContract;

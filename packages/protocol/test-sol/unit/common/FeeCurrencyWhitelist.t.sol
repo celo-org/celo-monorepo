@@ -33,32 +33,28 @@ contract FeeCurrencyWhitelistInitialize is FeeCurrencyWhitelistTest {
 }
 
 contract FeeCurrencyWhitelistAddToken is FeeCurrencyWhitelistTest {
-  function test_Reverts_WhenCalledOnL2() public {
-    _whenL2();
+  function test_Reverts_WhenCalled() public {
     vm.expectRevert("This method is no longer supported in L2.");
     feeCurrencyWhitelist.addToken(address(1));
   }
 }
 
 contract FeeCurrencyWhitelistRemoveToken is FeeCurrencyWhitelistTest {
-  function test_Reverts_WhenCalledOnL2() public {
-    _whenL2();
+  function test_Reverts_WhenCalled() public {
     vm.expectRevert("This method is no longer supported in L2.");
     feeCurrencyWhitelist.removeToken(address(2), 1);
   }
 }
 
 contract FeeCurrencyWhitelist_whitelist is FeeCurrencyWhitelistTest {
-  function test_Reverts_WhenCalledOnL2() public {
-    _whenL2();
+  function test_Reverts_WhenCalled() public {
     vm.expectRevert("This method is no longer supported in L2.");
     feeCurrencyWhitelist.whitelist(0);
   }
 }
 
 contract FeeCurrencyWhitelist_getWhitelist is FeeCurrencyWhitelistTest {
-  function test_Reverts_WhenCalledOnL2() public {
-    _whenL2();
+  function test_Reverts_WhenCalled() public {
     vm.expectRevert("This method is no longer supported in L2.");
     feeCurrencyWhitelist.getWhitelist();
   }

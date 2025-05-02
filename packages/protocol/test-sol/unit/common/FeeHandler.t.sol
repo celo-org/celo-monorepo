@@ -7,8 +7,7 @@ pragma experimental ABIEncoderV2;
 
 import "@celo-contracts/common/FeeHandler.sol";
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-import "@test-sol/utils/WhenL2.sol";
+import "@test-sol/TestWithUtils.sol";
 
 import { Exchange } from "@mento-core/contracts/Exchange.sol";
 import { StableToken } from "@mento-core/contracts/StableToken.sol";
