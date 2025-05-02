@@ -2,8 +2,8 @@
 pragma solidity >=0.5.13 <0.9.0;
 
 interface IElection {
-  function vote(address, uint256, address, address) external returns (bool);
-  function activate(address) external returns (bool);
+  function vote(address group, uint256 value, address lesser, address greater) external returns (bool);
+  function activate(address group) external returns (bool);
   function revokeActive(address, uint256, address, address, uint256) external returns (bool);
   function revokeAllActive(address, address, address, uint256) external returns (bool);
   function revokePending(address, uint256, address, address, uint256) external returns (bool);
@@ -30,22 +30,22 @@ interface IElection {
   // view functions
   function electValidatorSigners() external view returns (address[] memory);
   function electValidatorAccounts() external view returns (address[] memory);
-  function electNValidatorSigners(uint256, uint256) external view returns (address[] memory);
-  function electNValidatorAccounts(uint256, uint256) external view returns (address[] memory);
+  function electNValidatorSigners(uint256 minElectableValidators, uint256 maxElectableValidators) external view returns (address[] memory);
+  function electNValidatorAccounts(uint256 minElectableValidators, uint256 maxElectableValidators) external view returns (address[] memory);
   function getElectableValidators() external view returns (uint256, uint256);
   function getElectabilityThreshold() external view returns (uint256);
-  function getNumVotesReceivable(address) external view returns (uint256);
+  function getNumVotesReceivable(address group) external view returns (uint256);
   function getTotalVotes() external view returns (uint256);
   function getActiveVotes() external view returns (uint256);
-  function getTotalVotesByAccount(address) external view returns (uint256);
-  function getPendingVotesForGroupByAccount(address, address) external view returns (uint256);
-  function getActiveVotesForGroupByAccount(address, address) external view returns (uint256);
-  function getTotalVotesForGroupByAccount(address, address) external view returns (uint256);
-  function getActiveVoteUnitsForGroupByAccount(address, address) external view returns (uint256);
-  function getTotalVotesForGroup(address) external view returns (uint256);
-  function getActiveVotesForGroup(address) external view returns (uint256);
-  function getPendingVotesForGroup(address) external view returns (uint256);
-  function getGroupEligibility(address) external view returns (bool);
+  function getTotalVotesByAccount(address account) external view returns (uint256);
+  function getPendingVotesForGroupByAccount(address group, address account) external view returns (uint256);
+  function getActiveVotesForGroupByAccount(address group, address account) external view returns (uint256);
+  function getTotalVotesForGroupByAccount(address group, address account) external view returns (uint256);
+  function getActiveVoteUnitsForGroupByAccount(address group, address account) external view returns (uint256);
+  function getTotalVotesForGroup(address group) external view returns (uint256);
+  function getActiveVotesForGroup(address group) external view returns (uint256);
+  function getPendingVotesForGroup(address group) external view returns (uint256);
+  function getGroupEligibility(address group) external view returns (bool);
   function getGroupEpochRewards(
     address,
     uint256,
