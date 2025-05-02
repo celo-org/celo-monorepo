@@ -4,7 +4,7 @@ FROM node:18-bookworm
 ENV PATH="${PATH}:/root/.foundry/bin"
 
 # install foundry
-RUN curl -L https://foundry.paradigm.xyz | bash && foundryup
+RUN curl -L https://foundry.paradigm.xyz | bash && foundryup --install stable
 
 # select /app as main directory
 WORKDIR /app
