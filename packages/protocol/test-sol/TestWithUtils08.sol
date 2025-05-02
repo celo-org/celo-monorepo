@@ -139,6 +139,12 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
     return (addr, pk);
   }
 
+
+  function assertAlmostEqual(uint256 actual, uint256 expected, uint256 margin, string memory message) public {
+    uint256 diff = actual > expected ? actual - expected : expected - actual;
+    assertTrue(diff <= margin, string(abi.encodePacked("Difference is ", diff, " ", message)));
+  }
+
   // This function can be also found in OpenZeppelin's library, but in a newer version than the one we use.
   function compareStrings(string memory a, string memory b) public pure returns (bool) {
     return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
