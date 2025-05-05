@@ -798,7 +798,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     vm.startPrank(ctx.alice);
     election.activate(ctx.targetGroup);
     vm.stopPrank();
-    // assert equal is used because usually locked celo != active votes since votes are adjusted by Celo inflation in function unitsToVotes
+    // assertApproxEqAbs is used because usually locked celo != active votes since votes are adjusted by Celo inflation in function unitsToVotes
     assertApproxEqAbs(
       election.getActiveVotesForGroupByAccount(ctx.targetGroup, ctx.alice),
       ctx.lockedAmount,
