@@ -793,7 +793,8 @@ struct AliceContext {
     vm.startPrank(ctx.alice);
     election.activate(ctx.targetGroup);
     vm.stopPrank();
-    assertAlmostEqual(election.getActiveVotesForGroupByAccount(ctx.targetGroup, ctx.alice), ctx.lockedAmount, 10, "Alice activation failed");
+    // assert equal is used because usually locked celo != active votes since votes are adjusted by Celo inflation in function unitsToVotes
+    assertApproxEqAbs(election.getActiveVotesForGroupByAccount(ctx.targetGroup, ctx.alice), ctx.lockedAmount, 1, "Alice activation failed");
   }
 
    function _aliceRevoke(AliceContext memory ctx) internal {
