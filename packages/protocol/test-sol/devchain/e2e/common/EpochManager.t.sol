@@ -282,11 +282,6 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
 }
 
 contract E2E_EpochManager_InitializeSystem is E2E_EpochManager {
-  function setUp() public override {
-    super.setUp();
-    whenL2();
-  }
-
   function test_shouldRevert_WhenCalledByNonEnabler() public {
     vm.expectRevert("msg.sender is not Enabler");
     epochManagerContract.initializeSystem(1, 1, firstElected);
