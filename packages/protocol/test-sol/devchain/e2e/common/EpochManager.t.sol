@@ -80,7 +80,7 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
     uint256[] memory rewards = new uint256[](_groups.length);
 
     for (uint256 i = 0; i < _groups.length; i++) {
-       if (_groups[i] == address(0)) continue;
+      if (_groups[i] == address(0)) continue;
       uint256 _groupScore = scoreManager.getGroupScore(_groups[i]);
       rewards[i] = election.getGroupEpochRewardsBasedOnScore(
         _groups[i],
@@ -89,7 +89,7 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
       );
     }
     for (uint256 i = 0; i < _groups.length; i++) {
-       if (_groups[i] == address(0)) continue;
+      if (_groups[i] == address(0)) continue;
       for (uint256 j = 0; j < groupWithVotes.length; j++) {
         if (groupWithVotes[j].group == _groups[i]) {
           groupWithVotes[j].votes += rewards[i];
@@ -114,12 +114,9 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
     }
   }
 
-  function getGroupsWithVotes()
-    internal
-    view
-    returns (GroupWithVotes[] memory groupWithVotes)
-  {
-    (address[] memory groupsInOrder, uint256[] memory votesTotal) = election.getTotalVotesForEligibleValidatorGroups();
+  function getGroupsWithVotes() internal view returns (GroupWithVotes[] memory groupWithVotes) {
+    (address[] memory groupsInOrder, uint256[] memory votesTotal) = election
+      .getTotalVotesForEligibleValidatorGroups();
 
     groupWithVotes = new GroupWithVotes[](groupsInOrder.length);
     for (uint256 i = 0; i < groupsInOrder.length; i++) {
@@ -384,7 +381,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
   EnumerableSet.AddressSet internal originalyElected;
 
-struct AliceContext {
+  struct AliceContext {
     address alice;
     uint256 lockedAmount;
     address targetGroup;
@@ -705,7 +702,10 @@ struct AliceContext {
         break;
       }
     }
-    require(targetGroupIndex < groupWithVotesSimulated.length, "Target group not found for voting simulation");
+    require(
+      targetGroupIndex < groupWithVotesSimulated.length,
+      "Target group not found for voting simulation"
+    );
 
     sort(groupWithVotesSimulated);
 
@@ -713,21 +713,23 @@ struct AliceContext {
     greater = address(0);
     for (uint i = 0; i < groupWithVotesSimulated.length; i++) {
       if (groupWithVotesSimulated[i].group == targetGroup) {
-        lesser = (i == groupWithVotesSimulated.length - 1) ? address(0) : groupWithVotesSimulated[i + 1].group;
+        lesser = (i == groupWithVotesSimulated.length - 1)
+          ? address(0)
+          : groupWithVotesSimulated[i + 1].group;
         greater = (i == 0) ? address(0) : groupWithVotesSimulated[i - 1].group;
         break;
       }
     }
   }
 
- /**
-  * @notice Calculates the lesser, greater neighbors, and original index for a group after a potential vote revocation.
-  * @param targetGroup The group whose votes are being revoked.
-  * @param revokeAmount The amount of votes being revoked.
-  * @return lesser The address of the group with the next lower vote count after revocation.
-  * @return greater The address of the group with the next higher vote count after revocation.
-  * @return index The original index of the targetGroup in the eligible list before simulation.
-  */
+  /**
+   * @notice Calculates the lesser, greater neighbors, and original index for a group after a potential vote revocation.
+   * @param targetGroup The group whose votes are being revoked.
+   * @param revokeAmount The amount of votes being revoked.
+   * @return lesser The address of the group with the next lower vote count after revocation.
+   * @return greater The address of the group with the next higher vote count after revocation.
+   * @return index The original index of the targetGroup in the eligible list before simulation.
+   */
   function _calculateRevokeNeighbors(
     address targetGroup,
     uint256 revokeAmount
@@ -746,7 +748,10 @@ struct AliceContext {
         break;
       }
     }
-    require(targetGroupIndexSimulated < groupWithVotesSimulated.length, "Target group not found for revoke simulation");
+    require(
+      targetGroupIndexSimulated < groupWithVotesSimulated.length,
+      "Target group not found for revoke simulation"
+    );
     index = targetGroupIndexSimulated;
 
     sort(groupWithVotesSimulated);
@@ -755,14 +760,14 @@ struct AliceContext {
     greater = address(0);
     for (uint i = 0; i < groupWithVotesSimulated.length; i++) {
       if (groupWithVotesSimulated[i].group == targetGroup) {
-        lesser = (i == groupWithVotesSimulated.length - 1) ? address(0) : groupWithVotesSimulated[i + 1].group;
+        lesser = (i == groupWithVotesSimulated.length - 1)
+          ? address(0)
+          : groupWithVotesSimulated[i + 1].group;
         greater = (i == 0) ? address(0) : groupWithVotesSimulated[i - 1].group;
         break;
       }
     }
   }
-
-
 
   function _setupAlice() internal returns (AliceContext memory ctx) {
     ctx.alice = vm.addr(uint256(keccak256(abi.encodePacked("alice"))));
@@ -794,11 +799,19 @@ struct AliceContext {
     election.activate(ctx.targetGroup);
     vm.stopPrank();
     // assert equal is used because usually locked celo != active votes since votes are adjusted by Celo inflation in function unitsToVotes
-    assertApproxEqAbs(election.getActiveVotesForGroupByAccount(ctx.targetGroup, ctx.alice), ctx.lockedAmount, 1, "Alice activation failed");
+    assertApproxEqAbs(
+      election.getActiveVotesForGroupByAccount(ctx.targetGroup, ctx.alice),
+      ctx.lockedAmount,
+      1,
+      "Alice activation failed"
+    );
   }
 
-   function _aliceRevoke(AliceContext memory ctx) internal {
-    (address lesser, address greater, uint index) = _calculateRevokeNeighbors(ctx.targetGroup, ctx.lockedAmount);
+  function _aliceRevoke(AliceContext memory ctx) internal {
+    (address lesser, address greater, uint index) = _calculateRevokeNeighbors(
+      ctx.targetGroup,
+      ctx.lockedAmount
+    );
 
     vm.startPrank(ctx.alice);
     uint256 activeVotes = election.getTotalVotesForGroupByAccount(ctx.targetGroup, ctx.alice);
@@ -808,42 +821,57 @@ struct AliceContext {
   }
 
   function _aliceUnlock(AliceContext memory ctx) internal {
-     uint256 unlockingPeriod = lockedCelo.unlockingPeriod();
-     timeTravel(unlockingPeriod + 1); 
+    uint256 unlockingPeriod = lockedCelo.unlockingPeriod();
+    timeTravel(unlockingPeriod + 1);
 
-     vm.prank(ctx.alice);
-     lockedCelo.unlock(ctx.lockedAmount);
-     vm.stopPrank();
+    vm.prank(ctx.alice);
+    lockedCelo.unlock(ctx.lockedAmount);
+    vm.stopPrank();
   }
 
-  function _advanceAndFinishNextEpochProcessing(uint256 expectedStartEpoch) internal returns (uint256 newEpoch) {
-      assertEq(epochManagerContract.getCurrentEpochNumber(), expectedStartEpoch, "Epoch mismatch before finish");
-      timeTravel(epochDuration / 2);
-      blockTravel(100);
+  function _advanceAndFinishNextEpochProcessing(
+    uint256 expectedStartEpoch
+  ) internal returns (uint256 newEpoch) {
+    assertEq(
+      epochManagerContract.getCurrentEpochNumber(),
+      expectedStartEpoch,
+      "Epoch mismatch before finish"
+    );
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
 
-      address[] memory lessers;
-      address[] memory greaters;
-      (lessers, greaters, ) = getLessersAndGreaters(groups); 
+    address[] memory lessers;
+    address[] memory greaters;
+    (lessers, greaters, ) = getLessersAndGreaters(groups);
 
-      epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
-      newEpoch = epochManagerContract.getCurrentEpochNumber();
-      assertEq(newEpoch, expectedStartEpoch + 1, "Epoch did not increment after finish");
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+    newEpoch = epochManagerContract.getCurrentEpochNumber();
+    assertEq(newEpoch, expectedStartEpoch + 1, "Epoch did not increment after finish");
   }
 
-   function _advanceAndStartNextEpochProcessing(uint256 expectedStartEpoch) internal {
-       assertEq(epochManagerContract.getCurrentEpochNumber(), expectedStartEpoch, "Epoch mismatch before start");
-       timeTravel(epochDuration + 1); 
-       epochManagerContract.startNextEpochProcess();
-       uint256 currentEpoch = epochManagerContract.getCurrentEpochNumber();
-       assertEq(currentEpoch, expectedStartEpoch, "Epoch number changed unexpectedly on startNextEpochProcess");
-   }
-
+  function _advanceAndStartNextEpochProcessing(uint256 expectedStartEpoch) internal {
+    assertEq(
+      epochManagerContract.getCurrentEpochNumber(),
+      expectedStartEpoch,
+      "Epoch mismatch before start"
+    );
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
+    uint256 currentEpoch = epochManagerContract.getCurrentEpochNumber();
+    assertEq(
+      currentEpoch,
+      expectedStartEpoch,
+      "Epoch number changed unexpectedly on startNextEpochProcess"
+    );
+  }
 
   function test_shouldFinishNextEpochProcessing_WithAlice_Votes() public {
     AliceContext memory aliceCtx = _setupAlice();
     _aliceVote(aliceCtx);
 
-    uint256 epochAfterVote = _advanceAndFinishNextEpochProcessing(epochManagerContract.getCurrentEpochNumber()); 
+    uint256 epochAfterVote = _advanceAndFinishNextEpochProcessing(
+      epochManagerContract.getCurrentEpochNumber()
+    );
 
     _advanceAndStartNextEpochProcessing(epochAfterVote);
 
@@ -980,11 +1008,8 @@ contract E2E_GasTest1_FinishNextEpochProcess is E2E_GasTest_Setup {
     epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
     uint256 gasLeftAfter1 = gasleft();
 
-
-
-
     uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1;
-    assertGt(gasUsed, 0); 
+    assertGt(gasUsed, 0);
   }
 }
 
@@ -1009,11 +1034,8 @@ contract E2E_GasTest2_FinishNextEpochProcess is E2E_GasTest_Setup {
     epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
     uint256 gasLeftAfter1 = gasleft();
 
-
-
-
     uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1;
-    assertGt(gasUsed, 0); 
+    assertGt(gasUsed, 0);
   }
 }
 
@@ -1138,7 +1160,7 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
       uint256 gasLeftAfter1 = gasleft();
 
       uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1;
-      assertGt(gasUsed, 0); 
+      assertGt(gasUsed, 0);
     }
   }
 
@@ -1163,14 +1185,13 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
     epochManagerContract.setToProcessGroups();
 
-
     for (uint256 i = 0; i < groups.length; i++) {
       uint256 gasLeftBefore1 = gasleft();
       epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
       uint256 gasLeftAfter1 = gasleft();
 
       uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1;
-      assertGt(gasUsed, 0); 
+      assertGt(gasUsed, 0);
     }
   }
 
@@ -1201,7 +1222,7 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
       uint256 gasLeftAfter1 = gasleft();
 
       uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1;
-      assertGt(gasUsed, 0); 
+      assertGt(gasUsed, 0);
     }
   }
 }
