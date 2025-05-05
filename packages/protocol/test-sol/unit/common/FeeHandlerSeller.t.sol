@@ -10,7 +10,6 @@ import { MentoFeeHandlerSeller } from "@celo-contracts/common/MentoFeeHandlerSel
 import { UniswapFeeHandlerSeller } from "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-import "@test-sol/utils/WhenL2.sol";
 
 contract FeeHandlerSellerTest is TestWithUtils {
   // Actors
@@ -44,10 +43,9 @@ contract FeeHandlerSellerTest is TestWithUtils {
 
     feeHandlerSellerInstances.push(mentoFeeHandlerSeller);
     feeHandlerSellerInstances.push(uniswapFeeHandlerSeller);
+    whenL2WithEpochManagerInitialization();
   }
 }
-
-contract FeeHandlerSellerTest_L2 is WhenL2, FeeHandlerSellerTest {}
 
 contract FeeHandlerSellerTest_Transfer is FeeHandlerSellerTest {
   uint256 constant ZERO_CELOTOKEN = 0;
@@ -94,11 +92,6 @@ contract FeeHandlerSellerTest_Transfer is FeeHandlerSellerTest {
   }
 }
 
-contract FeeHandlerSellerTest_Transfer_L2 is
-  FeeHandlerSellerTest_L2,
-  FeeHandlerSellerTest_Transfer
-{}
-
 contract FeeHandlerSellerTest_SetMinimumReports is FeeHandlerSellerTest {
   address ARBITRARY_TOKEN_ADDRESS = actor("Arbitrary Token Address");
   uint256 constant ARBITRARY_NR_OF_MINIMUM_REPORTS = 15;
@@ -133,11 +126,6 @@ contract FeeHandlerSellerTest_SetMinimumReports is FeeHandlerSellerTest {
   }
 }
 
-contract FeeHandlerSellerTest_SetMinimumReports_L2 is
-  FeeHandlerSellerTest_L2,
-  FeeHandlerSellerTest_SetMinimumReports
-{}
-
 contract FeeHandlerSellerTest_setOracleAddress is FeeHandlerSellerTest {
   function test_Reverts_WhenCalledByNonOwner() public {
     vm.prank(NON_OWNER_ADDRESS);
@@ -161,8 +149,3 @@ contract FeeHandlerSellerTest_setOracleAddress is FeeHandlerSellerTest {
     uniswapFeeHandlerSeller.setOracleAddress(address(celoToken), oracle);
   }
 }
-
-contract FeeHandlerSellerTest_setOracleAddress_L2 is
-  FeeHandlerSellerTest_L2,
-  FeeHandlerSellerTest_setOracleAddress
-{}
