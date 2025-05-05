@@ -72,7 +72,7 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
     )
   {
     (, , uint256 maxTotalRewards, , ) = epochManagerContract.getEpochProcessingState();
-    (, groupWithVotes) = getGroupsWithVotes();
+    groupWithVotes = getGroupsWithVotes();
 
     lessers = new address[](_groups.length);
     greaters = new address[](_groups.length);
@@ -117,10 +117,9 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
   function getGroupsWithVotes()
     internal
     view
-    returns (address[] memory groupsInOrder, GroupWithVotes[] memory groupWithVotes)
+    returns (GroupWithVotes[] memory groupWithVotes)
   {
-    uint256[] memory votesTotal;
-    (groupsInOrder, votesTotal) = election.getTotalVotesForEligibleValidatorGroups();
+    (address[] memory groupsInOrder, uint256[] memory votesTotal) = election.getTotalVotesForEligibleValidatorGroups();
 
     groupWithVotes = new GroupWithVotes[](groupsInOrder.length);
     for (uint256 i = 0; i < groupsInOrder.length; i++) {
@@ -158,7 +157,7 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
     uint256 validatorCount
   ) internal returns (address newValidatorGroup, address newValidator) {
     require(validatorCount > 0, "validatorCount must be at least 1");
-    (, GroupWithVotes[] memory groupWithVotes) = getGroupsWithVotes();
+    GroupWithVotes[] memory groupWithVotes = getGroupsWithVotes();
     uint256 newGroupPK = uint256(keccak256(abi.encodePacked("newGroup", index + 1)));
 
     address[] memory validatorAddresses = new address[](validatorCount);
@@ -696,7 +695,7 @@ struct AliceContext {
     address targetGroup,
     uint256 voteAmount
   ) internal view returns (address lesser, address greater) {
-    (, GroupWithVotes[] memory groupWithVotesSimulated) = getGroupsWithVotes();
+    GroupWithVotes[] memory groupWithVotesSimulated = getGroupsWithVotes();
 
     uint targetGroupIndex = groupWithVotesSimulated.length; // Sentinel value
     for (uint i = 0; i < groupWithVotesSimulated.length; i++) {
@@ -733,7 +732,7 @@ struct AliceContext {
     address targetGroup,
     uint256 revokeAmount
   ) internal view returns (address lesser, address greater, uint index) {
-    (address[] memory groupsInOrder, GroupWithVotes[] memory groupWithVotesSimulated) = getGroupsWithVotes();
+    GroupWithVotes[] memory groupWithVotesSimulated = getGroupsWithVotes();
 
     uint targetGroupIndexSimulated = groupWithVotesSimulated.length;
     for (uint i = 0; i < groupWithVotesSimulated.length; i++) {
@@ -748,6 +747,7 @@ struct AliceContext {
       }
     }
     require(targetGroupIndexSimulated < groupWithVotesSimulated.length, "Target group not found for revoke simulation");
+    index = targetGroupIndexSimulated;
 
     sort(groupWithVotesSimulated);
 
@@ -760,15 +760,6 @@ struct AliceContext {
         break;
       }
     }
-
-    index = groupsInOrder.length;
-    for (uint i = 0; i < groupsInOrder.length; i++) {
-      if (groupsInOrder[i] == targetGroup) {
-        index = i;
-        break; 
-      }
-    }
-    require(index < groupsInOrder.length, "Target group not found for revoke index");
   }
 
 
@@ -786,7 +777,7 @@ struct AliceContext {
     uint256 actualLocked = lockedCelo.getAccountTotalLockedGold(ctx.alice);
     require(actualLocked == ctx.lockedAmount, "Alice lock failed");
 
-    (, GroupWithVotes[] memory initialGroups) = getGroupsWithVotes();
+    GroupWithVotes[] memory initialGroups = getGroupsWithVotes();
     require(initialGroups.length >= 3, "Not enough groups for test setup");
     ctx.targetGroup = initialGroups[2].group;
   }
@@ -991,7 +982,7 @@ contract E2E_GasTest1_FinishNextEpochProcess is E2E_GasTest_Setup {
 
 
 
-    uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1; // Keep calculation for potential future use/logging
+    uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1;
     assertGt(gasUsed, 0); 
   }
 }
@@ -1020,7 +1011,7 @@ contract E2E_GasTest2_FinishNextEpochProcess is E2E_GasTest_Setup {
 
 
 
-    uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1; // Keep calculation for potential future use/logging
+    uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1;
     assertGt(gasUsed, 0); 
   }
 }
@@ -1145,7 +1136,7 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
       epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
       uint256 gasLeftAfter1 = gasleft();
 
-      uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1; // Keep calculation for potential future use/logging
+      uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1;
       assertGt(gasUsed, 0); 
     }
   }
@@ -1177,7 +1168,7 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
       epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
       uint256 gasLeftAfter1 = gasleft();
 
-      uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1; // Keep calculation for potential future use/logging
+      uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1;
       assertGt(gasUsed, 0); 
     }
   }
@@ -1208,7 +1199,7 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
       epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
       uint256 gasLeftAfter1 = gasleft();
 
-      uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1; // Keep calculation for potential future use/logging
+      uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1;
       assertGt(gasUsed, 0); 
     }
   }
