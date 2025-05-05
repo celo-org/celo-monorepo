@@ -80,7 +80,7 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
     uint256[] memory rewards = new uint256[](_groups.length);
 
     for (uint256 i = 0; i < _groups.length; i++) {
-       if (_groups[i] == address(0)) continue; // Skip if group address is zero
+       if (_groups[i] == address(0)) continue;
       uint256 _groupScore = scoreManager.getGroupScore(_groups[i]);
       rewards[i] = election.getGroupEpochRewardsBasedOnScore(
         _groups[i],
@@ -89,7 +89,7 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
       );
     }
     for (uint256 i = 0; i < _groups.length; i++) {
-       if (_groups[i] == address(0)) continue; // Skip if group address is zero
+       if (_groups[i] == address(0)) continue;
       for (uint256 j = 0; j < groupWithVotes.length; j++) {
         if (groupWithVotes[j].group == _groups[i]) {
           groupWithVotes[j].votes += rewards[i];
@@ -384,6 +384,12 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   EnumerableSet.AddressSet internal originalyElected;
+
+struct AliceContext {
+    address alice;
+    uint256 lockedAmount;
+    address targetGroup;
+  }
 
   function setUp() public override {
     super.setUp();
@@ -986,7 +992,7 @@ contract E2E_GasTest1_FinishNextEpochProcess is E2E_GasTest_Setup {
 
 
     uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1; // Keep calculation for potential future use/logging
-    assertGt(gasUsed, 0); // Basic assertion that gas was used
+    assertGt(gasUsed, 0); 
   }
 }
 
@@ -1015,7 +1021,7 @@ contract E2E_GasTest2_FinishNextEpochProcess is E2E_GasTest_Setup {
 
 
     uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1; // Keep calculation for potential future use/logging
-    assertGt(gasUsed, 0); // Basic assertion that gas was used
+    assertGt(gasUsed, 0); 
   }
 }
 
@@ -1140,7 +1146,7 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
       uint256 gasLeftAfter1 = gasleft();
 
       uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1; // Keep calculation for potential future use/logging
-      assertGt(gasUsed, 0); // Basic assertion that gas was used
+      assertGt(gasUsed, 0); 
     }
   }
 
@@ -1172,7 +1178,7 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
       uint256 gasLeftAfter1 = gasleft();
 
       uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1; // Keep calculation for potential future use/logging
-      assertGt(gasUsed, 0); // Basic assertion that gas was used
+      assertGt(gasUsed, 0); 
     }
   }
 
@@ -1203,7 +1209,7 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
       uint256 gasLeftAfter1 = gasleft();
 
       uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1; // Keep calculation for potential future use/logging
-      assertGt(gasUsed, 0); // Basic assertion that gas was used
+      assertGt(gasUsed, 0); 
     }
   }
 }
