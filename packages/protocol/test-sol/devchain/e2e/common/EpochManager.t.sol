@@ -765,11 +765,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     require(index < groupsInOrder.length, "Target group not found for revoke index");
   }
 
-  struct AliceContext {
-    address alice;
-    uint256 lockedAmount;
-    address targetGroup;
-  }
+
 
   function _setupAlice() internal returns (AliceContext memory ctx) {
     ctx.alice = vm.addr(uint256(keccak256(abi.encodePacked("alice"))));
@@ -865,18 +861,6 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
     _advanceAndFinishNextEpochProcessing(epochAfterActivate);
   }
-
-
-  // Helper function to check if an address is in an array
-  function addressArrayContains(address[] memory array, address element) internal pure returns (bool) {
-      for (uint i = 0; i < array.length; i++) {
-          if (array[i] == element) {
-              return true;
-          }
-      }
-      return false;
-  }
-
 
   function clearElectedGroupsHelper() internal {
     address[] memory values = electedGroupsHelper.values();
