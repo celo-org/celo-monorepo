@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9.0;
 
 import { Devchain } from "@test-sol/devchain/e2e/utils.sol";
 
@@ -72,7 +72,7 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
     )
   {
     (, , uint256 maxTotalRewards, , ) = epochManagerContract.getEpochProcessingState();
-    (, groupWithVotes) = getGroupsWithVotes();
+    groupWithVotes = getGroupsWithVotes();
 
     lessers = new address[](_groups.length);
     greaters = new address[](_groups.length);
@@ -80,6 +80,7 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
     uint256[] memory rewards = new uint256[](_groups.length);
 
     for (uint256 i = 0; i < _groups.length; i++) {
+      if (_groups[i] == address(0)) continue;
       uint256 _groupScore = scoreManager.getGroupScore(_groups[i]);
       rewards[i] = election.getGroupEpochRewardsBasedOnScore(
         _groups[i],
@@ -88,6 +89,7 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
       );
     }
     for (uint256 i = 0; i < _groups.length; i++) {
+      if (_groups[i] == address(0)) continue;
       for (uint256 j = 0; j < groupWithVotes.length; j++) {
         if (groupWithVotes[j].group == _groups[i]) {
           groupWithVotes[j].votes += rewards[i];
@@ -112,13 +114,9 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
     }
   }
 
-  function getGroupsWithVotes()
-    internal
-    view
-    returns (address[] memory groupsInOrder, GroupWithVotes[] memory groupWithVotes)
-  {
-    uint256[] memory votesTotal;
-    (groupsInOrder, votesTotal) = election.getTotalVotesForEligibleValidatorGroups();
+  function getGroupsWithVotes() internal view returns (GroupWithVotes[] memory groupWithVotes) {
+    (address[] memory groupsInOrder, uint256[] memory votesTotal) = election
+      .getTotalVotesForEligibleValidatorGroups();
 
     groupWithVotes = new GroupWithVotes[](groupsInOrder.length);
     for (uint256 i = 0; i < groupsInOrder.length; i++) {
@@ -156,7 +154,7 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
     uint256 validatorCount
   ) internal returns (address newValidatorGroup, address newValidator) {
     require(validatorCount > 0, "validatorCount must be at least 1");
-    (, GroupWithVotes[] memory groupWithVotes) = getGroupsWithVotes();
+    GroupWithVotes[] memory groupWithVotes = getGroupsWithVotes();
     uint256 newGroupPK = uint256(keccak256(abi.encodePacked("newGroup", index + 1)));
 
     address[] memory validatorAddresses = new address[](validatorCount);
@@ -377,6 +375,12 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   EnumerableSet.AddressSet internal originalyElected;
+
+  struct AliceContext {
+    address alice;
+    uint256 lockedAmount;
+    address targetGroup;
+  }
 
   function setUp() public override {
     super.setUp();
@@ -672,6 +676,213 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length - 1); // -1 because the validator deaffiliated
   }
 
+  /**
+   * @notice Calculates the lesser and greater neighbors for a group after a potential vote.
+   * @param targetGroup The group receiving the vote.
+   * @param voteAmount The amount of the vote.
+   * @return lesser The address of the group with the next lower vote count after the vote.
+   * @return greater The address of the group with the next higher vote count after the vote.
+   */
+  function _calculateVoteNeighbors(
+    address targetGroup,
+    uint256 voteAmount
+  ) internal view returns (address lesser, address greater) {
+    GroupWithVotes[] memory groupWithVotesSimulated = getGroupsWithVotes();
+
+    uint targetGroupIndex = groupWithVotesSimulated.length; // Sentinel value
+    for (uint i = 0; i < groupWithVotesSimulated.length; i++) {
+      if (groupWithVotesSimulated[i].group == targetGroup) {
+        groupWithVotesSimulated[i].votes += voteAmount;
+        targetGroupIndex = i;
+        break;
+      }
+    }
+    require(
+      targetGroupIndex < groupWithVotesSimulated.length,
+      "Target group not found for voting simulation"
+    );
+
+    sort(groupWithVotesSimulated);
+
+    lesser = address(0);
+    greater = address(0);
+    for (uint i = 0; i < groupWithVotesSimulated.length; i++) {
+      if (groupWithVotesSimulated[i].group == targetGroup) {
+        lesser = (i == groupWithVotesSimulated.length - 1)
+          ? address(0)
+          : groupWithVotesSimulated[i + 1].group;
+        greater = (i == 0) ? address(0) : groupWithVotesSimulated[i - 1].group;
+        break;
+      }
+    }
+  }
+
+  /**
+   * @notice Calculates the lesser, greater neighbors, and original index for a group after a potential vote revocation.
+   * @param targetGroup The group whose votes are being revoked.
+   * @param revokeAmount The amount of votes being revoked.
+   * @return lesser The address of the group with the next lower vote count after revocation.
+   * @return greater The address of the group with the next higher vote count after revocation.
+   * @return index The original index of the targetGroup in the eligible list before simulation.
+   */
+  function _calculateRevokeNeighbors(
+    address targetGroup,
+    uint256 revokeAmount
+  ) internal view returns (address lesser, address greater, uint index) {
+    GroupWithVotes[] memory groupWithVotesSimulated = getGroupsWithVotes();
+
+    uint targetGroupIndexSimulated = groupWithVotesSimulated.length;
+    for (uint i = 0; i < groupWithVotesSimulated.length; i++) {
+      if (groupWithVotesSimulated[i].group == targetGroup) {
+        if (groupWithVotesSimulated[i].votes >= revokeAmount) {
+          groupWithVotesSimulated[i].votes -= revokeAmount;
+        } else {
+          groupWithVotesSimulated[i].votes = 0;
+        }
+        targetGroupIndexSimulated = i;
+        break;
+      }
+    }
+    require(
+      targetGroupIndexSimulated < groupWithVotesSimulated.length,
+      "Target group not found for revoke simulation"
+    );
+    index = targetGroupIndexSimulated;
+
+    sort(groupWithVotesSimulated);
+
+    lesser = address(0);
+    greater = address(0);
+    for (uint i = 0; i < groupWithVotesSimulated.length; i++) {
+      if (groupWithVotesSimulated[i].group == targetGroup) {
+        lesser = (i == groupWithVotesSimulated.length - 1)
+          ? address(0)
+          : groupWithVotesSimulated[i + 1].group;
+        greater = (i == 0) ? address(0) : groupWithVotesSimulated[i - 1].group;
+        break;
+      }
+    }
+  }
+
+  function _setupAlice() internal returns (AliceContext memory ctx) {
+    ctx.alice = vm.addr(uint256(keccak256(abi.encodePacked("alice"))));
+    vm.deal(ctx.alice, 100_000 ether);
+    ctx.lockedAmount = 1 ether;
+
+    vm.startPrank(ctx.alice);
+    accounts.createAccount();
+    lockedCelo.lock{ value: ctx.lockedAmount }();
+    vm.stopPrank();
+
+    uint256 actualLocked = lockedCelo.getAccountTotalLockedGold(ctx.alice);
+    require(actualLocked == ctx.lockedAmount, "Alice lock failed");
+
+    GroupWithVotes[] memory initialGroups = getGroupsWithVotes();
+    require(initialGroups.length >= 3, "Not enough groups for test setup");
+    ctx.targetGroup = initialGroups[2].group;
+  }
+
+  function _aliceVote(AliceContext memory ctx) internal {
+    (address lesser, address greater) = _calculateVoteNeighbors(ctx.targetGroup, ctx.lockedAmount);
+    vm.prank(ctx.alice);
+    election.vote(ctx.targetGroup, ctx.lockedAmount, lesser, greater);
+    vm.stopPrank();
+  }
+
+  function _aliceActivate(AliceContext memory ctx) internal {
+    vm.startPrank(ctx.alice);
+    election.activate(ctx.targetGroup);
+    vm.stopPrank();
+    // assertApproxEqAbs is used because usually locked celo != active votes since votes are adjusted by Celo inflation in function unitsToVotes
+    assertApproxEqAbs(
+      election.getActiveVotesForGroupByAccount(ctx.targetGroup, ctx.alice),
+      ctx.lockedAmount,
+      1,
+      "Alice activation failed"
+    );
+  }
+
+  function _aliceRevoke(AliceContext memory ctx) internal {
+    (address lesser, address greater, uint index) = _calculateRevokeNeighbors(
+      ctx.targetGroup,
+      ctx.lockedAmount
+    );
+
+    vm.startPrank(ctx.alice);
+    uint256 activeVotes = election.getTotalVotesForGroupByAccount(ctx.targetGroup, ctx.alice);
+    require(activeVotes >= ctx.lockedAmount, "Insufficient active votes to revoke");
+    election.revokeActive(ctx.targetGroup, ctx.lockedAmount, lesser, greater, index);
+    vm.stopPrank();
+  }
+
+  function _aliceUnlock(AliceContext memory ctx) internal {
+    uint256 unlockingPeriod = lockedCelo.unlockingPeriod();
+    timeTravel(unlockingPeriod + 1);
+
+    vm.prank(ctx.alice);
+    lockedCelo.unlock(ctx.lockedAmount);
+    vm.stopPrank();
+  }
+
+  function _advanceAndFinishNextEpochProcessing(
+    uint256 expectedStartEpoch
+  ) internal returns (uint256 newEpoch) {
+    assertEq(
+      epochManagerContract.getCurrentEpochNumber(),
+      expectedStartEpoch,
+      "Epoch mismatch before finish"
+    );
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
+
+    address[] memory lessers;
+    address[] memory greaters;
+    (lessers, greaters, ) = getLessersAndGreaters(groups);
+
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+    newEpoch = epochManagerContract.getCurrentEpochNumber();
+    assertEq(newEpoch, expectedStartEpoch + 1, "Epoch did not increment after finish");
+  }
+
+  function _advanceAndStartNextEpochProcessing(uint256 expectedStartEpoch) internal {
+    assertEq(
+      epochManagerContract.getCurrentEpochNumber(),
+      expectedStartEpoch,
+      "Epoch mismatch before start"
+    );
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
+    uint256 currentEpoch = epochManagerContract.getCurrentEpochNumber();
+    assertEq(
+      currentEpoch,
+      expectedStartEpoch,
+      "Epoch number changed unexpectedly on startNextEpochProcess"
+    );
+  }
+
+  function test_shouldFinishNextEpochProcessing_WithAlice_Votes() public {
+    AliceContext memory aliceCtx = _setupAlice();
+    _aliceVote(aliceCtx);
+
+    uint256 epochAfterVote = _advanceAndFinishNextEpochProcessing(
+      epochManagerContract.getCurrentEpochNumber()
+    );
+
+    _advanceAndStartNextEpochProcessing(epochAfterVote);
+
+    _aliceActivate(aliceCtx);
+
+    uint256 epochAfterActivate = _advanceAndFinishNextEpochProcessing(epochAfterVote);
+
+    _advanceAndStartNextEpochProcessing(epochAfterActivate);
+
+    _aliceRevoke(aliceCtx);
+
+    _aliceUnlock(aliceCtx);
+
+    _advanceAndFinishNextEpochProcessing(epochAfterActivate);
+  }
+
   function clearElectedGroupsHelper() internal {
     address[] memory values = electedGroupsHelper.values();
 
@@ -791,10 +1002,9 @@ contract E2E_GasTest1_FinishNextEpochProcess is E2E_GasTest_Setup {
     uint256 gasLeftBefore1 = gasleft();
     epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
     uint256 gasLeftAfter1 = gasleft();
-    console.log("validator groups: 120");
-    console.log("validators per group: 2");
-    console.log("finishNextEpochProcess gas used 2: ", gasLeftBefore1 - gasLeftAfter1);
-    console.log("elected count2: ", epochManagerContract.getElectedAccounts().length);
+
+    uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1;
+    assertGt(gasUsed, 0);
   }
 }
 
@@ -818,10 +1028,9 @@ contract E2E_GasTest2_FinishNextEpochProcess is E2E_GasTest_Setup {
     uint256 gasLeftBefore1 = gasleft();
     epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
     uint256 gasLeftAfter1 = gasleft();
-    console.log("validator groups: 60");
-    console.log("validators per group: 2");
-    console.log("finishNextEpochProcess gas used 2: ", gasLeftBefore1 - gasLeftAfter1);
-    console.log("elected count2: ", epochManagerContract.getElectedAccounts().length);
+
+    uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1;
+    assertGt(gasUsed, 0);
   }
 }
 
@@ -944,7 +1153,9 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
       uint256 gasLeftBefore1 = gasleft();
       epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
       uint256 gasLeftAfter1 = gasleft();
-      console.log("processGroup gas used: ", gasLeftBefore1 - gasLeftAfter1);
+
+      uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1;
+      assertGt(gasUsed, 0);
     }
   }
 
@@ -969,12 +1180,13 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
     (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
     epochManagerContract.setToProcessGroups();
 
-    console.log("3");
     for (uint256 i = 0; i < groups.length; i++) {
       uint256 gasLeftBefore1 = gasleft();
       epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
       uint256 gasLeftAfter1 = gasleft();
-      console.log("processGroup gas used: ", gasLeftBefore1 - gasLeftAfter1);
+
+      uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1;
+      assertGt(gasUsed, 0);
     }
   }
 
@@ -1003,7 +1215,9 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
       uint256 gasLeftBefore1 = gasleft();
       epochManagerContract.processGroup(groups[i], lessers[i], greaters[i]);
       uint256 gasLeftAfter1 = gasleft();
-      console.log("processGroup gas used: ", gasLeftBefore1 - gasLeftAfter1);
+
+      uint256 gasUsed = gasLeftBefore1 - gasLeftAfter1;
+      assertGt(gasUsed, 0);
     }
   }
 }
