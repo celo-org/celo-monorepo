@@ -15,6 +15,7 @@ interface IGovernance {
   ) external returns (bool);
 
   function setConstitution(address destination, bytes4 functionId, uint256 threshold) external;
+  function getConstitution(address destination, bytes4 functionId) external view returns (uint256);
 
   function isVoting(address) external view returns (bool);
   function getAmountOfGoldUsedForVoting(address account) external view returns (uint256);
