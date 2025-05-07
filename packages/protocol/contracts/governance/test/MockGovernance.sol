@@ -31,18 +31,22 @@ contract MockGovernance is IGovernance {
     revert("not implemented");
   }
 
+  function getConstitution(address, bytes4) external view returns (uint256) {
+    revert("not implemented");
+  }
+
   function votePartially(uint256, uint256, uint256, uint256, uint256) external returns (bool) {
     return true;
+  }
+
+  function getAmountOfGoldUsedForVoting(address account) external view returns (uint256) {
+    return totalVotes[account];
   }
 
   function getProposal(
     uint256
   ) external view returns (address, uint256, uint256, uint256, string memory, uint256, bool) {
     return (address(0), 0, 0, 0, "", 0, false);
-  }
-
-  function getAmountOfGoldUsedForVoting(address account) external view returns (uint256) {
-    return totalVotes[account];
   }
 
   function getReferendumStageDuration() external view returns (uint256) {
