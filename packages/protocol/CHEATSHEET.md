@@ -1,6 +1,6 @@
 # Cheatsheet
 
-Covers changes in `package.json`
+Covers changes in `package.json` scripts introduced starting with PR [#11369](https://github.com/celo-org/celo-monorepo/pull/11369). This is a temporary document, slated to be removed after the migration away from Truffle is completed, when `package.json` is expected to be further simplified.
 
 > ... - means does not exist in this version
 

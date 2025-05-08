@@ -29,10 +29,6 @@ To apply any new migrations to a network, run:
 yarn run devchain:migrate -n NETWORK
 ```
 
-### Accounts
-
-TBD
-
 ### Console
 
 To start a truffle console run:
