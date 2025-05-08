@@ -12,8 +12,6 @@
     "anvil-devchain:start-L2": "./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh",
     "anvil-devchain:status": "if nc -z localhost 8546; then echo 'Devchain is serving at http://localhost:8546'; else echo 'Devchain is not running.'; fi",
     "anvil-devchain:stop": "./scripts/foundry/stop_anvil.sh",
-    "artifacts:download": "./scripts/bash/download_artifacts.sh",
-    "artifacts:upload": "./scripts/bash/upload_artifacts.sh",
     "build:foundry": "forge build",
     "prebuild": "rm -rf ./build",
     "build": "yarn build:truffle-sol && yarn build:truffle-ts",

@@ -6,8 +6,6 @@ Covers changes in `package.json`
 
 | Before                                  | After                                         |
 | --------------------------------------- | --------------------------------------------- |
-| `download-artifacts`                    | `artifacts:download`                          |
-| `upload-artifacts`                      | `artifacts:upload`                            |
 | `...`                                   | `build:foundry`                               |
 | `build`                                 | `build`                                       |
 | `build:sol`                             | `build:truffle-sol`                           |
@@ -43,5 +41,7 @@ Covers changes in `package.json`
 | `prepare_devchain_anvil_publishing`     | `utils:prepare-devchain-anvil-publishing`     |
 | `sourcify-publish`                      | `utils:sourcify-publish`                      |
 | `validate_abis_exports`                 | `utils:validate-abis-exports`                 |
+| `download-artifacts`                    | `...`                                         |
 | `generate-stabletoken-files`            | `...`                                         |
 | `revoke`                                | `...`                                         |
+| `upload-artifacts`                      | `...`                                         |

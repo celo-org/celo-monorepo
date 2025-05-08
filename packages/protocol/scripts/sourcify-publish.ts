@@ -43,6 +43,7 @@ type Artifact = {
   contractName: string
 }
 
+// TODO: Check if this script works during next deployment
 async function main(buildTargets: BuildOptions) {
   const artifactBasePath = buildTargets.buildArtifactsPath || './build/contracts'
   const artifactPaths = fs.readdirSync(artifactBasePath)

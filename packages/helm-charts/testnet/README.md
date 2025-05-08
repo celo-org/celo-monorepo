@@ -1,5 +1,8 @@
 # Testnet Helm Chart
 
+> All helm charts in this package are deprecated and should be removed
+> Instead - we use: https://github.com/celo-org/charts
+
 This helm chart allows you to deploy testnets, on which you can deploy smart contracts or interact with our app. See the README at the parent folder for more general Helm
 
 `NAMESPACE_NAME` is the Kubernetes namespace all Kubernetes primitives are getting deployed to. This isolates various networks from each other. `RELEASE_NAME` is the helm chart release name, i.e. a consistent name that refers to the primitives as a group. By convention, `NAMESPACE_NAME` and `RELEASE_NAME` should be the same name and just use [a-z0-9\-] characters so that most scripts you just pass `NAME` instead of having to specify all the names separately. However if you would like to, you can generally use the `-r` or `-n` flags to do so.
@@ -49,13 +52,13 @@ yarn run devchain:init-network -n $NAME
 You can then share the contract build artifacts by running:
 
 ```bash
-yarn run artifacts:upload -n $NAME
+yarn run upload-artifacts -n $NAME
 ```
 
 This will upload the build artifacts to the cluster, and can be consequently downloaded via:
 
 ```bash
-yarn run artifacts:download -n $NAME
+yarn run download-artifacts -n $NAME
 ```
 
 This will download the build artifacts to your build folder, as if you deployed the contracts yourself.
@@ -64,8 +67,6 @@ You should be sure to update the appropriate yaml file in `packages/blockchain-a
 
 The last step is to update the contract ABIs and addresses for use in the mobile app as per [mobile README](../../mobile/README.md)
 
-
-[//]: <> (FIXME: packages/mobile does not exist)
 ```bash
 # pwd: .../packages/mobile
 yarn run update-contracts --testnets=testnet_prod,integration,argentinastaging,argentinaproduction,$NAME

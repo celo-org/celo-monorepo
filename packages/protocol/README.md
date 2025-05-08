@@ -31,43 +31,7 @@ yarn run devchain:migrate -n NETWORK
 
 ### Accounts
 
-To give an account some gold, wrapped gold, and stable token, run:
-
-[//]: <> (FIXME: faucet does not exist)
-```bash
-yarn run faucet -n NETWORK -a ACCOUNT_ADDRESS
-```
-
-You can check balances by running:
-
-[//]: <> (FIXME: get-balances does not exist)
-```bash
-yarn run get-balances -n NETWORK -a ACCOUNT_ADDRESS
-```
-
-You can run 'onlyOwner' methods via the [MultiSig](contracts/common/MultiSig.sol) by running:
-
-```bash
-yarn run truffle:govern -n NETWORK -c "stableToken.setMinter(0x1234)"
-```
-
-### Build artifacts
-
-When interacting with one of our Kubernetes-deployed networks, you can download the build artifacts to a local directory using:
-
-```bash
-yarn run artifacts:download -n NAME
-```
-
-You must run this before interacting with one of these networks to have the build artifacts available locally.
-
-If you changed the build artifacts (e.g. by running the `devchain:init-network` or `devchain:migrate` script), upload the new build artifacts with:
-
-```bash
-yarn run artifacts:upload -n NAME
-```
-
-By default, `NAME` will be set as `RELEASE_NAME`, `NAMESPACE_NAME`, `TESTNET_NAME` which you should have used with the same name in prior instructions. If you used separate names for the above, you can customize the run with the `-r -n -t` flags respectively.
+TBD
 
 ### Console
 
