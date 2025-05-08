@@ -38,4 +38,6 @@ interface ILockedCelo {
   function getAccountTotalGovernanceVotingPower(address account) external view returns (uint256);
   function unlockingPeriod() external view returns (uint256);
   function getAccountNonvotingLockedCelo(address account) external view returns (uint256);
+
+  function getAccountTotalLockedGold(address account) external view returns (uint256);
 }

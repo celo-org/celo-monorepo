@@ -16,7 +16,6 @@ import "@celo-contracts-8/stability/test/MockStableToken.sol";
 
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
-import { WhenL2, WhenL2NoInitialization } from "@test-sol/utils/WhenL2-08.sol";
 
 contract EpochManagerTest is TestWithUtils08 {
   EpochManager_WithMocks epochManagerContract;
@@ -117,6 +116,7 @@ contract EpochManagerTest is TestWithUtils08 {
 
     validators.setEpochRewards(validator1, validator1Reward);
     validators.setEpochRewards(validator2, validator2Reward);
+    whenL2WithEpochManagerInitialization();
   }
 
   function setupAndElectValidators() public {
@@ -181,18 +181,6 @@ contract EpochManagerTest is TestWithUtils08 {
   }
 }
 
-contract EpochManagerTest_L2_NoInit is EpochManagerTest, WhenL2NoInitialization {
-  function setUp() public virtual override(EpochManagerTest, WhenL2NoInitialization) {
-    super.setUp();
-  }
-}
-
-contract EpochManagerTest_L2 is EpochManagerTest, WhenL2 {
-  function setUp() public virtual override(EpochManagerTest, WhenL2) {
-    super.setUp();
-  }
-}
-
 contract EpochManagerTest_initialize is EpochManagerTest {
   function test_initialize() public virtual {
     assertEq(address(epochManagerContract.registry()), REGISTRY_ADDRESS);
@@ -215,22 +203,12 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
 
   function setUp() public override {
     super.setUp();
-    _registerAndElectValidatorsForL2();
-    epochManagerEnabler.captureEpochAndValidators();
-    setCeloUnreleasedTreasuryBalance();
 
     lastKnownEpochNumber = epochManagerEnabler.lastKnownEpochNumber();
     lastKnownFirstBlockOfEpoch = epochManagerEnabler.lastKnownFirstBlockOfEpoch();
     lastKnownElectedAccounts = epochManagerEnabler.getlastKnownElectedAccounts();
   }
   function test_processCanBeStarted() public virtual {
-    vm.prank(address(epochManagerEnabler));
-
-    epochManagerContract.initializeSystem(
-      lastKnownEpochNumber,
-      lastKnownFirstBlockOfEpoch,
-      lastKnownElectedAccounts
-    );
     (
       uint256 _firstEpochBlock,
       uint256 _lastEpochBlock,
@@ -247,12 +225,6 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
   }
 
   function test_Reverts_processCannotBeStartedAgain() public virtual {
-    vm.prank(address(epochManagerEnabler));
-    epochManagerContract.initializeSystem(
-      lastKnownEpochNumber,
-      lastKnownFirstBlockOfEpoch,
-      lastKnownElectedAccounts
-    );
     vm.prank(address(epochManagerEnabler));
     vm.expectRevert("Epoch system already initialized");
     epochManagerContract.initializeSystem(
@@ -273,20 +245,6 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
 }
 
 contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
-  function test_Reverts_onL1() public {
-    vm.expectRevert("Epoch system not initialized");
-    epochManagerContract.startNextEpochProcess();
-  }
-}
-
-contract EpochManagerTest_startNextEpochProcess_L2_NoInit is EpochManagerTest_L2_NoInit {
-  function test_Reverts_whenSystemNotInitialized() public {
-    vm.expectRevert("Epoch system not initialized");
-    epochManagerContract.startNextEpochProcess();
-  }
-}
-
-contract EpochManagerTest_startNextEpochProcess_L2 is EpochManagerTest_L2 {
   function test_Reverts_WhenEndOfEpochHasNotBeenReached() public {
     vm.expectRevert("Epoch is not ready to start");
     epochManagerContract.startNextEpochProcess();
@@ -375,15 +333,6 @@ contract EpochManagerTest_setEpochDuration is EpochManagerTest {
     vm.expectRevert("New epoch duration must be greater than zero.");
     epochManagerContract.setEpochDuration(0);
   }
-}
-
-contract EpochManagerTest_setEpochDuration_L2 is
-  EpochManagerTest_L2,
-  EpochManagerTest_setEpochDuration
-{
-  function setUp() public override(EpochManagerTest_L2, EpochManagerTest) {
-    super.setUp();
-  }
 
   function test_Reverts_WhenIsOnEpochProcess() public {
     setupAndElectValidators();
@@ -423,15 +372,6 @@ contract EpochManagerTest_setOracleAddress is EpochManagerTest {
     vm.expectRevert("Oracle address cannot be the same.");
     epochManagerContract.setOracleAddress(address(sortedOracles));
   }
-}
-
-contract EpochManagerTest_setOracleAddress_L2 is
-  EpochManagerTest_L2,
-  EpochManagerTest_setOracleAddress
-{
-  function setUp() public override(EpochManagerTest_L2, EpochManagerTest) {
-    super.setUp();
-  }
 
   function test_Reverts_WhenIsOnEpochProcess() public {
     setupAndElectValidators();
@@ -453,47 +393,7 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
 
   uint256 epochManagerBalanceBefore;
 
-  function setUp() public override {
-    super.setUp();
-    _registerAndElectValidatorsForL2();
-    validators.setValidatorGroup(group);
-    validators.setValidator(validator1);
-    validators.setValidator(validator2);
-
-    address[] memory members = new address[](2);
-    members[0] = validator1;
-    members[1] = validator2;
-    validators.setMembers(group, members);
-
-    stableToken.mint(address(epochManagerContract), paymentAmount * 2);
-    epochManagerBalanceBefore = stableToken.balanceOf(address(epochManagerContract));
-    epochManagerContract._setPaymentAllocation(validator1, paymentAmount);
-  }
-
-  function test_Reverts_onL1() public {
-    validators.setCommission(group, fiftyPercent);
-    vm.prank(validator1);
-    accountsContract.setPaymentDelegation(beneficiary, fiftyPercent);
-
-    vm.expectRevert("Epoch system not initialized");
-
-    epochManagerContract.sendValidatorPayment(validator1);
-  }
-}
-
-contract EpochManagerTest_sendValidatorPayment_L2 is EpochManagerTest_L2 {
-  address beneficiary = actor("beneficiary");
-
-  uint256 paymentAmount = 4 ether;
-  uint256 quarterOfPayment = paymentAmount / 4;
-  uint256 halfOfPayment = paymentAmount / 2;
-  uint256 threeQuartersOfPayment = (paymentAmount / 4) * 3;
-  uint256 twentyFivePercent = 250000000000000000000000;
-  uint256 fiftyPercent = 500000000000000000000000;
-
-  uint256 epochManagerBalanceBefore;
-
-  function setUp() public override(EpochManagerTest_L2) {
+  function setUp() public override(EpochManagerTest) {
     super.setUp();
 
     validators.setValidatorGroup(group);
@@ -615,18 +515,9 @@ contract EpochManagerTest_sendValidatorPayment_L2 is EpochManagerTest_L2 {
 }
 
 contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
-  function test_Reverts_onL1() public {
-    address[] memory groups = new address[](0);
-
-    vm.expectRevert("Epoch process is not started");
-    epochManagerContract.finishNextEpochProcess(groups, groups, groups);
-  }
-}
-
-contract EpochManagerTest_finishNextEpochProcess_L2 is EpochManagerTest_L2 {
   uint256 groupEpochRewards = 44e18;
 
-  function setUp() public override(EpochManagerTest_L2) {
+  function setUp() public override(EpochManagerTest) {
     super.setUp();
 
     setupAndElectValidators();
@@ -725,16 +616,9 @@ contract EpochManagerTest_finishNextEpochProcess_L2 is EpochManagerTest_L2 {
 }
 
 contract EpochManagerTest_setToProcessGroups is EpochManagerTest {
-  function test_Reverts_onL1() public {
-    vm.expectRevert("Epoch process is not started");
-    epochManagerContract.setToProcessGroups();
-  }
-}
-
-contract EpochManagerTest_setToProcessGroups_L2 is EpochManagerTest_L2 {
   uint256 groupEpochRewards = 44e18;
 
-  function setUp() public override(EpochManagerTest_L2) {
+  function setUp() public override(EpochManagerTest) {
     super.setUp();
 
     setupAndElectValidators();
@@ -802,16 +686,9 @@ contract EpochManagerTest_setToProcessGroups_L2 is EpochManagerTest_L2 {
 }
 
 contract EpochManagerTest_processGroup is EpochManagerTest {
-  function test_Reverts_onL1() public {
-    vm.expectRevert("Indivudual epoch process is not started");
-    epochManagerContract.processGroup(group, address(0), address(0));
-  }
-}
-
-contract EpochManagerTest_processGroup_L2 is EpochManagerTest_L2 {
   uint256 groupEpochRewards = 44e18;
 
-  function setUp() public override(EpochManagerTest_L2) {
+  function setUp() public override(EpochManagerTest) {
     super.setUp();
 
     setupAndElectValidators();
@@ -910,15 +787,7 @@ contract EpochManagerTest_processGroup_L2 is EpochManagerTest_L2 {
 }
 
 contract EpochManagerTest_getEpochByNumber is EpochManagerTest {
-  function test_Reverts_onL1() public {
-    vm.expectRevert("Epoch system not initialized");
-
-    epochManagerContract.getEpochByNumber(9);
-  }
-}
-
-contract EpochManagerTest_getEpochByNumber_L2 is EpochManagerTest_L2 {
-  function setUp() public override(EpochManagerTest_L2) {
+  function setUp() public override(EpochManagerTest) {
     super.setUp();
 
     setupAndElectValidators();
@@ -1001,14 +870,7 @@ contract EpochManagerTest_getEpochByNumber_L2 is EpochManagerTest_L2 {
 }
 
 contract EpochManagerTest_getEpochNumberOfBlock is EpochManagerTest {
-  function test_Reverts_WhenL1() public {
-    vm.expectRevert("Epoch system not initialized");
-    epochManagerContract.getEpochNumberOfBlock(75);
-  }
-}
-
-contract EpochManagerTest_getEpochNumberOfBlock_L2 is EpochManagerTest_L2 {
-  function setUp() public override(EpochManagerTest_L2) {
+  function setUp() public override(EpochManagerTest) {
     super.setUp();
   }
 
@@ -1021,14 +883,7 @@ contract EpochManagerTest_getEpochNumberOfBlock_L2 is EpochManagerTest_L2 {
 }
 
 contract EpochManagerTest_getEpochByBlockNumber is EpochManagerTest {
-  function test_Reverts_WhenL1() public {
-    vm.expectRevert("Epoch system not initialized");
-    epochManagerContract.getEpochNumberOfBlock(1000);
-  }
-}
-
-contract EpochManagerTest_getEpochByBlockNumber_L2 is EpochManagerTest_L2 {
-  function setUp() public override(EpochManagerTest_L2) {
+  function setUp() public override(EpochManagerTest) {
     super.setUp();
     setupAndElectValidators();
     _travelAndProcess_N_L2Epoch(2);
@@ -1049,14 +904,7 @@ contract EpochManagerTest_getEpochByBlockNumber_L2 is EpochManagerTest_L2 {
 }
 
 contract EpochManagerTest_numberOfElectedInCurrentSet is EpochManagerTest {
-  function test_Reverts_WhenL1() public {
-    vm.expectRevert("Epoch system not initialized");
-    epochManagerContract.numberOfElectedInCurrentSet();
-  }
-}
-
-contract EpochManagerTest_numberOfElectedInCurrentSet_L2 is EpochManagerTest_L2 {
-  function setUp() public override(EpochManagerTest_L2) {
+  function setUp() public override(EpochManagerTest) {
     super.setUp();
     setupAndElectValidators();
   }
@@ -1069,14 +917,7 @@ contract EpochManagerTest_numberOfElectedInCurrentSet_L2 is EpochManagerTest_L2 
 }
 
 contract EpochManagerTest_getElectedAccounts is EpochManagerTest {
-  function test_Reverts_WhenL1() public {
-    vm.expectRevert("Epoch system not initialized");
-    epochManagerContract.getElectedAccounts();
-  }
-}
-
-contract EpochManagerTest_getElectedAccounts_L2 is EpochManagerTest_L2 {
-  function setUp() public override(EpochManagerTest_L2) {
+  function setUp() public override(EpochManagerTest) {
     super.setUp();
     setupAndElectValidators();
   }
@@ -1089,14 +930,7 @@ contract EpochManagerTest_getElectedAccounts_L2 is EpochManagerTest_L2 {
 }
 
 contract EpochManagerTest_getElectedAccountByIndex is EpochManagerTest {
-  function test_Reverts_WhenL1() public {
-    vm.expectRevert("Epoch system not initialized");
-    epochManagerContract.getElectedAccountByIndex(0);
-  }
-}
-
-contract EpochManagerTest_getElectedAccountByIndex_L2 is EpochManagerTest_L2 {
-  function setUp() public override(EpochManagerTest_L2) {
+  function setUp() public override(EpochManagerTest) {
     super.setUp();
     setupAndElectValidators();
   }
@@ -1106,14 +940,7 @@ contract EpochManagerTest_getElectedAccountByIndex_L2 is EpochManagerTest_L2 {
 }
 
 contract EpochManagerTest_getElectedSigners is EpochManagerTest {
-  function test_Reverts_WhenL1() public {
-    vm.expectRevert("Epoch system not initialized");
-    epochManagerContract.getElectedSigners();
-  }
-}
-
-contract EpochManagerTest_getElectedSigners_L2 is EpochManagerTest_L2 {
-  function setUp() public override(EpochManagerTest_L2) {
+  function setUp() public override(EpochManagerTest) {
     super.setUp();
     setupAndElectValidators();
   }
@@ -1129,14 +956,7 @@ contract EpochManagerTest_getElectedSigners_L2 is EpochManagerTest_L2 {
 }
 
 contract EpochManagerTest_getElectedSignerByIndex is EpochManagerTest {
-  function test_Reverts_WhenL1() public {
-    vm.expectRevert("Epoch system not initialized");
-    epochManagerContract.getElectedSignerByIndex(1);
-  }
-}
-
-contract EpochManagerTest_getElectedSignerByIndex_L2 is EpochManagerTest_L2 {
-  function setUp() public override(EpochManagerTest_L2) {
+  function setUp() public override(EpochManagerTest) {
     super.setUp();
     setupAndElectValidators();
   }

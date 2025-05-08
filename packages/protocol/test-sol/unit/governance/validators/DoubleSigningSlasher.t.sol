@@ -2,8 +2,7 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "celo-foundry/Test.sol";
-import { TestConstants } from "@test-sol/constants.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
@@ -13,7 +12,11 @@ import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/DoubleSigningSlasher.sol";
 import "@celo-contracts/governance/test/MockUsingPrecompiles.sol";
 
-contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecompiles, Test {
+contract DoubleSigningSlasherTest is
+  DoubleSigningSlasher(true),
+  MockUsingPrecompiles,
+  TestWithUtils
+{
   struct SlashParams {
     address signer;
     uint256 index;
@@ -51,12 +54,11 @@ contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecom
   }
 }
 
-contract DoubleSigningSlasherBaseTest is Test, TestConstants {
+contract DoubleSigningSlasherBaseTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
 
   SlashingIncentives public expectedSlashingIncentives;
 
-  Registry registry;
   Accounts accounts;
   MockValidators validators;
   MockLockedGold lockedGold;
@@ -96,6 +98,7 @@ contract DoubleSigningSlasherBaseTest is Test, TestConstants {
   event DoubleSigningSlashPerformed(address indexed validator, uint256 indexed blockNumber);
 
   function setUp() public {
+    super.setUp();
     ph.setEpochSize(100);
     (nonOwner, nonOwnerPK) = actorWithPK("nonOwner");
     (validator, validatorPK) = actorWithPK("validator");
@@ -110,8 +113,6 @@ contract DoubleSigningSlasherBaseTest is Test, TestConstants {
     validators = new MockValidators();
     lockedGold = new MockLockedGold();
     slasher = new DoubleSigningSlasherTest();
-
-    registry = Registry(REGISTRY_ADDRESS);
 
     accounts.createAccount();
 
@@ -153,10 +154,7 @@ contract DoubleSigningSlasherBaseTest is Test, TestConstants {
     lockedGold.setAccountTotalLockedGold(otherValidator, 50000);
     lockedGold.setAccountTotalLockedGold(group, 50000);
     lockedGold.setAccountTotalLockedGold(otherGroup, 50000);
-  }
-
-  function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+    whenL2WithEpochManagerInitialization();
   }
 }
 
@@ -178,40 +176,10 @@ contract DoubleSigningSlasherInitialize is DoubleSigningSlasherBaseTest {
 }
 
 contract DoubleSigningSlasherSetSlashingIncentives is DoubleSigningSlasherBaseTest {
-  function test_RevertWhen_CalledByNonOwner() public {
-    vm.prank(nonOwner);
-    vm.expectRevert("Ownable: caller is not the owner");
-    slasher.setSlashingIncentives(123, 67);
-  }
-
-  function test_RevertWhen_RewardGreaterThanPenalty() public {
-    vm.expectRevert("Penalty has to be larger than reward");
-    slasher.setSlashingIncentives(123, 678);
-  }
-
-  function test_ShouldSetSlashingIncentives() public {
-    uint256 newPenalty = 123;
-    uint256 newReward = 67;
-    slasher.setSlashingIncentives(newPenalty, newReward);
-
-    (uint256 actualPenalty, uint256 actualReward) = slasher.slashingIncentives();
-    assertEq(actualPenalty, newPenalty);
-    assertEq(actualReward, newReward);
-  }
-
-  function test_Emits_SlashingIncentivesSetEvent() public {
-    uint256 newPenalty = 123;
-    uint256 newReward = 67;
-    vm.expectEmit(true, true, true, true);
-    emit SlashingIncentivesSet(newPenalty, newReward);
-    slasher.setSlashingIncentives(newPenalty, newReward);
-  }
-
   function test_ShouldRevert_WhenInL2() public {
     uint256 newPenalty = 123;
     uint256 newReward = 67;
 
-    _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
     slasher.setSlashingIncentives(newPenalty, newReward);
   }
@@ -235,181 +203,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
   address[] groupElectionGreaters = new address[](0);
   uint256[] groupElectionIndices = new uint256[](0);
 
-  function setUp() public {
-    super.setUp();
-
-    slasher.setBlockNumber(headerA, blockNumber);
-    slasher.setBlockNumber(headerB, blockNumber + 1);
-    slasher.setBlockNumber(headerC, blockNumber);
-
-    epoch = slasher.getEpochNumberOfBlock(blockNumber);
-
-    slasher.setEpochSigner(epoch, validatorIndex, address(validator));
-    slasher.setEpochSigner(epoch, otherValidatorIndex, address(otherValidator));
-
-    slasher.setNumberValidators(7);
-    slasher.setVerifiedSealBitmap(headerA, bitmap);
-    slasher.setVerifiedSealBitmap(headerB, bitmap);
-    slasher.setVerifiedSealBitmap(headerC, bitmap);
-  }
-
-  function test_RevertIf_BlockNumbersDoNotMatch() public {
-    params = DoubleSigningSlasherTest.SlashParams({
-      signer: validator,
-      index: validatorIndex,
-      headerA: headerA,
-      headerB: headerB,
-      groupMembershipHistoryIndex: 0,
-      validatorElectionLessers: validatorElectionLessers,
-      validatorElectionGreaters: validatorElectionGreaters,
-      validatorElectionIndices: validatorElectionIndices,
-      groupElectionLessers: groupElectionLessers,
-      groupElectionGreaters: groupElectionGreaters,
-      groupElectionIndices: groupElectionIndices
-    });
-    vm.expectRevert("Block headers are from different height");
-    slasher.mockSlash(params, validator);
-  }
-
-  function test_RevertIf_NotSignedAtIndex() public {
-    params = DoubleSigningSlasherTest.SlashParams({
-      signer: otherValidator,
-      index: otherValidatorIndex,
-      headerA: headerA,
-      headerB: headerC,
-      groupMembershipHistoryIndex: 0,
-      validatorElectionLessers: validatorElectionLessers,
-      validatorElectionGreaters: validatorElectionGreaters,
-      validatorElectionIndices: validatorElectionIndices,
-      groupElectionLessers: groupElectionLessers,
-      groupElectionGreaters: groupElectionGreaters,
-      groupElectionIndices: groupElectionIndices
-    });
-
-    vm.expectRevert("Didn't sign first block");
-
-    slasher.mockSlash(params, otherValidator);
-  }
-
-  function test_RevertIf_EpochSignerIsWrong() public {
-    params = DoubleSigningSlasherTest.SlashParams({
-      signer: otherValidator,
-      index: validatorIndex,
-      headerA: headerA,
-      headerB: headerC,
-      groupMembershipHistoryIndex: 0,
-      validatorElectionLessers: validatorElectionLessers,
-      validatorElectionGreaters: validatorElectionGreaters,
-      validatorElectionIndices: validatorElectionIndices,
-      groupElectionLessers: groupElectionLessers,
-      groupElectionGreaters: groupElectionGreaters,
-      groupElectionIndices: groupElectionIndices
-    });
-
-    vm.expectRevert("Wasn't a signer with given index");
-    slasher.mockSlash(params, validator);
-  }
-
-  function test_RevertIf_NotEnoughSigners() public {
-    slasher.setNumberValidators(100);
-
-    params = DoubleSigningSlasherTest.SlashParams({
-      signer: validator,
-      index: validatorIndex,
-      headerA: headerA,
-      headerB: headerC,
-      groupMembershipHistoryIndex: 0,
-      validatorElectionLessers: validatorElectionLessers,
-      validatorElectionGreaters: validatorElectionGreaters,
-      validatorElectionIndices: validatorElectionIndices,
-      groupElectionLessers: groupElectionLessers,
-      groupElectionGreaters: groupElectionGreaters,
-      groupElectionIndices: groupElectionIndices
-    });
-
-    vm.expectRevert("Not enough signers in the first block");
-    slasher.mockSlash(params, validator);
-  }
-
-  function test_Emits_DoubleSigningSlashPerformedEvent() public {
-    params = DoubleSigningSlasherTest.SlashParams({
-      signer: validator,
-      index: validatorIndex,
-      headerA: headerA,
-      headerB: headerC,
-      groupMembershipHistoryIndex: 0,
-      validatorElectionLessers: validatorElectionLessers,
-      validatorElectionGreaters: validatorElectionGreaters,
-      validatorElectionIndices: validatorElectionIndices,
-      groupElectionLessers: groupElectionLessers,
-      groupElectionGreaters: groupElectionGreaters,
-      groupElectionIndices: groupElectionIndices
-    });
-    vm.expectEmit(true, true, true, true);
-    emit DoubleSigningSlashPerformed(validator, blockNumber);
-    slasher.mockSlash(params, validator);
-  }
-
-  function test_ShouldDecrementCELO() public {
-    params = DoubleSigningSlasherTest.SlashParams({
-      signer: validator,
-      index: validatorIndex,
-      headerA: headerA,
-      headerB: headerC,
-      groupMembershipHistoryIndex: 0,
-      validatorElectionLessers: validatorElectionLessers,
-      validatorElectionGreaters: validatorElectionGreaters,
-      validatorElectionIndices: validatorElectionIndices,
-      groupElectionLessers: groupElectionLessers,
-      groupElectionGreaters: groupElectionGreaters,
-      groupElectionIndices: groupElectionIndices
-    });
-
-    slasher.mockSlash(params, validator);
-
-    assertEq(lockedGold.accountTotalLockedGold(validator), 40000);
-  }
-
-  function test_ShouldAlsoSlashGroup() public {
-    params = DoubleSigningSlasherTest.SlashParams({
-      signer: validator,
-      index: validatorIndex,
-      headerA: headerA,
-      headerB: headerC,
-      groupMembershipHistoryIndex: 0,
-      validatorElectionLessers: validatorElectionLessers,
-      validatorElectionGreaters: validatorElectionGreaters,
-      validatorElectionIndices: validatorElectionIndices,
-      groupElectionLessers: groupElectionLessers,
-      groupElectionGreaters: groupElectionGreaters,
-      groupElectionIndices: groupElectionIndices
-    });
-
-    slasher.mockSlash(params, validator);
-    assertEq(lockedGold.accountTotalLockedGold(group), 40000);
-  }
-
-  function test_RevertWhen_SlashedTwice() public {
-    params = DoubleSigningSlasherTest.SlashParams({
-      signer: validator,
-      index: validatorIndex,
-      headerA: headerA,
-      headerB: headerC,
-      groupMembershipHistoryIndex: 0,
-      validatorElectionLessers: validatorElectionLessers,
-      validatorElectionGreaters: validatorElectionGreaters,
-      validatorElectionIndices: validatorElectionIndices,
-      groupElectionLessers: groupElectionLessers,
-      groupElectionGreaters: groupElectionGreaters,
-      groupElectionIndices: groupElectionIndices
-    });
-    slasher.mockSlash(params, validator);
-    vm.expectRevert("Already slashed");
-    slasher.mockSlash(params, validator);
-  }
-
   function test_Reverts_WhenL2() public {
-    _whenL2();
     params = DoubleSigningSlasherTest.SlashParams({
       signer: validator,
       index: validatorIndex,
