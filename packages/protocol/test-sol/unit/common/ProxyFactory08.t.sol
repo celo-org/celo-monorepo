@@ -1,11 +1,14 @@
 pragma solidity ^0.8.15;
 
-import "@celo-contracts-8/common/ProxyFactory08.sol";
-import "@celo-contracts/common/interfaces/IProxy.sol";
+import { ProxyFactory08 } from "@celo-contracts-8/common/ProxyFactory08.sol";
+import { StringUtils } from "@celo-contracts/common/libraries/StringUtils.sol";
+import { IProxy } from "@celo-contracts/common/interfaces/IProxy.sol";
 
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
 contract ProxyFactoryTest is TestWithUtils08 {
+  using StringUtils for string;
+
   ProxyFactory08 proxyFactory08;
   bytes proxyInitCode;
   address constant owner = address(0xAA963FC97281d9632d96700aB62A4D1340F9a28a);
@@ -61,7 +64,7 @@ contract ProxyFactoryTest is TestWithUtils08 {
     string memory bytecodeToCompare = substring(bytecodeString, 0, compareLength);
 
     // Assert that the truncated bytecode matches
-    assert(compareStrings(bytecodeBackUpToCompare, bytecodeToCompare));
+    assert(bytecodeBackUpToCompare.compareStrings(bytecodeToCompare));
   }
 
   function substring(
