@@ -31,7 +31,7 @@ contract MigrationsConstants is TestConstants {
     "OdisPayments",
     "Random",
     "Registry", // FIXME: Should Registry be inside Registry?
-    "ScoreManager"
+    "ScoreManager",
     "SortedOracles",
     "Validators",
     "MentoFeeHandlerSeller",
