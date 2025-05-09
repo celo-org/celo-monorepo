@@ -139,11 +139,6 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
     return (addr, pk);
   }
 
-  // This function can be also found in OpenZeppelin's library, but in a newer version than the one we use.
-  function compareStrings(string memory a, string memory b) public pure returns (bool) {
-    return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
-  }
-
   function _registerAndElectValidatorsForL2() internal {
     address enablerAddr = registry.getAddressFor(EPOCH_MANAGER_ENABLER_REGISTRY_ID);
     epochManagerEnablerMockInterface = IEpochManagerEnablerMock(enablerAddr);
