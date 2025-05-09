@@ -46,6 +46,10 @@ contract MockGovernance is IGovernance {
     revert("not implemented");
   }
 
+  function getConstitution(address, bytes4) external view returns (uint256) {
+    revert("not implemented");
+  }
+
   function votePartially(uint256, uint256, uint256, uint256, uint256) external returns (bool) {
     return true;
   }

@@ -15,7 +15,8 @@ time FOUNDRY_PROFILE=devchain forge test \
 -vvv \
 --match-path "*test-sol/devchain/e2e/*" \
 --isolate \
---fork-url $ANVIL_RPC_URL
+--fork-url $ANVIL_RPC_URL \
+--ffi
 
 # Stop devchain
 echo "Stopping devchain..."

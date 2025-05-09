@@ -5,6 +5,7 @@ export FROM_ACCOUNT="0x$FROM_ACCOUNT_NO_ZERO" # Anvil default account (1)
 # Anvil configurations (Source: https://book.getfoundry.sh/reference/anvil/)
 export ANVIL_PORT=8546
 export ANVIL_RPC_URL="http://127.0.0.1:$ANVIL_PORT"
+export ANVIL_LOGGING_ENABLED=true # Flag to enable or disable logging. Useful for local development
 export GAS_LIMIT=50000000
 export CODE_SIZE_LIMIT=245760 # EIP-170: Contract code size limit in bytes. Useful to increase for tests. [default: 0x6000 (~25kb)]
 export BALANCE=60000 # Set the balance of the accounts. [default: 10000]
