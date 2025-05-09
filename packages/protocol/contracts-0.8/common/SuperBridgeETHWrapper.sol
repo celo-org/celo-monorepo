@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity ^0.8.15;
+pragma solidity >=0.8.7 <0.8.20;
 
 import "../../contracts/common/Initializable.sol";
-import "@openzeppelin/contracts8/access/Ownable.sol";
 import "./interfaces/IStandardBridge.sol";
 import "./interfaces/IWETH.sol";
 
