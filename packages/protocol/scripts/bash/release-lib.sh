@@ -21,7 +21,7 @@ function build_tag() {
   [ -d contracts ] && rm -r contracts
   [ -d contracts-0.8 ] && rm -r contracts-0.8
 
-  git checkout $BRANCH -- contracts* 2>>$LOG_FILE >> $LOG_FILE
+  git restore --source $BRANCH contracts* 2>>$LOG_FILE >> $LOG_FILE
 
   if [ ! -d $BUILD_DIR ]; then
     echo " - Build contract artifacts at $BUILD_DIR"
@@ -32,5 +32,5 @@ function build_tag() {
 
   [ -d contracts ] && rm -r contracts
   [ -d contracts-0.8 ] && rm -r contracts-0.8
-  git checkout $CURRENT_HASH -- contracts* 2>>$LOG_FILE >> $LOG_FILE
+  git restore --source $CURRENT_HASH --staged --worktree contracts* 2>>$LOG_FILE >> $LOG_FILE
 }
