@@ -47,24 +47,25 @@ export CELO_UNRELEASED_TREASURY_INITIAL_BALANCE="$(($GOLD_TOKEN_CELO_SUPPLY_CAP 
 export RESERVE_INITIAL_BALANCE="5000000" # setting this here because it gets overwritten in the L2 migration script
 
 # Contract libraries
-export LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
-                "contracts/common/Signatures.sol:Signatures"
-                "contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
-                "contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList"
-                "contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"
-                "contracts/governance/Proposals.sol:Proposals"
+export LIBRARIES_PATH=(
+  "contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
+  "contracts/common/Signatures.sol:Signatures"
+  "contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
+  "contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList"
+  "contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"
+  "contracts/governance/Proposals.sol:Proposals"
 )
 export LIBRARY_DEPENDENCIES_PATH=(
-    "contracts/common/FixidityLib.sol"
-    "contracts/common/linkedlists/LinkedList.sol"
-    "contracts-0.8/common/linkedlists/LinkedList.sol"
-    "contracts/common/linkedlists/SortedLinkedList.sol"
-    "contracts/common/linkedlists/SortedLinkedListWithMedian.sol"
-    "lib/openzeppelin-contracts/contracts/math/SafeMath.sol"
-    "lib/openzeppelin-contracts8/contracts/utils/math/SafeMath.sol"
-    "lib/openzeppelin-contracts/contracts/math/Math.sol"
-    "lib/openzeppelin-contracts/contracts/cryptography/ECDSA.sol"
-    "lib/openzeppelin-contracts/contracts/utils/Address.sol"
-    "lib/solidity-bytes-utils/contracts/BytesLib.sol"
-    "lib/celo-foundry/lib/forge-std/src/console.sol"
+  "contracts/common/FixidityLib.sol"
+  "contracts/common/linkedlists/LinkedList.sol"
+  "contracts-0.8/common/linkedlists/LinkedList.sol"
+  "contracts/common/linkedlists/SortedLinkedList.sol"
+  "contracts/common/linkedlists/SortedLinkedListWithMedian.sol"
+  "lib/openzeppelin-contracts/contracts/math/SafeMath.sol"
+  "lib/openzeppelin-contracts8/contracts/utils/math/SafeMath.sol"
+  "lib/openzeppelin-contracts/contracts/math/Math.sol"
+  "lib/openzeppelin-contracts/contracts/cryptography/ECDSA.sol"
+  "lib/openzeppelin-contracts/contracts/utils/Address.sol"
+  "lib/solidity-bytes-utils/contracts/BytesLib.sol"
+  "lib/celo-foundry/lib/forge-std/src/console.sol"
 )

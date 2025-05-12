@@ -1055,7 +1055,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         string memory contractName_ = contractsNames_[i];
 
         // skip proxy
-        if (contractName_.compareStrings("proxy")) {
+        if (contractName_.equals("proxy")) {
           continue;
         }
 

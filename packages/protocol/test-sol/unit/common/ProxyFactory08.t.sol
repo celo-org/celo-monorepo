@@ -64,7 +64,7 @@ contract ProxyFactoryTest is TestWithUtils08 {
     string memory bytecodeToCompare = substring(bytecodeString, 0, compareLength);
 
     // Assert that the truncated bytecode matches
-    assert(bytecodeBackUpToCompare.compareStrings(bytecodeToCompare));
+    assert(bytecodeBackUpToCompare.equals(bytecodeToCompare));
   }
 
   function substring(

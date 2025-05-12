@@ -26,14 +26,14 @@ source $PWD/scripts/foundry/start_anvil.sh
 source $PWD/scripts/foundry/deploy_libraries.sh
 echo "Library flags are: $LIBRARY_FLAGS"
 
+# Build map of selectors from constitution
+source $PWD/scripts/foundry/build_constitution_selectors_map.sh
+
 # Build all contracts with deployed libraries
 # Including contracts that depend on libraries. This step replaces the library placeholder
 # in the bytecode with the address of the actually deployed library.
 echo "Compiling with libraries..."
 time FOUNDRY_PROFILE=devchain forge build $LIBRARY_FLAGS
-
-# Build map of selectors from constitution
-source $PWD/scripts/foundry/build_constitution_selectors_map.sh
 
 # Deploy precompile contracts
 source $PWD/scripts/foundry/deploy_precompiles.sh
