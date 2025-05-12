@@ -32,6 +32,9 @@ echo "Library flags are: $LIBRARY_FLAGS"
 echo "Compiling with libraries..."
 time FOUNDRY_PROFILE=devchain forge build $LIBRARY_FLAGS
 
+# Build map of selectors from constitution
+source $PWD/scripts/foundry/build_constitution_selectors_map.sh
+
 # Deploy precompile contracts
 source $PWD/scripts/foundry/deploy_precompiles.sh
 
