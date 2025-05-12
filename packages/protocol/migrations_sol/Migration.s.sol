@@ -59,6 +59,7 @@ import { UsingRegistry } from "@celo-contracts-8/common/UsingRegistry.sol";
 
 // Local imports
 import { StringUtils } from "@celo-contracts/common/libraries/StringUtils.sol";
+import { SelectorParser } from "@celo-contracts/common/test/SelectorParser.sol";
 
 // Test imports
 import { ISECP256K1 } from "@test-sol/utils/SECP256K1.sol";
@@ -77,6 +78,7 @@ contract ForceTx {
 contract Migration is Script, UsingRegistry, MigrationsConstants {
   using stdJson for string;
   using StringUtils for string;
+  using SelectorParser for string;
 
   struct InitParamsTunnel {
     // The number of blocks to delay a ValidatorGroup's commission
@@ -1049,6 +1051,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     IGovernance governance_ = IGovernance(_governanceAddress);
     string memory constitutionJson_ = vm.readFile("./governanceConstitution.json");
     string[] memory contractsNames_ = vm.parseJsonKeys(constitutionJson_, "$");
+    string memory selectorJson_;
+    string[] memory functionsWithTypes_;
 
     if (!skipSetConstitution_) {
       for (uint256 i = 0; i < contractsNames_.length; i++) {
@@ -1068,6 +1072,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
           string.concat(".", contractName_)
         );
 
+        // load selectors for given contract from file
+        selectorJson_ = vm.readFile(string.concat("./.tmp/selectors/", contractName_, ".json"));
+
+        // get function names with types
+        functionsWithTypes_ = vm.parseJsonKeys(selectorJson_, "");
+
         // loop over function names
         for (uint256 j = 0; j < functionNames_.length; j++) {
           string memory functionName_ = functionNames_[j];
@@ -1075,9 +1085,14 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
             string.concat("  Setting constitution thresholds for function : ", functionName_)
           );
 
-          // get function selector
-          // TODO: Replace with selector
-          bytes4 selector_ = bytes4(keccak256(bytes(functionName_)));
+          bytes4 selector_;
+          if (functionName_.equals("default")) {
+            // use empty selector as default
+            selector_ = hex"00000000";
+          } else {
+            // retrieve selector from selector JSON
+            selector_ = selectorJson_.getSelector(functionsWithTypes_, functionName_, vm);
+          }
 
           // get threshold for function
           uint256 threshold_ = abi.decode(
