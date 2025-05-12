@@ -33,6 +33,7 @@
     "lint:ts": "yarn run --top-level eslint .",
     "release:check-opcodes": "yarn ts-node scripts/check-opcodes.ts",
     "release:check-versions": "./scripts/bash/check-versions.sh",
+    "release:check-versions:foundry": "./scripts/bash/check-versions-foundry.sh",
     "release:determine-release-version": "yarn --silent ts-node --preferTsExts ./scripts/determine-release-version.ts",
     "release:make": "./scripts/bash/make-release.sh",
     "release:verify-deployed": "./scripts/bash/verify-deployed.sh",
