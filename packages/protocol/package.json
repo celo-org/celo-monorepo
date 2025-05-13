@@ -56,6 +56,7 @@
     "anvil-devchain:status": "if nc -z localhost 8546; then echo 'Devchain is serving at http://localhost:8546'; else echo 'Devchain is not running.'; fi",
     "anvil-devchain:stop": "./scripts/foundry/stop_anvil.sh",
     "anvil-devchain:e2e-tests": "./scripts/foundry/run_e2e_tests_in_anvil.sh",
+    "anvil-devchain:e2e-tests:no-logs": "ANVIL_LOGGING=false ./scripts/foundry/run_e2e_tests_in_anvil.sh",
     "anvil-devchain:integration-tests": "./scripts/foundry/run_integration_tests_in_anvil.sh",
     "view-tags": "git for-each-ref 'refs/tags/core-contracts.*' --sort=-committerdate --format='%(color:magenta)%(committerdate:short) %(color:blue)%(tree) %(color:green)github.com/celo-org/celo-monorepo/releases/tag/%(color:yellow)%(refname:short)'",
     "generate-stabletoken-files": "yarn ts-node ./scripts/generate-stabletoken-files.ts",
