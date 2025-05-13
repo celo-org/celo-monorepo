@@ -1,8 +1,6 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloTxObject } from '@celo/connect'
 import { getBlsPoP, getBlsPublicKey } from '@celo/cryptographic-utils/lib/bls'
-import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
-import { ArtifactsSingleton } from '@celo/protocol/lib/artifactsSingleton'
 import {
   getDeployedProxiedContract,
   sendTransactionWithPrivateKey,
@@ -12,8 +10,7 @@ import { privateKeyToAddress, privateKeyToPublicKey } from '@celo/utils/lib/addr
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { signMessage } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
-import { AccountsInstance, ElectionInstance, LockedGoldInstance } from 'types'
-import { ValidatorsInstance } from 'types/08'
+import { AccountsInstance, ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
 import Web3 from 'web3'
 
 const truffle = require('@celo/protocol/truffle-config.js')
@@ -224,8 +221,6 @@ async function registerValidator(
 }
 
 module.exports = async (_deployer: any, networkName: string) => {
-  const artifacts08 = ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE, artifacts)
-
   const accounts: AccountsInstance = await getDeployedProxiedContract<AccountsInstance>(
     'Accounts',
     artifacts
@@ -233,7 +228,7 @@ module.exports = async (_deployer: any, networkName: string) => {
 
   const validators: ValidatorsInstance = await getDeployedProxiedContract<ValidatorsInstance>(
     'Validators',
-    artifacts08
+    artifacts
   )
 
   const lockedGold: LockedGoldInstance = await getDeployedProxiedContract<LockedGoldInstance>(

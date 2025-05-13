@@ -113,6 +113,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           'Random',
           'Registry',
           'SortedOracles',
+          'Validators',
         ],
       },
       {
@@ -129,13 +130,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
         __contractPackage: MENTO_PACKAGE,
       },
       {
-        contracts: [
-          'GasPriceMinimum',
-          'Validators',
-          'EpochManager',
-          'ScoreManager',
-          'EpochManagerEnabler',
-        ],
+        contracts: ['GasPriceMinimum'],
         __contractPackage: SOLIDITY_08_PACKAGE,
       },
     ]

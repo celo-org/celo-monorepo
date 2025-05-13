@@ -20,7 +20,3 @@
 	path = packages/protocol/lib/celo-foundry
 	url = https://github.com/celo-org/celo-foundry
 	branch = celo-foundry-v0.5.13
-[submodule "packages/protocol/lib/solidity-bytes-utils-8"]
-	path = packages/protocol/lib/solidity-bytes-utils-8
-	url = https://github.com/GNSPS/solidity-bytes-utils
-	branch = master

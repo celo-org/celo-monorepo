@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Read environment variables and constants
-source $PWD/scripts/foundry/constants.sh
+# Name of temporary directory
+TEMP_DIR_NAME=".tmp/libraries"
+TEMP_DIR="$PWD/$TEMP_DIR_NAME"
 
 # Create a temporary directory or remove it first it if exists
 if [ -d "$TEMP_DIR" ]; then
@@ -12,6 +13,14 @@ fi
 mkdir $TEMP_DIR
 
 # Copy libraries to the directory
+LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
+                "contracts/common/Signatures.sol:Signatures"
+                "contracts/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
+                "contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList"
+                "contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"
+                "contracts/governance/Proposals.sol:Proposals"
+)
+
 for LIB_PATH in "${LIBRARIES_PATH[@]}"; do
     IFS=":" read -r SOURCE DEST <<< "$LIB_PATH"
     DEST_FILE="$TEMP_DIR/$SOURCE"
@@ -21,11 +30,23 @@ for LIB_PATH in "${LIBRARIES_PATH[@]}"; do
     cp "$SOURCE" "$DEST_FILE"
 done
 
+# Copy dependencies of the libraries to the directory
+LIBRARY_DEPENDENCIES_PATH=(
+    "contracts/common/FixidityLib.sol"
+    "contracts/common/linkedlists/LinkedList.sol"
+    "contracts/common/linkedlists/SortedLinkedList.sol"
+    "contracts/common/linkedlists/SortedLinkedListWithMedian.sol"
+    "lib/openzeppelin-contracts/contracts/math/SafeMath.sol"
+    "lib/openzeppelin-contracts/contracts/math/Math.sol"
+    "lib/openzeppelin-contracts/contracts/cryptography/ECDSA.sol"   
+    "lib/openzeppelin-contracts/contracts/utils/Address.sol"
+    "lib/solidity-bytes-utils/contracts/BytesLib.sol"
+)
+
 # Creating two variables for better readability
 SOURCE_DIR=$PWD
 DEST_DIR=$TEMP_DIR
 
-# Copy dependencies of the libraries to the directory
 for LIB_PATH in "${LIBRARY_DEPENDENCIES_PATH[@]}"; do
     # Creates directory for the dependency, including any necessary parent directories
     mkdir -p $DEST_DIR/$(dirname $LIB_PATH)
@@ -33,9 +54,8 @@ for LIB_PATH in "${LIBRARY_DEPENDENCIES_PATH[@]}"; do
     cp $SOURCE_DIR/$LIB_PATH $DEST_DIR/$LIB_PATH
 done
 
-# Copy foundry config and remappings to the temporary directory
+# Copy foundry config to the temporary directory
 cp $SOURCE_DIR/foundry.toml $DEST_DIR/foundry.toml
-cp $SOURCE_DIR/remappings.txt $DEST_DIR/remappings.txt
 
 # Move into the temporary directory
 pushd $TEMP_DIR
@@ -53,7 +73,7 @@ for LIB_PATH in "${LIBRARIES_PATH[@]}"; do
     # LIB_PATH = "contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
     # LIB_NAME = AddressSortedLinkedListWithMedian
     echo "Deploying library: $LIB_NAME"
-    create_library_out=`forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url $ANVIL_RPC_URL --unlocked --json`
+    create_library_out=`forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url http://127.0.0.1:$ANVIL_PORT --unlocked --json`
     LIB_ADDRESS=`echo $create_library_out | jq -r '.deployedTo'`
     # Constructing library flag so the remaining contracts can be built and linkeded to these libraries
     LIBRARY_FLAGS="$LIBRARY_FLAGS --libraries $LIB_PATH:$LIB_ADDRESS"

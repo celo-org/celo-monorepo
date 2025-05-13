@@ -1,23 +1,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-### This scripts sets up a local Anvil instance, deploys libraries, precompiles, and runs migrations
-
-# Read environment variables and constants
-source $PWD/scripts/foundry/constants.sh
-
 # Keeping track of start time to measure how long it takes to run the script entirely
 START_TIME=$SECONDS
 
+export ANVIL_PORT=8546
+
 echo "Forge version: $(forge --version)"
 
+# TODO make this configurable
+FROM_ACCOUNT_NO_ZERO="f39Fd6e51aad88F6F4ce6aB8827279cffFb92266" # This is Anvil's default account (1)
+export FROM_ACCOUNT="0x$FROM_ACCOUNT_NO_ZERO"
+
 # Create temporary directory
-if [ -d "$TMP_FOLDER" ]; then
+TEMP_FOLDER="$PWD/.tmp"
+if [ -d "$TEMP_FOLDER" ]; then
     # Remove temporary directory first it if exists
     echo "Removing existing temporary folder..."
-    rm -rf $TMP_FOLDER
+    rm -rf $TEMP_FOLDER
 fi
-mkdir -p $TMP_FOLDER
+mkdir -p $TEMP_FOLDER
 
 # Start a local anvil instance
 source $PWD/scripts/foundry/start_anvil.sh
@@ -29,64 +31,36 @@ echo "Library flags are: $LIBRARY_FLAGS"
 # Build all contracts with deployed libraries
 # Including contracts that depend on libraries. This step replaces the library placeholder
 # in the bytecode with the address of the actually deployed library.
-echo "Compiling with libraries..."
-time FOUNDRY_PROFILE=devchain forge build $LIBRARY_FLAGS
+echo "Compiling with libraries... "
+time forge build $LIBRARY_FLAGS
 
 # Deploy precompile contracts
 source $PWD/scripts/foundry/deploy_precompiles.sh
 
 echo "Setting Registry Proxy"
-PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode.object' ./out/Proxy.sol/Proxy.json)
-cast rpc anvil_setCode $REGISTRY_ADDRESS $PROXY_DEPLOYED_BYTECODE --rpc-url $ANVIL_RPC_URL
+REGISTRY_ADDRESS="0x000000000000000000000000000000000000ce10"
+PROXY_BYTECODE=`cat ./out/Proxy.sol/Proxy.json | jq -r '.deployedBytecode.object'`
+cast rpc anvil_setCode --rpc-url http://127.0.0.1:$ANVIL_PORT $REGISTRY_ADDRESS $PROXY_BYTECODE
+REGISTRY_OWNER_ADDRESS=$FROM_ACCOUNT_NO_ZERO
 
-# Sets the storage of the registry so that it has an owner we control
 echo "Setting Registry owner"
-cast rpc \
-anvil_setStorageAt \
-$REGISTRY_ADDRESS $REGISTRY_STORAGE_LOCATION "0x000000000000000000000000$REGISTRY_OWNER_ADDRESS" \
---rpc-url $ANVIL_RPC_URL
+# Sets the storage of the registry so that it has an owner we control
+# position is bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1);
+cast rpc anvil_setStorageAt --rpc-url http://127.0.0.1:$ANVIL_PORT $REGISTRY_ADDRESS 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 "0x000000000000000000000000$REGISTRY_OWNER_ADDRESS"
 
-# Run migrations
+# run migrations
 echo "Running migration script... "
-forge script \
-  $MIGRATION_SCRIPT_PATH \
-  --target-contract $MIGRATION_TARGET_CONTRACT \
-  --sender $FROM_ACCOUNT \
-  --unlocked \
-  $VERBOSITY_LEVEL \
-  $BROADCAST \
-  $SKIP_SIMULATION \
-  $NON_INTERACTIVE \
-  $LIBRARY_FLAGS \
-  --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
-
-CELO_EPOCH_REWARDS_ADDRESS=$(
-  cast call \
-    $REGISTRY_ADDRESS \
-    "getAddressForStringOrDie(string calldata identifier)(address)" \
-    "EpochRewards" \
-    --rpc-url $ANVIL_RPC_URL
-)
-
-echo "Setting storage of EpochRewards start time to same value as on mainnet"
-# Storage slot of start time is 2 and the value is 1587587214 which is identical to mainnet
-cast rpc \
-anvil_setStorageAt \
-$CELO_EPOCH_REWARDS_ADDRESS 2 "0x000000000000000000000000000000000000000000000000000000005ea0a88e" \
---rpc-url $ANVIL_RPC_URL
+# helpers to disable broadcast and simulation
+# TODO move to configuration
+BROADCAST="--broadcast"
+SKIP_SIMULATION=""
+# SKIP_SIMULATION="--skip-simulation" 
+# BROADCAST=""
+time forge script migrations_sol/Migration.s.sol --tc Migration --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive --sender $FROM_ACCOUNT --unlocked $LIBRARY_FLAGS || echo "Migration script failed"
 
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
-echo "Migration script total elapsed time: $ELAPSED_TIME seconds"
-
-# this helps to make sure that devchain state is actually being saved
-sleep $SLEEP_DURATION
-
-if [[ "${KEEP_DEVCHAIN_FOLDER:-}" == "true" ]]; then
-    cp $ANVIL_FOLDER/state.json $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME
-    echo "Keeping devchain folder as per flag."
-else
-    # Rename devchain artifact and remove unused directory
-    mv $ANVIL_FOLDER/state.json $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME
-    rm -rf $ANVIL_FOLDER
-fi
+echo "Total elapsed time: $ELAPSED_TIME seconds"
+# Rename devchain artifact and remove unused directory
+mv $TEMP_FOLDER/devchain/state.json $TEMP_FOLDER/devchain.json
+rm -rf $TEMP_FOLDER/devchain

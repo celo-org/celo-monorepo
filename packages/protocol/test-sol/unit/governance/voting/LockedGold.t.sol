@@ -2,12 +2,12 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-import "@test-sol/utils/WhenL2.sol";
+import "celo-foundry/Test.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
+import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
-import "@test-sol/unit/common/CeloTokenMock.sol";
+import "@test-sol/unit/common/GoldTokenMock.sol";
 import "@celo-contracts/governance/LockedGold.sol";
 import "@celo-contracts/governance/ReleaseGold.sol";
 import "@celo-contracts/governance/Election.sol";
@@ -16,13 +16,12 @@ import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockGovernance.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 
-import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";
-
-contract LockedGoldTest is TestWithUtils {
+contract LockedGoldTest is Test {
   using FixidityLib for FixidityLib.Fraction;
 
+  Registry registry;
   Accounts accounts;
-  GoldToken celoToken;
+  GoldToken goldToken;
   MockStableToken stableToken;
   MockElection election;
   MockGovernance governance;
@@ -36,24 +35,6 @@ contract LockedGoldTest is TestWithUtils {
 
   address randomAddress = actor("randomAddress");
   address caller = address(this);
-  TestBlocker blocker;
-
-  address delegatee1 = actor("delegatee1");
-  address delegatee2 = actor("delegatee2");
-  address delegatee3 = actor("delegatee3");
-  address delegator = actor("delegator");
-  address delegator2 = actor("delegator2");
-  address reporter = actor("reporter");
-  string slasherName = "DowntimeSlasher";
-  address downtimeSlasher = actor(slasherName);
-  address delegatorSigner;
-  uint256 delegatorSignerPK;
-  address delegatorSigner2;
-  uint256 delegatorSigner2PK;
-  address delegateeSigner1;
-  uint256 delegateeSigner1PK;
-  address delegateeSigner2;
-  uint256 delegateeSigner2PK;
 
   event UnlockingPeriodSet(uint256 period);
   event GoldLocked(address indexed account, uint256 value);
@@ -83,9 +64,11 @@ contract LockedGoldTest is TestWithUtils {
   event MaxDelegateesCountSet(uint256 value);
 
   function setUp() public {
-    super.setUp();
+    address registryAddress = 0x000000000000000000000000000000000000ce10;
+    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    registry = Registry(registryAddress);
 
-    celoToken = new CeloTokenMock();
+    goldToken = new GoldTokenMock();
     accounts = new Accounts(true);
     lockedGold = new LockedGold(true);
     election = new MockElection();
@@ -95,23 +78,13 @@ contract LockedGoldTest is TestWithUtils {
 
     registry.setAddressFor("Accounts", address(accounts));
     registry.setAddressFor("Election", address(election));
+    registry.setAddressFor("GoldToken", address(goldToken));
     registry.setAddressFor("Governance", address(governance));
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("StableToken", address(stableToken));
     lockedGold.initialize(address(registry), unlockingPeriod);
     accounts.createAccount();
-
-    blocker = new TestBlocker();
-
-    lockedGold.setBlockedByContract(address(blocker));
-
-    (delegatorSigner, delegatorSignerPK) = actorWithPK("delegatorSigner");
-    (delegatorSigner2, delegatorSigner2PK) = actorWithPK("delegatorSigner2");
-    (delegateeSigner1, delegateeSigner1PK) = actorWithPK("delegateeSigner1");
-    (delegateeSigner2, delegateeSigner2PK) = actorWithPK("delegateeSigner2");
-    vm.deal(delegator, 10 ether);
-    vm.deal(delegator2, 10 ether);
   }
 
   function getParsedSignatureOfAddress(
@@ -235,42 +208,7 @@ contract LockedGoldTest is TestWithUtils {
     vm.prank(celoOwner);
     lockedGold.lock.value(value)();
   }
-
-  function whenVoteSigner_LockedGoldDelegateGovernanceVotes() public {
-    helper_WhenVoteSigners(
-      WhenVoteSignerStruct(
-        delegator,
-        delegator2,
-        delegatee1,
-        delegatee2,
-        delegatorSignerPK,
-        delegateeSigner1PK,
-        delegatorSigner2PK,
-        delegateeSigner2PK,
-        true
-      )
-    );
-  }
-
-  function helper_WhenAccountIsSlashedForAllOfItsLockedGold(
-    uint256 penalty,
-    uint256 reward,
-    address accountToSlash
-  ) public {
-    address[] memory lessers = new address[](1);
-    lessers[0] = address(0);
-    address[] memory greaters = new address[](1);
-    greaters[0] = address(0);
-
-    uint256[] memory indices = new uint256[](1);
-    indices[0] = 0;
-
-    vm.prank(downtimeSlasher);
-    lockedGold.slash(accountToSlash, penalty, reporter, reward, lessers, greaters, indices);
-  }
 }
-
-contract LockedGoldTest_L2 is WhenL2, LockedGoldTest {}
 
 contract LockedGoldTest_initialize is LockedGoldTest {
   function setUp() public {
@@ -313,8 +251,6 @@ contract LockedGoldTest_setRegistry is LockedGoldTest {
   }
 }
 
-contract LockedGoldTest_setRegistry_L2 is LockedGoldTest_L2, LockedGoldTest_setRegistry {}
-
 contract LockedGoldTest_setUnlockingPeriod is LockedGoldTest {
   function setUp() public {
     super.setUp();
@@ -344,11 +280,6 @@ contract LockedGoldTest_setUnlockingPeriod is LockedGoldTest {
     lockedGold.setUnlockingPeriod(100);
   }
 }
-
-contract LockedGoldTest_setUnlockingPeriod_L2 is
-  LockedGoldTest_L2,
-  LockedGoldTest_setUnlockingPeriod
-{}
 
 contract LockedGoldTest_lock is LockedGoldTest {
   uint256 value = 1000;
@@ -394,8 +325,6 @@ contract LockedGoldTest_lock is LockedGoldTest {
     lockedGold.lock.value(1)();
   }
 }
-
-contract LockedGoldTest_lock_L2 is LockedGoldTest_L2, LockedGoldTest_lock {}
 
 contract LockedGoldTest_unlock is LockedGoldTest {
   uint256 value = 1000;
@@ -579,8 +508,6 @@ contract LockedGoldTest_unlock is LockedGoldTest {
   }
 }
 
-contract LockedGoldTest_unlock_L2 is LockedGoldTest_L2, LockedGoldTest_unlock {}
-
 contract LockedGoldTest_unlockDelegation is LockedGoldTest {
   uint256 value = 1000;
   uint256 availabilityTime = unlockingPeriod + block.timestamp;
@@ -656,8 +583,6 @@ contract LockedGoldTest_unlockDelegation is LockedGoldTest {
   }
 }
 
-contract LockedGoldTest_unlockDelegation_L2 is LockedGoldTest_L2, LockedGoldTest_unlockDelegation {}
-
 contract LockedGoldTest_unlock_WhenDelegation2Delegatees is LockedGoldTest {
   uint256 value = 1000;
   uint256 availabilityTime = unlockingPeriod + block.timestamp;
@@ -722,11 +647,6 @@ contract LockedGoldTest_unlock_WhenDelegation2Delegatees is LockedGoldTest {
     assertEq(governance.removeVotesCalledFor(delegatee2), originallyDelegatedAmount / 2);
   }
 }
-
-contract LockedGoldTest_unlock_WhenDelegation2Delegatees_L2 is
-  LockedGoldTest_L2,
-  LockedGoldTest_unlock_WhenDelegation2Delegatees
-{}
 
 contract LockedGoldTest_unlock_WhenDelegatingTo3Delegatees is LockedGoldTest {
   uint256 value = 5;
@@ -860,11 +780,6 @@ contract LockedGoldTest_unlock_WhenDelegatingTo3Delegatees is LockedGoldTest {
     lockedGold.unlock(toUnlock);
   }
 }
-
-contract LockedGoldTest_unlock_WhenDelegatingTo3Delegatees_L2 is
-  LockedGoldTest_L2,
-  LockedGoldTest_unlock_WhenDelegatingTo3Delegatees
-{}
 
 contract LockedGoldTest_lock_AfterUnlocking is LockedGoldTest {
   uint256 pendingWithdrawalValue = 100;
@@ -1029,11 +944,6 @@ contract LockedGoldTest_lock_AfterUnlocking is LockedGoldTest {
   }
 }
 
-contract LockedGoldTest_lock_AfterUnlocking_L2 is
-  LockedGoldTest_L2,
-  LockedGoldTest_lock_AfterUnlocking
-{}
-
 contract LockedGoldTest_withdraw is LockedGoldTest {
   uint256 value = 1000;
   uint256 index = 0;
@@ -1074,8 +984,6 @@ contract LockedGoldTest_withdraw is LockedGoldTest {
   function() external payable {}
 }
 
-contract LockedGoldTest_withdraw_L2 is LockedGoldTest_L2, LockedGoldTest_withdraw {}
-
 contract LockedGoldTest_addSlasher is LockedGoldTest {
   string slasherName = "DowntimeSlasher";
   address downtimeSlasher = actor(slasherName);
@@ -1103,8 +1011,6 @@ contract LockedGoldTest_addSlasher is LockedGoldTest {
     lockedGold.addSlasher(slasherName);
   }
 }
-
-contract LockedGoldTest_addSlasher_L2 is LockedGoldTest_L2, LockedGoldTest_addSlasher {}
 
 contract LockedGoldTest_removeSlasher is LockedGoldTest {
   string slasherName = "DowntimeSlasher";
@@ -1148,12 +1054,13 @@ contract LockedGoldTest_removeSlasher is LockedGoldTest {
   }
 }
 
-contract LockedGoldTest_removeSlasher_L2 is LockedGoldTest_L2, LockedGoldTest_removeSlasher {}
-
 contract LockedGoldTest_slash is LockedGoldTest {
+  string slasherName = "DowntimeSlasher";
   uint256 value = 1000;
   address group = actor("group");
   address groupMember = actor("groupMember");
+  address reporter = actor("reporter");
+  address downtimeSlasher = actor(slasherName);
   address delegatee = actor("delegatee");
 
   Election electionSlashTest;
@@ -1185,25 +1092,22 @@ contract LockedGoldTest_slash is LockedGoldTest {
 
     vm.prank(reporter);
     accounts.createAccount();
-
-    vm.prank(delegatee1);
-    accounts.createAccount();
-    vm.prank(delegatee2);
-    accounts.createAccount();
-    vm.prank(delegatee3);
-    accounts.createAccount();
-    vm.prank(delegator);
-    accounts.createAccount();
-    vm.prank(delegator2);
-    accounts.createAccount();
   }
 
-  function test_Reverts_WhenBlocked() public {
-    uint256 penalty = value;
-    uint256 reward = value / 2;
-    blocker.mockSetBlocked(true);
-    vm.expectRevert("Contract is blocked from performing this action");
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, caller);
+  function helper_WhenAccountIsSlashedForAllOfItsLockedGold(
+    uint256 penalty,
+    uint256 reward
+  ) public {
+    address[] memory lessers = new address[](1);
+    lessers[0] = address(0);
+    address[] memory greaters = new address[](1);
+    greaters[0] = address(0);
+
+    uint256[] memory indices = new uint256[](1);
+    indices[0] = 0;
+
+    vm.prank(downtimeSlasher);
+    lockedGold.slash(caller, penalty, reporter, reward, lessers, greaters, indices);
   }
 
   function test_ShouldReduceAccountsLockedGoldBalance_WhenAccountIsSlashedForAllOfItsLockedGold()
@@ -1211,7 +1115,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
   {
     uint256 penalty = value;
     uint256 reward = value / 2;
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, caller);
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(lockedGold.getAccountNonvotingLockedGold(caller), value - penalty);
     assertEq(lockedGold.getAccountTotalLockedGold(caller), value - penalty);
@@ -1222,7 +1126,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
   {
     uint256 penalty = value;
     uint256 reward = value / 2;
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, caller);
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(lockedGold.getAccountNonvotingLockedGold(reporter), reward);
     assertEq(lockedGold.getAccountTotalLockedGold(reporter), reward);
@@ -1233,7 +1137,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
   {
     uint256 penalty = value;
     uint256 reward = value / 2;
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, caller);
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(address(governance).balance, penalty - reward);
   }
@@ -1245,7 +1149,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
     uint256 reward = value / 2;
     lockedGold.removeSlasher(slasherName, 0);
     vm.expectRevert("Caller is not a whitelisted slasher.");
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, caller);
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
   }
 
   function test_ShouldReduceAccountsNonVotingLockedGoldBalance_WhenAccountIsSlashedForOnlyItsNonvotingBalance_WhenTheAccountHasHalfVotingAndHalfNonVotingGold()
@@ -1257,7 +1161,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
     uint256 reward = penalty / 2;
     electionSlashTest.vote(group, voting, address(0), address(0));
 
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, caller);
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
     assertEq(lockedGold.getAccountNonvotingLockedGold(caller), nonVoting - penalty);
   }
 
@@ -1269,7 +1173,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
     uint256 penalty = nonVoting;
     uint256 reward = penalty / 2;
     electionSlashTest.vote(group, voting, address(0), address(0));
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, caller);
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(lockedGold.getAccountTotalLockedGold(caller), value - penalty);
     assertEq(electionSlashTest.getTotalVotesByAccount(caller), voting);
@@ -1283,7 +1187,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
     uint256 penalty = nonVoting;
     uint256 reward = penalty / 2;
     electionSlashTest.vote(group, voting, address(0), address(0));
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, caller);
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(lockedGold.getAccountNonvotingLockedGold(reporter), reward);
     assertEq(lockedGold.getAccountTotalLockedGold(reporter), reward);
@@ -1297,7 +1201,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
     uint256 penalty = nonVoting;
     uint256 reward = penalty / 2;
     electionSlashTest.vote(group, voting, address(0), address(0));
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, caller);
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(address(governance).balance, penalty - reward);
   }
@@ -1310,7 +1214,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
     uint256 reward = penalty / 2;
     electionSlashTest.vote(group, voting, address(0), address(0));
 
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, caller);
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
     assertEq(lockedGold.getAccountNonvotingLockedGold(caller), 0);
   }
 
@@ -1321,7 +1225,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
     uint256 penalty = value;
     uint256 reward = penalty / 2;
     electionSlashTest.vote(group, voting, address(0), address(0));
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, caller);
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(lockedGold.getAccountTotalLockedGold(caller), 0);
     assertEq(electionSlashTest.getTotalVotesByAccount(caller), 0);
@@ -1334,7 +1238,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
     uint256 penalty = value;
     uint256 reward = penalty / 2;
     electionSlashTest.vote(group, voting, address(0), address(0));
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, caller);
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(lockedGold.getAccountNonvotingLockedGold(reporter), reward);
     assertEq(lockedGold.getAccountTotalLockedGold(reporter), reward);
@@ -1347,7 +1251,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
     uint256 penalty = value;
     uint256 reward = penalty / 2;
     electionSlashTest.vote(group, voting, address(0), address(0));
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, caller);
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(address(governance).balance, penalty - reward);
   }
@@ -1359,7 +1263,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
     uint256 penalty = value * 2;
     uint256 reward = penalty / 2;
     electionSlashTest.vote(group, voting, address(0), address(0));
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, caller);
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(lockedGold.getAccountNonvotingLockedGold(caller), 0);
     assertEq(lockedGold.getAccountTotalLockedGold(caller), 0);
@@ -1373,7 +1277,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
     uint256 penalty = value * 2;
     uint256 reward = penalty / 2;
     electionSlashTest.vote(group, voting, address(0), address(0));
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, caller);
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(lockedGold.getAccountNonvotingLockedGold(reporter), reward);
     assertEq(lockedGold.getAccountTotalLockedGold(reporter), reward);
@@ -1386,7 +1290,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
     uint256 penalty = value * 2;
     uint256 reward = penalty / 2;
     electionSlashTest.vote(group, voting, address(0), address(0));
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, caller);
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(address(governance).balance, value - reward);
   }
@@ -1415,32 +1319,28 @@ contract LockedGoldTest_slash is LockedGoldTest {
 
     uint256 reward = value / 2;
 
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(value, reward, caller);
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(value, reward);
     assertEq(lockedGold.getAccountNonvotingLockedGold(reporter), reward);
     assertEq(lockedGold.getAccountTotalLockedGold(reporter), reward);
   }
-
-  function test_ShouldReduceAccountsLockedGoldBalance_WhenAccountIsSlashedForAllOfItsLockedGoldAndIsDelegating()
-    public
-  {
-    uint256 penalty = value;
-    uint256 reward = value / 2;
-    whenVoteSigner_LockedGoldDelegateGovernanceVotes();
-    vm.prank(delegator);
-    lockedGold.delegateGovernanceVotes(delegatee1, FixidityLib.newFixedFraction(30, 100).unwrap());
-    assertEq(lockedGold.getAccountNonvotingLockedGold(delegator), 1000);
-    assertEq(lockedGold.getAccountTotalLockedGold(delegator), 1000);
-    assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegatee1), 300);
-    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, delegator);
-    assertEq(lockedGold.getAccountNonvotingLockedGold(delegator), 0);
-    assertEq(lockedGold.getAccountTotalLockedGold(delegator), 0);
-    assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegatee1), 0);
-  }
 }
 
-contract LockedGoldTest_slash_L2 is LockedGoldTest_L2, LockedGoldTest_slash {}
-
 contract LockedGoldTest_delegateGovernanceVotes is LockedGoldTest {
+  address delegatee1 = actor("delegatee1");
+  address delegatee2 = actor("delegatee2");
+  address delegatee3 = actor("delegatee3");
+  address delegator = actor("delegator");
+  address delegator2 = actor("delegator2");
+
+  address delegatorSigner;
+  uint256 delegatorSignerPK;
+  address delegatorSigner2;
+  uint256 delegatorSigner2PK;
+  address delegateeSigner1;
+  uint256 delegateeSigner1PK;
+  address delegateeSigner2;
+  uint256 delegateeSigner2PK;
+
   uint256 value = 1000;
   uint256 percentToDelegate = 30;
   uint256 delegatedAmount = (value * percentToDelegate) / 100;
@@ -1473,6 +1373,22 @@ contract LockedGoldTest_delegateGovernanceVotes is LockedGoldTest {
 
     vm.deal(delegator, 10 ether);
     vm.deal(delegator2, 10 ether);
+  }
+
+  function whenVoteSigner_LockedGoldDelegateGovernanceVotes() public {
+    helper_WhenVoteSigners(
+      WhenVoteSignerStruct(
+        delegator,
+        delegator2,
+        delegatee1,
+        delegatee2,
+        delegatorSignerPK,
+        delegateeSigner1PK,
+        delegatorSigner2PK,
+        delegateeSigner2PK,
+        true
+      )
+    );
   }
 
   function test_ShouldRevertWhenDelegateeIsNotAccount() public {
@@ -1823,12 +1739,22 @@ contract LockedGoldTest_delegateGovernanceVotes is LockedGoldTest {
   }
 }
 
-contract LockedGoldTest_delegateGovernanceVotes_L2 is
-  LockedGoldTest_L2,
-  LockedGoldTest_delegateGovernanceVotes
-{}
-
 contract LockedGoldTest_revokeDelegatedGovernanceVotes is LockedGoldTest {
+  address delegatee1 = actor("delegatee1");
+  address delegatee2 = actor("delegatee2");
+  address delegatee3 = actor("delegatee3");
+  address delegator = actor("delegator");
+  address delegator2 = actor("delegator2");
+
+  address delegatorSigner;
+  uint256 delegatorSignerPK;
+  address delegatorSigner2;
+  uint256 delegatorSigner2PK;
+  address delegateeSigner1;
+  uint256 delegateeSigner1PK;
+  address delegateeSigner2;
+  uint256 delegateeSigner2PK;
+
   uint256 value = 1000;
   uint256 percentageToRevoke = 2;
   uint256 percentageToDelegate = 10;
@@ -2182,11 +2108,6 @@ contract LockedGoldTest_revokeDelegatedGovernanceVotes is LockedGoldTest {
   }
 }
 
-contract LockedGoldTest_revokeDelegatedGovernanceVotes_L2 is
-  LockedGoldTest_L2,
-  LockedGoldTest_revokeDelegatedGovernanceVotes
-{}
-
 contract LockedGoldTest_getAccountTotalGovernanceVotingPower is LockedGoldTest {
   address delegator = actor("delegator");
   address delegatee = actor("delegatee");
@@ -2234,11 +2155,6 @@ contract LockedGoldTest_getAccountTotalGovernanceVotingPower is LockedGoldTest {
   }
 }
 
-contract LockedGoldTest_getAccountTotalGovernanceVotingPower_L2 is
-  LockedGoldTest_L2,
-  LockedGoldTest_getAccountTotalGovernanceVotingPower
-{}
-
 contract LockedGoldTest_getDelegatorDelegateeInfo is LockedGoldTest {
   address delegator = actor("delegator");
   address delegatee = actor("delegatee");
@@ -2280,11 +2196,6 @@ contract LockedGoldTest_getDelegatorDelegateeInfo is LockedGoldTest {
     assertEq(currentAmount, amount);
   }
 }
-
-contract LockedGoldTest_getDelegatorDelegateeInfo_L2 is
-  LockedGoldTest_L2,
-  LockedGoldTest_getDelegatorDelegateeInfo
-{}
 
 contract LockedGoldTest_getDelegatorDelegateeExpectedAndRealAmount is LockedGoldTest {
   address delegator = actor("delegator");
@@ -2402,11 +2313,6 @@ contract LockedGoldTest_getDelegatorDelegateeExpectedAndRealAmount is LockedGold
   }
 }
 
-contract LockedGoldTest_getDelegatorDelegateeExpectedAndRealAmount_L2 is
-  LockedGoldTest_L2,
-  LockedGoldTest_getDelegatorDelegateeExpectedAndRealAmount
-{}
-
 contract LockedGoldTest_updateDelegatedAmount is LockedGoldTest {
   address delegator = actor("delegator");
   address delegatee = actor("delegatee");
@@ -2484,11 +2390,6 @@ contract LockedGoldTest_updateDelegatedAmount is LockedGoldTest {
   }
 }
 
-contract LockedGoldTest_updateDelegatedAmount_L2 is
-  LockedGoldTest_L2,
-  LockedGoldTest_updateDelegatedAmount
-{}
-
 contract LockedGoldTest_getTotalPendingWithdrawalsCount is LockedGoldTest {
   uint256 value = 1000;
   address account = actor("account");
@@ -2518,11 +2419,6 @@ contract LockedGoldTest_getTotalPendingWithdrawalsCount is LockedGoldTest {
     assertEq(lockedGold.getTotalPendingWithdrawalsCount(randomAddress), 0);
   }
 }
-
-contract LockedGoldTest_getTotalPendingWithdrawalsCount_L2 is
-  LockedGoldTest_L2,
-  LockedGoldTest_getTotalPendingWithdrawalsCount
-{}
 
 contract LockedGoldTestGetPendingWithdrawalsInBatch is LockedGoldTest {
   uint256 value = 1000;
@@ -2606,8 +2502,3 @@ contract LockedGoldTestGetPendingWithdrawalsInBatch is LockedGoldTest {
     assertEq(timestamps.length, 0);
   }
 }
-
-contract LockedGoldTestGetPendingWithdrawalsInBatch_L2 is
-  LockedGoldTest_L2,
-  LockedGoldTestGetPendingWithdrawalsInBatch
-{}

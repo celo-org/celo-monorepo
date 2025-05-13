@@ -2,18 +2,20 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
+import "celo-foundry/Test.sol";
 import "@celo-contracts/common/FixidityLib.sol";
+import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-import "@test-sol/utils/WhenL2.sol";
-
-contract AccountsTest is TestWithUtils {
+contract AccountsTest is Test {
   using FixidityLib for FixidityLib.Fraction;
 
+  Registry registry;
   Accounts accounts;
   MockValidators validators;
+
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   string constant name = "Account";
   string constant metadataURL = "https://www.celo.org";
@@ -78,10 +80,14 @@ contract AccountsTest is TestWithUtils {
   event PaymentDelegationSet(address indexed beneficiary, uint256 fraction);
 
   function setUp() public {
-    super.setUp();
+    address registryAddress = 0x000000000000000000000000000000000000ce10;
+
+    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
 
     accounts = new Accounts(true);
     validators = new MockValidators();
+
+    registry = Registry(registryAddress);
 
     registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("Accounts", address(accounts));
@@ -91,6 +97,10 @@ contract AccountsTest is TestWithUtils {
 
     (caller, callerPK) = actorWithPK("caller");
     (caller2, caller2PK) = actorWithPK("caller2");
+  }
+
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
   }
 
   function getParsedSignatureOfAddress(
@@ -193,8 +203,6 @@ contract AccountsTest is TestWithUtils {
   }
 }
 
-contract AccountsTest_L2 is AccountsTest, WhenL2 {}
-
 contract AccountsTest_createAccount is AccountsTest {
   function setUp() public {
     super.setUp();
@@ -212,8 +220,6 @@ contract AccountsTest_createAccount is AccountsTest {
     accounts.createAccount();
   }
 }
-
-contract AccountsTest_createAccount_L2 is AccountsTest_L2, AccountsTest_createAccount {}
 
 contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
   function setUp() public {
@@ -249,11 +255,6 @@ contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
     accounts.setAccountDataEncryptionKey(dataEncryptionKey);
   }
 }
-
-contract AccountsTest_setAccountDataEncryptionKey_L2 is
-  AccountsTest_L2,
-  AccountsTest_setAccountDataEncryptionKey
-{}
 
 contract AccountsTest_setAccount is AccountsTest {
   function setUp() public {
@@ -341,8 +342,6 @@ contract AccountsTest_setAccount is AccountsTest {
   }
 }
 
-contract AccountsTest_setAccount_L2 is AccountsTest_L2, AccountsTest_setAccount {}
-
 contract AccountsTest_setWalletAddress is AccountsTest {
   function setUp() public {
     super.setUp();
@@ -393,8 +392,6 @@ contract AccountsTest_setWalletAddress is AccountsTest {
   }
 }
 
-contract AccountsTest_setWalletAddress_L2 is AccountsTest_L2, AccountsTest_setWalletAddress {}
-
 contract AccountsTest_setMetadataURL is AccountsTest {
   function setUp() public {
     super.setUp();
@@ -418,8 +415,6 @@ contract AccountsTest_setMetadataURL is AccountsTest {
     accounts.setMetadataURL(metadataURL);
   }
 }
-
-contract AccountsTest_setMetadataURL_L2 is AccountsTest_L2, AccountsTest_setMetadataURL {}
 
 contract AccountsTest_batchGetMetadataURL is AccountsTest {
   function setUp() public {
@@ -471,8 +466,6 @@ contract AccountsTest_batchGetMetadataURL is AccountsTest {
   }
 }
 
-contract AccountsTest_batchGetMetadataURL_L2 is AccountsTest_L2, AccountsTest_batchGetMetadataURL {}
-
 contract AccountsTest_addStorageRoot is AccountsTest {
   function setUp() public {
     super.setUp();
@@ -518,8 +511,6 @@ contract AccountsTest_addStorageRoot is AccountsTest {
     assertStorageRoots(string(concatenated), length, urls);
   }
 }
-
-contract AccountsTest_addStorageRoot_L2 is AccountsTest_L2, AccountsTest_addStorageRoot {}
 
 contract AccountsTest_removeStorageRoot is AccountsTest {
   function setUp() public {
@@ -597,8 +588,6 @@ contract AccountsTest_removeStorageRoot is AccountsTest {
   }
 }
 
-contract AccountsTest_removeStorageRoot_L2 is AccountsTest_L2, AccountsTest_removeStorageRoot {}
-
 contract AccountsTest_setPaymentDelegation is AccountsTest {
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
@@ -621,6 +610,13 @@ contract AccountsTest_setPaymentDelegation is AccountsTest {
     assertEq(realFraction, fraction);
   }
 
+  function test_Revert_SetPaymentDelegation_WhenL2() public {
+    _whenL2();
+    accounts.createAccount();
+    vm.expectRevert("This method is no longer supported in L2.");
+    accounts.setPaymentDelegation(beneficiary, fraction);
+  }
+
   function test_ShouldNotAllowFractionGreaterThan1() public {
     accounts.createAccount();
     vm.expectRevert("Fraction must not be greater than 1");
@@ -640,11 +636,6 @@ contract AccountsTest_setPaymentDelegation is AccountsTest {
     accounts.setPaymentDelegation(beneficiary, fraction);
   }
 }
-
-contract AccountsTest_setPaymentDelegation_L2 is
-  AccountsTest_L2,
-  AccountsTest_setPaymentDelegation
-{}
 
 contract AccountsTest_deletePaymentDelegation is AccountsTest {
   address beneficiary = actor("beneficiary");
@@ -676,11 +667,6 @@ contract AccountsTest_deletePaymentDelegation is AccountsTest {
   }
 }
 
-contract AccountsTest_deletePaymentDelegation_L2 is
-  AccountsTest_L2,
-  AccountsTest_deletePaymentDelegation
-{}
-
 contract AccountsTest_setName is AccountsTest {
   function setUp() public {
     super.setUp();
@@ -704,8 +690,6 @@ contract AccountsTest_setName is AccountsTest {
     accounts.setName(name);
   }
 }
-
-contract AccountsTest_setName_L2 is AccountsTest_L2, AccountsTest_setName {}
 
 contract AccountsTest_GenericAuthorization is AccountsTest {
   address account2 = actor("account2");
@@ -890,11 +874,6 @@ contract AccountsTest_GenericAuthorization is AccountsTest {
     assertEq(accounts.getDefaultSigner(address(this), role), address(this));
   }
 }
-
-contract AccountsTest_GenericAuthorization_L2 is
-  AccountsTest_L2,
-  AccountsTest_GenericAuthorization
-{}
 
 contract AccountsTest_BackwardCompatibility is AccountsTest {
   address account = address(this);
@@ -1563,8 +1542,3 @@ contract AccountsTest_BackwardCompatibility is AccountsTest {
     helper_ShouldRemoveSigner(Role.Validator, false, true);
   }
 }
-
-contract AccountsTest_BackwardCompatibility_L2 is
-  AccountsTest_L2,
-  AccountsTest_BackwardCompatibility
-{}

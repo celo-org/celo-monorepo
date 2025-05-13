@@ -71,22 +71,8 @@ library SortedLinkedList {
     bytes32 lesserKey,
     bytes32 greaterKey
   ) internal {
-    require(contains(list, key), "key not in list");
-    require(key != bytes32(0) && key != lesserKey && key != greaterKey, "invalid key");
-    require(
-      (lesserKey != bytes32(0) || greaterKey != bytes32(0)) || list.list.numElements == 1,
-      "greater and lesser key zero"
-    );
-
-    bytes32 oldLesserKey = list.list.elements[key].previousKey;
-    bytes32 oldGreaterKey = list.list.elements[key].nextKey;
-
-    if (isValueBetween(list, value, oldLesserKey, oldGreaterKey)) {
-      list.values[key] = value;
-    } else {
-      remove(list, key);
-      insert(list, key, value, lesserKey, greaterKey);
-    }
+    remove(list, key);
+    insert(list, key, value, lesserKey, greaterKey);
   }
 
   /**

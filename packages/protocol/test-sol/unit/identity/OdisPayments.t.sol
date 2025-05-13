@@ -3,14 +3,12 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
-import { TestConstants } from "@test-sol/constants.sol";
-
 import "@celo-contracts/identity/OdisPayments.sol";
 import { StableToken } from "@mento-core/contracts/StableToken.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Freezer.sol";
 
-contract OdisPaymentsFoundryTest is Test, TestConstants {
+contract OdisPaymentsFoundryTest is Test {
   uint256 FIXED1 = 1000000000000000000000000;
   uint256 SECONDS_IN_A_DAY = 60 * 60 * 24;
   uint256 startingBalanceCUSD = 1000;
@@ -26,9 +24,11 @@ contract OdisPaymentsFoundryTest is Test, TestConstants {
   event PaymentMade(address indexed account, uint256 valueInCUSD);
 
   function setUp() public {
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    address registryAddress = 0x000000000000000000000000000000000000ce10;
 
-    registry = Registry(REGISTRY_ADDRESS);
+    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+
+    registry = Registry(registryAddress);
     freezer = new Freezer(true);
     odisPayments = new OdisPayments(true);
     stableToken = new StableToken(true);

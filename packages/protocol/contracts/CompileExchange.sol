@@ -312,7 +312,7 @@ contract CompileExchange is
       goldBucket = goldBucket.add(sellAmount);
       stableBucket = stableBucket.sub(buyAmount);
       require(
-        getCeloToken().transferFrom(msg.sender, address(reserve), sellAmount),
+        getGoldToken().transferFrom(msg.sender, address(reserve), sellAmount),
         "Transfer of sell token failed"
       );
       require(IStableToken(stable).mint(msg.sender, buyAmount), "Mint of stable token failed");

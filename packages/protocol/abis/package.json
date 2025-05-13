@@ -4,7 +4,7 @@
   "license": "LGPL-3.0",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
-  "private": true,
+  "private": "true",
   "types": "./dist/types/index.d.ts",
   "typings": "./dist/types/index.d.ts",
   "repository": {
@@ -33,9 +33,6 @@
     "./BlockchainParameters.json": {
       "default": "./dist/BlockchainParameters.json"
     },
-    "./CeloUnreleasedTreasury.json": {
-      "default": "./dist/CeloUnreleasedTreasury.json"
-    },
     "./DoubleSigningSlasher.json": {
       "default": "./dist/DoubleSigningSlasher.json"
     },
@@ -44,12 +41,6 @@
     },
     "./Election.json": {
       "default": "./dist/Election.json"
-    },
-    "./EpochManager.json": {
-      "default": "./dist/EpochManager.json"
-    },
-    "./EpochManagerEnabler.json": {
-      "default": "./dist/EpochManagerEnabler.json"
     },
     "./EpochRewards.json": {
       "default": "./dist/EpochRewards.json"
@@ -69,9 +60,6 @@
     "./FederatedAttestations.json": {
       "default": "./dist/FederatedAttestations.json"
     },
-    "./FeeCurrencyDirectory.json": {
-      "default": "./dist/FeeCurrencyDirectory.json"
-    },
     "./FeeCurrencyWhitelist.json": {
       "default": "./dist/FeeCurrencyWhitelist.json"
     },
@@ -87,17 +75,11 @@
     "./GoldToken.json": {
       "default": "./dist/GoldToken.json"
     },
-    "./CeloToken.json": {
-      "default": "./dist/GoldToken.json"
-    },
     "./Governance.json": {
       "default": "./dist/Governance.json"
     },
     "./GovernanceApproverMultiSig.json": {
       "default": "./dist/GovernanceApproverMultiSig.json"
-    },
-    "./GovernanceSlasher.json": {
-      "default": "./dist/GovernanceSlasher.json"
     },
     "./GrandaMento.json": {
       "default": "./dist/GrandaMento.json"
@@ -112,9 +94,6 @@
       "default": "./dist/IERC20.json"
     },
     "./LockedGold.json": {
-      "default": "./dist/LockedGold.json"
-    },
-    "./LockedCelo.json": {
       "default": "./dist/LockedGold.json"
     },
     "./MentoFeeHandlerSeller.json": {
@@ -143,9 +122,6 @@
     },
     "./ReserveSpenderMultiSig.json": {
       "default": "./dist/ReserveSpenderMultiSig.json"
-    },
-    "./ScoreManager.json": {
-      "default": "./dist/ScoreManager.json"
     },
     "./SortedOracles.json": {
       "default": "./dist/SortedOracles.json"
@@ -180,11 +156,6 @@
       "require": "./dist/cjs/BlockchainParameters.js",
       "types": "./dist/types/BlockchainParameters.d.ts"
     },
-    "./CeloUnreleasedTreasury": {
-      "import": "./dist/esm/CeloUnreleasedTreasury.js",
-      "require": "./dist/cjs/CeloUnreleasedTreasury.js",
-      "types": "./dist/types/CeloUnreleasedTreasury.d.ts"
-    },
     "./DoubleSigningSlasher": {
       "import": "./dist/esm/DoubleSigningSlasher.js",
       "require": "./dist/cjs/DoubleSigningSlasher.js",
@@ -199,16 +170,6 @@
       "import": "./dist/esm/Election.js",
       "require": "./dist/cjs/Election.js",
       "types": "./dist/types/Election.d.ts"
-    },
-    "./EpochManager": {
-      "import": "./dist/esm/EpochManager.js",
-      "require": "./dist/cjs/EpochManager.js",
-      "types": "./dist/types/EpochManager.d.ts"
-    },
-    "./EpochManagerEnabler": {
-      "import": "./dist/esm/EpochManagerEnabler.js",
-      "require": "./dist/cjs/EpochManagerEnabler.js",
-      "types": "./dist/types/EpochManagerEnabler.d.ts"
     },
     "./EpochRewards": {
       "import": "./dist/esm/EpochRewards.js",
@@ -240,11 +201,6 @@
       "require": "./dist/cjs/FederatedAttestations.js",
       "types": "./dist/types/FederatedAttestations.d.ts"
     },
-    "./FeeCurrencyDirectory": {
-      "import": "./dist/esm/FeeCurrencyDirectory.js",
-      "require": "./dist/cjs/FeeCurrencyDirectory.js",
-      "types": "./dist/types/FeeCurrencyDirectory.d.ts"
-    },
     "./FeeCurrencyWhitelist": {
       "import": "./dist/esm/FeeCurrencyWhitelist.js",
       "require": "./dist/cjs/FeeCurrencyWhitelist.js",
@@ -270,11 +226,6 @@
       "require": "./dist/cjs/GoldToken.js",
       "types": "./dist/types/GoldToken.d.ts"
     },
-    "./CeloToken": {
-      "import": "./dist/esm/GoldToken.js",
-      "require": "./dist/cjs/GoldToken.js",
-      "types": "./dist/types/GoldToken.d.ts"
-    },
     "./Governance": {
       "import": "./dist/esm/Governance.js",
       "require": "./dist/cjs/Governance.js",
@@ -284,11 +235,6 @@
       "import": "./dist/esm/GovernanceApproverMultiSig.js",
       "require": "./dist/cjs/GovernanceApproverMultiSig.js",
       "types": "./dist/types/GovernanceApproverMultiSig.d.ts"
-    },
-    "./GovernanceSlasher": {
-      "import": "./dist/esm/GovernanceSlasher.js",
-      "require": "./dist/cjs/GovernanceSlasher.js",
-      "types": "./dist/types/GovernanceSlasher.d.ts"
     },
     "./GrandaMento": {
       "import": "./dist/esm/GrandaMento.js",
@@ -311,11 +257,6 @@
       "types": "./dist/types/IERC20.d.ts"
     },
     "./LockedGold": {
-      "import": "./dist/esm/LockedGold.js",
-      "require": "./dist/cjs/LockedGold.js",
-      "types": "./dist/types/LockedGold.d.ts"
-    },
-    "./LockedCelo": {
       "import": "./dist/esm/LockedGold.js",
       "require": "./dist/cjs/LockedGold.js",
       "types": "./dist/types/LockedGold.d.ts"
@@ -365,11 +306,6 @@
       "require": "./dist/cjs/ReserveSpenderMultiSig.js",
       "types": "./dist/types/ReserveSpenderMultiSig.d.ts"
     },
-    "./ScoreManager": {
-      "import": "./dist/esm/ScoreManager.js",
-      "require": "./dist/cjs/ScoreManager.js",
-      "types": "./dist/types/ScoreManager.d.ts"
-    },
     "./SortedOracles": {
       "import": "./dist/esm/SortedOracles.js",
       "require": "./dist/cjs/SortedOracles.js",
@@ -400,40 +336,10 @@
       "require": "./dist/cjs/Validators.js",
       "types": "./dist/types/Validators.d.ts"
     },
-    "./web3/0.8/CeloUnreleasedTreasury": {
-      "import": "./dist/esm/web3/0.8/CeloUnreleasedTreasury.js",
-      "require": "./dist/cjs/web3/0.8/CeloUnreleasedTreasury.js",
-      "types": "./dist/types/web3/0.8/CeloUnreleasedTreasury.d.ts"
-    },
-    "./web3/0.8/EpochManager": {
-      "import": "./dist/esm/web3/0.8/EpochManager.js",
-      "require": "./dist/cjs/web3/0.8/EpochManager.js",
-      "types": "./dist/types/web3/0.8/EpochManager.d.ts"
-    },
-    "./web3/0.8/EpochManagerEnabler": {
-      "import": "./dist/esm/web3/0.8/EpochManagerEnabler.js",
-      "require": "./dist/cjs/web3/0.8/EpochManagerEnabler.js",
-      "types": "./dist/types/web3/0.8/EpochManagerEnabler.d.ts"
-    },
-    "./web3/0.8/FeeCurrencyDirectory": {
-      "import": "./dist/esm/web3/0.8/FeeCurrencyDirectory.js",
-      "require": "./dist/cjs/web3/0.8/FeeCurrencyDirectory.js",
-      "types": "./dist/types/web3/0.8/FeeCurrencyDirectory.d.ts"
-    },
     "./web3/0.8/GasPriceMinimum": {
       "import": "./dist/esm/web3/0.8/GasPriceMinimum.js",
       "require": "./dist/cjs/web3/0.8/GasPriceMinimum.js",
       "types": "./dist/types/web3/0.8/GasPriceMinimum.d.ts"
-    },
-    "./web3/0.8/ScoreManager": {
-      "import": "./dist/esm/web3/0.8/ScoreManager.js",
-      "require": "./dist/cjs/web3/0.8/ScoreManager.js",
-      "types": "./dist/types/web3/0.8/ScoreManager.d.ts"
-    },
-    "./web3/0.8/Validators": {
-      "import": "./dist/esm/web3/0.8/Validators.js",
-      "require": "./dist/cjs/web3/0.8/Validators.js",
-      "types": "./dist/types/web3/0.8/Validators.d.ts"
     },
     "./web3/Accounts": {
       "import": "./dist/esm/web3/Accounts.js",
@@ -450,11 +356,6 @@
       "require": "./dist/cjs/web3/BlockchainParameters.js",
       "types": "./dist/types/web3/BlockchainParameters.d.ts"
     },
-    "./web3/CeloUnreleasedTreasury": {
-      "import": "./dist/esm/web3/CeloUnreleasedTreasury.js",
-      "require": "./dist/cjs/web3/CeloUnreleasedTreasury.js",
-      "types": "./dist/types/web3/CeloUnreleasedTreasury.d.ts"
-    },
     "./web3/DoubleSigningSlasher": {
       "import": "./dist/esm/web3/DoubleSigningSlasher.js",
       "require": "./dist/cjs/web3/DoubleSigningSlasher.js",
@@ -470,16 +371,6 @@
       "require": "./dist/cjs/web3/Election.js",
       "types": "./dist/types/web3/Election.d.ts"
     },
-    "./web3/EpochManager": {
-      "import": "./dist/esm/web3/EpochManager.js",
-      "require": "./dist/cjs/web3/EpochManager.js",
-      "types": "./dist/types/web3/EpochManager.d.ts"
-    },
-    "./web3/EpochManagerEnabler": {
-      "import": "./dist/esm/web3/EpochManagerEnabler.js",
-      "require": "./dist/cjs/web3/EpochManagerEnabler.js",
-      "types": "./dist/types/web3/EpochManagerEnabler.d.ts"
-    },
     "./web3/EpochRewards": {
       "import": "./dist/esm/web3/EpochRewards.js",
       "require": "./dist/cjs/web3/EpochRewards.js",
@@ -494,11 +385,6 @@
       "import": "./dist/esm/web3/FederatedAttestations.js",
       "require": "./dist/cjs/web3/FederatedAttestations.js",
       "types": "./dist/types/web3/FederatedAttestations.d.ts"
-    },
-    "./web3/FeeCurrencyDirectory": {
-      "import": "./dist/esm/web3/FeeCurrencyDirectory.js",
-      "require": "./dist/cjs/web3/FeeCurrencyDirectory.js",
-      "types": "./dist/types/web3/FeeCurrencyDirectory.d.ts"
     },
     "./web3/FeeCurrencyWhitelist": {
       "import": "./dist/esm/web3/FeeCurrencyWhitelist.js",
@@ -525,11 +411,6 @@
       "require": "./dist/cjs/web3/GoldToken.js",
       "types": "./dist/types/web3/GoldToken.d.ts"
     },
-    "./web3/CeloToken": {
-      "import": "./dist/esm/web3/GoldToken.js",
-      "require": "./dist/cjs/web3/GoldToken.js",
-      "types": "./dist/types/web3/GoldToken.d.ts"
-    },
     "./web3/Governance": {
       "import": "./dist/esm/web3/Governance.js",
       "require": "./dist/cjs/web3/Governance.js",
@@ -539,11 +420,6 @@
       "import": "./dist/esm/web3/GovernanceApproverMultiSig.js",
       "require": "./dist/cjs/web3/GovernanceApproverMultiSig.js",
       "types": "./dist/types/web3/GovernanceApproverMultiSig.d.ts"
-    },
-    "./web3/GovernanceSlasher": {
-      "import": "./dist/esm/web3/GovernanceSlasher.js",
-      "require": "./dist/cjs/web3/GovernanceSlasher.js",
-      "types": "./dist/types/web3/GovernanceSlasher.d.ts"
     },
     "./web3/ICeloToken": {
       "import": "./dist/esm/web3/ICeloToken.js",
@@ -561,11 +437,6 @@
       "types": "./dist/types/web3/IERC20.d.ts"
     },
     "./web3/LockedGold": {
-      "import": "./dist/esm/web3/LockedGold.js",
-      "require": "./dist/cjs/web3/LockedGold.js",
-      "types": "./dist/types/web3/LockedGold.d.ts"
-    },
-    "./web3/LockedCelo": {
       "import": "./dist/esm/web3/LockedGold.js",
       "require": "./dist/cjs/web3/LockedGold.js",
       "types": "./dist/types/web3/LockedGold.d.ts"
@@ -604,11 +475,6 @@
       "import": "./dist/esm/web3/ReleaseGold.js",
       "require": "./dist/cjs/web3/ReleaseGold.js",
       "types": "./dist/types/web3/ReleaseGold.d.ts"
-    },
-    "./web3/ScoreManager": {
-      "import": "./dist/esm/web3/ScoreManager.js",
-      "require": "./dist/cjs/web3/ScoreManager.js",
-      "types": "./dist/types/web3/ScoreManager.d.ts"
     },
     "./web3/SortedOracles": {
       "import": "./dist/esm/web3/SortedOracles.js",
