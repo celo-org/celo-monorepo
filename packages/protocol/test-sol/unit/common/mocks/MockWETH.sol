@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.15;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/token/ERC20/ERC20.sol";
 
@@ -23,5 +23,6 @@ contract MockWETH is ERC20 {
     _burn(msg.sender, wad);
     payable(msg.sender).transfer(wad);
     emit Withdrawal(msg.sender, wad);
+    totalDeposited -= wad;
   }
 }

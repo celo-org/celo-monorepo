@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity ^0.8.15;
+pragma solidity >=0.8.7 <0.8.20;
 
 import { Test } from "celo-foundry-8/Test.sol";
 
@@ -8,7 +8,6 @@ import { SuperBridgeETHWrapper } from "@celo-contracts-8/common/SuperBridgeETHWr
 import { MockWETH } from "./mocks/MockWETH.sol";
 import { MockStandardBridge } from "./mocks/MockStandardBridge.sol";
 import { IWETH } from "@celo-contracts-8/common/interfaces/IWETH.sol";
-import { IStandardBridge } from "@celo-contracts-8/common/interfaces/IStandardBridge.sol";
 
 contract SuperBridgeETHWrapperTestBase is Test {
   SuperBridgeETHWrapper public wrapper;
