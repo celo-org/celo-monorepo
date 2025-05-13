@@ -23,7 +23,7 @@ import { IFeeHandler } from "@celo-contracts/common/interfaces/IFeeHandler.sol";
 import { IFreezer } from "@celo-contracts/common/interfaces/IFreezer.sol";
 import { IGovernance } from "@celo-contracts/governance/interfaces/IGovernance.sol";
 // import { GovernanceSlasher } from "@celo-contracts/governance/GovernanceSlasher.sol";
-import { ILockedCelo } from "@celo-contracts/governance/interfaces/ILockedCelo.sol";
+import { ILockedGold } from "@celo-contracts/governance/interfaces/ILockedGold.sol";
 import { IOdisPayments } from "@celo-contracts/identity/interfaces/IOdisPayments.sol";
 import { IRandom } from "@celo-contracts/identity/interfaces/IRandom.sol";
 import { IScoreManager } from "@celo-contracts-8/common/interfaces/IScoreManager.sol";
@@ -51,7 +51,7 @@ contract Devchain is TestWithUtils08 {
   IFreezer freezer;
   IGovernance governance;
   // GovernanceSlasher governanceSlasher;
-  ILockedCelo lockedCelo;
+  ILockedGold lockedCelo;
   IOdisPayments odisPayments;
   IRandom randomContract;
   IScoreManager scoreManager;
@@ -89,7 +89,7 @@ contract Devchain is TestWithUtils08 {
     // governanceSlasher = GovernanceSlasher(
     //   registryContract.getAddressForOrDie(GOVERNANCE_SLASHER_REGISTRY_ID)
     // ); // FIXME: GovernanceSlasher is not in UsingRegistry.sol
-    lockedCelo = getLockedCelo();
+    lockedCelo = getLockedGold();
     odisPayments = getOdisPayments();
     randomContract = getRandom();
     scoreManager = IScoreManager(address(getScoreReader()));
