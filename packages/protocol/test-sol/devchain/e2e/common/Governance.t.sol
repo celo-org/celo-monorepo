@@ -15,7 +15,7 @@ import { IGovernanceSlasher } from "@celo-contracts/governance/interfaces/IGover
 
 // Common imports
 import { StringUtils } from "@celo-contracts/common/libraries/StringUtils.sol";
-import { SelectorParser } from "@celo-contracts/common/test/SelectorParser.sol";
+import { SelectorParser } from "@celo-contracts-8/common/test/SelectorParser.sol";
 import { IMultiSig } from "@celo-contracts/common/interfaces/IMultiSig.sol";
 import { IRegistry } from "@celo-contracts/common/interfaces/IRegistry.sol";
 
