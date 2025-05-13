@@ -8,13 +8,16 @@ import { stdJson } from "forge-std-8/StdJson.sol";
 // OpenZeppelin imports
 import { Ownable } from "@openzeppelin/contracts8/access/Ownable.sol";
 
-// Local imports
+// Governance
+import { IGovernance } from "@celo-contracts/governance/interfaces/IGovernance.sol";
+import { IGovernanceVote } from "@celo-contracts/governance/interfaces/IGovernanceVote.sol";
+import { IGovernanceSlasher } from "@celo-contracts/governance/interfaces/IGovernanceSlasher.sol";
+
+// Common imports
 import { StringUtils } from "@celo-contracts/common/libraries/StringUtils.sol";
 import { SelectorParser } from "@celo-contracts/common/test/SelectorParser.sol";
 import { IMultiSig } from "@celo-contracts/common/interfaces/IMultiSig.sol";
 import { IRegistry } from "@celo-contracts/common/interfaces/IRegistry.sol";
-import { IGovernance } from "@celo-contracts/governance/interfaces/IGovernance.sol";
-import { IGovernanceVote } from "@celo-contracts/governance/interfaces/IGovernanceVote.sol";
 
 // Test imports
 import { Devchain } from "@test-sol/devchain/e2e/utils.sol";
@@ -178,7 +181,7 @@ contract E2E_Governance is Devchain {
 
   function beforeTestSetup(
     bytes4 _testSelector
-  ) public pure returns (bytes[] memory beforeCalldata_) {
+  ) public pure virtual returns (bytes[] memory beforeCalldata_) {
     // ensure tests inherit state
     if (_testSelector == this.test_shouldUpvoteProposal.selector) {
       beforeCalldata_ = new bytes[](1);
@@ -201,7 +204,7 @@ contract E2E_Governance is Devchain {
     }
   }
 
-  function test_shouldIncrementProposalCount() public {
+  function test_shouldIncrementProposalCount() public virtual {
     // setup values
     uint256[] memory values_ = new uint256[](2);
     values_[0] = 0;
@@ -286,7 +289,7 @@ contract E2E_Governance is Devchain {
     assertEq(yesVotes, locked);
   }
 
-  function test_shouldExecuteProposal() public {
+  function test_shouldExecuteProposal() public virtual {
     // increase time and mine 1 block
     timeTravel(referendumDuration);
     blockTravel(1);
@@ -298,5 +301,131 @@ contract E2E_Governance is Devchain {
     // assert
     assertEq(registryContract.getAddressForStringOrDie("test1"), address(11));
     assertEq(registryContract.getAddressForStringOrDie("test2"), address(12));
+  }
+}
+
+// TODO: Altough not present in Truffle integration tests -> to fully test GovernanceSlasher it would be great to add:
+// TODO: - test case for account that already voted some of his locked celo (slashing requires revoking votes)
+// TODO: - test case for a validator account that is a member of a validator group (group additionally gets slashed)
+contract E2E_GovernanceSlashing is E2E_Governance {
+  // test vars
+  IGovernanceSlasher internal governanceSlasher;
+  address internal slashed = actor("slashed");
+  uint256 internal penalty = 10_000_000 ether;
+
+  function setUp() public virtual override {
+    super.setUp();
+
+    // get slasher
+    governanceSlasher = IGovernanceSlasher(
+      registryContract.getAddressForOrDie(GOVERNANCE_SLASHER_REGISTRY_ID)
+    );
+
+    // transfer out ownership to governance
+    vm.prank(ownerAddress);
+    Ownable(address(governanceSlasher)).transferOwnership(address(governance));
+
+    // setup slashed account
+    vm.deal(slashed, penalty + 1 ether);
+    vm.startPrank(slashed);
+    accounts.createAccount();
+    lockedCelo.lock{ value: penalty }();
+    vm.stopPrank();
+  }
+
+  function beforeTestSetup(
+    bytes4 _testSelector
+  ) public pure virtual override returns (bytes[] memory beforeCalldata_) {
+    if (
+      _testSelector == this.test_shouldSetApprovedSlashingZero.selector ||
+      _testSelector == this.test_shouldSlashAccount.selector
+    ) {
+      beforeCalldata_ = new bytes[](5);
+      beforeCalldata_[0] = abi.encodePacked(this.test_shouldIncrementProposalCount.selector);
+      beforeCalldata_[1] = abi.encodePacked(this.test_shouldUpvoteProposal.selector);
+      beforeCalldata_[2] = abi.encodePacked(this.test_shouldApproveProposal.selector);
+      beforeCalldata_[3] = abi.encodePacked(this.test_shouldIncrementVoteTotals.selector);
+      beforeCalldata_[4] = abi.encodePacked(this.test_shouldExecuteProposal.selector);
+    } else return super.beforeTestSetup(_testSelector);
+  }
+
+  function test_shouldIncrementProposalCount() public virtual override {
+    // setup values
+    uint256[] memory values_ = new uint256[](2);
+    values_[0] = 0;
+    values_[1] = 0;
+
+    // setup destinations
+    address[] memory destinations_ = new address[](2);
+    destinations_[0] = address(governanceSlasher);
+    destinations_[1] = address(governanceSlasher);
+
+    // setup data
+    bytes[] memory data_ = new bytes[](2);
+    data_[0] = abi.encodeWithSelector(
+      IGovernanceSlasher.approveSlashing.selector,
+      slashed,
+      penalty
+    );
+    data_[1] = abi.encodeWithSelector(IGovernanceSlasher.setSlasherExecuter.selector, tester);
+
+    // setup data lengths
+    uint256[] memory dataLengths_ = new uint256[](2);
+    dataLengths_[0] = data_[0].length;
+    dataLengths_[1] = data_[1].length;
+
+    // propose
+    vm.prank(tester);
+    governance.propose{ value: minDeposit }(
+      values_,
+      destinations_,
+      abi.encodePacked(data_[0], data_[1]),
+      dataLengths_,
+      "url"
+    );
+
+    // assert
+    assertEq(governance.proposalCount(), proposalId);
+  }
+
+  function test_shouldExecuteProposal() public virtual override {
+    // increase time and mine 1 block
+    timeTravel(referendumDuration);
+    blockTravel(1);
+
+    // execute
+    vm.prank(tester);
+    governance.execute(proposalId, dequeueIndex);
+
+    // assert
+    assertEq(governanceSlasher.getApprovedSlashing(slashed), penalty);
+  }
+
+  function _slash() internal {
+    // increase time and mine 1 block
+    timeTravel(referendumDuration);
+    blockTravel(1);
+
+    // slash
+    address group_ = address(0);
+    address[] memory lessers_;
+    address[] memory greaters_;
+    uint256[] memory indices_;
+    vm.prank(tester);
+    governanceSlasher.slash(slashed, group_, lessers_, greaters_, indices_);
+  }
+
+  function test_shouldSetApprovedSlashingZero() public {
+    _slash();
+
+    // should set approved slashing value to 0
+    assertEq(governanceSlasher.getApprovedSlashing(slashed), 0);
+  }
+
+  function test_shouldSlashAccount() public {
+    _slash();
+
+    // whole locked celo should be slashed
+    assertEq(lockedCelo.getAccountTotalLockedGold(slashed), 0);
   }
 }
