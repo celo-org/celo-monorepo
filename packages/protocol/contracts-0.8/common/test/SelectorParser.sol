@@ -5,7 +5,7 @@ pragma solidity >=0.5.13 <0.9.0;
 import { Vm } from "@lib/celo-foundry-8/lib/forge-std/src/Vm.sol";
 
 // Local imports
-import { StringUtils } from "../libraries/StringUtils.sol";
+import { StringUtils } from "../../../contracts/common/libraries/StringUtils.sol";
 
 library SelectorParser {
   using StringUtils for string;
