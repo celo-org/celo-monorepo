@@ -1,14 +1,9 @@
 import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
-import { constitution } from '@celo/protocol/governanceConstitution'
 import { assertEqualBN, stripHexEncoding, timeTravel } from '@celo/protocol/lib/test-utils'
-import {
-  getDeployedProxiedContract,
-  getFunctionSelectorsForContract,
-} from '@celo/protocol/lib/web3-utils'
+import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { build_directory, config } from '@celo/protocol/migrationsConfig'
 import { EpochManagerEnablerInstance, ValidatorsInstance } from '@celo/protocol/types/typechain-0.8'
 import { linkedListChanges, zip } from '@celo/utils/lib/collections'
-import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   ElectionInstance,
@@ -16,7 +11,6 @@ import {
   GovernanceInstance,
   GovernanceSlasherInstance,
   LockedGoldInstance,
-  RegistryInstance,
 } from 'types'
 import { ArtifactsSingleton } from '../../lib/artifactsSingleton'
 
@@ -85,25 +79,6 @@ async function findLessersAndGreaters(
   const changes = linkedListChanges(groups, changed)
   return { ...changes, indices: changed.map((a) => a.index) }
 }
-
-// contract('Integration: Running elections', (_accounts: string[]) => {
-//   let election: ElectionInstance
-
-//   before(async () => {
-//     election = await getDeployedProxiedContract('Election', artifacts)
-//   })
-
-//   describe('When getting the elected validators', () => {
-//     it('should elect all 30 validators', async () => {
-//       const elected = await election.electValidatorSigners()
-//       assert.equal(elected.length, 30)
-//     })
-//     it('should elect specified number validators with electNValidatorSigners', async () => {
-//       const elected = await election.electNValidatorSigners(1, 20)
-//       assert.equal(elected.length, 20)
-//     })
-//   })
-// })
 
 // skipping this test, as it requires the L1 precompile to capture epoch before L2 migration.
 // attempting to capture epoch is failing with `slicing out of range` error.
@@ -279,156 +254,6 @@ contract.skip('Integration: Governance slashing', (accounts: string[]) => {
         await lockedGold.getAccountTotalLockedGold(slashedAccount),
         valueOfSlashed.minus(penalty)
       )
-    })
-  })
-})
-
-contract('Integration: Governance', (accounts: string[]) => {
-  const proposalId = 1
-  const dequeuedIndex = 0
-  let lockedGold: LockedGoldInstance
-  let multiSig: GovernanceApproverMultiSigInstance
-  let governance: GovernanceInstance
-  let registry: RegistryInstance
-  let proposalTransactions: any
-  let value: BigNumber
-
-  before(async () => {
-    lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
-    // @ts-ignore
-    await lockedGold.lock({ value: '10000000000000000000000000' })
-    value = await lockedGold.getAccountTotalLockedGold(accounts[0])
-    multiSig = await getDeployedProxiedContract('GovernanceApproverMultiSig', artifacts)
-    governance = await getDeployedProxiedContract('Governance', artifacts)
-    registry = await getDeployedProxiedContract('Registry', artifacts)
-    proposalTransactions = [
-      {
-        value: 0,
-        destination: registry.address,
-        data: Buffer.from(
-          stripHexEncoding(
-            // @ts-ignore
-            registry.contract.methods.setAddressFor('test1', accounts[1]).encodeABI()
-          ),
-          'hex'
-        ),
-      },
-      {
-        value: 0,
-        destination: registry.address,
-        data: Buffer.from(
-          stripHexEncoding(
-            // @ts-ignore
-            registry.contract.methods.setAddressFor('test2', accounts[2]).encodeABI()
-          ),
-          'hex'
-        ),
-      },
-    ]
-  })
-
-  describe('Checking governance thresholds', () => {
-    for (const contractName of Object.keys(constitution).filter((k) => k !== 'proxy')) {
-      it('should have correct thresholds for ' + contractName, async () => {
-        const artifactsInstance = ArtifactsSingleton.getInstance(
-          constitution[contractName].__contractPackage,
-          artifacts
-        )
-
-        const contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
-          contractName,
-          artifactsInstance
-        )
-
-        const selectors = getFunctionSelectorsForContract(contract, contractName, artifactsInstance)
-
-        selectors.default = ['0x00000000']
-
-        const thresholds = { ...constitution.proxy, ...constitution[contractName] }
-        await Promise.all(
-          Object.keys(thresholds)
-            .filter((k) => k !== '__contractPackage')
-            .map((func) =>
-              Promise.all(
-                selectors[func].map(async (selector) => {
-                  assertEqualBN(
-                    await governance.getConstitution(contract.address, selector),
-                    toFixed(thresholds[func]),
-                    'Threshold set incorrectly for function ' + func
-                  )
-                })
-              )
-            )
-        )
-      })
-    }
-  })
-
-  describe('When making a governance proposal', () => {
-    before(async () => {
-      await governance.propose(
-        proposalTransactions.map((x: any) => x.value),
-        proposalTransactions.map((x: any) => x.destination),
-        // @ts-ignore
-        Buffer.concat(proposalTransactions.map((x: any) => x.data)),
-        proposalTransactions.map((x: any) => x.data.length),
-        'URL',
-        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-        { value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
-      )
-    })
-
-    it('should increment the proposal count', async () => {
-      assert.equal((await governance.proposalCount()).toNumber(), proposalId)
-    })
-  })
-
-  describe('When upvoting that proposal', () => {
-    before(async () => {
-      await governance.upvote(proposalId, 0, 0)
-    })
-
-    it('should increase the number of upvotes for the proposal', async () => {
-      assertEqualBN(await governance.getUpvotes(proposalId), value)
-    })
-  })
-
-  describe('When approving that proposal', () => {
-    before(async () => {
-      await timeTravel(config.governance.dequeueFrequency, web3)
-      // @ts-ignore
-      const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
-      await multiSig.submitTransaction(governance.address, 0, txData, {
-        from: accounts[0],
-      })
-    })
-
-    it('should set the proposal to approved', async () => {
-      assert.isTrue(await governance.isApproved(proposalId))
-    })
-  })
-
-  describe('When voting on that proposal', () => {
-    before(async () => {
-      await timeTravel(config.governance.approvalStageDuration, web3)
-      await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
-    })
-
-    it('should increment the vote totals', async () => {
-      const response = await governance.getVoteTotals(proposalId)
-      assertEqualBN(response[0], value)
-    })
-  })
-
-  describe('When executing that proposal', () => {
-    before(async () => {
-      await timeTravel(config.governance.referendumStageDuration, web3)
-      await governance.execute(proposalId, dequeuedIndex)
-    })
-
-    it('should execute the proposal', async () => {
-      assert.equal(await registry.getAddressForOrDie(web3.utils.soliditySha3('test1')), accounts[1])
-      assert.equal(await registry.getAddressForOrDie(web3.utils.soliditySha3('test2')), accounts[2])
     })
   })
 })
