@@ -19,6 +19,7 @@ contract MockWETH is ERC20 {
 
   function withdraw(uint256 wad) external {
     require(balanceOf(msg.sender) >= wad, "MockWETH: insufficient balance");
+    totalDeposited -= wad;
     _burn(msg.sender, wad);
     payable(msg.sender).transfer(wad);
     emit Withdrawal(msg.sender, wad);
