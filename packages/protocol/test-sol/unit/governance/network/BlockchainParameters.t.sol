@@ -2,12 +2,16 @@ pragma solidity ^0.5.13;
 
 import "@celo-contracts/governance/BlockchainParameters.sol";
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import "celo-foundry/Test.sol";
 
-contract BlockchainParametersTest is TestWithUtils {
+import { Constants } from "@test-sol/constants.sol";
+import { Utils } from "@test-sol/utils.sol";
+
+contract BlockchainParametersTest is Test, Constants, Utils {
   uint256 constant gasLimit = 7000000;
   uint256 constant gasForNonGoldCurrencies = 50000;
   address nonOwner;
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   BlockchainParameters blockchainParameters;
 
@@ -20,6 +24,9 @@ contract BlockchainParametersTest is TestWithUtils {
     nonOwner = actor("nonOwner");
     ph.setEpochSize(DAY / 5);
     blockchainParameters = new BlockchainParameters(true);
+  }
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
   }
 }
 
@@ -165,23 +172,5 @@ contract BlockchainParametersTest_setUptimeLookbackWindow is BlockchainParameter
     _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
     blockchainParameters.setUptimeLookbackWindow(100);
-  }
-}
-
-contract BlockchainParametersTest_blockGasLimit is BlockchainParametersTest {
-  function test_Reverts_WhenCalledOnL2() public {
-    _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    blockchainParameters.blockGasLimit();
-  }
-}
-
-contract BlockchainParametersTest_intrinsicGasForAlternativeFeeCurrency is
-  BlockchainParametersTest
-{
-  function test_Reverts_WhenCalledOnL2() public {
-    _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    blockchainParameters.intrinsicGasForAlternativeFeeCurrency();
   }
 }

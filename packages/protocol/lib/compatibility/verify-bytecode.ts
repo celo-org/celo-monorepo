@@ -21,12 +21,7 @@ let ignoredContracts = [
 
   // These contracts are not in the Registry (before release 1)
   'ReserveSpenderMultiSig',
-  'GovernanceApproverMultiSig',
-
-  // These contracts live in monorepo but are not part of the core protocol
-  'CeloFeeCurrencyAdapterOwnable',
-  'FeeCurrencyAdapter',
-  'FeeCurrencyAdapterOwnable',
+  'GovernanceApproverMultiSig'
 ]
 
 interface VerificationContext {

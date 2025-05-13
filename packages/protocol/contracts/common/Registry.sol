@@ -4,13 +4,12 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IRegistry.sol";
-import "./interfaces/IRegistryInitializer.sol";
 import "./Initializable.sol";
 
 /**
  * @title Routes identifiers to addresses.
  */
-contract Registry is IRegistry, IRegistryInitializer, Ownable, Initializable {
+contract Registry is IRegistry, Ownable, Initializable {
   using SafeMath for uint256;
 
   mapping(bytes32 => address) public registry;

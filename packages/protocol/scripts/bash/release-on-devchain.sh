@@ -53,7 +53,7 @@ echo " - Checkout migrationsConfig.js at $BRANCH"
 git checkout $BRANCH -- migrationsConfig.js
 
 source scripts/bash/contract-exclusion-regex.sh
-yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/contracts --new_contracts build/contracts --exclude $CONTRACT_EXCLUSION_REGEX --new_branch $BRANCH --output_file report.json
+yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/contracts --new_contracts build/contracts --exclude $CONTRACT_EXCLUSION_REGEX --output_file report.json
 
 echo "- Clean git modified file"
 git restore migrationsConfig.js

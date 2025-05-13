@@ -106,7 +106,13 @@ contract FeeCurrencyAdapterTest is Test {
     feeCurrencyAdapter = new CeloFeeCurrencyAdapterTestContract(true);
     feeCurrencyAdapterForFuzzyTests = new CeloFeeCurrencyAdapterTestContract(true);
 
+    address feeCurrencyAddress = actor("feeCurrency");
+
+    string memory name = "tokenName";
+    string memory symbol = "tN";
+
     feeCurrency = new FeeCurrency6DecimalsTest(initialSupply);
+
     feeCurrencyAdapter.initialize(address(feeCurrency), "wrapper", "wr", 18);
   }
 }
@@ -124,6 +130,7 @@ contract FeeCurrencyAdapter_Initialize is FeeCurrencyAdapterTest {
   function test_ShouldSucceed_WhenExpectedDecimalsAreMoreThenDecimals_Fuzz(uint8 amount) public {
     vm.assume(amount > 6);
     vm.assume(amount < 50);
+    console.log("amount", amount);
     feeCurrencyAdapterForFuzzyTests.initialize(address(feeCurrency), "adapter", "ad", amount);
   }
 
@@ -296,6 +303,7 @@ contract FeeCurrencyAdapter_CreditGasFees is FeeCurrencyAdapterTest {
   function creditFuzzHelper(uint8 expectedDigits, uint256 multiplier) public {
     uint256 originalAmount = 1000;
     uint256 amount = originalAmount * multiplier;
+    console.log("amount", amount);
 
     address secondAddress = actor("secondAddress");
     address thirdAddress = actor("thirdAddress");

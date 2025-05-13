@@ -3,8 +3,6 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
-import { TestConstants } from "@test-sol/constants.sol";
-
 import "@celo-contracts/identity/Escrow.sol";
 import "@celo-contracts/identity/FederatedAttestations.sol";
 import "@celo-contracts/identity/test/MockAttestations.sol";
@@ -13,7 +11,7 @@ import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Signatures.sol";
 
-contract EscrowTest is Test, TestConstants {
+contract EscrowTest is Test {
   using FixidityLib for FixidityLib.Fraction;
 
   Escrow escrowContract;
@@ -76,12 +74,14 @@ contract EscrowTest is Test, TestConstants {
   address trustedIssuer2;
 
   function setUp() public {
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    address registryAddress = 0x000000000000000000000000000000000000ce10;
+
+    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
 
     mockERC20Token = new MockERC20Token();
     escrowContract = new Escrow(true);
     escrowContract.initialize();
-    registry = Registry(REGISTRY_ADDRESS);
+    registry = Registry(registryAddress);
     (receiver, receiverPK) = actorWithPK("receiver");
     (sender, senderPK) = actorWithPK("sender");
     trustedIssuer1 = actor("trustedIssuer1");

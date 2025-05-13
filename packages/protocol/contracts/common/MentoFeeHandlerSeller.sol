@@ -30,7 +30,6 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   // without this line the contract can't receive native Celo transfers
   function() external payable {}
 
-  // Note: current version of Mento is not compatible with this Seller
   function sell(
     address sellTokenAddress,
     address buyTokenAddress,
@@ -38,7 +37,7 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     uint256 maxSlippage // as fraction,
   ) external returns (uint256) {
     require(
-      buyTokenAddress == registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID),
+      buyTokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
       "Buy token can only be gold token"
     );
 
@@ -65,7 +64,7 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     stableToken.approve(exchangeAddress, amount);
     exchange.sell(amount, minAmount, false);
 
-    IERC20 goldToken = getCeloToken();
+    IERC20 goldToken = getGoldToken();
     uint256 celoAmount = goldToken.balanceOf(address(this));
     goldToken.transfer(msg.sender, celoAmount);
 
@@ -81,6 +80,6 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 0, 0);
   }
 }

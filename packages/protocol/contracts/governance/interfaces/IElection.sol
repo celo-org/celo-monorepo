@@ -29,9 +29,7 @@ interface IElection {
 
   // view functions
   function electValidatorSigners() external view returns (address[] memory);
-  function electValidatorAccounts() external view returns (address[] memory);
   function electNValidatorSigners(uint256, uint256) external view returns (address[] memory);
-  function electNValidatorAccounts(uint256, uint256) external view returns (address[] memory);
   function getElectableValidators() external view returns (uint256, uint256);
   function getElectabilityThreshold() external view returns (uint256);
   function getNumVotesReceivable(address) external view returns (uint256);
@@ -51,11 +49,6 @@ interface IElection {
     uint256,
     uint256[] calldata
   ) external view returns (uint256);
-  function getGroupEpochRewardsBasedOnScore(
-    address group,
-    uint256 totalEpochRewards,
-    uint256 groupScore
-  ) external view returns (uint256);
   function getGroupsVotedForByAccount(address) external view returns (address[] memory);
   function getEligibleValidatorGroups() external view returns (address[] memory);
   function getTotalVotesForEligibleValidatorGroups()
@@ -67,5 +60,4 @@ interface IElection {
   function hasActivatablePendingVotes(address, address) external view returns (bool);
   function validatorSignerAddressFromCurrentSet(uint256 index) external view returns (address);
   function numberValidatorsInCurrentSet() external view returns (uint256);
-  function owner() external view returns (address);
 }

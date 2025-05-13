@@ -3,8 +3,6 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
-import { TestConstants } from "@test-sol/constants.sol";
-
 import "@celo-contracts/identity/test/AttestationsTest.sol";
 import "@celo-contracts/identity/FederatedAttestations.sol";
 import "@celo-contracts/identity/test/MockERC20Token.sol";
@@ -15,7 +13,7 @@ import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
 
-contract FederatedAttestationsFoundryTest is Test, TestConstants {
+contract FederatedAttestationsFoundryTest is Test {
   enum KeyOffsets {
     NO_OFFSET,
     VALIDATING_KEY_OFFSET,
@@ -328,7 +326,9 @@ contract FederatedAttestationsFoundryTest is Test, TestConstants {
     phoneHash = keccak256(abi.encodePacked(phoneNumber));
     phoneHash2 = keccak256(abi.encodePacked(phoneNumber2));
 
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    address registryAddress = 0x000000000000000000000000000000000000ce10;
+
+    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
 
     attestationsTest = new AttestationsTest();
     mockERC20Token = new MockERC20Token();
@@ -337,7 +337,7 @@ contract FederatedAttestationsFoundryTest is Test, TestConstants {
     mockLockedGold = new MockLockedGold();
     mockValidators = new MockValidators();
     random = new MockRandom();
-    registry = Registry(REGISTRY_ADDRESS);
+    registry = Registry(registryAddress);
     accounts = new Accounts(true);
     federatedAttestations = new FederatedAttestations(true);
     random.initialize(256);

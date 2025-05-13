@@ -1,4 +1,4 @@
-pragma solidity >=0.5.13 <0.8.20;
+pragma solidity ^0.5.13;
 
 import "../../../contracts-0.8/common/IsL2Check.sol";
 
@@ -9,8 +9,6 @@ contract MockElection is IsL2Check {
   mapping(address => bool) public isIneligible;
   mapping(address => bool) public isEligible;
   mapping(address => bool) public allowedToVoteOverMaxNumberOfGroups;
-  mapping(address => uint256) public groupRewardsBasedOnScore;
-  mapping(address => uint256) public distributedEpochRewards;
   address[] public electedValidators;
   uint256 active;
   uint256 total;
@@ -19,7 +17,7 @@ contract MockElection is IsL2Check {
     isIneligible[account] = true;
   }
 
-  function markGroupEligible(address account, address, address) external {
+  function markGroupEligible(address account, address, address) external onlyL1 {
     isEligible[account] = true;
   }
 
@@ -35,23 +33,23 @@ contract MockElection is IsL2Check {
     electedValidators = _electedValidators;
   }
 
-  function vote(address, uint256, address, address) external pure returns (bool) {
+  function vote(address, uint256, address, address) external onlyL1 returns (bool) {
     return true;
   }
 
-  function activate(address) external pure returns (bool) {
+  function activate(address) external onlyL1 returns (bool) {
     return true;
   }
 
-  function revokeAllActive(address, address, address, uint256) external pure returns (bool) {
+  function revokeAllActive(address, address, address, uint256) external returns (bool) {
     return true;
   }
 
-  function revokeActive(address, uint256, address, address, uint256) external pure returns (bool) {
+  function revokeActive(address, uint256, address, address, uint256) external returns (bool) {
     return true;
   }
 
-  function revokePending(address, uint256, address, address, uint256) external pure returns (bool) {
+  function revokePending(address, uint256, address, address, uint256) external returns (bool) {
     return true;
   }
 
@@ -74,38 +72,15 @@ contract MockElection is IsL2Check {
     return active;
   }
 
-  function getTotalVotesByAccount(address) external pure returns (uint256) {
+  function getTotalVotesByAccount(address) external view returns (uint256) {
     return 0;
   }
 
-  function electValidatorSigners() external view onlyL1 returns (address[] memory) {
-    return electedValidators;
-  }
-  function electValidators() external view onlyL2 returns (address[] memory) {
+  function electValidatorSigners() external view returns (address[] memory) {
     return electedValidators;
   }
 
-  function setAllowedToVoteOverMaxNumberOfGroups(address account, bool flag) public {
+  function setAllowedToVoteOverMaxNumberOfGroups(address account, bool flag) public onlyL1 {
     allowedToVoteOverMaxNumberOfGroups[account] = flag;
-  }
-
-  function getGroupEpochRewardsBasedOnScore(
-    address group,
-    uint256,
-    uint256
-  ) external view returns (uint256) {
-    return groupRewardsBasedOnScore[group];
-  }
-
-  function setGroupEpochRewardsBasedOnScore(address group, uint256 groupRewards) external {
-    groupRewardsBasedOnScore[group] = groupRewards;
-  }
-
-  function distributeEpochRewards(address group, uint256 value, address, address) external {
-    distributedEpochRewards[group] = value;
-  }
-
-  function electValidatorAccounts() external view returns (address[] memory) {
-    return electedValidators;
   }
 }

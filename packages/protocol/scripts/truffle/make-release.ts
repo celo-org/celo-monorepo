@@ -118,6 +118,9 @@ const deployImplementation = async (
   // without this delay it sometimes fails with ProviderError
   await delay(getRandomNumber(1, 1000))
 
+  console.log('gas update in2')
+  console.log('dryRun', dryRun)
+
   const bytecodeSize = (Contract.bytecode.length - 2) / 2
   console.log('Bytecode size in bytes:', bytecodeSize)
 
@@ -324,8 +327,7 @@ module.exports = async (callback: (error?: any) => number) => {
           contractName,
           { ...networks[argv.network], name: argv.network },
           SOLIDITY_08_PACKAGE.name,
-          web3,
-          argv.build_directory
+          web3
         )
         // TODO WARNING: make sure there are no libraries with the same name that don't get deployed
       }

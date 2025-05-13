@@ -1,27 +1,22 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import "celo-foundry/Test.sol";
+import { Utils } from "@test-sol/utils.sol";
 
 import "@celo-contracts/identity/Random.sol";
 import "@celo-contracts/identity/test/RandomTest.sol";
 
-contract RandomTest_ is TestWithUtils {
-  RandomTest random;
-
+contract RandomnessTest_SetRandomnessRetentionWindow is Test, IsL2Check {
   event RandomnessBlockRetentionWindowSet(uint256 value);
+
+  RandomTest random;
 
   function setUp() public {
     random = new RandomTest();
     random.initialize(256);
   }
 
-  function commitmentFor(uint256 value) internal pure returns (bytes32) {
-    return keccak256(abi.encodePacked(bytes32(value)));
-  }
-}
-
-contract RandomTest_SetRandomnessRetentionWindow is RandomTest_ {
   function test_ShouldSetTheVariable() public {
     random.setRandomnessBlockRetentionWindow(1000);
     assertEq(random.randomnessBlockRetentionWindow(), 1000);
@@ -40,15 +35,22 @@ contract RandomTest_SetRandomnessRetentionWindow is RandomTest_ {
   }
 
   function test_Reverts_WhenCalledOnL2() public {
-    _whenL2();
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
     vm.expectRevert("This method is no longer supported in L2.");
     random.setRandomnessBlockRetentionWindow(1000);
   }
 }
 
-contract RandomTest_AddTestRandomness is RandomTest_ {
+contract RandomnessTest_AddTestRandomness is Test, Utils, IsL2Check {
   uint256 constant RETENTION_WINDOW = 5;
   uint256 constant EPOCH_SIZE = 10;
+
+  RandomTest random;
+
+  function setUp() public {
+    random = new RandomTest();
+    random.initialize(256);
+  }
 
   function test_ShouldBeAbleToSimulateAddingRandomness() public {
     random.addTestRandomness(1, 0x0000000000000000000000000000000000000000000000000000000000000001);
@@ -214,7 +216,7 @@ contract RandomTest_AddTestRandomness is RandomTest_ {
   }
 
   function test_Reverts_WhenCalledOnL2() public {
-    _whenL2();
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
     vm.expectRevert("This method is no longer supported in L2.");
     random.addTestRandomness(1, 0x0000000000000000000000000000000000000000000000000000000000000001);
     vm.expectRevert("This method is no longer supported in L2.");
@@ -222,13 +224,20 @@ contract RandomTest_AddTestRandomness is RandomTest_ {
   }
 }
 
-contract RandomTest_RevealAndCommit is RandomTest_ {
+contract RandomnessTest_RevealAndCommit is Test, Utils, IsL2Check {
   address constant ACCOUNT = address(0x01);
   bytes32 constant RANDONMESS = bytes32(uint256(0x00));
 
+  RandomTest random;
+
   function setUp() public {
-    super.setUp();
+    random = new RandomTest();
+    random.initialize(256);
     random.setRandomnessBlockRetentionWindow(256);
+  }
+
+  function commitmentFor(uint256 value) private pure returns (bytes32) {
+    return keccak256(abi.encodePacked(bytes32(value)));
   }
 
   function testRevert_CannotAddZeroCommitment() public {
@@ -253,50 +262,9 @@ contract RandomTest_RevealAndCommit is RandomTest_ {
   }
 
   function test_Reverts_WhenCalledOnL2() public {
-    _whenL2();
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
     vm.expectRevert("This method is no longer supported in L2.");
     blockTravel(2);
     random.testRevealAndCommit(RANDONMESS, commitmentFor(0x01), ACCOUNT);
-  }
-}
-
-contract RandomTest_Commitments is RandomTest_ {
-  address constant ACCOUNT = address(0x01);
-  bytes32 constant RANDONMESS = bytes32(uint256(0x00));
-  uint256 randomness2 = 0x01;
-  bytes32 commitment2 = commitmentFor(randomness2);
-
-  function setUp() public {
-    super.setUp();
-    random.testRevealAndCommit(RANDONMESS, commitment2, ACCOUNT);
-  }
-
-  function test_returnsACommtiment() public {
-    bytes32 commitment = random.commitments(ACCOUNT);
-    assertEq(commitment, commitment2);
-  }
-
-  function test_Reverts_WhenCalledOnL2() public {
-    _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    random.commitments(ACCOUNT);
-  }
-}
-
-contract RandomTest_RandomnessBlockRetentionWindow is RandomTest_ {
-  function setUp() public {
-    super.setUp();
-    random.setRandomnessBlockRetentionWindow(256);
-  }
-
-  function test_getsTheRandomnessBlockRetentionWindow() public {
-    uint256 randomnessBlockRetentionWindow = random.randomnessBlockRetentionWindow();
-    assertEq(randomnessBlockRetentionWindow, 256);
-  }
-
-  function test_Reverts_WhenCalledOnL2() public {
-    _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    random.randomnessBlockRetentionWindow();
   }
 }

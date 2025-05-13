@@ -10,7 +10,6 @@ import "./UsingRegistry.sol";
 
 import "../common/interfaces/IFeeHandlerSeller.sol";
 import "../stability/interfaces/ISortedOracles.sol";
-import "../../contracts-0.8/common/interfaces/IOracle.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "./FeeHandlerSeller.sol";
@@ -71,8 +70,8 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     uint256 maxSlippage // as fraction,
   ) external returns (uint256) {
     require(
-      buyTokenAddress == registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID),
-      "Buy token can only be CELO token"
+      buyTokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
+      "Buy token can only be gold token"
     );
 
     require(
@@ -84,7 +83,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     // and if it generates a better outcome that the ones enabled that gets used
     // and the user gets a reward
 
-    IERC20 celoToken = getCeloToken();
+    IERC20 celoToken = getGoldToken();
 
     IUniswapV2RouterMin bestRouter;
     uint256 bestRouterQuote = 0;
@@ -148,7 +147,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (2, 0, 0, 0);
+    return (1, 1, 0, 0);
   }
 
   function _setRouter(address token, address router) private {
@@ -176,22 +175,18 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     uint256 amount,
     IUniswapV2RouterMin bestRouter
   ) private view returns (uint256) {
-    address _oracleAddress = getOracleAddress(sellTokenAddress);
-
+    ISortedOracles sortedOracles = getSortedOracles();
     uint256 minReports = minimumReports[sellTokenAddress];
 
-    IOracle oracle = IOracle(_oracleAddress);
+    require(
+      sortedOracles.numRates(sellTokenAddress) >= minReports,
+      "Number of reports for token not enough"
+    );
 
     uint256 minimalSortedOracles = 0;
     // if minimumReports for this token is zero, assume the check is not needed
     if (minReports > 0) {
-      ISortedOracles sortedOracles = ISortedOracles(_oracleAddress);
-      require(
-        sortedOracles.numRates(sellTokenAddress) >= minReports,
-        "Number of reports for token not enough"
-      );
-
-      (uint256 rateNumerator, uint256 rateDenominator) = oracle.getExchangeRate(sellTokenAddress);
+      (uint256 rateNumerator, uint256 rateDenominator) = sortedOracles.medianRate(sellTokenAddress);
 
       minimalSortedOracles = calculateMinAmount(
         rateNumerator,
@@ -201,7 +196,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
       );
     }
 
-    IERC20 celoToken = getCeloToken();
+    IERC20 celoToken = getGoldToken();
     address pair = IUniswapV2FactoryMin(bestRouter.factory()).getPair(
       sellTokenAddress,
       address(celoToken)

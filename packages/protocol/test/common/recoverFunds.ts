@@ -3,7 +3,6 @@
 import { recoverFunds } from '@celo/protocol/lib/recover-funds'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { expectBigNumberInRange } from '@celo/protocol/lib/test-utils'
-import { CeloUnreleasedTreasuryContract } from '@celo/protocol/types/08'
 import { BigNumber } from 'bignumber.js'
 import {
   FreezerContract,
@@ -12,8 +11,6 @@ import {
   ProxyInstance,
   RegistryContract,
 } from 'types'
-import { SOLIDITY_08_PACKAGE } from '../../contractPackages'
-import { ArtifactsSingleton } from '../../lib/artifactsSingleton'
 
 const GetSetV0: Truffle.Contract<GetSetV0Instance> = artifacts.require('GetSetV0')
 const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
@@ -37,22 +34,14 @@ contract('Proxy', (accounts: string[]) => {
     it('recovers funds from an incorrectly intialized implementation', async () => {
       const Freezer: FreezerContract = artifacts.require('Freezer')
       const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
-      const CeloUnreleasedTreasury: CeloUnreleasedTreasuryContract =
-        ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE).require('CeloUnreleasedTreasury') // Added because the CeloToken `_transfer` prevents transfers to the celoUnreleasedTreasury.
       // @ts-ignore
       GoldToken.numberFormat = 'BigNumber'
       const Registry: RegistryContract = artifacts.require('Registry')
 
       const freezer = await Freezer.new(true)
       const goldToken = await GoldToken.new(true)
-      const celoUnreleasedTreasury = await CeloUnreleasedTreasury.new(true)
-
       const registry = await Registry.new(true)
       await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
-      await registry.setAddressFor(
-        CeloContractName.CeloUnreleasedTreasury,
-        celoUnreleasedTreasury.address
-      )
       await goldToken.initialize(registry.address)
 
       const amount = new BigNumber(10)

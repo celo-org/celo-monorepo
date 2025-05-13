@@ -91,7 +91,7 @@ contract AddressSortedLinkedListWithMedianTest_update is AddressSortedLinkedList
     assertEq(numerators[0], newNumerator, "should have the correct numerator");
   }
 
-  function test_ShouldRevertIfTheKeyIsNotInTheList() public {
+  function test_ShouldRevertIfTheKEyIsNotInTheList() public {
     vm.expectRevert("key not in list");
     sortedList.update(key2, newNumerator, address(0), address(0));
   }
@@ -117,7 +117,7 @@ contract AddressSortedLinkedListWithMedianTest_remove is AddressSortedLinkedList
     sortedList.insert(key, numerator, address(0), address(0));
   }
 
-  function test_ShouldRemoveTheElementFromTheList() public {
+  function test_ShouldRemoveTheELementFromTheList() public {
     sortedList.remove(key);
     assertEq(sortedList.contains(key), false, "should not contain the key");
   }

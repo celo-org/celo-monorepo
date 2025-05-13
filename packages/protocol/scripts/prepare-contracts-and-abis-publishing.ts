@@ -8,7 +8,6 @@ import {
   ABIS_BUILD_DIR,
   ABIS_DIST_DIR,
   ABIS_PACKAGE_SRC_DIR,
-  AliasedContracts,
   BUILD_EXECUTABLE,
   BuildTarget,
   CONTRACTS_08_PACKAGE_DESTINATION_DIR,
@@ -143,61 +142,45 @@ function prepareTargetTypesExports() {
           path.relative(ABIS_PACKAGE_SRC_DIR, parsedPath.dir),
           parsedPathName
         )
-        const defaultExportKey = toExportKey(parsedPathName)
-
-        const exportKeys = [defaultExportKey]
-
-        // sometimes we want files to be exports via 2 keys like LockedGold and LockeCelo
-        // so place it in the AliasedContracts object and will be exported like
-        // "./LockedGold": { default: "./LockedGold.json", types: "./LockedGold.d.ts" }
-        // "./LockedCelo": { default: "./LockedGold.json", types: "./LockedGold.d.ts" }
-        if (typeof AliasedContracts[parsedPathName] === 'string') {
-          const aliasKey = toExportKey(AliasedContracts[parsedPathName] as string)
-          exportKeys.push(aliasKey)
-        }
-        for (const exportKey of exportKeys) {
-          // eslint-disable-next-line no-prototype-builtins
-          if (!exports.hasOwnProperty(exportKey)) {
-            exports[exportKey] = {}
-          }
-
-          if (target === BuildTarget.ESM) {
-            const importPath = `./${relativePath}.js`
-
-            expectFileExists(importPath)
-
-            exports[exportKey] = {
-              ...exports[exportKey],
-              import: importPath,
-            }
-          } else if (target === BuildTarget.CJS) {
-            const requirePath = `./${relativePath}.js`
-
-            expectFileExists(requirePath)
-
-            exports[exportKey] = {
-              ...exports[exportKey],
-              require: requirePath,
-            }
-          } else {
-            // types
-            const typesPath = `./${relativePath}.d.ts`
-
-            expectFileExists(typesPath)
-
-            exports[exportKey] = {
-              ...exports[exportKey],
-              types: typesPath,
-            }
-          }
-        }
-      }
-
-      function toExportKey(name: string) {
-        return `./${path.join(
+        const exportKey = `./${path.join(
           path.relative(path.join(ABIS_DIST_DIR, target), parsedPath.dir),
-          name
+          parsedPathName
         )}`
+
+        // eslint-disable-next-line no-prototype-builtins
+        if (!exports.hasOwnProperty(exportKey)) {
+          exports[exportKey] = {}
+        }
+
+        if (target === BuildTarget.ESM) {
+          const importPath = `./${relativePath}.js`
+
+          expectFileExists(importPath)
+
+          exports[exportKey] = {
+            ...exports[exportKey],
+            import: importPath,
+          }
+        } else if (target === BuildTarget.CJS) {
+          const requirePath = `./${relativePath}.js`
+
+          expectFileExists(requirePath)
+
+          exports[exportKey] = {
+            ...exports[exportKey],
+            require: requirePath,
+          }
+        } else {
+          // types
+          const typesPath = `./${relativePath}.d.ts`
+
+          expectFileExists(typesPath)
+
+          exports[exportKey] = {
+            ...exports[exportKey],
+            types: typesPath,
+          }
+        }
       }
     })
   })
@@ -242,17 +225,8 @@ function processRawJsonsAndPrepareExports() {
 
       expectFileExists(defaultPath)
 
-      const getJsonKey = (name: string) => `./${name}.json`
-
-      const makeDefaultExportValue = (value: string) => ({
-        default: `./${value}`,
-      })
-
-      exports[getJsonKey(parsedPath.name)] = makeDefaultExportValue(defaultPath)
-
-      if (AliasedContracts[parsedPath.name] !== undefined) {
-        exports[getJsonKey(AliasedContracts[parsedPath.name] as string)] =
-          makeDefaultExportValue(defaultPath)
+      exports[`./${parsedPath.name}.json`] = {
+        default: `./${defaultPath}`,
       }
     }
   })

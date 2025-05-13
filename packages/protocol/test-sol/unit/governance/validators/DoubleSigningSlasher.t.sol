@@ -3,8 +3,6 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
-import { TestConstants } from "@test-sol/constants.sol";
-
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
@@ -51,7 +49,7 @@ contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecom
   }
 }
 
-contract DoubleSigningSlasherBaseTest is Test, TestConstants {
+contract DoubleSigningSlasherBaseTest is Test {
   using FixidityLib for FixidityLib.Fraction;
 
   SlashingIncentives public expectedSlashingIncentives;
@@ -82,6 +80,8 @@ contract DoubleSigningSlasherBaseTest is Test, TestConstants {
 
   address caller2;
   uint256 caller2PK;
+  address public registryAddress = 0x000000000000000000000000000000000000ce10;
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   struct SlashingIncentives {
     // Value of LockedGold to slash from the account.
@@ -104,14 +104,14 @@ contract DoubleSigningSlasherBaseTest is Test, TestConstants {
     (otherGroup, groupPK) = actorWithPK("otherGroup");
     (caller2, caller2PK) = actorWithPK("caller2");
 
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
 
     accounts = new Accounts(true);
     validators = new MockValidators();
     lockedGold = new MockLockedGold();
     slasher = new DoubleSigningSlasherTest();
 
-    registry = Registry(REGISTRY_ADDRESS);
+    registry = Registry(registryAddress);
 
     accounts.createAccount();
 
@@ -130,7 +130,7 @@ contract DoubleSigningSlasherBaseTest is Test, TestConstants {
     vm.prank(otherGroup);
     accounts.createAccount();
 
-    accounts.initialize(REGISTRY_ADDRESS);
+    accounts.initialize(registryAddress);
 
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
@@ -145,7 +145,7 @@ contract DoubleSigningSlasherBaseTest is Test, TestConstants {
     expectedSlashingIncentives.penalty = slashingPenalty;
     expectedSlashingIncentives.reward = slashingReward;
 
-    slasher.initialize(REGISTRY_ADDRESS, slashingPenalty, slashingReward);
+    slasher.initialize(registryAddress, slashingPenalty, slashingReward);
 
     lockedGold.setAccountTotalLockedGold(address(this), 50000);
     lockedGold.setAccountTotalLockedGold(nonOwner, 50000);
@@ -156,7 +156,7 @@ contract DoubleSigningSlasherBaseTest is Test, TestConstants {
   }
 
   function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
   }
 }
 
@@ -173,7 +173,7 @@ contract DoubleSigningSlasherInitialize is DoubleSigningSlasherBaseTest {
 
   function test_RevertWhen_CalledTwice() public {
     vm.expectRevert("contract already initialized");
-    slasher.initialize(REGISTRY_ADDRESS, slashingPenalty, slashingReward);
+    slasher.initialize(registryAddress, slashingPenalty, slashingReward);
   }
 }
 

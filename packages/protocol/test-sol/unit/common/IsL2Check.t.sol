@@ -2,24 +2,19 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 import "celo-foundry-8/Test.sol";
-import { TestConstants } from "@test-sol/constants.sol";
 
 // Contract to test
 import "@celo-contracts-8/common/IsL2Check.sol";
 
 contract IsL2Test is IsL2Check {
-  // example function
   function onlyL1Function() public view onlyL1 returns (bool) {
     return true;
   }
-
-  // expose the function for testing
-  function isL2_public() public view returns (bool) {
-    return super.isL2();
-  }
 }
 
-contract IsL2CheckBase is Test, TestConstants {
+contract IsL2CheckBase is Test {
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
+
   IsL2Test isL2Check;
 
   function setUp() public virtual {
@@ -27,23 +22,23 @@ contract IsL2CheckBase is Test, TestConstants {
   }
 
   function helper_WhenProxyAdminAddressIsSet() public {
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
   }
 }
 
 contract IsL2Check_IsL2Test is IsL2CheckBase {
   function test_IsL2() public {
-    assertFalse(isL2Check.isL2_public());
+    assertFalse(isL2Check.isL2());
   }
 
   function test_IsL2_WhenProxyAdminSet() public {
     helper_WhenProxyAdminAddressIsSet();
-    assertTrue(isL2Check.isL2_public());
+    assertTrue(isL2Check.isL2());
   }
 
   function test_IsL1_WhenProxyAdminSet() public {
     helper_WhenProxyAdminAddressIsSet();
-    assertFalse(!isL2Check.isL2_public());
+    assertFalse(!isL2Check.isL2());
   }
 }
 

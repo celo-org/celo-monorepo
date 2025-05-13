@@ -4,60 +4,51 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import { Script } from "forge-std-8/Script.sol";
 
-// Foundry imports
 import "forge-std/console.sol";
 import "forge-std/StdJson.sol";
 
-// Helper contract imports
-import "@migrations-sol/HelperInterFaces.sol";
-import { MigrationsConstants } from "@migrations-sol/constants.sol";
-import "@openzeppelin/contracts8/utils/math/Math.sol";
-
-// Core contract imports on Solidity 0.5
-import "@celo-contracts/common/interfaces/IProxy.sol";
 import "@celo-contracts/common/interfaces/IProxyFactory.sol";
+import "@celo-contracts/common/interfaces/IProxy.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts/common/interfaces/IRegistryInitializer.sol";
 import "@celo-contracts/common/interfaces/IFreezer.sol";
-import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
-import "@celo-contracts/common/interfaces/ICeloTokenInitializer.sol";
-import "@celo-contracts/common/interfaces/IAccountsInitializer.sol";
-import "@celo-contracts/common/interfaces/IFeeHandlerSellerInitializer.sol";
-import "@celo-contracts/common/interfaces/IFeeHandler.sol";
-import "@celo-contracts/common/interfaces/IFeeHandlerInitializer.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
+import "@celo-contracts/common/interfaces/ICeloToken.sol"; // TODO move these to Initializer
+import "@celo-contracts/common/interfaces/IAccountsInitializer.sol";
 import "@celo-contracts/common/interfaces/IAccounts.sol";
-import "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
-import "@celo-contracts/governance/interfaces/ILockedGoldInitializer.sol";
-import "@celo-contracts-8/governance/interfaces/IValidatorsInitializer.sol";
+import "@celo-contracts/governance/interfaces/LockedGoldfunctionInitializer.sol";
+import "@celo-contracts/governance/interfaces/IValidatorsInitializer.sol";
 import "@celo-contracts/governance/interfaces/IElectionInitializer.sol";
 import "@celo-contracts/governance/interfaces/IEpochRewardsInitializer.sol";
 import "@celo-contracts/governance/interfaces/IBlockchainParametersInitializer.sol";
+import "@celo-contracts/governance/interfaces/ILockedGold.sol";
+import "@celo-contracts/common/interfaces/IAccounts.sol";
 import "@celo-contracts/governance/interfaces/IGovernanceSlasherInitializer.sol";
 import "@celo-contracts/governance/interfaces/IDoubleSigningSlasherInitializer.sol";
 import "@celo-contracts/governance/interfaces/IDowntimeSlasherInitializer.sol";
 import "@celo-contracts/governance/interfaces/IGovernanceApproverMultiSigInitializer.sol";
 import "@celo-contracts/governance/interfaces/IGovernanceInitializer.sol";
-import "@celo-contracts/governance/interfaces/ILockedGold.sol";
+
 import "@celo-contracts/governance/interfaces/IGovernance.sol";
+
+import "@celo-contracts/common/interfaces/IFeeHandlerSellerInitializer.sol";
+import "@celo-contracts/common/interfaces/IFeeHandlerInitializer.sol";
+import "@celo-contracts/common/interfaces/IFeeHandler.sol";
+
 import "@celo-contracts/identity/interfaces/IRandomInitializer.sol";
 import "@celo-contracts/identity/interfaces/IEscrowInitializer.sol";
 import "@celo-contracts/identity/interfaces/IOdisPaymentsInitializer.sol";
 import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
-import "@celo-contracts/stability/interfaces/ISortedOraclesInitializer.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
-
-// Core contract imports on Solidity 0.8
-import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectoryInitializer.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
-import "@celo-contracts-8/common/interfaces/ICeloUnreleasedTreasuryInitializer.sol";
-import "@celo-contracts-8/common/interfaces/IEpochManagerEnablerInitializer.sol";
-import "@celo-contracts-8/common/interfaces/IEpochManagerInitializer.sol";
-import "@celo-contracts-8/common/interfaces/IScoreManagerInitializer.sol";
-import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
+import "@celo-contracts-8/common/interfaces/IMintGoldScheduleInitializer.sol";
+
+import "@migrations-sol/HelperInterFaces.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
+
 import "@celo-contracts-8/common/UsingRegistry.sol";
 
-import "@test-sol/utils/SECP256K1.sol";
+import { Constants } from "@migrations-sol/constants.sol";
 
 contract ForceTx {
   // event to trigger so a tx can be processed
@@ -70,18 +61,18 @@ contract ForceTx {
   }
 }
 
-contract Migration is Script, UsingRegistry, MigrationsConstants {
+contract Migration is Script, UsingRegistry, Constants {
   using stdJson for string;
 
-  struct InitParamsTunnel {
-    // The number of blocks to delay a ValidatorGroup's commission
-    uint256 commissionUpdateDelay;
-    uint256 downtimeGracePeriod;
-  }
+  /**
+   * This is Anvil's default account
+   */
+  address constant deployerAccount = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
   IProxyFactory proxyFactory;
 
   uint256 proxyNonce = 0;
+  address constant registryAddress = address(0x000000000000000000000000000000000000ce10);
 
   event Result(bytes);
 
@@ -122,12 +113,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function addToRegistry(string memory contractName, address proxyAddress) public {
-    IProxy proxy = IProxy(REGISTRY_ADDRESS);
+    IProxy proxy = IProxy(registryAddress);
     if (proxy._getImplementation() == address(0)) {
       console.log("Can't add to registry because implementation not set");
       return;
     }
-    registry = IRegistry(REGISTRY_ADDRESS);
+    registry = IRegistry(registryAddress);
     console.log(" Setting on the registry contract:", contractName);
     registry.setAddressFor(contractName, proxyAddress);
   }
@@ -197,8 +188,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
    * Entry point of the script
    */
   function run() external {
-    // TODO check that this matches DEPLOYER_ACCOUNT and the pK can be avoided with --unlock
-    vm.startBroadcast(DEPLOYER_ACCOUNT);
+    // TODO check that this matches deployerAccount and the pK can be avoided with --unlock
+    vm.startBroadcast(deployerAccount);
 
     string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
 
@@ -208,12 +199,17 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     // Proxy for Registry is already set, just deploy implementation
     migrateRegistry();
-    setupUsingRegistry();
+
+    // Foloowing  lines required by parent UsingRegistry
+    _transferOwnership(deployerAccount);
+    setRegistry(registryAddress);
+
+    // End UsingRegistry setup
 
     migrateFreezer();
     migrateFeeCurrencyWhitelist();
     migrateFeeCurrencyDirectory();
-    migrateCeloToken(json);
+    migrateGoldToken(json);
     migrateSortedOracles(json);
     migrateGasPriceMinimum(json);
     migrateReserveSpenderMultiSig(json);
@@ -221,7 +217,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateStableToken(json);
     migrateExchange(json);
     migrateAccount();
-    migrateLockedCelo(json);
+    migrateLockedGold(json);
     migrateValidators(json); // this triggers a revert, the deploy after the json reads
     migrateElection(json);
     migrateEpochRewards(json);
@@ -239,10 +235,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateUniswapFeeHandlerSeller();
     migrateFeeHandler(json);
     migrateOdisPayments();
-    migrateCeloUnreleasedTreasury();
-    migrateEpochManagerEnabler();
-    migrateEpochManager(json);
-    migrateScoreManager();
+    migrateMintGoldSchedule();
     migrateGovernance(json);
 
     vm.stopBroadcast();
@@ -250,42 +243,27 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // Functions with broadcast with different addresses
     // Validators needs to lock, which can be only used by the msg.sender
     electValidators(json);
-
-    vm.startBroadcast(DEPLOYER_ACCOUNT);
-
-    captureEpochManagerEnablerValidators();
-
-    vm.stopBroadcast();
-  }
-
-  /**
-   * The function calls defined here are required by the parent UsingRegistry.sol contract.
-   */
-  function setupUsingRegistry() public {
-    _transferOwnership(DEPLOYER_ACCOUNT);
-    setRegistry(REGISTRY_ADDRESS);
   }
 
   function migrateRegistry() public {
     setImplementationOnProxy(
-      IProxy(REGISTRY_ADDRESS),
+      IProxy(registryAddress),
       "Registry",
-      abi.encodeWithSelector(IRegistryInitializer.initialize.selector)
+      abi.encodeWithSelector(IRegistry.initialize.selector)
     );
     // set registry in registry itself
-    console.log("Owner of the Registry Proxy is", IProxy(REGISTRY_ADDRESS)._getOwner());
-    addToRegistry("Registry", REGISTRY_ADDRESS);
+    console.log("Owner of the Registry Proxy is", IProxy(registryAddress)._getOwner());
+    addToRegistry("Registry", registryAddress);
     console.log("Done migration registry");
   }
 
   function migrateFreezer() public {
-    deployProxiedContract(
-      "Freezer",
-      abi.encodeWithSelector(IFreezerInitializer.initialize.selector)
-    );
+    // TODO migrate the initializations interface
+    deployProxiedContract("Freezer", abi.encodeWithSelector(IFreezer.initialize.selector));
   }
 
   function migrateFeeCurrencyWhitelist() public {
+    // TODO migrate the initializations interface
     deployProxiedContract(
       "FeeCurrencyWhitelist",
       abi.encodeWithSelector(IFeeCurrencyWhitelist.initialize.selector)
@@ -293,23 +271,23 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateFeeCurrencyDirectory() public {
+    // TODO migrate the initializations interface
     deployProxiedContract(
       "FeeCurrencyDirectory",
-      abi.encodeWithSelector(IFeeCurrencyDirectoryInitializer.initialize.selector)
+      abi.encodeWithSelector(FeeCurrencyDirectory.initialize.selector)
     );
   }
 
-  function migrateCeloToken(string memory json) public {
+  function migrateGoldToken(string memory json) public {
     // TODO change pre-funded addresses to make it match circulation supply
-    address celoProxyAddress = deployProxiedContract(
+    address goldProxyAddress = deployProxiedContract(
       "GoldToken",
-      abi.encodeWithSelector(ICeloTokenInitializer.initialize.selector, REGISTRY_ADDRESS)
+      abi.encodeWithSelector(ICeloToken.initialize.selector, registryAddress)
     );
 
-    addToRegistry("CeloToken", celoProxyAddress);
     bool frozen = abi.decode(json.parseRaw(".goldToken.frozen"), (bool));
     if (frozen) {
-      getFreezer().freeze(celoProxyAddress);
+      getFreezer().freeze(goldProxyAddress);
     }
   }
 
@@ -320,7 +298,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     );
     deployProxiedContract(
       "SortedOracles",
-      abi.encodeWithSelector(ISortedOraclesInitializer.initialize.selector, reportExpirySeconds)
+      abi.encodeWithSelector(ISortedOracles.initialize.selector, reportExpirySeconds)
     );
   }
 
@@ -343,7 +321,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "GasPriceMinimum",
       abi.encodeWithSelector(
         IGasPriceMinimumInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
+        registryAddress,
         gasPriceMinimumFloor,
         targetDensity,
         adjustmentSpeed,
@@ -354,7 +332,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function migrateReserveSpenderMultiSig(string memory json) public {
     address[] memory owners = new address[](1);
-    owners[0] = DEPLOYER_ACCOUNT;
+    owners[0] = deployerAccount;
 
     uint256 required = abi.decode(json.parseRaw(".reserveSpenderMultiSig.required"), (uint256));
     uint256 internalRequired = abi.decode(
@@ -404,7 +382,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "Reserve",
       abi.encodeWithSelector(
         IReserveInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
+        registryAddress,
         tobinTaxStalenessThreshold,
         spendingRatio,
         frozenGold,
@@ -423,7 +401,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     bool useSpender = abi.decode(json.parseRaw(".reserveSpenderMultiSig.required"), (bool));
     address spender = useSpender
       ? registry.getAddressForString("ReserveSpenderMultiSig")
-      : DEPLOYER_ACCOUNT;
+      : deployerAccount;
 
     IReserve(reserveProxyAddress).addSpender(spender);
     console.log("reserveSpenderMultiSig added as Reserve spender");
@@ -449,7 +427,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         name,
         symbol,
         decimals,
-        REGISTRY_ADDRESS,
+        registryAddress,
         inflationRate,
         inflationFactorUpdatePeriod,
         initialBalanceAddresses,
@@ -463,7 +441,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     }
 
     // TODO add more configurable oracles from the json
-    getSortedOracles().addOracle(stableTokenProxyAddress, DEPLOYER_ACCOUNT);
+    getSortedOracles().addOracle(stableTokenProxyAddress, deployerAccount);
 
     if (celoPrice != 0) {
       console.log("before report");
@@ -481,7 +459,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     */
     uint256 mockIntrinsicGas = 21000;
 
-    IFeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory"))
+    FeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory"))
       .setCurrencyConfig(stableTokenProxyAddress, address(getSortedOracles()), mockIntrinsicGas);
   }
 
@@ -509,7 +487,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 celoPrice = abi.decode(json.parseRaw(".stableTokens.celoPrice"), (uint256));
 
     address[] memory initialBalanceAddresses = new address[](1);
-    initialBalanceAddresses[0] = DEPLOYER_ACCOUNT;
+    initialBalanceAddresses[0] = deployerAccount;
 
     uint256[] memory initialBalanceValues = new uint256[](1);
     initialBalanceValues[0] = initialBalanceValue;
@@ -543,7 +521,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "Exchange",
       abi.encodeWithSelector(
         IExchangeInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
+        registryAddress,
         stableTokenIdentifier,
         spread,
         reserveFraction,
@@ -563,25 +541,23 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function migrateAccount() public {
     address accountsProxyAddress = deployProxiedContract(
       "Accounts",
-      abi.encodeWithSelector(IAccountsInitializer.initialize.selector, REGISTRY_ADDRESS)
+      abi.encodeWithSelector(IAccountsInitializer.initialize.selector, registryAddress)
     );
 
     IAccounts(accountsProxyAddress).setEip712DomainSeparator();
   }
 
-  function migrateLockedCelo(string memory json) public {
+  function migrateLockedGold(string memory json) public {
     uint256 unlockingPeriod = abi.decode(json.parseRaw(".lockedGold.unlockingPeriod"), (uint256));
 
-    address LockedCeloProxyAddress = deployProxiedContract(
+    deployProxiedContract(
       "LockedGold",
       abi.encodeWithSelector(
         ILockedGoldInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
+        registryAddress,
         unlockingPeriod
       )
     );
-
-    addToRegistry("LockedCelo", LockedCeloProxyAddress);
   }
 
   function migrateValidators(string memory json) public {
@@ -627,16 +603,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       (uint256)
     );
 
-    InitParamsTunnel memory initParamsTunnel = InitParamsTunnel({
-      commissionUpdateDelay: commissionUpdateDelay,
-      downtimeGracePeriod: downtimeGracePeriod
-    });
-
     deployProxiedContract(
       "Validators",
       abi.encodeWithSelector(
         IValidatorsInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
+        registryAddress,
         groupRequirementValue,
         groupRequirementDuration,
         validatorRequirementValue,
@@ -646,7 +617,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         membershipHistoryLength,
         slashingMultiplierResetPeriod,
         maxGroupSize,
-        initParamsTunnel
+        commissionUpdateDelay,
+        downtimeGracePeriod
       )
     );
   }
@@ -673,7 +645,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "Election",
       abi.encodeWithSelector(
         IElectionInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
+        registryAddress,
         minElectableValidators,
         maxElectableValidators,
         maxNumGroupsVotedFor,
@@ -732,7 +704,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "EpochRewards",
       abi.encodeWithSelector(
         IEpochRewardsInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
+        registryAddress,
         targetVotingYieldInitial,
         targetVotingYieldMax,
         targetVotingYieldAdjustmentFactor,
@@ -795,7 +767,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function migrateGovernanceSlasher() public {
     deployProxiedContract(
       "GovernanceSlasher",
-      abi.encodeWithSelector(IGovernanceSlasherInitializer.initialize.selector, REGISTRY_ADDRESS)
+      abi.encodeWithSelector(IGovernanceSlasherInitializer.initialize.selector, registryAddress)
     );
 
     getLockedGold().addSlasher("GovernanceSlasher");
@@ -809,7 +781,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "DoubleSigningSlasher",
       abi.encodeWithSelector(
         IDoubleSigningSlasherInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
+        registryAddress,
         penalty,
         reward
       )
@@ -830,7 +802,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "DowntimeSlasher",
       abi.encodeWithSelector(
         IDowntimeSlasherInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
+        registryAddress,
         penalty,
         reward,
         slashableDowntime
@@ -842,7 +814,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function migrateGovernanceApproverMultiSig(string memory json) public {
     address[] memory owners = new address[](1);
-    owners[0] = DEPLOYER_ACCOUNT;
+    owners[0] = deployerAccount;
 
     uint256 required = abi.decode(json.parseRaw(".governanceApproverMultiSig.required"), (uint256));
     uint256 internalRequired = abi.decode(
@@ -878,7 +850,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "MentoFeeHandlerSeller",
       abi.encodeWithSelector(
         IFeeHandlerSellerInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
+        registryAddress,
         tokenAddresses,
         minimumReports
       )
@@ -893,7 +865,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "UniswapFeeHandlerSeller",
       abi.encodeWithSelector(
         IFeeHandlerSellerInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
+        registryAddress,
         tokenAddresses,
         minimumReports
       )
@@ -912,7 +884,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "FeeHandler",
       abi.encodeWithSelector(
         IFeeHandlerInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
+        registryAddress,
         newFeeBeneficiary,
         newBurnFraction,
         tokens,
@@ -935,43 +907,10 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     );
   }
 
-  function migrateCeloUnreleasedTreasury() public {
+  function migrateMintGoldSchedule() public {
     deployProxiedContract(
-      "CeloUnreleasedTreasury",
-      abi.encodeWithSelector(
-        ICeloUnreleasedTreasuryInitializer.initialize.selector,
-        REGISTRY_ADDRESS
-      )
-    );
-  }
-
-  function migrateEpochManagerEnabler() public {
-    deployProxiedContract(
-      "EpochManagerEnabler",
-      abi.encodeWithSelector(IEpochManagerEnablerInitializer.initialize.selector, REGISTRY_ADDRESS)
-    );
-  }
-
-  function migrateScoreManager() public {
-    deployProxiedContract(
-      "ScoreManager",
-      abi.encodeWithSelector(IScoreManagerInitializer.initialize.selector)
-    );
-  }
-
-  function migrateEpochManager(string memory json) public {
-    address newEpochDuration = abi.decode(
-      json.parseRaw(".epochManager.newEpochDuration"),
-      (address)
-    );
-
-    deployProxiedContract(
-      "EpochManager",
-      abi.encodeWithSelector(
-        IEpochManagerInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
-        newEpochDuration
-      )
+      "MintGoldSchedule",
+      abi.encodeWithSelector(IMintGoldScheduleInitializer.initialize.selector)
     );
   }
 
@@ -980,7 +919,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     address approver = useApprover
       ? registry.getAddressForString("GovernanceApproverMultiSig")
-      : DEPLOYER_ACCOUNT;
+      : deployerAccount;
     uint256 concurrentProposals = abi.decode(
       json.parseRaw(".governance.concurrentProposals"),
       (uint256)
@@ -1017,7 +956,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "Governance",
       abi.encodeWithSelector(
         IGovernanceInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
+        registryAddress,
         approver,
         concurrentProposals,
         minDeposit,
@@ -1033,10 +972,10 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     );
 
     _setConstitution(governanceProxyAddress, json);
-    _transferOwnerShipCoreContract(governanceProxyAddress, json);
+    _transferOwnerShipCoreContact(governanceProxyAddress, json);
   }
 
-  function _transferOwnerShipCoreContract(address governanceAddress, string memory json) public {
+  function _transferOwnerShipCoreContact(address governanceAddress, string memory json) public {
     bool skipTransferOwnership = abi.decode(
       json.parseRaw(".governance.skipTransferOwnership"),
       (bool)
@@ -1069,7 +1008,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         }
 
         console.log(string.concat("Setting constitution thresholds for: ", contractName));
-        registry = IRegistry(REGISTRY_ADDRESS);
+        IRegistry registry = IRegistry(registryAddress);
 
         address contractAddress = registry.getAddressForString(contractName);
 
@@ -1105,12 +1044,14 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function registerValidator(
     uint256 validatorIndex,
+    bytes memory ecdsaPubKey,
     uint256 validatorKey,
     uint256 amountToLock,
     address groupToAffiliate
   ) public returns (address) {
     vm.startBroadcast(validatorKey);
     lockGold(amountToLock);
+    bytes memory _ecdsaPubKey = ecdsaPubKey;
     address accountAddress = (new ForceTx()).identity();
 
     // these blobs are not checked in the contract
@@ -1125,23 +1066,29 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       bytes16(0x05050505050505050505050505050506),
       bytes16(0x06060606060606060606060606060607)
     );
-
-    (bytes memory ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(accountAddress, validatorKey);
     getValidators().registerValidator(ecdsaPubKey, newBlsPublicKey, newBlsPop);
     getValidators().affiliate(groupToAffiliate);
-    console.log("Done registering validators");
+    console.log("Done registering validatora");
 
     vm.stopBroadcast();
     return accountAddress;
   }
 
   function getValidatorKeyIndex(
-    uint256 groupCount,
     uint256 groupIndex,
     uint256 validatorIndex,
     uint256 membersInAGroup
   ) public returns (uint256) {
-    return groupCount + groupIndex * membersInAGroup + validatorIndex;
+    return groupIndex * membersInAGroup + validatorIndex + 1;
+  }
+
+  function getValidatorKeyFromGroupGroup(
+    uint256[] memory keys,
+    uint256 groupIndex,
+    uint256 validatorIndex,
+    uint256 membersInAGroup
+  ) public returns (uint256) {
+    return keys[getValidatorKeyIndex(groupIndex, validatorIndex, membersInAGroup)];
   }
 
   function registerValidatorGroup(
@@ -1160,57 +1107,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     vm.stopBroadcast();
   }
 
-  function _generateEcdsaPubKeyWithSigner(
-    address _validator,
-    uint256 _signerPk
-  ) internal returns (bytes memory ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) {
-    (v, r, s) = getParsedSignatureOfAddress(_validator, _signerPk);
-
-    bytes32 addressHash = keccak256(abi.encodePacked(_validator));
-
-    ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
-  }
-
-  function addressToPublicKey(
-    bytes32 message,
-    uint8 _v,
-    bytes32 _r,
-    bytes32 _s
-  ) public returns (bytes memory) {
-    address SECP256K1Address = actor("SECP256K1Address");
-    deployCodeTo("SECP256K1.sol:SECP256K1", SECP256K1Address);
-    ISECP256K1 sECP256K1 = ISECP256K1(SECP256K1Address);
-
-    string memory header = "\x19Ethereum Signed Message:\n32";
-    bytes32 _message = keccak256(abi.encodePacked(header, message));
-    (uint256 x, uint256 y) = sECP256K1.recover(
-      uint256(_message),
-      _v - 27,
-      uint256(_r),
-      uint256(_s)
-    );
-    return abi.encodePacked(x, y);
-  }
-
-  function actor(string memory name) internal returns (address) {
-    return vm.addr(uint256(keccak256(abi.encodePacked(name))));
-  }
-
-  function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32) {
-    // 32 is the length in bytes of hash,
-    // enforced by the type signature above
-    return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
-  }
-
-  function getParsedSignatureOfAddress(
-    address _address,
-    uint256 privateKey
-  ) public pure returns (uint8, bytes32, bytes32) {
-    bytes32 addressHash = keccak256(abi.encodePacked(_address));
-    bytes32 prefixedHash = toEthSignedMessageHash(addressHash);
-    return vm.sign(privateKey, prefixedHash);
-  }
-
   function electValidators(string memory json) public {
     console.log("Electing validators: ");
 
@@ -1225,6 +1121,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       json.parseRaw(".validators.validatorLockedGoldRequirements.value"),
       (uint256)
     );
+    bytes[] memory ecdsaPubKeys = abi.decode(json.parseRaw(".validators.ecdsaPubKeys"), (bytes[]));
     // attestationKeys not migrated
 
     if (valKeys.length == 0) {
@@ -1237,76 +1134,52 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       );
     }
 
-    uint256 groupCount = 3;
-    console.log("groupCount", groupCount);
+    uint256 validatorGroup0Key = valKeys[0];
 
-    address[] memory groups = new address[](groupCount);
+    address groupAddress = registerValidatorGroup(
+      validatorGroup0Key,
+      maxGroupSize * validatorLockedGoldRequirements,
+      commission,
+      json
+    );
 
-    // register 3 validator groups
-    for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
-      address groupAddress = registerValidatorGroup(
-        valKeys[groupIndex],
-        maxGroupSize * validatorLockedGoldRequirements,
-        commission,
-        json
-      );
-      groups[groupIndex] = groupAddress;
-      console.log("registered group: ", groupAddress);
-    }
-
-    console.log("  * Registering validators ... Count: ", valKeys.length - groupCount);
+    console.log("  * Registering ${group.valKeys.length} validators ...");
     // Split the validator keys into groups that will fit within the max group size.
+    uint256 amountOfGroups = Math.ceilDiv(valKeys.length, maxGroupSize);
 
     // TODO change name of variable amount of groups for amount in group
-    for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
-      address groupAddress = groups[groupIndex];
-      console.log("Registering members for group: ", groupAddress);
-      for (uint256 validatorIndex = 0; validatorIndex < maxGroupSize; validatorIndex++) {
-        uint256 validatorKeyIndex = getValidatorKeyIndex(
-          groupCount,
-          groupIndex,
-          validatorIndex,
-          maxGroupSize
+    for (uint256 validatorIndex = 0; validatorIndex < amountOfGroups; validatorIndex++) {
+      console.log("Validator key index", getValidatorKeyIndex(0, validatorIndex, maxGroupSize));
+      console.log("Registering validator #: ", validatorIndex);
+      bytes memory ecdsaPubKey = ecdsaPubKeys[
+        getValidatorKeyIndex(0, validatorIndex, maxGroupSize)
+      ];
+      address validator = registerValidator(
+        validatorIndex,
+        ecdsaPubKey,
+        getValidatorKeyFromGroupGroup(valKeys, 0, validatorIndex, maxGroupSize),
+        validatorLockedGoldRequirements,
+        groupAddress
+      );
+      // TODO start broadcast
+      console.log("Adding to group...");
+
+      vm.startBroadcast(validatorGroup0Key);
+      if (validatorIndex == 0) {
+        getValidators().addFirstMember(validator, address(0), address(0));
+        console.log("Making group vote for itself");
+        getElection().vote(
+          groupAddress,
+          getLockedGold().getAccountNonvotingLockedGold(groupAddress),
+          address(0),
+          address(0)
         );
-        console.log("Registering validator #: ", validatorIndex);
-        address validator = registerValidator(
-          validatorIndex,
-          valKeys[validatorKeyIndex],
-          validatorLockedGoldRequirements,
-          groupAddress
-        );
-        // TODO start broadcast
-        console.log("Adding to group...");
-
-        vm.startBroadcast(groups[groupIndex]);
-        address greater = groupIndex == 0 ? address(0) : groups[groupIndex - 1];
-
-        if (validatorIndex == 0) {
-          getValidators().addFirstMember(validator, address(0), greater);
-          console.log("Making group vote for itself");
-        } else {
-          getValidators().addMember(validator);
-        }
-        getElection().vote(groupAddress, validatorLockedGoldRequirements, address(0), greater);
-
-        vm.stopBroadcast();
+      } else {
+        // unimplemented
+        console.log("WARNING: case not implemented");
       }
+
+      vm.stopBroadcast();
     }
-  }
-
-  function captureEpochManagerEnablerValidators() public {
-    address numberValidatorsInCurrentSetPrecompileAddress = 0x00000000000000000000000000000000000000f9;
-    numberValidatorsInCurrentSetPrecompileAddress.call(
-      abi.encodeWithSignature("setNumberOfValidators()")
-    );
-
-    address validatorSignerAddressFromCurrentSetPrecompileAddress = 0x00000000000000000000000000000000000000fa;
-    validatorSignerAddressFromCurrentSetPrecompileAddress.call(
-      abi.encodeWithSignature("setValidators()")
-    );
-
-    address epochManagerEnabler = registry.getAddressForString("EpochManagerEnabler");
-    IEpochManagerEnabler epochManagerEnablerContract = IEpochManagerEnabler(epochManagerEnabler);
-    epochManagerEnablerContract.captureEpochAndValidators();
   }
 }

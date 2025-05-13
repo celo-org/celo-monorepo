@@ -42,33 +42,27 @@ export async function setAndInitializeImplementation(
   },
   ...args: any[]
 ) {
-  try {
-
-
-    const callData = web3.eth.abi.encodeFunctionCall(initializerAbi, args)
-    if (txOptions.from != null) {
-      // The proxied contract needs to be funded prior to initialization
-      if (txOptions.value != null) {
-        // Proxy's fallback fn expects the contract's implementation to be set already
-        // So we set the implementation first, send the funding, and then set and initialize again.
-        await retryTx(proxy._setImplementation, [implementationAddress, { from: txOptions.from }])
-        await retryTx(web3.eth.sendTransaction, [
-          {
-            from: txOptions.from,
-            to: proxy.address,
-            value: txOptions.value,
-          },
-        ])
-      }
-      return retryTx(proxy._setAndInitializeImplementation, [
-        implementationAddress,
-        callData as any,
-        { from: txOptions.from },
+  const callData = web3.eth.abi.encodeFunctionCall(initializerAbi, args)
+  if (txOptions.from != null) {
+    // The proxied contract needs to be funded prior to initialization
+    if (txOptions.value != null) {
+      // Proxy's fallback fn expects the contract's implementation to be set already
+      // So we set the implementation first, send the funding, and then set and initialize again.
+      await retryTx(proxy._setImplementation, [implementationAddress, { from: txOptions.from }])
+      await retryTx(web3.eth.sendTransaction, [
+        {
+          from: txOptions.from,
+          to: proxy.address,
+          value: txOptions.value,
+        },
       ])
-    } else {
-      return retryTx(proxy._setAndInitializeImplementation, [implementationAddress, callData as any])
     }
-  } catch (error) {
-    console.log("errror", error);
+    return retryTx(proxy._setAndInitializeImplementation, [
+      implementationAddress,
+      callData as any,
+      { from: txOptions.from },
+    ])
+  } else {
+    return retryTx(proxy._setAndInitializeImplementation, [implementationAddress, callData as any])
   }
 }

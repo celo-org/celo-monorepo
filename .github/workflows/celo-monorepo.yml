@@ -8,7 +8,6 @@ on:
   push:
     branches:
       - master
-      - 'release/**'
   pull_request:
     branches:
       - master
@@ -24,7 +23,7 @@ defaults:
 
 env:
   # Increment these to force cache rebuilding
-  NODE_MODULE_CACHE_VERSION: 8
+  NODE_MODULE_CACHE_VERSION: 7
   NODE_OPTIONS: '--max-old-space-size=4096'
   TERM: dumb
   GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
@@ -198,7 +197,7 @@ jobs:
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks]
     if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'release') || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||

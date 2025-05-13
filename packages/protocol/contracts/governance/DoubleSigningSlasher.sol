@@ -45,7 +45,7 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 1);
+    return (1, 1, 2, 0);
   }
 
   /**
@@ -116,7 +116,7 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
     uint256 index,
     bytes memory headerA,
     bytes memory headerB
-  ) public view onlyL1 returns (uint256) {
+  ) public view returns (uint256) {
     require(hashHeader(headerA) != hashHeader(headerB), "Block hashes have to be different");
     uint256 blockNumber = getBlockNumberFromHeader(headerA);
     require(

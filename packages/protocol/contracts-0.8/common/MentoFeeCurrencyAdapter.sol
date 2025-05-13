@@ -14,7 +14,7 @@ contract MentoFeeCurrencyAdapter is IOracle, Initializable, Ownable {
   mapping(address => MentoCurrencyConfig) public currencies;
   address[] private currencyList;
 
-  constructor(bool test) Initializable(test) {}
+  constructor(bool test) public Initializable(test) {}
 
   /**
    * @notice Initializes the contract with the owner set.

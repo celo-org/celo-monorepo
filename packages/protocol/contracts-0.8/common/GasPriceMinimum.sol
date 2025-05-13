@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LGPL-3.0-only
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/access/Ownable.sol";
@@ -23,19 +23,20 @@ contract GasPriceMinimum is
   IsL2Check,
   CalledByVm
 {
+  // TODO add IGasPriceMinimum
   using FixidityLib for FixidityLib.Fraction;
 
-  uint256 private deprecated_gasPriceMinimum;
-  uint256 private deprecated_gasPriceMinimumFloor;
+  uint256 public deprecated_gasPriceMinimum;
+  uint256 public gasPriceMinimumFloor;
 
   // Block congestion level targeted by the gas price minimum calculation.
-  FixidityLib.Fraction private deprecated_targetDensity;
+  FixidityLib.Fraction public targetDensity;
 
   // Speed of gas price minimum adjustment due to congestion.
-  FixidityLib.Fraction private deprecated_adjustmentSpeed;
+  FixidityLib.Fraction public adjustmentSpeed;
 
-  uint256 private deprecated_baseFeeOpCodeActivationBlock;
-  uint256 private constant ABSOLUTE_MINIMAL_GAS_PRICE = 1;
+  uint256 public baseFeeOpCodeActivationBlock;
+  uint256 public constant ABSOLUTE_MINIMAL_GAS_PRICE = 1;
 
   event TargetDensitySet(uint256 targetDensity);
   event GasPriceMinimumFloorSet(uint256 gasPriceMinimumFloor);
@@ -47,7 +48,7 @@ contract GasPriceMinimum is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) Initializable(test) {}
+  constructor(bool test) public Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -111,7 +112,7 @@ contract GasPriceMinimum is
    * @param tokenAddress The currency the gas price should be in (defaults to Celo).
    * @return current gas price minimum in the requested currency
    */
-  function getGasPriceMinimum(address tokenAddress) external view onlyL1 returns (uint256) {
+  function getGasPriceMinimum(address tokenAddress) external view returns (uint256) {
     return Math.max(_getGasPriceMinimum(tokenAddress), ABSOLUTE_MINIMAL_GAS_PRICE);
   }
   /**
@@ -131,11 +132,8 @@ contract GasPriceMinimum is
    * @dev Value is expected to be < 1.
    */
   function setAdjustmentSpeed(uint256 _adjustmentSpeed) public onlyOwner onlyL1 {
-    deprecated_adjustmentSpeed = FixidityLib.wrap(_adjustmentSpeed);
-    require(
-      deprecated_adjustmentSpeed.lt(FixidityLib.fixed1()),
-      "adjustment speed must be smaller than 1"
-    );
+    adjustmentSpeed = FixidityLib.wrap(_adjustmentSpeed);
+    require(adjustmentSpeed.lt(FixidityLib.fixed1()), "adjustment speed must be smaller than 1");
     emit AdjustmentSpeedSet(_adjustmentSpeed);
   }
 
@@ -145,11 +143,8 @@ contract GasPriceMinimum is
    * @dev Value is expected to be < 1.
    */
   function setTargetDensity(uint256 _targetDensity) public onlyOwner onlyL1 {
-    deprecated_targetDensity = FixidityLib.wrap(_targetDensity);
-    require(
-      deprecated_targetDensity.lt(FixidityLib.fixed1()),
-      "target density must be smaller than 1"
-    );
+    targetDensity = FixidityLib.wrap(_targetDensity);
+    require(targetDensity.lt(FixidityLib.fixed1()), "target density must be smaller than 1");
     emit TargetDensitySet(_targetDensity);
   }
 
@@ -160,19 +155,12 @@ contract GasPriceMinimum is
    */
   function setGasPriceMinimumFloor(uint256 _gasPriceMinimumFloor) public onlyOwner onlyL1 {
     require(_gasPriceMinimumFloor > 0, "gas price minimum floor must be greater than zero");
-    deprecated_gasPriceMinimumFloor = _gasPriceMinimumFloor;
+    gasPriceMinimumFloor = _gasPriceMinimumFloor;
     emit GasPriceMinimumFloorSet(_gasPriceMinimumFloor);
   }
 
-  /**
-   * @notice Returns the gas price minimum.
-   * @return The gas price minimum.
-   */
-  function gasPriceMinimum() public view onlyL1 returns (uint256) {
-    if (
-      deprecated_baseFeeOpCodeActivationBlock > 0 &&
-      block.number >= deprecated_baseFeeOpCodeActivationBlock
-    ) {
+  function gasPriceMinimum() public view returns (uint256) {
+    if (baseFeeOpCodeActivationBlock > 0 && block.number >= baseFeeOpCodeActivationBlock) {
       return block.basefee;
     } else {
       return deprecated_gasPriceMinimum;
@@ -191,60 +179,25 @@ contract GasPriceMinimum is
   function getUpdatedGasPriceMinimum(
     uint256 blockGasTotal,
     uint256 blockGasLimit
-  ) public view onlyL1 returns (uint256) {
+  ) public view returns (uint256) {
     FixidityLib.Fraction memory blockDensity = FixidityLib.newFixedFraction(
       blockGasTotal,
       blockGasLimit
     );
-    bool densityGreaterThanTarget = blockDensity.gt(deprecated_targetDensity);
+    bool densityGreaterThanTarget = blockDensity.gt(targetDensity);
     FixidityLib.Fraction memory densityDelta = densityGreaterThanTarget
-      ? blockDensity.subtract(deprecated_targetDensity)
-      : deprecated_targetDensity.subtract(blockDensity);
+      ? blockDensity.subtract(targetDensity)
+      : targetDensity.subtract(blockDensity);
     FixidityLib.Fraction memory adjustment = densityGreaterThanTarget
-      ? FixidityLib.fixed1().add(deprecated_adjustmentSpeed.multiply(densityDelta))
-      : FixidityLib.fixed1().subtract(deprecated_adjustmentSpeed.multiply(densityDelta));
+      ? FixidityLib.fixed1().add(adjustmentSpeed.multiply(densityDelta))
+      : FixidityLib.fixed1().subtract(adjustmentSpeed.multiply(densityDelta));
 
     uint256 newGasPriceMinimum = adjustment
       .multiply(FixidityLib.newFixed(gasPriceMinimum()))
       .add(FixidityLib.fixed1())
       .fromFixed();
 
-    return
-      newGasPriceMinimum >= deprecated_gasPriceMinimumFloor
-        ? newGasPriceMinimum
-        : deprecated_gasPriceMinimumFloor;
-  }
-
-  /**
-   * @notice Returns the gas price minimum floor.
-   * @return The gas price minimum floor.
-   */
-  function gasPriceMinimumFloor() external view onlyL1 returns (uint256) {
-    return deprecated_gasPriceMinimumFloor;
-  }
-
-  /**
-   * @notice Returns the target density.
-   * @return The target density.
-   */
-  function targetDensity() external view onlyL1 returns (uint256) {
-    return deprecated_targetDensity.unwrap();
-  }
-
-  /**
-   * @notice Returns the adjustment speed.
-   * @return The adjustment speed.
-   */
-  function adjustmentSpeed() external view onlyL1 returns (uint256) {
-    return deprecated_adjustmentSpeed.unwrap();
-  }
-
-  /**
-   * @notice Returns the basefee opcode activation block.
-   * @return The basefee opcode activation block.
-   */
-  function baseFeeOpCodeActivationBlock() external view onlyL1 returns (uint256) {
-    return deprecated_baseFeeOpCodeActivationBlock;
+    return newGasPriceMinimum >= gasPriceMinimumFloor ? newGasPriceMinimum : gasPriceMinimumFloor;
   }
 
   /**
@@ -260,14 +213,14 @@ contract GasPriceMinimum is
       allowZero || _baseFeeOpCodeActivationBlock > 0,
       "baseFee opCode activation block must be greater than zero"
     );
-    deprecated_baseFeeOpCodeActivationBlock = _baseFeeOpCodeActivationBlock;
+    baseFeeOpCodeActivationBlock = _baseFeeOpCodeActivationBlock;
     emit BaseFeeOpCodeActivationBlockSet(_baseFeeOpCodeActivationBlock);
   }
 
   function _getGasPriceMinimum(address tokenAddress) private view returns (uint256) {
     if (
       tokenAddress == address(0) ||
-      tokenAddress == registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID)
+      tokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)
     ) {
       return gasPriceMinimum();
     } else {

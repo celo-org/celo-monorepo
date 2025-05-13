@@ -2,25 +2,20 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
-import "@test-sol/utils/WhenL2.sol";
 
 import "@celo-contracts/governance/Proposals.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 
-contract ProposalTest is Test {
+contract ProposalTest_getSupportWithQuorumPadding is Test {
   using Proposals for Proposals.Proposal;
   using FixidityLib for FixidityLib.Fraction;
 
-  Proposals.Proposal internal proposal;
+  Proposals.Proposal private proposal;
 
   function setUp() public {
     proposal.networkWeight = 100;
   }
-}
 
-contract ProposalTest_L2 is WhenL2, ProposalTest {}
-
-contract ProposalTest_getSupportWithQuorumPadding is ProposalTest {
   function test_ShouldReturnSupportRatioWhenParticipationAboveCriticalBaseline() public {
     proposal.votes.yes = 15;
     proposal.votes.no = 10;
@@ -52,8 +47,3 @@ contract ProposalTest_getSupportWithQuorumPadding is ProposalTest {
     assertEq(proposal.getSupportWithQuorumPadding(quorum).unwrap(), 0);
   }
 }
-
-contract ProposalTest_getSupportWithQuorumPadding_L2 is
-  ProposalTest_L2,
-  ProposalTest_getSupportWithQuorumPadding
-{}
