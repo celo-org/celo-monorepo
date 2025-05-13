@@ -35,6 +35,54 @@ contract MockGovernance is IGovernance {
     totalVotes[voter] = votes;
   }
 
+  function setConstitution(address, bytes4, uint256) external pure {
+    revert("not implemented");
+  }
+
+  function getConstitution(address, bytes4) external pure returns (uint256) {
+    revert("not implemented");
+  }
+
+  function propose(
+    uint256[] calldata,
+    address[] calldata,
+    bytes calldata,
+    uint256[] calldata,
+    string calldata
+  ) external payable returns (uint256) {
+    return 0;
+  }
+
+  function getProposal(
+    uint256
+  ) external pure returns (address, uint256, uint256, uint256, string memory, uint256, bool) {
+    return (address(0), 0, 0, 0, "", 0, false);
+  }
+
+  function proposalCount() external pure returns (uint256) {
+    return 0;
+  }
+
+  function upvote(uint256, uint256, uint256) external pure returns (bool) {
+    return true;
+  }
+
+  function getUpvotes(uint256) external pure returns (uint256) {
+    return 0;
+  }
+
+  function approve(uint256, uint256) external pure returns (bool) {
+    return true;
+  }
+
+  function isApproved(uint256) external pure returns (bool) {
+    return true;
+  }
+
+  function votePartially(uint256, uint256, uint256, uint256, uint256) external pure returns (bool) {
+    return true;
+  }
+
   function removeVotesWhenRevokingDelegatedVotes(
     address account,
     uint256 maxAmountAllowed
@@ -42,22 +90,8 @@ contract MockGovernance is IGovernance {
     removeVotesCalledFor[account] = maxAmountAllowed;
   }
 
-  function setConstitution(address, bytes4, uint256) external pure {
-    revert("not implemented");
-  }
-
-  function getConstitution(address, bytes4) external view returns (uint256) {
-    revert("not implemented");
-  }
-
-  function votePartially(uint256, uint256, uint256, uint256, uint256) external returns (bool) {
-    return true;
-  }
-
-  function getProposal(
-    uint256
-  ) external view returns (address, uint256, uint256, uint256, string memory, uint256, bool) {
-    return (address(0), 0, 0, 0, "", 0, false);
+  function getVoteTotals(uint256) external pure returns (uint256, uint256, uint256) {
+    return (0, 0, 0);
   }
 
   function getAmountOfGoldUsedForVoting(address account) external view returns (uint256) {
@@ -66,5 +100,9 @@ contract MockGovernance is IGovernance {
 
   function getReferendumStageDuration() external pure returns (uint256) {
     return 0;
+  }
+
+  function execute(uint256, uint256) external pure returns (bool) {
+    return true;
   }
 }
