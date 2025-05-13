@@ -23,6 +23,5 @@ contract MockWETH is ERC20 {
     _burn(msg.sender, wad);
     payable(msg.sender).transfer(wad);
     emit Withdrawal(msg.sender, wad);
-    totalDeposited -= wad;
   }
 }
