@@ -1,6 +1,6 @@
 pragma solidity >=0.5.13 <0.9.0;
 
-import { Test as ForgeTest } from "@lib/celo-foundry-8/lib/forge-std/src/Test.sol";
+import { Test as ForgeTest } from "forge-std-8/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 import { PrecompileHandler } from "@test-sol/utils/PrecompileHandler.sol";
 import { IEpochManagerEnablerMock } from "@test-sol/unit/common/interfaces/IEpochManagerEnablerMock.sol";
