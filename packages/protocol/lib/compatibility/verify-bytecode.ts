@@ -9,7 +9,6 @@ import {
 } from '@celo/protocol/lib/bytecode'
 import { verifyProxyStorageProof } from '@celo/protocol/lib/proxy-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
-import { ZERO_ADDRESS } from '@celo/protocol/test/constants'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { ProxyInstance, RegistryInstance } from 'types'
 import Web3 from 'web3'
@@ -129,7 +128,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
     implementationAddress = ensureLeading0x(context.libraryAddresses.addresses[contract])
   } else {
     const proxyAddress = await context.registry.getAddressForString(contract)
-    if (proxyAddress === ZERO_ADDRESS) {
+    if (proxyAddress === '0x0000000000000000000000000000000000000000') {
       console.log(`Contract ${contract} is not in registry - skipping bytecode verification`)
       return;
     }
