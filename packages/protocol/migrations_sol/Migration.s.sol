@@ -59,10 +59,10 @@ import { UsingRegistry } from "@celo-contracts-8/common/UsingRegistry.sol";
 
 // Local imports
 import { StringUtils } from "@celo-contracts/common/libraries/StringUtils.sol";
-import { SelectorParser } from "@celo-contracts-8/common/test/SelectorParser.sol";
 
 // Test imports
 import { ISECP256K1 } from "@test-sol/utils/SECP256K1.sol";
+import { SelectorParser } from "@test-sol/utils/SelectorParser.sol";
 
 contract ForceTx {
   // event to trigger so a tx can be processed
