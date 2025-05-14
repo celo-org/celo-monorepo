@@ -17,6 +17,7 @@
     "build": "yarn build:truffle-sol && yarn build:truffle-ts",
     "build:truffle-sol": "yarn submodules:pull && mkdir -p migrations && yarn ts-node --preferTsExts ./scripts/build.ts --solidity ${BUILD_DIR:-./build}",
     "build:truffle-ts": "rm -f migrations/*.js* && yarn ts-node --preferTsExts ./scripts/build.ts --truffleTypes ./types/typechain && tsc -b && mv migrations_ts/*.js* migrations",
+    "cheatsheet": "cat CHEATSHEET.md",
     "ci:test-make-release": "./scripts/bash/release-on-devchain.sh",
     "clean": "rm -rf ./types/typechain && rm -rf build/* && rm -rf .0x-artifacts/* && rm -rf migrations/*.js* && rm -rf migrations_ts/*.js* && rm -rf test/**/*.js* && rm -f lib/*.js* && rm -f lib/**/*.js* && rm -f scripts/*.js* && yarn clean:foundry",
     "clean:foundry": "forge clean && rm -rf cache out",
