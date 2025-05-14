@@ -18,7 +18,7 @@ Covers changes in `package.json` scripts introduced starting with PR [#11369](ht
 | `check-opcodes`                         | `release:check-opcodes`                       |
 | `check-versions`                        | `release:check-versions`                      |
 | `determine-release-version`             | `release:determine-release-version`           |
-| `make-release`                          | `release:make-release`                        |
+| `make-release`                          | `release:make`                                |
 | `verify-deployed`                       | `release:verify-deployed`                     |
 | `verify-release`                        | `release:verify-release`                      |
 | `pull-submodules`                       | `submodules:pull`                             |

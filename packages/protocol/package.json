@@ -33,7 +33,7 @@
     "release:check-opcodes": "yarn ts-node scripts/check-opcodes.ts",
     "release:check-versions": "./scripts/bash/check-versions.sh",
     "release:determine-release-version": "yarn --silent ts-node --preferTsExts ./scripts/determine-release-version.ts",
-    "release:make-release": "./scripts/bash/make-release.sh",
+    "release:make": "./scripts/bash/make-release.sh",
     "release:verify-deployed": "./scripts/bash/verify-deployed.sh",
     "release:verify-release": "./scripts/bash/verify-release.sh",
     "size:onchain": "./scripts/bash/get_smart_contract_size_from_onchain_address.sh",
