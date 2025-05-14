@@ -9,7 +9,6 @@ import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import { CeloUnreleasedTreasury } from "@celo-contracts-8/common/CeloUnreleasedTreasury.sol";
 
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
-import { WhenL2, WhenL2NoInitialization } from "@test-sol/utils/WhenL2-08.sol";
 
 contract CeloUnreleasedTreasuryTest is TestWithUtils08 {
   using FixidityLib for FixidityLib.Fraction;
@@ -34,6 +33,7 @@ contract CeloUnreleasedTreasuryTest is TestWithUtils08 {
 
     registry.setAddressFor(CeloTokenContract, address(celoTokenContract));
     newCeloUnreleasedTreasury();
+    whenL2WithEpochManagerInitialization();
   }
 
   function newCeloUnreleasedTreasury() internal {
@@ -44,12 +44,6 @@ contract CeloUnreleasedTreasuryTest is TestWithUtils08 {
 
     vm.prank(celoDistributionOwner);
     celoUnreleasedTreasuryContract.initialize(REGISTRY_ADDRESS);
-  }
-}
-
-contract CeloUnreleasedTreasuryTest_L2 is CeloUnreleasedTreasuryTest, WhenL2 {
-  function setUp() public virtual override(CeloUnreleasedTreasuryTest, WhenL2) {
-    super.setUp();
   }
 }
 
@@ -84,15 +78,7 @@ contract CeloUnreleasedTreasuryTest_initialize is CeloUnreleasedTreasuryTest {
 }
 
 contract CeloUnreleasedTreasuryTest_release is CeloUnreleasedTreasuryTest {
-  function test_Reverts_WhenL1() public {
-    vm.expectRevert("Insufficient balance.");
-    vm.prank(address(epochManager));
-
-    celoUnreleasedTreasuryContract.release(randomAddress, 4);
-  }
-}
-contract CeloUnreleasedTreasuryTest_release_L2 is CeloUnreleasedTreasuryTest_L2 {
-  function setUp() public override(CeloUnreleasedTreasuryTest_L2) {
+  function setUp() public override(CeloUnreleasedTreasuryTest) {
     super.setUp();
   }
 
@@ -115,26 +101,7 @@ contract CeloUnreleasedTreasuryTest_release_L2 is CeloUnreleasedTreasuryTest_L2 
 
 contract CeloUnreleasedTreasuryTest_getRemainingBalanceToRelease is CeloUnreleasedTreasuryTest {
   uint256 _startingBalance;
-  function setUp() public virtual override {
-    super.setUp();
-    _startingBalance = address(celoUnreleasedTreasuryContract).balance;
-  }
-
-  function test_ShouldReturnContractBalanceBeforeFirstRelease() public {
-    uint256 _remainingBalance = celoUnreleasedTreasuryContract.getRemainingBalanceToRelease();
-
-    assertEq(_startingBalance, _remainingBalance);
-  }
-}
-
-contract CeloUnreleasedTreasuryTest_getRemainingBalanceToRelease_L2 is
-  CeloUnreleasedTreasuryTest_L2,
-  CeloUnreleasedTreasuryTest_getRemainingBalanceToRelease
-{
-  function setUp()
-    public
-    override(CeloUnreleasedTreasuryTest_L2, CeloUnreleasedTreasuryTest_getRemainingBalanceToRelease)
-  {
+  function setUp() public override(CeloUnreleasedTreasuryTest) {
     super.setUp();
 
     _startingBalance = address(celoUnreleasedTreasuryContract).balance;

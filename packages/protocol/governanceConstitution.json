@@ -118,7 +118,6 @@
     "setMembershipHistoryLength": 700000000000000000000000,
     "setGroupLockedGoldRequirements": 800000000000000000000000,
     "setValidatorLockedGoldRequirements": 800000000000000000000000,
-    "setSlashingMultiplierResetPeriod": 700000000000000000000000,
-    "setValidatorScoreParameters": 700000000000000000000000
+    "setSlashingMultiplierResetPeriod": 700000000000000000000000
   }
 }

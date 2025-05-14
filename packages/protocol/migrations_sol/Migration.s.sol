@@ -76,7 +76,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   struct InitParamsTunnel {
     // The number of blocks to delay a ValidatorGroup's commission
     uint256 commissionUpdateDelay;
-    uint256 downtimeGracePeriod;
   }
 
   IProxyFactory proxyFactory;
@@ -601,14 +600,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       json.parseRaw(".validators.validatorLockedGoldRequirements.duration"),
       (uint256)
     );
-    uint256 validatorScoreExponent = abi.decode(
-      json.parseRaw(".validators.validatorScoreParameters.exponent"),
-      (uint256)
-    );
-    uint256 validatorScoreAdjustmentSpeed = abi.decode(
-      json.parseRaw(".validators.validatorScoreParameters.adjustmentSpeed"),
-      (uint256)
-    );
     uint256 membershipHistoryLength = abi.decode(
       json.parseRaw(".validators.membershipHistoryLength"),
       (uint256)
@@ -622,14 +613,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       json.parseRaw(".validators.commissionUpdateDelay"),
       (uint256)
     );
-    uint256 downtimeGracePeriod = abi.decode(
-      json.parseRaw(".validators.downtimeGracePeriod"),
-      (uint256)
-    );
 
     InitParamsTunnel memory initParamsTunnel = InitParamsTunnel({
-      commissionUpdateDelay: commissionUpdateDelay,
-      downtimeGracePeriod: downtimeGracePeriod
+      commissionUpdateDelay: commissionUpdateDelay
     });
 
     deployProxiedContract(
@@ -641,8 +627,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         groupRequirementDuration,
         validatorRequirementValue,
         validatorRequirementDuration,
-        validatorScoreExponent,
-        validatorScoreAdjustmentSpeed,
         membershipHistoryLength,
         slashingMultiplierResetPeriod,
         maxGroupSize,
@@ -1113,21 +1097,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     lockGold(amountToLock);
     address accountAddress = (new ForceTx()).identity();
 
-    // these blobs are not checked in the contract
-    // TODO make this configurable
-    bytes memory newBlsPublicKey = abi.encodePacked(
-      bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
-      bytes32(0x0202020202020202020202020202020202020202020202020202020202020203),
-      bytes32(0x0303030303030303030303030303030303030303030303030303030303030304)
-    );
-    bytes memory newBlsPop = abi.encodePacked(
-      bytes16(0x04040404040404040404040404040405),
-      bytes16(0x05050505050505050505050505050506),
-      bytes16(0x06060606060606060606060606060607)
-    );
-
     (bytes memory ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(accountAddress, validatorKey);
-    getValidators().registerValidator(ecdsaPubKey, newBlsPublicKey, newBlsPop);
+    getValidators().registerValidatorNoBls(ecdsaPubKey);
     getValidators().affiliate(groupToAffiliate);
     console.log("Done registering validators");
 
