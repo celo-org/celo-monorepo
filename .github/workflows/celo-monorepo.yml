@@ -219,10 +219,10 @@ jobs:
               fi
           - name: Protocol Common tests
             command: |
-              yarn --cwd packages/protocol test common/
+              yarn --cwd packages/protocol test:truffle common/
           - name: Protocol Compatibility
             command: |
-              yarn --cwd packages/protocol test compatibility/
+              yarn --cwd packages/protocol test:truffle compatibility/
           - name: Protocol scripts test
             command: |
               yarn --cwd packages/protocol test:scripts
