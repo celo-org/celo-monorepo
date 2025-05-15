@@ -10,7 +10,7 @@ Also, for compatibility reasons, include an ingress resource serving
 at DNS `https://ethstats-${env}.${celo-domain}`, so the old-configured
 clients can report/connect with that endpoint.
 
-To upgrade from an exisiting `ethstats` package, the easiest way is:
+To upgrade from an existing `ethstats` package, the easiest way is:
 
 1.  Remove the old `ethstats` package: `helm uninstall --purge ${env}-ethstats`
 
