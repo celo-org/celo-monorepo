@@ -96,7 +96,7 @@ interface ViemContract {
 }
 
 // Define the set of core contracts that are proxied
-const proxiedCoreContracts = new Set<CeloContractName>([
+const proxiedCoreContracts = new Set<string>([
   CeloContractName.Accounts,
   CeloContractName.Attestations,
   CeloContractName.BlockchainParameters,
@@ -123,14 +123,15 @@ const proxiedCoreContracts = new Set<CeloContractName>([
   CeloContractName.GrandaMento,
   CeloContractName.FeeHandler,
   CeloContractName.FederatedAttestations,
+  "Ahoj"
 ]);
 
 const isProxiedContract = (contractName: string): boolean => {
   // Check if the contract name is one of the known proxied core contracts
-  return proxiedCoreContracts.has(contractName as CeloContractName);
+  return proxiedCoreContracts.has(contractName);
 };
 
-const isCoreContract = (contractName: string) => Object.keys(CeloContractName).includes(contractName);
+const isCoreContract = (contractName: string) => [...Object.keys(CeloContractName), "Ahoj"].includes(contractName);
 
 // Define the extracted type for Viem's AbiConstructor
 type ViemAbiConstructor = Extract<Abi[number], { type: 'constructor' }>;
@@ -378,11 +379,15 @@ const deployCoreContract = async (
         }
         setImplementationTx.function = '_setAndInitializeImplementation';
         setImplementationTx.args.push(callData);
+      } else {
+        console.warn(
+          `No initialization data found for ${contractName}. Skipping initialization.`
+        );
       }
     }
-    // console.info(
-    //   `Add '${contractName}Proxy.${setImplementationTx.function}' with args ${JSON.stringify(setImplementationTx.args)} to proposal`
-    // );
+    console.info(
+      `Add '${contractName}Proxy.${setImplementationTx.function}' with args ${JSON.stringify(setImplementationTx.args)} to proposal`
+    );
     console.log("Deployed", contractName);
     proposal.push(setImplementationTx);
   }
