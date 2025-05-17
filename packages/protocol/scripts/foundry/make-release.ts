@@ -12,6 +12,7 @@ import { basename, join } from 'path';
 import { TextEncoder } from 'util';
 import {
   Abi,
+  AbiParameter, // Added AbiParameter
   Account,
   Chain,
   Hex,
@@ -131,16 +132,82 @@ const isProxiedContract = (contractName: string): boolean => {
 
 const isCoreContract = (contractName: string) => Object.keys(CeloContractName).includes(contractName);
 
+// Define the extracted type for Viem's AbiConstructor
+type ViemAbiConstructor = Extract<Abi[number], { type: 'constructor' }>;
+
+// Helper function to get default values for Solidity types - this was default behavior of truffle
+function getDefaultValueForSolidityType(solidityType: string, components?: readonly AbiParameter[]): any {
+  if (solidityType.startsWith('uint') || solidityType.startsWith('int')) {
+    return BigInt(0);
+  }
+  if (solidityType === 'bool') {
+    return false;
+  }
+  if (solidityType === 'address') {
+    return NULL_ADDRESS;
+  }
+  if (solidityType === 'string') {
+    return "";
+  }
+  if (solidityType.startsWith('bytes')) {
+    const sizeMatch = solidityType.match(/^bytes(\d+)$/);
+    if (sizeMatch) {
+      const size = parseInt(sizeMatch[1], 10);
+      return `0x${'00'.repeat(size)}`;
+    }
+    return '0x'; // For dynamic 'bytes'
+  }
+  if (solidityType.endsWith('[]')) { // Dynamic array
+    // For arrays of tuples, Viem expects an array of objects.
+    // If it's an array of primitives, an empty array is fine.
+    return [];
+  }
+  const fixedArrayMatch = solidityType.match(/^(.*)\[(\d+)\]$/);
+  if (fixedArrayMatch) { // Fixed-size array
+    const baseType = fixedArrayMatch[1];
+    const size = parseInt(fixedArrayMatch[2], 10);
+    const elementComponents = baseType === 'tuple' ? components : undefined;
+    return Array(size).fill(null).map(() => getDefaultValueForSolidityType(baseType, elementComponents));
+  }
+  if (solidityType.startsWith('tuple')) {
+    if (!components || components.length === 0) {
+      console.warn(`Tuple type ${solidityType} has no components defined in ABI input, returning {}.`);
+      return {};
+    }
+    const tupleValue: { [key: string]: any } = {};
+    for (const component of components) {
+      const subComponents = 'components' in component ? component.components as readonly AbiParameter[] : undefined;
+      tupleValue[component.name!] = getDefaultValueForSolidityType(component.type, subComponents);
+    }
+    return tupleValue;
+  }
+
+  console.warn(`Unknown Solidity type for default value: ${solidityType}, returning undefined.`);
+  return undefined;
+}
+
 const deployImplementation = async (
   contractName: string,
   contractArtifact: ViemContract,
   walletClient: WalletClient,
   publicClient: PublicClient,
   requireVersion = true,
-  gas?: bigint,
-  constructorArgs?: any[]
+  gas?: bigint
 ): Promise<ViemContract> => {
-  console.log("Deploying", contractName, "with constructor args", constructorArgs);
+  let finalConstructorArgs: any[] = [];
+  const constructorAbiEntry = contractArtifact.abi.find(
+    (item) => item.type === 'constructor'
+  ) as ViemAbiConstructor | undefined;
+
+  if (constructorAbiEntry && constructorAbiEntry.inputs && constructorAbiEntry.inputs.length > 0) {
+    finalConstructorArgs = constructorAbiEntry.inputs.map((input: Readonly<AbiParameter>) => {
+      // Check if input has 'components' property before passing it
+      const components = 'components' in input ? input.components as readonly AbiParameter[] : undefined;
+      return getDefaultValueForSolidityType(input.type, components);
+    });
+  }
+
+  console.log("Deploying", contractName, "with derived constructor args:", finalConstructorArgs);
 
   if (!contractArtifact.bytecode) {
     throw new Error(`Bytecode for ${contractName} is missing.`);
@@ -153,7 +220,7 @@ const deployImplementation = async (
     account: walletClient.account!,
     chain: walletClient.chain!,
     gas: gas ?? BigInt(20_000_000),
-    args: constructorArgs, // Pass constructorArgs here
+    args: finalConstructorArgs,
   });
   const receipt = await publicClient.waitForTransactionReceipt({ hash });
   if (receipt.status !== 'success' || !receipt.contractAddress) {
@@ -240,16 +307,14 @@ const deployCoreContract = async (
   publicClient: PublicClient,
   contractArtifactPaths: Map<string, string>
 ) => {
-  const constructorArgs = initializationData[contractName];
 
   const deployedImplementation = await deployImplementation(
     contractName,
     implementationArtifact,
     walletClient,
     publicClient,
-    true, // requireVersion for core contracts
-    undefined, // gas (let deployImplementation handle default)
-    constructorArgs // Pass constructor arguments
+    true,
+    undefined
   );
 
   const setImplementationTx: ProposalTx = {
