@@ -27,6 +27,8 @@ import {
 } from 'viem';
 import { mnemonicToAccount, privateKeyToAccount } from 'viem/accounts';
 import * as viemChains from 'viem/chains';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 import { getReleaseVersion, ignoredContractsV9 } from '../../lib/compatibility/ignored-contracts-v9';
 
 
@@ -356,7 +358,7 @@ const getViemChain = (networkName: string): Chain => {
       return viemChains.celo;
     case 'baklava':
       return {
-        id: 62320, network: 'baklava', name: 'Celo Baklava',
+        id: 62320, name: 'Celo Baklava',
         nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 },
         rpcUrls: { default: { http: ['https://baklava-forno.celo-testnet.org'] }, public: { http: ['https://baklava-forno.celo-testnet.org'] } },
         blockExplorers: { default: { name: 'CeloScan', url: 'https://baklava.celoscan.io' } },
@@ -522,17 +524,30 @@ const performRelease = async (
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
-    const argv = require('minimist')(process.argv.slice(2), {
-      string: ['report', 'from', 'proposal', 'librariesFile', 'initialize_data', 'build_directory', 'branch', 'network', 'privateKey', 'mnemonic'],
-      default: { network: 'development' },
-    });
+    const argv = await yargs(hideBin(process.argv))
+      .option('report', { type: 'string', demandOption: true, description: 'Path to the compatibility report JSON file.' })
+      .option('from', { type: 'string', description: 'Address to deploy from (not directly used in this script but kept for compatibility or future use).' })
+      .option('proposal', { type: 'string', demandOption: true, description: 'Path to output the proposal JSON file.' })
+      .option('librariesFile', { type: 'string', default: 'libraries.json', description: 'Path to the libraries.json file.' })
+      .option('initialize_data', { type: 'string', demandOption: true, description: 'Path to the JSON file with initialization data for contracts.' })
+      .option('build_directory', { type: 'string', demandOption: true, description: 'Path to the Foundry build output directory (e.g., out/).' })
+      .option('branch', { type: 'string', description: 'Git branch name (used for versioning).' })
+      .option('network', { type: 'string', default: 'development', description: 'Network name (e.g., alfajores, mainnet, development).' })
+      .option('privateKey', { type: 'string', description: 'Private key for deployment.' })
+      .option('mnemonic', { type: 'string', description: 'Mnemonic for deployment.' })
+      .check((argv) => {
+        if (!argv.privateKey && !argv.mnemonic) {
+          throw new Error('Either --privateKey or --mnemonic must be provided.');
+        }
+        return true;
+      })
+      .argv;
 
-    const networkName = argv.network;
-    const buildDir = argv.build_directory;
-    if (!buildDir) throw new Error('--build_directory is required');
-    if (!argv.report) throw new Error('--report is required');
-    if (!argv.proposal) throw new Error('--proposal is required');
-    if (!argv.initialize_data) throw new Error('--initialize_data is required');
+    const resolvedArgv = argv;
+
+    const networkName = resolvedArgv.network!; // network has a default, so it's always defined
+    const buildDir = resolvedArgv.build_directory;
+    // No need for manual checks for report, proposal, initialize_data, build_directory as demandOption handles it.
 
     const viemChain = getViemChain(networkName);
     let transportUrl: string;
@@ -544,23 +559,28 @@ module.exports = async (callback: (error?: any) => number) => {
     } else {
       throw new Error(`RPC URL for network ${networkName} could not be determined.`);
     }
-    const publicClient = createPublicClient({ chain: viemChain, transport: http(transportUrl) });
+    const publicClientInternal = createPublicClient({ chain: viemChain, transport: http(transportUrl) });
+    // Ensure the publicClient conforms to the type where account is undefined, as expected by PublicClient type.
+    const publicClient = {
+      ...publicClientInternal,
+      account: undefined,
+    } as PublicClient;
     let account: Account;
 
-    if (argv.privateKey) {
-      account = privateKeyToAccount(argv.privateKey as Hex);
-    } else if (argv.mnemonic) {
-      account = mnemonicToAccount(argv.mnemonic as string);
+    if (resolvedArgv.privateKey) {
+      account = privateKeyToAccount(resolvedArgv.privateKey as Hex);
+    } else if (resolvedArgv.mnemonic) {
+      account = mnemonicToAccount(resolvedArgv.mnemonic as string);
     } else {
       throw new Error('Deployment requires a signer. Please provide --privateKey or --mnemonic.');
     }
 
     const walletClient = createWalletClient({ account, chain: viemChain, transport: http(transportUrl) });
-    const fullReport = readJsonSync(argv.report);
-    const libraryMapping: LibraryAddresses['addresses'] = readJsonSync(argv.librariesFile ?? 'libraries.json');
+    const fullReport = readJsonSync(resolvedArgv.report);
+    const libraryMapping: LibraryAddresses['addresses'] = readJsonSync(resolvedArgv.librariesFile ?? 'libraries.json');
     const report: ASTDetailedVersionedReport = fullReport.report;
-    const branch = (argv.branch ? argv.branch : '') as string;
-    const initializationData = readJsonSync(argv.initialize_data);
+    const branch = (resolvedArgv.branch ? resolvedArgv.branch : '') as string;
+    const initializationData = readJsonSync(resolvedArgv.initialize_data);
     const dependencies = getCeloContractDependencies();
     const version = getReleaseVersion(branch);
 
@@ -624,8 +644,8 @@ module.exports = async (callback: (error?: any) => number) => {
       }
     }
 
-    writeJsonSync(argv.proposal, proposal, { spaces: 2 });
-    console.log(`Proposal successfully written to ${argv.proposal}`);
+    writeJsonSync(resolvedArgv.proposal, proposal, { spaces: 2 });
+    console.log(`Proposal successfully written to ${resolvedArgv.proposal}`);
     callback();
   } catch (error) {
     console.error('Error during script execution:', error);
