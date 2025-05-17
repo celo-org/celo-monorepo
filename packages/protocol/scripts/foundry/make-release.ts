@@ -85,6 +85,7 @@ class ContractAddresses {
 }
 
 interface ViemContract {
+  contractName: string;
   address: ViemAddress;
   abi: Abi;
   bytecode: Hex;
@@ -374,7 +375,7 @@ const loadContractArtifact = (contractName: string, artifactPath: string): ViemC
 
   const sourceFiles = Object.keys(artifact.metadata.sources);
 
-  return { abi: artifact.abi as Abi, bytecode: artifact.bytecode.object, address: '0x0' as ViemAddress, sourceFiles: sourceFiles };
+  return { contractName: contractName, abi: artifact.abi as Abi, bytecode: artifact.bytecode.object, address: '0x0' as ViemAddress, sourceFiles: sourceFiles };
 };
 
 const findContractArtifactsRecursive = (
@@ -409,6 +410,114 @@ const findContractArtifactsRecursive = (
       }
     }
   }
+};
+
+const linkLibraries = (
+  contractViemArtifact: ViemContract,
+  contractDependencies: string[],
+  addresses: ContractAddresses
+): void => {
+  if (!contractViemArtifact.bytecode.includes('__')) {
+    return
+  }
+
+  if (contractDependencies.length === 0) {
+    console.error(`No dependencies found for ${contractViemArtifact.contractName}. Skipping library linking.`);
+    return;
+  }
+
+  for (const dep of contractDependencies) {
+    if (addresses.addresses.has(dep)) {
+      const libAddress = addresses.get(dep).replace('0x', '');
+      const libSourceFilePath = contractViemArtifact.sourceFiles.find((file) => file.includes(`${dep}.sol`));
+
+      if (!libSourceFilePath) {
+        console.error(`Could not determine sourceFilePath for library ${dep}. Skipping Foundry placeholder replacement for it in ${contractViemArtifact.contractName}.`);
+        return;
+      }
+
+      const stringToHash = `${libSourceFilePath}:${dep}`;
+      const hashed = keccak256(toHex(new TextEncoder().encode(stringToHash)));
+      const placeholderHash = hashed.substring(2, 2 + 34); // Extract 34 chars after 0x
+
+      const placeholderRegexDollar = new RegExp(`__\\$${placeholderHash}\\$__`, "g");
+      if (contractViemArtifact.bytecode!.match(placeholderRegexDollar)) {
+        contractViemArtifact.bytecode = contractViemArtifact.bytecode!.replace(placeholderRegexDollar, libAddress) as Hex;
+      } else {
+        console.log(`No placeholder match for ${dep} in ${contractViemArtifact.contractName}.`);
+      }
+    }
+  }
+};
+
+const performRelease = async (
+  contractName: string,
+  report: ASTDetailedVersionedReport,
+  released: Set<string>,
+  contractArtifactPaths: Map<string, string>,
+  dependencies: { get(key: string): string[] | undefined },
+  addresses: ContractAddresses,
+  proposal: ProposalTx[],
+  initializationData: any,
+  walletClient: WalletClient,
+  publicClient: PublicClient
+): Promise<void> => {
+
+  if (released.has(contractName)) return;
+
+  const shouldDeployContract = Object.keys(report.contracts).includes(contractName);
+  const shouldDeployLibrary = Object.keys(report.libraries).includes(contractName);
+
+
+  if (!shouldDeployContract && !shouldDeployLibrary) return;
+
+  const artifactPath = contractArtifactPaths.get(contractName);
+  if (!artifactPath) {
+    console.error(`Artifact path for ${contractName} not found in map. Skipping.`);
+    released.add(contractName);
+    return;
+  }
+
+  let contractViemArtifact: ViemContract;
+  try {
+    contractViemArtifact = loadContractArtifact(contractName, artifactPath);
+  } catch (e) {
+    console.error(`Failed to load artifact for ${contractName} from ${artifactPath}. Skipping. Error: ${e}`);
+    released.add(contractName);
+    return;
+  }
+
+  if (shouldDeployContract) {
+    const contractDependencies = dependencies.get(contractName) || [];
+    for (const dependency of contractDependencies) {
+      if (!released.has(dependency)) {
+        await performRelease(
+          dependency,
+          report,
+          released,
+          contractArtifactPaths,
+          dependencies,
+          addresses,
+          proposal,
+          initializationData,
+          walletClient,
+          publicClient
+        );
+      }
+    }
+
+    linkLibraries(contractViemArtifact, contractDependencies, addresses);
+
+    await deployCoreContract(
+      contractName, contractViemArtifact, proposal, addresses, report, initializationData,
+      walletClient, publicClient, contractArtifactPaths
+    );
+  } else if (shouldDeployLibrary) {
+    await deployLibrary(
+      contractName, contractViemArtifact, addresses, walletClient, publicClient
+    );
+  }
+  released.add(contractName);
 };
 
 module.exports = async (callback: (error?: any) => number) => {
@@ -494,102 +603,24 @@ module.exports = async (callback: (error?: any) => number) => {
     const released: Set<string> = new Set([]);
     const proposal: ProposalTx[] = [];
 
-    const release = async (contractNameIn: string) => {
-      const contractName = contractNameIn;
-
-      const shouldDeployContract = Object.keys(report.contracts).includes(contractName);
-      const shouldDeployLibrary = Object.keys(report.libraries).includes(contractName);
-
-      if (released.has(contractName)) return;
-      if (!shouldDeployContract && !shouldDeployLibrary) return;
-
-      const artifactPath = contractArtifactPaths.get(contractName);
-      if (!artifactPath) {
-        console.error(`Artifact path for ${contractName} not found in map. Skipping.`);
-        released.add(contractName);
-        return;
-      }
-
-      let contractViemArtifact: ViemContract;
-      try {
-        contractViemArtifact = loadContractArtifact(contractName, artifactPath);
-      } catch (e) {
-        console.error(`Failed to load artifact for ${contractName} from ${artifactPath}. Skipping. Error: ${e}`);
-        released.add(contractName);
-        return;
-      }
-
-      if (shouldDeployContract) {
-        const contractDependencies = dependencies.get(contractName) || [];
-        for (const dependency of contractDependencies) {
-          if (!released.has(dependency)) await release(dependency);
-        }
-
-        if (contractViemArtifact.bytecode && contractViemArtifact.bytecode.includes('__')) {
-          for (const dep of contractDependencies) {
-            if (addresses.addresses.has(dep)) {
-              const libAddress = addresses.get(dep); // Get address without 0x
-
-              let replacedByFoundryPlaceholder = false;
-              // console.log("contractArtifactPaths", contractArtifactPaths);
-
-              let libSourceFilePath = contractViemArtifact.sourceFiles.find((file) => file.includes(`${dep}.sol`));
-
-              if (libSourceFilePath) {
-                const stringToHash = `${libSourceFilePath}:${dep}`;
-
-                const uint8Array = new TextEncoder().encode(stringToHash);
-                const hexStringToHash = toHex(uint8Array);
-                const hashed = keccak256(hexStringToHash);
-                const placeholderHash = hashed.substring(2, 2 + 34); // Extract 34 chars after 0x
-
-                const placeholderRegexFoundry = new RegExp(`__\\$${placeholderHash}\\$__`, "g");
-
-                if (contractViemArtifact.bytecode!.match(placeholderRegexFoundry)) {
-                  // console.log(`Foundry placeholder match for ${dep} in ${contractName} using ${placeholderRegexFoundry}`);
-                  contractViemArtifact.bytecode = contractViemArtifact.bytecode!.replace(placeholderRegexFoundry, libAddress) as Hex;
-                  replacedByFoundryPlaceholder = true;
-                } else {
-                  console.log(`Foundry placeholder NO match for ${dep} (${libSourceFilePath}) in ${contractName} using ${placeholderRegexFoundry}. Bytecode sample: ${contractViemArtifact.bytecode!.substring(0, 500)}`);
-                }
-              } else {
-                console.warn(`Could not determine sourceFilePath for library ${dep}. Skipping Foundry placeholder replacement for it in ${contractName}.`);
-              }
-
-              // Fallback to old regexes if Foundry placeholder wasn't matched or applicable
-              if (!replacedByFoundryPlaceholder) {
-                const placeholderRegexSimple = new RegExp(`__${dep}_+`, "g"); // e.g. __Signatures____...
-                const placeholderRegexDollar = new RegExp(`__\\$${dep}\\$__`, "g"); // e.g. __$Signatures$__
-
-                if (contractViemArtifact.bytecode!.match(placeholderRegexSimple)) {
-                  // console.log(`Legacy placeholder match (simple) for ${dep} in ${contractName}`);
-                  contractViemArtifact.bytecode = contractViemArtifact.bytecode!.replace(placeholderRegexSimple, libAddress) as Hex;
-                } else if (contractViemArtifact.bytecode!.match(placeholderRegexDollar)) {
-                  // console.log(`Legacy placeholder match (dollar) for ${dep} in ${contractName}`);
-                  contractViemArtifact.bytecode = contractViemArtifact.bytecode!.replace(placeholderRegexDollar, libAddress) as Hex;
-                } else {
-                  // console.log(`No placeholder match for ${dep} in ${contractName} with any known pattern.`);
-                }
-              }
-            }
-          }
-        }
-        await deployCoreContract(
-          contractName, contractViemArtifact, proposal, addresses, report, initializationData,
-          walletClient, publicClient, contractArtifactPaths
-        );
-      } else if (shouldDeployLibrary) {
-        await deployLibrary(
-          contractName, contractViemArtifact, addresses, walletClient, publicClient
-        );
-      }
-      released.add(contractName);
-    };
+    // The 'release' function has been extracted as 'performRelease' outside this scope.
+    // The library linking logic is now in 'linkLibraries' function, called by 'performRelease'.
 
     for (const contractName of allContractNames) {
       // Check if the contract is a core contract and if it's proxied
       if (isCoreContract(contractName) && isProxiedContract(contractName)) {
-        await release(contractName);
+        await performRelease(
+          contractName,
+          report,
+          released,
+          contractArtifactPaths,
+          dependencies,
+          addresses,
+          proposal,
+          initializationData,
+          walletClient,
+          publicClient
+        );
       }
     }
 
