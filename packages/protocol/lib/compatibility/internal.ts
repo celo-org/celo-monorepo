@@ -38,7 +38,7 @@ export function makeZContract(artifact: any): ZContract {
   contract.schema.ast = artifact.ast
   contract.contractName = getContractName(artifact)
   contract.schema.contractName = contract.contractName
-  contract.schema.deployedBytecode = artifact.deployedBytecode.object
+  contract.schema.deployedBytecode = artifact.deployedBytecode.object || artifact.deployedBytecode
   return contract
 }
 
