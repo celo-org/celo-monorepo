@@ -452,32 +452,36 @@ const loadContractArtifact = (contractName: string, artifactPath: string): ViemC
   return { contractName: contractName, abi: artifact.abi as Abi, bytecode: artifact.bytecode.object, address: '0x0' as ViemAddress, sourceFiles: sourceFiles };
 };
 
-const findContractArtifactsRecursive = (
-  currentPath: string,
+const findContractArtifacts = (
+  baseDir: string,
   contractArtifactPathsMap: Map<string, string>
 ) => {
-  const entries = readdirSync(currentPath, { withFileTypes: true });
+  const entries = readdirSync(baseDir, { withFileTypes: true });
   for (const entry of entries) {
-    if (!entry.isDirectory()) return;
-    const fullPath = join(currentPath, entry.name);
+    if (!entry.isDirectory() || !entry.name.endsWith('.sol')) {
+      continue;
+    }
+    const contractSolDirPath = join(baseDir, entry.name);
+    const filesInSolDir = readdirSync(contractSolDirPath, { withFileTypes: true });
 
-    if (entry.name.endsWith('.sol')) {
-      const contractJsonFiles = readdirSync(fullPath, { withFileTypes: true });
-      for (const file of contractJsonFiles) {
-        if (file.isFile() && file.name.endsWith('.json')) {
-          const contractName = basename(file.name, '.json');
-          try {
-            const content = readJsonSync(join(fullPath, file.name));
-            if (content.abi && content.bytecode) {
-              contractArtifactPathsMap.set(contractName, join(fullPath, file.name));
-            }
-          } catch (e) {
-            console.warn(`Skipping non-JSON or unreadable file: ${join(fullPath, file.name)}`);
-          }
-        }
+    for (const fileEntry of filesInSolDir) {
+      if (!fileEntry.isFile() || !fileEntry.name.endsWith('.json')) {
+        continue;
       }
-    } else {
-      findContractArtifactsRecursive(fullPath, contractArtifactPathsMap);
+
+      const contractName = basename(fileEntry.name, '.json');
+      const artifactFilePath = join(contractSolDirPath, fileEntry.name);
+
+      try {
+        const content = readJsonSync(artifactFilePath);
+        if (content.abi && content.bytecode) {
+          contractArtifactPathsMap.set(contractName, artifactFilePath);
+        } else {
+          console.warn(`Skipping non-ABI/bytecode file: ${artifactFilePath}`);
+        }
+      } catch (e) {
+        console.warn(`Skipping non-JSON or unreadable file: ${artifactFilePath}`);
+      }
     }
   }
 };
@@ -650,7 +654,7 @@ async function main() {
 
     const contractArtifactPaths = new Map<string, string>();
 
-    findContractArtifactsRecursive(buildDir, contractArtifactPaths);
+    findContractArtifacts(buildDir, contractArtifactPaths);
 
     if (contractArtifactPaths.size === 0) {
       console.warn(`No contract artifacts found in ${buildDir}. Ensure the directory is correct and contains Foundry outputs.`);
