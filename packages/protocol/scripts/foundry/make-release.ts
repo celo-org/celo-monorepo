@@ -84,7 +84,7 @@ class ContractAddresses {
     return new ContractAddresses(addresses)
   }
 
-  constructor(public addresses: Map<string, string>) { }
+  constructor(public addresses: Map<string, string>) {}
 
   public get = (contract: string): string => {
     if (this.addresses.has(contract)) {
@@ -154,7 +154,7 @@ type SolidityDefaultValue =
   | string
   | SolidityDefaultValue[]
   | { [key: string]: SolidityDefaultValue }
-  | undefined;
+  | undefined
 
 function getDefaultValueForSolidityType(
   solidityType: string,
@@ -751,7 +751,9 @@ async function main() {
     if (!registryArtifactPath) {
       throw new Error(
         `Registry.json artifact not found in ${buildDir} or its subdirectories. ` +
-        `Please ensure it is compiled and present in the Foundry output format (e.g., ${String(buildDir)}/Registry.sol/Registry.json).`
+          `Please ensure it is compiled and present in the Foundry output format (e.g., ${String(
+            buildDir
+          )}/Registry.sol/Registry.json).`
       )
     }
     const registryArtifact = loadContractArtifact('Registry', registryArtifactPath)
