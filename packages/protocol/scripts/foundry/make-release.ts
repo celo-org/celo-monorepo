@@ -12,7 +12,7 @@ import { basename, join } from 'path';
 import { TextEncoder } from 'util';
 import {
   Abi,
-  AbiParameter, // Added AbiParameter
+  AbiParameter,
   Account,
   Chain,
   Hex,
@@ -31,6 +31,19 @@ import * as viemChains from 'viem/chains';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { getReleaseVersion, ignoredContractsV9 } from '../../lib/compatibility/ignored-contracts-v9';
+
+interface MakeReleaseArgv {
+  report: string;
+  from?: string;
+  proposal: string;
+  librariesFile: string;
+  initialize_data: string;
+  build_directory: string;
+  branch?: string;
+  network: string;
+  privateKey?: string;
+  mnemonic?: string;
+}
 
 
 function bigIntReplacer(_key: string, value: any) {
@@ -95,7 +108,6 @@ interface ViemContract {
   sourceFiles: string[];
 }
 
-// Define the set of core contracts that are proxied
 const proxiedCoreContracts = new Set<string>([
   CeloContractName.Accounts,
   CeloContractName.Attestations,
@@ -123,20 +135,16 @@ const proxiedCoreContracts = new Set<string>([
   CeloContractName.GrandaMento,
   CeloContractName.FeeHandler,
   CeloContractName.FederatedAttestations,
-  "Ahoj"
 ]);
 
-const isProxiedContract = (contractName: string): boolean => {
-  // Check if the contract name is one of the known proxied core contracts
-  return proxiedCoreContracts.has(contractName);
+const isProxiedContract = (contractName: string, contractArtifactPaths: Map<string, string>): boolean => {
+  return proxiedCoreContracts.has(contractName) || contractArtifactPaths.has(`${contractName}Proxy`);
 };
 
-const isCoreContract = (contractName: string) => [...Object.keys(CeloContractName), "Ahoj"].includes(contractName);
+const isCoreContract = (contractName: string) => [...Object.keys(CeloContractName)].includes(contractName);
 
-// Define the extracted type for Viem's AbiConstructor
 type ViemAbiConstructor = Extract<Abi[number], { type: 'constructor' }>;
 
-// Helper function to get default values for Solidity types - this was default behavior of truffle
 function getDefaultValueForSolidityType(solidityType: string, components?: readonly AbiParameter[]): any {
   if (solidityType.startsWith('uint') || solidityType.startsWith('int')) {
     return BigInt(0);
@@ -156,15 +164,13 @@ function getDefaultValueForSolidityType(solidityType: string, components?: reado
       const size = parseInt(sizeMatch[1], 10);
       return `0x${'00'.repeat(size)}`;
     }
-    return '0x'; // For dynamic 'bytes'
+    return '0x';
   }
-  if (solidityType.endsWith('[]')) { // Dynamic array
-    // For arrays of tuples, Viem expects an array of objects.
-    // If it's an array of primitives, an empty array is fine.
+  if (solidityType.endsWith('[]')) {
     return [];
   }
   const fixedArrayMatch = solidityType.match(/^(.*)\[(\d+)\]$/);
-  if (fixedArrayMatch) { // Fixed-size array
+  if (fixedArrayMatch) {
     const baseType = fixedArrayMatch[1];
     const size = parseInt(fixedArrayMatch[2], 10);
     const elementComponents = baseType === 'tuple' ? components : undefined;
@@ -202,7 +208,6 @@ const deployImplementation = async (
 
   if (constructorAbiEntry && constructorAbiEntry.inputs && constructorAbiEntry.inputs.length > 0) {
     finalConstructorArgs = constructorAbiEntry.inputs.map((input: Readonly<AbiParameter>) => {
-      // Check if input has 'components' property before passing it
       const components = 'components' in input ? input.components as readonly AbiParameter[] : undefined;
       return getDefaultValueForSolidityType(input.type, components);
     });
@@ -440,13 +445,10 @@ const getViemChain = (networkName: string): Chain => {
   }
 };
 
-// Loads a contract artifact given the direct path to its JSON file.
 const loadContractArtifact = (contractName: string, artifactPath: string): ViemContract => {
   console.log("loadContractArtifact", contractName, artifactPath);
   const artifact = readJsonSync(artifactPath) as ForgeArtifact;
-
   const sourceFiles = Object.keys(artifact.metadata.sources);
-
   return { contractName: contractName, abi: artifact.abi as Abi, bytecode: artifact.bytecode.object, address: '0x0' as ViemAddress, sourceFiles: sourceFiles };
 };
 
@@ -456,30 +458,26 @@ const findContractArtifactsRecursive = (
 ) => {
   const entries = readdirSync(currentPath, { withFileTypes: true });
   for (const entry of entries) {
+    if (!entry.isDirectory()) return;
     const fullPath = join(currentPath, entry.name);
-    if (entry.isDirectory()) {
-      // Standard Foundry output: out/ContractFile.sol/ContractName.json
-      if (entry.name.endsWith('.sol')) {
-        const contractJsonFiles = readdirSync(fullPath, { withFileTypes: true });
-        for (const file of contractJsonFiles) {
-          if (file.isFile() && file.name.endsWith('.json')) {
-            const contractName = basename(file.name, '.json');
-            try {
-              const content = readJsonSync(join(fullPath, file.name));
-              if (content.abi && content.bytecode) { // Ensure it's a deployable contract artifact
-                contractArtifactPathsMap.set(contractName, join(fullPath, file.name));
-              } else if (content.abi) {
-                contractArtifactPathsMap.set(contractName, join(fullPath, file.name));
-              }
-            } catch (e) {
-              console.warn(`Skipping non-JSON or unreadable file: ${join(fullPath, file.name)}`);
+
+    if (entry.name.endsWith('.sol')) {
+      const contractJsonFiles = readdirSync(fullPath, { withFileTypes: true });
+      for (const file of contractJsonFiles) {
+        if (file.isFile() && file.name.endsWith('.json')) {
+          const contractName = basename(file.name, '.json');
+          try {
+            const content = readJsonSync(join(fullPath, file.name));
+            if (content.abi && content.bytecode) {
+              contractArtifactPathsMap.set(contractName, join(fullPath, file.name));
             }
+          } catch (e) {
+            console.warn(`Skipping non-JSON or unreadable file: ${join(fullPath, file.name)}`);
           }
         }
-      } else {
-        // Recursively search in other subdirectories
-        findContractArtifactsRecursive(fullPath, contractArtifactPathsMap);
       }
+    } else {
+      findContractArtifactsRecursive(fullPath, contractArtifactPathsMap);
     }
   }
 };
@@ -510,7 +508,7 @@ const linkLibraries = (
 
       const stringToHash = `${libSourceFilePath}:${dep}`;
       const hashed = keccak256(toHex(new TextEncoder().encode(stringToHash)));
-      const placeholderHash = hashed.substring(2, 2 + 34); // Extract 34 chars after 0x
+      const placeholderHash = hashed.substring(2, 2 + 34);
 
       const placeholderRegexDollar = new RegExp(`__\\$${placeholderHash}\\$__`, "g");
       if (contractViemArtifact.bytecode!.match(placeholderRegexDollar)) {
@@ -539,7 +537,6 @@ const performRelease = async (
 
   const shouldDeployContract = Object.keys(report.contracts).includes(contractName);
   const shouldDeployLibrary = Object.keys(report.libraries).includes(contractName);
-
 
   if (!shouldDeployContract && !shouldDeployLibrary) return;
 
@@ -594,7 +591,7 @@ const performRelease = async (
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
-    const argv = await yargs(hideBin(process.argv))
+    const argv: MakeReleaseArgv = await yargs(hideBin(process.argv))
       .option('report', { type: 'string', demandOption: true, description: 'Path to the compatibility report JSON file.' })
       .option('from', { type: 'string', description: 'Address to deploy from (not directly used in this script but kept for compatibility or future use).' })
       .option('proposal', { type: 'string', demandOption: true, description: 'Path to output the proposal JSON file.' })
@@ -613,44 +610,37 @@ module.exports = async (callback: (error?: any) => number) => {
       })
       .argv;
 
-    const resolvedArgv = argv;
-
-    const networkName = resolvedArgv.network!; // network has a default, so it's always defined
-    const buildDir = resolvedArgv.build_directory;
-    // No need for manual checks for report, proposal, initialize_data, build_directory as demandOption handles it.
-
+    const networkName = argv.network!;
+    const buildDir = argv.build_directory;
     const viemChain = getViemChain(networkName);
-    let transportUrl: string;
 
-    if (fornoUrls[networkName] && process.argv.includes('--forno')) {
-      transportUrl = fornoUrls[networkName];
-    } else if (viemChain.rpcUrls.default?.http?.[0]) {
-      transportUrl = viemChain.rpcUrls.default.http[0];
-    } else {
+    if (!viemChain.rpcUrls.default?.http?.[0]) {
       throw new Error(`RPC URL for network ${networkName} could not be determined.`);
     }
+
+    const transportUrl = viemChain.rpcUrls.default.http[0];
     const publicClientInternal = createPublicClient({ chain: viemChain, transport: http(transportUrl) });
-    // Ensure the publicClient conforms to the type where account is undefined, as expected by PublicClient type.
+
     const publicClient = {
       ...publicClientInternal,
       account: undefined,
     } as PublicClient;
     let account: Account;
 
-    if (resolvedArgv.privateKey) {
-      account = privateKeyToAccount(resolvedArgv.privateKey as Hex);
-    } else if (resolvedArgv.mnemonic) {
-      account = mnemonicToAccount(resolvedArgv.mnemonic as string);
+    if (argv.privateKey) {
+      account = privateKeyToAccount(argv.privateKey as Hex);
+    } else if (argv.mnemonic) {
+      account = mnemonicToAccount(argv.mnemonic as string);
     } else {
       throw new Error('Deployment requires a signer. Please provide --privateKey or --mnemonic.');
     }
 
     const walletClient = createWalletClient({ account, chain: viemChain, transport: http(transportUrl) });
-    const fullReport = readJsonSync(resolvedArgv.report);
-    const libraryMapping: LibraryAddresses['addresses'] = readJsonSync(resolvedArgv.librariesFile ?? 'libraries.json');
+    const fullReport = readJsonSync(argv.report);
+    const libraryMapping: LibraryAddresses['addresses'] = readJsonSync(argv.librariesFile ?? 'libraries.json');
     const report: ASTDetailedVersionedReport = fullReport.report;
-    const branch = (resolvedArgv.branch ? resolvedArgv.branch : '') as string;
-    const initializationData = readJsonSync(resolvedArgv.initialize_data);
+    const branch = (argv.branch ? argv.branch : '') as string;
+    const initializationData = readJsonSync(argv.initialize_data);
     const dependencies = getCeloContractDependencies();
     const version = getReleaseVersion(branch);
 
@@ -683,7 +673,7 @@ module.exports = async (callback: (error?: any) => number) => {
       );
 
     const addresses = await ContractAddresses.create(
-      allContractNames, // This list is now derived from discovered artifacts
+      allContractNames,
       publicClient,
       registryArtifact.abi,
       celoRegistryAddress as ViemAddress,
@@ -693,12 +683,8 @@ module.exports = async (callback: (error?: any) => number) => {
     const released: Set<string> = new Set([]);
     const proposal: ProposalTx[] = [];
 
-    // The 'release' function has been extracted as 'performRelease' outside this scope.
-    // The library linking logic is now in 'linkLibraries' function, called by 'performRelease'.
-
     for (const contractName of allContractNames) {
-      // Check if the contract is a core contract and if it's proxied
-      if (isCoreContract(contractName) && isProxiedContract(contractName)) {
+      if (isCoreContract(contractName) && isProxiedContract(contractName, contractArtifactPaths)) {
         await performRelease(
           contractName,
           report,
@@ -714,8 +700,8 @@ module.exports = async (callback: (error?: any) => number) => {
       }
     }
 
-    writeJsonSync(resolvedArgv.proposal, proposal, { spaces: 2 });
-    console.log(`Proposal successfully written to ${resolvedArgv.proposal}`);
+    writeJsonSync(argv.proposal, proposal, { spaces: 2 });
+    console.log(`Proposal successfully written to ${argv.proposal}`);
     callback();
   } catch (error) {
     console.error('Error during script execution:', error);
@@ -723,28 +709,15 @@ module.exports = async (callback: (error?: any) => number) => {
   }
 };
 
-const fornoUrls: { [key: string]: string } = {
-  alfajores: 'https://alfajores-forno.celo-testnet.org',
-  baklava: 'https://baklava-forno.celo-testnet.org',
-  rc1: 'https://forno.celo.org',
-  mainnet: 'https://forno.celo.org',
-  staging: 'https://staging-forno.celo-networks-dev.org',
-};
-
-// --- Self-invocation block ---
 if (require.main === module) {
   const mainFunction = module.exports as (callback: (error?: any) => void) => Promise<void>;
   mainFunction((error) => {
     if (error) {
-      // The script's internal try/catch (around line 370) already logs the specific error
       process.exit(1);
     } else {
-      // The script's internal logic logs success messages (e.g., "Proposal successfully written...")
       process.exit(0);
     }
   }).catch(err => {
-    // This catch is for unhandled promise rejections from mainFunction if it doesn't use the callback for errors,
-    // or if an error occurs outside the main try/catch block within mainFunction.
     console.error("Unhandled error during script execution:", err);
     process.exit(1);
   });
