@@ -495,7 +495,7 @@ const findContractArtifacts = (baseDir: string, contractArtifactPathsMap: Map<st
     if (!entry.isDirectory() || !entry.name.endsWith('.sol')) {
       continue
     }
-    const contractSolDirPath = join(baseDir, entry.name)
+    const contractSolDirPath = join(baseDir, entry.name as string)
     const filesInSolDir = readdirSync(contractSolDirPath, { withFileTypes: true })
 
     for (const fileEntry of filesInSolDir) {
@@ -503,8 +503,8 @@ const findContractArtifacts = (baseDir: string, contractArtifactPathsMap: Map<st
         continue
       }
 
-      const contractName = basename(fileEntry.name, '.json')
-      const artifactFilePath = join(contractSolDirPath, fileEntry.name)
+      const contractName = basename(fileEntry.name as string, '.json')
+      const artifactFilePath = join(contractSolDirPath, fileEntry.name as string)
 
       try {
         const content = readJsonSync(artifactFilePath)
