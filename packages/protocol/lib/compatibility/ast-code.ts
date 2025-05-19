@@ -265,7 +265,6 @@ export function reportASTIncompatibilities(
   for (const newArtifacts of newArtifactsSets) {
     const reports = newArtifacts.listArtifacts()
       .map((newArtifact) => {
-
         for (const oldArtifacts of oldArtifactsSet) {
           const oldArtifact = getArtifactByName(getContractName(newArtifact), oldArtifacts)
           if (oldArtifact) {
@@ -276,7 +275,6 @@ export function reportASTIncompatibilities(
         return generateASTCompatibilityReport(null, oldArtifactsSet[0], makeZContract(newArtifact), newArtifacts)
       })
     out = [...out, ...reports]
-
   }
 
   return mergeReports(out)
