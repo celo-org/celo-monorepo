@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
@@ -42,7 +43,7 @@ interface MakeReleaseArgv {
   mnemonic?: string
 }
 
-function bigIntReplacer(_key: string, value: any) {
+function bigIntReplacer(_key: string, value: any): unknown {
   if (typeof value === 'bigint') {
     return value.toString()
   }
@@ -147,10 +148,18 @@ const isCoreContract = (contractName: string) =>
 
 type ViemAbiConstructor = Extract<Abi[number], { type: 'constructor' }>
 
+type SolidityDefaultValue =
+  | bigint
+  | boolean
+  | string
+  | SolidityDefaultValue[]
+  | { [key: string]: SolidityDefaultValue }
+  | undefined;
+
 function getDefaultValueForSolidityType(
   solidityType: string,
   components?: readonly AbiParameter[]
-): any {
+): SolidityDefaultValue {
   if (solidityType.startsWith('uint') || solidityType.startsWith('int')) {
     return BigInt(0)
   }
@@ -190,7 +199,7 @@ function getDefaultValueForSolidityType(
       )
       return {}
     }
-    const tupleValue: { [key: string]: any } = {}
+    const tupleValue: { [key: string]: SolidityDefaultValue } = {}
     for (const component of components) {
       const subComponents =
         'components' in component ? (component.components as readonly AbiParameter[]) : undefined
@@ -230,7 +239,6 @@ const deployImplementation = async (
     throw new Error(`Bytecode for ${contractName} is missing.`)
   }
 
-  let deployedAddress: ViemAddress
   const hash = await walletClient.deployContract({
     abi: contractArtifact.abi,
     bytecode: contractArtifact.bytecode,
@@ -245,7 +253,7 @@ const deployImplementation = async (
       `Deployment of ${contractName} failed. Receipt: ${JSON.stringify(receipt, bigIntReplacer)}`
     )
   }
-  deployedAddress = receipt.contractAddress
+  const deployedAddress = receipt.contractAddress
   console.info(`${contractName} deployed at ${deployedAddress}`)
 
   if (requireVersion) {
@@ -279,7 +287,6 @@ const deployProxy = async (
     throw new Error(`Bytecode for ${proxyContractName} is missing.`)
   }
 
-  let proxyAddress: ViemAddress
   const hash = await walletClient.deployContract({
     abi: proxyArtifact.abi,
     bytecode: proxyArtifact.bytecode,
@@ -296,7 +303,7 @@ const deployProxy = async (
       )}`
     )
   }
-  proxyAddress = receipt.contractAddress
+  const proxyAddress = receipt.contractAddress
   console.info(`${proxyContractName} deployed at ${proxyAddress}`)
 
   const deployedProxyContract = { ...proxyArtifact, address: proxyAddress }
@@ -328,7 +335,7 @@ const deployCoreContract = async (
   proposal: ProposalTx[],
   addresses: ContractAddresses,
   report: ASTDetailedVersionedReport,
-  initializationData: any,
+  initializationData: Record<string, unknown[]>,
   walletClient: WalletClient,
   publicClient: PublicClient,
   contractArtifactPaths: Map<string, string>
@@ -466,7 +473,6 @@ const getViemChain = (networkName: string): Chain => {
       }
     default:
       return { ...viemChains.hardhat, id: 31337 }
-      throw new Error(`Unsupported network: ${networkName}. Please map it in getViemChain.`)
   }
 }
 
@@ -475,11 +481,11 @@ const loadContractArtifact = (contractName: string, artifactPath: string): ViemC
   const artifact = readJsonSync(artifactPath) as ForgeArtifact
   const sourceFiles = Object.keys(artifact.metadata.sources)
   return {
-    contractName: contractName,
+    contractName,
     abi: artifact.abi as Abi,
     bytecode: artifact.bytecode.object,
     address: '0x0' as ViemAddress,
-    sourceFiles: sourceFiles,
+    sourceFiles,
   }
 }
 
@@ -569,7 +575,7 @@ const performRelease = async (
   dependencies: { get(key: string): string[] | undefined },
   addresses: ContractAddresses,
   proposal: ProposalTx[],
-  initializationData: any,
+  initializationData: Record<string, unknown[]>,
   walletClient: WalletClient,
   publicClient: PublicClient
 ): Promise<void> => {
@@ -638,7 +644,7 @@ const performRelease = async (
 
 async function main() {
   try {
-    const argv: MakeReleaseArgv = await yargs(hideBin(process.argv))
+    const argv: MakeReleaseArgv = yargs(hideBin(process.argv) as string[])
       .option('report', {
         type: 'string',
         demandOption: true,
@@ -677,8 +683,8 @@ async function main() {
       })
       .option('privateKey', { type: 'string', description: 'Private key for deployment.' })
       .option('mnemonic', { type: 'string', description: 'Mnemonic for deployment.' })
-      .check((argv) => {
-        if (!argv.privateKey && !argv.mnemonic) {
+      .check((currentArgs) => {
+        if (!currentArgs.privateKey && !currentArgs.mnemonic) {
           throw new Error('Either --privateKey or --mnemonic must be provided.')
         }
         return true
@@ -723,7 +729,7 @@ async function main() {
     )
     const report: ASTDetailedVersionedReport = fullReport.report
     const branch = (argv.branch ? argv.branch : '') as string
-    const initializationData = readJsonSync(argv.initialize_data)
+    const initializationData: Record<string, unknown[]> = readJsonSync(String(argv.initialize_data))
     const dependencies = getCeloContractDependencies()
     const version = getReleaseVersion(branch)
 
@@ -745,7 +751,7 @@ async function main() {
     if (!registryArtifactPath) {
       throw new Error(
         `Registry.json artifact not found in ${buildDir} or its subdirectories. ` +
-        `Please ensure it is compiled and present in the Foundry output format (e.g., ${buildDir}/Registry.sol/Registry.json).`
+        `Please ensure it is compiled and present in the Foundry output format (e.g., ${String(buildDir)}/Registry.sol/Registry.json).`
       )
     }
     const registryArtifact = loadContractArtifact('Registry', registryArtifactPath)
@@ -791,4 +797,7 @@ async function main() {
   }
 }
 
-main()
+main().catch((error) => {
+  console.error('Unhandled error in main execution:', error)
+  process.exit(1)
+})
