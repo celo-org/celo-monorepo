@@ -2,6 +2,8 @@ import { Contract as ZContract } from '@openzeppelin/upgrades'
 const Web3 = require('web3')
 const web3 = new Web3(null)
 
+// Foundry build artifacts do not have a `.contractName` field, so we get it from the
+// `ContractDefinition` expression in the AST.
 const getContractNameFromDefinition = (artifact: any): string => {
   for (let i = 0; i < artifact.ast.nodes.length; i++) {
     const node = artifact.ast.nodes[i]
@@ -9,7 +11,7 @@ const getContractNameFromDefinition = (artifact: any): string => {
       return node.name
     }
   }
-  console.log("NAME NOT FOUND!!!")
+  console.error("Name not found in artifact AST")
   return ''
 }
 

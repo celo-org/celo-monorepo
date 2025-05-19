@@ -1,58 +1,11 @@
-import { Contract as Web3Contract } from '@celo/connect';
-import { Artifact, TypeInfo } from '@celo/protocol/lib/compatibility/internal';
+import { Artifact, TypeInfo, makeZContract, getContractName } from '@celo/protocol/lib/compatibility/internal';
 import {
   BuildArtifacts,
   Operation,
   StorageLayoutInfo,
-  Contract as ZContract,
   compareStorageLayouts,
   getStorageLayout
 } from '@openzeppelin/upgrades';
-const Web3 = require('web3')
-
-const web3 = new Web3(null)
-
-const getContractNameFromDefinition = (artifact: any): string => {
-  for (let i = 0; i < artifact.ast.nodes.length; i++) {
-    const node = artifact.ast.nodes[i]
-    if (node.nodeType === 'ContractDefinition') {
-      return node.name
-    }
-  }
-  console.log("NAME NOT FOUND!!!")
-  return ''
-}
-
-const getContractName = (artifact: any): string => {
-  if (artifact.contractName) {
-    return artifact.contractName
-  } else {
-    return getContractNameFromDefinition(artifact)
-  }
-}
-
-// getStorageLayout needs an oz-sdk Contract class instance. This class is a
-// subclass of Contract from web3-eth-contract, with an added .schema member and
-// several methods.
-//
-// Couldn't find an easy way of getting one just from contract artifacts. But
-// for getStorageLayout we really only need .schema.ast and .schema.contractName.
-const addSchemaForLayoutChecking = (web3Contract: Web3Contract, artifact: any): ZContract => {
-  // @ts-ignore
-  const contract = web3Contract as Contract
-  // @ts-ignore
-  contract.schema = {}
-  contract.schema.ast = artifact.ast
-  contract.contractName = getContractName(artifact)
-  contract.schema.contractName = contract.contractName
-  return contract
-}
-
-const makeZContract = (artifact: any): ZContract => {
-  const contract = new web3.eth.Contract(artifact.abi)
-
-  return addSchemaForLayoutChecking(contract, artifact)
-}
 
 export const getLayout = (artifact: Artifact, artifacts: BuildArtifacts) => {
   const contract = makeZContract(artifact)
