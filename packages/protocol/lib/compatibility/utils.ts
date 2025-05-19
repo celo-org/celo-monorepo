@@ -6,8 +6,7 @@ import { ASTDetailedVersionedReport, ASTReports } from '@celo/protocol/lib/compa
 import { linkedLibraries } from '@celo/protocol/migrationsConfig';
 import { BuildArtifacts, Contracts, getBuildArtifacts } from '@openzeppelin/upgrades';
 import { readJsonSync } from 'fs-extra';
-
-
+import { globSync } from 'glob'
 
 /**
  * Backward compatibility report, based on both the abstract syntax tree analysis of
@@ -79,4 +78,42 @@ export function instantiateArtifacts(buildDirectory: string): BuildArtifacts {
     console.error(`ERROR: could not create BuildArtifacts on directory '${buildDirectory}`)
     process.exit(10002)
   }
+}
+
+function listForgeBuildArtifacts(buildDirectory: string): string[] {
+  const coreContractPathPattern = /^contracts(-0\.8)?\//
+  const nonFoundryDependencyPathPattern = /^lib\/(?!celo)/
+  const artifactsGlobPattern = `${buildDirectory}/**/*.json`
+  const allArtifactPaths = globSync(artifactsGlobPattern)
+  const coreContracts = allArtifactPaths.filter(artifactPath => {
+    const artifact = readJsonSync(artifactPath)
+    const sourcePath = artifact.ast.absolutePath
+    return sourcePath.match(coreContractPathPattern) || sourcePath.match(nonFoundryDependencyPathPattern)
+  })
+
+  return coreContracts
+}
+
+interface CompilerArtifactsIndex {
+  [index: string]: string[]
+}
+
+function splitArtifactsByCompiler(artifactPaths: string[]): CompilerArtifactsIndex {
+  const artifactsIndex: CompilerArtifactsIndex = {}
+  artifactPaths.forEach(artifactPath => {
+    const artifact = readJsonSync(artifactPath)
+    const version = artifact.metadata.compiler.version
+    if (!artifactsIndex[version]) {
+      artifactsIndex[version] = []
+    }
+    artifactsIndex[version].push(artifactPath)
+  })
+
+  return artifactsIndex
+}
+
+export function instantiateArtifactsFromForge(buildDirectory: string): BuildArtifacts[] {
+  const artifactPaths = listForgeBuildArtifacts(buildDirectory)
+  const artifactsIndex: CompilerArtifactsIndex = splitArtifactsByCompiler(artifactPaths)
+  return Object.keys(artifactsIndex).map(compiler => new BuildArtifacts(artifactsIndex[compiler]))
 }
