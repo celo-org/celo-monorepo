@@ -1082,7 +1082,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         for (uint256 j = 0; j < functionNames_.length; j++) {
           string memory functionName_ = functionNames_[j];
           console.log(
-            string.concat("  Setting constitution thresholds for function : ", functionName_)
+            string.concat("  Setting constitution thresholds for function: ", functionName_)
           );
 
           bytes4 selector_;

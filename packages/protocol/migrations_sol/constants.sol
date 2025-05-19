@@ -22,7 +22,6 @@ contract MigrationsConstants is TestConstants {
     "Escrow",
     "FederatedAttestations",
     "FeeCurrencyDirectory",
-    "FeeCurrencyWhitelist",
     "FeeHandler",
     "Freezer",
     "Governance",

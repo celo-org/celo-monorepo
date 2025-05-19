@@ -43,6 +43,7 @@ interface InitializationData {
 }
 
 const ContractNameExtractorRegex = new RegExp(/(.*)Proxy/)
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 // Checks if the given transaction is a repointing of the Proxy for the given
 // contract.
@@ -128,7 +129,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
     implementationAddress = ensureLeading0x(context.libraryAddresses.addresses[contract])
   } else {
     const proxyAddress = await context.registry.getAddressForString(contract)
-    if (proxyAddress === '0x0000000000000000000000000000000000000000') {
+    if (proxyAddress === ZERO_ADDRESS) {
       console.log(`Contract ${contract} is not in registry - skipping bytecode verification`)
       return;
     }
