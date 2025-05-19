@@ -2,6 +2,25 @@ import { Contract as ZContract } from '@openzeppelin/upgrades'
 const Web3 = require('web3')
 const web3 = new Web3(null)
 
+const getContractNameFromDefinition = (artifact: any): string => {
+  for (let i = 0; i < artifact.ast.nodes.length; i++) {
+    const node = artifact.ast.nodes[i]
+    if (node.nodeType === 'ContractDefinition') {
+      return node.name
+    }
+  }
+  console.log("NAME NOT FOUND!!!")
+  return ''
+}
+
+export const getContractName = (artifact: any): string => {
+  if (artifact.contractName) {
+    return artifact.contractName
+  } else {
+    return getContractNameFromDefinition(artifact)
+  }
+}
+
 // getStorageLayout needs an oz-sdk Contract class instance. This class is a
 // subclass of Contract from web3-eth-contract, with an added .schema member and
 // several methods.
@@ -15,8 +34,9 @@ export function makeZContract(artifact: any): ZContract {
   // @ts-ignore
   contract.schema = {}
   contract.schema.ast = artifact.ast
-  contract.schema.contractName = artifact.contractName
-  contract.schema.deployedBytecode = artifact.deployedBytecode
+  contract.contractName = getContractName(artifact)
+  contract.schema.contractName = contract.contractName
+  contract.schema.deployedBytecode = artifact.deployedBytecode.object
   return contract
 }
 
