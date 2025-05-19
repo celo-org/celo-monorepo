@@ -2,7 +2,6 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
-import "@test-sol/utils/WhenL2-08.sol";
 
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/mocks/MockOracle.sol";
@@ -23,12 +22,7 @@ contract FeeCurrencyDirectoryTest is TestWithUtils08 {
 
     directory = new FeeCurrencyDirectory(true);
     directory.initialize();
-  }
-}
-
-contract FeeCurrencyDirectoryTest_L2 is FeeCurrencyDirectoryTest, WhenL2 {
-  function setUp() public virtual override(FeeCurrencyDirectoryTest, WhenL2) {
-    super.setUp();
+    whenL2WithEpochManagerInitialization();
   }
 }
 
@@ -84,12 +78,6 @@ contract TestSetCurrencyConfig is FeeCurrencyDirectoryTest {
   }
 }
 
-contract TestSetCurrencyConfig_L2 is FeeCurrencyDirectoryTest_L2, TestSetCurrencyConfig {
-  function setUp() public override(FeeCurrencyDirectoryTest, FeeCurrencyDirectoryTest_L2) {
-    super.setUp();
-  }
-}
-
 contract TestRemoveCurrencies is FeeCurrencyDirectoryTest {
   function setUp() public virtual override {
     super.setUp();
@@ -133,12 +121,6 @@ contract TestRemoveCurrencies is FeeCurrencyDirectoryTest {
   }
 }
 
-contract TestRemoveCurrencies_L2 is FeeCurrencyDirectoryTest_L2, TestRemoveCurrencies {
-  function setUp() public override(TestRemoveCurrencies, FeeCurrencyDirectoryTest_L2) {
-    super.setUp();
-  }
-}
-
 contract TestGetExchangeRate is FeeCurrencyDirectoryTest {
   address token;
 
@@ -158,11 +140,5 @@ contract TestGetExchangeRate is FeeCurrencyDirectoryTest {
   function test_Reverts_WhenTokenDoesntExist() public {
     vm.expectRevert("Currency not in the directory");
     directory.getExchangeRate(address(4));
-  }
-}
-
-contract TestGetExchangeRate_L2 is FeeCurrencyDirectoryTest_L2, TestGetExchangeRate {
-  function setUp() public override(TestGetExchangeRate, FeeCurrencyDirectoryTest_L2) {
-    super.setUp();
   }
 }

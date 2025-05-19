@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# NOTE: Deprecation notice: This script become outdated during migration from Truffle to Foundry. 
+# NOTE: Please checkout branch 'release/core-contracts/12' to further use script.
+# NOTE: If it breaks please contact cLabs for porting to Foundry.
+echo "Deprecation notice: This script become outdated during migration from Truffle to Foundry. 
+Please checkout branch 'release/core-contracts/12' to further use script.
+If it breaks please contact cLabs for porting to Foundry."
+# TODO: exit 1
+
 # Deploys all grants detailed in `GRANTS_FILE` from the corresponding entity.
 #
 # Flags:
@@ -45,15 +53,10 @@ done
 
 CONTRACT_ARTIFACTS_DIR="$PWD/build"
 
-if [[ ! -d "$CONTRACT_ARTIFACTS_DIR" ]]; then
-  echo "Error: no contract artifacts found in $CONTRACT_ARTIFACTS_DIR. Use download-artifacts to obtain them, or build them locally." >&2
-  exit 1
-fi
-
 if ! nc -z 127.0.0.1 8545 ; then
   echo "Warning: port 8545 not open" >&2
 fi
 
-yarn run build:ts && \
+yarn run build:truffle-ts && \
 yarn run truffle exec ./scripts/truffle/deploy_release_contracts.js \
   --network $NETWORK --from $FROM --grants $GRANTS_FILE --start_gold $START_GOLD --deployed_grants $DEPLOYED_GRANTS --output_file $OUTPUT_FILE $REALLY --build_directory $CONTRACT_ARTIFACTS_DIR \

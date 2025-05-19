@@ -3,7 +3,6 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-import "@test-sol/utils/WhenL2.sol";
 import { ECDSAHelper } from "@test-sol/utils/ECDSAHelper.sol";
 
 import "@celo-contracts/identity/Escrow.sol";
@@ -140,10 +139,10 @@ contract ReleaseGoldTest is TestWithUtils, ECDSAHelper {
     });
 
     vm.deal(randomAddress, 1000 ether);
+
+    whenL2WithEpochManagerInitialization();
   }
 }
-
-contract ReleaseGoldTest_L2 is WhenL2, ReleaseGoldTest {}
 
 contract ReleaseGoldTest_Initialize is ReleaseGoldTest {
   function test_ShouldIndicateIsFundedIfDeploymentIsPrefunded() public {
@@ -156,8 +155,6 @@ contract ReleaseGoldTest_Initialize is ReleaseGoldTest {
     assertFalse(releaseGold.isFunded());
   }
 }
-
-contract ReleaseGoldTest_Initialize_L2 is ReleaseGoldTest_L2, ReleaseGoldTest_Initialize {}
 
 contract ReleaseGoldTest_Payable is ReleaseGoldTest {
   function test_ShouldAcceptGoldTransferByDefaultFromAnyone() public {
@@ -194,8 +191,6 @@ contract ReleaseGoldTest_Payable is ReleaseGoldTest {
   }
 }
 
-contract ReleaseGoldTest_Payable_L2 is ReleaseGoldTest_L2, ReleaseGoldTest_Payable {}
-
 contract ReleaseGoldTest_Transfer is ReleaseGoldTest {
   address receiver = actor("receiver");
   uint256 transferAmount = 10;
@@ -213,8 +208,6 @@ contract ReleaseGoldTest_Transfer is ReleaseGoldTest {
     assertEq(stableToken.balanceOf(receiver), transferAmount);
   }
 }
-
-contract ReleaseGoldTest_Transfer_L2 is ReleaseGoldTest_L2, ReleaseGoldTest_Transfer {}
 
 contract ReleaseGoldTest_GenericTransfer is ReleaseGoldTest {
   address receiver = actor("receiver");
@@ -248,11 +241,6 @@ contract ReleaseGoldTest_GenericTransfer is ReleaseGoldTest {
     releaseGold.genericTransfer(address(goldToken), receiver, transferAmount);
   }
 }
-
-contract ReleaseGoldTest_GenericTransfer_L2 is
-  ReleaseGoldTest_L2,
-  ReleaseGoldTest_GenericTransfer
-{}
 
 contract ReleaseGoldTest_Creation is ReleaseGoldTest {
   uint256 public maxUint256 = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
@@ -375,8 +363,6 @@ contract ReleaseGoldTest_Creation is ReleaseGoldTest {
   }
 }
 
-contract ReleaseGoldTest_Creation_L2 is ReleaseGoldTest_L2, ReleaseGoldTest_Creation {}
-
 contract ReleaseGoldTest_SetBeneficiary is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
@@ -400,8 +386,6 @@ contract ReleaseGoldTest_SetBeneficiary is ReleaseGoldTest {
     releaseGold.setBeneficiary(address(uint160((newBeneficiary))));
   }
 }
-
-contract ReleaseGoldTest_SetBeneficiary_L2 is ReleaseGoldTest_L2, ReleaseGoldTest_SetBeneficiary {}
 
 contract ReleaseGoldTest_CreateAccount is ReleaseGoldTest {
   function setUp() public {
@@ -430,8 +414,6 @@ contract ReleaseGoldTest_CreateAccount is ReleaseGoldTest {
     releaseGold.createAccount();
   }
 }
-
-contract ReleaseGoldTest_CreateAccount_L2 is ReleaseGoldTest_L2, ReleaseGoldTest_CreateAccount {}
 
 contract ReleaseGoldTest_SetAccount is ReleaseGoldTest {
   uint8 v;
@@ -479,8 +461,6 @@ contract ReleaseGoldTest_SetAccount is ReleaseGoldTest {
   }
 }
 
-contract ReleaseGoldTest_SetAccount_L2 is ReleaseGoldTest_L2, ReleaseGoldTest_SetAccount {}
-
 contract ReleaseGoldTest_SetAccountName is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
@@ -521,8 +501,6 @@ contract ReleaseGoldTest_SetAccountName is ReleaseGoldTest {
     releaseGold.setAccountName("name");
   }
 }
-
-contract ReleaseGoldTest_SetAccountName_L2 is ReleaseGoldTest_L2, ReleaseGoldTest_SetAccountName {}
 
 contract ReleaseGoldTest_SetAccountWalletAddress is ReleaseGoldTest {
   uint8 v;
@@ -582,11 +560,6 @@ contract ReleaseGoldTest_SetAccountWalletAddress is ReleaseGoldTest {
   }
 }
 
-contract ReleaseGoldTest_SetAccountWalletAddress_L2 is
-  ReleaseGoldTest_L2,
-  ReleaseGoldTest_SetAccountWalletAddress
-{}
-
 contract ReleaseGoldTest_SetAccountMetadataURL is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
@@ -631,11 +604,6 @@ contract ReleaseGoldTest_SetAccountMetadataURL is ReleaseGoldTest {
     releaseGold.setAccountMetadataURL("url");
   }
 }
-
-contract ReleaseGoldTest_SetAccountMetadataURL_L2 is
-  ReleaseGoldTest_L2,
-  ReleaseGoldTest_SetAccountMetadataURL
-{}
 
 contract ReleaseGoldTest_SetAccountDataEncryptionKey is ReleaseGoldTest {
   bytes dataEncryptionKey = hex"02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111";
@@ -687,11 +655,6 @@ contract ReleaseGoldTest_SetAccountDataEncryptionKey is ReleaseGoldTest {
   }
 }
 
-contract ReleaseGoldTest_SetAccountDataEncryptionKey_L2 is
-  ReleaseGoldTest_L2,
-  ReleaseGoldTest_SetAccountDataEncryptionKey
-{}
-
 contract ReleaseGoldTest_SetMaxDistribution is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
@@ -721,11 +684,6 @@ contract ReleaseGoldTest_SetMaxDistribution is ReleaseGoldTest {
     releaseGold.setMaxDistribution(500);
   }
 }
-
-contract ReleaseGoldTest_SetMaxDistribution_L2 is
-  ReleaseGoldTest_L2,
-  ReleaseGoldTest_SetMaxDistribution
-{}
 
 contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
@@ -1046,11 +1004,6 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
   }
 }
 
-contract ReleaseGoldTest_AuthorizationTests_L2 is
-  ReleaseGoldTest_L2,
-  ReleaseGoldTest_AuthorizationTests
-{}
-
 contract ReleaseGoldTest_AuthorizeWithPublicKeys_setup is ReleaseGoldTest {
   uint8 v;
   bytes32 r;
@@ -1106,88 +1059,6 @@ contract ReleaseGoldTest_AuthorizeWithPublicKeys is ReleaseGoldTest_AuthorizeWit
     assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
     assertEq(accounts.validatorSignerToAccount(authorized), address(releaseGold));
   }
-
-  function test_ShouldSetTheAuthorizedKeys_WhenUsingBLSKeys() public {
-    bytes32 newBlsPublicKeyPart1 = _randomBytes32();
-    bytes32 newBlsPublicKeyPart2 = _randomBytes32();
-    bytes32 newBlsPublicKeyPart3 = _randomBytes32();
-    bytes memory newBlsPublicKey = abi.encodePacked(
-      newBlsPublicKeyPart1,
-      newBlsPublicKeyPart2,
-      newBlsPublicKeyPart3
-    );
-    newBlsPublicKey = _truncateBytes(newBlsPublicKey, 96);
-
-    bytes32 newBlsPoPPart1 = _randomBytes32();
-    bytes32 newBlsPoPPart2 = _randomBytes32();
-    bytes memory newBlsPoP = abi.encodePacked(newBlsPoPPart1, newBlsPoPPart2);
-    newBlsPoP = _truncateBytes(newBlsPoP, 48);
-
-    vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSignerWithKeys(
-      address(uint160(authorized)),
-      v,
-      r,
-      s,
-      ecdsaPublicKey,
-      newBlsPublicKey,
-      newBlsPoP
-    );
-
-    assertEq(accounts.authorizedBy(authorized), address(releaseGold));
-    assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
-    assertEq(accounts.validatorSignerToAccount(authorized), address(releaseGold));
-  }
-}
-
-contract ReleaseGoldTest_AuthorizeWithPublicKeys_L2 is
-  ReleaseGoldTest_L2,
-  ReleaseGoldTest_AuthorizeWithPublicKeys_setup
-{
-  function test_ShouldSetTheAuthorizedKeys_WhenUsingECDSAPublickKey() public {
-    vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSignerWithPublicKey(
-      address(uint160(authorized)),
-      v,
-      r,
-      s,
-      ecdsaPublicKey
-    );
-
-    assertEq(accounts.authorizedBy(authorized), address(releaseGold));
-    assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
-    assertEq(accounts.validatorSignerToAccount(authorized), address(releaseGold));
-  }
-
-  function test_Reverts_WhenAuthorizeValidatorSignerWithKeys() public {
-    bytes32 newBlsPublicKeyPart1 = _randomBytes32();
-    bytes32 newBlsPublicKeyPart2 = _randomBytes32();
-    bytes32 newBlsPublicKeyPart3 = _randomBytes32();
-    bytes memory newBlsPublicKey = abi.encodePacked(
-      newBlsPublicKeyPart1,
-      newBlsPublicKeyPart2,
-      newBlsPublicKeyPart3
-    );
-    newBlsPublicKey = _truncateBytes(newBlsPublicKey, 96);
-
-    bytes32 newBlsPoPPart1 = _randomBytes32();
-    bytes32 newBlsPoPPart2 = _randomBytes32();
-    bytes memory newBlsPoP = abi.encodePacked(newBlsPoPPart1, newBlsPoPPart2);
-    newBlsPoP = _truncateBytes(newBlsPoP, 48);
-
-    vm.expectRevert("This method is no longer supported in L2.");
-
-    vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSignerWithKeys(
-      address(uint160(authorized)),
-      v,
-      r,
-      s,
-      ecdsaPublicKey,
-      newBlsPublicKey,
-      newBlsPoP
-    );
-  }
 }
 
 contract ReleaseGoldTest_Revoke is ReleaseGoldTest {
@@ -1227,8 +1098,6 @@ contract ReleaseGoldTest_Revoke is ReleaseGoldTest {
     releaseGold.revoke();
   }
 }
-
-contract ReleaseGoldTest_Revoke_L2 is ReleaseGoldTest_L2, ReleaseGoldTest_Revoke {}
 
 contract ReleaseGoldTest_Expire is ReleaseGoldTest {
   function setUp() public {
@@ -1365,8 +1234,6 @@ contract ReleaseGoldTest_Expire is ReleaseGoldTest {
   }
 }
 
-contract ReleaseGoldTest_Expire_L2 is ReleaseGoldTest_L2, ReleaseGoldTest_Expire {}
-
 contract ReleaseGoldTest_RefundAndFinalize is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
@@ -1423,11 +1290,6 @@ contract ReleaseGoldTest_RefundAndFinalize is ReleaseGoldTest {
   }
 }
 
-contract ReleaseGoldTest_RefundAndFinalize_L2 is
-  ReleaseGoldTest_L2,
-  ReleaseGoldTest_RefundAndFinalize
-{}
-
 contract ReleaseGoldTest_ExpireSelfDestructTest is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
@@ -1440,6 +1302,9 @@ contract ReleaseGoldTest_ExpireSelfDestructTest is ReleaseGoldTest {
     releaseGold.refundAndFinalize();
   }
 
+  // This test fails at the same call depth as expectRevert, since it fails due to the contract no
+  // longer existing. Same with other selfdestruct tests in this suite.
+  /// forge-config: default.allow_internal_expect_revert = true
   function test_ShouldDestructReleaseGoldInstanceAfterFinalizingAndPreventCallingFurtherActions_WhenRevoked()
     public
   {
@@ -1447,11 +1312,6 @@ contract ReleaseGoldTest_ExpireSelfDestructTest is ReleaseGoldTest {
     releaseGold.getRemainingUnlockedBalance();
   }
 }
-
-contract ReleaseGoldTest_ExpireSelfDestructTest_L2 is
-  ReleaseGoldTest_L2,
-  ReleaseGoldTest_ExpireSelfDestructTest
-{}
 
 contract ReleaseGoldTest_LockGold is ReleaseGoldTest {
   uint256 lockAmount;
@@ -1494,8 +1354,6 @@ contract ReleaseGoldTest_LockGold is ReleaseGoldTest {
     releaseGold.lockGold(lockAmount);
   }
 }
-
-contract ReleaseGoldTest_LockGold_L2 is ReleaseGoldTest_L2, ReleaseGoldTest_LockGold {}
 
 contract ReleaseGoldTest_UnlockGold is ReleaseGoldTest {
   uint256 lockAmount;
@@ -1559,8 +1417,6 @@ contract ReleaseGoldTest_UnlockGold is ReleaseGoldTest {
     releaseGold.unlockGold(lockAmount);
   }
 }
-
-contract ReleaseGoldTest_UnlockGold_L2 is ReleaseGoldTest_L2, ReleaseGoldTest_UnlockGold {}
 
 contract ReleaseGoldTest_WithdrawLockedGold is ReleaseGoldTest {
   uint256 value = 1000;
@@ -1631,11 +1487,6 @@ contract ReleaseGoldTest_WithdrawLockedGold is ReleaseGoldTest {
     releaseGold.withdrawLockedGold(index);
   }
 }
-
-contract ReleaseGoldTest_WithdrawLockedGold_L2 is
-  ReleaseGoldTest_L2,
-  ReleaseGoldTest_WithdrawLockedGold
-{}
 
 contract ReleaseGoldTest_RelockGold is ReleaseGoldTest {
   uint256 pendingWithdrawalValue = 1000;
@@ -1742,8 +1593,6 @@ contract ReleaseGoldTest_RelockGold is ReleaseGoldTest {
     releaseGold.relockGold(1, pendingWithdrawalValue);
   }
 }
-
-contract ReleaseGoldTest_RelockGold_L2 is ReleaseGoldTest_L2, ReleaseGoldTest_RelockGold {}
 
 contract ReleaseGoldTest_Withdraw is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
@@ -2041,8 +1890,6 @@ contract ReleaseGoldTest_Withdraw is ReleaseGoldTest {
   }
 }
 
-contract ReleaseGoldTest_Withdraw_L2 is ReleaseGoldTest_L2, ReleaseGoldTest_Withdraw {}
-
 contract ReleaseGoldTest_WithdrawSelfDestruct_WhenNotRevoked is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
 
@@ -2063,16 +1910,12 @@ contract ReleaseGoldTest_WithdrawSelfDestruct_WhenNotRevoked is ReleaseGoldTest 
     releaseGold.withdraw(expectedWithdrawalAmount);
   }
 
+  /// forge-config: default.allow_internal_expect_revert = true
   function test_ShouldSelfDestructIfBeneficiaryWithdrawsTheEntireAmount() public {
     vm.expectRevert();
     releaseGold.totalWithdrawn();
   }
 }
-
-contract ReleaseGoldTest_WithdrawSelfDestruct_WhenNotRevoked_L2 is
-  ReleaseGoldTest_L2,
-  ReleaseGoldTest_WithdrawSelfDestruct_WhenNotRevoked
-{}
 
 contract ReleaseGoldTest_WithdrawSelfDestruct_WhenRevoked is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
@@ -2096,16 +1939,12 @@ contract ReleaseGoldTest_WithdrawSelfDestruct_WhenRevoked is ReleaseGoldTest {
     releaseGold.withdraw(expectedWithdrawalAmount);
   }
 
+  /// forge-config: default.allow_internal_expect_revert = true
   function test_ShouldSelfDestructIfBeneficiaryWithdrawsTheEntireAmount() public {
     vm.expectRevert();
     releaseGold.totalWithdrawn();
   }
 }
-
-contract ReleaseGoldTest_WithdrawSelfDestruct_WhenRevoked_L2 is
-  ReleaseGoldTest_L2,
-  ReleaseGoldTest_WithdrawSelfDestruct_WhenRevoked
-{}
 
 contract ReleaseGoldTest_GetCurrentReleasedTotalAmount is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
@@ -2149,11 +1988,6 @@ contract ReleaseGoldTest_GetCurrentReleasedTotalAmount is ReleaseGoldTest {
     assertEq(releaseGold.getCurrentReleasedTotalAmount(), initialReleaseGoldAmount);
   }
 }
-
-contract ReleaseGoldTest_GetCurrentReleasedTotalAmount_L2 is
-  ReleaseGoldTest_L2,
-  ReleaseGoldTest_GetCurrentReleasedTotalAmount
-{}
 
 contract ReleaseGoldTest_GetWithdrawableAmount is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
@@ -2257,8 +2091,3 @@ contract ReleaseGoldTest_GetWithdrawableAmount is ReleaseGoldTest {
     assertEq(releaseGold.getWithdrawableAmount(), initialReleaseGoldAmount / 4);
   }
 }
-
-contract ReleaseGoldTest_GetWithdrawableAmount_L2 is
-  ReleaseGoldTest_L2,
-  ReleaseGoldTest_GetWithdrawableAmount
-{}

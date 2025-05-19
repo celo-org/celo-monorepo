@@ -27,7 +27,7 @@ function build_tag() {
   git checkout $BRANCH -- contracts* 2>>$LOG_FILE >> $LOG_FILE
   if [ ! -d $BUILD_DIR ]; then
     echo " - Build contract artifacts at $BUILD_DIR"
-    BUILD_DIR=$BUILD_DIR yarn build:sol >> $LOG_FILE
+    BUILD_DIR=$BUILD_DIR yarn build:truffle-sol >> $LOG_FILE
   else
     echo " - Contract artifacts already built at $BUILD_DIR"
   fi

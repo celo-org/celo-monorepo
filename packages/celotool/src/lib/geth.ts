@@ -1663,7 +1663,7 @@ export async function migrateContracts(
   const args = [
     '--cwd',
     `${monorepoRoot}/packages/protocol`,
-    'init-network',
+    'devchain:init-network',
     '-n',
     'testing',
     '-m',

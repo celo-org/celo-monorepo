@@ -2,7 +2,6 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
-import { WhenL2, WhenL2NoInitialization } from "@test-sol/utils/WhenL2-08.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IScoreManagerGovernance.sol";
@@ -40,13 +39,8 @@ contract ScoreManagerTest is TestWithUtils08 {
 
     registry.setAddressFor("ScoreManager", address(scoreManager));
 
+    whenL2WithEpochManagerInitialization();
     scoreManagerImpl.initialize();
-  }
-}
-
-contract ScoreManagerTest_L2 is ScoreManagerTest, WhenL2 {
-  function setUp() public virtual override(ScoreManagerTest, WhenL2) {
-    super.setUp();
   }
 }
 
@@ -90,11 +84,6 @@ contract ScoreManagerTest_setGroupScore is ScoreManagerTest {
     assertEq(scoreManager.getGroupScore(owner), 42);
   }
 }
-contract ScoreManagerTest_setGroupScore_L2 is ScoreManagerTest_L2, ScoreManagerTest_setGroupScore {
-  function setUp() public override(ScoreManagerTest, ScoreManagerTest_L2) {
-    super.setUp();
-  }
-}
 
 contract ScoreManagerTest_setValidatorScore is ScoreManagerTest {
   function test_setValidatorScore() public {
@@ -136,14 +125,6 @@ contract ScoreManagerTest_setValidatorScore is ScoreManagerTest {
     assertEq(scoreManager.getValidatorScore(owner), 42);
   }
 }
-contract ScoreManagerTest_setValidatorScore_L2 is
-  ScoreManagerTest_L2,
-  ScoreManagerTest_setValidatorScore
-{
-  function setUp() public override(ScoreManagerTest, ScoreManagerTest_L2) {
-    super.setUp();
-  }
-}
 
 contract ScoreManagerTest_setScoreManagerSetter is ScoreManagerTest {
   function test_onlyOwnwerCanSetScoreManager() public {
@@ -161,13 +142,5 @@ contract ScoreManagerTest_setScoreManagerSetter is ScoreManagerTest {
     vm.expectEmit(false, false, false, true);
     emit ScoreManagerSetterSet(nonOwner);
     scoreManager.setScoreManagerSetter(nonOwner);
-  }
-}
-contract ScoreManagerTest_setScoreManagerSetter_L2 is
-  ScoreManagerTest_L2,
-  ScoreManagerTest_setScoreManagerSetter
-{
-  function setUp() public override(ScoreManagerTest, ScoreManagerTest_L2) {
-    super.setUp();
   }
 }

@@ -1,11 +1,9 @@
 pragma solidity >=0.5.13 <0.8.20;
 
-import "../../../contracts-0.8/common/IsL2Check.sol";
-
 /**
  * @title Holds a list of addresses of validators
  */
-contract MockElection is IsL2Check {
+contract MockElection {
   mapping(address => bool) public isIneligible;
   mapping(address => bool) public isEligible;
   mapping(address => bool) public allowedToVoteOverMaxNumberOfGroups;
@@ -78,10 +76,10 @@ contract MockElection is IsL2Check {
     return 0;
   }
 
-  function electValidatorSigners() external view onlyL1 returns (address[] memory) {
+  function electValidatorSigners() external view returns (address[] memory) {
     return electedValidators;
   }
-  function electValidators() external view onlyL2 returns (address[] memory) {
+  function electValidatorAccounts() external view returns (address[] memory) {
     return electedValidators;
   }
 
@@ -103,9 +101,5 @@ contract MockElection is IsL2Check {
 
   function distributeEpochRewards(address group, uint256 value, address, address) external {
     distributedEpochRewards[group] = value;
-  }
-
-  function electValidatorAccounts() external view returns (address[] memory) {
-    return electedValidators;
   }
 }

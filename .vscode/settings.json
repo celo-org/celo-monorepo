@@ -48,5 +48,7 @@
     "editor.codeActionsOnSave": {
       "source.organizeImports": "explicit"
     }
-  }
+  },
+  "git.detectSubmodules": false,
+  "git.ignoreSubmodules": true
 }

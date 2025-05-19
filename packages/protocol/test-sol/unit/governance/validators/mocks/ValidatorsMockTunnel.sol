@@ -12,7 +12,6 @@ contract ValidatorsMockTunnel is ForgeTest {
   struct InitParamsTunnel {
     // The number of blocks to delay a ValidatorGroup's commission
     uint256 commissionUpdateDelay;
-    uint256 downtimeGracePeriod;
   }
 
   constructor(address _validatorContractAddress) public {
@@ -26,8 +25,6 @@ contract ValidatorsMockTunnel is ForgeTest {
     uint256 groupRequirementDuration;
     uint256 validatorRequirementValue;
     uint256 validatorRequirementDuration;
-    uint256 validatorScoreExponent;
-    uint256 validatorScoreAdjustmentSpeed;
   }
 
   struct InitParams2 {
@@ -35,7 +32,6 @@ contract ValidatorsMockTunnel is ForgeTest {
     uint256 _slashingMultiplierResetPeriod;
     uint256 _maxGroupSize;
     uint256 _commissionUpdateDelay;
-    uint256 _downtimeGracePeriod;
   }
 
   // TODO move this to a generic Tunnel helper contract, add to other tunnels.
@@ -45,7 +41,7 @@ contract ValidatorsMockTunnel is ForgeTest {
    * See https://docs.soliditylang.org/en/v0.5.17/control-structures.html#revert
    * for details.
    */
-  function recoverErrorString(bytes memory errorData) internal returns (string memory) {
+  function recoverErrorString(bytes memory errorData) internal pure returns (string memory) {
     // Offset in `errorData` due to it starting with the signature for Error(string)
     uint256 signatureLength = 4;
     uint256 stringEncodingLength = errorData.length - signatureLength;
@@ -72,19 +68,16 @@ contract ValidatorsMockTunnel is ForgeTest {
     InitParams2 calldata params2
   ) external returns (bool, bytes memory) {
     InitParamsTunnel memory initParamsTunnel = InitParamsTunnel({
-      commissionUpdateDelay: params2._commissionUpdateDelay,
-      downtimeGracePeriod: params2._downtimeGracePeriod
+      commissionUpdateDelay: params2._commissionUpdateDelay
     });
 
     bytes memory data = abi.encodeWithSignature(
-      "initialize(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,(uint256,uint256))",
+      "initialize(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,(uint256))",
       params.registryAddress,
       params.groupRequirementValue,
       params.groupRequirementDuration,
       params.validatorRequirementValue,
       params.validatorRequirementDuration,
-      params.validatorScoreExponent,
-      params.validatorScoreAdjustmentSpeed,
       params2._membershipHistoryLength,
       params2._slashingMultiplierResetPeriod,
       params2._maxGroupSize,

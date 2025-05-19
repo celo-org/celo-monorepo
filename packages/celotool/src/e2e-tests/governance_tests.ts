@@ -376,9 +376,11 @@ describe('governance tests', () => {
     assertGoldTokenTotalSupplyChanged(blockNumber, new BigNumber(0))
 
   const assertGoldTokenTotalSupplyChanged = async (blockNumber: number, expected: BigNumber) => {
-    const currentSupply = new BigNumber(await goldToken.methods.totalSupply().call({}, blockNumber))
+    const currentSupply = new BigNumber(
+      await goldToken.methods.allocatedSupply().call({}, blockNumber)
+    )
     const previousSupply = new BigNumber(
-      await goldToken.methods.totalSupply().call({}, blockNumber - 1)
+      await goldToken.methods.allocatedSupply().call({}, blockNumber - 1)
     )
     assertAlmostEqual(currentSupply.minus(previousSupply), expected)
   }
