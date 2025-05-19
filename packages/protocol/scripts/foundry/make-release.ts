@@ -5,7 +5,7 @@ import { LibraryAddresses } from '@celo/protocol/lib/bytecode';
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report';
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies';
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils';
-import { ForgeArtifact } from '@celo/protocol/scripts/FoundryArtifact';
+import { ForgeArtifact } from '@celo/protocol/scripts/ForgeArtifact';
 import { NULL_ADDRESS, eqAddress } from '@celo/utils/lib/address';
 import { readJsonSync, readdirSync, writeJsonSync } from 'fs-extra';
 import { basename, join } from 'path';
