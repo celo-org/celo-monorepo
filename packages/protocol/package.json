@@ -121,7 +121,9 @@
     "web3-provider-engine": "^16.0.5",
     "web3-utils": "1.10.0",
     "truffle-plugin-verify": "^0.6.5",
-    "@truffle/hdwallet-provider": "^2.1.15"
+    "@truffle/hdwallet-provider": "^2.1.15",
+    "yargs": "17.7.2",
+    "viem": "^2.29.4"
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.3",
