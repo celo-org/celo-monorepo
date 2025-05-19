@@ -12,6 +12,25 @@ const Web3 = require('web3')
 
 const web3 = new Web3(null)
 
+const getContractNameFromDefinition = (artifact: any): string => {
+  for (let i = 0; i < artifact.ast.nodes.length; i++) {
+    const node = artifact.ast.nodes[i]
+    if (node.nodeType === 'ContractDefinition') {
+      return node.name
+    }
+  }
+  console.log("NAME NOT FOUND!!!")
+  return ''
+}
+
+const getContractName = (artifact: any): string => {
+  if (artifact.contractName) {
+    return artifact.contractName
+  } else {
+    return getContractNameFromDefinition(artifact)
+  }
+}
+
 // getStorageLayout needs an oz-sdk Contract class instance. This class is a
 // subclass of Contract from web3-eth-contract, with an added .schema member and
 // several methods.
@@ -24,7 +43,8 @@ const addSchemaForLayoutChecking = (web3Contract: Web3Contract, artifact: any): 
   // @ts-ignore
   contract.schema = {}
   contract.schema.ast = artifact.ast
-  contract.schema.contractName = artifact.contractName
+  contract.contractName = getContractName(artifact)
+  contract.schema.contractName = contract.contractName
   return contract
 }
 
@@ -200,28 +220,33 @@ export const generateCompatibilityReport = (oldArtifact: Artifact, oldArtifacts:
   const structsReport = generateStructsCompatibilityReport(oldLayout, newLayout)
 
   if (!layoutReport.compatible) {
-    console.log(newArtifact.contractName, "layoutReport incompatible", JSON.stringify(layoutReport.errors));
+    console.log(getContractName(newArtifact), "layoutReport incompatible", JSON.stringify(layoutReport.errors));
   }
 
   if (!structsReport.compatible) {
-    console.log(newArtifact.contractName, "structsReport incompatible", JSON.stringify(structsReport.errors));
+    console.log(getContractName(newArtifact), "structsReport incompatible", JSON.stringify(structsReport.errors));
   }
 
   return {
-    contract: newArtifact.contractName,
+    contract: getContractName(newArtifact),
     compatible: layoutReport.compatible && structsReport.compatible,
     errors: layoutReport.errors.concat(structsReport.errors),
     expanded: structsReport.expanded
   }
 }
 
+const getArtifactByName = (contractName: string, artifacts: BuildArtifacts): Artifact => {
+  return artifacts.listArtifacts().find(artifact =>
+    getContractName(artifact) === contractName
+  )
+}
+
 export const reportLayoutIncompatibilities = (oldArtifactsSet: BuildArtifacts[], newArtifactsSets: BuildArtifacts[]): ASTStorageCompatibilityReport[] => {
   let out: ASTStorageCompatibilityReport[] = []
   for (const newArtifacts of newArtifactsSets) {
-    const reports = newArtifacts.listArtifacts().map((newArtifact) => {
-
+    const reports = newArtifacts.listArtifacts().map((newArtifact: any) => {
       for (const oldArtifacts of oldArtifactsSet) {
-        const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
+        const oldArtifact: any = getArtifactByName(getContractName(newArtifact), oldArtifacts)
         if (oldArtifact !== undefined) {
           return generateCompatibilityReport(oldArtifact, oldArtifacts, newArtifact, newArtifacts)
         }
@@ -230,7 +255,7 @@ export const reportLayoutIncompatibilities = (oldArtifactsSet: BuildArtifacts[],
       // Generate an empty report for new contracts, which are, by definition, backwards
       // compatible.
       return {
-        contract: newArtifact.contractName,
+        contract: getContractName(newArtifact),
         compatible: true,
         errors: []
       }

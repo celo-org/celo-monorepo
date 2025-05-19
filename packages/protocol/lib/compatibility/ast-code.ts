@@ -5,7 +5,7 @@ import {
   MethodMutabilityChange, MethodRemovedChange, MethodReturnChange,
   MethodVisibilityChange, NewContractChange
 } from '@celo/protocol/lib/compatibility/change'
-import { makeZContract } from '@celo/protocol/lib/compatibility/internal'
+import { makeZContract, Artifact, getContractName } from '@celo/protocol/lib/compatibility/internal'
 import {
   BuildArtifacts,
   Contract as ZContract
@@ -244,6 +244,12 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
   return report
 }
 
+const getArtifactByName = (contractName: string, artifacts: BuildArtifacts): Artifact => {
+  return artifacts.listArtifacts().find(artifact =>
+    getContractName(artifact) === contractName
+  )
+}
+
 /**
  * Runs an ast code comparison and returns the spotted changes from the built artifacts given.
  *
@@ -262,7 +268,7 @@ export function reportASTIncompatibilities(
       .map((newArtifact) => {
 
         for (const oldArtifacts of oldArtifactsSet) {
-          const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
+          const oldArtifact = getArtifactByName(getContractName(newArtifact), oldArtifacts)
           if (oldArtifact) {
             return generateASTCompatibilityReport(makeZContract(oldArtifact), oldArtifacts, makeZContract(newArtifact), newArtifacts)
           }
