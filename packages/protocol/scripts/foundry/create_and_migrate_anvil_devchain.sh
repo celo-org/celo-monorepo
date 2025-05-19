@@ -26,7 +26,7 @@ source $PWD/scripts/foundry/start_anvil.sh
 source $PWD/scripts/foundry/deploy_libraries.sh
 echo "Library flags are: $LIBRARY_FLAGS"
 
-# Build map of selectors from constitution
+# Build map of selectors from governanceConstitution.json
 source $PWD/scripts/foundry/build_constitution_selectors_map.sh
 
 # Build all contracts with deployed libraries
