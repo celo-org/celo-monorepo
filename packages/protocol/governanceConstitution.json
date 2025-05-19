@@ -40,10 +40,6 @@
   "FederatedAttestations": {
     "default": 600000000000000000000000
   },
-  "FeeCurrencyWhitelist": {
-    "default": 800000000000000000000000,
-    "addToken": 800000000000000000000000
-  },
   "Freezer": {
     "default": 600000000000000000000000,
     "freeze": 600000000000000000000000,

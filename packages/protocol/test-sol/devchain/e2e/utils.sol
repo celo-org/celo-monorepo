@@ -18,7 +18,7 @@ import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.s
 import { IEscrow } from "@celo-contracts/identity/interfaces/IEscrow.sol";
 import { IFederatedAttestations } from "@celo-contracts/identity/interfaces/IFederatedAttestations.sol";
 import { FeeCurrencyDirectory } from "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
-import { IFeeCurrencyWhitelist } from "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+// import { IFeeCurrencyWhitelist } from "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import { IFeeHandler } from "@celo-contracts/common/interfaces/IFeeHandler.sol";
 import { IFreezer } from "@celo-contracts/common/interfaces/IFreezer.sol";
 import { IGovernance } from "@celo-contracts/governance/interfaces/IGovernance.sol";
@@ -45,7 +45,7 @@ contract Devchain is TestWithUtils08 {
   IEpochManager epochManagerContract;
   IEscrow escrow;
   IFederatedAttestations federatedAttestations;
-  IFeeCurrencyWhitelist feeCurrencyWhitelist;
+  // IFeeCurrencyWhitelist feeCurrencyWhitelist;
   FeeCurrencyDirectory feeCurrencyDirectory;
   IFeeHandler feeHandler;
   IFreezer freezer;
@@ -82,7 +82,7 @@ contract Devchain is TestWithUtils08 {
     feeCurrencyDirectory = FeeCurrencyDirectory(
       registryContract.getAddressForOrDie(FEE_CURRENCY_DIRECTORY_REGISTRY_ID)
     ); // FIXME: FeeCurrencyDirectory is not in UsingRegistry.sol
-    feeCurrencyWhitelist = getFeeCurrencyWhitelistRegistry();
+    // feeCurrencyWhitelist = getFeeCurrencyWhitelistRegistry();
     feeHandler = getFeeHandler();
     freezer = getFreezer();
     governance = getGovernance();
