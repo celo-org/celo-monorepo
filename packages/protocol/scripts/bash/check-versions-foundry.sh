@@ -43,8 +43,6 @@ BRANCH_BUILD_DIR=$BUILD_DIR
 build_tag_foundry $NEW_BRANCH $LOG_FILE
 NEW_BRANCH_BUILD_DIR=$BUILD_DIR
 
-exit 0
-
 # check-backward script uses migrationsConfig
 echo " - Checkout migrationsConfig.js at $NEW_BRANCH"
 CURRENT_HASH=`git log -n 1 --oneline | cut -c 1-9`
