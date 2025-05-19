@@ -10,11 +10,6 @@ Covers changes in `package.json` scripts introduced starting with PR [#11369](ht
 | `build`                                 | `build`                                       |
 | `build:sol`                             | `build:truffle-sol`                           |
 | `build:ts`                              | `build:truffle-ts`                            |
-| `devchain`                              | `devchain`                                    |
-| `init-network`                          | `devchain:init-network`                       |
-| `test:generate-old-devchain-and-build`  | `devchain:generate-old-devchain-and-build`    |
-| `migrate`                               | `devchain:migrate`                            |
-| `devchain:reset`                        | `devchain:reset`                              |
 | `check-opcodes`                         | `release:check-opcodes`                       |
 | `check-versions`                        | `release:check-versions`                      |
 | `determine-release-version`             | `release:determine-release-version`           |
@@ -34,8 +29,6 @@ Covers changes in `package.json` scripts introduced starting with PR [#11369](ht
 | `test`                                  | `test:truffle`                                |
 | `console`                               | `truffle:console`                             |
 | `govern`                                | `truffle:govern`                              |
-| `migrate`                               | `truffle:migrate`                             |
-| `set_block_gas_limit`                   | `truffle:set-block-gas-limit`                 |
 | `truffle-verify`                        | `truffle:verify`                              |
 | `prepare_contracts_and_abis_publishing` | `utils:prepare-contracts-and-abis-publishing` |
 | `prepare_devchain_anvil_publishing`     | `utils:prepare-devchain-anvil-publishing`     |
