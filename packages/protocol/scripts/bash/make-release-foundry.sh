@@ -11,19 +11,16 @@ set -euo pipefail
 # -i: Path to the data needed to initialize contracts.
 # -r: Path to the contract compatibility report.
 # -d: Whether to dry-run this deploy
-# -f: Address to sign transactions from.
+# -f: Private key to sign transactions from.
 # -l: Path to the canonical library mapping.
-# -F: Whether to use the forno endpoint
 
 NETWORK=""
 PROPOSAL=""
 BRANCH=""
 INITIALIZE_DATA=""
 REPORT=""
-DRYRUN=""
 FROM=""
 LIBRARIES=""
-FORNO=""
 
 while getopts 'b:n:p:i:r:df:l:F' flag; do
   case "${flag}" in
@@ -32,7 +29,6 @@ while getopts 'b:n:p:i:r:df:l:F' flag; do
     p) PROPOSAL="${OPTARG}" ;;
     i) INITIALIZE_DATA="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
-    d) DRYRUN="--dry_run" ;;
     F) FORNO="--forno" ;;
     f) FROM="${OPTARG}" ;;
     l) LIBRARIES="${OPTARG}" ;;
@@ -46,16 +42,16 @@ done
 [ -z "$INITIALIZE_DATA" ] && echo "Need to set the initialization data via the -i flag" && exit 1;
 [ -z "$REPORT" ] && echo "Need to set the compatibility report input via the -r flag" && exit 1;
 [ -z "$LIBRARIES" ] && echo "Need to set the library mapping input via the -l flag" && exit 1;
+[ -z "$FROM" ] && echo "Need to set the private key for signing via the -f flag" && exit 1;
 
-source scripts/bash/release-lib.sh
-build_tag $BRANCH "/dev/stdout"
+BUILD_DIR="./out/"
 
-yarn run truffle exec ./scripts/truffle/make-release.js \
-  --network $NETWORK \
-  --build_directory $BUILD_DIR \
-  --report $REPORT \
-  --librariesFile $LIBRARIES \
-  --proposal $PROPOSAL \
-  --from $FROM \
-  --branch $BRANCH \
-  --initialize_data $INITIALIZE_DATA $DRYRUN $FORNO
+yarn ts-node ./scripts/foundry/make-release.ts \
+  --network "$NETWORK" \
+  --build_directory "$BUILD_DIR" \
+  --report "$REPORT" \
+  --librariesFile "$LIBRARIES" \
+  --proposal "$PROPOSAL" \
+  --privateKey "$FROM" \
+  --branch "$BRANCH" \
+  --initialize_data "$INITIALIZE_DATA"

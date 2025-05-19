@@ -42,6 +42,7 @@
     "check-versions": "./scripts/bash/check-versions.sh",
     "check-opcodes": "yarn ts-node scripts/check-opcodes.ts",
     "make-release": "./scripts/bash/make-release.sh",
+    "make-release-foundry": "./scripts/bash/make-release-foundry.sh",
     "verify-deployed": "./scripts/bash/verify-deployed.sh",
     "verify-release": "./scripts/bash/verify-release.sh",
     "size:onchain": "./scripts/bash/get_smart_contract_size_from_onchain_address.sh",
@@ -119,7 +120,8 @@
     "web3-core-helpers": "1.10.0",
     "web3-provider-engine": "^16.0.5",
     "web3-utils": "1.10.0",
-    "truffle-plugin-verify": "^0.6.5"
+    "truffle-plugin-verify": "^0.6.5",
+    "@truffle/hdwallet-provider": "^2.1.15"
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.3",
