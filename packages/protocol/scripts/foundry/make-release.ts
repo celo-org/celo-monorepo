@@ -589,7 +589,7 @@ const performRelease = async (
   released.add(contractName);
 };
 
-module.exports = async (callback: (error?: any) => number) => {
+async function main() {
   try {
     const argv: MakeReleaseArgv = await yargs(hideBin(process.argv))
       .option('report', { type: 'string', demandOption: true, description: 'Path to the compatibility report JSON file.' })
@@ -702,23 +702,9 @@ module.exports = async (callback: (error?: any) => number) => {
 
     writeJsonSync(argv.proposal, proposal, { spaces: 2 });
     console.log(`Proposal successfully written to ${argv.proposal}`);
-    callback();
   } catch (error) {
     console.error('Error during script execution:', error);
-    callback(error);
   }
 };
 
-if (require.main === module) {
-  const mainFunction = module.exports as (callback: (error?: any) => void) => Promise<void>;
-  mainFunction((error) => {
-    if (error) {
-      process.exit(1);
-    } else {
-      process.exit(0);
-    }
-  }).catch(err => {
-    console.error("Unhandled error during script execution:", err);
-    process.exit(1);
-  });
-}
+main();
