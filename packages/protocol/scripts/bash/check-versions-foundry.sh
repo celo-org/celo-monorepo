@@ -49,10 +49,11 @@ CURRENT_HASH=`git log -n 1 --oneline | cut -c 1-9`
 git checkout $NEW_BRANCH -- migrationsConfig.js
 
 yarn ts-node scripts/check-backward.ts sem_check \
-  --old_contracts $BRANCH_BUILD_DIR/contracts \
-  --new_contracts $NEW_BRANCH_BUILD_DIR/contracts \
+  --old_contracts $BRANCH_BUILD_DIR \
+  --new_contracts $NEW_BRANCH_BUILD_DIR \
   --exclude $CONTRACT_EXCLUSION_REGEX \
   --new_branch $NEW_BRANCH \
+  --forge \
   $REPORT_FLAG
 
 git checkout $CURRENT_HASH -- migrationsConfig.js
