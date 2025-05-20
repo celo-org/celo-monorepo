@@ -1043,69 +1043,130 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     }
   }
 
+  // structs to combat stack too deep
+  struct JsonFiles {
+    string constitutionJson;
+    string proxySelectors;
+  }
+  struct FileProps {
+    string[] contractNames;
+    string[] proxyNames;
+    string[] proxySigs;
+  }
+  struct LoopVars {
+    string contractName;
+    address contractAddress;
+    string functionName;
+    bytes4 functionSelector;
+    uint256 threshold;
+  }
+
   function _setConstitution(address _governanceAddress, string memory _json) public {
     bool skipSetConstitution_ = abi.decode(
       _json.parseRaw(".governance.skipSetConstitution"),
       (bool)
     );
     IGovernance governance_ = IGovernance(_governanceAddress);
-    string memory constitutionJson_ = vm.readFile("./governanceConstitution.json");
-    string[] memory contractsNames_ = vm.parseJsonKeys(constitutionJson_, "$");
-    string memory selectorJson_;
-    string[] memory functionsWithTypes_;
+    registry = IRegistry(REGISTRY_ADDRESS);
 
     if (!skipSetConstitution_) {
-      for (uint256 i = 0; i < contractsNames_.length; i++) {
-        string memory contractName_ = contractsNames_[i];
+      // get contracts from constitution
+      JsonFiles memory files_ = JsonFiles(
+        vm.readFile("./governanceConstitution.json"), // constitution json
+        vm.readFile("./.tmp/selectors/Proxy.json") // proxy selectors
+      );
+      FileProps memory props_ = FileProps(
+        vm.parseJsonKeys(files_.constitutionJson, ""), // contract names
+        vm.parseJsonKeys(files_.constitutionJson, ".Proxy"), // proxy names
+        vm.parseJsonKeys(files_.proxySelectors, "") // proxy sigs
+      );
+
+      // vars for looping
+      LoopVars memory loop_;
+      string memory contractSelectors_;
+      string[] memory functionsWithTypes_;
+      string[] memory functionNames_;
+
+      for (uint256 i = 0; i < props_.contractNames.length; i++) {
+        loop_.contractName = props_.contractNames[i];
 
         // skip proxy
-        if (contractName_.equals("proxy")) {
+        if (loop_.contractName.equals("Proxy")) {
           continue;
         }
+        console.log(string.concat("Setting constitution thresholds for: ", loop_.contractName));
 
-        console.log(string.concat("Setting constitution thresholds for: ", contractName_));
-        registry = IRegistry(REGISTRY_ADDRESS);
-        address contractAddress_ = registry.getAddressForString(contractName_);
-
-        string[] memory functionNames_ = vm.parseJsonKeys(
-          constitutionJson_,
-          string.concat(".", contractName_)
-        );
+        // set address from registry
+        loop_.contractAddress = registry.getAddressForString(loop_.contractName);
 
         // load selectors for given contract from file
-        selectorJson_ = vm.readFile(string.concat("./.tmp/selectors/", contractName_, ".json"));
+        contractSelectors_ = vm.readFile(
+          string.concat("./.tmp/selectors/", loop_.contractName, ".json")
+        );
 
         // get function names with types
-        functionsWithTypes_ = vm.parseJsonKeys(selectorJson_, "");
+        functionsWithTypes_ = vm.parseJsonKeys(contractSelectors_, "");
+
+        // get functions names from constitution for contract
+        functionNames_ = vm.parseJsonKeys(
+          files_.constitutionJson,
+          string.concat(".", loop_.contractName)
+        );
 
         // loop over function names
-        for (uint256 j = 0; j < functionNames_.length; j++) {
-          string memory functionName_ = functionNames_[j];
+        uint256 functionsCount_ = functionNames_.length + props_.proxyNames.length;
+        for (uint256 j = 0; j < functionsCount_; j++) {
+          if (j < functionNames_.length) {
+            // get function from contract implementation
+            loop_.functionName = functionNames_[j];
+          } else {
+            // get function from proxy contract
+            loop_.functionName = props_.proxyNames[j - functionNames_.length];
+          }
           console.log(
-            string.concat("  Setting constitution thresholds for function: ", functionName_)
+            string.concat("  Setting constitution thresholds for function: ", loop_.functionName)
           );
 
-          bytes4 selector_;
-          if (functionName_.equals("default")) {
+          if (loop_.functionName.equals("default")) {
             // use empty selector as default
-            selector_ = hex"00000000";
+            loop_.functionSelector = hex"00000000";
+          } else if (j < functionNames_.length) {
+            // retrieve selector from contract selectors
+            loop_.functionSelector = contractSelectors_.getSelector(
+              functionsWithTypes_,
+              loop_.functionName,
+              vm
+            );
           } else {
-            // retrieve selector from selector JSON
-            selector_ = selectorJson_.getSelector(functionsWithTypes_, functionName_, vm);
+            // retrieve selector from proxy selectors
+            loop_.functionSelector = files_.proxySelectors.getSelector(
+              props_.proxySigs,
+              loop_.functionName,
+              vm
+            );
           }
 
-          // get threshold for function
-          uint256 threshold_ = abi.decode(
-            constitutionJson_.parseRaw(string.concat(".", contractName_, ".", functionName_)),
-            (uint256)
-          );
+          // determine treshold from constitution
+          if (j < functionNames_.length) {
+            loop_.threshold = files_.constitutionJson.readUint(
+              string.concat(".", loop_.contractName, ".", loop_.functionName)
+            );
+          } else {
+            loop_.threshold = files_.constitutionJson.readUint(
+              string.concat(".Proxy.", loop_.functionName)
+            );
+          }
 
           // set constitution
-          if (contractAddress_ != address(0)) {
-            governance_.setConstitution(contractAddress_, selector_, threshold_);
+          if (loop_.contractAddress != address(0)) {
+            governance_.setConstitution(
+              loop_.contractAddress,
+              loop_.functionSelector,
+              loop_.threshold
+            );
           } else {
             revert(
-              string.concat("Contract address is invalid to set constitution: ", contractName_)
+              string.concat("Contract address is invalid to set constitution: ", loop_.contractName)
             );
           }
         }

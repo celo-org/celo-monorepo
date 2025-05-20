@@ -88,7 +88,7 @@
   "OdisPayments": {
     "default": 600000000000000000000000
   },
-  "proxy": {
+  "Proxy": {
     "_transferOwnership": 900000000000000000000000,
     "_setAndInitializeImplementation": 900000000000000000000000,
     "_setImplementation": 900000000000000000000000
