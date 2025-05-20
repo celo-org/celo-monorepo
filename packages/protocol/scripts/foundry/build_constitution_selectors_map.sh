@@ -7,7 +7,7 @@ set -euo pipefail
 mkdir .tmp/selectors
 
 # Iterate over contracts defined in constitution and build json map
-for contractName in $(jq -r keys[] governanceConstitution.json | grep -v proxy); do
+for contractName in $(jq -r keys[] governanceConstitution.json); do
   echo "Building selectors map for contract: $contractName"
   forge inspect $contractName methods --json > .tmp/selectors/$contractName.json
 done

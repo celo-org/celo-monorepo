@@ -72,60 +72,117 @@ contract E2E_Constitution is Devchain {
     }
   }
 
+  // structs to combat stack too deep
+  struct JsonFiles {
+    string constitutionJson;
+    string proxySelectors;
+  }
+  struct FileProps {
+    string[] contractNames;
+    string[] proxyNames;
+    string[] proxySigs;
+  }
+  struct LoopVars {
+    string contractName;
+    address contractAddress;
+    string functionName;
+    bytes4 functionSelector;
+    uint256 threshold;
+  }
+
   function setUp() public virtual override {
     // get contracts from constitution
-    string memory constitutionJson_ = vm.readFile("./governanceConstitution.json");
-    string[] memory contractNames_ = vm.parseJsonKeys(constitutionJson_, "");
+    JsonFiles memory files_ = JsonFiles(
+      vm.readFile("./governanceConstitution.json"), // constitution json
+      vm.readFile("./.tmp/selectors/Proxy.json") // proxy selectors
+    );
+    FileProps memory props_ = FileProps(
+      vm.parseJsonKeys(files_.constitutionJson, ""), // contract names
+      vm.parseJsonKeys(files_.constitutionJson, ".Proxy"), // proxy names
+      vm.parseJsonKeys(files_.proxySelectors, "") // proxy sigs
+    );
 
     // vars for looping
-    string memory contractName_;
-    address address_;
-    string memory functionName_;
-    bytes4 selector_;
-    uint256 threshold_;
-    string memory selectorJson_;
+    LoopVars memory loop_;
+    string memory contractSelectors_;
     string[] memory functionsWithTypes_;
     string[] memory functionNames_;
 
     // loop over contract names
-    for (uint256 i = 0; i < contractNames_.length; i++) {
-      contractName_ = contractNames_[i];
-      if (contractName_.equals("proxy")) {
+    for (uint256 i = 0; i < props_.contractNames.length; i++) {
+      loop_.contractName = props_.contractNames[i];
+      if (loop_.contractName.equals("Proxy")) {
         // skip proxy address
         continue;
       } else {
         // set address from registry
-        address_ = registryContract.getAddressForStringOrDie(contractName_);
+        loop_.contractAddress = registryContract.getAddressForStringOrDie(loop_.contractName);
       }
 
       // load selectors for given contract from file
-      selectorJson_ = vm.readFile(string.concat("./.tmp/selectors/", contractName_, ".json"));
+      contractSelectors_ = vm.readFile(
+        string.concat("./.tmp/selectors/", loop_.contractName, ".json")
+      );
 
       // get function names with types
-      functionsWithTypes_ = vm.parseJsonKeys(selectorJson_, "");
+      functionsWithTypes_ = vm.parseJsonKeys(contractSelectors_, "");
 
       // get functions names from constitution for contract
-      functionNames_ = vm.parseJsonKeys(constitutionJson_, string.concat(".", contractName_));
+      functionNames_ = vm.parseJsonKeys(
+        files_.constitutionJson,
+        string.concat(".", loop_.contractName)
+      );
 
       // loop over function names
-      for (uint256 j = 0; j < functionNames_.length; j++) {
-        functionName_ = functionNames_[j];
-        if (functionName_.equals("default")) {
-          // use empty selector as default
-          selector_ = hex"00000000";
+      uint256 functionsCount_ = functionNames_.length + props_.proxyNames.length;
+      for (uint256 j = 0; j < functionsCount_; j++) {
+        if (j < functionNames_.length) {
+          // get function from contract implementation
+          loop_.functionName = functionNames_[j];
         } else {
-          // retrieve selector from selector JSON
-          selector_ = selectorJson_.getSelector(functionsWithTypes_, functionName_, vm);
+          // get function from proxy contract
+          loop_.functionName = props_.proxyNames[j - functionNames_.length];
+        }
+
+        if (loop_.functionName.equals("default")) {
+          // use empty selector as default
+          loop_.functionSelector = hex"00000000";
+        } else if (j < functionNames_.length) {
+          // retrieve selector from contract selectors
+          loop_.functionSelector = contractSelectors_.getSelector(
+            functionsWithTypes_,
+            loop_.functionName,
+            vm
+          );
+        } else {
+          // retrieve selector from proxy selectors
+          loop_.functionSelector = files_.proxySelectors.getSelector(
+            props_.proxySigs,
+            loop_.functionName,
+            vm
+          );
         }
 
         // determine treshold from constitution
-        threshold_ = constitutionJson_.readUint(
-          string.concat(".", contractName_, ".", functionName_)
-        );
+        if (j < functionNames_.length) {
+          loop_.threshold = files_.constitutionJson.readUint(
+            string.concat(".", loop_.contractName, ".", loop_.functionName)
+          );
+        } else {
+          loop_.threshold = files_.constitutionJson.readUint(
+            string.concat(".Proxy.", loop_.functionName)
+          );
+        }
 
         // push new test case
         constitutionCases.push(
-          ConstitutionCase(contractName_, address_, functionName_, selector_, threshold_)
+          ConstitutionCase(
+            loop_.contractName,
+            loop_.contractAddress,
+            loop_.functionName,
+            loop_.functionSelector,
+            loop_.threshold
+          )
         );
       }
     }
