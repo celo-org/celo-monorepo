@@ -2,62 +2,67 @@ pragma solidity >=0.8.7 <0.8.20;
 
 // Note: This script should not include any cheatcode so that it can run in production
 
+// Foundry-08 imports
 import { Script } from "forge-std-8/Script.sol";
 
 // Foundry imports
-import "forge-std/console.sol";
-import "forge-std/StdJson.sol";
+import { console } from "forge-std/console.sol";
+import { stdJson } from "forge-std/StdJson.sol";
 
 // Helper contract imports
-import "@migrations-sol/HelperInterFaces.sol";
+import { IReserveInitializer, IReserve, IStableTokenInitialize, IExchangeInitializer, IExchange, IReserveSpenderMultiSig } from "@migrations-sol/HelperInterFaces.sol";
 import { MigrationsConstants } from "@migrations-sol/constants.sol";
-import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 // Core contract imports on Solidity 0.5
-import "@celo-contracts/common/interfaces/IProxy.sol";
-import "@celo-contracts/common/interfaces/IProxyFactory.sol";
-import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts/common/interfaces/IRegistryInitializer.sol";
-import "@celo-contracts/common/interfaces/IFreezer.sol";
-import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
-import "@celo-contracts/common/interfaces/ICeloTokenInitializer.sol";
-import "@celo-contracts/common/interfaces/IAccountsInitializer.sol";
-import "@celo-contracts/common/interfaces/IFeeHandlerSellerInitializer.sol";
-import "@celo-contracts/common/interfaces/IFeeHandler.sol";
-import "@celo-contracts/common/interfaces/IFeeHandlerInitializer.sol";
-import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
-import "@celo-contracts/common/interfaces/IAccounts.sol";
-import "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
-import "@celo-contracts/governance/interfaces/ILockedGoldInitializer.sol";
-import "@celo-contracts-8/governance/interfaces/IValidatorsInitializer.sol";
-import "@celo-contracts/governance/interfaces/IElectionInitializer.sol";
-import "@celo-contracts/governance/interfaces/IEpochRewardsInitializer.sol";
-import "@celo-contracts/governance/interfaces/IBlockchainParametersInitializer.sol";
-import "@celo-contracts/governance/interfaces/IGovernanceSlasherInitializer.sol";
-import "@celo-contracts/governance/interfaces/IDoubleSigningSlasherInitializer.sol";
-import "@celo-contracts/governance/interfaces/IDowntimeSlasherInitializer.sol";
-import "@celo-contracts/governance/interfaces/IGovernanceApproverMultiSigInitializer.sol";
-import "@celo-contracts/governance/interfaces/IGovernanceInitializer.sol";
-import "@celo-contracts/governance/interfaces/ILockedGold.sol";
-import "@celo-contracts/governance/interfaces/IGovernance.sol";
-import "@celo-contracts/identity/interfaces/IRandomInitializer.sol";
-import "@celo-contracts/identity/interfaces/IEscrowInitializer.sol";
-import "@celo-contracts/identity/interfaces/IOdisPaymentsInitializer.sol";
-import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
-import "@celo-contracts/stability/interfaces/ISortedOraclesInitializer.sol";
-import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
+import { IProxy } from "@celo-contracts/common/interfaces/IProxy.sol";
+import { IProxyFactory } from "@celo-contracts/common/interfaces/IProxyFactory.sol";
+import { IRegistry } from "@celo-contracts/common/interfaces/IRegistry.sol";
+import { IRegistryInitializer } from "@celo-contracts/common/interfaces/IRegistryInitializer.sol";
+import { IFreezer } from "@celo-contracts/common/interfaces/IFreezer.sol";
+import { IFreezerInitializer } from "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
+import { ICeloTokenInitializer } from "@celo-contracts/common/interfaces/ICeloTokenInitializer.sol";
+import { IAccountsInitializer } from "@celo-contracts/common/interfaces/IAccountsInitializer.sol";
+import { IFeeHandlerSellerInitializer } from "@celo-contracts/common/interfaces/IFeeHandlerSellerInitializer.sol";
+import { IFeeHandler } from "@celo-contracts/common/interfaces/IFeeHandler.sol";
+import { IFeeHandlerInitializer } from "@celo-contracts/common/interfaces/IFeeHandlerInitializer.sol";
+import { IFeeCurrencyWhitelist } from "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
+import { IEpochManagerEnabler } from "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
+import { ILockedGoldInitializer } from "@celo-contracts/governance/interfaces/ILockedGoldInitializer.sol";
+import { IValidatorsInitializer } from "@celo-contracts-8/governance/interfaces/IValidatorsInitializer.sol";
+import { IElectionInitializer } from "@celo-contracts/governance/interfaces/IElectionInitializer.sol";
+import { IEpochRewardsInitializer } from "@celo-contracts/governance/interfaces/IEpochRewardsInitializer.sol";
+import { IBlockchainParametersInitializer } from "@celo-contracts/governance/interfaces/IBlockchainParametersInitializer.sol";
+import { IGovernanceSlasherInitializer } from "@celo-contracts/governance/interfaces/IGovernanceSlasherInitializer.sol";
+import { IDoubleSigningSlasherInitializer } from "@celo-contracts/governance/interfaces/IDoubleSigningSlasherInitializer.sol";
+import { IDowntimeSlasherInitializer } from "@celo-contracts/governance/interfaces/IDowntimeSlasherInitializer.sol";
+import { IGovernanceApproverMultiSigInitializer } from "@celo-contracts/governance/interfaces/IGovernanceApproverMultiSigInitializer.sol";
+import { IGovernanceInitializer } from "@celo-contracts/governance/interfaces/IGovernanceInitializer.sol";
+import { ILockedGold } from "@celo-contracts/governance/interfaces/ILockedGold.sol";
+import { IGovernance } from "@celo-contracts/governance/interfaces/IGovernance.sol";
+import { IRandomInitializer } from "@celo-contracts/identity/interfaces/IRandomInitializer.sol";
+import { IEscrowInitializer } from "@celo-contracts/identity/interfaces/IEscrowInitializer.sol";
+import { IOdisPaymentsInitializer } from "@celo-contracts/identity/interfaces/IOdisPaymentsInitializer.sol";
+import { IFederatedAttestationsInitializer } from "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
+import { ISortedOraclesInitializer } from "@celo-contracts/stability/interfaces/ISortedOraclesInitializer.sol";
+import { ISortedOracles } from "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 
 // Core contract imports on Solidity 0.8
-import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectoryInitializer.sol";
-import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
-import "@celo-contracts-8/common/interfaces/ICeloUnreleasedTreasuryInitializer.sol";
-import "@celo-contracts-8/common/interfaces/IEpochManagerEnablerInitializer.sol";
-import "@celo-contracts-8/common/interfaces/IEpochManagerInitializer.sol";
-import "@celo-contracts-8/common/interfaces/IScoreManagerInitializer.sol";
-import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
-import "@celo-contracts-8/common/UsingRegistry.sol";
+import { IFeeCurrencyDirectoryInitializer } from "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectoryInitializer.sol";
+import { IGasPriceMinimumInitializer } from "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
+import { ICeloUnreleasedTreasuryInitializer } from "@celo-contracts-8/common/interfaces/ICeloUnreleasedTreasuryInitializer.sol";
+import { IEpochManagerEnablerInitializer } from "@celo-contracts-8/common/interfaces/IEpochManagerEnablerInitializer.sol";
+import { IEpochManagerInitializer } from "@celo-contracts-8/common/interfaces/IEpochManagerInitializer.sol";
+import { IScoreManagerInitializer } from "@celo-contracts-8/common/interfaces/IScoreManagerInitializer.sol";
+import { IFeeCurrencyDirectory } from "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
+import { UsingRegistry } from "@celo-contracts-8/common/UsingRegistry.sol";
 
-import "@test-sol/utils/SECP256K1.sol";
+// Local imports
+import { StringUtils } from "@celo-contracts/common/libraries/StringUtils.sol";
+
+// Test imports
+import { ISECP256K1 } from "@test-sol/utils/SECP256K1.sol";
+import { SelectorParser } from "@test-sol/utils/SelectorParser.sol";
 
 contract ForceTx {
   // event to trigger so a tx can be processed
@@ -72,6 +77,8 @@ contract ForceTx {
 
 contract Migration is Script, UsingRegistry, MigrationsConstants {
   using stdJson for string;
+  using StringUtils for string;
+  using SelectorParser for string;
 
   struct InitParamsTunnel {
     // The number of blocks to delay a ValidatorGroup's commission
@@ -1036,46 +1043,131 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     }
   }
 
-  function _setConstitution(address governanceAddress, string memory json) public {
-    bool skipSetConstitution = abi.decode(json.parseRaw(".governance.skipSetConstitution"), (bool));
-    IGovernance governance = IGovernance(governanceAddress);
-    string memory constitutionJson = vm.readFile("./governanceConstitution.json");
-    string[] memory contractsKeys = vm.parseJsonKeys(constitutionJson, "$");
+  // structs to combat stack too deep
+  struct JsonFiles {
+    string constitutionJson;
+    string proxySelectors;
+  }
+  struct FileProps {
+    string[] contractNames;
+    string[] proxyNames;
+    string[] proxySigs;
+  }
+  struct LoopVars {
+    string contractName;
+    address contractAddress;
+    string functionName;
+    bytes4 functionSelector;
+    uint256 threshold;
+  }
 
-    if (!skipSetConstitution) {
-      for (uint256 i = 0; i < contractsKeys.length; i++) {
-        // TODO need to handle the special case for "proxy"
-        string memory contractName = contractsKeys[i];
+  function _setConstitution(address _governanceAddress, string memory _json) public {
+    bool skipSetConstitution_ = abi.decode(
+      _json.parseRaw(".governance.skipSetConstitution"),
+      (bool)
+    );
+    IGovernance governance_ = IGovernance(_governanceAddress);
+    registry = IRegistry(REGISTRY_ADDRESS);
 
-        // TODO make helper function for string comparison
-        if (keccak256(abi.encodePacked(contractName)) == keccak256(abi.encodePacked("proxy"))) {
+    if (!skipSetConstitution_) {
+      // get contracts from constitution
+      JsonFiles memory files_ = JsonFiles(
+        vm.readFile("./governanceConstitution.json"), // constitution json
+        vm.readFile("./.tmp/selectors/Proxy.json") // proxy selectors
+      );
+      FileProps memory props_ = FileProps(
+        vm.parseJsonKeys(files_.constitutionJson, ""), // contract names
+        vm.parseJsonKeys(files_.constitutionJson, ".Proxy"), // proxy names
+        vm.parseJsonKeys(files_.proxySelectors, "") // proxy sigs
+      );
+
+      // vars for looping
+      LoopVars memory loop_;
+      string memory contractSelectors_;
+      string[] memory functionsWithTypes_;
+      string[] memory functionNames_;
+
+      for (uint256 i = 0; i < props_.contractNames.length; i++) {
+        loop_.contractName = props_.contractNames[i];
+
+        // skip proxy
+        if (loop_.contractName.equals("Proxy")) {
           continue;
         }
+        console.log(string.concat("Setting constitution thresholds for: ", loop_.contractName));
 
-        console.log(string.concat("Setting constitution thresholds for: ", contractName));
-        registry = IRegistry(REGISTRY_ADDRESS);
+        // set address from registry
+        loop_.contractAddress = registry.getAddressForString(loop_.contractName);
 
-        address contractAddress = registry.getAddressForString(contractName);
-
-        string[] memory functionNames = vm.parseJsonKeys(
-          constitutionJson,
-          string.concat(".", contractName)
+        // load selectors for given contract from file
+        contractSelectors_ = vm.readFile(
+          string.concat("./.tmp/selectors/", loop_.contractName, ".json")
         );
-        for (uint256 j = 0; j < functionNames.length; j++) {
-          string memory functionName = functionNames[j];
+
+        // get function names with types
+        functionsWithTypes_ = vm.parseJsonKeys(contractSelectors_, "");
+
+        // get functions names from constitution for contract
+        functionNames_ = vm.parseJsonKeys(
+          files_.constitutionJson,
+          string.concat(".", loop_.contractName)
+        );
+
+        // loop over function names
+        uint256 functionsCount_ = functionNames_.length + props_.proxyNames.length;
+        for (uint256 j = 0; j < functionsCount_; j++) {
+          if (j < functionNames_.length) {
+            // get function from contract implementation
+            loop_.functionName = functionNames_[j];
+          } else {
+            // get function from proxy contract
+            loop_.functionName = props_.proxyNames[j - functionNames_.length];
+          }
           console.log(
-            string.concat("  Setting constitution thresholds for function : ", functionName)
-          );
-          bytes4 functionHash = bytes4(keccak256(bytes(functionName)));
-          uint256 threshold = abi.decode(
-            constitutionJson.parseRaw(string.concat(".", contractName, ".", functionName)),
-            (uint256)
+            string.concat("  Setting constitution thresholds for function: ", loop_.functionName)
           );
 
-          if (contractAddress != address(0)) {
-            // TODO fix this case, it should never be zero
-            // contract key is likely wrong
-            governance.setConstitution(contractAddress, functionHash, threshold);
+          if (loop_.functionName.equals("default")) {
+            // use empty selector as default
+            loop_.functionSelector = hex"00000000";
+          } else if (j < functionNames_.length) {
+            // retrieve selector from contract selectors
+            loop_.functionSelector = contractSelectors_.getSelector(
+              functionsWithTypes_,
+              loop_.functionName,
+              vm
+            );
+          } else {
+            // retrieve selector from proxy selectors
+            loop_.functionSelector = files_.proxySelectors.getSelector(
+              props_.proxySigs,
+              loop_.functionName,
+              vm
+            );
+          }
+
+          // determine treshold from constitution
+          if (j < functionNames_.length) {
+            loop_.threshold = files_.constitutionJson.readUint(
+              string.concat(".", loop_.contractName, ".", loop_.functionName)
+            );
+          } else {
+            loop_.threshold = files_.constitutionJson.readUint(
+              string.concat(".Proxy.", loop_.functionName)
+            );
+          }
+
+          // set constitution
+          if (loop_.contractAddress != address(0)) {
+            governance_.setConstitution(
+              loop_.contractAddress,
+              loop_.functionSelector,
+              loop_.threshold
+            );
+          } else {
+            revert(
+              string.concat("Contract address is invalid to set constitution: ", loop_.contractName)
+            );
           }
         }
       }
