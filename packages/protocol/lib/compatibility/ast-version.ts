@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file: 0 */
-import { Artifact } from '@celo/protocol/lib/compatibility/internal';
+import { Artifact, getContractName } from '@celo/protocol/lib/compatibility/internal';
 import { ContractVersion, ContractVersionChecker, ContractVersionCheckerIndex, ContractVersionDelta, ContractVersionDeltaIndex, ContractVersionIndex, DEFAULT_VERSION_STRING } from '@celo/protocol/lib/compatibility/version';
 import { Address as EJSAddress } from "@ethereumjs/util";
 import { VM } from "@ethereumjs/vm";
@@ -15,8 +15,8 @@ export class ASTContractVersions {
     const contracts = {}
 
     for (const artifacts of artifactsSet) {
-      await Promise.all(artifacts.listArtifacts().filter(c => !isLibrary(c.contractName, [artifacts])).map(async (artifact) => {
-        contracts[artifact.contractName] = await getContractVersion(artifact)
+      await Promise.all(artifacts.listArtifacts().filter(c => !isLibrary(getContractName(c), [artifacts])).map(async (artifact) => {
+        contracts[getContractName(artifact)] = await getContractVersion(artifact)
       }))
     }
 
@@ -34,7 +34,8 @@ export class ASTContractVersions {
  */
 export async function getContractVersion(artifact: Artifact): Promise<ContractVersion> {
   const vm = await VM.create();
-  const bytecode = artifact.deployedBytecode
+  // @ts-ignore
+  const bytecode = artifact.deployedBytecode.object || artifact.deployedBytecode
   const data = '0x' + abi.methodID('getVersionNumber', []).toString('hex')
   const nullAddress = '0000000000000000000000000000000000000000'
   // Artificially link all libraries to the null address.
