@@ -23,7 +23,7 @@
     "@google-cloud/storage": "^2.4.3",
     "bignumber.js": "^9.0.0",
     "bip32": "3.1.0",
-    "bip39": "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2",
+    "bip39": "https://github.com/bitcoinjs/bip39#a7ecbfe2e60d0214ce17163d610cad9f7b23140c",
     "bunyan": "1.8.12",
     "bunyan-gke-stackdriver": "0.1.2",
     "compare-versions": "^6.0.0",
