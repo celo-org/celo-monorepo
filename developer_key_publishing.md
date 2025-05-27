@@ -133,13 +133,13 @@ This command will query [clabs.co](https://clabs.co) over HTTPS and retrieve the
 
 ### Manually fetching a key
 
-If you want to check a key is correctly hosted, or want to fetch a key manualy for some reason, you can do so with:
+If you want to check a key is correctly hosted, or want to fetch a key manually for some reason, you can do so with:
 
 ```bash
 curl https://openpgpkey.clabs.co/.well-known/openpgpkey/clabs.co/hu/$USER_HASH
 ```
 
-`$USER_HASH` can be obtained by observing the output of the WKD utility. It is the filename of the resulting key file that is added to the website repsitory for publishing. It can also be calculated directly following the specification in the WKD specification, [draft-koch-openpgp-webkey-service](https://datatracker.ietf.org/doc/draft-koch-openpgp-webkey-service/?include_text=1), section 3.1. (Warning: It uses an obscure varient of base32 :| )
+`$USER_HASH` can be obtained by observing the output of the WKD utility. It is the filename of the resulting key file that is added to the website repository for publishing. It can also be calculated directly following the specification in the WKD specification, [draft-koch-openpgp-webkey-service](https://datatracker.ietf.org/doc/draft-koch-openpgp-webkey-service/?include_text=1), section 3.1. (Warning: It uses an obscure variant of base32 :| )
 
 ## Document Signing
 
