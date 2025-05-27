@@ -11,7 +11,7 @@ and other packages. The source code for the Celo Blockchain which operates a nod
 
 <!-- row 1 - status -->
 
-[![GitHub Actions](https://github.com/celo-org/celo-monorepo/actions/workflows/container-all-monorepo.yml/badge.svg)](https://github.com/celo-org/celo-monorepo/actions/workflows/container-all-monorepo.yml)
+[![GitHub Actions](https://github.com/celo-org/celo-monorepo/actions/workflows/celo-monorepo.yml/badge.svg)](https://github.com/celo-org/celo-monorepo/actions)
 [![GitHub contributors](https://img.shields.io/github/contributors/celo-org/celo-monorepo)](https://github.com/celo-org/celo-monorepo/graphs/contributors)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/w/celo-org/celo-monorepo)](https://github.com/celo-org/celo-monorepo/graphs/contributors)
 [![GitHub Stars](https://img.shields.io/github/stars/celo-org/celo-monorepo.svg)](https://github.com/celo-org/celo-monorepo/stargazers)
@@ -25,7 +25,7 @@ and other packages. The source code for the Celo Blockchain which operates a nod
 [![docs](https://img.shields.io/badge/docs-up-green)](https://docs.celo.org/)
 [![Youtube](https://img.shields.io/badge/YouTube%20channel-up-green)](https://www.youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw/videos?view=0&sort=p&flow=grid)
 [![forum](https://img.shields.io/badge/forum-up-green)](https://forum.celo.org)
-[![Discord](https://img.shields.io/discord/600834479145353243.svg)](https://discord.gg/RfHQKtY)
+[![Discord](https://img.shields.io/discord/600834479145353243.svg)](https://discord.com/invite/celo)
 [![Twitter CeloDevs](https://img.shields.io/twitter/follow/celodevs?style=social)](https://twitter.com/celodevs)
 [![Twitter CeloOrg](https://img.shields.io/twitter/follow/celoorg?style=social)](https://twitter.com/CeloOrg)
 [![Subreddit subscribers](https://img.shields.io/reddit/subreddit-subscribers/CeloHQ?style=social)](https://www.reddit.com/r/CeloHQ/)
@@ -132,7 +132,7 @@ twitter intent generator - http://tech.cymi.org/tweet-intents
 - [Blog](https://medium.com/celohq)
 - [YouTube](https://www.youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw/videos?view=0&sort=p&flow=grid)
 - [Forum](https://forum.celo.org)
-- [Discord](https://discord.gg/vRbExjv)
+- [Discord](https://discord.com/invite/celo)
 - [Twitter](https://twitter.com/CeloDevs)
 - [Reddit](https://www.reddit.com/r/CeloHQ/)
 - [Community Events](https://celo.org/community)
