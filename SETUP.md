@@ -15,7 +15,6 @@
     - [Optional](#optional)
       - [Install Rust](#install-rust)
   - [Building celo-monorepo](#building-celo-monorepo)
-  - [Running the mobile wallet](#running-the-mobile-wallet)
 
 This is a living document! Please edit and update it as part of your onboarding process :-)
 
