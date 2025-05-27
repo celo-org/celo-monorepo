@@ -39,7 +39,7 @@ function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
     }
 
     exec(
-      `yarn run truffle compile --silent --contracts_directory=${contractPath} --contracts_build_directory=${outdir}/contracts-${contractPackage.name} --config ${contractPackage.truffleConfig}` // todo change to outdir
+      `yarn run truffle compile --silent --contracts_directory=${contractPath} --contracts_build_directory=${outdir}/contracts-${contractPackage.name} --config ${contractPackage.truffleConfig} --verbose-rpc` // todo change to outdir
     )
   }
 
@@ -116,9 +116,8 @@ function generateFilesForEthers({ coreContractsOnly, ethersTypes: outdir }: Buil
   console.info(`protocol: Generating Ethers Types to ${outdir}`)
   exec(`rm -rf "${outdir}"`)
 
-  const contractKitContracts = coreContractsOnly
-    ? CoreContracts
-    : CoreContracts.concat('Proxy').concat(Interfaces)
+  const contractKitContracts = getContractList(coreContractsOnly)
+
   const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
 
   exec(`yarn run --silent typechain --target=ethers-v5 --outDir "${outdir}" "${globPattern}"`)
@@ -129,9 +128,7 @@ async function generateFilesForContractKit({ coreContractsOnly, web3Types: outdi
   exec(`rm -rf ${outdir}`)
   const relativePath = path.relative(ROOT_DIR, outdir)
 
-  const contractKitContracts = coreContractsOnly
-    ? CoreContracts
-    : CoreContracts.concat('Proxy').concat(Interfaces)
+  const contractKitContracts = getContractList(coreContractsOnly)
 
   const globPattern = `${BUILD_DIR}/contracts*/@(${contractKitContracts.join('|')}).json`
 
@@ -175,6 +172,10 @@ const _buildTargets: ParsedArgs = {
 } as const
 type BuildTargets = Record<keyof typeof _buildTargets, string> & {
   coreContractsOnly: boolean
+}
+
+function getContractList(coreContractsOnly: boolean) {
+  return coreContractsOnly ? CoreContracts : [...CoreContracts, 'Proxy', ...Interfaces]
 }
 
 async function main(buildTargets: BuildTargets) {

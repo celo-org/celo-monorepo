@@ -3,6 +3,7 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
+
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
@@ -11,7 +12,7 @@ import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/DowntimeSlasher.sol";
 import "@celo-contracts/governance/test/MockUsingPrecompiles.sol";
-import { Utils } from "@test-sol/utils.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 contract DowntimeSlasherMock is DowntimeSlasher(true), MockUsingPrecompiles, Test {
   struct SlashParams {
@@ -75,7 +76,7 @@ contract DowntimeSlasherMock is DowntimeSlasher(true), MockUsingPrecompiles, Tes
   }
 }
 
-contract DowntimeSlasherTest is Test, Utils {
+contract DowntimeSlasherTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -116,8 +117,6 @@ contract DowntimeSlasherTest is Test, Utils {
 
   address caller2;
   uint256 caller2PK;
-  address public registryAddress = 0x000000000000000000000000000000000000ce10;
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   uint256 epochSize;
   uint256 epoch;
@@ -172,14 +171,14 @@ contract DowntimeSlasherTest is Test, Utils {
     (otherGroup, groupPK) = actorWithPK("otherGroup");
     (caller2, caller2PK) = actorWithPK("caller2");
 
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
     accounts = new Accounts(true);
     validators = new MockValidators();
     lockedGold = new MockLockedGold();
     slasher = new DowntimeSlasherMock();
 
-    registry = Registry(registryAddress);
+    registry = Registry(REGISTRY_ADDRESS);
 
     accounts.createAccount();
 
@@ -200,7 +199,7 @@ contract DowntimeSlasherTest is Test, Utils {
     vm.prank(otherGroup);
     accounts.createAccount();
 
-    accounts.initialize(registryAddress);
+    accounts.initialize(REGISTRY_ADDRESS);
 
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
@@ -218,7 +217,7 @@ contract DowntimeSlasherTest is Test, Utils {
     expectedSlashingIncentives.penalty = slashingPenalty;
     expectedSlashingIncentives.reward = slashingReward;
 
-    slasher.initialize(registryAddress, slashingPenalty, slashingReward, slashableDowntime);
+    slasher.initialize(REGISTRY_ADDRESS, slashingPenalty, slashingReward, slashableDowntime);
 
     lockedGold.setAccountTotalLockedGold(address(this), 50000);
     lockedGold.setAccountTotalLockedGold(nonOwner, 50000);
@@ -321,10 +320,6 @@ contract DowntimeSlasherTest is Test, Utils {
     }
     return (_epochNumber.sub(1)).mul(epochSize).add(1);
   }
-
-  function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
-  }
 }
 
 contract DowntimeSlasherTestInitialize is DowntimeSlasherTest {
@@ -347,7 +342,7 @@ contract DowntimeSlasherTestInitialize is DowntimeSlasherTest {
 
   function test_Reverts_WhenCalledTwice() public {
     vm.expectRevert("contract already initialized");
-    slasher.initialize(registryAddress, slashingPenalty, slashingReward, slashableDowntime);
+    slasher.initialize(REGISTRY_ADDRESS, slashingPenalty, slashingReward, slashableDowntime);
   }
 }
 

@@ -64,7 +64,7 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (2, 0, 1, 0);
+    return (2, 0, 0, 1);
   }
 
   /**
@@ -170,7 +170,7 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
   function getBitmapForInterval(
     uint256 startBlock,
     uint256 endBlock
-  ) public view returns (bytes32) {
+  ) public view onlyL1 returns (bytes32) {
     require(endBlock >= startBlock, "endBlock must be greater or equal than startBlock");
     // The signature bitmap for block N is stored in block N+1.
     // The latest block is `block.number - 1`, which stores the signature bitmap for
@@ -215,7 +215,7 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
     uint256 startBlock,
     uint256 endBlock,
     uint256 signerIndex
-  ) public view returns (bool) {
+  ) public view onlyL1 returns (bool) {
     require(signerIndex < numberValidatorsInSet(startBlock), "bad validator index at start block");
     require(
       isBitmapSetForInterval(startBlock, endBlock),
@@ -250,7 +250,7 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
     uint256[] memory startBlocks,
     uint256[] memory endBlocks,
     uint256[] memory signerIndices
-  ) public view returns (bool) {
+  ) public view onlyL1 returns (bool) {
     require(startBlocks.length > 0, "requires at least one interval");
     require(
       startBlocks.length == endBlocks.length,

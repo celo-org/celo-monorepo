@@ -62,6 +62,7 @@ const oldArtifactsFolder08 = path.relative(process.cwd(), argv.old_contracts + '
 const newArtifactsFolder = path.relative(process.cwd(), argv.new_contracts)
 const newArtifactsFolder08 = path.relative(process.cwd(), argv.new_contracts + '-0.8')
 const newArtifactsFolders = [newArtifactsFolder, newArtifactsFolder08]
+const oldArtifactsFolders = [oldArtifactsFolder, oldArtifactsFolder08]
 
 const out = (msg: string, force?: boolean): void => {
   if (force || !argv.quiet) {
@@ -79,7 +80,7 @@ const newArtifacts08 = instantiateArtifacts(newArtifactsFolder08)
 
 try {
   const backward = ASTBackwardReport.create(
-    oldArtifactsFolder,
+    oldArtifactsFolders,
     newArtifactsFolders,
     [oldArtifacts, oldArtifacts08],
     [newArtifacts, newArtifacts08],

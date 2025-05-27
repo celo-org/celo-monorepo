@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -8,16 +9,26 @@ import "./UsingRegistry.sol";
 import "./CalledByVm.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
+import "./interfaces/ICeloTokenInitializer.sol";
 import "./interfaces/ICeloVersionedContract.sol";
-import "./interfaces/IMintGoldSchedule.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
 
+/**
+ * @title ERC20 interface for the CELO token.
+ * @notice The native token was initially called "Celo Gold", but soon after
+ * mainnet launch, the community voted to change the name to "CELO". For legacy
+ * reasons, the contract itself is still called GoldToken.
+ * @dev Note that this is not a wrapper token like WETH. Thanks to the
+ * `transfer` precompile, this contract provides an ERC20 interface *directly*
+ * to the native token.
+ */
 contract GoldToken is
   Initializable,
   CalledByVm,
   UsingRegistry,
   IERC20,
   ICeloToken,
+  ICeloTokenInitializer,
   ICeloVersionedContract,
   IsL2Check
 {
@@ -29,6 +40,7 @@ contract GoldToken is
   string constant NAME = "Celo native asset";
   string constant SYMBOL = "CELO";
   uint8 constant DECIMALS = 18;
+  uint256 constant CELO_SUPPLY_CAP = 1000000000 ether; // 1 billion CELO
   uint256 internal totalSupply_;
   // solhint-enable state-visibility
 
@@ -37,24 +49,11 @@ contract GoldToken is
   // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address
   address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
 
-  IMintGoldSchedule public goldTokenMintingSchedule;
-
   event Transfer(address indexed from, address indexed to, uint256 value);
 
   event TransferComment(string comment);
 
   event Approval(address indexed owner, address indexed spender, uint256 value);
-
-  event SetGoldTokenMintingScheduleAddress(address indexed newScheduleAddress);
-
-  modifier onlySchedule() {
-    if (isL2()) {
-      require(msg.sender == address(goldTokenMintingSchedule), "Only MintGoldSchedule can call.");
-    } else {
-      require(msg.sender == address(0), "Only VM can call.");
-    }
-    _;
-  }
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -70,23 +69,6 @@ contract GoldToken is
     totalSupply_ = 0;
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-  }
-
-  /**
-   * @notice Used set the address of the MintGoldSchedule contract.
-   * @param goldTokenMintingScheduleAddress The address of the MintGoldSchedule contract.
-   */
-  function setGoldTokenMintingScheduleAddress(
-    address goldTokenMintingScheduleAddress
-  ) external onlyOwner {
-    require(
-      goldTokenMintingScheduleAddress != address(0) ||
-        goldTokenMintingScheduleAddress != address(goldTokenMintingSchedule),
-      "Invalid address."
-    );
-    goldTokenMintingSchedule = IMintGoldSchedule(goldTokenMintingScheduleAddress);
-
-    emit SetGoldTokenMintingScheduleAddress(goldTokenMintingScheduleAddress);
   }
 
   /**
@@ -198,8 +180,9 @@ contract GoldToken is
    * @notice Mints new CELO and gives it to 'to'.
    * @param to The account for which to mint tokens.
    * @param value The amount of CELO to mint.
+   * @dev This function will be deprecated in L2.
    */
-  function mint(address to, uint256 value) external onlySchedule returns (bool) {
+  function mint(address to, uint256 value) external onlyL1 onlyVm returns (bool) {
     if (value == 0) {
       return true;
     }
@@ -247,17 +230,10 @@ contract GoldToken is
   }
 
   /**
-   * @return The total amount of CELO in existence, including what the burn address holds.
-   */
-  function totalSupply() external view returns (uint256) {
-    return totalSupply_;
-  }
-
-  /**
    * @return The total amount of CELO in existence, not including what the burn address holds.
    */
   function circulatingSupply() external view returns (uint256) {
-    return totalSupply_.sub(getBurnedAmount()).sub(balanceOf(address(0)));
+    return allocatedSupply().sub(getBurnedAmount()).sub(balanceOf(address(0)));
   }
 
   /**
@@ -283,7 +259,7 @@ contract GoldToken is
 
   /**
    * @notice Gets the amount of CELO that has been burned.
-   * @return The total amount of Celo that has been sent to the burn address.
+   * @return The total amount of CELO that has been sent to the burn address.
    */
   function getBurnedAmount() public view returns (uint256) {
     return balanceOf(BURN_ADDRESS);
@@ -296,6 +272,28 @@ contract GoldToken is
    */
   function balanceOf(address _owner) public view returns (uint256) {
     return _owner.balance;
+  }
+
+  /**
+   * @return The total amount of allocated CELO.
+   */
+  function allocatedSupply() public view returns (uint256) {
+    if (isL2()) {
+      return CELO_SUPPLY_CAP - getCeloUnreleasedTreasury().getRemainingBalanceToRelease();
+    } else {
+      return totalSupply();
+    }
+  }
+
+  /**
+   * @return The total amount of CELO in existence, including what the burn address holds.
+   */
+  function totalSupply() public view returns (uint256) {
+    if (isL2()) {
+      return CELO_SUPPLY_CAP;
+    } else {
+      return totalSupply_;
+    }
   }
 
   /**

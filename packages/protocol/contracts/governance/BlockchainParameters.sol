@@ -5,12 +5,10 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingPrecompiles.sol";
 
-import "../../contracts-0.8/common/IsL2Check.sol";
-
 /**
  * @title Contract for storing blockchain parameters that can be set by governance.
  */
-contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles, IsL2Check {
+contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   using SafeMath for uint256;
 
   // obsolete
@@ -30,9 +28,9 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles, IsL2C
   }
 
   ClientVersion private minimumClientVersion; // obsolete
-  uint256 public blockGasLimit;
-  uint256 public intrinsicGasForAlternativeFeeCurrency;
-  LookbackWindow public uptimeLookbackWindow;
+  uint256 private deprecated_blockGasLimit;
+  uint256 private deprecated_intrinsicGasForAlternativeFeeCurrency;
+  LookbackWindow private uptimeLookbackWindow;
 
   event IntrinsicGasForAlternativeFeeCurrencySet(uint256 gas);
   event BlockGasLimitSet(uint256 limit);
@@ -77,7 +75,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles, IsL2C
    * @param gasLimit New block gas limit.
    */
   function setBlockGasLimit(uint256 gasLimit) public onlyOwner onlyL1 {
-    blockGasLimit = gasLimit;
+    deprecated_blockGasLimit = gasLimit;
     emit BlockGasLimitSet(gasLimit);
   }
 
@@ -86,7 +84,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles, IsL2C
    * @param gas Intrinsic gas for non-gold gas currencies.
    */
   function setIntrinsicGasForAlternativeFeeCurrency(uint256 gas) public onlyOwner onlyL1 {
-    intrinsicGasForAlternativeFeeCurrency = gas;
+    deprecated_intrinsicGasForAlternativeFeeCurrency = gas;
     emit IntrinsicGasForAlternativeFeeCurrencySet(gas);
   }
 
@@ -116,6 +114,26 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles, IsL2C
   function getUptimeLookbackWindow() public view returns (uint256 lookbackWindow) {
     lookbackWindow = _getUptimeLookbackWindow();
     require(lookbackWindow != 0, "UptimeLookbackWindow is not initialized");
+  }
+
+  /**
+   * @notice Gets the Celo L1 block gas limit.
+   * @return The block gas limit.
+   * @dev Once Celo becomes an L2, query Optimism's L1 SystemConfig contract
+   * instead.
+   */
+  function blockGasLimit() public view onlyL1 returns (uint256) {
+    return deprecated_blockGasLimit;
+  }
+
+  /**
+   * @notice Gets the intrinsic gas paid for transactions using alternative fee
+   * currencies.
+   * @return The intrinsic gas for alternative fee currencies.
+   * @dev Once Celo becomes an L2, query the FeeCurrencyDirectory instead.
+   */
+  function intrinsicGasForAlternativeFeeCurrency() public view onlyL1 returns (uint256) {
+    return deprecated_intrinsicGasForAlternativeFeeCurrency;
   }
 
   /**
