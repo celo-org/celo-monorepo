@@ -10,10 +10,10 @@ arguments to newly deployed contracts.
 
 ## `versionReports/`
 
-This subdirectory contains the version reports output by the `utils:check:versions`
+This subdirectory contains the version reports output by the `release:check-versions`
 script between each successive major release. They are used by the
 `protocol-test-release-snapshots` CI job as a regression snapshot test for the
-`utils:check:versions` script, so the `oldArtifactsFolder` and `newArtifactsFolder`
+`release:check-versions` script, so the `oldArtifactsFolder` and `newArtifactsFolder`
 should be set to paths that CircleCI jobs use (`/home/circleci/app/...`, see one
 of the files for an example).
 
