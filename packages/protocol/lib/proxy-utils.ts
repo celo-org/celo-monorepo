@@ -1,9 +1,9 @@
-import { Address, bufferToHex, hexToBuffer } from '@celo/base/lib/address'
-import { SecureTrie } from 'merkle-patricia-tree'
-import { encode as rlpEncode } from 'rlp'
-import { ProxyInstance } from 'types'
-import Web3 from 'web3'
-import { retryTx } from './web3-utils'
+import { Address, bufferToHex, hexToBuffer } from '@celo/base/lib/address';
+import { SecureTrie } from 'merkle-patricia-tree';
+import { encode as rlpEncode } from 'rlp';
+import { ProxyInstance } from 'types';
+import Web3 from 'web3';
+import { retryTx } from './web3-utils';
 
 // from Proxy.sol
 
@@ -43,7 +43,6 @@ export async function setAndInitializeImplementation(
   ...args: any[]
 ) {
   try {
-
 
     const callData = web3.eth.abi.encodeFunctionCall(initializerAbi, args)
     if (txOptions.from != null) {

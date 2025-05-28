@@ -252,7 +252,7 @@ contract EpochManager is
       "Elected accounts and signers of different lengths."
     );
     for (uint i = 0; i < electedAccounts.length; i++) {
-      address group = validators.getValidatorsGroup(electedAccounts[i]);
+      address group = validators.getMembershipInLastEpoch(electedAccounts[i]);
       if (processedGroups[group] == 0) {
         toProcessGroups++;
         uint256 groupScore = scoreReader.getGroupScore(group);
@@ -339,7 +339,7 @@ contract EpochManager is
       "Elected accounts and signers of different lengths."
     );
     for (uint i = 0; i < electedAccounts.length; i++) {
-      address group = validators.getValidatorsGroup(electedAccounts[i]);
+      address group = validators.getMembershipInLastEpoch(electedAccounts[i]);
       if (processedGroups[group] == 0) {
         _toProcessGroups++;
         uint256 groupScore = scoreReader.getGroupScore(group);
@@ -590,7 +590,7 @@ contract EpochManager is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
+    return (1, 1, 0, 1);
   }
 
   /**

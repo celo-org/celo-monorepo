@@ -19,6 +19,7 @@ export MIGRATION_L2_TARGET_CONTRACT="MigrationL2" #  The name of the contract yo
 export BROADCAST="--broadcast" # Broadcasts the transactions. Enable: "--broadcast" / Disable: ""
 export SKIP_SIMULATION="" # Skips on-chain simulation. Enable: "--skip-simulation" / Disable: ""
 export NON_INTERACTIVE="--non-interactive" # Remove interactive prompts which appear if the contract is near the EIP-170 size limit.
+export TIMEOUT=30000 # set a timeout for the avil node
 export VERBOSITY_LEVEL="-vvv" # Pass multiple times to increase the verbosity (e.g. -v, -vv, -vvv).
 export REGISTRY_OWNER_ADDRESS=$FROM_ACCOUNT_NO_ZERO
 
@@ -42,6 +43,7 @@ export REGISTRY_STORAGE_LOCATION="0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee
 GOLD_TOKEN_CELO_SUPPLY_CAP=1000000000 # `GoldToken.CELO_SUPPLY_CAP()`
 GOLD_TOKEN_TOTAL_SUPPLY=700000000 # Arbitrary amount chosen to be approximately equal to `GoldToken.totalSupply()` on the L1 Mainnet (695,313,643 CELO as of this commit).
 export CELO_UNRELEASED_TREASURY_INITIAL_BALANCE="$(($GOLD_TOKEN_CELO_SUPPLY_CAP - $GOLD_TOKEN_TOTAL_SUPPLY))" # During the real L2 genesis, the VM will calculate and set an appropriate balance.
+export RESERVE_INITIAL_BALANCE="5000000" # setting this here because it gets overwritten in the L2 migration script
 
 # Contract libraries
 export LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"

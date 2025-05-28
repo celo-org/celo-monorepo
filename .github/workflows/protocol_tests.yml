@@ -57,7 +57,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: 'nightly-fa0e0c2ca3ae75895dd19173a02faf88509c0608' # TODO: revert back to env var
+          version: 'v1.0.0' # TODO: revert back to env var
 
       - name: Install forge dependencies
         run: forge install
@@ -132,7 +132,7 @@ jobs:
 
       - name: Generate migrations and run devchain
         if: success() || failure()
-        run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
+        run: ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
       
       - name: Run migration tests against local anvil devchain
         run: |
