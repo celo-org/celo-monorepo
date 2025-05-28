@@ -35,6 +35,24 @@ function build_tag() {
   git restore --source $CURRENT_HASH --staged --worktree contracts* 2>>$LOG_FILE >> $LOG_FILE
 }
 
+function checkout_build_sources() {
+  local BUILD_SOURCES="contracts contracts-0.8 test-sol foundry.toml remappings.txt"
+  local FROM=$1
+  local LOG_FILE=$2
+  # The third argument is optional. We temporarily allow unset variables.
+  set +u
+  local STAGE=$3
+  set -u
+  local FLAGS=
+
+  if [[ $STAGE == "-s" ]]; then
+    FLAGS="--staged --worktree"
+  fi
+
+  rm -rf $BUILD_SOURCES
+  git restore --source $FROM $FLAGS $BUILD_SOURCES 2>>$LOG_FILE >> $LOG_FILE
+}
+
 # USAGE: build_tag_foundry <branch> <log file>
 # This function:
 # 1. checks out the given branch
@@ -53,11 +71,8 @@ function build_tag_foundry() {
   git fetch origin +'refs/tags/core-contracts.v*:refs/tags/core-contracts.v*' >> $LOG_FILE
   echo " - Checkout contracts source code at $BRANCH"
   BUILD_DIR=$(echo out-$(echo $BRANCH | sed -e 's/\//_/g'))
-  [ -d contracts ] && rm -r contracts
-  [ -d contracts-0.8 ] && rm -r contracts-0.8
-  [ -d test-sol ] && rm -r test-sol
 
-  git restore --source $BRANCH contracts* test-sol 2>>$LOG_FILE >> $LOG_FILE
+  checkout_build_sources $BRANCH $LOG_FILE
 
   if [ ! -d $BUILD_DIR ]; then
     echo " - Build contract artifacts at $BUILD_DIR"
@@ -66,8 +81,5 @@ function build_tag_foundry() {
     echo " - Contract artifacts already built at $BUILD_DIR"
   fi
 
-  [ -d contracts ] && rm -r contracts
-  [ -d contracts-0.8 ] && rm -r contracts-0.8
-  [ -d test-sol ] && rm -r test-sol
-  git restore --source $CURRENT_HASH --staged --worktree contracts* test-sol 2>>$LOG_FILE >> $LOG_FILE
+  checkout_build_sources $CURRENT_HASH $LOG_FILE -s
 }
