@@ -1,0 +1,6 @@
+services:
+  celo:
+    build: .
+    command: ["sleep infinity"]
+    volumes:
+      - .:/app
