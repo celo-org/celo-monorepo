@@ -3,6 +3,6 @@ set -euo pipefail
 
 anvil \
   --port 8545 \
-  --fork-url https://reth-0.cel2.celo-networks-dev.org?apikey= \
+  --fork-url https://eth-holesky.g.alchemy.com/v2/ \
   --fork-chain-id 17000 \
-  --fork-block-number 3881641
+  --fork-block-number 3904335

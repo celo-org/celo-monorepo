@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+[ -z "$NETWORK" ] && echo "Need to set the NETWORK via env" && exit 1;
 [ -z "$OP_ROOT" ] && echo "Need to set the OP_ROOT via env" && exit 1;
 [ -z "$MULTISIG_ADDRESS" ] && echo "Need to set the MULTISIG_ADDRESS via env" && exit 1;
 [ -z "$DEPLOYER_PK" ] && echo "Need to set the DEPLOYER_PK via env" && exit 1;
@@ -22,6 +23,8 @@ set -euo pipefail
 #    --protocol-versions-proxy value              Protocol versions proxy. [$DEPLOYER_PROTOCOL_VERSIONS_PROXY]
 #    --upgrade-controller value                   Upgrade controller. [$DEPLOYER_UPGRADE_CONTROLLER]
 #    --use-interop                                If true, deploy Interop implementations. (default: false) [$DEPLOYER_USE_INTEROP]
+if [ "${NETWORK}" == "alfajores" ]; then
+echo "Boostrapping implementations for Alfajores!"
 op-deployer bootstrap implementations \
   --l1-rpc-url="http://127.0.0.1:8545" \
   --l1-contracts-release="op-contracts/v2.0.0" \
@@ -30,3 +33,16 @@ op-deployer bootstrap implementations \
   --protocol-versions-proxy="0x5E5FEA4D2A8f632Af05D1E725D7ca865327A080b" \
   --upgrade-controller=$MULTISIG_ADDRESS \
   --private-key=$DEPLOYER_PK
+elif [ "${NETWORK}" == "baklava" ]; then
+echo "Boostrapping implementations for Baklava!"
+op-deployer bootstrap implementations \
+  --l1-rpc-url="http://127.0.0.1:8545" \
+  --l1-contracts-release="op-contracts/v2.0.0" \
+  --artifacts-locator="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts" \
+  --superchain-config-proxy="0xf07502A4a950d870c43b12660fB1Dd18c170D344" \
+  --protocol-versions-proxy="0x3d438C63e0431DA844d3F60E6c712d10FC75c529" \
+  --upgrade-controller=$MULTISIG_ADDRESS \
+  --private-key=$DEPLOYER_PK
+else
+  echo "Unsupported network! Choose from 'alfajores' or 'baklava'"
+fi
