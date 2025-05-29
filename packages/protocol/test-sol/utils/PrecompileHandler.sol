@@ -4,8 +4,8 @@ pragma solidity >=0.5.13 <0.8.20;
 // Note: This is contract is a copy of `PrecompileHandler` in celo-foundry, but uses `UsingPrecompile` instead of `Precompiles`.
 // This contract is to be removed/deprecated once the transition to L2 is live on mainnet.
 
-import "@lib/celo-foundry-8/lib/forge-std/src/Vm.sol";
-import "@lib/celo-foundry-8/lib/forge-std/src/console2.sol";
+import "forge-std-8/Vm.sol";
+import "forge-std-8/console2.sol";
 import "@celo-contracts-8/common/UsingPrecompiles.sol";
 
 contract PrecompileHandler is UsingPrecompiles {

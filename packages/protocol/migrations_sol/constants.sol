@@ -7,7 +7,8 @@ contract MigrationsConstants is TestConstants {
   address constant DEPLOYER_ACCOUNT = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
   // List of contracts that are expected to be in Registry.sol
-  string[27] contractsInRegistry = [
+  // TODO: Probably should be synced with Migration.s.sol
+  string[26] contractsInRegistry = [
     "Accounts",
     "BlockchainParameters",
     "CeloUnreleasedTreasury",
@@ -20,20 +21,19 @@ contract MigrationsConstants is TestConstants {
     "EpochManager",
     "Escrow",
     "FederatedAttestations",
-    "FeeCurrencyWhitelist",
     "FeeCurrencyDirectory",
-    "Freezer",
     "FeeHandler",
+    "Freezer",
     "Governance",
     "GovernanceSlasher",
     "LockedGold",
     "OdisPayments",
     "Random",
-    "Registry",
+    "Registry", // FIXME: Should Registry be inside Registry?
+    "ScoreManager",
     "SortedOracles",
-    "UniswapFeeHandlerSeller",
-    "MentoFeeHandlerSeller",
     "Validators",
-    "ScoreManager"
+    "MentoFeeHandlerSeller",
+    "UniswapFeeHandlerSeller"
   ];
 }
