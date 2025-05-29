@@ -64,6 +64,10 @@ function build_tag_foundry() {
   local BRANCH="$1"
   local LOG_FILE="$2"
 
+  # Assuming a `core-contracts.vNN` tag, using 'v' as the delimeter, the second field will be just
+  # the release number.
+  local RELEASE_NUMBER=`echo $BRANCH | cut -dv -f2`
+
   echo "Writing logs to $LOG_FILE"
 
   local CURRENT_HASH=`git log -n 1 --oneline | cut -c 1-9`
@@ -75,6 +79,12 @@ function build_tag_foundry() {
   checkout_build_sources $BRANCH $LOG_FILE
 
   if [ ! -d $BUILD_DIR ]; then
+    if [[ $RELEASE_NUMBER -le 12 ]]; then
+        foundryup --install nightly-f625d0fa7c51e65b4bf1e8f7931cd1c6e2e285e9
+    else
+        foundryup --instal 1.0.0
+    fi
+
     echo " - Build contract artifacts at $BUILD_DIR"
     forge build --out $BUILD_DIR --ast >> $LOG_FILE
   else
