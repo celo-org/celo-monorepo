@@ -15,7 +15,7 @@ and other packages. The source code for the Celo Blockchain which operates a nod
 [![GitHub contributors](https://img.shields.io/github/contributors/celo-org/celo-monorepo)](https://github.com/celo-org/celo-monorepo/graphs/contributors)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/w/celo-org/celo-monorepo)](https://github.com/celo-org/celo-monorepo/commits/master)
 [![GitHub Stars](https://img.shields.io/github/stars/celo-org/celo-monorepo.svg)](https://github.com/celo-org/celo-monorepo/stargazers)
-![GitHub repo size](https://img.shields.io/github/repo-size/celo-org/celo-monorepo)
+[![GitHub repo size](https://img.shields.io/github/repo-size/celo-org/celo-monorepo)](https://bundlephobia.com/package/celo@1.1.5)
 [![GitHub](https://img.shields.io/github/license/celo-org/celo-monorepo?color=blue)](https://github.com/celo-org/celo-monorepo/blob/master/LICENSE)
 
 <!-- row 2 - links & profiles -->
