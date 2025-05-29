@@ -1,4 +1,4 @@
-import { Contract as ZContract } from '@openzeppelin/upgrades'
+import { BuildArtifacts, Contract as ZContract } from '@openzeppelin/upgrades'
 const Web3 = require('web3')
 const web3 = new Web3(null)
 
@@ -21,6 +21,12 @@ export const getContractName = (artifact: any): string => {
   } else {
     return getContractNameFromDefinition(artifact)
   }
+}
+
+export const getArtifactByName = (contractName: string, artifacts: BuildArtifacts): Artifact => {
+  return artifacts.listArtifacts().find(artifact =>
+    getContractName(artifact) === contractName
+  )
 }
 
 // getStorageLayout needs an oz-sdk Contract class instance. This class is a

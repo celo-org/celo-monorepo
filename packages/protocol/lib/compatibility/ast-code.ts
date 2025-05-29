@@ -5,7 +5,7 @@ import {
   MethodMutabilityChange, MethodRemovedChange, MethodReturnChange,
   MethodVisibilityChange, NewContractChange
 } from '@celo/protocol/lib/compatibility/change'
-import { makeZContract, Artifact, getContractName } from '@celo/protocol/lib/compatibility/internal'
+import { makeZContract, getContractName, getArtifactByName } from '@celo/protocol/lib/compatibility/internal'
 import {
   BuildArtifacts,
   Contract as ZContract
@@ -241,12 +241,6 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
     report.push(new DeployedBytecodeChange(contractName))
   }
   return report
-}
-
-const getArtifactByName = (contractName: string, artifacts: BuildArtifacts): Artifact => {
-  return artifacts.listArtifacts().find(artifact =>
-    getContractName(artifact) === contractName
-  )
 }
 
 /**
