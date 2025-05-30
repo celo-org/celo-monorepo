@@ -1,9 +1,33 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+[ -z "$VERSION" ] && echo "Need to set the VERSION via env" && exit 1;
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via env" && exit 1;
 [ -z "$OP_ROOT" ] && echo "Need to set the OP_ROOT via env" && exit 1;
 [ -z "$DEPLOYER_PK" ] && echo "Need to set the DEPLOYER_PK via env" && exit 1;
+
+case $VERSION in
+  "v2.0.0")
+    echo "Detected supported version: $VERSION"
+    TAG="v2"
+    ;;
+  "v3.0.0")
+    echo "Detected supported version: $VERSION"
+    TAG="v3"
+    ;;
+  *)
+    echo "Invalid version: $VERSION" && exit 1
+    ;;
+esac
+
+case $NETWORK in
+  "alfajores","baklava")
+    echo "Detected supported network: $NETWORK"
+    ;;
+  *)
+    echo "Unsupported network! Choose from 'alfajores' or 'baklava'" && exit 1
+    ;;
+esac
 
 # USAGE: op-deployer bootstrap validator [command options]
 # OPTIONS:
@@ -13,20 +37,9 @@ set -euo pipefail
 #    --artifacts-locator value  Locator for artifacts. [$DEPLOYER_ARTIFACTS_LOCATOR]
 #    --config value             Path to a JSON file [$DEPLOYER_CONFIG]
 #    --use-interop              If true, deploy Interop implementations. (default: false) [$DEPLOYER_USE_INTEROP]
-if [ "${NETWORK}" == "alfajores" ]; then
-echo "Boostrapping validator for Alfajores!"
+echo "Boostrapping validator for $NETWORK!"
 op-deployer bootstrap validator \
   --l1-rpc-url="http://127.0.0.1:8545" \
   --artifacts-locator="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts" \
-  --config="./scripts/foundry/upgrade/config-validator-alfajores.json" \
+  --config="./scripts/foundry/upgrade/config-validator-$NETWORK-$TAG.json" \
   --private-key=$DEPLOYER_PK
-elif [ "${NETWORK}" == "baklava" ]; then
-echo "Boostrapping validator for Baklava!"
-op-deployer bootstrap validator \
-  --l1-rpc-url="http://127.0.0.1:8545" \
-  --artifacts-locator="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts" \
-  --config="./scripts/foundry/upgrade/config-validator-baklava.json" \
-  --private-key=$DEPLOYER_PK
-else
-  echo "Unsupported network! Choose from 'alfajores' or 'baklava'"
-fi

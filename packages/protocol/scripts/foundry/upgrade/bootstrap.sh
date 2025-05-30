@@ -1,10 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+[ -z "$VERSION" ] && echo "Need to set the VERSION via env" && exit 1;
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via env" && exit 1;
 [ -z "$OP_ROOT" ] && echo "Need to set the OP_ROOT via env" && exit 1;
 [ -z "$MULTISIG_ADDRESS" ] && echo "Need to set the MULTISIG_ADDRESS via env" && exit 1;
 [ -z "$DEPLOYER_PK" ] && echo "Need to set the DEPLOYER_PK via env" && exit 1;
+
+case $VERSION in
+  "v2.0.0"|"v3.0.0")
+    echo "Detected supported version: $VERSION"
+    ;;
+  *)
+    echo "Invalid version: $VERSION" && exit 1
+    ;;
+esac
 
 # USAGE: op-deployer bootstrap implementations [command options]
 # OPTIONS:
@@ -27,7 +37,7 @@ if [ "${NETWORK}" == "alfajores" ]; then
 echo "Boostrapping implementations for Alfajores!"
 op-deployer bootstrap implementations \
   --l1-rpc-url="http://127.0.0.1:8545" \
-  --l1-contracts-release="op-contracts/v2.0.0" \
+  --l1-contracts-release="celo-contracts/$VERSION" \
   --artifacts-locator="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts" \
   --superchain-config-proxy="0xdf4Fb5371B706936527B877F616eAC0e47c9b785" \
   --protocol-versions-proxy="0x5E5FEA4D2A8f632Af05D1E725D7ca865327A080b" \
@@ -37,7 +47,7 @@ elif [ "${NETWORK}" == "baklava" ]; then
 echo "Boostrapping implementations for Baklava!"
 op-deployer bootstrap implementations \
   --l1-rpc-url="http://127.0.0.1:8545" \
-  --l1-contracts-release="op-contracts/v2.0.0" \
+  --l1-contracts-release="celo-contracts/$VERSION" \
   --artifacts-locator="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts" \
   --superchain-config-proxy="0xf07502A4a950d870c43b12660fB1Dd18c170D344" \
   --protocol-versions-proxy="0x3d438C63e0431DA844d3F60E6c712d10FC75c529" \
