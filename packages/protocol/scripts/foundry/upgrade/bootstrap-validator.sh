@@ -21,7 +21,7 @@ case $VERSION in
 esac
 
 case $NETWORK in
-  "alfajores","baklava")
+  "alfajores"|"baklava")
     echo "Detected supported network: $NETWORK"
     ;;
   *)
