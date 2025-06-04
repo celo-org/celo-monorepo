@@ -5,7 +5,9 @@ pragma solidity >=0.8.0 <0.8.20;
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
-contract UsingPrecompiles {
+import "../../contracts-0.8/common/IsL2Check.sol";
+
+contract UsingPrecompiles is IsL2Check {
   using SafeMath for uint256;
 
   address constant TRANSFER = address(0xff - 2);
