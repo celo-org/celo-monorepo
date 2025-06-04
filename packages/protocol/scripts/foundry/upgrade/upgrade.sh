@@ -5,6 +5,8 @@ set -euo pipefail
 [ -z "$OP_ROOT" ] && echo "Need to set the OP_ROOT via env" && exit 1;
 [ -z "$DEPLOYER_PK" ] && echo "Need to set the DEPLOYER_PK via env" && exit 1;
 
+OP_DEPLOYER_CMD="$OP_ROOT/op-deployer/bin/op-deployer"
+
 VERSION=v2.0.0
 
 # USAGE: op-deployer upgrade <version> [command options]
@@ -18,20 +20,14 @@ VERSION=v2.0.0
 #    --log.format value              Format the log output. Supported formats: 'text', 'terminal', 'logfmt', 'json', 'json-pretty', (default: text) [$DEPLOYER_LOG_FORMAT]
 #    --log.color                     Color the log output if in terminal mode (default: false) [$DEPLOYER_LOG_COLOR]
 #    --log.pid                       Show pid in the log (default: false) [$DEPLOYER_LOG_PID]
-if [ "${NETWORK}" == "alfajores" ]; then
-echo "Performing upgrade to $VERSION for Alfajores!"
-op-deployer upgrade $VERSION \
-  --l1-rpc-url="http://127.0.0.1:8545" \
-  --config="./scripts/foundry/upgrade/config-upgrade-alfajores.json" \
-  --override-artifacts-url="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts" \
+
+L1_RPC_URL=http://localhost:8545
+ARTIFACTS_LOCATOR="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts"
+CONFIG=./scripts/foundry/upgrade/config-upgrade.json
+
+echo "Performing upgrade to $VERSION for $NETWORK!"
+$OP_DEPLOYER_CMD upgrade $VERSION \
+  --l1-rpc-url="$L1_RPC_URL" \
+  --config="$CONFIG" \
+  --override-artifacts-url="$ARTIFACTS_LOCATOR" \
   --private-key=$DEPLOYER_PK
-elif [ "${NETWORK}" == "baklava" ]; then
-echo "Performing upgrade to $VERSION for Baklava!"
-op-deployer upgrade $VERSION \
-  --l1-rpc-url="http://127.0.0.1:8545" \
-  --config="./scripts/foundry/upgrade/config-upgrade-baklava.json" \
-  --override-artifacts-url="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts" \
-  --private-key=$DEPLOYER_PK
-else
-  echo "Unsupported network! Choose from 'alfajores' or 'baklava'"
-fi
