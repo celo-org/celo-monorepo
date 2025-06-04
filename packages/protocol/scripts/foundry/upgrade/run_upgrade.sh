@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 
 # Orchestrates the upgrade scripts to perform Optimism Upgrade 13, updating L1 contracts to 2.0.0.
 
@@ -7,8 +7,12 @@ set -euo pipefail
 [ -z "$OP_ROOT" ] && echo "Need to set the OP_ROOT via env" && exit 1;
 
 export VERSION=v2.0.0
-# Safe to share: private key of first default Anvil account
-export DEPLOYER_PK=ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+
+if [[ -z "$DEPLOYER_PK" ]]; then
+    echo "Using deafult Anvil deployer"
+    # Safe to share: private key of first default Anvil account
+    export DEPLOYER_PK=ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+fi
 
 if [ "${NETWORK}" == "alfajores" ]; then
     export MULTISIG_ADDRESS=0xf05f102e890E713DC9dc0a5e13A8879D5296ee48
