@@ -6,6 +6,8 @@ set -euo pipefail
 [ -z "$MULTISIG_ADDRESS" ] && echo "Need to set the MULTISIG_ADDRESS via env" && exit 1;
 [ -z "$DEPLOYER_PK" ] && echo "Need to set the DEPLOYER_PK via env" && exit 1;
 
+OP_DEPLOYER_CMD="$OP_ROOT/op-deployer/bin/op-deployer"
+
 # USAGE: op-deployer bootstrap implementations [command options]
 # OPTIONS:
 #    --l1-rpc-url value                           RPC URL for the L1 chain. Must be set for live chains. Can be blank for chains deploying to local allocs files. [$L1_RPC_URL]
@@ -25,7 +27,7 @@ set -euo pipefail
 #    --use-interop                                If true, deploy Interop implementations. (default: false) [$DEPLOYER_USE_INTEROP]
 if [ "${NETWORK}" == "alfajores" ]; then
 echo "Boostrapping implementations for Alfajores!"
-op-deployer bootstrap implementations \
+$OP_DEPLOYER_CMD bootstrap implementations \
   --l1-rpc-url="http://127.0.0.1:8545" \
   --l1-contracts-release="celo-contracts/v2.0.0" \
   --artifacts-locator="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts" \
@@ -36,7 +38,7 @@ op-deployer bootstrap implementations \
   --private-key=$DEPLOYER_PK
 elif [ "${NETWORK}" == "baklava" ]; then
 echo "Boostrapping implementations for Baklava!"
-op-deployer bootstrap implementations \
+$OP_DEPLOYER_CMD bootstrap implementations \
   --l1-rpc-url="http://127.0.0.1:8545" \
   --l1-contracts-release="celo-contracts/v2.0.0" \
   --artifacts-locator="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts" \

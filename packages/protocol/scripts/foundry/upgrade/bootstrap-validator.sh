@@ -5,6 +5,8 @@ set -euo pipefail
 [ -z "$OP_ROOT" ] && echo "Need to set the OP_ROOT via env" && exit 1;
 [ -z "$DEPLOYER_PK" ] && echo "Need to set the DEPLOYER_PK via env" && exit 1;
 
+OP_DEPLOYER_CMD="$OP_ROOT/op-deployer/bin/op-deployer"
+
 # USAGE: op-deployer bootstrap validator [command options]
 # OPTIONS:
 #    --l1-rpc-url value         RPC URL for the L1 chain. Must be set for live chains. Can be blank for chains deploying to local allocs files. [$L1_RPC_URL]
@@ -15,14 +17,14 @@ set -euo pipefail
 #    --use-interop              If true, deploy Interop implementations. (default: false) [$DEPLOYER_USE_INTEROP]
 if [ "${NETWORK}" == "alfajores" ]; then
 echo "Boostrapping validator for Alfajores!"
-op-deployer bootstrap validator \
+$OP_DEPLOYER_CMD bootstrap validator \
   --l1-rpc-url="http://127.0.0.1:8545" \
   --artifacts-locator="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts" \
   --config="./scripts/foundry/upgrade/config-validator-alfajores.json" \
   --private-key=$DEPLOYER_PK
 elif [ "${NETWORK}" == "baklava" ]; then
 echo "Boostrapping validator for Baklava!"
-op-deployer bootstrap validator \
+$OP_DEPLOYER_CMD bootstrap validator \
   --l1-rpc-url="http://127.0.0.1:8545" \
   --artifacts-locator="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts" \
   --config="./scripts/foundry/upgrade/config-validator-baklava.json" \
