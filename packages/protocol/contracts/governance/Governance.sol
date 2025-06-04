@@ -193,8 +193,6 @@ contract Governance is
 
   event ParticipationBaselineQuorumFactorSet(uint256 baselineQuorumFactor);
 
-  event HotfixWhitelisted(bytes32 indexed hash, address whitelister);
-
   event HotfixApproved(bytes32 indexed hash, address approver);
 
   event HotfixPrepared(bytes32 indexed hash, uint256 indexed executionLimit);
