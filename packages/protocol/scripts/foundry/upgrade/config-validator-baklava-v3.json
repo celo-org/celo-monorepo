@@ -8,7 +8,7 @@
   "l1ERC721BridgeImpl": "0x7ae1d3bd877a4c5ca257404ce26be93a02c98013",
   "l1PAOMultisig": "0xd542f3328ff2516443FE4db1c89E427F67169D94",
   "l1StandardBridgeImpl": "0x28841965b26d41304905a836da5c0921da7dbb84",
-  "mips": "0x8F5a62ceb69c0D0674937DA29023b49BA279F164",
+  "mips": "0xaa59a0777648bc75cd10364083e878c1ccd6112a",
   "mipsImpl": "0xaa59a0777648bc75cd10364083e878c1ccd6112a",
   "optimismMintableERC20FactoryImpl": "0x6a52641d87a600ba103ccdfbe3eb02ac7e73c04a",
   "optimismPortalImpl": "0xb420dd1fb404fce3951568583578de77fec4d838",
