@@ -354,6 +354,7 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
 }
 
 contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
+  // transition has already happened, shall I remove this test?
   function test_revoke_celo_after_l2_transition() public {
     uint256 lockedGoldValue = 1e18;
     uint256 active = 12;
@@ -460,6 +461,7 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
     return _ecdsaPubKey;
   }
 
+  // transition has already happened, shall I remove this test?
   function test_releaseGoldOwnerHasValidator_CanRemoveCelo_WhenTransitionedToL2() public {
     _registerValidatorGroupWithMembers(group, 1);
 
