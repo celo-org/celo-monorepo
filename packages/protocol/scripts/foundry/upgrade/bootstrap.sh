@@ -39,6 +39,7 @@ op-deployer bootstrap implementations \
   --l1-rpc-url="http://127.0.0.1:8545" \
   --l1-contracts-release="celo-contracts/$VERSION" \
   --artifacts-locator="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts" \
+  --withdrawal-delay-seconds=604800 \
   --superchain-config-proxy="0xdf4Fb5371B706936527B877F616eAC0e47c9b785" \
   --protocol-versions-proxy="0x5E5FEA4D2A8f632Af05D1E725D7ca865327A080b" \
   --upgrade-controller=$MULTISIG_ADDRESS \
@@ -49,6 +50,7 @@ op-deployer bootstrap implementations \
   --l1-rpc-url="http://127.0.0.1:8545" \
   --l1-contracts-release="celo-contracts/$VERSION" \
   --artifacts-locator="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts" \
+  --withdrawal-delay-seconds=604800 \
   --superchain-config-proxy="0xf07502A4a950d870c43b12660fB1Dd18c170D344" \
   --protocol-versions-proxy="0x3d438C63e0431DA844d3F60E6c712d10FC75c529" \
   --upgrade-controller=$MULTISIG_ADDRESS \
