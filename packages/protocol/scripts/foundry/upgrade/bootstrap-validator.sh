@@ -15,20 +15,13 @@ OP_DEPLOYER_CMD="$OP_ROOT/op-deployer/bin/op-deployer"
 #    --artifacts-locator value  Locator for artifacts. [$DEPLOYER_ARTIFACTS_LOCATOR]
 #    --config value             Path to a JSON file [$DEPLOYER_CONFIG]
 #    --use-interop              If true, deploy Interop implementations. (default: false) [$DEPLOYER_USE_INTEROP]
-if [ "${NETWORK}" == "alfajores" ]; then
-echo "Boostrapping validator for Alfajores!"
+
+L1_RPC_URL=http://localhost:8545
+ARTIFACTS_LOCATOR="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts"
+CONFIG=./scripts/foundry/upgrade/config-validator.json
+
 $OP_DEPLOYER_CMD bootstrap validator \
-  --l1-rpc-url="http://127.0.0.1:8545" \
-  --artifacts-locator="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts" \
-  --config="./scripts/foundry/upgrade/config-validator-alfajores.json" \
+  --l1-rpc-url="$L1_RPC_URL" \
+  --artifacts-locator="$ARTIFACTS_LOCATOR" \
+  --config="$CONFIG" \
   --private-key=$DEPLOYER_PK
-elif [ "${NETWORK}" == "baklava" ]; then
-echo "Boostrapping validator for Baklava!"
-$OP_DEPLOYER_CMD bootstrap validator \
-  --l1-rpc-url="http://127.0.0.1:8545" \
-  --artifacts-locator="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts" \
-  --config="./scripts/foundry/upgrade/config-validator-baklava.json" \
-  --private-key=$DEPLOYER_PK
-else
-  echo "Unsupported network! Choose from 'alfajores' or 'baklava'"
-fi
