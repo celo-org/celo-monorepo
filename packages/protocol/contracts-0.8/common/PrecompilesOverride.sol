@@ -19,11 +19,7 @@ contract PrecompilesOverride is UsingPrecompiles, UsingRegistry {
    * @return Epoch number.
    */
   function getEpochNumberOfBlock(uint256 blockNumber) public view override returns (uint256) {
-    if (isL2()) {
-      return getEpochManager().getEpochNumberOfBlock(blockNumber);
-    } else {
-      return epochNumberOfBlock(blockNumber, getEpochSize());
-    }
+    return getEpochManager().getEpochNumberOfBlock(blockNumber);
   }
 
   /**
@@ -42,11 +38,7 @@ contract PrecompilesOverride is UsingPrecompiles, UsingRegistry {
   function validatorSignerAddressFromCurrentSet(
     uint256 index
   ) public view override returns (address) {
-    if (isL2()) {
-      return getEpochManager().getElectedSignerByIndex(index);
-    } else {
-      return super.validatorSignerAddressFromCurrentSet(index);
-    }
+    return getEpochManager().getElectedSignerByIndex(index);
   }
 
   /**
