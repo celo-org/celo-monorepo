@@ -104,9 +104,14 @@ SUPERCHAIN_CONFIG_IMPL=`jq --raw-output '.SuperchainConfigImpl' $BOOTSTRAP_JSON`
 SYSTEM_CONFIG_IMPL=`jq --raw-output '.SystemConfigImpl' $BOOTSTRAP_JSON`
 
 # Workaround until we fix deterministic addresses
-if [ "${VERSION}" == "v3.0.0" && -f "scripts/foundry/upgrade/config-validator.json" ]; then
+if [ "${VERSION}" = "v3.0.0" ] && [ -f "scripts/foundry/upgrade/config-validator.json" ]; then
+  echo "Using workaround for v3 config validator!"
   DELAYED_WETH_IMPL=`cat scripts/foundry/upgrade/config-validator.json | jq .delayedWETHImpl`
+  DELAYED_WETH_IMPL="${DELAYED_WETH_IMPL#\"}" # Remove leading "
+  DELAYED_WETH_IMPL="${DELAYED_WETH_IMPL%\"}" # Remove trailing "
   OPTIMISM_MINTABLE_ERC20_FACTORY_IMPL=`cat scripts/foundry/upgrade/config-validator.json | jq .optimismMintableERC20FactoryImpl`
+  OPTIMISM_MINTABLE_ERC20_FACTORY_IMPL="${OPTIMISM_MINTABLE_ERC20_FACTORY_IMPL#\"}" # Remove leading "
+  OPTIMISM_MINTABLE_ERC20_FACTORY_IMPL="${OPTIMISM_MINTABLE_ERC20_FACTORY_IMPL%\"}" # Remove trailing "
 fi
 
 # Create validator config

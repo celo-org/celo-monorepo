@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eo pipefail
+set -euo pipefail
 
 # Orchestrates the upgrade scripts to perform desired Optimism Upgrade, updating L1 contracts to specified version.
 
