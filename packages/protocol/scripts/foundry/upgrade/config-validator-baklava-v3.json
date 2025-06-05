@@ -2,7 +2,7 @@
   "release": "v3.0.0",
   "anchorStateRegistryImpl": "0x7b465370bb7a333f99edd19599eb7fb1c2d3f8d2",
   "challenger": "0xDc94436A193a827786270dD4F6cD4b35c3f0C8f8",
-  "delayedWETHImpl": "0x5e40b9231b86984b5150507046e354dbfbed3d9e",
+  "delayedWETHImpl": "0x1e121e21e1a11ae47c0efe8a7e13ae3eb4923796",
   "disputeGameFactoryImpl": "0x4bba758f006ef09402ef31724203f316ab74e4a0",
   "l1CrossDomainMessengerImpl": "0x807124f75ff2120b2f26d7e6f9e39c03ee9de212",
   "l1ERC721BridgeImpl": "0x7ae1d3bd877a4c5ca257404ce26be93a02c98013",
@@ -10,10 +10,10 @@
   "l1StandardBridgeImpl": "0x28841965b26d41304905a836da5c0921da7dbb84",
   "mips": "0xaa59a0777648bc75cd10364083e878c1ccd6112a",
   "mipsImpl": "0xaa59a0777648bc75cd10364083e878c1ccd6112a",
-  "optimismMintableERC20FactoryImpl": "0x6a52641d87a600ba103ccdfbe3eb02ac7e73c04a",
-  "optimismPortalImpl": "0xb420dd1fb404fce3951568583578de77fec4d838",
+  "optimismMintableERC20FactoryImpl": "0x5493f4677a186f64805fe7317d6993ba4863988f",
+  "optimismPortalImpl": "0x215a5ff85308a72a772f09b520da71d3520e9ac7",
   "protocolVersionsImpl": "0x37e15e4d6dffa9e5e320ee1ec036922e563cb76c",
   "superchainConfig": "0xf07502A4a950d870c43b12660fB1Dd18c170D344",
   "superchainConfigImpl": "0x4da82a327773965b8d4d85fa3db8249b387458e7",
-  "systemConfigImpl": "0xa35a0e092ef6857f78f3afab0fcda512189e53f4"
+  "systemConfigImpl": "0x9c61c5a8ff9408b83ac92571278550097a9d2bb5"
 }

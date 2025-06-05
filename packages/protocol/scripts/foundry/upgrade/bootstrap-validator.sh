@@ -6,6 +6,8 @@ set -euo pipefail
 [ -z "$OP_ROOT" ] && echo "Need to set the OP_ROOT via env" && exit 1;
 [ -z "$DEPLOYER_PK" ] && echo "Need to set the DEPLOYER_PK via env" && exit 1;
 
+OP_DEPLOYER_CMD="$OP_ROOT/op-deployer/bin/op-deployer"
+
 case $VERSION in
   "v2.0.0")
     echo "Detected supported version: $VERSION"
@@ -38,7 +40,7 @@ esac
 #    --config value             Path to a JSON file [$DEPLOYER_CONFIG]
 #    --use-interop              If true, deploy Interop implementations. (default: false) [$DEPLOYER_USE_INTEROP]
 echo "Boostrapping validator for $NETWORK!"
-op-deployer bootstrap validator \
+$OP_DEPLOYER_CMD bootstrap validator \
   --l1-rpc-url="http://127.0.0.1:8545" \
   --artifacts-locator="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts" \
   --config="./scripts/foundry/upgrade/config-validator-$NETWORK-$TAG.json" \
