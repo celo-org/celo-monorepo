@@ -2,11 +2,11 @@
 set -euo pipefail
 
 # Require env vars
-[ -z "$VERSION" ] && echo "Need to set the VERSION via env" && exit 1;
-[ -z "$NETWORK" ] && echo "Need to set the NETWORK via env" && exit 1;
-[ -z "$OP_ROOT" ] && echo "Need to set the OP_ROOT via env" && exit 1;
-[ -z "$MULTISIG_ADDRESS" ] && echo "Need to set the MULTISIG_ADDRESS via env" && exit 1;
-[ -z "$DEPLOYER_PK" ] && echo "Need to set the DEPLOYER_PK via env" && exit 1;
+[ -z "${VERSION:-}" ] && echo "Need to set the VERSION via env" && exit 1;
+[ -z "${NETWORK:-}" ] && echo "Need to set the NETWORK via env" && exit 1;
+[ -z "${OP_ROOT:-}" ] && echo "Need to set the OP_ROOT via env" && exit 1;
+[ -z "${MULTISIG_ADDRESS:-}" ] && echo "Need to set the MULTISIG_ADDRESS via env" && exit 1;
+[ -z "${DEPLOYER_PK:-}" ] && echo "Need to set the DEPLOYER_PK via env" && exit 1;
 
 # Check version
 case $VERSION in
@@ -45,10 +45,16 @@ fi
 
 # Set vars
 OP_DEPLOYER_CMD="$OP_ROOT/op-deployer/bin/op-deployer"
-L1_RPC_URL=http://localhost:8545
 L1_CONTRACTS_RELEASE=celo-contracts/$VERSION
 ARTIFACTS_LOCATOR="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts"
 WITHDRAWAL_DELAY_SECONDS=604800
+if [[ -z "${RPC_URL:-}" ]]; then
+  L1_RPC_URL=http://localhost:8545
+  echo "Using localhost"
+else
+  L1_RPC_URL=$RPC_URL
+  echo "Using rpc: $L1_RPC_URL"
+fi
 
 ###################
 # OP-DEPLOYER CMD #
