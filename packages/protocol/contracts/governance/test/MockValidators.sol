@@ -3,7 +3,6 @@ pragma solidity ^0.5.13;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "../interfaces/IValidators.sol";
-import "../../../contracts-0.8/common/IsL2Check.sol";
 
 // Mocks Validators, compatible with 0.5
 // For forge tests, can be avoided with calls to deployCodeTo
@@ -11,7 +10,7 @@ import "../../../contracts-0.8/common/IsL2Check.sol";
 /**
  * @title Holds a list of addresses of validators
  */
-contract MockValidators is IValidators, IsL2Check {
+contract MockValidators is IValidators {
   using SafeMath for uint256;
 
   event HavelSlashingMultiplierHalved(address validator);
@@ -32,17 +31,6 @@ contract MockValidators is IValidators, IsL2Check {
   uint256 public mintedStable;
 
   function updateEcdsaPublicKey(address, address, bytes calldata) external returns (bool) {
-    return true;
-  }
-
-  function updatePublicKeys(
-    address,
-    address,
-    bytes calldata,
-    bytes calldata,
-    bytes calldata
-  ) external returns (bool) {
-    allowOnlyL1();
     return true;
   }
 
@@ -113,7 +101,6 @@ contract MockValidators is IValidators, IsL2Check {
   }
 
   function getValidatorGroupSlashingMultiplier(address) external view returns (uint256) {
-    allowOnlyL1();
     return FIXED1_UINT;
   }
 
@@ -127,10 +114,6 @@ contract MockValidators is IValidators, IsL2Check {
 
   function getAccountLockedGoldRequirement(address account) external view returns (uint256) {
     return lockedGoldRequirements[account];
-  }
-
-  function calculateGroupEpochScore(uint256[] calldata uptimes) external view returns (uint256) {
-    return uptimes[0];
   }
 
   function getGroupsNumMembers(address[] calldata groups) external view returns (uint256[] memory) {
@@ -169,9 +152,14 @@ contract MockValidators is IValidators, IsL2Check {
     revert("Method not implemented in mock");
   }
 
+  function registerValidator(bytes calldata) external returns (bool) {
+    revert("Method not implemented in mock");
+  }
+
   function registerValidatorNoBls(bytes calldata) external returns (bool) {
     revert("Method not implemented in mock");
   }
+
   function removeMember(address) external returns (bool) {
     revert("Method not implemented in mock");
   }
@@ -192,23 +180,11 @@ contract MockValidators is IValidators, IsL2Check {
     revert("Method not implemented in mock");
   }
 
-  function updateBlsPublicKey(bytes calldata, bytes calldata) external returns (bool) {
-    revert("Method not implemented in mock");
-  }
-
-  function setValidatorScoreParameters(uint256, uint256) external returns (bool) {
-    revert("Method not implemented in mock");
-  }
-
   function setValidatorLockedGoldRequirements(uint256, uint256) external returns (bool) {
     revert("Method not implemented in mock");
   }
 
   function setMaxGroupSize(uint256) external returns (bool) {
-    revert("Method not implemented in mock");
-  }
-
-  function setDowntimeGracePeriod(uint256) external {
     revert("Method not implemented in mock");
   }
 
@@ -224,10 +200,6 @@ contract MockValidators is IValidators, IsL2Check {
     revert("Method not implemented in mock");
   }
 
-  function updateValidatorScoreFromSigner(address, uint256) external {
-    revert("Method not implemented in mock");
-  }
-
   function mintStableToEpochManager(uint256 amount) external {
     mintedStable = mintedStable.add(amount);
   }
@@ -236,15 +208,7 @@ contract MockValidators is IValidators, IsL2Check {
     revert("Method not implemented in mock");
   }
 
-  function getValidatorScoreParameters() external view returns (uint256, uint256) {
-    revert("Method not implemented in mock");
-  }
-
   function getValidatorLockedGoldRequirements() external view returns (uint256, uint256) {
-    revert("Method not implemented in mock");
-  }
-
-  function getValidatorBlsPublicKeyFromSigner(address) external view returns (bytes memory) {
     revert("Method not implemented in mock");
   }
 
@@ -260,8 +224,8 @@ contract MockValidators is IValidators, IsL2Check {
     revert("Method not implemented in mock");
   }
 
-  function getMembershipInLastEpoch(address) external view returns (address) {
-    revert("Method not implemented in mock");
+  function getMembershipInLastEpoch(address validator) external view returns (address) {
+    return affiliations[validator];
   }
 
   function getMembershipHistoryLength() external view returns (uint256) {
@@ -269,10 +233,6 @@ contract MockValidators is IValidators, IsL2Check {
   }
 
   function addMember(address) external returns (bool) {
-    revert("Method not implemented in mock");
-  }
-
-  function calculateEpochScore(uint256) external view returns (uint256) {
     revert("Method not implemented in mock");
   }
 
@@ -285,14 +245,6 @@ contract MockValidators is IValidators, IsL2Check {
   }
 
   function deregisterValidatorGroup(uint256) external returns (bool) {
-    revert("Method not implemented in mock");
-  }
-
-  function distributeEpochPaymentsFromSigner(address, uint256) external onlyL1 returns (uint256) {
-    revert("Method not implemented in mock");
-  }
-
-  function downtimeGracePeriod() external view returns (uint256) {
     revert("Method not implemented in mock");
   }
 
@@ -310,14 +262,6 @@ contract MockValidators is IValidators, IsL2Check {
 
   function setEpochRewards(address account, uint256 reward) external {
     epochRewards[account] = reward;
-  }
-
-  function registerValidator(
-    bytes calldata,
-    bytes calldata,
-    bytes calldata
-  ) external returns (bool) {
-    revert("Method not implemented in mock");
   }
 
   function getMembershipHistory(

@@ -79,7 +79,7 @@ export const handler = async (argv: ContractsArgv) => {
   console.info(`Deploying smart contracts to ${argv.celoEnv}`)
   const cb = async () => {
     await execCmd(
-      `yarn --cwd ../protocol run init-network -n ${argv.celoEnv} -c '${JSON.stringify(
+      `yarn --cwd ../protocol run devchain:init-network -n ${argv.celoEnv} -c '${JSON.stringify(
         truffleOverrides()
       )}' -m '${JSON.stringify(await migrationOverrides(!argv.skipFaucetting))}'`
     )

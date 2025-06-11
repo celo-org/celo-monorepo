@@ -6,13 +6,7 @@ You can build this project by simply running
 forge build
 ```
 
-
-**Note**: Due to a regression in Foundry, you might need to use an older
-version. You can install the most recent version verified to work by running
-
-```bash
-foundryup --version nightly-f625d0fa7c51e65b4bf1e8f7931cd1c6e2e285e9
-```
+These test suites are verified to work with Foundry version 1.0.0-stable.
 
 ### Testing
 
@@ -54,11 +48,6 @@ You can read more about the `forge test` command [here](https://book.getfoundry.
 
 To skip a specific test, you can add `vm.skip(true);` as the first line of the test.
 
-If a test name begins with `testFail` rather than `test`, foundry will expect the test to fail / revert.
-
 Please follow the naming convention `test_NameOfTest` / `testFail_NameOfTest`.
 
 If you're new to Forge / Foundry, we recommend looking through the [Cheatcode Reference](https://book.getfoundry.sh/cheatcodes/) for a list of useful commands that make writing tests easier.
-
-
-

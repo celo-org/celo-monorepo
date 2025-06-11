@@ -134,7 +134,6 @@ const DefaultConstitution = {
     setGroupLockedGoldRequirements: 0.8,
     setValidatorLockedGoldRequirements: 0.8,
     setSlashingMultiplierResetPeriod: 0.7,
-    setValidatorScoreParameters: 0.7,
     __contractPackage: contractPackages.SOLIDITY_08_PACKAGE,
   },
 }
