@@ -195,6 +195,7 @@ contract EpochManager is
 
     electedAccounts = firstElected;
 
+    // transformThis to a no_check function?
     // _setElectedSigners(firstElected); // TODO what do I do with this?
   }
 

@@ -50,7 +50,7 @@ contract MigrationL2 is Script, MigrationsConstants, UsingRegistry, MigrationsHe
 
     vm.stopBroadcast();
 
-    // electValidators(json);
+    electValidators(json);
   }
 
   function setupUsingRegistry() public {
@@ -80,7 +80,8 @@ contract MigrationL2 is Script, MigrationsConstants, UsingRegistry, MigrationsHe
     EpochManagerEnablerMockMigrations epochManagerEnabler = EpochManagerEnablerMockMigrations(
       epochManagerEnablerAddress
     );
-    epochManagerEnabler.initEpochManager(1, 1, address(1));
+
+    epochManagerEnabler.initEpochManager(1, 1);
   }
 
   function lockGold(uint256 value) public {
