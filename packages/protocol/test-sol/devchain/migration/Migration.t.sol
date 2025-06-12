@@ -96,8 +96,8 @@ contract RegistryIntegrationTest is IntegrationTest, MigrationsConstants {
         hashContractName != hashSortedOracles &&
         hashContractName != hashValidators &&
         hashContractName != hashCeloToken && // TODO: remove once GoldToken contract has been renamed to CeloToken
-        hashContractName != hashLockedCelo && // TODO: remove once LockedGold contract has been renamed to LockedCelo
-        hashContractName != hashEpochManager
+        hashContractName != hashLockedCelo // TODO: remove once LockedGold contract has been renamed to LockedCelo
+        // && hashContractName != hashEpochManager TODO add me back later
       ) {
         // Get proxy address registered in the Registry
         address proxyAddress = registry.getAddressForStringOrDie(contractName);
