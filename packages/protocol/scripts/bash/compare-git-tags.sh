@@ -12,8 +12,8 @@ if [ "$#" -ne 2 ]; then
 fi
 
 # Assign input arguments to variables
-BRANCH1=$1
-BRANCH2=$2
+BRANCH1=$1 # new branch/tag
+BRANCH2=$2 # old branch/tag
 
 # Fetch the latest changes from the remote repository
 git fetch
@@ -32,6 +32,7 @@ echo "$CHANGED_FILES"
 # Initialize an empty string for storing commits
 COMMITS=""
 
+# TODO these are sorted by date
 # Loop through each changed file and find the commits affecting those files between the two branches
 for file in $CHANGED_FILES; do
   FILE_COMMITS=$(git log --pretty=format:"%h %s" "$BRANCH1..$BRANCH2" -- "$file")

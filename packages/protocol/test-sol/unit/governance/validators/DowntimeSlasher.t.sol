@@ -27,38 +27,6 @@ contract DowntimeSlasherMock is DowntimeSlasher(true), MockUsingPrecompiles, Tes
   }
 
   function mockSlash(SlashParams calldata slashParams, address[] calldata _validators) external {
-    require(
-      slashParams.signerIndices.length == _validators.length,
-      "validators list and signerIndices list length are different."
-    );
-
-    ph.mockReturn(
-      ph.GET_VALIDATOR(),
-      abi.encodePacked(slashParams.signerIndices[0], slashParams.startBlocks[0]),
-      abi.encode(_validators[0])
-    );
-
-    if (slashParams.signerIndices.length > 1) {
-      for (uint256 i = 0; i < slashParams.startBlocks.length; i = i.add(1)) {
-        if (i > 0) {
-          if (slashParams.startBlocks[i].mod(17280) == 1) {
-            ph.mockReturn(
-              ph.GET_VALIDATOR(),
-              abi.encodePacked(
-                slashParams.signerIndices[i.sub(1)],
-                slashParams.startBlocks[i].sub(1)
-              ),
-              abi.encode(_validators[0])
-            );
-            ph.mockReturn(
-              ph.GET_VALIDATOR(),
-              abi.encodePacked(slashParams.signerIndices[i], slashParams.startBlocks[i]),
-              abi.encode(_validators[1])
-            );
-          }
-        }
-      }
-    }
     slash(
       slashParams.startBlocks,
       slashParams.endBlocks,
@@ -301,18 +269,6 @@ contract DowntimeSlasherTest is TestWithUtils {
     return _calculateEverySlot(startBlock);
   }
 
-  function _setEpochSettings() internal {
-    ph.setEpochSize(17280);
-    epochSize = ph.epochSize();
-
-    blockTravel(epochSize);
-    blockNumber = block.number;
-    epoch = slasher.getEpochNumberOfBlock(blockNumber);
-
-    _waitUntilSafeBlocks(epoch);
-    slasher.setNumberValidators(2);
-  }
-
   function _getFirstBlockNumberOfEpoch(uint256 _epochNumber) internal view returns (uint256) {
     if (_epochNumber == 0) {
       return 0;
@@ -432,8 +388,6 @@ contract DowntimeSlasherTestSlash_WhenSlashing is DowntimeSlasherTest {
 
     _signerIndices[0] = validatorIndexInEpoch;
     _validatorsList[0] = validator;
-
-    _setEpochSettings();
   }
 
   function _generateProofs(uint256[] memory startBlocks, uint256[] memory endBlocks) public {
@@ -442,58 +396,9 @@ contract DowntimeSlasherTestSlash_WhenSlashing is DowntimeSlasherTest {
     }
   }
 
-  function _setupSlashTest() public {
-    slasher.setEpochSigner(epoch, 0, validator);
-    uint256 startBlock = _getFirstBlockNumberOfEpoch(epoch);
-    uint256[] memory validatorIndices = new uint256[](1);
-    validatorIndices[0] = validatorIndexInEpoch;
-    (uint256[] memory _startBlocks, uint256[] memory _endBlocks) = _ensureValidatorIsSlashable(
-      startBlock,
-      _signerIndices
-    );
-
-    slashParams = DowntimeSlasherMock.SlashParams({
-      startBlocks: _startBlocks,
-      endBlocks: _endBlocks,
-      signerIndices: _signerIndices,
-      groupMembershipHistoryIndex: 0,
-      validatorElectionLessers: validatorElectionLessers,
-      validatorElectionGreaters: validatorElectionGreaters,
-      validatorElectionIndices: validatorElectionIndices,
-      groupElectionLessers: groupElectionLessers,
-      groupElectionGreaters: groupElectionGreaters,
-      groupElectionIndices: groupElectionIndices
-    });
-    slasher.mockSlash(slashParams, _validatorsList);
-  }
-
   function test_Reverts_WhenL2_IfIntervalsOverlap_WhenIntervalCoverSlashableDowntimeWindow()
     public
   {
-    uint256 startBlock = _getFirstBlockNumberOfEpoch(epoch);
-    _bitmaps0[0] = bitmapWithoutValidator[validatorIndexInEpoch];
-    _presetParentSealForBlock(startBlock, slashableDowntime, _bitmaps0);
-
-    uint256[] memory _startBlocks = new uint256[](2);
-    uint256[] memory _endBlocks = new uint256[](2);
-    _startBlocks[0] = startBlock;
-    _startBlocks[1] = startBlock.add(2);
-    _endBlocks[0] = startBlock.add(slashableDowntime.sub(3));
-    _endBlocks[1] = startBlock.add(slashableDowntime.sub(1));
-
-    slashParams = DowntimeSlasherMock.SlashParams({
-      startBlocks: _startBlocks,
-      endBlocks: _endBlocks,
-      signerIndices: _signerIndices,
-      groupMembershipHistoryIndex: 0,
-      validatorElectionLessers: validatorElectionLessers,
-      validatorElectionGreaters: validatorElectionGreaters,
-      validatorElectionIndices: validatorElectionIndices,
-      groupElectionLessers: groupElectionLessers,
-      groupElectionGreaters: groupElectionGreaters,
-      groupElectionIndices: groupElectionIndices
-    });
-
     vm.expectRevert("This method is no longer supported in L2.");
     slasher.mockSlash(slashParams, _validatorsList);
   }
