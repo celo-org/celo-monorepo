@@ -77,6 +77,7 @@ contract RegistryIntegrationTest is IntegrationTest, MigrationsConstants {
     bytes32 hashCeloToken = keccak256(abi.encodePacked("CeloToken"));
     bytes32 hashLockedCelo = keccak256(abi.encodePacked("LockedCelo"));
     bytes32 hashEpochManager = keccak256(abi.encodePacked("EpochManager"));
+    bytes32 hashEpochManagerEnablerHash = keccak256(abi.encodePacked("EpochManagerEnabler"));
 
     for (uint256 i = 0; i < contractsInRegistry.length; i++) {
       // Read name from list of core contracts
@@ -96,8 +97,9 @@ contract RegistryIntegrationTest is IntegrationTest, MigrationsConstants {
         hashContractName != hashSortedOracles &&
         hashContractName != hashValidators &&
         hashContractName != hashCeloToken && // TODO: remove once GoldToken contract has been renamed to CeloToken
-        hashContractName != hashLockedCelo // TODO: remove once LockedGold contract has been renamed to LockedCelo
-        // && hashContractName != hashEpochManager TODO add me back later
+        hashContractName != hashLockedCelo && // TODO: remove once LockedGold contract has been renamed to LockedCelo
+        hashContractName != hashEpochManager &&
+        hashContractName != hashEpochManagerEnablerHash // TODO it's different for testing
       ) {
         // Get proxy address registered in the Registry
         address proxyAddress = registry.getAddressForStringOrDie(contractName);
