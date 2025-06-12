@@ -1,14 +1,22 @@
 pragma solidity ^0.5.13;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-import "../common/Initializable.sol";
-import "../common/UsingRegistry.sol";
-import "./interfaces/IValidators.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
+import { Initializable } from "../common/Initializable.sol";
+import { UsingRegistry } from "../common/UsingRegistry.sol";
+import { ICeloVersionedContract } from "../common/interfaces/ICeloVersionedContract.sol";
+import { IValidators } from "./interfaces/IValidators.sol";
+import { ILockedGold } from "./interfaces/ILockedGold.sol";
+import { IGovernanceSlasher } from "./interfaces/IGovernanceSlasher.sol";
 
-contract GovernanceSlasher is Ownable, Initializable, UsingRegistry, ICeloVersionedContract {
+contract GovernanceSlasher is
+  Ownable,
+  Initializable,
+  UsingRegistry,
+  ICeloVersionedContract,
+  IGovernanceSlasher
+{
   using SafeMath for uint256;
   // Maps a slashed address to the amount to be slashed.
   // Note that there is no reward paid when slashing via governance.

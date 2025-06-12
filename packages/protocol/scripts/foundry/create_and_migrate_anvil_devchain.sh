@@ -26,6 +26,9 @@ source $PWD/scripts/foundry/start_anvil.sh
 source $PWD/scripts/foundry/deploy_libraries.sh
 echo "Library flags are: $LIBRARY_FLAGS"
 
+# Build map of selectors from governanceConstitution.json
+source $PWD/scripts/foundry/build_constitution_selectors_map.sh
+
 # Build all contracts with deployed libraries
 # Including contracts that depend on libraries. This step replaces the library placeholder
 # in the bytecode with the address of the actually deployed library.
