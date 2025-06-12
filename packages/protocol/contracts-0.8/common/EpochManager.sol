@@ -195,7 +195,7 @@ contract EpochManager is
 
     electedAccounts = firstElected;
 
-    _setElectedSigners(firstElected);
+    // _setElectedSigners(firstElected); // TODO what do I do with this?
   }
 
   /**

@@ -48,17 +48,16 @@ contract EpochManagerEnablerMockMigrations is
    */
   function initEpochManager(
     uint256 _lastKnownEpochNumber,
-    uint256 _lastKnownFirstBlockOfEpoch,
-    address _validatorAddress
+    uint256 _lastKnownFirstBlockOfEpoch
   ) external onlyL2 {
-    lastKnownElectedAccounts.push(_validatorAddress);
+    // lastKnownElectedAccounts.push(_validatorAddress);
     require(_lastKnownEpochNumber != 0, "lastKnownEpochNumber not set.");
     require(_lastKnownFirstBlockOfEpoch != 0, "lastKnownFirstBlockOfEpoch not set.");
-    require(lastKnownElectedAccounts.length > 0, "lastKnownElectedAccounts not set.");
+    // require(lastKnownElectedAccounts.length > 0, "lastKnownElectedAccounts not set.");
     getEpochManager().initializeSystem(
       _lastKnownEpochNumber,
       _lastKnownFirstBlockOfEpoch,
-      lastKnownElectedAccounts
+      lastKnownElectedAccounts // should be empty
     );
   }
 
