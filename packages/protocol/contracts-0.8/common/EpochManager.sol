@@ -196,7 +196,7 @@ contract EpochManager is
     electedAccounts = firstElected;
 
     // transformThis to a no_check function?
-    // _setElectedSigners(firstElected); // TODO what do I do with this?
+    _setElectedSignersNoCheck(firstElected); // TODO what do I do with this?
   }
 
   /**
@@ -705,6 +705,15 @@ contract EpochManager is
       registry.getAddressForOrDie(RESERVE_REGISTRY_ID),
       CELOequivalent
     );
+  }
+
+  function _setElectedSignersNoCheck(address[] memory _elected) internal {
+    // require(electedAccounts.length > 0, "Elected list length cannot be zero.");
+    IAccounts accounts = getAccounts();
+    electedSigners = new address[](_elected.length);
+    for (uint i = 0; i < _elected.length; i++) {
+      electedSigners[i] = accounts.getValidatorSigner(_elected[i]);
+    }
   }
 
   /**
