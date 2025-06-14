@@ -21,13 +21,7 @@ If your network was deployed with `helm`, you will probably set `NETWORK` the sa
 
 ### Migrations
 
-If a new contract needs to be deployed, create a migration file in the `migrations/` directory, prefixing it with the successor of the highest current migration number.
-
-To apply any new migrations to a network, run:
-
-```bash
-yarn run devchain:migrate -n NETWORK
-```
+// TODO(soloseng): add steps for foundry migration
 
 ### Console
 
