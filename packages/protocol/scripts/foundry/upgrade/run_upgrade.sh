@@ -23,8 +23,10 @@ if [ "${NETWORK}" == "alfajores" ]; then
   export MULTISIG_ADDRESS=0xf05f102e890E713DC9dc0a5e13A8879D5296ee48
 elif [ "${NETWORK}" == "baklava" ]; then
   export MULTISIG_ADDRESS=0xd542f3328ff2516443FE4db1c89E427F67169D94
+elif [ "${NETWORK}" == "mainnet" ]; then
+  export MULTISIG_ADDRESS=0x4092A77bAF58fef0309452cEaCb09221e556E112
 else
-  echo "Unsupported network! Choose from 'alfajores' or 'baklava'"
+  echo "Unsupported network! Choose from 'alfajores', 'baklava' or 'mainnet'"
   exit 1
 fi
 

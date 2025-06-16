@@ -24,7 +24,7 @@ esac
 
 # Check network
 case $NETWORK in
-  "alfajores"|"baklava")
+  "alfajores"|"baklava"|"mainnet")
     echo "Detected supported network: $NETWORK"
     ;;
   *)
