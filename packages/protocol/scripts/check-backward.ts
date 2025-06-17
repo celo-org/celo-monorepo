@@ -181,7 +181,8 @@ try {
       const versionChecker = await ASTContractVersionsChecker.create(
         buildArtifacts.old,
         buildArtifacts.new,
-        backward.report.versionDeltas()
+        backward.report.versionDeltas(),
+        argv.forge
       )
       const mismatches = versionChecker.excluding(exclude).mismatches()
       if (mismatches.isEmpty()) {
