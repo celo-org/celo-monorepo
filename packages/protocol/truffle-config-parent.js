@@ -7,6 +7,8 @@ const { CoverageSubprovider } = require('@0x/sol-coverage')
 var Web3 = require('web3')
 var net = require('net')
 
+const HDWalletProvider = require('@truffle/hdwallet-provider')
+
 const argv = require('minimist')(process.argv.slice(2), {
   string: ['truffle_override', 'network'],
   boolean: ['reset'],
@@ -40,10 +42,10 @@ const defaultConfig = {
   from: OG_FROM,
   gas: gasLimit,
   gasPrice: 100000000000,
-  // maxFeePerGas: 975000000,
+  maxFeePerGas: 975000000000,
 }
 
-const freeGasConfig = { ...defaultConfig, ...{ gasPrice: 0 } }
+const freeGasConfig = { ...defaultConfig, ...{ gasPrice: 0 } } // TODO remove
 
 // ipcProvider returns a function to create an IPC provider when called.
 // Use by adding `provider: ipcProvider(...)` to any of the configs below.
@@ -56,7 +58,9 @@ let coverageProvider = null
 
 const fornoUrls = {
   alfajores: 'https://alfajores-forno.celo-testnet.org',
+  // alfajores: 'http://127.0.0.1:8545',
   baklava: 'https://baklava-forno.celo-testnet.org',
+  // baklava: 'http://127.0.0.1:8545',
   rc1: 'https://forno.celo.org',
   mainnet: 'https://forno.celo.org',
   staging: 'https://staging-forno.celo-networks-dev.org',
@@ -160,7 +164,10 @@ const networks = {
   alfajores: {
     ...defaultConfig,
     network_id: ALFAJORES_NETWORKID,
-    from: ALFAJORES_FROM,
+    // from: ALFAJORES_FROM,
+    from: '0x3e206e0674d5050f7b33e7e79Cace768050eE06f',
+    // mnemonic:
+    //   '',
   },
 
   cannoli: {
@@ -171,8 +178,9 @@ const networks = {
 
   baklava: {
     ...defaultConfig,
-    from: BAKLAVA_FROM,
+    from: '0x3e206e0674d5050f7b33e7e79Cace768050eE06f',
     network_id: BAKLAVA_NETWORKID,
+    mnemonic: '',
   },
   baklavastaging: {
     ...defaultConfig,
@@ -184,6 +192,8 @@ const networks = {
     from: STAGING_FROM,
   },
 }
+
+console.log('hello from parent config')
 // Equivalent
 networks.mainnet = networks.rc1
 
@@ -198,6 +208,8 @@ if (argv.truffle_override || !(argv.network in networks)) {
   }
 }
 
+console.log('hello from parent confi2')
+
 if (process.argv.includes('--forno')) {
   if (!fornoUrls[argv.network]) {
     console.log(`Forno URL for network ${argv.network} not known!`)
@@ -206,8 +218,23 @@ if (process.argv.includes('--forno')) {
 
   networks[argv.network].host = undefined
   networks[argv.network].port = undefined
-  networks[argv.network].provider = function () {
-    return new Web3.providers.HttpProvider(fornoUrls[argv.network])
+
+  // TODO check how to read this from env file
+  console.log('hola')
+  const mnemonic = networks[argv.network].mnemonic
+  console.log('mnemonic is', mnemonic)
+  if (networks[argv.network].mnemonic) {
+    console.log('try to use HDWalletProvider')
+    networks[argv.network].provider = function () {
+      return new HDWalletProvider({
+        privateKeys: [''],
+        providerOrUrl: fornoUrls[argv.network],
+      })
+    }
+  } else {
+    networks[argv.network].provider = function () {
+      return new Web3.providers.HttpProvider(fornoUrls[argv.network])
+    }
   }
 }
 

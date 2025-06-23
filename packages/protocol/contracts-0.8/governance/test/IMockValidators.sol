@@ -52,6 +52,8 @@ interface IMockValidators {
 
   function getAccountLockedGoldRequirement(address account) external view returns (uint256);
 
+  function calculateGroupEpochScore(uint256[] calldata uptimes) external view returns (uint256);
+
   function getGroupsNumMembers(address[] calldata groups) external view returns (uint256[] memory);
 
   function groupMembershipInEpoch(address addr, uint256, uint256) external view returns (address);
