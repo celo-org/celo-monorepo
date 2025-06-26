@@ -14,7 +14,7 @@ case $NETWORK in
   "holesky")
     echo "Detected supported network: $NETWORK"
     CHAIN_ID=17000
-    BLOCK_NUMBER=4011607
+    BLOCK_NUMBER=4050838
     ;;
   *)
     echo "Unsupported network: $NETWORK" && exit 1
