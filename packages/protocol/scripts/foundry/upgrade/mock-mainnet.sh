@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# deployer pk
+# addresses
 MOCKED_DEPLOYER=0xe571b94CF7e95C46DFe6bEa529335f4A11d15D92
 
 # multisigs
@@ -22,8 +22,12 @@ SENTINEL_ADDRESS=0x0000000000000000000000000000000000000001
 RPC_URL=http://127.0.0.1:8545
 
 # set 10_000 ETH on mocked owner
-echo "Mock deployer balance"
+echo "Mock accounts balance"
 cast rpc anvil_setBalance $MOCKED_DEPLOYER 0x21e19e0c9bab2400000 -r $RPC_URL
+cast rpc anvil_setBalance $MOCKED_SIGNER_1 0x21e19e0c9bab2400000 -r $RPC_URL
+cast rpc anvil_setBalance $MOCKED_SIGNER_2 0x21e19e0c9bab2400000 -r $RPC_URL
+cast rpc anvil_setBalance $MOCKED_SIGNER_3 0x21e19e0c9bab2400000 -r $RPC_URL
+cast rpc anvil_setBalance $MOCKED_SIGNER_4 0x21e19e0c9bab2400000 -r $RPC_URL
 
 # change threshold of signers to 2 for each multisig
 echo "Change treshold for multisigs"
