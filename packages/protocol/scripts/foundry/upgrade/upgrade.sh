@@ -28,7 +28,7 @@ case $NETWORK in
     echo "Detected supported network: $NETWORK"
     ;;
   *)
-    echo "Unsupported network! Choose from 'alfajores' or 'baklava'" && exit 1
+    echo "Unsupported network! Choose from 'alfajores', 'baklava' or 'mainnet'" && exit 1
     ;;
 esac
 

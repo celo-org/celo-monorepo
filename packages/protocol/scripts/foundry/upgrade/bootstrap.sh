@@ -49,7 +49,7 @@ elif [ "${NETWORK}" == "mainnet" ]; then
   CHALLENGER="0x6b145ebf66602ec524b196426b46631259689583"
   UPGRADE_SUPERCHAIN_CONFIG=false
 else
-  echo "Unsupported network! Choose from 'alfajores' or 'baklava'"
+  echo "Unsupported network! Choose from 'alfajores', 'baklava' or 'mainnet'"
   exit 1
 fi
 

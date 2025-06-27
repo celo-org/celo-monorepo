@@ -25,23 +25,23 @@ esac
 # addresses
 SENDER=0xe571b94CF7e95C46DFe6bEa529335f4A11d15D92
 if [ $SENDER != $(cast wallet address --private-key $PK) ]; then
-  echo "Invalid PK"; exit -1;
+  echo "Invalid PK"; exit 1;
 fi
 MOCKED_SIGNER_1=0x899a864C6bE2c573a98d8493961F4D4c0F7Dd0CC
 if [ $MOCKED_SIGNER_1 != $(cast wallet address --private-key $SIGNER_1_PK) ]; then
-  echo "Invalid SIGNER_1_PK"; exit -1;
+  echo "Invalid SIGNER_1_PK"; exit 1;
 fi
 MOCKED_SIGNER_2=0x865d05C8bB46E7AF16D6Dc99ddfb2e64BBec1345
 if [ $MOCKED_SIGNER_2 != $(cast wallet address --private-key $SIGNER_2_PK) ]; then
-  echo "Invalid SIGNER_2_PK"; exit -1;
+  echo "Invalid SIGNER_2_PK"; exit 1;
 fi
 MOCKED_SIGNER_3=0x8Af6f11c501c082bD880B3ceC83e6bB249Fa32c9
 if [ $MOCKED_SIGNER_3 != $(cast wallet address --private-key $SIGNER_3_PK) ]; then
-  echo "Invalid SIGNER_3_PK"; exit -1;
+  echo "Invalid SIGNER_3_PK"; exit 1;
 fi
 MOCKED_SIGNER_4=0x480C5f2340f9E7A46ee25BAa815105B415a7c2e2
 if [ $MOCKED_SIGNER_4 != $(cast wallet address --private-key $SIGNER_4_PK) ]; then
-  echo "Invalid SIGNER_4_PK"; exit -1;
+  echo "Invalid SIGNER_4_PK"; exit 1;
 fi
 
 # rpc
@@ -99,7 +99,7 @@ CLABS_TX_HASH=$(cast call $CLABS_SAFE_ADDRESS \
 echo "cLabs hash: $CLABS_TX_HASH"
 
 # approve or sign cLabs
-if [ APPROVE_OR_SIGN = 'approve' ]; then
+if [ $APPROVE_OR_SIGN = 'approve' ]; then
   echo "Approve cLabs hash"
   CLABS_APPROVE_FROM_SIGNER_CALLDATA=$(cast calldata 'approveHash(bytes32)' $CLABS_TX_HASH)
   cast send $CLABS_SAFE_ADDRESS $CLABS_APPROVE_FROM_SIGNER_CALLDATA --private-key $SIGNER_1_PK -r $RPC_URL
@@ -116,7 +116,7 @@ fi
 
 # exec cLabs
 echo "Exec cLabs approval"
-if [ APPROVE_OR_SIGN = 'approve' ]; then
+if [ $APPROVE_OR_SIGN = 'approve' ]; then
   CLABS_SIG=0x000000000000000000000000${MOCKED_SIGNER_2:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000${MOCKED_SIGNER_1:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000
 else
   CLABS_SIG=0x${CLABS_SIG_2:2}${CLABS_SIG_1:2}
@@ -140,7 +140,7 @@ COUNCIL_TX_HASH=$(cast call $COUNCIL_SAFE_ADDRESS \
 echo "Council hash: $COUNCIL_TX_HASH"
 
 # approve or sign Council
-if [ APPROVE_OR_SIGN = 'approve' ]; then
+if [ $APPROVE_OR_SIGN = 'approve' ]; then
   echo "Approve Council hash"
   COUNCIL_APPROVE_FROM_SIGNER_CALLDATA=$(cast calldata 'approveHash(bytes32)' $COUNCIL_TX_HASH)
   cast send $COUNCIL_SAFE_ADDRESS $COUNCIL_APPROVE_FROM_SIGNER_CALLDATA --private-key $SIGNER_3_PK -r $RPC_URL
@@ -157,7 +157,7 @@ fi
 
 # exec Council
 echo "Exec Council approval"
-if [ APPROVE_OR_SIGN = 'approve' ]; then
+if [ $APPROVE_OR_SIGN = 'approve' ]; then
   COUNCIL_SIG=0x000000000000000000000000${MOCKED_SIGNER_4:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000${MOCKED_SIGNER_3:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000
 else
   COUNCIL_SIG=0x${COUNCIL_SIG_2:2}${COUNCIL_SIG_1:2}
