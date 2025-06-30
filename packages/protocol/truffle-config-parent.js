@@ -39,14 +39,6 @@ const defaultConfig = {
   maxFeePerGas: 975000000000,
 }
 
-const freeGasConfig = { ...defaultConfig, ...{ gasPrice: 0 } } // TODO remove
-
-// ipcProvider returns a function to create an IPC provider when called.
-// Use by adding `provider: ipcProvider(...)` to any of the configs below.
-function ipcProvider(path) {
-  return () => new Web3.providers.IpcProvider(path, net)
-}
-
 function readNmenomic(networkName) {
   dotenv = require('dotenv').config({
     path: require('path').resolve(__dirname, `../../.env.mnemonic.${networkName}`),
@@ -62,8 +54,6 @@ function readNmenomic(networkName) {
 
   return process.env.DEPLOYER_PRIVATKEY
 }
-
-// readNmenomic()
 
 // Here to avoid recreating it each time
 let coverageProvider = null
@@ -180,7 +170,6 @@ const networks = {
   },
 }
 
-console.log('hello from parent config')
 // Equivalent
 networks.mainnet = networks.rc1
 
@@ -195,8 +184,6 @@ if (argv.truffle_override || !(argv.network in networks)) {
   }
 }
 
-console.log('hello from parent confi2')
-
 if (process.argv.includes('--forno')) {
   if (!fornoUrls[argv.network]) {
     console.log(`Forno URL for network ${argv.network} not known!`)
@@ -206,12 +193,8 @@ if (process.argv.includes('--forno')) {
   networks[argv.network].host = undefined
   networks[argv.network].port = undefined
 
-  // TODO check how to read this from env file
-  console.log('hola')
-  const mnemonic = networks[argv.network].mnemonic
-  console.log('mnemonic is', mnemonic)
   if (networks[argv.network].privateKeyAvailable) {
-    console.log('try to use HDWalletProvider')
+    console.log('Network is supposed to have a private key available, using HDWalletProvider')
     networks[argv.network].provider = function () {
       return new HDWalletProvider({
         privateKeys: [readNmenomic(argv.network)],
