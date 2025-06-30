@@ -112,7 +112,6 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
 
     const onchainProxyBytecode = await getOnchainBytecode(proxyAddress, context)
     const sourceProxyBytecode = getSourceBytecode(`${contract}Proxy`, context)
-    console.log("Checking contract named", contract)
     if (onchainProxyBytecode !== sourceProxyBytecode) {
       throw new Error(`Proposed ${contract}Proxy does not match compiled proxy bytecode`)
     }
