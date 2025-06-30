@@ -1,0 +1,409 @@
+{
+  "oldArtifactsFolder": [
+    "build/core-contracts.v12.post_audit-renamed/contracts",
+    "build/core-contracts.v12.post_audit-renamed/contracts-0.8"
+  ],
+  "newArtifactsFolder": [
+    "build/core-contracts.v13.post-audit/contracts",
+    "build/core-contracts.v13.post-audit/contracts-0.8"
+  ],
+  "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles|CeloFeeCurrencyAdapterOwnable|FeeCurrencyAdapter|FeeCurrencyAdapterOwnable|IsL2Check|Blockable|PrecompilesOverride|CompileExchange|PrecompilesOverrideV2|UsingRegistryV2NoMento|^UsingRegistry|^Ownable|Initializable|BLS12_377Passthrough|BLS12_381Passthrough]UniswapV2ERC20|ReentrancyGuard|MockElection|\\bFeeHandlerSeller\\b/",
+  "report": {
+    "contracts": {
+      "Accounts": {
+        "changes": {
+          "storage": [],
+          "major": [
+            {
+              "contract": "Accounts",
+              "signature": "authorizeValidatorSignerWithKeys(address,uint8,bytes32,bytes32,bytes,bytes,bytes)",
+              "type": "MethodRemoved"
+            }
+          ],
+          "minor": [],
+          "patch": [
+            {
+              "contract": "Accounts",
+              "type": "DeployedBytecode"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "+1",
+          "minor": "0",
+          "patch": "0"
+        }
+      },
+      "Election": {
+        "changes": {
+          "storage": [],
+          "major": [
+            {
+              "contract": "Election",
+              "signature": "getGroupEpochRewards(address,uint256,uint256[])",
+              "type": "MethodRemoved"
+            }
+          ],
+          "minor": [],
+          "patch": [
+            {
+              "contract": "Election",
+              "type": "DeployedBytecode"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "+1",
+          "minor": "0",
+          "patch": "0"
+        }
+      },
+      "EpochRewards": {
+        "changes": {
+          "storage": [],
+          "major": [
+            {
+              "contract": "EpochRewards",
+              "signature": "isReserveLow()",
+              "type": "MethodRemoved"
+            }
+          ],
+          "minor": [],
+          "patch": [
+            {
+              "contract": "EpochRewards",
+              "type": "DeployedBytecode"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "+1",
+          "minor": "0",
+          "patch": "0"
+        }
+      },
+      "GoldToken": {
+        "changes": {
+          "storage": [],
+          "major": [
+            {
+              "contract": "GoldToken",
+              "signature": "mint(address,uint256)",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "GoldToken",
+              "signature": "increaseSupply(uint256)",
+              "type": "MethodRemoved"
+            }
+          ],
+          "minor": [],
+          "patch": [
+            {
+              "contract": "GoldToken",
+              "type": "DeployedBytecode"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "+1",
+          "minor": "0",
+          "patch": "0"
+        }
+      },
+      "Governance": {
+        "changes": {
+          "storage": [],
+          "major": [
+            {
+              "contract": "Governance",
+              "signature": "whitelistHotfix(bytes32)",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "Governance",
+              "signature": "hotfixWhitelistValidatorTally(bytes32)",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "Governance",
+              "signature": "isHotfixPassing(bytes32)",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "Governance",
+              "signature": "getL1HotfixRecord(bytes32)",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "Governance",
+              "signature": "getHotfixRecord(bytes32)",
+              "oldValue": "bool, bool, uint256",
+              "newValue": "bool, bool, bool, uint256",
+              "type": "MethodReturn"
+            },
+            {
+              "contract": "Governance",
+              "signature": "getL2HotfixRecord(bytes32)",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "Governance",
+              "signature": "isHotfixWhitelistedBy(bytes32,address)",
+              "type": "MethodRemoved"
+            }
+          ],
+          "minor": [],
+          "patch": [
+            {
+              "contract": "Governance",
+              "type": "DeployedBytecode"
+            },
+            {
+              "contract": "Governance",
+              "dependency": "IntegerSortedLinkedList",
+              "type": "LibraryLinkingChange"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "+1",
+          "minor": "0",
+          "patch": "0"
+        }
+      },
+      "GovernanceSlasher": {
+        "changes": {
+          "storage": [],
+          "major": [
+            {
+              "contract": "GovernanceSlasher",
+              "signature": "slash(address,address[],address[],uint256[])",
+              "type": "MethodRemoved"
+            }
+          ],
+          "minor": [
+            {
+              "contract": "GovernanceSlasher",
+              "signature": "slash(address,address,address[],address[],uint256[])",
+              "type": "MethodAdded"
+            }
+          ],
+          "patch": [
+            {
+              "contract": "GovernanceSlasher",
+              "signature": "slashL2(address,address,address[],address[],uint256[])",
+              "oldValue": "external",
+              "newValue": "public",
+              "type": "MethodVisibility"
+            },
+            {
+              "contract": "GovernanceSlasher",
+              "type": "DeployedBytecode"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "+1",
+          "minor": "0",
+          "patch": "0"
+        }
+      },
+      "Permissioned": {
+        "changes": {
+          "storage": [],
+          "major": [
+            {
+              "contract": "Permissioned",
+              "type": "NewContract"
+            }
+          ],
+          "minor": [],
+          "patch": []
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "+1",
+          "minor": "0",
+          "patch": "0"
+        }
+      },
+      "SuperBridgeETHWrapper": {
+        "changes": {
+          "storage": [],
+          "major": [
+            {
+              "contract": "SuperBridgeETHWrapper",
+              "type": "NewContract"
+            }
+          ],
+          "minor": [],
+          "patch": []
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "+1",
+          "minor": "0",
+          "patch": "0"
+        }
+      },
+      "Validators": {
+        "changes": {
+          "storage": [],
+          "major": [
+            {
+              "contract": "Validators",
+              "signature": "registerValidator(bytes,bytes,bytes)",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "Validators",
+              "signature": "updateBlsPublicKey(bytes,bytes)",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "Validators",
+              "signature": "setValidatorScoreParameters(uint256,uint256)",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "Validators",
+              "signature": "setDowntimeGracePeriod(uint256)",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "Validators",
+              "signature": "updatePublicKeys(address,address,bytes,bytes,bytes)",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "Validators",
+              "signature": "updateValidatorScoreFromSigner(address,uint256)",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "Validators",
+              "signature": "distributeEpochPaymentsFromSigner(address,uint256)",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "Validators",
+              "signature": "downtimeGracePeriod()",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "Validators",
+              "signature": "getValidatorScoreParameters()",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "Validators",
+              "signature": "calculateEpochScore(uint256)",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "Validators",
+              "signature": "calculateGroupEpochScore(uint256[])",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "Validators",
+              "signature": "getValidatorBlsPublicKeyFromSigner(address)",
+              "type": "MethodRemoved"
+            },
+            {
+              "contract": "Validators",
+              "signature": "initialize(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,struct Validators.InitParams)",
+              "type": "MethodRemoved"
+            }
+          ],
+          "minor": [
+            {
+              "contract": "Validators",
+              "signature": "registerValidator(bytes)",
+              "type": "MethodAdded"
+            },
+            {
+              "contract": "Validators",
+              "signature": "initialize(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,struct Validators.InitParams)",
+              "type": "MethodAdded"
+            }
+          ],
+          "patch": [
+            {
+              "contract": "Validators",
+              "signature": "registerValidatorNoBls(bytes)",
+              "oldValue": "external",
+              "newValue": "public",
+              "type": "MethodVisibility"
+            },
+            {
+              "contract": "Validators",
+              "type": "DeployedBytecode"
+            },
+            {
+              "contract": "Validators",
+              "dependency": "AddressLinkedList",
+              "type": "LibraryLinkingChange"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "+1",
+          "minor": "0",
+          "patch": "0"
+        }
+      },
+      "EpochManager": {
+        "changes": {
+          "storage": [],
+          "major": [],
+          "minor": [],
+          "patch": [
+            {
+              "contract": "EpochManager",
+              "type": "DeployedBytecode"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "=",
+          "minor": "=",
+          "patch": "+1"
+        }
+      }
+    },
+    "libraries": {
+      "AddressLinkedList": {
+        "storage": [],
+        "major": [],
+        "minor": [],
+        "patch": [
+          {
+            "contract": "AddressLinkedList",
+            "type": "DeployedBytecode"
+          }
+        ]
+      },
+      "IntegerSortedLinkedList": {
+        "storage": [],
+        "major": [],
+        "minor": [],
+        "patch": [
+          {
+            "contract": "IntegerSortedLinkedList",
+            "type": "DeployedBytecode"
+          }
+        ]
+      }
+    }
+  }
+}

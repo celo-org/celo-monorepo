@@ -7,6 +7,8 @@ const { CoverageSubprovider } = require('@0x/sol-coverage')
 var Web3 = require('web3')
 var net = require('net')
 
+const HDWalletProvider = require('@truffle/hdwallet-provider')
+
 const argv = require('minimist')(process.argv.slice(2), {
   string: ['truffle_override', 'network'],
   boolean: ['reset'],
@@ -14,20 +16,14 @@ const argv = require('minimist')(process.argv.slice(2), {
 
 const ALFAJORES_NETWORKID = 44787
 const BAKLAVA_NETWORKID = 62320
-const BAKLAVASTAGING_NETWORKID = 31420
-const CANNOLI_NETWORKID = 17323
 
 const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
 const INTEGRATION_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const INTEGRATION_TESTING_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
-const ALFAJORESSTAGING_FROM = '0xf4314cb9046bece6aa54bb9533155434d0c76909'
-const ALFAJORES_FROM = '0x456f41406B32c45D59E539e4BBA3D7898c3584dA'
+const ALFAJORES_FROM = '0x59A60D2B488154dc5CB48c42347Df222e13C70Ba'
 const RC0_FROM = '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C'
-const BAKLAVA_FROM = '0x0Cc59Ed03B3e763c02d54D695FFE353055f1502D'
-const BAKLAVASTAGING_FROM = '0x4588ABb84e1BBEFc2BcF4b2296F785fB7AD9F285'
-const STAGING_FROM = '0x4e3d385ecdee402da395a3b18575b05cc5e8ff21'
-const CANNOLI_FROM = '0x8C174E896A85E487aa895865657b78Ea64879dC7' // validator zero
+const BAKLAVA_FROM = '0x3e206e0674d5050f7b33e7e79Cace768050eE06f'
 
 const gasLimit = 20000000
 const hostAddress = process.env.CELO_NODE_ADDRESS || '127.0.0.1'
@@ -40,15 +36,23 @@ const defaultConfig = {
   from: OG_FROM,
   gas: gasLimit,
   gasPrice: 100000000000,
-  // maxFeePerGas: 975000000,
+  maxFeePerGas: 975000000000,
 }
 
-const freeGasConfig = { ...defaultConfig, ...{ gasPrice: 0 } }
+function readNmenomic(networkName) {
+  dotenv = require('dotenv').config({
+    path: require('path').resolve(__dirname, `../../.env.mnemonic.${networkName}`),
+  })
 
-// ipcProvider returns a function to create an IPC provider when called.
-// Use by adding `provider: ipcProvider(...)` to any of the configs below.
-function ipcProvider(path) {
-  return () => new Web3.providers.IpcProvider(path, net)
+  const privateKey = process.env.DEPLOYER_PRIVATKEY
+  if (privateKey === undefined || privateKey === null || privateKey === '') {
+    console.log(
+      `No private key found in .env.mnemonic.${networkName}. Please run "yarn keys:decrypt" in root after escalating perms in Akeyless`
+    )
+    process.exit(1)
+  }
+
+  return process.env.DEPLOYER_PRIVATKEY
 }
 
 // Here to avoid recreating it each time
@@ -152,38 +156,20 @@ const networks = {
     from: INTEGRATION_TESTING_FROM,
     network_id: 1101,
   },
-  alfajoresstaging: {
-    ...defaultConfig,
-    from: ALFAJORESSTAGING_FROM,
-  },
-
   alfajores: {
     ...defaultConfig,
     network_id: ALFAJORES_NETWORKID,
     from: ALFAJORES_FROM,
+    privateKeyAvailable: true,
   },
-
-  cannoli: {
-    ...defaultConfig,
-    network_id: CANNOLI_NETWORKID,
-    from: CANNOLI_FROM,
-  },
-
   baklava: {
     ...defaultConfig,
     from: BAKLAVA_FROM,
     network_id: BAKLAVA_NETWORKID,
-  },
-  baklavastaging: {
-    ...defaultConfig,
-    from: BAKLAVASTAGING_FROM,
-    network_id: BAKLAVASTAGING_NETWORKID,
-  },
-  staging: {
-    ...defaultConfig,
-    from: STAGING_FROM,
+    privateKeyAvailable: true,
   },
 }
+
 // Equivalent
 networks.mainnet = networks.rc1
 
@@ -206,8 +192,19 @@ if (process.argv.includes('--forno')) {
 
   networks[argv.network].host = undefined
   networks[argv.network].port = undefined
-  networks[argv.network].provider = function () {
-    return new Web3.providers.HttpProvider(fornoUrls[argv.network])
+
+  if (networks[argv.network].privateKeyAvailable) {
+    console.log('Network is supposed to have a private key available, using HDWalletProvider')
+    networks[argv.network].provider = function () {
+      return new HDWalletProvider({
+        privateKeys: [readNmenomic(argv.network)],
+        providerOrUrl: fornoUrls[argv.network],
+      })
+    }
+  } else {
+    networks[argv.network].provider = function () {
+      return new Web3.providers.HttpProvider(fornoUrls[argv.network])
+    }
   }
 }
 

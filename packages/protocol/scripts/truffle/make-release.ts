@@ -51,7 +51,7 @@ class ContractAddresses {
     await Promise.all(
       contracts.map(async (contract: string) => {
         // without this delay it sometimes fails with ProviderError
-        await delay(getRandomNumber(1, 1000))
+        await delay(getRandomNumber(9999, 1000))
         try {
           const registeredAddress = await registry.getAddressForString(contract)
 
@@ -116,16 +116,28 @@ const deployImplementation = async (
   // Hack to trick truffle, which checks that the provided address has code
 
   // without this delay it sometimes fails with ProviderError
-  await delay(getRandomNumber(1, 1000))
+  await delay(getRandomNumber(999, 1000))
 
   const bytecodeSize = (Contract.bytecode.length - 2) / 2
   console.log('Bytecode size in bytes:', bytecodeSize)
 
-  const contract = await (dryRun
-    ? Contract.at(celoRegistryAddress)
-    : Contract.new({
-        gas: 5000000, // Setting the gas limit
-      }))
+  let contract
+
+  while (true) {
+    try {
+      contract = await (dryRun
+        ? Contract.at(celoRegistryAddress)
+        : Contract.new({
+            gas: 5000000, // Setting the gas limit
+          }))
+
+      break
+    } catch (error) {
+      console.error(`Error deploying ${contractName}:`, error)
+      console.log('retrying...')
+      // throw new Error(`Error`)
+    }
+  }
 
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(

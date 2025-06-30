@@ -50,6 +50,7 @@ done
 source scripts/bash/release-lib.sh
 build_tag $BRANCH "/dev/stdout"
 
+
 yarn run truffle exec ./scripts/truffle/make-release.js \
   --network $NETWORK \
   --build_directory $BUILD_DIR \
