@@ -122,8 +122,7 @@ export class LibraryAddresses {
     Object.keys(libraryPositions.positions).forEach((library) =>
       libraryPositions.positions[library].forEach((position) => {
         if (!this.addAddress(library, bytecode.slice(position, position + ADDRESS_LENGTH))) {
-          console.log(`Mismatched addresses for ${library} at ${position}, but skiped`)
-          // throw new Error(`Mismatched addresses for ${library} at ${position}`)
+          throw new Error(`Mismatched addresses for ${library} at ${position}`)
         }
       })
     )

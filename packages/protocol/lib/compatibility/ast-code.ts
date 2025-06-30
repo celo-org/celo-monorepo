@@ -237,12 +237,10 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
 
   const report = doASTCompatibilityReport(contractName, oldAST, newAST)
   // Check deployed byte code change
-  console.log("Checking contract named", contractName)
-  if (contractName !== 'InitParamsLib'){ // This works but I have no idea why
-    if ((stripMetadata(oldContract.schema.deployedBytecode) !== stripMetadata(newContract.schema.deployedBytecode))) {
-      report.push(new DeployedBytecodeChange(contractName))
-    }
+  if ((stripMetadata(oldContract.schema.deployedBytecode) !== stripMetadata(newContract.schema.deployedBytecode))) {
+    report.push(new DeployedBytecodeChange(contractName))
   }
+
   return report
 }
 
