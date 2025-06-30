@@ -47,7 +47,7 @@ function readNmenomic(networkName) {
   const privateKey = process.env.DEPLOYER_PRIVATKEY
   if (privateKey === undefined || privateKey === null || privateKey === '') {
     console.log(
-      `No private key found in .env.mnemonic.${networkName}1. Please run "yarn keys:decrypt" in root after escalating perms in Akeyless`
+      `No private key found in .env.mnemonic.${networkName}. Please run "yarn keys:decrypt" in root after escalating perms in Akeyless`
     )
     process.exit(1)
   }
