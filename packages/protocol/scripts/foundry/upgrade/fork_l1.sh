@@ -9,7 +9,7 @@ case $NETWORK in
   "mainnet")
     echo "Detected supported network: $NETWORK"
     CHAIN_ID=1
-    BLOCK_NUMBER=22715820
+    BLOCK_NUMBER=22830470
     ;;
   "holesky")
     echo "Detected supported network: $NETWORK"

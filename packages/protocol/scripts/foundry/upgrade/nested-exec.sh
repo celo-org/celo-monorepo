@@ -4,12 +4,33 @@ set -euo pipefail
 # behaviour (values: 'approve', 'sign')
 APPROVE_OR_SIGN='sign'
 
+# optionally allow to specify signer
+EXTERNAL_SIG=${SIG:-}
+EXTERNAL_ACCOUNT=${ACCOUNT:-}
+EXTERNAL_TEAM=${TEAM:-}
+if [ -n "$EXTERNAL_SIG" ] && [ -n "$EXTERNAL_ACCOUNT" ]; then
+  echo "Detected external account: $EXTERNAL_ACCOUNT"
+  case $EXTERNAL_TEAM in
+    "clabs"|"council")
+      echo "Detected valid team: $EXTERNAL_TEAM"
+      ;;
+    *)
+      echo "Invalid team: $EXTERNAL_TEAM" && exit 1
+      ;;
+  esac
+  echo "External sig: $EXTERNAL_SIG"
+fi
+
 # required envs
 [ -z "${VERSION:-}" ] && echo "Need to set the VERSION via env" && exit 1;
 [ -z "${PK:-}" ] && echo "Need to set the PK via env" && exit 1;
-[ -z "${SIGNER_1_PK:-}" ] && echo "Need to set the SIGNER_1_PK via env" && exit 1;
+if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ]; then
+  [ -z "${SIGNER_1_PK:-}" ] && echo "Need to set the SIGNER_1_PK via env" && exit 1;
+fi
 [ -z "${SIGNER_2_PK:-}" ] && echo "Need to set the SIGNER_2_PK via env" && exit 1;
-[ -z "${SIGNER_3_PK:-}" ] && echo "Need to set the SIGNER_3_PK via env" && exit 1;
+if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
+  [ -z "${SIGNER_3_PK:-}" ] && echo "Need to set the SIGNER_3_PK via env" && exit 1;
+fi
 [ -z "${SIGNER_4_PK:-}" ] && echo "Need to set the SIGNER_4_PK via env" && exit 1;
 
 # check version
@@ -27,17 +48,21 @@ SENDER=0xe571b94CF7e95C46DFe6bEa529335f4A11d15D92
 if [ $SENDER != $(cast wallet address --private-key $PK) ]; then
   echo "Invalid PK"; exit 1;
 fi
-MOCKED_SIGNER_1=0x899a864C6bE2c573a98d8493961F4D4c0F7Dd0CC
-if [ $MOCKED_SIGNER_1 != $(cast wallet address --private-key $SIGNER_1_PK) ]; then
-  echo "Invalid SIGNER_1_PK"; exit 1;
+if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ]; then
+  MOCKED_SIGNER_1=0x899a864C6bE2c573a98d8493961F4D4c0F7Dd0CC
+  if [ $MOCKED_SIGNER_1 != $(cast wallet address --private-key $SIGNER_1_PK) ]; then
+    echo "Invalid SIGNER_1_PK"; exit 1;
+  fi
 fi
 MOCKED_SIGNER_2=0x865d05C8bB46E7AF16D6Dc99ddfb2e64BBec1345
 if [ $MOCKED_SIGNER_2 != $(cast wallet address --private-key $SIGNER_2_PK) ]; then
   echo "Invalid SIGNER_2_PK"; exit 1;
 fi
-MOCKED_SIGNER_3=0x8Af6f11c501c082bD880B3ceC83e6bB249Fa32c9
-if [ $MOCKED_SIGNER_3 != $(cast wallet address --private-key $SIGNER_3_PK) ]; then
-  echo "Invalid SIGNER_3_PK"; exit 1;
+if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
+  MOCKED_SIGNER_3=0x8Af6f11c501c082bD880B3ceC83e6bB249Fa32c9
+  if [ $MOCKED_SIGNER_3 != $(cast wallet address --private-key $SIGNER_3_PK) ]; then
+    echo "Invalid SIGNER_3_PK"; exit 1;
+  fi
 fi
 MOCKED_SIGNER_4=0x480C5f2340f9E7A46ee25BAa815105B415a7c2e2
 if [ $MOCKED_SIGNER_4 != $(cast wallet address --private-key $SIGNER_4_PK) ]; then
@@ -107,7 +132,11 @@ if [ $APPROVE_OR_SIGN = 'approve' ]; then
   echo "cLabs hash approved"
 else
   echo "Sign cLabs hash"
-  CLABS_SIG_1=$(cast wallet sign --no-hash $CLABS_TX_HASH --private-key $SIGNER_1_PK)
+  if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ]; then
+    CLABS_SIG_1=$(cast wallet sign --no-hash $CLABS_TX_HASH --private-key $SIGNER_1_PK)
+  else
+    CLABS_SIG_1=$EXTERNAL_SIG
+  fi
   echo "Sig 1: $CLABS_SIG_1"
   CLABS_SIG_2=$(cast wallet sign --no-hash $CLABS_TX_HASH --private-key $SIGNER_2_PK)
   echo "Sig 2: $CLABS_SIG_2"
@@ -119,7 +148,13 @@ echo "Exec cLabs approval"
 if [ $APPROVE_OR_SIGN = 'approve' ]; then
   CLABS_SIG=0x000000000000000000000000${MOCKED_SIGNER_2:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000${MOCKED_SIGNER_1:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000
 else
-  CLABS_SIG=0x${CLABS_SIG_2:2}${CLABS_SIG_1:2}
+  if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ]; then
+    CLABS_SIG=0x${CLABS_SIG_2:2}${CLABS_SIG_1:2}
+  elif [[ ${MOCKED_SIGNER_2:2} < ${EXTERNAL_ACCOUNT:2} ]]; then
+    CLABS_SIG=0x${CLABS_SIG_2:2}${EXTERNAL_SIG:2}
+  else
+    CLABS_SIG=0x${EXTERNAL_SIG:2}${CLABS_SIG_2:2}
+  fi
 fi
 echo "cLabs sig: $CLABS_SIG"
 cast send $CLABS_SAFE_ADDRESS \
@@ -148,7 +183,11 @@ if [ $APPROVE_OR_SIGN = 'approve' ]; then
   echo "Council hash approved"
 else
   echo "Sign Council hash"
-  COUNCIL_SIG_1=$(cast wallet sign --no-hash $COUNCIL_TX_HASH --private-key $SIGNER_3_PK)
+  if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
+    COUNCIL_SIG_1=$(cast wallet sign --no-hash $COUNCIL_TX_HASH --private-key $SIGNER_3_PK)
+  else
+    COUNCIL_SIG_1=$EXTERNAL_SIG
+  fi
   echo "Sig 1: $COUNCIL_SIG_1"
   COUNCIL_SIG_2=$(cast wallet sign --no-hash $COUNCIL_TX_HASH --private-key $SIGNER_4_PK)
   echo "Sig 2: $COUNCIL_SIG_2"
@@ -160,7 +199,13 @@ echo "Exec Council approval"
 if [ $APPROVE_OR_SIGN = 'approve' ]; then
   COUNCIL_SIG=0x000000000000000000000000${MOCKED_SIGNER_4:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000${MOCKED_SIGNER_3:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000
 else
-  COUNCIL_SIG=0x${COUNCIL_SIG_2:2}${COUNCIL_SIG_1:2}
+  if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
+    COUNCIL_SIG=0x${COUNCIL_SIG_2:2}${COUNCIL_SIG_1:2}
+  elif [[ ${MOCKED_SIGNER_4:2} < ${EXTERNAL_ACCOUNT:2} ]]; then
+    COUNCIL_SIG=0x${COUNCIL_SIG_2:2}${EXTERNAL_SIG:2}
+  else
+    COUNCIL_SIG=0x${EXTERNAL_SIG:2}${COUNCIL_SIG_2:2}
+  fi
 fi
 echo "Council sig: $COUNCIL_SIG"
 cast send $COUNCIL_SAFE_ADDRESS \
