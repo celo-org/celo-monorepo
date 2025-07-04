@@ -8,6 +8,7 @@ APPROVE_OR_SIGN='sign'
 EXTERNAL_SIG=${SIG:-}
 EXTERNAL_ACCOUNT=${ACCOUNT:-}
 EXTERNAL_TEAM=${TEAM:-}
+GRAND_CHILD_MULTISIG=${GC_MULTISIG:-}
 if [ -n "$EXTERNAL_SIG" ] && [ -n "$EXTERNAL_ACCOUNT" ]; then
   echo "Detected external account: $EXTERNAL_ACCOUNT"
   case $EXTERNAL_TEAM in
@@ -19,6 +20,9 @@ if [ -n "$EXTERNAL_SIG" ] && [ -n "$EXTERNAL_ACCOUNT" ]; then
       ;;
   esac
   echo "External sig: $EXTERNAL_SIG"
+fi
+if [ -n $GRAND_CHILD_MULTISIG ] && [ $EXTERNAL_TEAM != "council" ]; then
+  echo "Grand Child multisig is not supported for other team than council" && exit 1
 fi
 
 # required envs
@@ -175,6 +179,28 @@ COUNCIL_TX_HASH=$(cast call $COUNCIL_SAFE_ADDRESS \
 echo "Council hash: $COUNCIL_TX_HASH"
 
 # approve or sign Council
+if [ -n $GRAND_CHILD_MULTISIG ]; then
+  echo "Detected Grand Child multisig: $GRAND_CHILD_MULTISIG"
+
+  GRAND_CHILD_NONCE=$(cast call $GRAND_CHILD_MULTISIG "nonce()(uint256)" -r $RPC_URL)
+  echo "Grand Child nonce: $GRAND_CHILD_NONCE"
+
+  APPROVE_ON_CHILD_CALLDATA=$(cast calldata 'approveHash(bytes32)' $COUNCIL_TX_HASH)
+  GRAND_CHILD_TX_HASH=$(cast call $GRAND_CHILD_MULTISIG \
+    "getTransactionHash(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,uint256)(bytes32)" \
+    $COUNCIL_SAFE_ADDRESS $VALUE $APPROVE_ON_CHILD_CALLDATA $OP_CALL $SAFE_TX_GAS $BASE_GAS $GAS_PRICE $GAS_TOKEN $REFUND_RECEIVER $GRAND_CHILD_NONCE \
+    -r $RPC_URL
+  )
+  echo "Grand Child hash: $GRAND_CHILD_TX_HASH"
+  echo "Grand Child sig: $EXTERNAL_SIG"
+  cast send $GRAND_CHILD_MULTISIG \
+    "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)" \
+    $COUNCIL_SAFE_ADDRESS $VALUE $APPROVE_ON_CHILD_CALLDATA $OP_CALL $SAFE_TX_GAS $BASE_GAS $GAS_PRICE $GAS_TOKEN $REFUND_RECEIVER $EXTERNAL_SIG \
+    --private-key $PK \
+    -r $RPC_URL
+  echo "Grand Child approval executed"
+fi
+
 if [ $APPROVE_OR_SIGN = 'approve' ]; then
   echo "Approve Council hash"
   COUNCIL_APPROVE_FROM_SIGNER_CALLDATA=$(cast calldata 'approveHash(bytes32)' $COUNCIL_TX_HASH)
@@ -183,12 +209,14 @@ if [ $APPROVE_OR_SIGN = 'approve' ]; then
   echo "Council hash approved"
 else
   echo "Sign Council hash"
-  if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
-    COUNCIL_SIG_1=$(cast wallet sign --no-hash $COUNCIL_TX_HASH --private-key $SIGNER_3_PK)
-  else
-    COUNCIL_SIG_1=$EXTERNAL_SIG
+  if [ -z $GRAND_CHILD_MULTISIG ]; then
+    if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
+      COUNCIL_SIG_1=$(cast wallet sign --no-hash $COUNCIL_TX_HASH --private-key $SIGNER_3_PK)
+    else
+      COUNCIL_SIG_1=$EXTERNAL_SIG
+    fi
+    echo "Sig 1: $COUNCIL_SIG_1"
   fi
-  echo "Sig 1: $COUNCIL_SIG_1"
   COUNCIL_SIG_2=$(cast wallet sign --no-hash $COUNCIL_TX_HASH --private-key $SIGNER_4_PK)
   echo "Sig 2: $COUNCIL_SIG_2"
   echo "Council hash signed"
@@ -199,12 +227,16 @@ echo "Exec Council approval"
 if [ $APPROVE_OR_SIGN = 'approve' ]; then
   COUNCIL_SIG=0x000000000000000000000000${MOCKED_SIGNER_4:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000${MOCKED_SIGNER_3:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000
 else
-  if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
-    COUNCIL_SIG=0x${COUNCIL_SIG_2:2}${COUNCIL_SIG_1:2}
-  elif [[ ${MOCKED_SIGNER_4:2} < ${EXTERNAL_ACCOUNT:2} ]]; then
-    COUNCIL_SIG=0x${COUNCIL_SIG_2:2}${EXTERNAL_SIG:2}
+  if [ -z $GRAND_CHILD_MULTISIG ]; then
+    if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
+      COUNCIL_SIG=0x${COUNCIL_SIG_2:2}${COUNCIL_SIG_1:2}
+    elif [[ ${MOCKED_SIGNER_4:2} < ${EXTERNAL_ACCOUNT:2} ]]; then
+      COUNCIL_SIG=0x${COUNCIL_SIG_2:2}${EXTERNAL_SIG:2}
+    else
+      COUNCIL_SIG=0x${EXTERNAL_SIG:2}${COUNCIL_SIG_2:2}
+    fi
   else
-    COUNCIL_SIG=0x${EXTERNAL_SIG:2}${COUNCIL_SIG_2:2}
+    COUNCIL_SIG=0x${COUNCIL_SIG_2:2}000000000000000000000000${GRAND_CHILD_MULTISIG:2}000000000000000000000000000000000000000000000000000000000000000001
   fi
 fi
 echo "Council sig: $COUNCIL_SIG"
@@ -213,7 +245,7 @@ cast send $COUNCIL_SAFE_ADDRESS \
   $PARENT_SAFE_ADDRESS $VALUE $APPROVE_ON_PARENT_CALLDATA $OP_CALL $SAFE_TX_GAS $BASE_GAS $GAS_PRICE $GAS_TOKEN $REFUND_RECEIVER $COUNCIL_SIG \
   --private-key $PK \
   -r $RPC_URL
-echo "cLabs approval executed"
+echo "Council approval executed"
 
 echo "--- Parent exec ---"
 
