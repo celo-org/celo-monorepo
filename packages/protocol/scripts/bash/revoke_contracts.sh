@@ -1,4 +1,7 @@
 #! /usr/bin/env bash
+
+# Revokes a ReleaseGold contract
+
 set -euo pipefail
 rejects=()
 
