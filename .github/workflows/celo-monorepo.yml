@@ -261,57 +261,60 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Transfer test
-            command: |
-              set -e
-              # Forcing to load go and rust paths
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_transfers.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Blockchain Parameters test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_blockchain_parameters.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Slashing test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_slashing.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Governance test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_governance.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Replica test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_replicas.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Sync test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_sync.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: CIP35 eth compatibility test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              echo "Test is skipped because migrations somehow fail"
-              # ./ci_test_cip35.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Validator order test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
+          - name: Geth e2e test
+            command: echo "Skipping these tests as they are running against a deprecated GETH version"
+          #   command: |
+          # - name: Transfer test
+          #   command: |
+          #     set -e
+          #     # Forcing to load go and rust paths
+          #     export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
+          #     cd packages/celotool
+          #     ./ci_test_transfers.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
+          # - name: Blockchain Parameters test
+          #   command: |
+          #     set -e
+          #     export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
+          #     cd packages/celotool
+          #     ./ci_test_blockchain_parameters.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
+          # - name: Slashing test
+          #   command: |
+          #     set -e
+          #     export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
+          #     cd packages/celotool
+          #     ./ci_test_slashing.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
+          # - name: Governance test
+          #   command: |
+          #     set -e
+          #     export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
+          #     cd packages/celotool
+          #     ./ci_test_governance.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
+          # - name: Replica test
+          #   command: |
+          #     set -e
+          #     export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
+          #     cd packages/celotool
+          #     ./ci_test_replicas.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
+          # - name: Sync test
+          #   command: |
+          #     set -e
+          #     export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
+          #     cd packages/celotool
+          #     ./ci_test_sync.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
+          # - name: CIP35 eth compatibility test
+          #   command: |
+          #     set -e
+          #     export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
+          #     cd packages/celotool
+          #     echo "Test is skipped because migrations somehow fail"
+          #     # ./ci_test_cip35.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
+          # - name: Validator order test
+          #   command: |
+          #     set -e
+          #     export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
+          #     cd packages/celotool
 
-              ./ci_test_validator_order.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
+          #     ./ci_test_validator_order.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
     steps:
       - uses: actions/checkout@v4
         with:
