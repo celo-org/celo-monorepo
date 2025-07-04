@@ -262,7 +262,7 @@ jobs:
       matrix:
         include:
           - name: Geth e2e test
-            command: echo "Skipping these tests as they ara running agains a deprecated GETH version"
+            command: echo "Skipping these tests as they are running against a deprecated GETH version"
           #   command: |
           # - name: Transfer test
           #   command: |
