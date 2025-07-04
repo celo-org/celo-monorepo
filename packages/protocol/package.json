@@ -11,7 +11,6 @@
     "lint": "yarn run lint:ts && yarn run lint:sol",
     "clean": "rm -rf ./types/typechain && rm -rf build/* && rm -rf .0x-artifacts/* && rm -rf migrations/*.js* && rm -rf migrations_ts/*.js* && rm -rf test/**/*.js* && rm -f lib/*.js* && rm -f lib/**/*.js* && rm -f scripts/*.js* && yarn clean:foundry",
     "clean:foundry": "forge clean && rm -rf cache out",
-    "test": "rm test/**/*.js ; node runTests.js",
     "test:scripts": "yarn ts-node scripts/run-scripts-tests.ts --testPathPattern=scripts/",
     "quicktest": "./scripts/bash/quicktest.sh",
     "test:coverage": "yarn run test --coverage",
