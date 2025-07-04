@@ -10,6 +10,7 @@ const logFormat = fetchEnvOrDefault('LOG_FORMAT', 'human')
 const streams: Logger.LoggerOptions['streams'] = []
 switch (logFormat) {
   case 'stackdriver':
+    // eslint-disable-next-line
     streams.push(createStream(levelFromName[logLevel]))
     break
   case 'json':
