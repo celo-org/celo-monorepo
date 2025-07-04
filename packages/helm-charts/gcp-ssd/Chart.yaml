@@ -1,8 +1,0 @@
-name: gcp-ssd
-version: 0.0.1
-description: Chart to deploy a GCP SSD storage class
-keywords:
-- gcp
-- ssd
-- storage-class
-appVersion: v1.7.3
