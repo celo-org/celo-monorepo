@@ -3,6 +3,7 @@ import { ArtifactsSingleton } from '../lib/artifactsSingleton'
 import { networks } from '../truffle-config.js'
 
 module.exports = async (deployer: any, network: any) => {
+  throw new Error('these migrations have been deprecated')
   const Migrations = artifacts.require('./Migrations.sol')
   deployer.deploy(Migrations)
 
