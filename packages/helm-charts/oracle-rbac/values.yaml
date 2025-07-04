@@ -1,6 +1,0 @@
-environment:
-  name: default
-  currencyPair: CELOUSD
-
-oracle:
-  replicas: 1

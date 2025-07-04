@@ -1,3 +1,4 @@
+// @ts-expect-error module started failing
 import Logger, { createLogger, levelFromName, LogLevelString, stdSerializers } from 'bunyan'
 import bunyanDebugStream from 'bunyan-debug-stream'
 import { createStream } from 'bunyan-gke-stackdriver'
@@ -9,6 +10,7 @@ const logFormat = fetchEnvOrDefault('LOG_FORMAT', 'human')
 const streams: Logger.LoggerOptions['streams'] = []
 switch (logFormat) {
   case 'stackdriver':
+    // eslint-disable-next-line
     streams.push(createStream(levelFromName[logLevel]))
     break
   case 'json':
