@@ -17,7 +17,7 @@
     "ci:test-make-release": "./scripts/bash/release-on-devchain.sh",
     "test:release-snapshots": "./scripts/bash/release-snapshots.sh",
     "test:generate-old-devchain-and-build": "./scripts/bash/generate-old-devchain-and-build.sh",
-    "build:ts": "rm -f migrations/*.js* && yarn ts-node --preferTsExts ./scripts/build.ts --truffleTypes ./types/typechain && tsc -b && mv migrations_ts/*.js* migrations",
+    "build:ts": "rm -f migrations/*.js* && yarn ts-node --preferTsExts ./scripts/build.ts --truffleTypes ./types/typechain && tsc -b",
     "gas": "yarn run test --gas",
     "pull-submodules": "git submodule update --init --recursive",
     "delete-submodules": "rm -rf $(git submodule | awk '{ print $2 }')",
