@@ -23,6 +23,7 @@
     "delete-submodules": "rm -rf $(git submodule | awk '{ print $2 }')",
     "build:sol": "yarn pull-submodules && mkdir -p migrations && yarn ts-node --preferTsExts ./scripts/build.ts --solidity ${BUILD_DIR:-./build}",
     "build": "yarn build:sol && yarn build:ts",
+    "build:forge": "forge build",
     "prebuild": "rm -rf ./build",
     "determine-release-version": "yarn --silent ts-node --preferTsExts ./scripts/determine-release-version.ts",
     "prepare_contracts_and_abis_publishing": "yarn ts-node --preferTsExts ./scripts/prepare-contracts-and-abis-publishing.ts",
