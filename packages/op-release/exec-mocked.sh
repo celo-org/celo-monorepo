@@ -21,7 +21,7 @@ if [ -n "$EXTERNAL_SIG" ] && [ -n "$EXTERNAL_ACCOUNT" ]; then
   esac
   echo "External sig: $EXTERNAL_SIG"
 fi
-if [ -n $GRAND_CHILD_MULTISIG ] && [ $EXTERNAL_TEAM != "council" ]; then
+if [ -n "$GRAND_CHILD_MULTISIG" ] && [ $EXTERNAL_TEAM != "council" ]; then
   echo "Grand Child multisig is not supported for other team than council" && exit 1
 fi
 
@@ -179,7 +179,7 @@ COUNCIL_TX_HASH=$(cast call $COUNCIL_SAFE_ADDRESS \
 echo "Council hash: $COUNCIL_TX_HASH"
 
 # approve or sign Council
-if [ -n $GRAND_CHILD_MULTISIG ]; then
+if [ -n "$GRAND_CHILD_MULTISIG" ]; then
   echo "Detected Grand Child multisig: $GRAND_CHILD_MULTISIG"
 
   GRAND_CHILD_NONCE=$(cast call $GRAND_CHILD_MULTISIG "nonce()(uint256)" -r $RPC_URL)
@@ -209,7 +209,7 @@ if [ $APPROVE_OR_SIGN = 'approve' ]; then
   echo "Council hash approved"
 else
   echo "Sign Council hash"
-  if [ -z $GRAND_CHILD_MULTISIG ]; then
+  if [ -z "$GRAND_CHILD_MULTISIG" ]; then
     if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
       COUNCIL_SIG_1=$(cast wallet sign --no-hash $COUNCIL_TX_HASH --private-key $SIGNER_3_PK)
     else
@@ -227,7 +227,7 @@ echo "Exec Council approval"
 if [ $APPROVE_OR_SIGN = 'approve' ]; then
   COUNCIL_SIG=0x000000000000000000000000${MOCKED_SIGNER_4:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000${MOCKED_SIGNER_3:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000
 else
-  if [ -z $GRAND_CHILD_MULTISIG ]; then
+  if [ -z "$GRAND_CHILD_MULTISIG" ]; then
     if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
       COUNCIL_SIG=0x${COUNCIL_SIG_2:2}${COUNCIL_SIG_1:2}
     elif [[ ${MOCKED_SIGNER_4:2} < ${EXTERNAL_ACCOUNT:2} ]]; then

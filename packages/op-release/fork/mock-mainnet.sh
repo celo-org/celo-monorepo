@@ -24,7 +24,7 @@ if [ -n "$EXTERNAL_ACCOUNT" ]; then
       ;;
   esac
 fi
-if [ -n $GRAND_CHILD_MULTISIG ] && [ $EXTERNAL_TEAM != "council" ]; then
+if [ -n "$GRAND_CHILD_MULTISIG" ] && [ $EXTERNAL_TEAM != "council" ]; then
   echo "Grand Child multisig is not supported for other team than council" && exit 1
 fi
 
@@ -63,7 +63,7 @@ cast rpc anvil_setStorageAt $CLABS_MULTISIG 0x0000000000000000000000000000000000
 cast rpc anvil_setStorageAt $COUNCIL_MULTISIG 0x0000000000000000000000000000000000000000000000000000000000000004 0x0000000000000000000000000000000000000000000000000000000000000002 -r $RPC_URL
 
 # change threshold to 1 for Grand Child multisig
-if [ -n $GRAND_CHILD_MULTISIG ]; then
+if [ -n "$GRAND_CHILD_MULTISIG" ]; then
   cast rpc anvil_setStorageAt $GRAND_CHILD_MULTISIG 0x0000000000000000000000000000000000000000000000000000000000000004 0x0000000000000000000000000000000000000000000000000000000000000001 -r $RPC_URL
 fi
 
@@ -74,7 +74,7 @@ cast rpc anvil_setStorageAt $CLABS_MULTISIG 0x0000000000000000000000000000000000
 cast rpc anvil_setStorageAt $COUNCIL_MULTISIG 0x0000000000000000000000000000000000000000000000000000000000000003 0x0000000000000000000000000000000000000000000000000000000000000002 -r $RPC_URL
 
 # change owner count to 1 for Grand Child multisig
-if [ -n $GRAND_CHILD_MULTISIG ]; then
+if [ -n "$GRAND_CHILD_MULTISIG" ]; then
   cast rpc anvil_setStorageAt $GRAND_CHILD_MULTISIG 0x0000000000000000000000000000000000000000000000000000000000000003 0x0000000000000000000000000000000000000000000000000000000000000001 -r $RPC_URL
 fi
 
@@ -96,7 +96,7 @@ cast rpc anvil_setStorageAt $CLABS_MULTISIG $SIGNER_1_SLOT 0x0000000000000000000
 # Signer #2 -> Sentinel: cast index address 0x865d05C8bB46E7AF16D6Dc99ddfb2e64BBec1345 2 -> 0x18877be3912428d756ff6389ee4e71768eb68d3e723f7c81e68919c0a11fe761
 cast rpc anvil_setStorageAt $CLABS_MULTISIG 0x18877be3912428d756ff6389ee4e71768eb68d3e723f7c81e68919c0a11fe761 0x000000000000000000000000${SENTINEL_ADDRESS:2} -r $RPC_URL
 # [Council]
-if [ -z $GRAND_CHILD_MULTISIG ]; then
+if [ -z "$GRAND_CHILD_MULTISIG" ]; then
   # Sentinel -> Signer #3: cast index address 0x0000000000000000000000000000000000000001 2 -> 0xe90b7bceb6e7df5418fb78d8ee546e97c83a08bbccc01a0644d599ccd2a7c2e0
   cast rpc anvil_setStorageAt $COUNCIL_MULTISIG 0xe90b7bceb6e7df5418fb78d8ee546e97c83a08bbccc01a0644d599ccd2a7c2e0 0x000000000000000000000000${MOCKED_SIGNER_3:2} -r $RPC_URL
   # Signer #3 -> Signer #4: cast index address 0x8Af6f11c501c082bD880B3ceC83e6bB249Fa32c9 2 -> 0xfe2b681ac5bf197b6e6f3e6e8cb27c9abb3fa4018a18e1b5762ed302770b84e2
@@ -135,7 +135,7 @@ echo "cLabs signer is Signer #2: $(cast call $CLABS_MULTISIG "isOwner(address)(b
 echo "--- Council ---"
 echo "Council threshold: $(cast call $COUNCIL_MULTISIG "getThreshold()(uint256)" -r $RPC_URL)"
 echo "Council owners: $(cast call $COUNCIL_MULTISIG "getOwners()(address[])" -r $RPC_URL)"
-if [ -z $GRAND_CHILD_MULTISIG ]; then
+if [ -z "$GRAND_CHILD_MULTISIG" ]; then
   echo "Council signer is Signer #3: $(cast call $COUNCIL_MULTISIG "isOwner(address)(bool)" $MOCKED_SIGNER_3 -r $RPC_URL)"
   echo "Council signer is Signer #4: $(cast call $COUNCIL_MULTISIG "isOwner(address)(bool)" $MOCKED_SIGNER_4 -r $RPC_URL)"
 else
