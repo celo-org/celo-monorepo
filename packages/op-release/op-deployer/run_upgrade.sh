@@ -47,6 +47,6 @@ if [[ -z "${DEPLOYER_PK:-}" ]]; then
 fi
 
 # Run all scripts synchronously
-./scripts/foundry/upgrade/bootstrap.sh
-./scripts/foundry/upgrade/bootstrap-validator.sh
-./scripts/foundry/upgrade/upgrade.sh
+./op-deployer/bootstrap.sh
+./op-deployer/bootstrap-validator.sh
+./op-deployer/upgrade.sh

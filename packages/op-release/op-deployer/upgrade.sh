@@ -35,7 +35,7 @@ esac
 # Set vars
 OP_DEPLOYER_CMD="$OP_ROOT/op-deployer/bin/op-deployer"
 ARTIFACTS_LOCATOR="file://$OP_ROOT/packages/contracts-bedrock/forge-artifacts"
-CONFIG=./scripts/foundry/upgrade/config-upgrade.json
+CONFIG=./op-deployer/config-upgrade.json
 if [[ -z "${RPC_URL:-}" ]]; then
   L1_RPC_URL=http://localhost:8545
   echo "Using localhost"
