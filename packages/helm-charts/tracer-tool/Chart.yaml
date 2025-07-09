@@ -1,8 +1,0 @@
-name: tracer-tool
-version: 0.0.1
-description: Chart which runs tracer tool
-keywords:
-- ethereum
-- blockchain
-- tracer
-appVersion: v1.7.3
