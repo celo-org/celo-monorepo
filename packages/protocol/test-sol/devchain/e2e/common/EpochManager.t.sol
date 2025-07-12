@@ -591,6 +591,90 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length - 1); // -1 because the validator deaffiliated
   }
 
+  function test_shouldFinishNextEpochProcessing_WhenValidatorDeaffiliatesAndDeregistersBeforeStart() public {
+    address[] memory lessers;
+    address[] memory greaters;
+    GroupWithVotes[] memory groupWithVotes;
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+
+    uint256 currentEpoch = epochManagerContract.getCurrentEpochNumber();
+    address[] memory currentlyElected = epochManagerContract.getElectedAccounts();
+    for (uint256 i = 0; i < currentlyElected.length; i++) {
+      originalyElected.add(currentlyElected[i]);
+    }
+
+    // wait some time before finishing
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
+
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+
+    assertEq(currentEpoch + 1, epochManagerContract.getCurrentEpochNumber());
+
+    for (uint256 i = 0; i < currentlyElected.length; i++) {
+      assertEq(originalyElected.contains(currentlyElected[i]), true);
+    }
+
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
+
+    // wait some time before finishing
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
+
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
+
+    assertEq(currentEpoch + 2, epochManagerContract.getCurrentEpochNumber());
+
+    address[] memory newlyElected2 = epochManagerContract.getElectedAccounts();
+
+    for (uint256 i = 0; i < currentlyElected.length; i++) {
+      assertEq(originalyElected.contains(newlyElected2[i]), true);
+    }
+
+    // add new validator group and validator
+    (address newValidatorGroup, address newValidator) = registerNewValidatorGroupWithValidator(
+      0,
+      1
+    );
+
+    vm.prank(currentlyElected[0]);
+    validators.deaffiliate();
+    (, uint256 duration) = validators.getValidatorLockedGoldRequirements();
+    vm.warp(block.timestamp + duration + 1);
+    vm.prank(currentlyElected[0]);
+    validators.deregisterValidator(0);
+
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
+
+    timeTravel(epochDuration / 2);
+    blockTravel(100);
+
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
+
+    groups.push(newValidatorGroup);
+    validatorsArray.push(newValidator);
+
+    assertEq(
+      epochManagerContract.getElectedAccounts().length,
+      validators.getRegisteredValidators().length - 1 // -1 because the validator deaffiliated
+    );
+    assertEq(groups.length, validators.getRegisteredValidatorGroups().length);
+
+    timeTravel(epochDuration + 1);
+    epochManagerContract.startNextEpochProcess();
+    (lessers, greaters, groupWithVotes) = getLessersAndGreaters(groups);
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+    assertGroupWithVotes(groupWithVotes);
+
+    assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length - 1); // -1 because the validator deaffiliated
+  }
+
   function test_shouldFinishNextEpochProcessing_WhenValidatorDeaffiliatesBeforeFinish() public {
     address[] memory lessers;
     address[] memory greaters;
