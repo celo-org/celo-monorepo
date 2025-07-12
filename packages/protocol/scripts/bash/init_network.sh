@@ -6,4 +6,4 @@ set -euo pipefail
 # Flags:
 # -n: Name of the network to migrate to
 
-yarn run migrate -r "$@" && yarn run set_block_gas_limit "$@"
+yarn run devchain:migrate -r "$@" && yarn run truffle:set-block-gas-limit "$@"

@@ -1,5 +1,8 @@
 # Testnet Helm Chart
 
+> All helm charts in this package are deprecated and should be removed
+> Instead - we use: https://github.com/celo-org/charts
+
 This helm chart allows you to deploy testnets, on which you can deploy smart contracts or interact with our app. See the README at the parent folder for more general Helm
 
 `NAMESPACE_NAME` is the Kubernetes namespace all Kubernetes primitives are getting deployed to. This isolates various networks from each other. `RELEASE_NAME` is the helm chart release name, i.e. a consistent name that refers to the primitives as a group. By convention, `NAMESPACE_NAME` and `RELEASE_NAME` should be the same name and just use [a-z0-9\-] characters so that most scripts you just pass `NAME` instead of having to specify all the names separately. However if you would like to, you can generally use the `-r` or `-n` flags to do so.
@@ -43,7 +46,7 @@ So a contract deploy as per [protocol README](../../protocol/README.md) would lo
 # pwd: .../packages/protocol
 # portforward is active
 # Don't forget to set $NAME in the new terminal
-yarn run init-network -n $NAME
+yarn run devchain:init-network -n $NAME
 ```
 
 You can then share the contract build artifacts by running:
