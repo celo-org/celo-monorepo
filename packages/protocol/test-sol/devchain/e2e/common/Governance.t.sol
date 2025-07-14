@@ -19,8 +19,7 @@ import { IRegistry } from "@celo-contracts/common/interfaces/IRegistry.sol";
 
 // Test imports
 import { Devchain } from "@test-sol/devchain/e2e/utils.sol";
-import { SelectorParser } from "@test-sol/utils/SelectorParser.sol";
-import { StringUtils } from "@test-sol/utils/StringUtils.sol";
+import { ConstitutionHelper } from "@test-sol/utils/ConstitutionHelper.sol";
 
 contract E2E_Election is Devchain {
   function test_shouldElectAllValidators() public {
@@ -41,23 +40,12 @@ contract E2E_Election is Devchain {
 }
 
 contract E2E_Constitution is Devchain {
-  using stdJson for string;
-  using StringUtils for string;
-  using SelectorParser for string;
-
   // test cases
-  struct ConstitutionCase {
-    string contractName;
-    address contractAddress;
-    string functionName;
-    bytes4 selector;
-    uint256 threshold;
-  }
-  ConstitutionCase[] internal constitutionCases;
-  ConstitutionCase internal currentCase;
+  ConstitutionHelper.ConstitutionEntry[] internal constitutionCases;
+  ConstitutionHelper.ConstitutionEntry internal currentCase;
 
   // event for transparency
-  event LogConstitutionCase(ConstitutionCase);
+  event LogConstitutionCase(ConstitutionHelper.ConstitutionEntry);
 
   // snapshot
   uint256 internal constitutionSnapshot;
@@ -72,126 +60,15 @@ contract E2E_Constitution is Devchain {
     }
   }
 
-  // structs to combat stack too deep
-  struct JsonFiles {
-    string constitutionJson;
-    string proxySelectors;
-  }
-  struct FileProps {
-    string[] contractNames;
-    string[] proxyNames;
-    string[] proxySigs;
-  }
-  struct LoopVars {
-    string contractName;
-    address contractAddress;
-    string functionName;
-    bytes4 functionSelector;
-    uint256 threshold;
-  }
-
   function setUp() public virtual override {
-    // get contracts from constitution
-    JsonFiles memory files_ = JsonFiles(
-      vm.readFile("./governanceConstitution.json"), // constitution json
-      vm.readFile("./.tmp/selectors/Proxy.json") // proxy selectors
-    );
-    FileProps memory props_ = FileProps(
-      vm.parseJsonKeys(files_.constitutionJson, ""), // contract names
-      vm.parseJsonKeys(files_.constitutionJson, ".Proxy"), // proxy names
-      vm.parseJsonKeys(files_.proxySelectors, "") // proxy sigs
-    );
-
-    // vars for looping
-    LoopVars memory loop_;
-    string memory contractSelectors_;
-    string[] memory functionsWithTypes_;
-    string[] memory functionNames_;
-
-    // loop over contract names
-    for (uint256 i = 0; i < props_.contractNames.length; i++) {
-      loop_.contractName = props_.contractNames[i];
-      if (loop_.contractName.equals("Proxy")) {
-        // skip proxy address
-        continue;
-      } else {
-        // set address from registry
-        loop_.contractAddress = registryContract.getAddressForStringOrDie(loop_.contractName);
-      }
-
-      // load selectors for given contract from file
-      contractSelectors_ = vm.readFile(
-        string.concat("./.tmp/selectors/", loop_.contractName, ".json")
-      );
-
-      // get function names with types
-      functionsWithTypes_ = vm.parseJsonKeys(contractSelectors_, "");
-
-      // get functions names from constitution for contract
-      functionNames_ = vm.parseJsonKeys(
-        files_.constitutionJson,
-        string.concat(".", loop_.contractName)
-      );
-
-      // loop over function names
-      uint256 functionsCount_ = functionNames_.length + props_.proxyNames.length;
-      for (uint256 j = 0; j < functionsCount_; j++) {
-        if (j < functionNames_.length) {
-          // get function from contract implementation
-          loop_.functionName = functionNames_[j];
-        } else {
-          // get function from proxy contract
-          loop_.functionName = props_.proxyNames[j - functionNames_.length];
-        }
-
-        if (loop_.functionName.equals("default")) {
-          // use empty selector as default
-          loop_.functionSelector = hex"00000000";
-        } else if (j < functionNames_.length) {
-          // retrieve selector from contract selectors
-          loop_.functionSelector = contractSelectors_.getSelector(
-            functionsWithTypes_,
-            loop_.functionName,
-            vm
-          );
-        } else {
-          // retrieve selector from proxy selectors
-          loop_.functionSelector = files_.proxySelectors.getSelector(
-            props_.proxySigs,
-            loop_.functionName,
-            vm
-          );
-        }
-
-        // determine treshold from constitution
-        if (j < functionNames_.length) {
-          loop_.threshold = files_.constitutionJson.readUint(
-            string.concat(".", loop_.contractName, ".", loop_.functionName)
-          );
-        } else {
-          loop_.threshold = files_.constitutionJson.readUint(
-            string.concat(".Proxy.", loop_.functionName)
-          );
-        }
-
-        // push new test case
-        constitutionCases.push(
-          ConstitutionCase(
-            loop_.contractName,
-            loop_.contractAddress,
-            loop_.functionName,
-            loop_.functionSelector,
-            loop_.threshold
-          )
-        );
-      }
-    }
+    // read constitution
+    ConstitutionHelper.readConstitution(constitutionCases, registryContract, vm);
   }
 
   function test_shouldHaveCorrectThreshold() public parametrized__constitutionCase {
     emit LogConstitutionCase(currentCase);
     assertEq(
-      governance.getConstitution(currentCase.contractAddress, currentCase.selector),
+      governance.getConstitution(currentCase.contractAddress, currentCase.functionSelector),
       currentCase.threshold
     );
   }
