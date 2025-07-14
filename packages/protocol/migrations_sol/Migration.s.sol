@@ -57,12 +57,10 @@ import { IScoreManagerInitializer } from "@celo-contracts-8/common/interfaces/IS
 import { IFeeCurrencyDirectory } from "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
 import { UsingRegistry } from "@celo-contracts-8/common/UsingRegistry.sol";
 
-// Local imports
-import { StringUtils } from "@celo-contracts/common/libraries/StringUtils.sol";
-
 // Test imports
 import { ISECP256K1 } from "@test-sol/utils/SECP256K1.sol";
 import { SelectorParser } from "@test-sol/utils/SelectorParser.sol";
+import { StringUtils } from "@test-sol/utils/StringUtils.sol";
 
 contract ForceTx {
   // event to trigger so a tx can be processed

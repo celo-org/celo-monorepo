@@ -8,6 +8,7 @@ contract MigrationsConstants is TestConstants {
 
   // List of contracts that are expected to be in Registry.sol
   // TODO: Probably should be synced with Migration.s.sol
+  // TODO: Change to be automatically populated and length calculated
   string[26] contractsInRegistry = [
     "Accounts",
     "BlockchainParameters",

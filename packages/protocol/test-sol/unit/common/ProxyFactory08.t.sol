@@ -1,10 +1,12 @@
 pragma solidity ^0.8.15;
 
+// Celo imports
 import { ProxyFactory08 } from "@celo-contracts-8/common/ProxyFactory08.sol";
-import { StringUtils } from "@celo-contracts/common/libraries/StringUtils.sol";
 import { IProxy } from "@celo-contracts/common/interfaces/IProxy.sol";
 
+// Test imports
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
+import { StringUtils } from "@test-sol/utils/StringUtils.sol";
 
 contract ProxyFactoryTest is TestWithUtils08 {
   using StringUtils for string;
