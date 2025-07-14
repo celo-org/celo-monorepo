@@ -14,13 +14,13 @@ import { IGovernanceVote } from "@celo-contracts/governance/interfaces/IGovernan
 import { IGovernanceSlasher } from "@celo-contracts/governance/interfaces/IGovernanceSlasher.sol";
 
 // Common imports
-import { StringUtils } from "@celo-contracts/common/libraries/StringUtils.sol";
 import { IMultiSig } from "@celo-contracts/common/interfaces/IMultiSig.sol";
 import { IRegistry } from "@celo-contracts/common/interfaces/IRegistry.sol";
 
 // Test imports
 import { Devchain } from "@test-sol/devchain/e2e/utils.sol";
 import { SelectorParser } from "@test-sol/utils/SelectorParser.sol";
+import { StringUtils } from "@test-sol/utils/StringUtils.sol";
 
 contract E2E_Election is Devchain {
   function test_shouldElectAllValidators() public {
