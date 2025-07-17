@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Read environment variables and constants
-source $PWD/scripts/foundry/constants.sh
+# source $PWD/scripts/foundry/constants.sh
 
 # Create a temporary directory or remove it first it if exists
 if [ -d "$TEMP_DIR" ]; then
@@ -53,7 +53,7 @@ for LIB_PATH in "${LIBRARIES_PATH[@]}"; do
     # LIB_PATH = "contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
     # LIB_NAME = AddressSortedLinkedListWithMedian
     echo "Deploying library: $LIB_NAME"
-    create_library_out=`forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url $ANVIL_RPC_URL --unlocked --broadcast --json`
+    create_library_out=`forge create $LIB_PATH --from 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --rpc-url $ANVIL_RPC_URL --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --broadcast --json`
     LIB_ADDRESS=`echo $create_library_out | jq -r '.deployedTo'`
     # Constructing library flag so the remaining contracts can be built and linkeded to these libraries
     LIBRARY_FLAGS="$LIBRARY_FLAGS --libraries $LIB_PATH:$LIB_ADDRESS"
