@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Read environment variables and constants
-# source $PWD/scripts/foundry/constants.sh
+source $PWD/scripts/foundry/constants.sh
 
 # Create a temporary directory or remove it first it if exists
 if [ -d "$TEMP_DIR" ]; then
@@ -64,4 +64,3 @@ popd
 
 # Remove the temporary directory
 rm -rf $TEMP_DIR
-
