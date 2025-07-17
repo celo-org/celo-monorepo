@@ -264,6 +264,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // // Functions with broadcast with different addresses
     // // Validators needs to lock, which can be only used by the msg.sender
   }
+
   function run2() public {
     vm.startBroadcast(DEPLOYER_ACCOUNT);
 

@@ -5,10 +5,8 @@ set -euo pipefail
 
 # Read environment variables and constants
 source $PWD/scripts/foundry/constants.sh
-
-
-ANVIL_PORT=9545
-ANVIL_RPC_URL="http://127.0.0.1:9545"
+DEPLOYER_PK=0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+MIGRATION_PK=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
 CACHED_LIBRARIES_FLAG=`cat $TMP_FOLDER/library_flags.txt || echo ""`
 echo "Library flags are: $CACHED_LIBRARIES_FLAG"
@@ -40,11 +38,8 @@ echo "Library flags are: $CACHED_LIBRARIES_FLAG"
 #   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
 # exit 1
 
-
-
 # Keeping track of start time to measure how long it takes to run the script entirely
 START_TIME=$SECONDS
-
 echo "Forge version: $(forge --version)"
 
 # Create temporary directory
@@ -59,8 +54,6 @@ mkdir -p $TMP_FOLDER
 #source $PWD/scripts/foundry/start_anvil.sh
 
 # Deploy libraries to the anvil instance
-ANVIL_PORT=9545
-ANVIL_RPC_URL="http://127.0.0.1:9545"
 source $PWD/scripts/foundry/deploy_libraries.sh
 echo "Library flags are: $LIBRARY_FLAGS"
 echo $LIBRARY_FLAGS > $TMP_FOLDER/library_flags.txt
@@ -90,7 +83,11 @@ time FOUNDRY_PROFILE=devchain forge build $LIBRARY_FLAGS
 # --rpc-url $ANVIL_RPC_URL
 
 # pre-deploy election.sol?
-forge create Election --constructor-args false --rpc-url  http://localhost:9545 --private-key 59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d $LIBRARY_FLAGS
+echo "Deploying Election contract..."
+forge create -r $ANVIL_RPC_URL --private-key $DEPLOYER_PK $LIBRARY_FLAGS \
+  --broadcast \
+  contracts/governance/Election.sol:Election \
+  --constructor-args false
 # [⠊] Compiling...
 # No files changed, compilation skipped
 # Deployer: 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
@@ -99,44 +96,41 @@ forge create Election --constructor-args false --rpc-url  http://localhost:9545 
 # exit 1
 
 # Run migrations
-echo "Running migration script... "
+echo "Running migration script..."
 forge script \
   $MIGRATION_SCRIPT_PATH \
   --target-contract $MIGRATION_TARGET_CONTRACT \
   --sender $FROM_ACCOUNT \
-  --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
+  --private-key $MIGRATION_PK \
   $VERBOSITY_LEVEL \
   $BROADCAST \
   $SKIP_SIMULATION \
   $NON_INTERACTIVE \
   $LIBRARY_FLAGS \
-  --slow \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
   
-
-echo "transfering funds to UNRELEASE_TREASURY"
+echo "Transfering funds to Unreleased Treasury..."
 CELO_TOKEN_ADDRESS=`cast call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string calldata identifier) external view returns (address)" "CeloToken" --rpc-url $ANVIL_RPC_URL`
 CELO_UNRELEASED_TREASURY_ADDRESS=0xB76D502Ad168F9D545661ea628179878DcA92FD5
 #CELO_UNRELEASED_TREASURY=`cast call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string calldata identifier) external view returns (address)" "CeloUnreleasedTreasury" --rpc-url $ANVIL_RPC_URL`
 UNRELEASE_TREASURY_PRE_MINT=390000000000000000000000000
-cast send $CELO_TOKEN_ADDRESS "function transfer(address to, uint256 value) external returns (bool)" $CELO_UNRELEASED_TREASURY_ADDRESS $UNRELEASE_TREASURY_PRE_MINT --rpc-url  $ANVIL_RPC_URL --private-key 59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
-# libraries flag somehow breaks the next script?
+cast send $CELO_TOKEN_ADDRESS "function transfer(address to, uint256 value) external returns (bool)" $CELO_UNRELEASED_TREASURY_ADDRESS $UNRELEASE_TREASURY_PRE_MINT --rpc-url  $ANVIL_RPC_URL --private-key $DEPLOYER_PK
 
+echo "Running second part of migration script..."
 forge script \
   $MIGRATION_SCRIPT_PATH \
   --target-contract $MIGRATION_TARGET_CONTRACT \
   --sender $FROM_ACCOUNT \
-  --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
-  $VERBOSITY_LEVEL \
+  --private-key $MIGRATION_PK \
   --sig "run2()" \
-  $NON_INTERACTIVE \
-  --slow \
+  $VERBOSITY_LEVEL \
   $BROADCAST \
   $SKIP_SIMULATION \
-  --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
+  $NON_INTERACTIVE \
+  $LIBRARY_FLAGS \
+  --rpc-url $ANVIL_RPC_URL || { echo "Migration script (part 2) failed"; exit 1; }
 
-
-
+echo "Getting address for Epoch Rewards..."
 CELO_EPOCH_REWARDS_ADDRESS=$(
   cast call \
     $REGISTRY_ADDRESS \
@@ -157,13 +151,13 @@ ELAPSED_TIME=$(($SECONDS - $START_TIME))
 echo "Migration script total elapsed time: $ELAPSED_TIME seconds"
 
 # this helps to make sure that devchain state is actually being saved
-sleep $SLEEP_DURATION
+# sleep $SLEEP_DURATION
 
-if [[ "${KEEP_DEVCHAIN_FOLDER:-}" == "true" ]]; then
-    cp $ANVIL_FOLDER/state.json $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME
-    echo "Keeping devchain folder as per flag."
-else
-    # Rename devchain artifact and remove unused directory
-    mv $ANVIL_FOLDER/state.json $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME
-    rm -rf $ANVIL_FOLDER
-fi
+# if [[ "${KEEP_DEVCHAIN_FOLDER:-}" == "true" ]]; then
+#     cp $ANVIL_FOLDER/state.json $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME
+#     echo "Keeping devchain folder as per flag."
+# else
+#     # Rename devchain artifact and remove unused directory
+#     mv $ANVIL_FOLDER/state.json $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME
+#     rm -rf $ANVIL_FOLDER
+# fi
