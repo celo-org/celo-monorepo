@@ -4,7 +4,7 @@ import { TestConstants } from "@test-sol/constants.sol";
 
 contract MigrationsConstants is TestConstants {
   // Addresses
-  address constant DEPLOYER_ACCOUNT = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+  address constant DEPLOYER_ACCOUNT = 0x95a40aA01d2d72b4122C19c86160710D01224ada;
 
   // List of contracts that are expected to be in Registry.sol
   string[] contractsInRegistry = [

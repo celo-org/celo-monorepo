@@ -5,16 +5,20 @@ set -euo pipefail
 
 # Read environment variables and constants
 source $PWD/scripts/foundry/constants.sh
-DEPLOYER_PK=0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
-MIGRATION_PK=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+# DEPLOYER_PK=0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+# MIGRATION_PK=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+ANVIL_PORT=9545
+ANVIL_RPC_URL="http://127.0.0.1:9545"
+DEPLOYER_PRIVATE_KEY="0xc2e0b480b7d39aa35be9cb0761cb11b5f27d8deefad7a4a194b09274937804df"
+FROM_ADDRESS="$(cast wallet address --private-key $DEPLOYER_PRIVATE_KEY)"
 
-CACHED_LIBRARIES_FLAG=`cat $TMP_FOLDER/library_flags.txt || echo ""`
+CACHED_LIBRARIES_FLAG=$(cat $TMP_FOLDER/library_flags.txt || echo "")
 echo "Library flags are: $CACHED_LIBRARIES_FLAG"
 # forge script \
 #   $MIGRATION_SCRIPT_PATH \
 #   --target-contract $MIGRATION_TARGET_CONTRACT \
-#   --sender $FROM_ACCOUNT \
-#   --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
+#   --sender $FROM_ADDRESS \
+#   --private-key $DEPLOYER_PRIVATE_KEY \
 #   $VERBOSITY_LEVEL \
 #   --sig "run3()" \
 #   $NON_INTERACTIVE \
@@ -27,8 +31,8 @@ echo "Library flags are: $CACHED_LIBRARIES_FLAG"
 # forge script \
 #   $MIGRATION_SCRIPT_PATH \
 #   --target-contract $MIGRATION_TARGET_CONTRACT \
-#   --sender $FROM_ACCOUNT \
-#   --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
+#   --sender $FROM_ADDRESS \
+#   --private-key $DEPLOYER_PRIVATE_KEY \
 #   $VERBOSITY_LEVEL \
 #   --sig "run3()" \
 #   $NON_INTERACTIVE \
@@ -96,8 +100,8 @@ echo "Running migration script..."
 forge script \
   $MIGRATION_SCRIPT_PATH \
   --target-contract $MIGRATION_TARGET_CONTRACT \
-  --sender $FROM_ACCOUNT \
-  --private-key $MIGRATION_PK \
+  --sender $FROM_ADDRESS \
+  --private-key $DEPLOYER_PRIVATE_KEY \
   $VERBOSITY_LEVEL \
   $BROADCAST \
   $SKIP_SIMULATION \
@@ -105,26 +109,31 @@ forge script \
   $LIBRARY_FLAGS \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
   
-echo "Transfering funds to Unreleased Treasury..."
-CELO_TOKEN_ADDRESS=`cast call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string calldata identifier) external view returns (address)" "CeloToken" --rpc-url $ANVIL_RPC_URL`
-CELO_UNRELEASED_TREASURY_ADDRESS=0xB76D502Ad168F9D545661ea628179878DcA92FD5
-#CELO_UNRELEASED_TREASURY=`cast call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string calldata identifier) external view returns (address)" "CeloUnreleasedTreasury" --rpc-url $ANVIL_RPC_URL`
-UNRELEASE_TREASURY_PRE_MINT=390000000000000000000000000
-cast send $CELO_TOKEN_ADDRESS "function transfer(address to, uint256 value) external returns (bool)" $CELO_UNRELEASED_TREASURY_ADDRESS $UNRELEASE_TREASURY_PRE_MINT --rpc-url  $ANVIL_RPC_URL --private-key $DEPLOYER_PK
+echo "Completed run() execution"
+
+# echo "transfering funds to UNRELEASE_TREASURY"
+# CELO_TOKEN_ADDRESS=$(cast call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string calldata identifier) external view returns (address)" "CeloToken" --rpc-url $ANVIL_RPC_URL)
+# CELO_UNRELEASED_TREASURY_ADDRESS=0xB76D502Ad168F9D545661ea628179878DcA92FD5
+# #CELO_UNRELEASED_TREASURY=`cast call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string calldata identifier) external view returns (address)" "CeloUnreleasedTreasury" --rpc-url $ANVIL_RPC_URL`
+# UNRELEASE_TREASURY_PRE_MINT=390000000000000000000000000
+# cast send $CELO_TOKEN_ADDRESS "function transfer(address to, uint256 value) external returns (bool)" $CELO_UNRELEASED_TREASURY_ADDRESS $UNRELEASE_TREASURY_PRE_MINT --rpc-url  $ANVIL_RPC_URL --private-key 59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+# # libraries flag somehow breaks the next script?
 
 echo "Running second part of migration script..."
 forge script \
   $MIGRATION_SCRIPT_PATH \
   --target-contract $MIGRATION_TARGET_CONTRACT \
-  --sender $FROM_ACCOUNT \
-  --private-key $MIGRATION_PK \
-  --sig "run2()" \
+  --sender $FROM_ADDRESS \
+  --private-key $DEPLOYER_PRIVATE_KEY \
   $VERBOSITY_LEVEL \
+  --sig "run2()" \
+  $NON_INTERACTIVE \
   $BROADCAST \
   $SKIP_SIMULATION \
-  $NON_INTERACTIVE \
   $LIBRARY_FLAGS \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script (part 2) failed"; exit 1; }
+
+echo "Completed run2() execution"
 
 echo "Getting address for Epoch Rewards..."
 CELO_EPOCH_REWARDS_ADDRESS=$(

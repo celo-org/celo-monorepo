@@ -262,6 +262,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function run2() public {
+    // Ensure deployer has sufficient native balance for all operations
+    vm.deal(DEPLOYER_ACCOUNT, 1000000 ether);
+
     vm.startBroadcast(DEPLOYER_ACCOUNT);
 
     proxyFactory = IProxyFactory(
@@ -527,7 +530,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     /*
     Arbitrary intrinsic gas number take from existing `FeeCurrencyDirectory.t.sol` tests
-    Source: https://github.com/celo-org/celo-monorepo/blob/2cec07d43328cf4216c62491a35eacc4960fffb6/packages/protocol/test-sol/common/FeeCurrencyDirectory.t.sol#L27 
+    Source: https://github.com/celo-org/celo-monorepo/blob/2cec07d43328cf4216c62491a35eacc4960fffb6/packages/protocol/test-sol/common/FeeCurrencyDirectory.t.sol#L27
     */
     uint256 mockIntrinsicGas = 21000;
 
@@ -1015,7 +1018,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     console.log("Funding CeloUnreleasedTreasury");
     address celoUnreleasedTreasury = address(getCeloUnreleasedTreasury());
 
-    vm.startBroadcast(0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d);
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
 
     getCeloToken().transfer(celoUnreleasedTreasury, 400_000_000 ether);
 
@@ -1245,7 +1248,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 amountToLock,
     address groupToAffiliate
   ) public returns (address) {
+    // fundAccount(vm.addr(validatorKey), amountToLock + 1 ether);
     vm.startBroadcast(validatorKey);
+    console.log("Registering validator: ", vm.addr(validatorKey));
     lockGold(amountToLock);
     address accountAddress = (new ForceTx()).identity();
 
@@ -1273,7 +1278,10 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 commission,
     string memory json
   ) public returns (address accountAddress) {
+    // fundAccount(vm.addr(validator0Key), amountToLock + 1000 ether);
     string memory groupName = abi.decode(json.parseRaw(".validators.groupName"), (string));
+    console.log("Registering validator group", groupName, "with address: ", vm.addr(validator0Key));
+    console.log("Locking gold: ", amountToLock);
     vm.startBroadcast(validator0Key);
     lockGold(amountToLock);
     getAccounts().setName(groupName);
@@ -1281,6 +1289,16 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     accountAddress = (new ForceTx()).identity();
     vm.stopBroadcast();
+  }
+
+  function fundAccount(address account, uint256 amount) public {
+    console.log("Funding account: ", account, " with amount: ", amount);
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
+    vm.deal(account, amount);
+    vm.stopBroadcast();
+
+    // Also give native balance for lock() calls that use {value: }
+    vm.deal(account, amount);
   }
 
   function _generateEcdsaPubKeyWithSigner(
