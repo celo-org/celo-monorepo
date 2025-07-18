@@ -175,6 +175,8 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
+        
+          # this is using ganache
       - name: Download protocol devchain artifact
         uses: dawidd6/action-download-artifact@20319c5641d495c8a52e688b7dc5fada6c3a9fbc
         with:
@@ -189,6 +191,7 @@ jobs:
         run: |
           echo "Comparing against $RELEASE_TAG"
           BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
+          # this is the command that should work with anvil
           yarn --cwd packages/protocol ci:test-make-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR
 
   protocol-test-matrix:
