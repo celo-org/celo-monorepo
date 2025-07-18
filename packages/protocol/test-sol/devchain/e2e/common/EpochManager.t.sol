@@ -642,6 +642,17 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
       1
     );
 
+    uint256 registeredValidatorsBeforeDeregistering = validators.getRegisteredValidators().length;
+
+    // 7
+    // commenting these asserts as for some reason console.log doesnt work
+    // assertEq(
+    //     registeredValidatorsBeforeDeregistering, 0,
+    //     "Registered validators before deregistering:"
+    //   );
+    // assertEq(epochManagerContract.getElectedAccounts().length, 0, "Elected accounts length before deregistering:");
+    // // console.log("Elected accounts length before deregistering:", epochManagerContract.getElectedAccounts().length);
+
     vm.prank(currentlyElected[0]);
     validators.deaffiliate();
     (, uint256 duration) = validators.getValidatorLockedGoldRequirements();
@@ -651,9 +662,27 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
     timeTravel(epochDuration + 1);
 
+    //   assertEq(
+    //     validators.getRegisteredValidators().length, 0,
+    //     "Registered validators after deregistering:"
+    //   );
+    // assertEq(epochManagerContract.getElectedAccounts().length, 0, "Elected accounts length after deregistering:");
+
+    assertEq(
+      registeredValidatorsBeforeDeregistering - 1,
+      validators.getRegisteredValidators().length,
+      "Registered validators length should decrease by 1 after deregistering"
+    );
+
+    assertEq(
+      newlyElected2.length,
+      epochManagerContract.getElectedAccounts().length,
+      "Elected accounts length should not change"
+    );
+
     assertEq( // note: Pavel check this
       epochManagerContract.getElectedAccounts().length,
-      validators.getRegisteredValidators().length, // +1 because the validator deaffiliated,
+      validators.getRegisteredValidators().length, // not all validators are elected
       "Wrong number of validators before passing the epoch"
     );
 
