@@ -745,7 +745,12 @@ contract Validators is
     uint256 score,
     uint256 maxPayment
   ) external view virtual returns (uint256) {
-    require(isValidator(account), "Not a validator");
+    if (!isValidator(account)) {
+      // In the unlikely scenario that the validator is still in the set after it has deaffiliated
+      // skip the payment. This is only possible if the epochs has not been processed for more than the time
+      // defined in validatorLockedGoldRequirements.duration.
+      return 0;
+    }
     FixidityLib.Fraction memory scoreFraction = FixidityLib.wrap(score);
     require(scoreFraction.lte(FixidityLib.fixed1()), "Score must be <= 1");
 
