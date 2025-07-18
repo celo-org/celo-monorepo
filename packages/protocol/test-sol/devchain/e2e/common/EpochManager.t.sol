@@ -650,6 +650,13 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     validators.deregisterValidator(0);
 
     timeTravel(epochDuration + 1);
+
+    assertEq( // note: Pavel check this
+      epochManagerContract.getElectedAccounts().length,
+      validators.getRegisteredValidators().length + 1, // +1 because the validator deaffiliated,
+      "Wrong number of validators before passing the epoch"
+    );
+
     epochManagerContract.startNextEpochProcess();
 
     timeTravel(epochDuration / 2);
@@ -664,7 +671,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
     assertEq(
       epochManagerContract.getElectedAccounts().length,
-      validators.getRegisteredValidators().length - 1, // -1 because the validator deaffiliated,
+      validators.getRegisteredValidators().length,
       "Wrong number of validators"
     );
     assertEq(
