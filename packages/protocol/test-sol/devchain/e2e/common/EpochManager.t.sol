@@ -653,7 +653,7 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
 
     assertEq( // note: Pavel check this
       epochManagerContract.getElectedAccounts().length,
-      validators.getRegisteredValidators().length + 1, // +1 because the validator deaffiliated,
+      validators.getRegisteredValidators().length, // +1 because the validator deaffiliated,
       "Wrong number of validators before passing the epoch"
     );
 
