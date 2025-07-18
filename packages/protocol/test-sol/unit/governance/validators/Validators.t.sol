@@ -185,7 +185,10 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
   }
 
   function deployAndInitValidatorsContract(address _validatorsContractAddress) public {
-    deployCodeTo("ValidatorsMock", _validatorsContractAddress);
+    // ValidatorsCompile should be Validators.sol
+    // The reason is deployed like this is because is in an old solidity version
+    // and forge can't deploy contracts that are not imported explicitly
+    deployCodeTo("ValidatorsCompile", _validatorsContractAddress);
     validators = IValidators(_validatorsContractAddress);
     validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
     registry.setAddressFor(ValidatorsContract, address(validators));

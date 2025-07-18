@@ -747,8 +747,8 @@ contract Validators is
   ) external view virtual returns (uint256) {
     if (!isValidator(account)) {
       // In the unlikely scenario that the validator is still in the set after it has deaffiliated
-      // skip the payment. This is only possible if the epochs has not been processed for more than the time
-      // defined in validatorLockedGoldRequirements.duration.
+      // skip the payment. This is only possible if the epochs have not been processed for more than the time
+      // defined in validatorLockedGoldRequirements.duration. (currently 60 days)
       return 0;
     }
     FixidityLib.Fraction memory scoreFraction = FixidityLib.wrap(score);
