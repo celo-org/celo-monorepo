@@ -591,7 +591,9 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     assertEq(epochManagerContract.getElectedAccounts().length, validatorsArray.length - 1); // -1 because the validator deaffiliated
   }
 
-  function test_shouldFinishNextEpochProcessing_WhenValidatorDeaffiliatesAndDeregistersBeforeStart() public {
+  function test_shouldFinishNextEpochProcessing_WhenValidatorDeaffiliatesAndDeregistersBeforeStart()
+    public
+  {
     address[] memory lessers;
     address[] memory greaters;
     GroupWithVotes[] memory groupWithVotes;
