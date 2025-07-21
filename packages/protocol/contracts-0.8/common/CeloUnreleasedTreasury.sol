@@ -6,8 +6,8 @@ import "@openzeppelin/contracts8/utils/math/Math.sol";
 import "./UsingRegistry.sol";
 
 import "../../contracts/common/Initializable.sol";
-import "./libraries/ReentrancyGuard08.sol";
 import "./interfaces/ICeloUnreleasedTreasuryInitializer.sol";
+import "./libraries/ReentrancyGuard08.sol";
 
 /**
  * @title Contract for unreleased Celo tokens.
