@@ -158,7 +158,7 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
     election = new Election(true);
     lockedGold = new LockedGold(true);
     address validatorsAddress = actor("Validators");
-    deployCodeTo("ValidatorsMock.sol", validatorsAddress);
+    deployCodeTo("ValidatorsCompile", validatorsAddress);
     validators = IValidators(validatorsAddress);
     // TODO move to create2
     validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
