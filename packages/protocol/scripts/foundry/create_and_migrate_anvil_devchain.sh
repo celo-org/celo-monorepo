@@ -5,46 +5,15 @@ set -euo pipefail
 
 # Read environment variables and constants
 source $PWD/scripts/foundry/constants.sh
-# DEPLOYER_PK=0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+# DEPLOYER_PRIVATE_KEY=0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
 # MIGRATION_PK=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 ANVIL_PORT=9545
 ANVIL_RPC_URL="http://127.0.0.1:9545"
 DEPLOYER_PRIVATE_KEY="0xc2e0b480b7d39aa35be9cb0761cb11b5f27d8deefad7a4a194b09274937804df"
-FROM_ADDRESS="$(cast wallet address --private-key $DEPLOYER_PRIVATE_KEY)"
+FROM_ADDRESS="$(cast wallet address --private-key $DEPLOYER_PRIVATE_KEY)" # 0x95a40aA01d2d72b4122C19c86160710D01224ada
 
 CACHED_LIBRARIES_FLAG=$(cat $TMP_FOLDER/library_flags.txt || echo "")
 echo "Library flags are: $CACHED_LIBRARIES_FLAG"
-<<<<<<< HEAD
-# forge script \
-#   $MIGRATION_SCRIPT_PATH \
-#   --target-contract $MIGRATION_TARGET_CONTRACT \
-#   --sender $FROM_ADDRESS \
-#   --private-key $DEPLOYER_PRIVATE_KEY \
-#   $VERBOSITY_LEVEL \
-#   --sig "run3()" \
-#   $NON_INTERACTIVE \
-#   --rpc-url $ANVIL_RPC_URL \
-#   $BROADCAST \
-#   $SKIP_SIMULATION \
-#   --slow
-
-  # `cat $TMP_FOLDER/library_flags.txt` \ 
-# forge script \
-#   $MIGRATION_SCRIPT_PATH \
-#   --target-contract $MIGRATION_TARGET_CONTRACT \
-#   --sender $FROM_ADDRESS \
-#   --private-key $DEPLOYER_PRIVATE_KEY \
-#   $VERBOSITY_LEVEL \
-#   --sig "run3()" \
-#   $NON_INTERACTIVE \
-#   $BROADCAST \
-#   $SKIP_SIMULATION \
-#   --slow \
-#   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
-# exit 1
-=======
->>>>>>> 26ebc70c4b0c70e0bec03b0722ecc7f7e3574670
-
 # Keeping track of start time to measure how long it takes to run the script entirely
 START_TIME=$SECONDS
 echo "Forge version: $(forge --version)"
@@ -74,7 +43,7 @@ time FOUNDRY_PROFILE=devchain forge build $LIBRARY_FLAGS
 
 # Pre-deploy Election
 echo "Deploying Election contract..."
-forge create -r $ANVIL_RPC_URL --private-key $DEPLOYER_PK $LIBRARY_FLAGS \
+forge create -r $ANVIL_RPC_URL --private-key $DEPLOYER_PRIVATE_KEY $LIBRARY_FLAGS \
   --broadcast \
   contracts/governance/Election.sol:Election \
   --constructor-args false
@@ -99,7 +68,7 @@ echo "Completed run() execution"
 # CELO_TOKEN_ADDRESS=`cast call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string calldata identifier) external view returns (address)" "CeloToken" --rpc-url $ANVIL_RPC_URL`
 # CELO_UNRELEASED_TREASURY_ADDRESS=0xB76D502Ad168F9D545661ea628179878DcA92FD5
 # UNRELEASE_TREASURY_PRE_MINT=390000000000000000000000000
-# cast send $CELO_TOKEN_ADDRESS "function transfer(address to, uint256 value) external returns (bool)" $CELO_UNRELEASED_TREASURY_ADDRESS $UNRELEASE_TREASURY_PRE_MINT --rpc-url  $ANVIL_RPC_URL --private-key $DEPLOYER_PK
+# cast send $CELO_TOKEN_ADDRESS "function transfer(address to, uint256 value) external returns (bool)" $CELO_UNRELEASED_TREASURY_ADDRESS $UNRELEASE_TREASURY_PRE_MINT --rpc-url  $ANVIL_RPC_URL --private-key $DEPLOYER_PRIVATE_KEY
 
 echo "Running second part of migration script..."
 forge script \
