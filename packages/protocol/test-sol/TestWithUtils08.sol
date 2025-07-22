@@ -60,7 +60,7 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
     epochManager = new EpochManager_WithMocks();
     mockOracleAddress = actor("oracle");
     registry.setAddressFor(SortedOraclesContract, mockOracleAddress);
-    epochManager.initialize(REGISTRY_ADDRESS, l2EpochDuration);
+    epochManager.initialize(REGISTRY_ADDRESS, l2EpochDuration, mockOracleAddress);
     registry.setAddressFor(EpochManagerContract, address(epochManager));
   }
 
