@@ -37,7 +37,7 @@ contract GoldToken is
   string constant SYMBOL = "CELO";
   uint8 constant DECIMALS = 18;
   uint256 constant CELO_SUPPLY_CAP = 1000000000 ether; // 1 billion CELO
-  uint256 internal totalSupply_; // this variable is deprecated
+  uint256 internal deprecated_totalSupply_; // this variable is deprecated
   // solhint-enable state-visibility
 
   mapping(address => mapping(address => uint256)) internal allowed;
