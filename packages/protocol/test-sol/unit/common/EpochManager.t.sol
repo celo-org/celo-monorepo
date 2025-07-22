@@ -111,7 +111,7 @@ contract EpochManagerTest is TestWithUtils08 {
 
     scoreManager.setValidatorScore(validator1, 1);
 
-    epochManagerContract.initialize(REGISTRY_ADDRESS, 10);
+    epochManagerContract.initialize(REGISTRY_ADDRESS, 10, address(sortedOracles));
     epochRewards.setCarbonOffsettingPartner(carbonOffsettingPartner);
 
     validators.setEpochRewards(validator1, validator1Reward);
@@ -190,7 +190,7 @@ contract EpochManagerTest_initialize is EpochManagerTest {
 
   function test_Reverts_WhenAlreadyInitialized() public virtual {
     vm.expectRevert("contract already initialized");
-    epochManagerContract.initialize(REGISTRY_ADDRESS, 10);
+    epochManagerContract.initialize(REGISTRY_ADDRESS, 10, address(sortedOracles));
   }
 }
 
