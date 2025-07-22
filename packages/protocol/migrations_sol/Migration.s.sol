@@ -1033,8 +1033,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 signerIndexCount = 0;
 
     for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
-      // address groupAddress = groups[groupIndex];
-      // console.log("Getting keys for members of group: ", groupAddress);
       for (uint256 validatorIndex = 0; validatorIndex < maxGroupSize; validatorIndex++) {
         uint256 validatorKeyIndex = getValidatorKeyIndex(
           groupCount,
@@ -1049,15 +1047,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         signers[signerIndexCount] = signer;
         signerIndexCount++;
         vm.stopBroadcast();
-
-        // console.log("Registering validator #: ", validatorIndex);
       }
     }
 
-    //
-    vm.startBroadcast(DEPLOYER_ACCOUNT);
+    // Bypass epoch manager enabler?
+    vm.broadcast(DEPLOYER_ACCOUNT);
     IEpochManager(getEpochManager()).initializeSystem(1, block.number, signers); // TODO fix signers
-    vm.stopBroadcast();
   }
 
   function migrateEpochManager(string memory json) public {
@@ -1066,7 +1061,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       (address)
     );
 
-    address epochManager = deployProxiedContract(
+    deployProxiedContract(
       "EpochManager",
       abi.encodeWithSelector(
         IEpochManagerInitializer.initialize.selector,
