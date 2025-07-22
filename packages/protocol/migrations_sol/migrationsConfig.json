@@ -151,7 +151,7 @@
   "governanceApproverMultiSig": {
     "required": 1,
     "internalRequired": 1,
-    "governanceApproverMultiSig": true
+    "governanceApproverMultiSig": false
   },
   "reserveSpenderMultiSig": {
     "required": 1,
@@ -163,15 +163,15 @@
   },
   "governance": {
     "concurrentProposals": 3,
-    "dequeueFrequency": 14400,
+    "dequeueFrequency": 30,
     "queueExpiry": 2419200,
     "queueExpiry_helper": "4 * WEEK",
     "dequeueFrequency_helper": "4 * HOUR",
     "approvalStageDuration": 14400,
     "approvalStageDuration_helper": "4 * HOUR",
-    "referendumStageDuration": 86400,
+    "referendumStageDuration": 300,
     "referendumStageDuration_hlper": "DAY",
-    "executionStageDuration": 604800,
+    "executionStageDuration": 300,
     "executionStageDuration_hlper": "WEEK",
     "participationBaseline": 5000000000000000000000,
     "minDeposit": 100000000000000000000,

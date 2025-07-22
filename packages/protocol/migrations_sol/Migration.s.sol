@@ -122,11 +122,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function addToRegistry(string memory contractName, address proxyAddress) public {
-    // IProxy proxy = IProxy(REGISTRY_ADDRESS);
-    // if (proxy._getImplementation() == address(0)) {
-    //   console.log("Can't add to registry because implementation not set");
-    //   return;
-    // }
+    IProxy proxy = IProxy(REGISTRY_ADDRESS);
+    if (proxy._getImplementation() == address(0)) {
+      console.log("Can't add to registry because implementation not set");
+      return;
+    }
     registry = IRegistry(REGISTRY_ADDRESS);
     console.log(" Setting on the registry contract:", contractName);
     registry.setAddressFor(contractName, proxyAddress);
@@ -221,11 +221,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     setupUsingRegistry();
 
     migrateFreezer();
-    // migrateFeeCurrencyWhitelist();
     migrateFeeCurrencyDirectory();
     migrateCeloToken(json);
     migrateSortedOracles(json);
-    // // migrateGasPriceMinimum(json);
     migrateReserveSpenderMultiSig(json);
     migrateReserve(json);
     migrateStableToken(json);
@@ -237,13 +235,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateElection(json); // fails here
 
     migrateEpochRewards(json);
-    // // migrateRandom(json);
     migrateEscrow();
     // attestation not migrated
-    // // migrateBlockchainParameters(json);
     migrateGovernanceSlasher();
-    // // migrateDoubleSigningSlasher(json);
-    // // migrateDowntimeSlasher(json);
     migrateGovernanceApproverMultiSig(json);
     // GrandaMento not migrated
     migrateFederatedAttestations();
@@ -254,11 +248,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateCeloUnreleasedTreasury();
     vm.stopBroadcast();
 
-    // // needs to broadcast from a pre-funded account
-    // fundCeloUnreleasedTreasury();
+    // needs to broadcast from a pre-funded account
+    // fundCeloUnreleasedTreasury(json);
 
-    // // Functions with broadcast with different addresses
-    // // Validators needs to lock, which can be only used by the msg.sender
+    // Functions with broadcast with different addresses
+    // Validators needs to lock, which can be only used by the msg.sender
   }
 
   function run2() public {
@@ -291,13 +285,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     vm.stopBroadcast();
 
     electValidators(json);
-    // electValidators(json);
 
-    // vm.startBroadcast(DEPLOYER_ACCOUNT);
-
+    // vm.broadcast(DEPLOYER_ACCOUNT);
     // captureEpochManagerEnablerValidators();
-
-    // vm.stopBroadcast();
   }
 
   /**
@@ -309,19 +299,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateRegistry() public {
-    // setImplementationOnProxy(
-    //   IProxy(REGISTRY_ADDRESS),
-    //   "Registry",
-    //   abi.encodeWithSelector(IRegistryInitializer.initialize.selector)
-    // );
-    // set registry in registry itself
-    // console.log("Owner of the Registry Proxy is", IProxy(REGISTRY_ADDRESS)._getOwner());
     deployImplementationAndAddToRegistry(
       "Registry",
       IProxy(REGISTRY_ADDRESS),
       abi.encodeWithSelector(IRegistryInitializer.initialize.selector)
     );
-    // addToRegistry("Registry", REGISTRY_ADDRESS);
     console.log("Done migration registry");
   }
 
@@ -351,7 +333,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateCeloToken(string memory json) public {
-    // TODO change pre-funded addresses to make it match circulation supply
+    // TODO: change pre-funded addresses to make it match circulation supply
+    // pre deployed celo token proxy address from L2Genesis.s.sol
     address celoProxyAddress = 0x471EcE3750Da237f93B8E339c536989b8978a438;
 
     deployImplementationAndAddToRegistry(
@@ -525,8 +508,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     }
 
     IReserve(registry.getAddressForStringOrDie("Reserve")).addToken(stableTokenProxyAddress);
-
-    // getFeeCurrencyWhitelist().addToken(stableTokenProxyAddress);
 
     /*
     Arbitrary intrinsic gas number take from existing `FeeCurrencyDirectory.t.sol` tests
@@ -724,7 +705,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       )
     );
 
-    // TODO read from a json
+    // TODO: read from a json
     // address implementation = address(0x8464135c8F25Da09e49BC8782676a84730C318bC);
 
     // proxy._setAndInitializeImplementation(
@@ -970,6 +951,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256[] memory newLimits;
     uint256[] memory newMaxSlippages;
 
+    // pre deployed fee handler proxy address from L2Genesis.s.sol
     address feeHandlerProxyAddress = 0xcD437749E43A154C07F3553504c68fBfD56B8778;
 
     deployImplementationAndAddToRegistry(
@@ -1001,6 +983,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateCeloUnreleasedTreasury() public {
+    // pre deployed celo unreleased treasury proxy address from L2Genesis.s.sol
     address celoUnreleasedTreasury = 0xB76D502Ad168F9D545661ea628179878DcA92FD5;
 
     deployImplementationAndAddToRegistry(
@@ -1014,16 +997,14 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     addToRegistry("CeloUnreleasedTreasury", celoUnreleasedTreasury);
   }
 
-  function fundCeloUnreleasedTreasury() public {
+  function fundCeloUnreleasedTreasury(string memory json) public {
     console.log("Funding CeloUnreleasedTreasury");
     address celoUnreleasedTreasury = address(getCeloUnreleasedTreasury());
 
-    vm.startBroadcast(DEPLOYER_ACCOUNT);
-
+    // broadcast as first validator
+    uint256 firstValidatorPk = abi.decode(json.parseRaw(".validators.valKeys[0]"), (uint256));
+    vm.broadcast(firstValidatorPk);
     getCeloToken().transfer(celoUnreleasedTreasury, 400_000_000 ether);
-
-    vm.stopBroadcast();
-
     console.log(
       "Balance of CeloUnreleasedTreasury is",
       getCeloToken().balanceOf(celoUnreleasedTreasury)
@@ -1055,8 +1036,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 signerIndexCount = 0;
 
     for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
-      // address groupAddress = groups[groupIndex];
-      // console.log("Getting keys for members of group: ", groupAddress);
       for (uint256 validatorIndex = 0; validatorIndex < maxGroupSize; validatorIndex++) {
         uint256 validatorKeyIndex = getValidatorKeyIndex(
           groupCount,
@@ -1071,15 +1050,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         signers[signerIndexCount] = signer;
         signerIndexCount++;
         vm.stopBroadcast();
-
-        // console.log("Registering validator #: ", validatorIndex);
       }
     }
 
-    //
-    vm.startBroadcast(DEPLOYER_ACCOUNT);
+    // Bypass epoch manager enabler?
+    vm.broadcast(DEPLOYER_ACCOUNT);
     IEpochManager(getEpochManager()).initializeSystem(1, block.number, signers); // TODO fix signers
-    vm.stopBroadcast();
   }
 
   function migrateEpochManager(string memory json) public {
@@ -1088,12 +1064,13 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       (address)
     );
 
-    address epochManager = deployProxiedContract(
+    deployProxiedContract(
       "EpochManager",
       abi.encodeWithSelector(
         IEpochManagerInitializer.initialize.selector,
         REGISTRY_ADDRESS,
-        newEpochDuration
+        newEpochDuration,
+        registry.getAddressForStringOrDie("SortedOracles")
       )
     );
 
@@ -1415,7 +1392,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
           validatorLockedGoldRequirements,
           groupAddress
         );
-        // TODO start broadcast
         console.log("Adding to group...");
 
         vm.startBroadcast(groups[groupIndex]);

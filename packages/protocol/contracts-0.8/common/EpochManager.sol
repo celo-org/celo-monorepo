@@ -154,12 +154,17 @@ contract EpochManager is
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
    * @param newEpochDuration The duration of an epoch in seconds.
+   * @param sortedOraclesAddress The address of the sorted oracles core smart contract.
    */
-  function initialize(address registryAddress, uint256 newEpochDuration) external initializer {
+  function initialize(
+    address registryAddress,
+    uint256 newEpochDuration,
+    address sortedOraclesAddress
+  ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setEpochDuration(newEpochDuration);
-    setOracleAddress(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
+    setOracleAddress(sortedOraclesAddress);
   }
 
   /**
