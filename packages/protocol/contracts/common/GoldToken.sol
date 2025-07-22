@@ -193,13 +193,6 @@ contract GoldToken is
   }
 
   /**
-   * @return The total amount of CELO in existence, not including what the burn address holds.
-   */
-  function circulatingSupply() external view returns (uint256) {
-    return allocatedSupply().sub(getBurnedAmount()).sub(balanceOf(address(0)));
-  }
-
-  /**
    * @notice Gets the amount of owner's CELO allowed to be spent by spender.
    * @param _owner The owner of the CELO.
    * @param spender The spender of the CELO.

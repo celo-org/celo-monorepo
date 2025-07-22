@@ -185,7 +185,10 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
   }
 
   function deployAndInitValidatorsContract(address _validatorsContractAddress) public {
-    deployCodeTo("ValidatorsMock.sol", _validatorsContractAddress);
+    // ValidatorsCompile should be Validators.sol
+    // The reason is deployed like this is because is in an old solidity version
+    // and forge can't deploy contracts that are not imported explicitly
+    deployCodeTo("ValidatorsCompile", _validatorsContractAddress);
     validators = IValidators(_validatorsContractAddress);
     validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
     registry.setAddressFor(ValidatorsContract, address(validators));
@@ -485,6 +488,16 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
     vm.prank(nonOwner);
     vm.expectRevert("Ownable: caller is not the owner");
     validators.setMembershipHistoryLength(newLength);
+  }
+}
+
+contract ValidatorsTest_ComputeEpochReward is ValidatorsTest {
+  function test_returnsZero_WhenNotAValidator() public {
+    assertEq(
+      validators.computeEpochReward(nonValidator, 1e24, 150e18),
+      0,
+      "Should return zero reward for non-validator"
+    );
   }
 }
 
