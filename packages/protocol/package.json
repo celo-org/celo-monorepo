@@ -28,7 +28,7 @@
     "devchain:reset": "yarn devchain generate-tar .tmp/devchain.tar.gz --upto 29",
     "ganache-dev": "./scripts/bash/ganache.sh",
     "ganache-devchain": "./scripts/bash/ganache_devchain.sh",
-    "geth-devchain:start-L2": "./scripts/foundry/create_and_migrate_anvil_devchain.sh",
+    "geth-devchain:start-L2": "./scripts/foundry/create_and_migrate_op_geth.sh",
     "lint": "yarn run lint:ts && yarn run lint:sol",
     "lint:sol": "solhint --version && solhint './contracts/**/*.sol' && solhint './contracts-0.8/**/*.sol'",
     "lint:ts": "yarn run --top-level eslint .",
