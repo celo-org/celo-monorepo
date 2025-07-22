@@ -9,18 +9,14 @@ contract MigrationsConstants is TestConstants {
   // List of contracts that are expected to be in Registry.sol
   string[] contractsInRegistry = [
     "Accounts",
-    // "BlockchainParameters",
     "CeloUnreleasedTreasury",
     "CeloToken",
-    // "DoubleSigningSlasher",
-    // "DowntimeSlasher",
     "Election",
     "EpochRewards",
     "EpochManagerEnabler",
     "EpochManager",
     "Escrow",
     "FederatedAttestations",
-    // "FeeCurrencyWhitelist",
     "FeeCurrencyDirectory",
     "FeeHandler",
     "Freezer",
@@ -28,7 +24,6 @@ contract MigrationsConstants is TestConstants {
     "GovernanceSlasher",
     "LockedGold",
     "OdisPayments",
-    // "Random",
     // "Registry", // Registry is deployed by the migration script and has a different proxy FIXME
     "SortedOracles",
     "Validators",
