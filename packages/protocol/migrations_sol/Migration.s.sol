@@ -1051,8 +1051,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     }
 
     // Bypass epoch manager enabler?
-    vm.broadcast(DEPLOYER_ACCOUNT);
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
     IEpochManager(getEpochManager()).initializeSystem(1, block.number, signers); // TODO fix signers
+    vm.stopBroadcast();
   }
 
   function migrateEpochManager(string memory json) public {
