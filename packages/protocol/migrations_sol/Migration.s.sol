@@ -238,7 +238,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateEscrow();
     // attestation not migrated
     migrateGovernanceSlasher();
-    migrateGovernanceApproverMultiSig(json);
+    //migrateGovernanceApproverMultiSig(json);
     // GrandaMento not migrated
     migrateFederatedAttestations();
     migrateMentoFeeHandlerSeller();
