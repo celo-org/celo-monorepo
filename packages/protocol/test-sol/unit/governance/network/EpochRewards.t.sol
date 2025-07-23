@@ -87,7 +87,6 @@ contract EpochRewardsTest is TestWithUtils {
 
     mockCeloToken = new CeloTokenMock();
     mockCeloToken.setRegistry(REGISTRY_ADDRESS);
-    mockCeloToken.setTotalSupply(L1_MINTED_CELO_SUPPLY);
 
     freezer = new Freezer(true);
 
