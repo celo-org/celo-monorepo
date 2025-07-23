@@ -37,7 +37,7 @@ contract GoldToken is
   string constant SYMBOL = "CELO";
   uint8 constant DECIMALS = 18;
   uint256 constant CELO_SUPPLY_CAP = 1000000000 ether; // 1 billion CELO
-  uint256 internal totalSupply_;
+  uint256 internal deprecated_totalSupply_; // this variable is deprecated
   // solhint-enable state-visibility
 
   mapping(address => mapping(address => uint256)) internal allowed;
@@ -62,7 +62,6 @@ contract GoldToken is
    * @param registryAddress Address of the Registry contract.
    */
   function initialize(address registryAddress) external initializer {
-    totalSupply_ = 0;
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
   }
@@ -241,7 +240,7 @@ contract GoldToken is
   /**
    * @return The total amount of CELO in existence, including what the burn address holds.
    */
-  function totalSupply() public view returns (uint256) {
+  function totalSupply() external view returns (uint256) {
     return CELO_SUPPLY_CAP;
   }
 
