@@ -149,8 +149,8 @@
     "slashableDowntime": 60
   },
   "governanceApproverMultiSig": {
-    "required": 1,
-    "internalRequired": 1,
+    "required": 0,
+    "internalRequired": 0,
     "governanceApproverMultiSig": false
   },
   "reserveSpenderMultiSig": {
