@@ -1169,9 +1169,10 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         console.log("New proxy owner is: ", proxy._getOwner());
 
         // Transfer contract ownership
-        console.log("Previous contract owner was: ", Ownable(contractToTransfer).owner());
-        Ownable(contractToTransfer).transferOwnership(governanceAddress);
-        console.log("New contract owner is: ", Ownable(contractToTransfer).owner());
+        Ownable ownable = Ownable(registry.getAddressForStringOrDie(contractToTransfer));
+        console.log("Previous contract owner was: ", ownable.owner());
+        ownable.transferOwnership(governanceAddress);
+        console.log("New contract owner is: ", ownable.owner());
       }
     }
   }
