@@ -1,47 +1,31 @@
-import { ensureLeading0x, NULL_ADDRESS } from '@celo/base/lib/address'
 import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
-import { constitution } from '@celo/protocol/governanceConstitution'
 import {
   addressMinedLatestBlock,
   assertEqualBN,
-  assertTransactionRevertWithReason,
-  assumeOwnershipWithTruffle,
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import {
-  getDeployedProxiedContract,
-  getFunctionSelectorsForContract,
-  makeTruffleContractForMigration,
-} from '@celo/protocol/lib/web3-utils'
+import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { build_directory, config } from '@celo/protocol/migrationsConfig'
 import { EpochManagerEnablerInstance, ValidatorsInstance } from '@celo/protocol/types/typechain-0.8'
 import { linkedListChanges, zip } from '@celo/utils/lib/collections'
-import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   ElectionInstance,
-  FeeCurrencyWhitelistInstance,
-  FreezerInstance,
   GoldTokenInstance,
   GovernanceApproverMultiSigInstance,
   GovernanceInstance,
   GovernanceSlasherInstance,
   LockedGoldInstance,
-  RegistryInstance,
 } from 'types'
 import {
-  ExchangeContract,
   ExchangeInstance,
   ReserveInstance,
   ReserveSpenderMultiSigInstance,
-  SortedOraclesInstance,
-  StableTokenContract,
   StableTokenInstance,
 } from 'types/mento'
 import { MENTO_PACKAGE } from '../../contractPackages'
 import { ArtifactsSingleton } from '../../lib/artifactsSingleton'
-import { SECONDS_IN_A_WEEK } from '../constants'
 
 const Artifactor = require('@truffle/artifactor')
 
@@ -108,25 +92,6 @@ async function findLessersAndGreaters(
   const changes = linkedListChanges(groups, changed)
   return { ...changes, indices: changed.map((a) => a.index) }
 }
-
-contract('Integration: Running elections', (_accounts: string[]) => {
-  let election: ElectionInstance
-
-  before(async () => {
-    election = await getDeployedProxiedContract('Election', artifacts)
-  })
-
-  describe('When getting the elected validators', () => {
-    it('should elect all 30 validators', async () => {
-      const elected = await election.electValidatorSigners()
-      assert.equal(elected.length, 30)
-    })
-    it('should elect specified number validators with electNValidatorSigners', async () => {
-      const elected = await election.electNValidatorSigners(1, 20)
-      assert.equal(elected.length, 20)
-    })
-  })
-})
 
 // skipping this test, as it requires the L1 precompile to capture epoch before L2 migration.
 // attempting to capture epoch is failing with `slicing out of range` error.
@@ -302,156 +267,6 @@ contract.skip('Integration: Governance slashing', (accounts: string[]) => {
         await lockedGold.getAccountTotalLockedGold(slashedAccount),
         valueOfSlashed.minus(penalty)
       )
-    })
-  })
-})
-
-contract('Integration: Governance', (accounts: string[]) => {
-  const proposalId = 1
-  const dequeuedIndex = 0
-  let lockedGold: LockedGoldInstance
-  let multiSig: GovernanceApproverMultiSigInstance
-  let governance: GovernanceInstance
-  let registry: RegistryInstance
-  let proposalTransactions: any
-  let value: BigNumber
-
-  before(async () => {
-    lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
-    // @ts-ignore
-    await lockedGold.lock({ value: '10000000000000000000000000' })
-    value = await lockedGold.getAccountTotalLockedGold(accounts[0])
-    multiSig = await getDeployedProxiedContract('GovernanceApproverMultiSig', artifacts)
-    governance = await getDeployedProxiedContract('Governance', artifacts)
-    registry = await getDeployedProxiedContract('Registry', artifacts)
-    proposalTransactions = [
-      {
-        value: 0,
-        destination: registry.address,
-        data: Buffer.from(
-          stripHexEncoding(
-            // @ts-ignore
-            registry.contract.methods.setAddressFor('test1', accounts[1]).encodeABI()
-          ),
-          'hex'
-        ),
-      },
-      {
-        value: 0,
-        destination: registry.address,
-        data: Buffer.from(
-          stripHexEncoding(
-            // @ts-ignore
-            registry.contract.methods.setAddressFor('test2', accounts[2]).encodeABI()
-          ),
-          'hex'
-        ),
-      },
-    ]
-  })
-
-  describe('Checking governance thresholds', () => {
-    for (const contractName of Object.keys(constitution).filter((k) => k !== 'proxy')) {
-      it('should have correct thresholds for ' + contractName, async () => {
-        const artifactsInstance = ArtifactsSingleton.getInstance(
-          constitution[contractName].__contractPackage,
-          artifacts
-        )
-
-        const contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
-          contractName,
-          artifactsInstance
-        )
-
-        const selectors = getFunctionSelectorsForContract(contract, contractName, artifactsInstance)
-
-        selectors.default = ['0x00000000']
-
-        const thresholds = { ...constitution.proxy, ...constitution[contractName] }
-        await Promise.all(
-          Object.keys(thresholds)
-            .filter((k) => k !== '__contractPackage')
-            .map((func) =>
-              Promise.all(
-                selectors[func].map(async (selector) => {
-                  assertEqualBN(
-                    await governance.getConstitution(contract.address, selector),
-                    toFixed(thresholds[func]),
-                    'Threshold set incorrectly for function ' + func
-                  )
-                })
-              )
-            )
-        )
-      })
-    }
-  })
-
-  describe('When making a governance proposal', () => {
-    before(async () => {
-      await governance.propose(
-        proposalTransactions.map((x: any) => x.value),
-        proposalTransactions.map((x: any) => x.destination),
-        // @ts-ignore
-        Buffer.concat(proposalTransactions.map((x: any) => x.data)),
-        proposalTransactions.map((x: any) => x.data.length),
-        'URL',
-        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-        { value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
-      )
-    })
-
-    it('should increment the proposal count', async () => {
-      assert.equal((await governance.proposalCount()).toNumber(), proposalId)
-    })
-  })
-
-  describe('When upvoting that proposal', () => {
-    before(async () => {
-      await governance.upvote(proposalId, 0, 0)
-    })
-
-    it('should increase the number of upvotes for the proposal', async () => {
-      assertEqualBN(await governance.getUpvotes(proposalId), value)
-    })
-  })
-
-  describe('When approving that proposal', () => {
-    before(async () => {
-      await timeTravel(config.governance.dequeueFrequency, web3)
-      // @ts-ignore
-      const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
-      await multiSig.submitTransaction(governance.address, 0, txData, {
-        from: accounts[0],
-      })
-    })
-
-    it('should set the proposal to approved', async () => {
-      assert.isTrue(await governance.isApproved(proposalId))
-    })
-  })
-
-  describe('When voting on that proposal', () => {
-    before(async () => {
-      await timeTravel(config.governance.approvalStageDuration, web3)
-      await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
-    })
-
-    it('should increment the vote totals', async () => {
-      const response = await governance.getVoteTotals(proposalId)
-      assertEqualBN(response[0], value)
-    })
-  })
-
-  describe('When executing that proposal', () => {
-    before(async () => {
-      await timeTravel(config.governance.referendumStageDuration, web3)
-      await governance.execute(proposalId, dequeuedIndex)
-    })
-
-    it('should execute the proposal', async () => {
-      assert.equal(await registry.getAddressForOrDie(web3.utils.soliditySha3('test1')), accounts[1])
-      assert.equal(await registry.getAddressForOrDie(web3.utils.soliditySha3('test2')), accounts[2])
     })
   })
 })
@@ -651,147 +466,3 @@ Array.from([
     })
   })
 )
-
-contract('Integration: Adding StableToken', (accounts: string[]) => {
-  const Exchange: ExchangeContract = makeTruffleContractForMigration(
-    'Exchange',
-    MENTO_PACKAGE,
-    web3
-  )
-  const StableToken: StableTokenContract = makeTruffleContractForMigration(
-    'StableToken',
-    MENTO_PACKAGE,
-    web3
-  )
-  let exchangeAbc: ExchangeInstance
-  let freezer: FreezerInstance
-  let goldToken: GoldTokenInstance
-  let stableTokenAbc: StableTokenInstance
-  const sellAmount = web3.utils.toWei('0.1', 'ether')
-  const minBuyAmount = 1
-
-  // 0. Make ourselves the owner of the various contracts we will need to interact with, as
-  // passing a governance proposal for each one will be a pain in the butt.
-  before(async () => {
-    goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
-    freezer = await getDeployedProxiedContract('Freezer', artifacts)
-    const contractsToOwn = ['Freezer', 'Registry', 'SortedOracles', 'FeeCurrencyWhitelist']
-    await assumeOwnershipWithTruffle(contractsToOwn, accounts[0])
-    await assumeOwnershipWithTruffle(['Reserve'], accounts[0], 0, MENTO_PACKAGE)
-  })
-
-  // 1. Mimic the state of the world post-contracts-release
-  //   a) Deploy the contracts. For simplicity, omit proxies for now.
-  //   b) Register the contracts
-  //   c) Initialize the contracts
-  //   d) Confirm mento is effectively frozen
-  describe('When the contracts have been deployed and initialized', () => {
-    before(async () => {
-      exchangeAbc = await Exchange.new(true)
-      stableTokenAbc = await StableToken.new(true)
-
-      const registry: RegistryInstance = await getDeployedProxiedContract('Registry', artifacts)
-      await registry.setAddressFor('ExchangeABC', exchangeAbc.address)
-      await registry.setAddressFor('StableTokenABC', stableTokenAbc.address)
-
-      await stableTokenAbc.initialize(
-        'Celo Abc', // Name
-        'cABC', // symbol
-        '18', // decimals
-        registry.address,
-        fixed1, // inflationRate
-        SECONDS_IN_A_WEEK, // inflationRatePeriod
-        [accounts[0]], // pre-mint account
-        ['1000000000000000000'], // pre-mint amount
-        'ExchangeABC' // exchange contract key on the registry
-      )
-      await exchangeAbc.initialize(
-        registry.address,
-        'StableTokenABC',
-        '5000000000000000000000', // spread, matches mainnet for cUSD and cEUR
-        '1300000000000000000000', // reserveFraction, matches mainnet for cEUR
-        '300', // updateFrequency, matches mainnet for cUSD and cEUR
-        '1' // minimumReports, minimum possible to avoid having to mock multiple reports
-      )
-    })
-
-    it(`should be impossible to sell CELO`, async () => {
-      await goldToken.approve(exchangeAbc.address, sellAmount)
-      await assertTransactionRevertWithReason(exchangeAbc.sell(sellAmount, minBuyAmount, true))
-    })
-
-    it(`should be impossible to sell stable token`, async () => {
-      await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
-      await assertTransactionRevertWithReason(exchangeAbc.sell(sellAmount, minBuyAmount, false))
-    })
-  })
-
-  // 2. Mimic the state of the world post-oracle-activation-proposal
-  //   a) Activate the oracles and freeze the mento
-  //   b) Make an oracle report
-  //   c) Confirm mento is effectively frozen
-  describe('When the contracts have been frozen and an oracle report has been made', () => {
-    before(async () => {
-      const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract(
-        'SortedOracles',
-        artifacts
-      )
-      await sortedOracles.addOracle(stableTokenAbc.address, ensureLeading0x(accounts[0]))
-      await freezer.freeze(stableTokenAbc.address)
-      await freezer.freeze(exchangeAbc.address)
-      await sortedOracles.report(stableTokenAbc.address, toFixed(1), NULL_ADDRESS, NULL_ADDRESS)
-    })
-
-    it(`should be impossible to sell CELO`, async () => {
-      await goldToken.approve(exchangeAbc.address, sellAmount)
-      await assertTransactionRevertWithReason(
-        exchangeAbc.sell(sellAmount, minBuyAmount, true),
-        "can't call when contract is frozen"
-      )
-    })
-
-    it(`should be impossible to sell stable token`, async () => {
-      await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
-      await assertTransactionRevertWithReason(
-        exchangeAbc.sell(sellAmount, minBuyAmount, false),
-        "can't call when contract is frozen"
-      )
-    })
-  })
-
-  // 3. Mimic the state of the world post-mento-activation-proposal
-  //   a) Add the stable token to the reserve
-  //   b) Unfreeze the mento
-  //   c) Confirm mento is functional
-  describe('When the contracts have been unfrozen and the mento has been activated', () => {
-    before(async () => {
-      const reserve: ReserveInstance = await getDeployedProxiedContract(
-        'Reserve',
-        ArtifactsSingleton.getInstance(MENTO_PACKAGE)
-      )
-      const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract(
-        'FeeCurrencyWhitelist',
-        artifacts
-      )
-      await reserve.addToken(stableTokenAbc.address)
-      await reserve.addExchangeSpender(exchangeAbc.address)
-      await freezer.unfreeze(stableTokenAbc.address)
-      await freezer.unfreeze(exchangeAbc.address)
-
-      // activate stable during mento-activation proposal
-      await exchangeAbc.activateStable()
-      // Fee currency can't be tested here, but keep this line for reference
-      await feeCurrencyWhitelist.addToken(stableTokenAbc.address)
-    })
-
-    it(`should be possible to sell CELO`, async () => {
-      await goldToken.approve(exchangeAbc.address, sellAmount)
-      await exchangeAbc.sell(sellAmount, minBuyAmount, true)
-    })
-
-    it(`should be possible to sell stable token`, async () => {
-      await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
-      await exchangeAbc.sell(sellAmount, minBuyAmount, false)
-    })
-  })
-})

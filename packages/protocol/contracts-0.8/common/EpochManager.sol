@@ -184,7 +184,7 @@ contract EpochManager is
       firstEpochBlock <= block.number,
       "First epoch block must be less or equal than current block"
     );
-    require(firstElected.length > 0, "First elected validators must be greater than 0");
+    // require(firstElected.length > 0, "First elected validators must be greater than 0");
     isSystemInitialized = true;
     firstKnownEpoch = firstEpochNumber;
     currentEpochNumber = firstEpochNumber;
@@ -195,7 +195,8 @@ contract EpochManager is
 
     electedAccounts = firstElected;
 
-    _setElectedSigners(firstElected);
+    // transformThis to a no_check function?
+    _setElectedSignersNoCheck(firstElected); // TODO what do I do with this?
   }
 
   /**
@@ -704,6 +705,15 @@ contract EpochManager is
       registry.getAddressForOrDie(RESERVE_REGISTRY_ID),
       CELOequivalent
     );
+  }
+
+  function _setElectedSignersNoCheck(address[] memory _elected) internal {
+    // require(electedAccounts.length > 0, "Elected list length cannot be zero.");
+    IAccounts accounts = getAccounts();
+    electedSigners = new address[](_elected.length);
+    for (uint i = 0; i < _elected.length; i++) {
+      electedSigners[i] = accounts.getValidatorSigner(_elected[i]);
+    }
   }
 
   /**

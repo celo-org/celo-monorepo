@@ -2,7 +2,6 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
 
 import "./UsingPrecompiles.sol";
 import "./UsingRegistryV2NoMento.sol";
@@ -19,11 +18,7 @@ abstract contract PrecompilesOverrideV2 is UsingPrecompiles, UsingRegistryV2NoMe
    * @return Epoch number.
    */
   function getEpochNumberOfBlock(uint256 blockNumber) public view override returns (uint256) {
-    if (isL2()) {
-      return getEpochManager().getEpochNumberOfBlock(blockNumber);
-    } else {
-      return epochNumberOfBlock(blockNumber, getEpochSize());
-    }
+    return getEpochManager().getEpochNumberOfBlock(blockNumber);
   }
 
   /**
@@ -42,11 +37,7 @@ abstract contract PrecompilesOverrideV2 is UsingPrecompiles, UsingRegistryV2NoMe
   function validatorSignerAddressFromCurrentSet(
     uint256 index
   ) public view override returns (address) {
-    if (isL2()) {
-      return getEpochManager().getElectedSignerByIndex(index);
-    } else {
-      return super.validatorSignerAddressFromCurrentSet(index);
-    }
+    return getEpochManager().getElectedSignerByIndex(index);
   }
 
   /**
@@ -63,10 +54,6 @@ abstract contract PrecompilesOverrideV2 is UsingPrecompiles, UsingRegistryV2NoMe
    * @return Size of the current elected validator set.
    */
   function numberValidatorsInCurrentSet() public view override returns (uint256) {
-    if (isL2()) {
-      return getEpochManager().numberOfElectedInCurrentSet();
-    } else {
-      return super.numberValidatorsInCurrentSet();
-    }
+    return getEpochManager().numberOfElectedInCurrentSet();
   }
 }

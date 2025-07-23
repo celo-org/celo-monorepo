@@ -1,4 +1,3 @@
-import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloTxObject } from '@celo/connect'
 import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { ArtifactsSingleton } from '@celo/protocol/lib/artifactsSingleton'
@@ -7,11 +6,10 @@ import {
   sendTransactionWithPrivateKey,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { privateKeyToAddress, privateKeyToPublicKey } from '@celo/utils/lib/address'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { signMessage } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
-import { AccountsInstance, ElectionInstance, LockedGoldInstance } from 'types'
+import { AccountsInstance, LockedGoldInstance } from 'types'
 import { ValidatorsInstance } from 'types/08'
 import Web3 from 'web3'
 
@@ -135,90 +133,90 @@ async function registerValidatorGroup(
   return account
 }
 
-async function registerValidator(
-  accounts: AccountsInstance,
-  lockedGold: LockedGoldInstance,
-  validators: ValidatorsInstance,
-  validatorPrivateKey: string,
-  attestationKey: string,
-  groupAddress: string,
-  index: number,
-  networkName: string
-) {
-  const valName = `CLabs Validator #${index} on ${networkName}`
+// async function registerValidator(
+//   accounts: AccountsInstance,
+//   lockedGold: LockedGoldInstance,
+//   validators: ValidatorsInstance,
+//   validatorPrivateKey: string,
+//   attestationKey: string,
+//   groupAddress: string,
+//   index: number,
+//   networkName: string
+// ) {
+//   const valName = `CLabs Validator #${index} on ${networkName}`
 
-  console.info(`    - lockGold ${valName}`)
-  await lockGold(
-    accounts,
-    lockedGold,
-    config.validators.validatorLockedGoldRequirements.value,
-    validatorPrivateKey
-  )
+//   console.info(`    - lockGold ${valName}`)
+//   await lockGold(
+//     accounts,
+//     lockedGold,
+//     config.validators.validatorLockedGoldRequirements.value,
+//     validatorPrivateKey
+//   )
 
-  console.info(`    - setName ${valName}`)
+//   console.info(`    - setName ${valName}`)
 
-  // @ts-ignore
-  const setNameTx = accounts.contract.methods.setName(valName)
-  await sendTransaction(web3, setNameTx, validatorPrivateKey, {
-    to: accounts.address,
-  })
+//   // @ts-ignore
+//   const setNameTx = accounts.contract.methods.setName(valName)
+//   await sendTransaction(web3, setNameTx, validatorPrivateKey, {
+//     to: accounts.address,
+//   })
 
-  console.info(`    - registerValidator ${valName}`)
-  const publicKey = privateKeyToPublicKey(validatorPrivateKey)
+//   console.info(`    - registerValidator ${valName}`)
+//   const publicKey = privateKeyToPublicKey(validatorPrivateKey)
 
-  // @ts-ignore
-  const registerTx = validators.contract.methods.registerValidatorNoBls(publicKey)
+//   // @ts-ignore
+//   const registerTx = validators.contract.methods.registerValidatorNoBls(publicKey)
 
-  await sendTransaction(web3, registerTx, validatorPrivateKey, {
-    to: validators.address,
-  })
+//   await sendTransaction(web3, registerTx, validatorPrivateKey, {
+//     to: validators.address,
+//   })
 
-  console.info(`    - affiliate ${valName}`)
+//   console.info(`    - affiliate ${valName}`)
 
-  // @ts-ignore
-  const affiliateTx = validators.contract.methods.affiliate(groupAddress)
+//   // @ts-ignore
+//   const affiliateTx = validators.contract.methods.affiliate(groupAddress)
 
-  await sendTransaction(web3, affiliateTx, validatorPrivateKey, {
-    to: validators.address,
-  })
+//   await sendTransaction(web3, affiliateTx, validatorPrivateKey, {
+//     to: validators.address,
+//   })
 
-  console.info(`    - setAccountDataEncryptionKey ${valName}`)
+//   console.info(`    - setAccountDataEncryptionKey ${valName}`)
 
-  // @ts-ignore
-  const registerDataEncryptionKeyTx = accounts.contract.methods.setAccountDataEncryptionKey(
-    privateKeyToPublicKey(validatorPrivateKey)
-  )
+//   // @ts-ignore
+//   const registerDataEncryptionKeyTx = accounts.contract.methods.setAccountDataEncryptionKey(
+//     privateKeyToPublicKey(validatorPrivateKey)
+//   )
 
-  await sendTransaction(web3, registerDataEncryptionKeyTx, validatorPrivateKey, {
-    to: accounts.address,
-  })
+//   await sendTransaction(web3, registerDataEncryptionKeyTx, validatorPrivateKey, {
+//     to: accounts.address,
+//   })
 
-  if (!isGanache) {
-    // Authorize the attestation signer
-    const attestationKeyAddress = privateKeyToAddress(attestationKey)
-    console.info(`    - authorizeAttestationSigner ${valName}->${attestationKeyAddress}`)
-    const message = web3.utils.soliditySha3({
-      type: 'address',
-      value: privateKeyToAddress(validatorPrivateKey),
-    })
-    const signature = signMessage(message, attestationKey, attestationKeyAddress)
+//   if (!isGanache) {
+//     // Authorize the attestation signer
+//     const attestationKeyAddress = privateKeyToAddress(attestationKey)
+//     console.info(`    - authorizeAttestationSigner ${valName}->${attestationKeyAddress}`)
+//     const message = web3.utils.soliditySha3({
+//       type: 'address',
+//       value: privateKeyToAddress(validatorPrivateKey),
+//     })
+//     const signature = signMessage(message, attestationKey, attestationKeyAddress)
 
-    // @ts-ignore
-    const registerAttestationKeyTx = accounts.contract.methods.authorizeAttestationSigner(
-      attestationKeyAddress,
-      signature.v,
-      signature.r,
-      signature.s
-    )
+//     // @ts-ignore
+//     const registerAttestationKeyTx = accounts.contract.methods.authorizeAttestationSigner(
+//       attestationKeyAddress,
+//       signature.v,
+//       signature.r,
+//       signature.s
+//     )
 
-    await sendTransaction(web3, registerAttestationKeyTx, validatorPrivateKey, {
-      to: accounts.address,
-    })
-  }
+//     await sendTransaction(web3, registerAttestationKeyTx, validatorPrivateKey, {
+//       to: accounts.address,
+//     })
+//   }
 
-  console.info(`    - done ${valName}`)
-  return
-}
+//   console.info(`    - done ${valName}`)
+//   return
+// }
 
 module.exports = async (_deployer: any, networkName: string) => {
   const artifacts08 = ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE, artifacts)
@@ -238,10 +236,10 @@ module.exports = async (_deployer: any, networkName: string) => {
     artifacts
   )
 
-  const election: ElectionInstance = await getDeployedProxiedContract<ElectionInstance>(
-    'Election',
-    artifacts
-  )
+  // const election: ElectionInstance = await getDeployedProxiedContract<ElectionInstance>(
+  //   'Election',
+  //   artifacts
+  // )
 
   if (networkName === 'development') {
     isGanache = true
@@ -260,7 +258,7 @@ module.exports = async (_deployer: any, networkName: string) => {
   }
 
   const valKeys: string[] = config.validators.validatorKeys
-  const attestationKeys: string[] = config.validators.attestationKeys
+  // const attestationKeys: string[] = config.validators.attestationKeys
 
   if (valKeys.length === 0) {
     console.info('  No validators to register')
@@ -319,6 +317,7 @@ module.exports = async (_deployer: any, networkName: string) => {
     }
   })
 
+  // @ts-ignore
   for (const [idx, group] of groups.entries()) {
     console.info(
       `  Registering validator group: ${group.name} with: ${group.lockedGold} CG locked...`
@@ -332,74 +331,77 @@ module.exports = async (_deployer: any, networkName: string) => {
       group.lockedGold
     )
 
-    console.info(`  * Registering ${group.valKeys.length} validators ...`)
-    await Promise.all(
-      group.valKeys.map((key, i) => {
-        const index = idx * config.validators.maxGroupSize + i
-        return registerValidator(
-          accounts,
-          lockedGold,
-          validators,
-          key,
-          attestationKeys[index],
-          group.account.address,
-          index,
-          networkName
-        )
-      })
+    // console.info(`  * Registering ${group.valKeys.length} validators ...`)
+    console.log(
+      'Not registering validators as these migrations are not compatible with L2 code and will be deprecated'
     )
+    // await Promise.all(
+    //   group.valKeys.map((key, i) => {
+    //     const index = idx * config.validators.maxGroupSize + i
+    //     return registerValidator(
+    //       accounts,
+    //       lockedGold,
+    //       validators,
+    //       key,
+    //       attestationKeys[index],
+    //       group.account.address,
+    //       index,
+    //       networkName
+    //     )
+    //   })
+    // )
 
-    console.info(`  * Adding Validators to ${group.name} ...`)
-    for (const [i, key] of group.valKeys.entries()) {
-      const address = privateKeyToAddress(key)
-      console.info(`    - Adding ${address} ...`)
-      if (i === 0) {
-        const groupsWithVotes = groups.slice(0, idx)
-        groupsWithVotes.sort((a, b) => a.voteAmount.comparedTo(b.voteAmount))
+    // console.info(`  * Adding Validators to ${group.name} ...`)
+    // for (const [i, key] of group.valKeys.entries()) {
+    //   const address = privateKeyToAddress(key)
+    //   console.info(`    - Adding ${address} ...`)
+    //   if (i === 0) {
+    //     const groupsWithVotes = groups.slice(0, idx)
+    //     groupsWithVotes.sort((a, b) => a.voteAmount.comparedTo(b.voteAmount))
 
-        // @ts-ignore
-        const addTx = validators.contract.methods.addFirstMember(
-          address,
-          NULL_ADDRESS,
-          groupsWithVotes.length ? groupsWithVotes[0].account.address : NULL_ADDRESS
-        )
-        await sendTransaction(web3, addTx, group.account.privateKey, {
-          to: validators.address,
-        })
-      } else {
-        // @ts-ignore
-        const addTx = validators.contract.methods.addMember(address)
-        await sendTransaction(web3, addTx, group.account.privateKey, {
-          to: validators.address,
-        })
-      }
-    }
+    //     // @ts-ignore
+    //     const addTx = validators.contract.methods.addFirstMember(
+    //       address,
+    //       NULL_ADDRESS,
+    //       groupsWithVotes.length ? groupsWithVotes[0].account.address : NULL_ADDRESS
+    //     )
+    //     await sendTransaction(web3, addTx, group.account.privateKey, {
+    //       to: validators.address,
+    //     })
+    //   } else {
+    //     // @ts-ignore
+    //     const addTx = validators.contract.methods.addMember(address)
+    //     await sendTransaction(web3, addTx, group.account.privateKey, {
+    //       to: validators.address,
+    //     })
+    //   }
+    // }
 
-    // Determine the lesser and greater group addresses after voting.
-    const sortedGroups = groups.slice(0, idx + 1)
-    sortedGroups.sort((a, b) => a.voteAmount.comparedTo(b.voteAmount))
-    const groupSortedIndex = sortedGroups.indexOf(group)
-    const lesser =
-      groupSortedIndex > 0 ? sortedGroups[groupSortedIndex - 1].account.address : NULL_ADDRESS
-    const greater =
-      groupSortedIndex < idx ? sortedGroups[groupSortedIndex + 1].account.address : NULL_ADDRESS
+    // // Determine the lesser and greater group addresses after voting.
+    // const sortedGroups = groups.slice(0, idx + 1)
+    // sortedGroups.sort((a, b) => a.voteAmount.comparedTo(b.voteAmount))
+    // const groupSortedIndex = sortedGroups.indexOf(group)
+    // const lesser =
+    //   groupSortedIndex > 0 ? sortedGroups[groupSortedIndex - 1].account.address : NULL_ADDRESS
+    // const greater =
+    //   groupSortedIndex < idx ? sortedGroups[groupSortedIndex + 1].account.address : NULL_ADDRESS
 
-    // Note: Only the groups vote for themselves here. The validators do not vote.
-    console.info('  * Group voting for itself ...')
+    // // Note: Only the groups vote for themselves here. The validators do not vote.
+    // console.info('  * Group voting for itself ...')
 
-    // Make first and last group high votes so we can maintain presence.
-    const voteAmount = '0x' + group.voteAmount.toString(16)
+    // // Make first and last group high votes so we can maintain presence.
+    // const voteAmount = '0x' + group.voteAmount.toString(16)
 
-    // @ts-ignore
-    const voteTx = election.contract.methods.vote(
-      group.account.address,
-      voteAmount,
-      lesser,
-      greater
-    )
-    await sendTransaction(web3, voteTx, group.account.privateKey, {
-      to: election.address,
-    })
+    // // @ts-ignore
+    // const voteTx = election.contract.methods.vote(
+    //   group.account.address,
+    //   voteAmount,
+    //   lesser,
+    //   greater
+    // )
+    // await sendTransaction(web3, voteTx, group.account.privateKey, {
+    //   to: election.address,
+    // })
   }
   console.info('Done with migrations')
 }
