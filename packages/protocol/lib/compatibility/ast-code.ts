@@ -259,6 +259,10 @@ export function reportASTIncompatibilities(
   let out: ASTCodeCompatibilityReport[] = []
   for (const newArtifacts of newArtifactsSets) {
     const reports = newArtifacts.listArtifacts()
+      .filter((newArtifact) => {
+        const coreContractPathPattern = /^contracts(-0\.8)?\//
+        return coreContractPathPattern.test(newArtifact.ast.absolutePath)
+      })
       .map((newArtifact) => {
         for (const oldArtifacts of oldArtifactsSet) {
           const oldArtifact = getArtifactByName(getContractName(newArtifact), oldArtifacts)

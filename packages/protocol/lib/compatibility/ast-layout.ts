@@ -197,7 +197,12 @@ const getArtifactByName = (contractName: string, artifacts: BuildArtifacts): Art
 export const reportLayoutIncompatibilities = (oldArtifactsSet: BuildArtifacts[], newArtifactsSets: BuildArtifacts[]): ASTStorageCompatibilityReport[] => {
   let out: ASTStorageCompatibilityReport[] = []
   for (const newArtifacts of newArtifactsSets) {
-    const reports = newArtifacts.listArtifacts().map((newArtifact: any) => {
+    const reports = newArtifacts.listArtifacts()
+      .filter((newArtifact: any) => {
+        const coreContractPathPattern = /^contracts(-0\.8)?\//
+        return coreContractPathPattern.test(newArtifact.ast.absolutePath)
+      })
+      .map((newArtifact: any) => {
       for (const oldArtifacts of oldArtifactsSet) {
         const oldArtifact: any = getArtifactByName(getContractName(newArtifact), oldArtifacts)
         if (oldArtifact !== undefined) {
