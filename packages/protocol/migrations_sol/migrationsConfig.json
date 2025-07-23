@@ -76,7 +76,7 @@
     "membershipHistoryLength": 60,
     "commissionUpdateDelay": 51840,
     "commissionUpdateDelay_help": "(3 * DAY) / 5",
-
+    "groupCount": 3,
     "maxGroupSize": 2,
     "slashingMultiplierResetPeriod": 2592000,
     "slashingPenaltyResetPeriod_help": "30 * DAY",

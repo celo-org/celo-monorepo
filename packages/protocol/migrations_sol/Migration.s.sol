@@ -347,17 +347,14 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     addToRegistry("CeloToken", celoProxyAddress);
 
-    bool frozen = abi.decode(json.parseRaw(".goldToken.frozen"), (bool));
+    bool frozen = json.readBool(".goldToken.frozen");
     if (frozen) {
       getFreezer().freeze(celoProxyAddress);
     }
   }
 
   function migrateSortedOracles(string memory json) public {
-    uint256 reportExpirySeconds = abi.decode(
-      json.parseRaw(".sortedOracles.reportExpirySeconds"),
-      (uint256)
-    );
+    uint256 reportExpirySeconds = json.readUint(".sortedOracles.reportExpirySeconds");
     deployProxiedContract(
       "SortedOracles",
       abi.encodeWithSelector(ISortedOraclesInitializer.initialize.selector, reportExpirySeconds)
@@ -365,18 +362,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateGasPriceMinimum(string memory json) public {
-    uint256 gasPriceMinimumFloor = abi.decode(
-      json.parseRaw(".gasPriceMinimum.minimumFloor"),
-      (uint256)
-    );
-    uint256 targetDensity = abi.decode(json.parseRaw(".gasPriceMinimum.targetDensity"), (uint256));
-    uint256 adjustmentSpeed = abi.decode(
-      json.parseRaw(".gasPriceMinimum.adjustmentSpeed"),
-      (uint256)
-    );
-    uint256 baseFeeOpCodeActivationBlock = abi.decode(
-      json.parseRaw(".gasPriceMinimum.baseFeeOpCodeActivationBlock"),
-      (uint256)
+    uint256 gasPriceMinimumFloor = json.readUint(".gasPriceMinimum.minimumFloor");
+    uint256 targetDensity = json.readUint(".gasPriceMinimum.targetDensity");
+    uint256 adjustmentSpeed = json.readUint(".gasPriceMinimum.adjustmentSpeed");
+    uint256 baseFeeOpCodeActivationBlock = json.readUint(
+      ".gasPriceMinimum.baseFeeOpCodeActivationBlock"
     );
 
     deployProxiedContract(
@@ -396,11 +386,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     address[] memory owners = new address[](1);
     owners[0] = DEPLOYER_ACCOUNT;
 
-    uint256 required = abi.decode(json.parseRaw(".reserveSpenderMultiSig.required"), (uint256));
-    uint256 internalRequired = abi.decode(
-      json.parseRaw(".reserveSpenderMultiSig.internalRequired"),
-      (uint256)
-    );
+    uint256 required = json.readUint(".reserveSpenderMultiSig.required");
+    uint256 internalRequired = json.readUint(".reserveSpenderMultiSig.internalRequired");
 
     // Deploys and adds the ReserveSpenderMultiSig to the Registry for ease of reference.
     // The ReserveSpenderMultiSig is not in the Registry on Mainnet, but it's useful to keep a
@@ -417,28 +404,18 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateReserve(string memory json) public {
-    uint256 tobinTaxStalenessThreshold = abi.decode(
-      json.parseRaw(".reserve.tobinTaxStalenessThreshold"),
-      (uint256)
-    );
-    uint256 spendingRatio = abi.decode(json.parseRaw(".reserve.spendingRatio"), (uint256));
-    uint256 frozenGold = abi.decode(json.parseRaw(".reserve.frozenGold"), (uint256));
-    uint256 frozenDays = abi.decode(json.parseRaw(".reserve.frozenDays"), (uint256));
-    bytes32[] memory assetAllocationSymbols = abi.decode(
-      json.parseRaw(".reserve.assetAllocationSymbols"),
-      (bytes32[])
+    uint256 tobinTaxStalenessThreshold = json.readUint(".reserve.tobinTaxStalenessThreshold");
+    uint256 spendingRatio = json.readUint(".reserve.spendingRatio");
+    uint256 frozenGold = json.readUint(".reserve.frozenGold");
+    uint256 frozenDays = json.readUint(".reserve.frozenDays");
+    bytes32[] memory assetAllocationSymbols = json.readBytes32Array(
+      ".reserve.assetAllocationSymbols"
     );
 
-    uint256[] memory assetAllocationWeights = abi.decode(
-      json.parseRaw(".reserve.assetAllocationWeights"),
-      (uint256[])
-    );
-    uint256 tobinTax = abi.decode(json.parseRaw(".reserve.tobinTax"), (uint256));
-    uint256 tobinTaxReserveRatio = abi.decode(
-      json.parseRaw(".reserve.tobinTaxReserveRatio"),
-      (uint256)
-    );
-    uint256 initialBalance = abi.decode(json.parseRaw(".reserve.initialBalance"), (uint256));
+    uint256[] memory assetAllocationWeights = json.readUintArray(".reserve.assetAllocationWeights");
+    uint256 tobinTax = json.readUint(".reserve.tobinTax");
+    uint256 tobinTaxReserveRatio = json.readUint(".reserve.tobinTaxReserveRatio");
+    uint256 initialBalance = json.readUint(".reserve.initialBalance");
 
     address reserveProxyAddress = deployProxiedContract(
       "Reserve",
@@ -460,7 +437,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     vm.deal(reserveProxyAddress, initialBalance);
 
     // Adds ReserveSpenderMultiSig to Reserve
-    bool useSpender = abi.decode(json.parseRaw(".reserveSpenderMultiSig.required"), (bool));
+    bool useSpender = json.readBool(".reserveSpenderMultiSig.required");
     address spender = useSpender
       ? registry.getAddressForString("ReserveSpenderMultiSig")
       : DEPLOYER_ACCOUNT;
@@ -522,27 +499,18 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateStableToken(string memory json) public {
-    string[] memory names = abi.decode(json.parseRaw(".stableTokens.names"), (string[]));
-    string[] memory symbols = abi.decode(json.parseRaw(".stableTokens.symbols"), (string[]));
-    string[] memory contractSufixs = abi.decode(
-      json.parseRaw(".stableTokens.contractSufixs"),
-      (string[])
-    );
+    string[] memory names = json.readStringArray(".stableTokens.names");
+    string[] memory symbols = json.readStringArray(".stableTokens.symbols");
+    string[] memory contractSufixs = json.readStringArray(".stableTokens.contractSufixs");
 
     require(names.length == symbols.length, "Ticker and stable names should match");
 
     uint8 decimals = abi.decode(json.parseRaw(".stableTokens.decimals"), (uint8));
-    uint256 inflationRate = abi.decode(json.parseRaw(".stableTokens.inflationRate"), (uint256));
-    uint256 inflationFactorUpdatePeriod = abi.decode(
-      json.parseRaw(".stableTokens.inflationPeriod"),
-      (uint256)
-    );
-    uint256 initialBalanceValue = abi.decode(
-      json.parseRaw(".stableTokens.initialBalance"),
-      (uint256)
-    );
-    bool frozen = abi.decode(json.parseRaw(".stableTokens.frozen"), (bool));
-    uint256 celoPrice = abi.decode(json.parseRaw(".stableTokens.celoPrice"), (uint256));
+    uint256 inflationRate = json.readUint(".stableTokens.inflationRate");
+    uint256 inflationFactorUpdatePeriod = json.readUint(".stableTokens.inflationPeriod");
+    uint256 initialBalanceValue = json.readUint(".stableTokens.initialBalance");
+    bool frozen = json.readBool(".stableTokens.frozen");
+    uint256 celoPrice = json.readUint(".stableTokens.celoPrice");
 
     address[] memory initialBalanceAddresses = new address[](1);
     initialBalanceAddresses[0] = DEPLOYER_ACCOUNT;
@@ -570,10 +538,10 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // TODO make this for all stables (using a loop like in stable)
 
     string memory stableTokenIdentifier = "StableToken";
-    uint256 spread = abi.decode(json.parseRaw(".exchange.spread"), (uint256));
-    uint256 reserveFraction = abi.decode(json.parseRaw(".exchange.reserveFraction"), (uint256));
-    uint256 updateFrequency = abi.decode(json.parseRaw(".exchange.updateFrequency"), (uint256));
-    uint256 minimumReports = abi.decode(json.parseRaw(".exchange.minimumReports"), (uint256));
+    uint256 spread = json.readUint(".exchange.spread");
+    uint256 reserveFraction = json.readUint(".exchange.reserveFraction");
+    uint256 updateFrequency = json.readUint(".exchange.updateFrequency");
+    uint256 minimumReports = json.readUint(".exchange.minimumReports");
 
     address exchangeProxyAddress = deployProxiedContract(
       "Exchange",
@@ -588,7 +556,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       )
     );
 
-    bool frozen = abi.decode(json.parseRaw(".exchange.frozen"), (bool));
+    bool frozen = json.readBool(".exchange.frozen");
     if (frozen) {
       getFreezer().freeze(exchangeProxyAddress);
     }
@@ -606,7 +574,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateLockedCelo(string memory json) public {
-    uint256 unlockingPeriod = abi.decode(json.parseRaw(".lockedGold.unlockingPeriod"), (uint256));
+    uint256 unlockingPeriod = json.readUint(".lockedGold.unlockingPeriod");
 
     address LockedCeloProxyAddress = deployProxiedContract(
       "LockedGold",
@@ -621,35 +589,22 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateValidators(string memory json) public {
-    uint256 groupRequirementValue = abi.decode(
-      json.parseRaw(".validators.groupLockedGoldRequirements.value"),
-      (uint256)
+    uint256 groupRequirementValue = json.readUint(".validators.groupLockedGoldRequirements.value");
+    uint256 groupRequirementDuration = json.readUint(
+      ".validators.groupLockedGoldRequirements.duration"
     );
-    uint256 groupRequirementDuration = abi.decode(
-      json.parseRaw(".validators.groupLockedGoldRequirements.duration"),
-      (uint256)
+    uint256 validatorRequirementValue = json.readUint(
+      ".validators.validatorLockedGoldRequirements.value"
     );
-    uint256 validatorRequirementValue = abi.decode(
-      json.parseRaw(".validators.validatorLockedGoldRequirements.value"),
-      (uint256)
+    uint256 validatorRequirementDuration = json.readUint(
+      ".validators.validatorLockedGoldRequirements.duration"
     );
-    uint256 validatorRequirementDuration = abi.decode(
-      json.parseRaw(".validators.validatorLockedGoldRequirements.duration"),
-      (uint256)
+    uint256 membershipHistoryLength = json.readUint(".validators.membershipHistoryLength");
+    uint256 slashingMultiplierResetPeriod = json.readUint(
+      ".validators.slashingMultiplierResetPeriod"
     );
-    uint256 membershipHistoryLength = abi.decode(
-      json.parseRaw(".validators.membershipHistoryLength"),
-      (uint256)
-    );
-    uint256 slashingMultiplierResetPeriod = abi.decode(
-      json.parseRaw(".validators.slashingMultiplierResetPeriod"),
-      (uint256)
-    );
-    uint256 maxGroupSize = abi.decode(json.parseRaw(".validators.maxGroupSize"), (uint256));
-    uint256 commissionUpdateDelay = abi.decode(
-      json.parseRaw(".validators.commissionUpdateDelay"),
-      (uint256)
-    );
+    uint256 maxGroupSize = json.readUint(".validators.maxGroupSize");
+    uint256 commissionUpdateDelay = json.readUint(".validators.commissionUpdateDelay");
 
     InitParamsTunnel memory initParamsTunnel = InitParamsTunnel({
       commissionUpdateDelay: commissionUpdateDelay
@@ -673,22 +628,10 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateElection(string memory json) public {
-    uint256 minElectableValidators = abi.decode(
-      json.parseRaw(".election.minElectableValidators"),
-      (uint256)
-    );
-    uint256 maxElectableValidators = abi.decode(
-      json.parseRaw(".election.maxElectableValidators"),
-      (uint256)
-    );
-    uint256 maxNumGroupsVotedFor = abi.decode(
-      json.parseRaw(".election.maxNumGroupsVotedFor"),
-      (uint256)
-    );
-    uint256 electabilityThreshold = abi.decode(
-      json.parseRaw(".election.electabilityThreshold"),
-      (uint256)
-    );
+    uint256 minElectableValidators = json.readUint(".election.minElectableValidators");
+    uint256 maxElectableValidators = json.readUint(".election.maxElectableValidators");
+    uint256 maxNumGroupsVotedFor = json.readUint(".election.maxNumGroupsVotedFor");
+    uint256 electabilityThreshold = json.readUint(".election.electabilityThreshold");
 
     address proxyAddress = proxyFactory.deployProxy();
 
@@ -712,50 +655,25 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateEpochRewards(string memory json) public {
-    uint256 targetVotingYieldInitial = abi.decode(
-      json.parseRaw(".epochRewards.targetVotingYieldParameters.initial"),
-      (uint256)
+    uint256 targetVotingYieldInitial = json.readUint(
+      ".epochRewards.targetVotingYieldParameters.initial"
     );
-    uint256 targetVotingYieldMax = abi.decode(
-      json.parseRaw(".epochRewards.targetVotingYieldParameters.max"),
-      (uint256)
+    uint256 targetVotingYieldMax = json.readUint(".epochRewards.targetVotingYieldParameters.max");
+    uint256 targetVotingYieldAdjustmentFactor = json.readUint(
+      ".epochRewards.targetVotingYieldParameters.adjustmentFactor"
     );
-    uint256 targetVotingYieldAdjustmentFactor = abi.decode(
-      json.parseRaw(".epochRewards.targetVotingYieldParameters.adjustmentFactor"),
-      (uint256)
+    uint256 rewardsMultiplierMax = json.readUint(".epochRewards.rewardsMultiplierParameters.max");
+    uint256 rewardsMultiplierUnderspendAdjustmentFactor = json.readUint(
+      ".epochRewards.rewardsMultiplierParameters.adjustmentFactors.underspend"
     );
-    uint256 rewardsMultiplierMax = abi.decode(
-      json.parseRaw(".epochRewards.rewardsMultiplierParameters.max"),
-      (uint256)
+    uint256 rewardsMultiplierOverspendAdjustmentFactor = json.readUint(
+      ".epochRewards.rewardsMultiplierParameters.adjustmentFactors.overspend"
     );
-    uint256 rewardsMultiplierUnderspendAdjustmentFactor = abi.decode(
-      json.parseRaw(".epochRewards.rewardsMultiplierParameters.adjustmentFactors.underspend"),
-      (uint256)
-    );
-    uint256 rewardsMultiplierOverspendAdjustmentFactor = abi.decode(
-      json.parseRaw(".epochRewards.rewardsMultiplierParameters.adjustmentFactors.overspend"),
-      (uint256)
-    );
-    uint256 targetVotingGoldFraction = abi.decode(
-      json.parseRaw(".epochRewards.targetVotingGoldFraction"),
-      (uint256)
-    );
-    uint256 targetValidatorEpochPayment = abi.decode(
-      json.parseRaw(".epochRewards.maxValidatorEpochPayment"),
-      (uint256)
-    );
-    uint256 communityRewardFraction = abi.decode(
-      json.parseRaw(".epochRewards.communityRewardFraction"),
-      (uint256)
-    );
-    address carbonOffsettingPartner = abi.decode(
-      json.parseRaw(".epochRewards.carbonOffsettingPartner"),
-      (address)
-    );
-    uint256 carbonOffsettingFraction = abi.decode(
-      json.parseRaw(".epochRewards.carbonOffsettingFraction"),
-      (uint256)
-    );
+    uint256 targetVotingGoldFraction = json.readUint(".epochRewards.targetVotingGoldFraction");
+    uint256 targetValidatorEpochPayment = json.readUint(".epochRewards.maxValidatorEpochPayment");
+    uint256 communityRewardFraction = json.readUint(".epochRewards.communityRewardFraction");
+    address carbonOffsettingPartner = json.readAddress(".epochRewards.carbonOffsettingPartner");
+    uint256 carbonOffsettingFraction = json.readUint(".epochRewards.carbonOffsettingFraction");
 
     address epochRewardsProxy = deployProxiedContract(
       "EpochRewards",
@@ -776,7 +694,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       )
     );
 
-    bool frozen = abi.decode(json.parseRaw(".epochRewards.frozen"), (bool));
+    bool frozen = json.readBool(".epochRewards.frozen");
 
     if (frozen) {
       getFreezer().freeze(epochRewardsProxy);
@@ -784,9 +702,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateRandom(string memory json) public {
-    uint256 randomnessBlockRetentionWindow = abi.decode(
-      json.parseRaw(".random.randomnessBlockRetentionWindow"),
-      (uint256)
+    uint256 randomnessBlockRetentionWindow = json.readUint(
+      ".random.randomnessBlockRetentionWindow"
     );
 
     deployProxiedContract(
@@ -800,15 +717,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateBlockchainParameters(string memory json) public {
-    uint256 gasForNonGoldCurrencies = abi.decode(
-      json.parseRaw(".blockchainParameters.gasForNonGoldCurrencies"),
-      (uint256)
+    uint256 gasForNonGoldCurrencies = json.readUint(
+      ".blockchainParameters.gasForNonGoldCurrencies"
     );
-    uint256 gasLimit = abi.decode(json.parseRaw(".blockchainParameters.gasLimit"), (uint256));
-    uint256 lookbackWindow = abi.decode(
-      json.parseRaw(".blockchainParameters.lookbackWindow"),
-      (uint256)
-    );
+    uint256 gasLimit = json.readUint(".blockchainParameters.gasLimit");
+    uint256 lookbackWindow = json.readUint(".blockchainParameters.lookbackWindow");
 
     deployProxiedContract(
       "BlockchainParameters",
@@ -831,8 +744,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateDoubleSigningSlasher(string memory json) public {
-    uint256 penalty = abi.decode(json.parseRaw(".doubleSigningSlasher.penalty"), (uint256));
-    uint256 reward = abi.decode(json.parseRaw(".doubleSigningSlasher.reward"), (uint256));
+    uint256 penalty = json.readUint(".doubleSigningSlasher.penalty");
+    uint256 reward = json.readUint(".doubleSigningSlasher.reward");
 
     deployProxiedContract(
       "DoubleSigningSlasher",
@@ -848,12 +761,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateDowntimeSlasher(string memory json) public {
-    uint256 penalty = abi.decode(json.parseRaw(".downtimeSlasher.penalty"), (uint256));
-    uint256 reward = abi.decode(json.parseRaw(".downtimeSlasher.reward"), (uint256));
-    uint256 slashableDowntime = abi.decode(
-      json.parseRaw(".downtimeSlasher.slashableDowntime"),
-      (uint256)
-    );
+    uint256 penalty = json.readUint(".downtimeSlasher.penalty");
+    uint256 reward = json.readUint(".downtimeSlasher.reward");
+    uint256 slashableDowntime = json.readUint(".downtimeSlasher.slashableDowntime");
 
     deployProxiedContract(
       "DowntimeSlasher",
@@ -873,12 +783,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     address[] memory owners = new address[](1);
     owners[0] = DEPLOYER_ACCOUNT;
 
-    uint256 required = abi.decode(json.parseRaw(".governanceApproverMultiSig.required"), (uint256));
-    uint256 internalRequired = abi.decode(
-      json.parseRaw(".governanceApproverMultiSig.internalRequired"),
-      (uint256)
-    );
-
+    uint256 required = json.readUint(".governanceApproverMultiSig.required");
+    uint256 internalRequired = json.readUint(".governanceApproverMultiSig.internalRequired");
     // This adds the multisig to the registry, which is not a case in mainnet but it's useful to keep a reference
     // of the deployed contract
     deployProxiedContract(
@@ -930,8 +836,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateFeeHandler(string memory json) public {
-    address newFeeBeneficiary = abi.decode(json.parseRaw(".feeHandler.beneficiary"), (address));
-    uint256 newBurnFraction = abi.decode(json.parseRaw(".feeHandler.burnFraction"), (uint256));
+    address newFeeBeneficiary = json.readAddress(".feeHandler.beneficiary");
+    uint256 newBurnFraction = json.readUint(".feeHandler.burnFraction");
     address[] memory tokens;
     address[] memory handlers;
     uint256[] memory newLimits;
@@ -988,7 +894,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     address celoUnreleasedTreasury = address(getCeloUnreleasedTreasury());
 
     // broadcast as first validator
-    uint256 firstValidatorPk = abi.decode(json.parseRaw(".validators.valKeys[0]"), (uint256));
+    uint256 firstValidatorPk = json.readUint(".validators.valKeys[0]");
     vm.startBroadcast(firstValidatorPk);
     getCeloToken().transfer(celoUnreleasedTreasury, 400_000_000 ether);
     console.log(
@@ -1014,8 +920,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function initializeEpochManager(string memory json) public {
     console.log("Initialize epoch manager...");
-    uint256[] memory valKeys = abi.decode(json.parseRaw(".validators.valKeys"), (uint256[]));
-    uint256 maxGroupSize = abi.decode(json.parseRaw(".validators.maxGroupSize"), (uint256));
+    uint256[] memory valKeys = json.readUintArray(".validators.valKeys");
+    uint256 maxGroupSize = json.readUint(".validators.maxGroupSize");
     uint256 groupCount = 3;
     address[] memory signers = new address[](maxGroupSize * groupCount);
     // TODO check no signer is left with 0x0
@@ -1051,10 +957,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateEpochManager(string memory json) public {
-    address newEpochDuration = abi.decode(
-      json.parseRaw(".epochManager.newEpochDuration"),
-      (address)
-    );
+    address newEpochDuration = json.readAddress(".epochManager.newEpochDuration");
 
     deployProxiedContract(
       "EpochManager",
@@ -1068,42 +971,21 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateGovernance(string memory json) public {
-    bool useApprover = abi.decode(json.parseRaw(".governanceApproverMultiSig.required"), (bool));
+    bool useApprover = json.readBool(".governanceApproverMultiSig.required");
 
     address approver = useApprover
       ? registry.getAddressForString("GovernanceApproverMultiSig")
       : DEPLOYER_ACCOUNT;
-    uint256 concurrentProposals = abi.decode(
-      json.parseRaw(".governance.concurrentProposals"),
-      (uint256)
-    );
-    uint256 minDeposit = abi.decode(json.parseRaw(".governance.minDeposit"), (uint256));
-    uint256 queueExpiry = abi.decode(json.parseRaw(".governance.queueExpiry"), (uint256));
-    uint256 dequeueFrequency = abi.decode(json.parseRaw(".governance.dequeueFrequency"), (uint256));
-    uint256 referendumStageDuration = abi.decode(
-      json.parseRaw(".governance.referendumStageDuration"),
-      (uint256)
-    );
-    uint256 executionStageDuration = abi.decode(
-      json.parseRaw(".governance.executionStageDuration"),
-      (uint256)
-    );
-    uint256 participationBaseline = abi.decode(
-      json.parseRaw(".governance.participationBaseline"),
-      (uint256)
-    );
-    uint256 participationFloor = abi.decode(
-      json.parseRaw(".governance.participationFloor"),
-      (uint256)
-    );
-    uint256 baselineUpdateFactor = abi.decode(
-      json.parseRaw(".governance.baselineUpdateFactor"),
-      (uint256)
-    );
-    uint256 baselineQuorumFactor = abi.decode(
-      json.parseRaw(".governance.baselineQuorumFactor"),
-      (uint256)
-    );
+    uint256 concurrentProposals = json.readUint(".governance.concurrentProposals");
+    uint256 minDeposit = json.readUint(".governance.minDeposit");
+    uint256 queueExpiry = json.readUint(".governance.queueExpiry");
+    uint256 dequeueFrequency = json.readUint(".governance.dequeueFrequency");
+    uint256 referendumStageDuration = json.readUint(".governance.referendumStageDuration");
+    uint256 executionStageDuration = json.readUint(".governance.executionStageDuration");
+    uint256 participationBaseline = json.readUint(".governance.participationBaseline");
+    uint256 participationFloor = json.readUint(".governance.participationFloor");
+    uint256 baselineUpdateFactor = json.readUint(".governance.baselineUpdateFactor");
+    uint256 baselineQuorumFactor = json.readUint(".governance.baselineQuorumFactor");
 
     address governanceProxyAddress = deployProxiedContract(
       "Governance",
@@ -1129,10 +1011,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function _transferOwnerShipCoreContract(address governanceAddress, string memory json) public {
-    bool skipTransferOwnership = abi.decode(
-      json.parseRaw(".governance.skipTransferOwnership"),
-      (bool)
-    );
+    bool skipTransferOwnership = json.readBool(".governance.skipTransferOwnership");
     if (!skipTransferOwnership) {
       // BlockchainParameters ownership transitioned to governance in a follow-up script.?
       for (uint256 i = 0; i < contractsInRegistry.length; i++) {
@@ -1153,10 +1032,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function _setConstitution(address _governanceAddress, string memory _json) public {
-    bool skipSetConstitution_ = abi.decode(
-      _json.parseRaw(".governance.skipSetConstitution"),
-      (bool)
-    );
+    bool skipSetConstitution_ = _json.readBool(".governance.skipSetConstitution");
     IGovernance governance_ = IGovernance(_governanceAddress);
     registry = IRegistry(REGISTRY_ADDRESS);
 
@@ -1228,7 +1104,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 commission,
     string memory json
   ) public returns (address accountAddress) {
-    string memory groupName = abi.decode(json.parseRaw(".validators.groupName"), (string));
+    string memory groupName = json.readString(".validators.groupName");
     vm.startBroadcast(validator0Key);
     lockGold(amountToLock);
     getAccounts().setName(groupName);
@@ -1292,16 +1168,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function electValidators(string memory json) public {
     console.log("Electing validators: ");
 
-    uint256 commission = abi.decode(json.parseRaw(".validators.commission"), (uint256));
-    uint256 minElectableValidators = abi.decode(
-      json.parseRaw(".election.minElectableValidators"),
-      (uint256)
-    );
-    uint256[] memory valKeys = abi.decode(json.parseRaw(".validators.valKeys"), (uint256[]));
-    uint256 maxGroupSize = abi.decode(json.parseRaw(".validators.maxGroupSize"), (uint256));
-    uint256 validatorLockedGoldRequirements = abi.decode(
-      json.parseRaw(".validators.validatorLockedGoldRequirements.value"),
-      (uint256)
+    uint256 commission = json.readUint(".validators.commission");
+    uint256 minElectableValidators = json.readUint(".election.minElectableValidators");
+    uint256[] memory valKeys = json.readUintArray(".validators.valKeys");
+    uint256 maxGroupSize = json.readUint(".validators.maxGroupSize");
+    uint256 validatorLockedGoldRequirements = json.readUint(
+      ".validators.validatorLockedGoldRequirements.value"
     );
     // attestationKeys not migrated
 
@@ -1315,7 +1187,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       );
     }
 
-    uint256 groupCount = 3; // TODO add to config (migrationsConfig.json)
+    uint256 groupCount = json.readUint(".validators.groupCount");
 
     address[] memory groups = new address[](groupCount);
 
