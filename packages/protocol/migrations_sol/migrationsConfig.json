@@ -127,7 +127,7 @@
     "frozen": false
   },
   "epochManager": {
-    "newEpochDuration": 60
+    "newEpochDuration": 86400
   },
   "random": {
     "randomnessBlockRetentionWindow": "720",
