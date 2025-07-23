@@ -63,6 +63,7 @@ forge script \
   $LIBRARY_FLAGS \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
   
+# TODO: Combine run + unrealesed treasury + run2 into single Foundry script
 echo "Transfering funds to Unreleased Treasury..."
 CELO_TOKEN_ADDRESS=`cast call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string calldata identifier) external view returns (address)" "CeloToken" --rpc-url $ANVIL_RPC_URL`
 CELO_UNRELEASED_TREASURY_ADDRESS=0xB76D502Ad168F9D545661ea628179878DcA92FD5

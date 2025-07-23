@@ -236,14 +236,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateLockedCelo(json);
     migrateValidators(json);
 
-    migrateElection(json); // fails here
+    migrateElection(json);
 
     migrateEpochRewards(json);
     migrateEscrow();
-    // attestation not migrated
     migrateGovernanceSlasher();
-    //migrateGovernanceApproverMultiSig(json);
-    // GrandaMento not migrated
+    // migrateGovernanceApproverMultiSig(json);
     migrateFederatedAttestations();
     migrateMentoFeeHandlerSeller();
     migrateUniswapFeeHandlerSeller();
@@ -253,6 +251,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     vm.stopBroadcast();
 
     // needs to broadcast from a pre-funded account
+    // run + bash + run2
+    // this could be done in genesis L2 as native funds in optimism repo (TBD with Javi)
+    // if anvil is underneath it might be possible to 'deal'
     // fundCeloUnreleasedTreasury(json);
 
     // Functions with broadcast with different addresses
@@ -706,22 +707,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       )
     );
 
-    // TODO: read from a json
-    // address implementation = address(0x8464135c8F25Da09e49BC8782676a84730C318bC);
-
-    // proxy._setAndInitializeImplementation(
-    //   implementation,
-    //   abi.encodeWithSelector(
-    //     IElectionInitializer.initialize.selector,
-    //     REGISTRY_ADDRESS,
-    //     minElectableValidators,
-    //     maxElectableValidators,
-    //     maxNumGroupsVotedFor,
-    //     electabilityThreshold
-    //   )
-    // );
-    // addToRegistry("Election", address(proxy));
-
     console.log(" Done deploying:", "Election");
     console.log("------------------------------");
   }
@@ -1004,12 +989,13 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     // broadcast as first validator
     uint256 firstValidatorPk = abi.decode(json.parseRaw(".validators.valKeys[0]"), (uint256));
-    vm.broadcast(firstValidatorPk);
+    vm.startBroadcast(firstValidatorPk);
     getCeloToken().transfer(celoUnreleasedTreasury, 400_000_000 ether);
     console.log(
       "Balance of CeloUnreleasedTreasury is",
       getCeloToken().balanceOf(celoUnreleasedTreasury)
     );
+    vm.stopBroadcast();
   }
 
   function migrateEpochManagerEnabler() public {
@@ -1028,7 +1014,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function initializeEpochManager(string memory json) public {
     console.log("Initialize epoch manager...");
-    // TODO will not be initialized because it's not funded
     uint256[] memory valKeys = abi.decode(json.parseRaw(".validators.valKeys"), (uint256[]));
     uint256 maxGroupSize = abi.decode(json.parseRaw(".validators.maxGroupSize"), (uint256));
     uint256 groupCount = 3;
@@ -1046,7 +1031,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         );
 
         vm.startBroadcast(valKeys[validatorKeyIndex]);
+        // PK -> Address
         address accountAddress = (new ForceTx()).identity();
+        // On mainnet potentially singer & account should be different
+        // 1 -> list of accounts
+        // 2 -> list of signers
+        // Double check on mainnet & with Javi
         address signer = accountAddress;
         signers[signerIndexCount] = signer;
         signerIndexCount++;
@@ -1056,7 +1046,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     // Bypass epoch manager enabler?
     vm.startBroadcast(DEPLOYER_ACCOUNT);
-    IEpochManager(getEpochManager()).initializeSystem(1, block.number, signers); // TODO fix signers
+    IEpochManager(getEpochManager()).initializeSystem(1, block.number, signers); // TODO fix signers (nice to have)
     vm.stopBroadcast();
   }
 
@@ -1075,21 +1065,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         registry.getAddressForStringOrDie("SortedOracles")
       )
     );
-
-    //  for (uint256 validatorIndex = 0; validatorIndex < maxGroupSize; validatorIndex++) {
-    //     vm.startBroadcast(validatorKey);
-    //     address accountAddress = (new ForceTx()).identity();
-    //     address signer;
-    //     vm.stopBroadcast();
-
-    //     uint256 validatorKeyIndex = getValidatorKeyIndex(
-    //       groupCount,
-    //       groupIndex,
-    //       validatorIndex,
-    //       maxGroupSize
-    //     );
-    //     console.log("Registering validator #: ", validatorIndex);
-    //  }
   }
 
   function migrateGovernance(string memory json) public {
@@ -1340,7 +1315,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       );
     }
 
-    uint256 groupCount = 3; // TODO add to config
+    uint256 groupCount = 3; // TODO add to config (migrationsConfig.json)
 
     address[] memory groups = new address[](groupCount);
 
