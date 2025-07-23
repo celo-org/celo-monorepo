@@ -1162,10 +1162,16 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       // BlockchainParameters ownership transitioned to governance in a follow-up script.?
       for (uint256 i = 0; i < contractsInRegistry.length; i++) {
         string memory contractToTransfer = contractsInRegistry[i];
-        console.log("Transfering ownership of: ", contractToTransfer);
+        console.log("Transfering proxy ownership of: ", contractToTransfer);
         IProxy proxy = IProxy(registry.getAddressForStringOrDie(contractToTransfer));
-        console.log("Previous owner was: ", proxy._getOwner());
+        console.log("Previous proxy owner was: ", proxy._getOwner());
         proxy._transferOwnership(governanceAddress);
+        console.log("New proxy owner is: ", proxy._getOwner());
+
+        // Transfer contract ownership
+        console.log("Previous contract owner was: ", Ownable(contractToTransfer).owner());
+        Ownable(contractToTransfer).transferOwnership(governanceAddress);
+        console.log("New contract owner is: ", Ownable(contractToTransfer).owner());
       }
     }
   }
