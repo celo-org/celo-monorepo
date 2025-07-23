@@ -259,8 +259,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function run2() public {
     vm.startBroadcast(DEPLOYER_ACCOUNT);
 
-    lockGold(10000 * 1e18);
-
     proxyFactory = IProxyFactory(
       create2deploy(
         bytes32(uint256(block.number)),
