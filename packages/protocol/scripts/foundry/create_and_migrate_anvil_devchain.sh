@@ -64,11 +64,12 @@ forge script \
   
 echo "Completed run() execution"
 
+# TODO: Combine run + unrealesed treasury + run2 into single Foundry script
 # echo "Transfering funds to Unreleased Treasury..."
 # CELO_TOKEN_ADDRESS=`cast call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string calldata identifier) external view returns (address)" "CeloToken" --rpc-url $ANVIL_RPC_URL`
 # CELO_UNRELEASED_TREASURY_ADDRESS=0xB76D502Ad168F9D545661ea628179878DcA92FD5
 # UNRELEASE_TREASURY_PRE_MINT=390000000000000000000000000
-# cast send $CELO_TOKEN_ADDRESS "function transfer(address to, uint256 value) external returns (bool)" $CELO_UNRELEASED_TREASURY_ADDRESS $UNRELEASE_TREASURY_PRE_MINT --rpc-url  $ANVIL_RPC_URL --private-key $DEPLOYER_PRIVATE_KEY
+# cast send $CELO_TOKEN_ADDRESS "function transfer(address to, uint256 value) external returns (bool)" $CELO_UNRELEASED_TREASURY_ADDRESS $UNRELEASE_TREASURY_PRE_MINT --rpc-url  $ANVIL_RPC_URL --private-key $DEPLOYER_PK
 
 echo "Running second part of migration script..."
 forge script \

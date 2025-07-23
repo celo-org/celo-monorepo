@@ -175,8 +175,8 @@ contract EpochManager is
   function initializeSystem(
     uint256 firstEpochNumber,
     uint256 firstEpochBlock,
-    address[] memory firstElected // onlyEpochManagerEnabler  // TODO fixme
-  ) external {
+    address[] memory firstElected
+  ) external onlyOwner {
     require(
       getCeloToken().balanceOf(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURY_REGISTRY_ID)) >
         0,
