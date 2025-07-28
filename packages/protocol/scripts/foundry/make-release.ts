@@ -544,10 +544,9 @@ const linkLibraries = (
       )
 
       if (!libSourceFilePath) {
-        console.error(
-          `Could not determine sourceFilePath for library ${dep}. Skipping Foundry placeholder replacement for it in ${contractViemArtifact.contractName}.`
+        throw new Error(
+          `Could not determine sourceFilePath for library ${dep} in ${contractViemArtifact.contractName}.`
         )
-        return
       }
 
       const stringToHash = `${libSourceFilePath}:${dep}`
@@ -556,7 +555,7 @@ const linkLibraries = (
 
       const placeholderRegexDollar = new RegExp(`__\\$${placeholderHash}\\$__`, 'g')
       if (contractViemArtifact.bytecode!.match(placeholderRegexDollar)) {
-        contractViemArtifact.bytecode = contractViemArtifact.bytecode!.replaceAll(
+        contractViemArtifact.bytecode = contractViemArtifact.bytecode!.replace(
           placeholderRegexDollar,
           libAddress
         ) as Hex
@@ -588,20 +587,18 @@ const performRelease = async (
 
   const artifactPath = contractArtifactPaths.get(contractName)
   if (!artifactPath) {
-    console.error(`Artifact path for ${contractName} not found in map. Skipping.`)
-    released.add(contractName)
-    return
+    throw new Error(
+      `Artifact path for ${contractName} not found in map.`
+    )
   }
 
   let contractViemArtifact: ViemContract
   try {
     contractViemArtifact = loadContractArtifact(contractName, artifactPath)
   } catch (e) {
-    console.error(
+    throw new Error(
       `Failed to load artifact for ${contractName} from ${artifactPath}. Skipping. Error: ${e}`
     )
-    released.add(contractName)
-    return
   }
 
   if (shouldDeployContract) {
