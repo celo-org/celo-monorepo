@@ -199,7 +199,7 @@ export const reportLayoutIncompatibilities = (oldArtifactsSet: BuildArtifacts[],
   for (const newArtifacts of newArtifactsSets) {
     const reports = newArtifacts.listArtifacts()
       .filter((newArtifact: any) => {
-        const coreContractPathPattern = /^contracts(-0\.8)?\//
+        const coreContractPathPattern = /^(project:\/)?contracts(-0\.8)?\//
         return coreContractPathPattern.test(newArtifact.ast.absolutePath)
       })
       .map((newArtifact: any) => {

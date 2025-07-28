@@ -260,7 +260,7 @@ export function reportASTIncompatibilities(
   for (const newArtifacts of newArtifactsSets) {
     const reports = newArtifacts.listArtifacts()
       .filter((newArtifact) => {
-        const coreContractPathPattern = /^contracts(-0\.8)?\//
+        const coreContractPathPattern = /^(project:\/)?contracts(-0\.8)?\//
         return coreContractPathPattern.test(newArtifact.ast.absolutePath)
       })
       .map((newArtifact) => {
