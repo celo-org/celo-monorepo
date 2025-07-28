@@ -81,11 +81,11 @@ echo "Migration script total elapsed time: $ELAPSED_TIME seconds"
 # this helps to make sure that devchain state is actually being saved
 sleep $SLEEP_DURATION
 
-if [[ "${KEEP_DEVCHAIN_FOLDER:-}" == "true" ]]; then
-    cp $ANVIL_FOLDER/state.json $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME
-    echo "Keeping devchain folder as per flag."
-else
-    # Rename devchain artifact and remove unused directory
-    mv $ANVIL_FOLDER/state.json $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME
-    rm -rf $ANVIL_FOLDER
-fi
+# if [[ "${KEEP_DEVCHAIN_FOLDER:-}" == "true" ]]; then
+#     cp $ANVIL_FOLDER/state.json $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME
+#     echo "Keeping devchain folder as per flag."
+# else
+#     # Rename devchain artifact and remove unused directory
+#     mv $ANVIL_FOLDER/state.json $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME
+#     rm -rf $ANVIL_FOLDER
+# fi

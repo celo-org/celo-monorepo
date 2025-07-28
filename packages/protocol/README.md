@@ -104,6 +104,30 @@ Compared to the normal test command, quicktest will:
 1. Not run the pretest script of building solidity (will still be run as part of truffle test) and compiling typescript. This works because truffle can run typescript "natively".
 2. Only migrate selected migrations as set in `backupmigrations.sh` (you'll likely need at least one compilation step since truffle seems to only run compiled migrations)
 
+## Making a new release (Foundry)
+
+To create a new release using the Foundry script, run the following command:
+
+```bash
+./scripts/foundry/make-release-foundry.sh -n <network> -b <build-meta> -p <proposal-path> -i <initialization-data-path> -r <report-path> -l <libraries-path> -f <private-key>
+```
+
+Example:
+
+```bash
+./scripts/foundry/make-release-foundry.sh -n alfajores -b core-contracts.v13.post-audit -p proposal.json -i releaseData/initializationData/release13.json -r report.json -l libraries.json -f $PRIVATE_KEY
+```
+
+### Parameters
+
+- `-n`: The network name (e.g., `alfajores`, `mainnet`).
+- `-b`: The build metadata (e.g., `core-contracts.v13.post-audit`).
+- `-p`: The path to the proposal JSON file.
+- `-i`: The path to the initialization data JSON file.
+- `-r`: The path to the report JSON file.
+- `-l`: The path to the libraries JSON file.
+- `-f`: The private key for signing.
+
 ## Verify released smart contracts
 
 1. Update CeloScanApi in env.json file
