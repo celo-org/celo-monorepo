@@ -13,7 +13,7 @@ echo "Library flags are: $CACHED_LIBRARIES_FLAG"
 
 # Keeping track of start time to measure how long it takes to run the script entirely
 START_TIME=$SECONDS
-echo "Forge version: $(forge --version)"
+echo "Forge version: $($FORGE_EXEC --version)"
 
 # Create temporary directory
 if [ -d "$TMP_FOLDER" ]; then
@@ -32,7 +32,7 @@ echo $LIBRARY_FLAGS > $TMP_FOLDER/library_flags.txt
 # Including contracts that depend on libraries. This step replaces the library placeholder
 # in the bytecode with the address of the actually deployed library.
 echo "Compiling with libraries..."
-time FOUNDRY_PROFILE=devchain forge build $LIBRARY_FLAGS
+time FOUNDRY_PROFILE=devchain $FORGE_EXEC build $LIBRARY_FLAGS
 
 # TODO: Move to L2Gensis.s.sol?
 # Deploy precompile contracts
@@ -45,9 +45,24 @@ forge create -r $ANVIL_RPC_URL --private-key $DEPLOYER_PK $LIBRARY_FLAGS \
   contracts/governance/Election.sol:Election \
   --constructor-args false
 
+# Pre-deploy Celo Token to utilize transfer precompile
+echo "Pre-deploying Celo Token contract..."
+$FORGE_EXEC script \
+  $MIGRATION_SCRIPT_PATH \
+  --target-contract $MIGRATION_TARGET_CONTRACT \
+  --sender $FROM_ACCOUNT \
+  --private-key $MIGRATION_PK \
+  --sig "predeployCeloToken()" \
+  $VERBOSITY_LEVEL \
+  $BROADCAST \
+  $SKIP_SIMULATION \
+  $NON_INTERACTIVE \
+  $LIBRARY_FLAGS \
+  --rpc-url $ANVIL_RPC_URL || { echo "Predeploy script failed"; exit 1; }
+
 # Run migrations
 echo "Running migration script..."
-forge script \
+$FORGE_EXEC script \
   $MIGRATION_SCRIPT_PATH \
   --target-contract $MIGRATION_TARGET_CONTRACT \
   --sender $FROM_ACCOUNT \
@@ -58,31 +73,10 @@ forge script \
   $NON_INTERACTIVE \
   $LIBRARY_FLAGS \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
-  
-# TODO: Combine run + unrealesed treasury + run2 into single Foundry script
-echo "Transfering funds to Unreleased Treasury..."
-CELO_TOKEN_ADDRESS=`cast call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string calldata identifier) external view returns (address)" "CeloToken" --rpc-url $ANVIL_RPC_URL`
-CELO_UNRELEASED_TREASURY_ADDRESS=0xB76D502Ad168F9D545661ea628179878DcA92FD5
-UNRELEASE_TREASURY_PRE_MINT=390000000000000000000000000
-cast send $CELO_TOKEN_ADDRESS "function transfer(address to, uint256 value) external returns (bool)" $CELO_UNRELEASED_TREASURY_ADDRESS $UNRELEASE_TREASURY_PRE_MINT --rpc-url  $ANVIL_RPC_URL --private-key $DEPLOYER_PK
-
-echo "Running second part of migration script..."
-forge script \
-  $MIGRATION_SCRIPT_PATH \
-  --target-contract $MIGRATION_TARGET_CONTRACT \
-  --sender $FROM_ACCOUNT \
-  --private-key $MIGRATION_PK \
-  --sig "run2()" \
-  $VERBOSITY_LEVEL \
-  $BROADCAST \
-  $SKIP_SIMULATION \
-  $NON_INTERACTIVE \
-  $LIBRARY_FLAGS \
-  --rpc-url $ANVIL_RPC_URL || { echo "Migration script (part 2) failed"; exit 1; }
 
 echo "Getting address for Epoch Rewards..."
 CELO_EPOCH_REWARDS_ADDRESS=$(
-  cast call \
+  $CAST_EXEC call \
     $REGISTRY_ADDRESS \
     "getAddressForStringOrDie(string calldata identifier)(address)" \
     "EpochRewards" \

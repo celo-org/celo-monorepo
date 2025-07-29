@@ -6,6 +6,7 @@ import { Script } from "forge-std-8/Script.sol";
 
 // Foundry imports
 import "forge-std/console.sol";
+import "forge-std/console2.sol";
 import "forge-std/StdJson.sol";
 
 // Helper contract imports
@@ -207,19 +208,14 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
    * Entry point of the script
    */
   function run() external {
-    // TODO check that this matches DEPLOYER_ACCOUNT and the pK can be avoided with --unlock
-    vm.startBroadcast(DEPLOYER_ACCOUNT);
-
     string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
+    bytes memory factoryCode_ = vm.getCode("./out/ProxyFactory.sol/ProxyFactory.json");
 
-    proxyFactory = IProxyFactory(
-      create2deploy(0, vm.getCode("./out/ProxyFactory.sol/ProxyFactory.json"))
-    );
-
-    // Proxy for Registry is already set, just deploy implementation
-    migrateRegistry();
+    // TODO: check that this matches DEPLOYER_ACCOUNT and the PK can be avoided with --unlock
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
+    proxyFactory = IProxyFactory(create2deploy(0, factoryCode_));
+    migrateRegistry(); // Proxy for Registry is set in L2Genesis.s.sol
     setupUsingRegistry();
-
     migrateFreezer();
     migrateFeeCurrencyDirectory();
     migrateCeloToken(json);
@@ -231,9 +227,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateAccount();
     migrateLockedCelo(json);
     migrateValidators(json);
-
     migrateElection(json);
-
     migrateEpochRewards(json);
     migrateEscrow();
     migrateGovernanceSlasher();
@@ -247,45 +241,33 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     vm.stopBroadcast();
 
     // needs to broadcast from a pre-funded account
-    // run + bash + run2
-    // this could be done in genesis L2 as native funds in optimism repo (TBD with Javi)
-    // if anvil is underneath it might be possible to 'deal'
-    // fundCeloUnreleasedTreasury(json);
+    fundCeloUnreleasedTreasury(json);
 
-    // Functions with broadcast with different addresses
-    // Validators needs to lock, which can be only used by the msg.sender
-  }
-
-  function run2() public {
-    vm.startBroadcast(DEPLOYER_ACCOUNT);
-
-    proxyFactory = IProxyFactory(
-      create2deploy(
-        bytes32(uint256(block.number)),
-        vm.getCode("./out/ProxyFactory.sol/ProxyFactory.json")
-      )
-    );
-    string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
-
-    setupUsingRegistry();
+    // functions with broadcast with different addresses
+    // validators needs to lock, which can be only used by the msg.sender
     console.log("Account owner:", IProxy(address(getAccounts()))._getOwner());
-
-    // Proxy for Registry is already set, just deploy implementation
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
     migrateEpochManagerEnabler();
     migrateEpochManager(json);
     migrateScoreManager();
     vm.stopBroadcast();
 
+    // broadcast as individual validators
+    uint256 balanceOfTreasury = getCeloToken().balanceOf(
+      registry.getAddressForOrDie(CELO_UNRELEASED_TREASURY_REGISTRY_ID)
+    );
+    console2.log(
+      "[Before EpochManager init] Balance of CeloUnreleasedTreasury is %s",
+      balanceOfTreasury
+    );
     initializeEpochManager(json);
 
     vm.startBroadcast(DEPLOYER_ACCOUNT);
     migrateGovernance(json);
     vm.stopBroadcast();
 
+    // broadcast as groups
     electValidators(json);
-
-    // vm.broadcast(DEPLOYER_ACCOUNT);
-    // captureEpochManagerEnablerValidators();
   }
 
   /**
@@ -330,17 +312,23 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     addToRegistry("FeeCurrencyDirectory", feeCurrencyDirectoryProxyAddress);
   }
 
+  function predeployCeloToken() external {
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
+    address celoProxyAddress = 0x471EcE3750Da237f93B8E339c536989b8978a438;
+    setImplementationOnProxy(
+      IProxy(celoProxyAddress),
+      "GoldToken",
+      abi.encodeWithSelector(ICeloTokenInitializer.initialize.selector, REGISTRY_ADDRESS)
+    );
+    vm.stopBroadcast();
+  }
+
   function migrateCeloToken(string memory json) public {
     // TODO: change pre-funded addresses to make it match circulation supply
     // pre deployed celo token proxy address from L2Genesis.s.sol
     address celoProxyAddress = 0x471EcE3750Da237f93B8E339c536989b8978a438;
 
-    deployImplementationAndAddToRegistry(
-      "GoldToken",
-      IProxy(celoProxyAddress),
-      abi.encodeWithSelector(ICeloTokenInitializer.initialize.selector, REGISTRY_ADDRESS)
-    );
-
+    addToRegistry("GoldToken", celoProxyAddress);
     addToRegistry("CeloToken", celoProxyAddress);
 
     bool frozen = json.readBool(".goldToken.frozen");
@@ -892,9 +880,33 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // broadcast as first validator
     uint256 firstValidatorPk = json.readUint(".validators.valKeys[0]");
     vm.startBroadcast(firstValidatorPk);
+    address validatorAddress = vm.addr(firstValidatorPk);
+    console2.log(
+      "[Before Treasury transfer] ERC20 balance of Sender is %s",
+      validatorAddress,
+      getCeloToken().balanceOf(validatorAddress)
+    );
+
+    // FIXME: Transfer of CeloToken fails when migration happens in single run()
+    console.log("Performing transfer to CeloUnreleasedTreasury");
+
+    // 1. ERC20 transfer silently fails - it does not revert but does not change balances
     getCeloToken().transfer(celoUnreleasedTreasury, 400_000_000 ether);
-    console.log(
-      "Balance of CeloUnreleasedTreasury is",
+
+    // 2. native transfer reverts without the message
+    // payable(celoUnreleasedTreasury).transfer(400_000_000 ether);
+
+    // 3. deal initially mocks balance correctly, but later during EpochManager.initializeSystem() it
+    // breaks with CeloUnreleasedTreasury not yet funded (balanceOf returns 0)
+    // vm.deal(celoUnreleasedTreasury, 400_000_000 ether);
+
+    console2.log(
+      "[After Treasury transfer] ERC20 balance of Sender is %s",
+      validatorAddress,
+      getCeloToken().balanceOf(validatorAddress)
+    );
+    console2.log(
+      "[After Treasury transfer] Balance of CeloUnreleasedTreasury is",
       getCeloToken().balanceOf(celoUnreleasedTreasury)
     );
     vm.stopBroadcast();
@@ -920,7 +932,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 maxGroupSize = json.readUint(".validators.maxGroupSize");
     uint256 groupCount = 3;
     address[] memory signers = new address[](maxGroupSize * groupCount);
-    // TODO check no signer is left with 0x0
+    // TODO: check no signer is left with 0x0
     uint256 signerIndexCount = 0;
 
     for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
@@ -933,11 +945,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         );
 
         vm.startBroadcast(valKeys[validatorKeyIndex]);
-        // PK -> Address
+        // TODO: ForceTx was used to convert PK to Address
+        // Explore other options to get the address from the PK
+        // Can't rely on vm.addr due to compatibility with op-geth
         address accountAddress = (new ForceTx()).identity();
-        // On mainnet potentially singer & account should be different
-        // 1 -> list of accounts
-        // 2 -> list of signers
+        // TODO: On mainnet potentially singer & account should be different
         // Double check on mainnet & with Javi
         address signer = accountAddress;
         signers[signerIndexCount] = signer;
@@ -946,9 +958,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       }
     }
 
-    // Bypass epoch manager enabler?
     vm.startBroadcast(DEPLOYER_ACCOUNT);
-    IEpochManager(getEpochManager()).initializeSystem(1, block.number, signers); // TODO fix signers (nice to have)
+    IEpochManager(getEpochManager()).initializeSystem(1, block.number, signers); // TODO: fix signers (see comment above; nice to have)
     vm.stopBroadcast();
   }
 
