@@ -1,4 +1,4 @@
-import { Artifact, TypeInfo, makeZContract, getContractName } from '@celo/protocol/lib/compatibility/internal';
+import { Artifact, TypeInfo, makeZContract, getContractName, getArtifactByName } from '@celo/protocol/lib/compatibility/internal';
 import {
   BuildArtifacts,
   Operation,
@@ -186,12 +186,6 @@ export const generateCompatibilityReport = (oldArtifact: Artifact, oldArtifacts:
     errors: layoutReport.errors.concat(structsReport.errors),
     expanded: structsReport.expanded
   }
-}
-
-const getArtifactByName = (contractName: string, artifacts: BuildArtifacts): Artifact => {
-  return artifacts.listArtifacts().find(artifact =>
-    getContractName(artifact) === contractName
-  )
 }
 
 export const reportLayoutIncompatibilities = (oldArtifactsSet: BuildArtifacts[], newArtifactsSets: BuildArtifacts[]): ASTStorageCompatibilityReport[] => {
