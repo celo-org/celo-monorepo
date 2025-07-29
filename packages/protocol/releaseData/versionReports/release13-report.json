@@ -1,11 +1,11 @@
 {
   "oldArtifactsFolder": [
-    "build/core-contracts.v12.post_audit-renamed/contracts",
-    "build/core-contracts.v12.post_audit-renamed/contracts-0.8"
+    "build/core-contracts.v12-renamed/contracts",
+    "build/core-contracts.v12-renamed/contracts-0.8"
   ],
   "newArtifactsFolder": [
-    "build/core-contracts.v13.post-audit/contracts",
-    "build/core-contracts.v13.post-audit/contracts-0.8"
+    "build/core-contracts.v13/contracts",
+    "build/core-contracts.v13/contracts-0.8"
   ],
   "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles|CeloFeeCurrencyAdapterOwnable|FeeCurrencyAdapter|FeeCurrencyAdapterOwnable|IsL2Check|Blockable|PrecompilesOverride|CompileExchange|PrecompilesOverrideV2|UsingRegistryV2NoMento|^UsingRegistry|^Ownable|Initializable|BLS12_377Passthrough|BLS12_381Passthrough]UniswapV2ERC20|ReentrancyGuard|MockElection|\\bFeeHandlerSeller\\b/",
   "report": {
@@ -98,10 +98,22 @@
               "contract": "GoldToken",
               "signature": "increaseSupply(uint256)",
               "type": "MethodRemoved"
+            },
+            {
+              "contract": "GoldToken",
+              "signature": "circulatingSupply()",
+              "type": "MethodRemoved"
             }
           ],
           "minor": [],
           "patch": [
+            {
+              "contract": "GoldToken",
+              "signature": "totalSupply()",
+              "oldValue": "public",
+              "newValue": "external",
+              "type": "MethodVisibility"
+            },
             {
               "contract": "GoldToken",
               "type": "DeployedBytecode"
