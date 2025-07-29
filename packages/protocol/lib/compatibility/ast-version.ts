@@ -50,20 +50,11 @@ export async function getContractVersion(artifact: Artifact, newLinking: boolean
     isStatic: true,
     data: Buffer.from(data.slice(2), 'hex')
   })
-  console.log("version for", getContractName(artifact))
   if (result.execResult.exceptionError === undefined) {
-    console.log("no exception error")
     const value = result.execResult.returnValue
     if (value.length === 4 * 32) {
-      console.log("length ok")
-      const v = ContractVersion.fromGetVersionNumberReturnValue(value)
-      console.log("version is", v.toString())
       return ContractVersion.fromGetVersionNumberReturnValue(value)
-    } else {
-      console.log("length incorrect")
     }
-  } else {
-    console.log("exception error:", result.execResult.exceptionError)
   }
   // If we can't fetch the version number, assume default version.
   return ContractVersion.fromString(DEFAULT_VERSION_STRING)
