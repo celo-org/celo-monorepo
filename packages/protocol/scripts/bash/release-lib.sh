@@ -83,7 +83,7 @@ function build_tag_foundry() {
         foundryup --install nightly-f625d0fa7c51e65b4bf1e8f7931cd1c6e2e285e9
         create_import
     else
-        foundryup --instal 1.0.0
+        foundryup --install 1.0.0
     fi
 
     echo " - Build contract artifacts at $BUILD_DIR"
