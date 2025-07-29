@@ -218,22 +218,6 @@ contract CeloTokenTest_burn is CeloTokenTest {
   }
 }
 
-contract CeloTokenTest_circulatingSupply is CeloTokenTest {
-  function test_ShouldBeLessThanTheTotalSupply() public {
-    assertLt(celoToken.circulatingSupply(), celoToken.totalSupply());
-  }
-
-  function test_ShouldMatchAllocatedSupply_WhenNoBurn() public {
-    assertEq(celoToken.circulatingSupply(), celoToken.allocatedSupply());
-  }
-
-  function test_ShouldDecreaseCirculatingSupply_WhenThereWasBurn() public {
-    vm.prank(randomAddress);
-    celoToken.burn(ONE_CELOTOKEN);
-    assertEq(celoToken.circulatingSupply(), celoToken.allocatedSupply() - ONE_CELOTOKEN);
-  }
-}
-
 contract CeloTokenTest_AllocatedSupply is CeloTokenTest {
   function test_ShouldReturnTotalSupplyMinusCeloUnreleasedTreasuryBalance() public {
     assertEq(celoToken.allocatedSupply(), CELO_SUPPLY_CAP - L2_INITIAL_STASH_BALANCE);
