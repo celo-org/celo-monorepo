@@ -85,10 +85,11 @@ const networks = {
   rc1: {
     host: '127.0.0.1',
     port: 8545,
-    from: '0xE23a4c6615669526Ab58E9c37088bee4eD2b2dEE',
+    from: '0xF3EB910DA09B8AF348E0E5B6636da442cFa79239',
     network_id: 42220,
     gas: gasLimit,
     gasPrice: 10000000000,
+    privateKeyAvailable: true,
   },
   coverage: {
     host: 'localhost',
