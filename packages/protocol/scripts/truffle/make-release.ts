@@ -51,7 +51,7 @@ class ContractAddresses {
     await Promise.all(
       contracts.map(async (contract: string) => {
         // without this delay it sometimes fails with ProviderError
-        await delay(getRandomNumber(9999, 1000))
+        await delay(getRandomNumber(999, 1000))
         try {
           const registeredAddress = await registry.getAddressForString(contract)
 
@@ -115,15 +115,15 @@ const deployImplementation = async (
   console.info(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
 
-  // without this delay it sometimes fails with ProviderError
-  await delay(getRandomNumber(999, 1000))
-
   const bytecodeSize = (Contract.bytecode.length - 2) / 2
   console.log('Bytecode size in bytes:', bytecodeSize)
 
   let contract
 
   while (true) {
+    // without this delay it sometimes fails with ProviderError
+    // the provider error is due two main reasons: RPC rate limit and gas price being too low
+    await delay(getRandomNumber(99, 100))
     try {
       contract = await (dryRun
         ? Contract.at(celoRegistryAddress)

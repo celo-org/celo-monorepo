@@ -80,15 +80,14 @@ const networks = {
     port: hostPort,
     from: RC0_FROM,
     network_id: 200312,
-    gasPrice: 100000000000,
+    gasPrice: 6000000000000,
   },
   rc1: {
-    host: '127.0.0.1',
     port: 8545,
     from: '0xF3EB910DA09B8AF348E0E5B6636da442cFa79239',
     network_id: 42220,
     gas: gasLimit,
-    gasPrice: 10000000000,
+    gasPrice: 100000000000,
     privateKeyAvailable: true,
   },
   coverage: {
@@ -186,6 +185,7 @@ if (argv.truffle_override || !(argv.network in networks)) {
 }
 
 if (process.argv.includes('--forno')) {
+  console.log('Using forno as RPC')
   if (!fornoUrls[argv.network]) {
     console.log(`Forno URL for network ${argv.network} not known!`)
     process.exit(1)
