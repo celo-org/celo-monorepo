@@ -81,11 +81,15 @@ export function instantiateArtifacts(buildDirectory: string): BuildArtifacts {
 }
 
 function listForgeBuildArtifacts(buildDirectory: string): string[] {
+  const buildInfoPathPattern = /build-info/
   const coreContractPathPattern = /^contracts(-0\.8)?\//
   const nonFoundryDependencyPathPattern = /^lib\/(?!celo)/
   const artifactsGlobPattern = `${buildDirectory}/**/*.json`
   const allArtifactPaths = globSync(artifactsGlobPattern)
   const coreContracts = allArtifactPaths.filter(artifactPath => {
+    if (artifactPath.match(buildInfoPathPattern)) {
+      return false
+    }
     const artifact = readJsonSync(artifactPath)
     const sourcePath = artifact.ast.absolutePath
     return sourcePath.match(coreContractPathPattern) || sourcePath.match(nonFoundryDependencyPathPattern)
