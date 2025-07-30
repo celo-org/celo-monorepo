@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 
 echo "Node version: $(node --version)"
 echo "Yarn version: $(yarn --version)"
