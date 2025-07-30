@@ -71,13 +71,7 @@ jobs:
           restore-keys: |
             node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-
       - name: Double check node version
-        run: |
-          echo "Node version: $(node --version)"
-          echo "Yarn version: $(yarn --version)"
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-          use v18.16.1
+        run: ./scripts/setup-node.sh
       - name: Install yarn dependencies
         run: git config --global url."https://".insteadOf ssh:// && yarn generate-lock-entry && yarn install --frozen-lockfile --network-timeout 1000000
         if: steps.cache_node.outputs.cache-hit != 'true'
