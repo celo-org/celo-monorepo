@@ -22,7 +22,6 @@ const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
 const INTEGRATION_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const INTEGRATION_TESTING_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const ALFAJORES_FROM = '0x59A60D2B488154dc5CB48c42347Df222e13C70Ba'
-const RC0_FROM = '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C'
 const BAKLAVA_FROM = '0x3e206e0674d5050f7b33e7e79Cace768050eE06f'
 
 const gasLimit = 20000000
@@ -39,12 +38,12 @@ const defaultConfig = {
   maxFeePerGas: 975000000000,
 }
 
-function readNmenomic(networkName) {
+function readMnemonic(networkName) {
   dotenv = require('dotenv').config({
     path: require('path').resolve(__dirname, `../../.env.mnemonic.${networkName}`),
   })
 
-  const privateKey = process.env.DEPLOYER_PRIVATKEY
+  const privateKey = process.env.DEPLOYER_PRIVATE_KEY
   if (privateKey === undefined || privateKey === null || privateKey === '') {
     console.log(
       `No private key found in .env.mnemonic.${networkName}. Please run "yarn keys:decrypt" in root after escalating perms in Akeyless`
@@ -52,7 +51,7 @@ function readNmenomic(networkName) {
     process.exit(1)
   }
 
-  return process.env.DEPLOYER_PRIVATKEY
+  return process.env.DEPLOYER_PRIVATE_KEY
 }
 
 // Here to avoid recreating it each time
@@ -74,13 +73,6 @@ const networks = {
     gas: gasLimit,
     defaultBalance: 200000000,
     mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
-  },
-  rc0: {
-    host: hostAddress,
-    port: hostPort,
-    from: RC0_FROM,
-    network_id: 200312,
-    gasPrice: 6000000000000,
   },
   rc1: {
     port: 8545,
@@ -198,7 +190,7 @@ if (process.argv.includes('--forno')) {
     console.log('Network is supposed to have a private key available, using HDWalletProvider')
     networks[argv.network].provider = function () {
       return new HDWalletProvider({
-        privateKeys: [readNmenomic(argv.network)],
+        privateKeys: [readMnemonic(argv.network)],
         providerOrUrl: fornoUrls[argv.network],
       })
     }
