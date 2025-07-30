@@ -35,7 +35,7 @@ const defaultConfig = {
   from: OG_FROM,
   gas: gasLimit,
   gasPrice: 100000000000,
-  maxFeePerGas: 975000000000,
+  maxFeePerGas: 975_000_000_000,
 }
 
 function readMnemonic(networkName) {
