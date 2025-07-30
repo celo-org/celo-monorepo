@@ -74,6 +74,7 @@ jobs:
         run: |
           echo "Node version: $(node --version)"
           echo "Yarn version: $(yarn --version)"
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
           nvm use v18.16.1
       - name: Install yarn dependencies
         run: git config --global url."https://".insteadOf ssh:// && yarn generate-lock-entry && yarn install --frozen-lockfile --network-timeout 1000000
