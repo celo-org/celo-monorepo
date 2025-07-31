@@ -64,9 +64,7 @@ function build_tag_foundry() {
   local BRANCH="$1"
   local LOG_FILE="$2"
 
-  # Assuming a `core-contracts.vNN` tag, using 'v' as the delimeter, the second field will be just
-  # the release number.
-  local RELEASE_NUMBER=`echo $BRANCH | cut -dv -f2`
+  local RELEASE_NUMBER=$(echo "$BRANCH" | grep -o 'v[0-9]\+' | tr -dc '0-9')
 
   echo "Writing logs to $LOG_FILE"
 
