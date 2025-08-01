@@ -174,7 +174,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     IProxy proxy,
     bytes memory initializeCalldata
   ) public {
-    console.log("Owner is:", proxy._getOwner());
+    address owner_ = proxy._getOwner();
+    console.log("Owner is:", owner_);
     setImplementationOnProxy(proxy, contractName, initializeCalldata);
     addToRegistry(contractName, address(proxy));
   }

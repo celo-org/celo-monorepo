@@ -54,10 +54,20 @@ jobs:
           path: ./out
           key: ${{ runner.os }}-foundry-out-${{ env.FOUNDRY_CACHE_KEY }}
 
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
+      - name: Checkout Celo Foundry repo
+        uses: actions/checkout@v4
         with:
-          version: 'v1.0.0' # TODO: revert back to env var
+          repository: 'celo-org/foundry'
+          ref: 'celo'
+          path: celo-foundry
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install Celo Foundry
+        run: |
+          cd $GITHUB_WORKSPACE/celo-foundry
+          cargo build --release
+          echo "$GITHUB_WORKSPACE/celo-foundry/target/release" >> $GITHUB_PATH
 
       - name: Install forge dependencies
         run: forge install
@@ -128,13 +138,52 @@ jobs:
         if: success() || failure()
         run: |
           forge test -vvv \
-          --match-path "test-sol/integration/*" \
+          --match-path "test-sol/integration/*"
 
-      - name: Generate migrations and run devchain
+      - name: Checkout Optimism repo
+        uses: actions/checkout@v4
         if: success() || failure()
-        run: ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
+        with:
+          repository: 'celo-org/optimism'
+          ref: 'mc01/completeMigrations'
+          path: celo-optimism
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Generate initial state for devchain
+        if: success() || failure()
+        run: |
+          cd $GITHUB_WORKSPACE/celo-optimism/packages/contracts-bedrock
+
+          anvil --celo --port 9545 --code-size-limit 245760 &
+          while ! nc -z localhost 9545; do
+            sleep 0.5
+          done
+
+          DEPLOY_CONFIG_PATH=deploy-config/celo-devnet.json forge script \
+            --rpc-url http://localhost:9545 \
+            --broadcast \
+            --private-key ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
+            --sig "runCeloDevnet()" \
+            scripts/L2Genesis.s.sol:L2Genesis
+          lsof -i :9545 | awk 'NR!=1 {print $2}' | xargs kill -9
+
+          python3 convert_to_anvil_state.py state-dump-11142220-granite.json anvil-state.json
+
+      - name: Set up anvil devchain from generated state
+        if: success() || failure()
+        run: |
+          cd $GITHUB_WORKSPACE/celo-optimism/packages/contracts-bedrock
+          anvil --celo --port 9545 --code-size-limit 245760 --load-state anvil-state.json &
+          while ! nc -z localhost 9545; do
+            sleep 0.5
+          done
+            
+      - name: Generate migrations on local devchain
+        if: success() || failure()
+        run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
       
-      - name: Run migration tests against local anvil devchain
+      - name: Run migration tests against local op-geth devchain
         run: |
           source ./scripts/foundry/constants.sh
 
@@ -142,7 +191,7 @@ jobs:
           --match-path "test-sol/devchain/migration/*" \
           --fork-url $ANVIL_RPC_URL
       
-      - name: Run e2e tests against local anvil devchain
+      - name: Run e2e tests against local devchain
         run: |
           source ./scripts/foundry/constants.sh
 

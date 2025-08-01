@@ -178,6 +178,7 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
     setCeloUnreleasedTreasuryBalance();
     whenL2();
 
+    epochManager.transferOwnership(address(epochManagerEnabler));
     epochManagerEnabler.initEpochManager();
   }
 
