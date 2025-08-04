@@ -22,6 +22,8 @@ env:
   FOUNDRY_CACHE_KEY: 1
   # Supported Foundry version defined at celo-org (GitHub organisation) level, for consistency across workflows.
   SUPPORTED_FOUNDRY_VERSION: ${{ vars.SUPPORTED_FOUNDRY_VERSION }}
+  # Celo Foundry (celo-org/foundry) binaries version used for devchain anvil generation
+  CELO_FOUNDRY_VERSION: "celo-0.1.0"
 
 permissions:
   contents: read
@@ -92,20 +94,17 @@ jobs:
         run: |
           echo "Pull Request Number: ${{ env.PR_NUMBER }}"
 
-      - name: Checkout Celo Foundry repo
-        uses: actions/checkout@v4
-        with:
-          repository: 'celo-org/foundry'
-          ref: 'celo'
-          path: celo-foundry
-          submodules: recursive
-          fetch-depth: 0
-
-      - name: Install Celo Foundry
+      - name: Install Celo Foundry pre-requisites
         run: |
-          cd $GITHUB_WORKSPACE/celo-foundry
-          cargo build --release
-          echo "$GITHUB_WORKSPACE/celo-foundry/target/release" >> $GITHUB_PATH
+          sudo apt-get update
+          sudo apt-get install -y libc6-dev
+
+      - name: Install Celo Foundry binaries
+        run: |
+          curl -L -o foundry.tar.gz https://github.com/celo-org/foundry/releases/download/${{ env.CELO_FOUNDRY_VERSION }}/foundry_${{ env.CELO_FOUNDRY_VERSION }}_linux_amd64.tar.gz
+          mkdir -p celo-foundry
+          tar -xzf foundry.tar.gz -C celo-foundry
+          echo "$(pwd)/celo-foundry" >> $GITHUB_PATH
 
       - name: Install forge dependencies
         run: forge install
