@@ -9,7 +9,6 @@ import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewar
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 import { EpochManagerEnablerMock } from "@test-sol/mocks/EpochManagerEnablerMock.sol";
 import "@celo-contracts-8/common/mocks/EpochManager_WithMocks.sol";
-import { ValidatorsMock } from "@test-sol/unit/governance/validators/mocks/ValidatorsMock.sol";
 import "@test-sol/utils/WhenL2-08.sol";
 
 contract EpochManagerEnablerTest is TestWithUtils08 {
