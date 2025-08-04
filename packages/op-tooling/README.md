@@ -5,3 +5,4 @@ Sections:
 - [fork](./fork/) - scripts for forking & mocking networks (most useful: `fork_l1.sh` & `mock-mainnet.sh`)
 - [op-deployer](./op-deployer/) - scripts for interacting with op-deployer upgrade pipeline (most useful: `run_upgrade.sh`)
 - [safe](./safe/) - scripts for interacting with Safe API tx submission (requires delegatecall creation not disabled over API)
+- [withdrawal](./withdrawal/) - scripts for performing L2 to L1 withdrawal via L2L1MessagePasser & OptimismPortal
