@@ -40,14 +40,14 @@ WITHDRAWAL_PROOF="[0xf8918080808080a0231eba9c2bc1784b944714d5260873e3f92b58434c1
 
 Check status of correctly proved withdrawal:
 ```sh
-WITHDRAWAL_ID=... PROOF_SUBMITTER=... ALCHEMY_KEY=... ./get.sh
+WITHDRAWAL_HASH=... PROOF_SUBMITTER=... ALCHEMY_KEY=... ./get.sh
 ```
 
 ## Wait 7 days for withdrawal window to complete
 
 Check if withdrawal is ready to claim:
 ```sh
-WITHDRAWAL_ID=... PROOF_SUBMITTER=... ALCHEMY_KEY=... ./check.sh
+WITHDRAWAL_HASH=... PROOF_SUBMITTER=... ALCHEMY_KEY=... ./check.sh
 ```
 
 Reverts if there is any issue with withdrawal.

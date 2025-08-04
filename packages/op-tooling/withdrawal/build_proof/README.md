@@ -14,6 +14,12 @@ Install dependencies using Yarn:
 yarn install
 ```
 
+## Waiting time
+
+It might take up to **1 hour** until building proof is possible.
+When running script and receiving `waiting-to-prove` status - wait a bit and retry.
+When `ready-to-prove` status appear, the script will output `Prove Args`.
+
 ## Building Proofs
 
 To build a proof for a withdrawal, run the following command with the required environment variables:
@@ -26,3 +32,35 @@ PK=... TX_HASH=... yarn build
 - `TX_HASH`: The transaction hash of the withdrawal on L2.
 
 The script will fetch the necessary data from Optimism L2, construct the proof, and output the result for submission to L1.
+
+## Example output of building proof
+
+Ensure to save data (`l2OutputIndex`, `outputRootProof`, `withdrawalProof` & `withdrawal`) from `Prove Args`:
+```sh
+Receipt: {...}
+Status: ready-to-prove
+Output: {...}
+Withdrawal: {...}
+Prove Args: {
+  l2OutputIndex: ...,
+  outputRootProof: {
+    latestBlockhash: ...,
+    messagePasserStorageRoot: ...,
+    stateRoot: ...,
+    version: ...
+  },
+  withdrawalProof: [
+    ...,
+    ...
+  ],
+  withdrawal: {
+    nonce: ...,
+    sender: ...,
+    target: ...,
+    value: ...,
+    gasLimit: ...,
+    data: ...,
+    withdrawalHash: ...
+  }
+}
+```

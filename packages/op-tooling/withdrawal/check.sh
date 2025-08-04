@@ -5,7 +5,7 @@ set -euo pipefail
 L1_OPTIMISM_PORTAL=0x44ae3d41a335a7d05eb533029917aad35662dcc2
 
 # Required environment variables
-WITHDRAWAL_ID=${WITHDRAWAL_ID:-}; [ -z "${WITHDRAWAL_ID:-}" ] && echo "Need to set the WITHDRAWAL_ID via env" && exit 1;
+WITHDRAWAL_HASH=${WITHDRAWAL_HASH:-}; [ -z "${WITHDRAWAL_HASH:-}" ] && echo "Need to set the WITHDRAWAL_HASH via env" && exit 1;
 PROOF_SUBMITTER=${PROOF_SUBMITTER:-}; [ -z "${PROOF_SUBMITTER:-}" ] && echo "Need to set the PROOF_SUBMITTER via env" && exit 1;
 
 # Optional environment variables
@@ -20,6 +20,6 @@ fi
 # Reverts with reason if something is wrong with withdrawal (not proven, not initiated, not ready for claim etc.)
 cast call $L1_OPTIMISM_PORTAL \
   "checkWithdrawal(bytes32,address)" \
-  $WITHDRAWAL_ID \
+  $WITHDRAWAL_HASH \
   $PROOF_SUBMITTER \
   -r $L1_RPC_URL
