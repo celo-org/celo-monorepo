@@ -52,7 +52,7 @@ jobs:
       # Adding a initial comma so ',<path>' matches also for the first file
       all_modified_files: ',${{ steps.changed-files.outputs.all_modified_files }}'
       artifacts_to_cache: ${{ steps.get_artifacts_to_cache.outputs.artifacts_to_cache }}
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'monorepo-node18']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo22-18:ubuntu22-node18
     timeout-minutes: 30
@@ -142,7 +142,7 @@ jobs:
 
   lint-checks:
     name: Lint code
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'monorepo-node18']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo22-18:ubuntu22-node18
     timeout-minutes: 30
@@ -160,7 +160,7 @@ jobs:
 
   protocol-test-release:
     name: Protocol Test Release
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'monorepo-node18']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo22-18:ubuntu22-node18
     timeout-minutes: 500
@@ -199,7 +199,7 @@ jobs:
   protocol-test-matrix:
     # Keeping name short because GitHub UI does not handle long names well
     name: ${{ matrix.name }}
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'monorepo-node18']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo22-18:ubuntu22-node18
     timeout-minutes: 60
@@ -253,7 +253,7 @@ jobs:
   # NOTE: This has not been fully tested as we don't have a license for certora
   certora-test:
     name: Certora test ${{ matrix.name }}
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'monorepo-node18']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo22-18:ubuntu22-node18
     timeout-minutes: 30
