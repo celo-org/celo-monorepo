@@ -105,7 +105,9 @@ jobs:
           echo "$(pwd)/celo-foundry" >> $GITHUB_PATH
 
       - name: Install forge dependencies
-        run: forge install
+        run: |
+          git config --global --add safe.directory /__w/celo-monorepo/celo-monorepo
+          forge install
 
       - name: Get current date
         id: date
