@@ -12,10 +12,4 @@
 
 /dockerfiles/ @celo-org/devopsre
 
-/packages/env-tests/ @celo-org/primitives
-/packages/helm-charts/ @celo-org/devopsre
-/packages/helm-charts/mock-oracle/ @celo-org/mento  @celo-org/devopsre
-/packages/helm-charts/oracle-rbac/ @celo-org/mento  @celo-org/devopsre
-/packages/helm-charts/oracle/ @celo-org/mento  @celo-org/devopsre
-/packages/metadata-crawler/ @celo-org/devopsre
-/packages/protocol/ @celo-org/primitives
+/packages/ @celo-org/primitives
