@@ -8,9 +8,6 @@ package.json
 packages/**/dist
 packages/**/lib
 
-# Needed because we have packages/celotool/src/lib
-!packages/celotool/src/**
-
 packages/docs/_book
 
 packages/protocol/build/

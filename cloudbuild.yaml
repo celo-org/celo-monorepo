@@ -3,15 +3,6 @@
 
 steps:
 
-- id: "docker:celotool"
-  name: gcr.io/kaniko-project/executor:v1.23.1
-  args: [
-    "--dockerfile=dockerfiles/celotool/Dockerfile",
-    "--cache=true",
-    "--destination=gcr.io/$PROJECT_ID/celo-monorepo:celotool-$COMMIT_SHA"
-  ]
-  waitFor: ['-']
-
 - id: "docker:cli"
   name: gcr.io/kaniko-project/executor:v1.23.1
   args: [

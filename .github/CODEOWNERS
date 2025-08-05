@@ -12,7 +12,6 @@
 
 /dockerfiles/ @celo-org/devopsre
 
-/packages/celotool/ @celo-org/devopsre
 /packages/env-tests/ @celo-org/primitives
 /packages/helm-charts/ @celo-org/devopsre
 /packages/helm-charts/mock-oracle/ @celo-org/mento  @celo-org/devopsre
