@@ -26,10 +26,11 @@ jobs:
       run:
         working-directory: packages/protocol
     name: Run tests
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo22-18:ubuntu22-node18
-      options: --user root
+    runs-on: ubuntu-latest
+    # runs-on: ['self-hosted', 'org', '8-cpu']
+    # container:
+    #   image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo22-18:ubuntu22-node18
+    #   options: --user root
     steps:
       # - name: Set Swap Space
       #   uses: pierotofy/set-swap-space@0404882bc4666c0ff2f6fd8b3d32af69a730183c
@@ -67,9 +68,8 @@ jobs:
           echo "$(pwd)/celo-foundry" >> $GITHUB_PATH
 
       - name: Install forge dependencies
-        run: |
-          git config --global --add safe.directory /__w/celo-monorepo/celo-monorepo
-          forge install
+        run: forge install
+        #           git config --global --add safe.directory /__w/celo-monorepo/celo-monorepo
 
       # "Run tests" already tries to compile the contracts
       # Making it explicit here to have easier to read errors
