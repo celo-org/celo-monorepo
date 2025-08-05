@@ -32,10 +32,10 @@ jobs:
     #   image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo22-18:ubuntu22-node18
     #   options: --user root
     steps:
-      # - name: Set Swap Space
-      #   uses: pierotofy/set-swap-space@0404882bc4666c0ff2f6fd8b3d32af69a730183c
-      #   with:
-      #     swap-size-gb: 32
+      - name: Set Swap Space
+        uses: pierotofy/set-swap-space@0404882bc4666c0ff2f6fd8b3d32af69a730183c
+        with:
+          swap-size-gb: 32
       - uses: actions/checkout@v4
         with:
           submodules: recursive
