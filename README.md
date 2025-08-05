@@ -7,7 +7,7 @@
 **Celo Monorepo - Official repository for core projects comprising the Celo platform**
 
 This repository contains the source code for the Celo core projects including the [smart contracts](https://github.com/celo-org/celo-monorepo/tree/master/packages/protocol)
-and other packages. The source code for the Celo Blockchain which operates a node on the Celo Network is kept in a separate repo [here](https://github.com/celo-org/celo-blockchain).
+and other packages. The source code for the Celo Blockchain which operates a node on the Celo Network is kept in [a separate repo](https://github.com/celo-org/op-geth).
 
 <!-- row 1 - status -->
 
@@ -21,13 +21,13 @@ and other packages. The source code for the Celo Blockchain which operates a nod
 <!-- row 2 - links & profiles -->
 
 [![Website celo.org](https://img.shields.io/website-up-down-green-red/https/celo.org.svg)](https://celo.org)
-[![Blog](https://img.shields.io/badge/blog-up-green)](https://medium.com/celoorg)
+[![Blog](https://img.shields.io/badge/blog-up-green)](https://blog.celo.org/)
 [![docs](https://img.shields.io/badge/docs-up-green)](https://docs.celo.org/)
 [![Youtube](https://img.shields.io/badge/YouTube%20channel-up-green)](https://www.youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw/videos?view=0&sort=p&flow=grid)
 [![forum](https://img.shields.io/badge/forum-up-green)](https://forum.celo.org)
 [![Discord](https://img.shields.io/discord/600834479145353243.svg)](https://discord.com/invite/celo)
 [![Twitter CeloDevs](https://img.shields.io/twitter/follow/celodevs?style=social)](https://twitter.com/celodevs)
-[![Twitter CeloOrg](https://img.shields.io/twitter/follow/celoorg?style=social)](https://twitter.com/CeloOrg)
+[![Twitter Celo](https://img.shields.io/twitter/follow/celoorg?style=social)](https://twitter.com/Celo)
 [![Subreddit subscribers](https://img.shields.io/reddit/subreddit-subscribers/CeloHQ?style=social)](https://www.reddit.com/r/CeloHQ/)
 
 <!-- row 3 - detailed status -->
@@ -99,24 +99,18 @@ See [Developer's Guide](https://docs.celo.org/developer) for full details about 
 
 See the [issue backlog](https://github.com/celo-org/celo-monorepo/issues) for a list of active or proposed tasks. Feel free to create new issues to report bugs and/or request features.
 
-## 📂 <a id="repo"></a>Repo Structure
-
-The repository has the following packages (sub projects):
-
-- [protocol](packages/protocol) - identity, stability and other smart contracts for the Celo protocol ([docs](https://docs.celo.org/protocol))
-
 Code owners for each package can be found in [.github/CODEOWNERS](.github/CODEOWNERS).
 
 ## ✍️ <a id="contributing"></a>Contributing
 
 Feel free to jump on the Celo 🚂🚋🚋🚋. Improvements and contributions are highly encouraged! 🙏👊
 
-See the [contributing guide](https://docs.celo.org/community/contributing) for details on how to participate.
+See the [contributing guide](https://docs.celo.org/what-is-celo/joining-celo/contributors/overview) for details on how to participate.
 [![GitHub issues by-label](https://img.shields.io/github/issues/celo-org/celo-monorepo/1%20hour%20tasks)](https://github.com/celo-org/celo-monorepo/issues?q=is%3Aopen+is%3Aissue+label%3A%221+hour+tasks%22)
 
 All communication and contributions to the Celo project are subject to the [Celo Code of Conduct](https://celo.org/code-of-conduct).
 
-Not yet ready to contribute but do like the project? Support Celo with a ⭐ or share the love in a [![Twitter URL](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fcelo.org%2F)](https://twitter.com/intent/tweet?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DkKggE5OvyhE&via=celohq&text=Checkout%20celo%21%20Love%20what%20they%20are%20building.&hashtags=celo)
+Not yet ready to contribute but do like the project? Support Celo with a ⭐ or share the love in a [![Twitter URL](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fcelo.org%2F)](https://twitter.com/intent/tweet?text=Checkout%20@Celo%21%20Love%20what%20they%20are%20building.)
 
 <!--
 Twitter
