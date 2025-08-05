@@ -67,7 +67,9 @@ jobs:
           echo "$(pwd)/celo-foundry" >> $GITHUB_PATH
 
       - name: Install forge dependencies
-        run: forge install
+        run: |
+          git config --global --add safe.directory /__w/celo-monorepo/celo-monorepo
+          forge install
 
       # "Run tests" already tries to compile the contracts
       # Making it explicit here to have easier to read errors
