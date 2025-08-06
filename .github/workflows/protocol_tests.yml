@@ -27,10 +27,10 @@ jobs:
         working-directory: packages/protocol
     name: Run tests
     # runs-on: ubuntu-latest
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo22-18:ubuntu22-node18
-      options: --user runner
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18-04']
+    # container:
+    #   image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo22-18:ubuntu22-node18
+    #   options: --user runner
     steps:
       # - name: Set Swap Space
       #   uses: pierotofy/set-swap-space@0404882bc4666c0ff2f6fd8b3d32af69a730183c
