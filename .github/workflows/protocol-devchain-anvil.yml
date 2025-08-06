@@ -34,7 +34,7 @@ jobs:
       run:
         working-directory: packages/protocol
     name: Generate anvil
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     permissions:
       contents: read
       pull-requests: read
@@ -94,11 +94,6 @@ jobs:
         run: |
           echo "Pull Request Number: ${{ env.PR_NUMBER }}"
 
-      - name: Install Celo Foundry pre-requisites
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libc6-dev
-
       - name: Install Celo Foundry binaries
         run: |
           curl -L -o foundry.tar.gz https://github.com/celo-org/foundry/releases/download/${{ env.CELO_FOUNDRY_VERSION }}/foundry_${{ env.CELO_FOUNDRY_VERSION }}_linux_amd64.tar.gz
@@ -120,17 +115,6 @@ jobs:
           api-url: https://api.gateway.akeyless.celo-networks-dev.org
           access-id: p-kf9vjzruht6l
           static-secrets: '{"/static-secrets/NPM/npm-publish-token":"NPM_TOKEN"}'
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '18.x'
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: 'Setup yarn'
-        shell: bash
-        run: |
-          npm install --global yarn
-          source ~/.bashrc
 
       - name: 'Install packages'
         shell: bash
