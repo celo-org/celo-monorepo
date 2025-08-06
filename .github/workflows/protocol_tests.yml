@@ -26,12 +26,13 @@ jobs:
       run:
         working-directory: packages/protocol
     name: Run tests
-    runs-on: ubuntu-latest
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     steps:
-      - name: Set Swap Space
-        uses: pierotofy/set-swap-space@0404882bc4666c0ff2f6fd8b3d32af69a730183c
-        with:
-          swap-size-gb: 32
+      # TODO: Determine if we need to set swap space
+      # - name: Set Swap Space
+      #   uses: pierotofy/set-swap-space@0404882bc4666c0ff2f6fd8b3d32af69a730183c
+      #   with:
+      #     swap-size-gb: 32
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -55,11 +56,6 @@ jobs:
         with:
           path: ./out
           key: ${{ runner.os }}-foundry-out-${{ env.FOUNDRY_CACHE_KEY }}
-
-      - name: Install Celo Foundry pre-requisites
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libc6-dev
 
       - name: Install Celo Foundry binaries
         run: |

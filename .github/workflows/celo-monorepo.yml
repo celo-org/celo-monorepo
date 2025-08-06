@@ -52,8 +52,7 @@ jobs:
       # Adding a initial comma so ',<path>' matches also for the first file
       all_modified_files: ',${{ steps.changed-files.outputs.all_modified_files }}'
       artifacts_to_cache: ${{ steps.get_artifacts_to_cache.outputs.artifacts_to_cache }}
-    # runs-on: ubuntu-latest
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -141,7 +140,7 @@ jobs:
 
   lint-checks:
     name: Lint code
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     timeout-minutes: 30
     needs: install-dependencies
     steps:
@@ -157,7 +156,7 @@ jobs:
 
   protocol-test-release:
     name: Protocol Test Release
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     timeout-minutes: 500
     needs: [install-dependencies, lint-checks]
     if: |
@@ -194,7 +193,7 @@ jobs:
   protocol-test-matrix:
     # Keeping name short because GitHub UI does not handle long names well
     name: ${{ matrix.name }}
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks]
     if: |
@@ -246,7 +245,7 @@ jobs:
   # NOTE: This has not been fully tested as we don't have a license for certora
   certora-test:
     name: Certora test ${{ matrix.name }}
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks]
     # Disable as certora license is not active
