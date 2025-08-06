@@ -281,11 +281,12 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
 
 contract E2E_EpochManager_InitializeSystem is E2E_EpochManager {
   function test_shouldRevert_WhenCalledByNonEnabler() public {
-    vm.expectRevert("msg.sender is not Enabler");
+    vm.prank(actor("notOwner"));
+    vm.expectRevert("Ownable: caller is not the owner");
     epochManagerContract.initializeSystem(1, 1, firstElected);
   }
   function test_shouldRevert_WhenAlreadyInitialized() public {
-    vm.prank(epochManagerEnablerAddress);
+    vm.prank(epochManagerOwner);
     vm.expectRevert("Epoch system already initialized");
     epochManagerContract.initializeSystem(1, 1, firstElected);
   }
