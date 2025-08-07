@@ -77,6 +77,9 @@ const DefaultConfig = {
     carbonOffsettingFraction: 1 / 1000,
     frozen: false,
   },
+  epochManager: {
+    newEpochDuration: 100,
+  },
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1 / 100,
@@ -165,6 +168,9 @@ const DefaultConfig = {
     numRequiredConfirmations: 1,
     numInternalRequiredConfirmations: 1,
   },
+  scoreManager: {
+    newEpochDuration: 100,
+  },
   stableToken: {
     decimals: 18,
     goldPrice: 1,
@@ -217,16 +223,11 @@ const DefaultConfig = {
       // MUST BE KEPT IN SYNC WITH MEMBERSHIP HISTORY LENGTH
       duration: 60 * DAY,
     },
-    validatorScoreParameters: {
-      exponent: 10,
-      adjustmentSpeed: 0.1,
-    },
     // MUST BE KEPT IN SYNC WITH VALIDATOR LOCKED GOLD DURATION
     membershipHistoryLength: 60,
     commissionUpdateDelay: (3 * DAY) / 5, // Approximately 3 days with 5s block times
     maxGroupSize: 5,
     slashingPenaltyResetPeriod: 30 * DAY,
-    downtimeGracePeriod: 0,
 
     // Register cLabs groups to contain an initial set of validators to run test networks.
     validatorKeys: [],
@@ -581,7 +582,7 @@ NetworkConfigs.mainnet = NetworkConfigs.rc1
 
 const linkedLibraries = {
   Proposals: ['Governance'],
-  AddressLinkedList: ['Validators', 'ValidatorsMock'],
+  AddressLinkedList: ['Validators'],
   AddressSortedLinkedList: ['Election', 'ElectionTest'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListMock'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianMock'],

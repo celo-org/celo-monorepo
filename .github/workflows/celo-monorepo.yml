@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - master
+      - 'release/**'
   pull_request:
     branches:
       - master
@@ -23,12 +24,12 @@ defaults:
 
 env:
   # Increment these to force cache rebuilding
-  NODE_MODULE_CACHE_VERSION: 7
+  NODE_MODULE_CACHE_VERSION: 8
   NODE_OPTIONS: '--max-old-space-size=4096'
   TERM: dumb
   GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
   # Git Tag for contract release to use
-  RELEASE_TAG: core-contracts.v11
+  RELEASE_TAG: core-contracts.v12-renamed
   # CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
   CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.8.x
 
@@ -47,12 +48,11 @@ jobs:
   install-dependencies:
     name: Install dependencies
     outputs:
-      # Propagate more outputs if you need https://github.com/tj-actions/changed-files#outputs
+      # Propagate more outputs if you need https://github.com/step-security/changed-files#outputs
       # Adding a initial comma so ',<path>' matches also for the first file
       all_modified_files: ',${{ steps.changed-files.outputs.all_modified_files }}'
       artifacts_to_cache: ${{ steps.get_artifacts_to_cache.outputs.artifacts_to_cache }}
-    # runs-on: ubuntu-latest
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ['self-hosted', 'monorepo-node18@sha256:34b1c5e90f9613964160cdf6bc292b410362ec6d']
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -70,6 +70,10 @@ jobs:
           key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-
+      - name: Double check node version
+        run: |
+          echo "Node version: $(node --version)"
+          echo "Yarn version: $(yarn --version)"
       - name: Install yarn dependencies
         run: git config --global url."https://".insteadOf ssh:// && yarn generate-lock-entry && yarn install --frozen-lockfile --network-timeout 1000000
         if: steps.cache_node.outputs.cache-hit != 'true'
@@ -130,7 +134,7 @@ jobs:
             code-${{ github.sha }}
       - name: Detect files changed in PR (or commit), and expose as output
         id: changed-files
-        uses: tj-actions/changed-files@48d8f15b2aaa3d255ca5af3eba4870f807ce6b3c
+        uses: step-security/changed-files@3dbe17c78367e7d60f00d78ae6781a35be47b4a1
         with:
           # Using comma as separator to be able to easily match full paths (using ,<path>)
           separator: ','
@@ -175,7 +179,7 @@ jobs:
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
       - name: Download protocol devchain artifact
-        uses: dawidd6/action-download-artifact@bf251b5aa9c2f7eeb574a96ee720e24f801b7c11
+        uses: dawidd6/action-download-artifact@20319c5641d495c8a52e688b7dc5fada6c3a9fbc
         with:
           workflow: protocol-devchain.yml
           name: devchain-${{ env.RELEASE_TAG }}
@@ -197,7 +201,7 @@ jobs:
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks]
     if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+      github.base_ref == 'master' || contains(github.base_ref, 'release') || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
@@ -218,10 +222,10 @@ jobs:
               fi
           - name: Protocol Common tests
             command: |
-              yarn --cwd packages/protocol test common/
+              yarn --cwd packages/protocol test:truffle common/
           - name: Protocol Compatibility
             command: |
-              yarn --cwd packages/protocol test compatibility/
+              yarn --cwd packages/protocol test:truffle compatibility/
           - name: Protocol scripts test
             command: |
               yarn --cwd packages/protocol test:scripts
@@ -238,91 +242,6 @@ jobs:
         uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
         with:
           timeout_minutes: 40
-          max_attempts: 3
-          command: |
-            ${{ matrix.command }}
-
-  end-to-end-geth-matrix:
-    # Keeping name short because GitHub UI does not handle long names well
-    name: e2e ${{ matrix.name }}
-    runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 60
-    needs: [install-dependencies, lint-checks]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'release') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/celotool') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: Transfer test
-            command: |
-              set -e
-              # Forcing to load go and rust paths
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_transfers.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Blockchain Parameters test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_blockchain_parameters.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Slashing test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_slashing.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Governance test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_governance.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Replica test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_replicas.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Sync test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_sync.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: CIP35 eth compatibility test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              echo "Test is skipped because migrations somehow fail"
-              # ./ci_test_cip35.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Validator order test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-
-              ./ci_test_validator_order.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Execute matrix command for test
-        uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
-        with:
-          timeout_minutes: 30
           max_attempts: 3
           command: |
             ${{ matrix.command }}

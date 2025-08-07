@@ -6,17 +6,20 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IElection.sol";
 import "./interfaces/IValidators.sol";
-import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
-import "../common/UsingPrecompiles.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/Heap.sol";
 import "../common/libraries/ReentrancyGuard.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
+import "../common/Blockable.sol";
+import "../common/PrecompilesOverride.sol";
+import "../common/Permissioned.sol";
 
+/**
+ * @title Manages the validator election process.
+ */
 contract Election is
   IElection,
   ICeloVersionedContract,
@@ -24,9 +27,9 @@ contract Election is
   ReentrancyGuard,
   Initializable,
   UsingRegistry,
-  UsingPrecompiles,
-  CalledByVm,
-  IsL2Check
+  PrecompilesOverride,
+  Blockable,
+  Permissioned
 {
   using AddressSortedLinkedList for SortedLinkedList.List;
   using FixidityLib for FixidityLib.Fraction;
@@ -198,7 +201,7 @@ contract Election is
     uint256 value,
     address lesser,
     address greater
-  ) external nonReentrant onlyL1 returns (bool) {
+  ) external nonReentrant onlyWhenNotBlocked returns (bool) {
     require(votes.total.eligible.contains(group), "Group not eligible");
     require(0 < value, "Vote value cannot be zero");
     require(canReceiveVotes(group, value), "Group cannot receive votes");
@@ -231,7 +234,7 @@ contract Election is
    * @return True upon success.
    * @dev Pending votes cannot be activated until an election has been held.
    */
-  function activate(address group) external nonReentrant onlyL1 returns (bool) {
+  function activate(address group) external nonReentrant returns (bool) {
     address account = getAccounts().voteSignerToAccount(msg.sender);
     return _activate(group, account);
   }
@@ -243,10 +246,7 @@ contract Election is
    * @return True upon success.
    * @dev Pending votes cannot be activated until an election has been held.
    */
-  function activateForAccount(
-    address group,
-    address account
-  ) external nonReentrant onlyL1 returns (bool) {
+  function activateForAccount(address group, address account) external nonReentrant returns (bool) {
     return _activate(group, account);
   }
 
@@ -343,7 +343,7 @@ contract Election is
     uint256 value,
     address lesser,
     address greater
-  ) external onlyVm onlyL1 {
+  ) external onlyPermitted(registry.getAddressFor(EPOCH_MANAGER_REGISTRY_ID)) {
     _distributeEpochRewards(group, value, lesser, greater);
   }
 
@@ -369,7 +369,7 @@ contract Election is
     address group,
     address lesser,
     address greater
-  ) external onlyL1 onlyRegisteredContract(VALIDATORS_REGISTRY_ID) {
+  ) external onlyRegisteredContract(VALIDATORS_REGISTRY_ID) {
     uint256 value = getTotalVotesForGroup(group);
     votes.total.eligible.insert(group, value, lesser, greater);
     emit ValidatorGroupMarkedEligible(group);
@@ -424,6 +424,15 @@ contract Election is
   }
 
   /**
+   *  @notice Sets the address of the blocking contract.
+   *  @param _blockedBy The address of the contract that will determine if this contract is blocked.
+   *  @dev Can only be called by the owner of the contract.
+   */
+  function setBlockedByContract(address _blockedBy) external onlyOwner {
+    _setBlockedBy(_blockedBy);
+  }
+
+  /**
    * @notice Returns the groups that `account` has voted for.
    * @param account The address of the account casting votes.
    * @return The groups that `account` has voted for.
@@ -474,12 +483,21 @@ contract Election is
   }
 
   /**
+   * @notice Returns a list of elected validator signers with seats allocated to groups via the D'Hondt
+   *   method.
+   * @return The list of elected validator signers.
+   */
+  function electValidatorSigners() external view returns (address[] memory) {
+    return electNValidatorSigners(electableValidators.min, electableValidators.max);
+  }
+
+  /**
    * @notice Returns a list of elected validators with seats allocated to groups via the D'Hondt
    *   method.
    * @return The list of elected validators.
    */
-  function electValidatorSigners() external view returns (address[] memory) {
-    return electNValidatorSigners(electableValidators.min, electableValidators.max);
+  function electValidatorAccounts() external view returns (address[] memory) {
+    return electNValidatorAccounts(electableValidators.min, electableValidators.max);
   }
 
   /**
@@ -536,14 +554,14 @@ contract Election is
    * @notice Returns the amount of rewards that voters for `group` are due at the end of an epoch.
    * @param group The group to calculate epoch rewards for.
    * @param totalEpochRewards The total amount of rewards going to all voters.
-   * @param uptimes Array of Fixidity representations of the validators' uptimes, between 0 and 1.
+   * @param groupScore The score of the group.
    * @return The amount of rewards that voters for `group` are due at the end of an epoch.
    * @dev Eligible groups that have received their maximum number of votes cannot receive more.
    */
-  function getGroupEpochRewards(
+  function getGroupEpochRewardsBasedOnScore(
     address group,
     uint256 totalEpochRewards,
-    uint256[] calldata uptimes
+    uint256 groupScore
   ) external view returns (uint256) {
     IValidators validators = getValidators();
     // The group must meet the balance requirements for their voters to receive epoch rewards.
@@ -555,12 +573,11 @@ contract Election is
       votes.active.forGroup[group].total,
       votes.active.total
     );
-    FixidityLib.Fraction memory score = FixidityLib.wrap(
-      validators.calculateGroupEpochScore(uptimes)
-    );
     FixidityLib.Fraction memory slashingMultiplier = FixidityLib.wrap(
       validators.getValidatorGroupSlashingMultiplier(group)
     );
+
+    FixidityLib.Fraction memory score = FixidityLib.wrap(groupScore);
     return
       FixidityLib
         .newFixed(totalEpochRewards)
@@ -577,10 +594,7 @@ contract Election is
    * @return Whether or not `account` has activatable votes for `group`.
    * @dev Pending votes cannot be activated until an election has been held.
    */
-  function hasActivatablePendingVotes(
-    address account,
-    address group
-  ) external view onlyL1 returns (bool) {
+  function hasActivatablePendingVotes(address account, address group) external view returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
     return pendingVote.epoch < getEpochNumber() && pendingVote.value > 0;
   }
@@ -610,7 +624,7 @@ contract Election is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 4, 0);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -619,7 +633,7 @@ contract Election is
    * @param max The maximum number of validators that can be elected.
    * @return True upon success.
    */
-  function setElectableValidators(uint256 min, uint256 max) public onlyOwner onlyL1 returns (bool) {
+  function setElectableValidators(uint256 min, uint256 max) public onlyOwner returns (bool) {
     require(0 < min, "Minimum electable validators cannot be zero");
     require(min <= max, "Maximum electable validators cannot be smaller than minimum");
     require(
@@ -636,9 +650,7 @@ contract Election is
    * @param _maxNumGroupsVotedFor The maximum number of groups an account can vote for.
    * @return True upon success.
    */
-  function setMaxNumGroupsVotedFor(
-    uint256 _maxNumGroupsVotedFor
-  ) public onlyOwner onlyL1 returns (bool) {
+  function setMaxNumGroupsVotedFor(uint256 _maxNumGroupsVotedFor) public onlyOwner returns (bool) {
     require(_maxNumGroupsVotedFor != maxNumGroupsVotedFor, "Max groups voted for not changed");
     maxNumGroupsVotedFor = _maxNumGroupsVotedFor;
     emit MaxNumGroupsVotedForSet(_maxNumGroupsVotedFor);
@@ -650,7 +662,7 @@ contract Election is
    * @param threshold Electability threshold as unwrapped Fraction.
    * @return True upon success.
    */
-  function setElectabilityThreshold(uint256 threshold) public onlyOwner onlyL1 returns (bool) {
+  function setElectabilityThreshold(uint256 threshold) public onlyOwner returns (bool) {
     electabilityThreshold = FixidityLib.wrap(threshold);
     require(
       electabilityThreshold.lt(FixidityLib.fixed1()),
@@ -681,7 +693,7 @@ contract Election is
    * If not run, voting power of account will not reflect rewards awarded.
    * @param flag The on/off flag.
    */
-  function setAllowedToVoteOverMaxNumberOfGroups(bool flag) public onlyL1 {
+  function setAllowedToVoteOverMaxNumberOfGroups(bool flag) public {
     address account = getAccounts().voteSignerToAccount(msg.sender);
     IValidators validators = getValidators();
     require(
@@ -742,80 +754,22 @@ contract Election is
     return votes.active.total;
   }
 
-  /**
-   * @notice Returns a list of elected validators with seats allocated to groups via the D'Hondt
-   *   method.
-   * @return The list of elected validators.
-   * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
-   */
   function electNValidatorSigners(
     uint256 minElectableValidators,
     uint256 maxElectableValidators
   ) public view returns (address[] memory) {
-    // Groups must have at least `electabilityThreshold` proportion of the total votes to be
-    // considered for the election.
-    uint256 requiredVotes = electabilityThreshold
-      .multiply(FixidityLib.newFixed(getTotalVotes()))
-      .fromFixed();
-    // Only consider groups with at least `requiredVotes` but do not consider more groups than the
-    // max number of electable validators.
-    uint256 numElectionGroups = votes.total.eligible.numElementsGreaterThan(
-      requiredVotes,
-      maxElectableValidators
-    );
-    address[] memory electionGroups = votes.total.eligible.headN(numElectionGroups);
-    uint256[] memory numMembers = getValidators().getGroupsNumMembers(electionGroups);
-    // Holds the number of members elected for each of the eligible validator groups.
-    uint256[] memory numMembersElected = new uint256[](electionGroups.length);
-    uint256 totalNumMembersElected = 0;
+    bool accounts = false;
+    return
+      _electNValidatorSignerOrAccount(minElectableValidators, maxElectableValidators, accounts);
+  }
 
-    uint256[] memory keys = new uint256[](electionGroups.length);
-    FixidityLib.Fraction[] memory votesForNextMember = new FixidityLib.Fraction[](
-      electionGroups.length
-    );
-    for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
-      keys[i] = i;
-      votesForNextMember[i] = FixidityLib.newFixed(
-        votes.total.eligible.getValue(electionGroups[i])
-      );
-    }
-
-    // Assign a number of seats to each validator group.
-    while (totalNumMembersElected < maxElectableValidators && electionGroups.length > 0) {
-      uint256 groupIndex = keys[0];
-      // All electable validators have been elected.
-      if (votesForNextMember[groupIndex].unwrap() == 0) break;
-      // All members of the group have been elected
-      if (numMembers[groupIndex] <= numMembersElected[groupIndex]) {
-        votesForNextMember[groupIndex] = FixidityLib.wrap(0);
-      } else {
-        // Elect the next member from the validator group
-        numMembersElected[groupIndex] = numMembersElected[groupIndex].add(1);
-        totalNumMembersElected = totalNumMembersElected.add(1);
-        // If there are already n elected members in a group, the votes for the next member
-        // are total votes of group divided by n+1
-        votesForNextMember[groupIndex] = FixidityLib
-          .newFixed(votes.total.eligible.getValue(electionGroups[groupIndex]))
-          .divide(FixidityLib.newFixed(numMembersElected[groupIndex].add(1)));
-      }
-      Heap.heapifyDown(keys, votesForNextMember);
-    }
-    require(totalNumMembersElected >= minElectableValidators, "Not enough elected validators");
-    // Grab the top validators from each group that won seats.
-    address[] memory electedValidators = new address[](totalNumMembersElected);
-    totalNumMembersElected = 0;
-    for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
-      // We use the validating delegate if one is set.
-      address[] memory electedGroupValidators = getValidators().getTopGroupValidators(
-        electionGroups[i],
-        numMembersElected[i]
-      );
-      for (uint256 j = 0; j < electedGroupValidators.length; j = j.add(1)) {
-        electedValidators[totalNumMembersElected] = electedGroupValidators[j];
-        totalNumMembersElected = totalNumMembersElected.add(1);
-      }
-    }
-    return electedValidators;
+  function electNValidatorAccounts(
+    uint256 minElectableValidators,
+    uint256 maxElectableValidators
+  ) public view returns (address[] memory) {
+    bool accounts = true;
+    return
+      _electNValidatorSignerOrAccount(minElectableValidators, maxElectableValidators, accounts);
   }
 
   /**
@@ -910,7 +864,7 @@ contract Election is
     uint256 value,
     address lesser,
     address greater
-  ) internal onlyL1 {
+  ) internal {
     if (votes.total.eligible.contains(group)) {
       uint256 newVoteTotal = votes.total.eligible.getValue(group).add(value);
       votes.total.eligible.update(group, newVoteTotal, lesser, greater);
@@ -921,9 +875,11 @@ contract Election is
     emit EpochRewardsDistributedToVoters(group, value);
   }
 
-  function _activate(address group, address account) internal returns (bool) {
+  function _activate(address group, address account) internal onlyWhenNotBlocked returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
+
     require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
+
     uint256 value = pendingVote.value;
     require(value > 0, "Vote value cannot be zero");
     decrementPendingVotes(group, account, value);
@@ -938,7 +894,7 @@ contract Election is
     address lesser,
     address greater,
     uint256 index
-  ) internal returns (bool) {
+  ) internal onlyWhenNotBlocked returns (bool) {
     // TODO(asa): Dedup with revokePending.
     require(group != address(0), "Group address zero");
     address account = getAccounts().voteSignerToAccount(msg.sender);
@@ -979,7 +935,7 @@ contract Election is
     address lesser,
     address greater,
     uint256 index
-  ) internal returns (uint256) {
+  ) internal onlyWhenNotBlocked returns (uint256) {
     uint256 remainingValue = maxValue;
     uint256 pendingVotes = getPendingVotesForGroupByAccount(group, account);
     if (pendingVotes > 0) {
@@ -1003,6 +959,95 @@ contract Election is
       }
     }
     return decrementedValue;
+  }
+
+  /**
+   * @notice Returns a list of elected validator with seats allocated to groups via the D'Hondt
+   *   method.
+   * @return The list of elected validator signers or accounts depending on input.
+   * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
+   */
+  function _electNValidatorSignerOrAccount(
+    uint256 minElectableValidators,
+    uint256 maxElectableValidators,
+    bool accounts // accounts or signers
+  ) internal view returns (address[] memory) {
+    // Groups must have at least `electabilityThreshold` proportion of the total votes to be
+    // considered for the election.
+    uint256 requiredVotes = electabilityThreshold
+      .multiply(FixidityLib.newFixed(getTotalVotes()))
+      .fromFixed();
+    // Only consider groups with at least `requiredVotes` but do not consider more groups than the
+    // max number of electable validators.
+    uint256 numElectionGroups = votes.total.eligible.numElementsGreaterThan(
+      requiredVotes,
+      maxElectableValidators
+    );
+
+    address[] memory electionGroups = votes.total.eligible.headN(numElectionGroups);
+    uint256[] memory numMembers = getValidators().getGroupsNumMembers(electionGroups);
+    // Holds the number of members elected for each of the eligible validator groups.
+    uint256[] memory numMembersElected = new uint256[](electionGroups.length);
+    uint256 totalNumMembersElected = 0;
+
+    uint256[] memory keys = new uint256[](electionGroups.length);
+    FixidityLib.Fraction[] memory votesForNextMember = new FixidityLib.Fraction[](
+      electionGroups.length
+    );
+    for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
+      keys[i] = i;
+      votesForNextMember[i] = FixidityLib.newFixed(
+        votes.total.eligible.getValue(electionGroups[i])
+      );
+    }
+
+    // Assign a number of seats to each validator group.
+    while (totalNumMembersElected < maxElectableValidators && electionGroups.length > 0) {
+      uint256 groupIndex = keys[0];
+      // All electable validators have been elected.
+      if (votesForNextMember[groupIndex].unwrap() == 0) break;
+      // All members of the group have been elected
+      if (numMembers[groupIndex] <= numMembersElected[groupIndex]) {
+        votesForNextMember[groupIndex] = FixidityLib.wrap(0);
+      } else {
+        // Elect the next member from the validator group
+        numMembersElected[groupIndex] = numMembersElected[groupIndex].add(1);
+        totalNumMembersElected = totalNumMembersElected.add(1);
+        // If there are already n elected members in a group, the votes for the next member
+        // are total votes of group divided by n+1
+        votesForNextMember[groupIndex] = FixidityLib
+          .newFixed(votes.total.eligible.getValue(electionGroups[groupIndex]))
+          .divide(FixidityLib.newFixed(numMembersElected[groupIndex].add(1)));
+      }
+      Heap.heapifyDown(keys, votesForNextMember);
+    }
+    require(totalNumMembersElected >= minElectableValidators, "Not enough elected validators");
+    // Grab the top validators from each group that won seats.
+    address[] memory electedValidators = new address[](totalNumMembersElected);
+    totalNumMembersElected = 0;
+
+    IValidators validators = getValidators();
+
+    for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
+      // We use the validating delegate if one is set.
+      address[] memory electedGroupValidators;
+      if (accounts) {
+        electedGroupValidators = validators.getTopGroupValidatorsAccounts(
+          electionGroups[i],
+          numMembersElected[i]
+        );
+      } else {
+        electedGroupValidators = validators.getTopGroupValidators(
+          electionGroups[i],
+          numMembersElected[i]
+        );
+      }
+      for (uint256 j = 0; j < electedGroupValidators.length; j = j.add(1)) {
+        electedValidators[totalNumMembersElected] = electedGroupValidators[j];
+        totalNumMembersElected = totalNumMembersElected.add(1);
+      }
+    }
+    return electedValidators;
   }
 
   /**

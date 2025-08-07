@@ -268,7 +268,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     uint256 value
   ) external onlyWhenInProperState {
     require(
-      erc20 != registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
+      erc20 != registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID),
       "Transfer must not target celo balance"
     );
     SafeERC20.safeTransfer(IERC20(erc20), to, value);
@@ -451,7 +451,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
    * @dev The v,r and s signature should be signed by the authorized signer
    *      key, with the ReleaseGold contract address as the message.
-   * @dev Function is deprecated on L2.
    */
   function authorizeValidatorSignerWithPublicKey(
     address payable signer,
@@ -465,45 +464,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
       fundSigner(signer);
     }
     getAccounts().authorizeValidatorSignerWithPublicKey(signer, v, r, s, ecdsaPublicKey);
-  }
-
-  /**
-   * @notice A wrapper function for the authorize validator signer with keys account method.
-   * @param signer The address of the signing key to authorize.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
-   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
-   *   proof of possession. 96 bytes.
-   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
-   *   account address. 48 bytes.
-   * @dev The v,r and s signature should be signed by the authorized signer
-   *      key, with the ReleaseGold contract address as the message.
-   * @dev Function is deprecated on L2.
-   */
-  function authorizeValidatorSignerWithKeys(
-    address payable signer,
-    uint8 v,
-    bytes32 r,
-    bytes32 s,
-    bytes calldata ecdsaPublicKey,
-    bytes calldata blsPublicKey,
-    bytes calldata blsPop
-  ) external nonReentrant onlyCanValidate onlyWhenInProperState {
-    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
-    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
-      fundSigner(signer);
-    }
-    getAccounts().authorizeValidatorSignerWithKeys(
-      signer,
-      v,
-      r,
-      s,
-      ecdsaPublicKey,
-      blsPublicKey,
-      blsPop
-    );
   }
 
   /**

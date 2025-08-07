@@ -1,3 +1,4 @@
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import path from 'path'
 import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 
@@ -31,50 +32,55 @@ export const ProxyContracts = [
   'GoldTokenProxy',
   'GovernanceApproverMultiSigProxy',
   'GovernanceProxy',
+  'GovernanceSlasherProxy',
   'LockedGoldProxy',
   'OdisPaymentsProxy',
   'RegistryProxy',
   'SortedOraclesProxy',
   'UniswapFeeHandlerSellerProxy',
-  'CeloDistributionScheduleProxy',
+  'CeloUnreleasedTreasuryProxy',
 ]
 
-export const CoreContracts = [
+export const CoreContracts: string[] = [
   // common
-  'Accounts',
-  'GasPriceMinimum',
-  'FeeHandler',
-  'MentoFeeHandlerSeller',
-  'UniswapFeeHandlerSeller',
-  'FeeCurrencyDirectory',
-  'FeeCurrencyWhitelist',
-  'GoldToken',
-  'MultiSig',
-  'Registry',
-  'Freezer',
-  'CeloDistributionSchedule',
+  CeloContractName.Accounts,
+  CeloContractName.GasPriceMinimum,
+  CeloContractName.FeeHandler,
+  CeloContractName.MentoFeeHandlerSeller,
+  CeloContractName.UniswapFeeHandlerSeller,
+  CeloContractName.FeeCurrencyDirectory,
+  CeloContractName.FeeCurrencyWhitelist,
+  CeloContractName.GoldToken,
+  'MultiSig' as const,
+  'Registry' as const,
+  CeloContractName.Freezer,
+  CeloContractName.CeloUnreleasedTreasury,
 
   // governance
-  'Election',
-  'EpochRewards',
-  'Governance',
-  'GovernanceApproverMultiSig',
-  'BlockchainParameters',
-  'DoubleSigningSlasher',
-  'DowntimeSlasher',
-  'LockedGold',
-  'Validators',
-  'ReleaseGold',
+  CeloContractName.Election,
+  CeloContractName.EpochRewards,
+  CeloContractName.EpochManager,
+  CeloContractName.EpochManagerEnabler,
+  CeloContractName.Governance,
+  CeloContractName.GovernanceSlasher,
+  CeloContractName.GovernanceApproverMultiSig,
+  CeloContractName.BlockchainParameters,
+  CeloContractName.DoubleSigningSlasher,
+  CeloContractName.DowntimeSlasher,
+  CeloContractName.LockedGold,
+  CeloContractName.Validators,
+  'ReleaseGold' as const,
+  CeloContractName.ScoreManager,
 
   // identity
-  'Attestations',
-  'Escrow',
-  'FederatedAttestations',
-  'Random',
-  'OdisPayments',
+  CeloContractName.Attestations,
+  CeloContractName.Escrow,
+  CeloContractName.FederatedAttestations,
+  CeloContractName.Random,
+  CeloContractName.OdisPayments,
 
   // stability
-  'SortedOracles',
+  CeloContractName.SortedOracles,
 ]
 
 export const OtherContracts = [
@@ -87,13 +93,21 @@ export const OtherContracts = [
 
 export const contractPackages = [MENTO_PACKAGE, SOLIDITY_08_PACKAGE].filter(Boolean)
 
-export const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
+export const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract'] as const
 
 export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreContracts)
 
-export const PublishContracts = CoreContracts.concat(Interfaces)
-  .concat(PROXY_CONTRACT)
-  .concat(MENTO_PACKAGE.contracts)
+export const PublishContracts = [
+  ...CoreContracts,
+  ...Interfaces,
+  PROXY_CONTRACT,
+  ...MENTO_PACKAGE.contracts,
+]
+
+export const AliasedContracts = {
+  [CeloContractName.GoldToken]: CeloContractName.CeloToken,
+  [CeloContractName.LockedGold]: CeloContractName.LockedCelo,
+}
 
 export enum BuildTarget {
   CJS = 'cjs',

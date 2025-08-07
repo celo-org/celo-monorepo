@@ -1,5 +1,7 @@
 # Celotool
 
+> This package is deprecated and should be removed
+
 A useful tool for various scripts that we as an engineering team might run.
 This is the only remaining version, in Typescript. There used to be a Python version too.
 Hence the references to celotooljs.

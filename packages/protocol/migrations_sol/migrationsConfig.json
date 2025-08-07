@@ -1,5 +1,5 @@
 {
-  "goldToken": {"frozen":false},
+  "goldToken": { "frozen": false },
   "sortedOracles": {
     "reportExpirySeconds": 300
   },
@@ -21,9 +21,23 @@
       "0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB",
       "0x298FbD6dad2Fc2cB56d7E37d8aCad8Bf07324f67"
     ],
-    "assetAllocationSymbols_": ["cGLD", "BTC", "ETH", "DAI", "They are don't by converting string to hex, and then `cast to-bytes32`"],
-    "assetAllocationSymbols": ["0x63474c4400000000000000000000000000000000000000000000000000000000", "0x4254430000000000000000000000000000000000000000000000000000000000", "0x4554480000000000000000000000000000000000000000000000000000000000", "0x4441490000000000000000000000000000000000000000000000000000000000"],
-    "assetAllocationWeights": [500000000000000000000000, 300000000000000000000000, 150000000000000000000000, 50000000000000000000000],
+    "assetAllocationSymbols_": [
+      "cGLD",
+      "BTC",
+      "ETH",
+      "DAI",
+      "They are don't by converting string to hex, and then `cast to-bytes32`"
+    ],
+    "assetAllocationSymbols": [
+      "0x63474c4400000000000000000000000000000000000000000000000000000000",
+      "0x4254430000000000000000000000000000000000000000000000000000000000",
+      "0x4554480000000000000000000000000000000000000000000000000000000000",
+      "0x4441490000000000000000000000000000000000000000000000000000000000"
+    ],
+    "assetAllocationWeights": [
+      500000000000000000000000, 300000000000000000000000, 150000000000000000000000,
+      50000000000000000000000
+    ],
     "initialBalance": 5000000000000000000000000
   },
   "stableTokens": {
@@ -39,7 +53,7 @@
   },
   "exchange": {
     "spread": 5000000000000000000000,
-    "reserveFraction": 10000000000000000000000, 
+    "reserveFraction": 10000000000000000000000,
     "updateFrequency": 300,
     "minimumReports": 1,
     "frozen": false
@@ -59,44 +73,46 @@
       "duration": 5184000,
       "duration_help": "60 * DAY"
     },
-    "validatorScoreParameters": {
-      "exponent": 10,
-      "adjustmentSpeed": 100000000000000000000000
-    },
     "membershipHistoryLength": 60,
-    "commissionUpdateDelay": 51840, 
-    "commissionUpdateDelay_help": "(3 * DAY) / 5", 
+    "commissionUpdateDelay": 51840,
+    "commissionUpdateDelay_help": "(3 * DAY) / 5",
 
-    "maxGroupSize": 5,
+    "maxGroupSize": 2,
     "slashingMultiplierResetPeriod": 2592000,
     "slashingPenaltyResetPeriod_help": "30 * DAY",
-    "downtimeGracePeriod": 0,
     "validatorKeys": [],
     "attestationKeys": [],
     "groupName": "cLabs",
     "commission": 100000000000000000000000,
     "votesRatioOfLastVsFirstGroup": 2000000000000000000000000,
-    "valKeys": ["0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d","0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a"],
-    "ecdsaPubKeys": [
-                      "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", 
-                      "0x9d9031e97dd78ff8c15aa86939de9b1e791066a0224e331bc962a2099a7b1f0464b8bbafe1535f2301c72c2cb3535b172da30b02686ab0393d348614f157fbdb"]
+    "valKeys": [
+      "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d",
+      "0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a",
+      "0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6",
+      "0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a",
+      "0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba",
+      "0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e",
+      "0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356",
+      "0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97",
+      "0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6"
+    ]
   },
   "election": {
     "minElectableValidators": 1,
-    "maxElectableValidators": 100,
+    "maxElectableValidators": 110,
     "maxNumGroupsVotedFor": 10,
     "electabilityThreshold": 1000000000000000000000
   },
   "epochRewards": {
     "targetVotingYieldParameters": {
-      "initial": 0,
-      "max": 500000000000000000000, 
+      "initial": 160000000000000000000,
+      "max": 500000000000000000000,
       "max_helper": "(x + 1) ^ 365 = 1.20",
-      "adjustmentFactor": 0, 
+      "adjustmentFactor": 0,
       "adjustmentFactor_helper": "Change to 1 / 3650 once Mainnet activated."
     },
     "rewardsMultiplierParameters": {
-      "max": 2,
+      "max": 2000000000000000000000000,
       "adjustmentFactors": {
         "underspend": 500000000000000000000000,
         "overspend": 5000000000000000000000000
@@ -106,9 +122,12 @@
     "maxValidatorEpochPayment": 205479452054794520547,
     "maxValidatorEpochPayment_helper": "(75,000 / 365) * 10 ^ 18",
     "communityRewardFraction": 250000000000000000000000,
-    "carbonOffsettingPartner": "0x0000000000000000000000000000000000000000",
+    "carbonOffsettingPartner": "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972",
     "carbonOffsettingFraction": 1000000000000000000000,
     "frozen": false
+  },
+  "epochManager": {
+    "newEpochDuration": 86400
   },
   "random": {
     "randomnessBlockRetentionWindow": "720",
@@ -147,7 +166,7 @@
     "dequeueFrequency": 14400,
     "queueExpiry": 2419200,
     "queueExpiry_helper": "4 * WEEK",
-    "dequeueFrequency_helper":"4 * HOUR",
+    "dequeueFrequency_helper": "4 * HOUR",
     "approvalStageDuration": 14400,
     "approvalStageDuration_helper": "4 * HOUR",
     "referendumStageDuration": 86400,

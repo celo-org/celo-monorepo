@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - 'release/**'
   pull_request:
     branches:
       - master
@@ -11,7 +12,8 @@ on:
 env:
   # Increment these to force cache rebuilding
   FOUNDRY_CACHE_KEY: 2
-  ANVIL_PORT: 8546
+  # Supported Foundry version defined at celo-org (GitHub organisation) level, for consistency across workflows. Please contact DevOps to update value.
+  SUPPORTED_FOUNDRY_VERSION: ${{ vars.SUPPORTED_FOUNDRY_VERSION }}
 
 permissions:
   contents: read
@@ -25,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set Swap Space
-        uses: pierotofy/set-swap-space@49819abfb41bd9b44fb781159c033dba90353a7c
+        uses: pierotofy/set-swap-space@0404882bc4666c0ff2f6fd8b3d32af69a730183c
         with:
           swap-size-gb: 32
       - uses: actions/checkout@v4
@@ -55,7 +57,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: "nightly-f625d0fa7c51e65b4bf1e8f7931cd1c6e2e285e9"
+          version: 'v1.0.0' # TODO: revert back to env var
 
       - name: Install forge dependencies
         run: forge install
@@ -90,8 +92,7 @@ jobs:
         if: success() || failure()
         run: | 
           forge test -vvv \
-          --match-path "test-sol/unit/governance/voting/*" \
-          --block-gas-limit 50000000
+          --match-path "test-sol/unit/governance/voting/*"
 
       - name: Run unit tests stability
         if: success() || failure()
@@ -123,20 +124,28 @@ jobs:
           forge test -vvv \
           --match-path "test-sol/unit/*"
       
-      - name: Generate migrations and run devchain
-        if: success() || failure()
-        run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
-      
-      - name: Run integration tests against local anvil devchain
+      - name: Run integration tests (that don't require an anvil devchain)
         if: success() || failure()
         run: |
           forge test -vvv \
           --match-path "test-sol/integration/*" \
-          --fork-url http://127.0.0.1:${{ env.ANVIL_PORT }}
+
+      - name: Generate migrations and run devchain
+        if: success() || failure()
+        run: ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
+      
+      - name: Run migration tests against local anvil devchain
+        run: |
+          source ./scripts/foundry/constants.sh
+
+          FOUNDRY_PROFILE=devchain forge test -vvv \
+          --match-path "test-sol/devchain/migration/*" \
+          --fork-url $ANVIL_RPC_URL
       
       - name: Run e2e tests against local anvil devchain
-        if: success() || failure()
         run: |
-          forge test -vvv \
-          --match-path "test-sol/e2e/*" \
-          --fork-url http://127.0.0.1:${{ env.ANVIL_PORT }}
+          source ./scripts/foundry/constants.sh
+
+          FOUNDRY_PROFILE=devchain forge test -vvv \
+          --match-path "test-sol/devchain/e2e/*" \
+          --fork-url $ANVIL_RPC_URL

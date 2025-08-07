@@ -11,7 +11,6 @@ import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
 import "../common/libraries/ReentrancyGuard.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
 
 contract Accounts is
   IAccounts,
@@ -19,8 +18,7 @@ contract Accounts is
   Ownable,
   ReentrancyGuard,
   Initializable,
-  UsingRegistry,
-  IsL2Check
+  UsingRegistry
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -132,6 +130,9 @@ contract Accounts is
     _setEip712DomainSeparator();
   }
 
+  /**
+   * @notice Sets the EIP712 domain separator for the Celo Accounts abstraction.
+   */
   function setEip712DomainSeparator() external {
     _setEip712DomainSeparator();
   }
@@ -265,38 +266,6 @@ contract Accounts is
     require(
       getValidators().updateEcdsaPublicKey(msg.sender, signer, ecdsaPublicKey),
       "Failed to update ECDSA public key"
-    );
-    emit ValidatorSignerAuthorized(msg.sender, signer);
-  }
-
-  /**
-   * @notice Authorizes an address to sign consensus messages on behalf of the account.
-   * @param signer The address of the signing key to authorize.
-   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
-   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
-   *   proof of possession. 96 bytes.
-   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
-   *   account address. 48 bytes.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
-   */
-  function authorizeValidatorSignerWithKeys(
-    address signer,
-    uint8 v,
-    bytes32 r,
-    bytes32 s,
-    bytes calldata ecdsaPublicKey,
-    bytes calldata blsPublicKey,
-    bytes calldata blsPop
-  ) external nonReentrant {
-    legacyAuthorizeSignerWithSignature(signer, ValidatorSigner, v, r, s);
-    setIndexedSigner(signer, ValidatorSigner);
-
-    require(
-      getValidators().updatePublicKeys(msg.sender, signer, ecdsaPublicKey, blsPublicKey, blsPop),
-      "Failed to update validator keys"
     );
     emit ValidatorSignerAuthorized(msg.sender, signer);
   }
@@ -495,7 +464,7 @@ contract Accounts is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 5, 0);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -567,7 +536,7 @@ contract Accounts is
    * be greater than 1.
    * @dev Use `deletePaymentDelegation` to unset the payment delegation.
    */
-  function setPaymentDelegation(address beneficiary, uint256 fraction) public onlyL1 {
+  function setPaymentDelegation(address beneficiary, uint256 fraction) public {
     require(isAccount(msg.sender), "Must first register address with Account.createAccount");
     require(beneficiary != address(0), "Beneficiary cannot be address 0x0");
     FixidityLib.Fraction memory f = FixidityLib.wrap(fraction);

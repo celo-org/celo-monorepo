@@ -1,9 +1,9 @@
-import { Address, bufferToHex, hexToBuffer } from '@celo/base/lib/address'
-import { SecureTrie } from 'merkle-patricia-tree'
-import { encode as rlpEncode } from 'rlp'
-import { ProxyInstance } from 'types'
-import Web3 from 'web3'
-import { retryTx } from './web3-utils'
+import { Address, bufferToHex, hexToBuffer } from '@celo/base/lib/address';
+import { SecureTrie } from 'merkle-patricia-tree';
+import { encode as rlpEncode } from 'rlp';
+import { ProxyInstance } from 'types';
+import Web3 from 'web3';
+import { retryTx } from './web3-utils';
 
 // from Proxy.sol
 
@@ -42,27 +42,32 @@ export async function setAndInitializeImplementation(
   },
   ...args: any[]
 ) {
-  const callData = web3.eth.abi.encodeFunctionCall(initializerAbi, args)
-  if (txOptions.from != null) {
-    // The proxied contract needs to be funded prior to initialization
-    if (txOptions.value != null) {
-      // Proxy's fallback fn expects the contract's implementation to be set already
-      // So we set the implementation first, send the funding, and then set and initialize again.
-      await retryTx(proxy._setImplementation, [implementationAddress, { from: txOptions.from }])
-      await retryTx(web3.eth.sendTransaction, [
-        {
-          from: txOptions.from,
-          to: proxy.address,
-          value: txOptions.value,
-        },
+  try {
+
+    const callData = web3.eth.abi.encodeFunctionCall(initializerAbi, args)
+    if (txOptions.from != null) {
+      // The proxied contract needs to be funded prior to initialization
+      if (txOptions.value != null) {
+        // Proxy's fallback fn expects the contract's implementation to be set already
+        // So we set the implementation first, send the funding, and then set and initialize again.
+        await retryTx(proxy._setImplementation, [implementationAddress, { from: txOptions.from }])
+        await retryTx(web3.eth.sendTransaction, [
+          {
+            from: txOptions.from,
+            to: proxy.address,
+            value: txOptions.value,
+          },
+        ])
+      }
+      return retryTx(proxy._setAndInitializeImplementation, [
+        implementationAddress,
+        callData as any,
+        { from: txOptions.from },
       ])
+    } else {
+      return retryTx(proxy._setAndInitializeImplementation, [implementationAddress, callData as any])
     }
-    return retryTx(proxy._setAndInitializeImplementation, [
-      implementationAddress,
-      callData as any,
-      { from: txOptions.from },
-    ])
-  } else {
-    return retryTx(proxy._setAndInitializeImplementation, [implementationAddress, callData as any])
+  } catch (error) {
+    console.log("errror", error);
   }
 }

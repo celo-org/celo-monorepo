@@ -3,10 +3,9 @@ pragma solidity ^0.5.13;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IFeeCurrencyWhitelist.sol";
-
 import "../common/Initializable.sol";
-
 import "../common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts-0.8/common/IsL2Check.sol";
 
 /**
  * @title Holds a whitelist of the ERC20+ tokens that can be used to pay for gas
@@ -16,10 +15,11 @@ contract FeeCurrencyWhitelist is
   IFeeCurrencyWhitelist,
   Ownable,
   Initializable,
-  ICeloVersionedContract
+  ICeloVersionedContract,
+  IsL2Check
 {
   // Array of all the tokens enabled
-  address[] public whitelist;
+  address[] private deprecated_whitelist;
 
   event FeeCurrencyWhitelisted(address token);
 
@@ -42,16 +42,28 @@ contract FeeCurrencyWhitelist is
    * @dev Add a token to the whitelist
    * @param tokenAddress The address of the token to add.
    */
-  function addToken(address tokenAddress) external onlyOwner {
-    whitelist.push(tokenAddress);
+  function addToken(address tokenAddress) external onlyOwner onlyL1 {
+    deprecated_whitelist.push(tokenAddress);
     emit FeeCurrencyWhitelisted(tokenAddress);
   }
 
   /**
    * @return a list of all tokens enabled as gas fee currency.
+   * @dev Once Celo becomes an L2, use the FeeCurrencyDirectory contract
+   * instead.
    */
-  function getWhitelist() external view returns (address[] memory) {
-    return whitelist;
+  function getWhitelist() external view onlyL1 returns (address[] memory) {
+    return deprecated_whitelist;
+  }
+
+  /**
+   * @notice Gets the whitelist item at the specified index.
+   * @return Address of a token in the whitelist.
+   * @dev Once Celo becomes an L2, use the FeeCurrencyDirectory contract
+   * instead.
+   */
+  function whitelist(uint256 index) external view onlyL1 returns (address) {
+    return deprecated_whitelist[index];
   }
 
   /**
@@ -62,7 +74,7 @@ contract FeeCurrencyWhitelist is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 2, 0);
   }
 
   /**
@@ -71,11 +83,11 @@ contract FeeCurrencyWhitelist is
    * @param tokenAddress The address of the token to remove.
    * @param index The index of the token in the whitelist array.
    */
-  function removeToken(address tokenAddress, uint256 index) public onlyOwner {
-    require(whitelist[index] == tokenAddress, "Index does not match");
-    uint256 length = whitelist.length;
-    whitelist[index] = whitelist[length - 1];
-    whitelist.pop();
+  function removeToken(address tokenAddress, uint256 index) public onlyOwner onlyL1 {
+    require(deprecated_whitelist[index] == tokenAddress, "Index does not match");
+    uint256 length = deprecated_whitelist.length;
+    deprecated_whitelist[index] = deprecated_whitelist[length - 1];
+    deprecated_whitelist.pop();
     emit FeeCurrencyWhitelistRemoved(tokenAddress);
   }
 }

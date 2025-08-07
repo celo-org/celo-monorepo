@@ -51,7 +51,7 @@ class ContractAddresses {
     await Promise.all(
       contracts.map(async (contract: string) => {
         // without this delay it sometimes fails with ProviderError
-        await delay(getRandomNumber(1, 1000))
+        await delay(getRandomNumber(999, 1000))
         try {
           const registeredAddress = await registry.getAddressForString(contract)
 
@@ -115,20 +115,29 @@ const deployImplementation = async (
   console.info(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
 
-  // without this delay it sometimes fails with ProviderError
-  await delay(getRandomNumber(1, 1000))
-
-  console.log('gas update in2')
-  console.log('dryRun', dryRun)
-
   const bytecodeSize = (Contract.bytecode.length - 2) / 2
   console.log('Bytecode size in bytes:', bytecodeSize)
 
-  const contract = await (dryRun
-    ? Contract.at(celoRegistryAddress)
-    : Contract.new({
-        gas: 5000000, // Setting the gas limit
-      }))
+  let contract
+
+  while (true) {
+    // without this delay it sometimes fails with ProviderError
+    // the provider error is due two main reasons: RPC rate limit and gas price being too low
+    await delay(getRandomNumber(99, 100))
+    try {
+      contract = await (dryRun
+        ? Contract.at(celoRegistryAddress)
+        : Contract.new({
+            gas: 5000000, // Setting the gas limit
+          }))
+
+      break
+    } catch (error) {
+      console.error(`Error deploying ${contractName}:`, error)
+      console.log('retrying...')
+      // throw new Error(`Error`)
+    }
+  }
 
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(
@@ -327,7 +336,8 @@ module.exports = async (callback: (error?: any) => number) => {
           contractName,
           { ...networks[argv.network], name: argv.network },
           SOLIDITY_08_PACKAGE.name,
-          web3
+          web3,
+          argv.build_directory
         )
         // TODO WARNING: make sure there are no libraries with the same name that don't get deployed
       }

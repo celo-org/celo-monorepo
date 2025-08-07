@@ -2,20 +2,17 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "celo-foundry/Test.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 
-contract AccountsTest is Test {
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+
+contract AccountsTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
 
-  Registry registry;
   Accounts accounts;
   MockValidators validators;
-
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   string constant name = "Account";
   string constant metadataURL = "https://www.celo.org";
@@ -80,14 +77,10 @@ contract AccountsTest is Test {
   event PaymentDelegationSet(address indexed beneficiary, uint256 fraction);
 
   function setUp() public {
-    address registryAddress = 0x000000000000000000000000000000000000ce10;
-
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    super.setUp();
 
     accounts = new Accounts(true);
     validators = new MockValidators();
-
-    registry = Registry(registryAddress);
 
     registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("Accounts", address(accounts));
@@ -97,10 +90,7 @@ contract AccountsTest is Test {
 
     (caller, callerPK) = actorWithPK("caller");
     (caller2, caller2PK) = actorWithPK("caller2");
-  }
-
-  function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    whenL2WithEpochManagerInitialization();
   }
 
   function getParsedSignatureOfAddress(
@@ -204,10 +194,6 @@ contract AccountsTest is Test {
 }
 
 contract AccountsTest_createAccount is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldCreateTheAccount() public {
     assertEq(accounts.isAccount(address(this)), false);
     accounts.createAccount();
@@ -222,10 +208,6 @@ contract AccountsTest_createAccount is AccountsTest {
 }
 
 contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldSetDataEncryptionKey() public {
     accounts.setAccountDataEncryptionKey(dataEncryptionKey);
     assertEq(accounts.getDataEncryptionKey(address(this)), dataEncryptionKey);
@@ -257,10 +239,6 @@ contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
 }
 
 contract AccountsTest_setAccount is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldSetTheNameDataEncryptionKeyAndWalletAddress_WhenTheAccountHasBeenCreated()
     public
   {
@@ -343,10 +321,6 @@ contract AccountsTest_setAccount is AccountsTest {
 }
 
 contract AccountsTest_setWalletAddress is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldRevert_WhenAccountHasNotBeenCreated() public {
     vm.expectRevert("Unknown account");
     accounts.setWalletAddress(address(this), 0, 0x0, 0x0);
@@ -393,10 +367,6 @@ contract AccountsTest_setWalletAddress is AccountsTest {
 }
 
 contract AccountsTest_setMetadataURL is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldRevert_WhenAccountHasNotBeenCreated() public {
     vm.expectRevert("Unknown account");
     accounts.setMetadataURL(metadataURL);
@@ -417,10 +387,6 @@ contract AccountsTest_setMetadataURL is AccountsTest {
 }
 
 contract AccountsTest_batchGetMetadataURL is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function parseSolidityStringArray(
     uint256[] memory stringLengths,
     bytes memory data
@@ -467,10 +433,6 @@ contract AccountsTest_batchGetMetadataURL is AccountsTest {
 }
 
 contract AccountsTest_addStorageRoot is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldRevert_WhenAccountHasNotBeenCreated() public {
     vm.expectRevert("Unknown account");
     accounts.addStorageRoot(storageRoot);
@@ -513,10 +475,6 @@ contract AccountsTest_addStorageRoot is AccountsTest {
 }
 
 contract AccountsTest_removeStorageRoot is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldRevert_WhenAccountHasNotBeenCreated() public {
     vm.expectRevert("Unknown account");
     accounts.removeStorageRoot(0);
@@ -593,10 +551,6 @@ contract AccountsTest_setPaymentDelegation is AccountsTest {
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
   uint256 badFraction = FixidityLib.newFixedFraction(12, 10).unwrap();
 
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldNotBeCallableByNonAccount() public {
     vm.expectRevert("Must first register address with Account.createAccount");
     accounts.setPaymentDelegation((beneficiary), fraction);
@@ -608,13 +562,6 @@ contract AccountsTest_setPaymentDelegation is AccountsTest {
     (address realBeneficiary, uint256 realFraction) = accounts.getPaymentDelegation(address(this));
     assertEq(realBeneficiary, beneficiary);
     assertEq(realFraction, fraction);
-  }
-
-  function test_Revert_SetPaymentDelegation_WhenL2() public {
-    _whenL2();
-    accounts.createAccount();
-    vm.expectRevert("This method is no longer supported in L2.");
-    accounts.setPaymentDelegation(beneficiary, fraction);
   }
 
   function test_ShouldNotAllowFractionGreaterThan1() public {
@@ -668,10 +615,6 @@ contract AccountsTest_deletePaymentDelegation is AccountsTest {
 }
 
 contract AccountsTest_setName is AccountsTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldNotBeCallableByNonAccount() public {
     vm.expectRevert("Register with createAccount to set account name");
     accounts.setName(name);

@@ -7,6 +7,7 @@ import "openzeppelin-solidity/contracts/utils/Address.sol";
 import "openzeppelin-solidity/contracts/utils/EnumerableSet.sol";
 
 import "./interfaces/ILockedGold.sol";
+import "./interfaces/ILockedGoldInitializer.sol";
 
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
@@ -14,15 +15,21 @@ import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
+import "../common/Blockable.sol";
 
+/**
+ * @title Manages the CELO locked for use in Celo governance, election, and
+ * staking systems.
+ */
 contract LockedGold is
   ILockedGold,
+  ILockedGoldInitializer,
   ICeloVersionedContract,
   ReentrancyGuard,
   Initializable,
-  UsingRegistry
+  UsingRegistry,
+  Blockable
 {
-  // TODO add initializer
   using SafeMath for uint256;
   using Address for address payable; // prettier-ignore
   using FixidityLib for FixidityLib.Fraction;
@@ -35,13 +42,13 @@ contract LockedGold is
     uint256 timestamp;
   }
 
-  // NOTE: This contract does not store an account's locked gold that is being used in electing
+  // NOTE: This contract does not store an account's locked CELO that is being used in electing
   // validators.
   struct Balances {
-    // The amount of locked gold that this account has that is not currently participating in
+    // The amount of locked CELO that this account has that is not currently participating in
     // validator elections.
     uint256 nonvoting;
-    // Gold that has been unlocked and will become available for withdrawal.
+    // CELO that has been unlocked and will become available for withdrawal.
     PendingWithdrawal[] pendingWithdrawals;
   }
 
@@ -103,6 +110,9 @@ contract LockedGold is
   );
   event MaxDelegateesCountSet(uint256 value);
 
+  /**
+   * @notice Ensures a function can only be called by an authorized slasher.
+   */
   modifier onlySlasher() {
     require(
       registry.isOneOf(slashingWhitelist, msg.sender),
@@ -130,7 +140,7 @@ contract LockedGold is
   }
 
   /**
-   * @notice Locks gold to be used for voting.
+   * @notice Locks CELO to be used for voting.
    */
   function lock() external payable nonReentrant {
     require(
@@ -169,8 +179,8 @@ contract LockedGold is
   }
 
   /**
-   * @notice Unlocks gold that becomes withdrawable after the unlocking period.
-   * @param value The amount of gold to unlock.
+   * @notice Unlocks CELO that becomes withdrawable after the unlocking period.
+   * @param value The amount of CELO to unlock.
    */
   function unlock(uint256 value) external nonReentrant {
     require(
@@ -180,7 +190,7 @@ contract LockedGold is
     Balances storage account = balances[msg.sender];
 
     uint256 totalLockedGold = getAccountTotalLockedGold(msg.sender);
-    // Prevent unlocking gold when voting on governance proposals so that the gold cannot be
+    // Prevent unlocking CELO when voting on governance proposals so that the CELO cannot be
     // used to vote more than once.
     uint256 remainingLockedGold = totalLockedGold.sub(value);
 
@@ -210,7 +220,7 @@ contract LockedGold is
   }
 
   /**
-   * @notice Relocks gold that has been unlocked but not withdrawn.
+   * @notice Relocks CELO that has been unlocked but not withdrawn.
    * @param index The index of the pending withdrawal to relock from.
    * @param value The value to relock from the specified pending withdrawal.
    */
@@ -234,7 +244,7 @@ contract LockedGold is
   }
 
   /**
-   * @notice Withdraws gold that has been unlocked after the unlocking period has passed.
+   * @notice Withdraws CELO that has been unlocked after the unlocking period has passed.
    * @param index The index of the pending withdrawal to withdraw.
    */
   function withdraw(uint256 index) external nonReentrant {
@@ -254,7 +264,7 @@ contract LockedGold is
   }
 
   /**
-   * Delegates CELO to delegatee.
+   * @notice Delegates CELO to delegatee.
    * @param delegatee The delegatee account.
    * @param delegateFraction Fraction of total CELO that will be delegated from delegatee. Fixidity fraction
    */
@@ -355,7 +365,7 @@ contract LockedGold is
   }
 
   /**
-   * Revokes delegated CELO.
+   * @notice Revokes delegated CELO.
    * @param delegatee The delegatee acount.
    * @param revokeFraction Fraction of total CELO that will be revoked from delegatee. Fixidity fraction
    */
@@ -445,11 +455,11 @@ contract LockedGold is
   }
 
   /**
-   * @notice Slashes `account` by reducing its nonvoting locked gold by `penalty`.
-   *         If there is not enough nonvoting locked gold to slash, calls into
-   *         `Election.slashVotes` to slash the remaining gold. If `account` does not have
-   *         `penalty` worth of locked gold, slashes `account`'s total locked gold.
-   *         Also sends `reward` gold to the reporter, and penalty-reward to the Community Fund.
+   * @notice Slashes `account` by reducing its nonvoting locked CELO by `penalty`.
+   *         If there is not enough nonvoting locked CELO to slash, calls into
+   *         `Election.slashVotes` to slash the remaining CELO. If `account` does not have
+   *         `penalty` worth of locked CELO, slashes `account`'s total locked CELO.
+   *         Also sends `reward` CELO to the reporter, and penalty-reward to the Community Fund.
    * @param account Address of account being slashed.
    * @param penalty Amount to slash account.
    * @param reporter Address of account reporting the slasher.
@@ -459,7 +469,7 @@ contract LockedGold is
    * @param greaters The groups receiving more votes than the i'th group, or 0 if the i'th group
    *                 has the most votes of any validator group.
    * @param indices The indices of the i'th group in `account`'s voting list.
-   * @dev Fails if `reward` is greater than `account`'s total locked gold.
+   * @dev Fails if `reward` is greater than `account`'s total locked CELO.
    */
   function slash(
     address account,
@@ -469,7 +479,7 @@ contract LockedGold is
     address[] calldata lessers,
     address[] calldata greaters,
     uint256[] calldata indices
-  ) external onlySlasher {
+  ) external onlySlasher onlyWhenNotBlocked {
     uint256 maxSlash = Math.min(penalty, getAccountTotalLockedGold(account));
     require(maxSlash >= reward, "reward cannot exceed penalty.");
     // `reporter` receives the reward in locked CELO, so it must be given to an account
@@ -488,13 +498,16 @@ contract LockedGold is
         require(
           getElection().forceDecrementVotes(account, difference, lessers, greaters, indices) ==
             difference,
-          "Cannot revoke enough voting gold."
+          "Cannot revoke enough voting CELO."
         );
       }
       // forceDecrementVotes does not increment nonvoting account balance, so we can't double count
       _decrementNonvotingAccountBalance(account, maxSlash.sub(difference));
       _incrementNonvotingAccountBalance(reporter, reward);
     }
+
+    _updateDelegatedAmount(account);
+
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
     address payable communityFundPayable = address(uint160(communityFund));
     require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
@@ -503,28 +516,42 @@ contract LockedGold is
   }
 
   /**
-   * @notice Returns the total amount of locked gold in the system. Note that this does not include
-   *   gold that has been unlocked but not yet withdrawn.
-   * @return The total amount of locked gold in the system.
+   * @notice Sets the address of the blocking contract.
+   * @param _blockedBy The address of the contract that will determine if this contract is blocked.
+   * @dev Can only be called by the owner of the contract.
+   */
+  function setBlockedByContract(address _blockedBy) external onlyOwner {
+    _setBlockedBy(_blockedBy);
+  }
+
+  /**
+   * @notice Returns the total amount of locked CELO in the system. Note that this does not include
+   *   CELO that has been unlocked but not yet withdrawn.
+   * @return The total amount of locked CELO in the system.
    */
   function getTotalLockedGold() external view returns (uint256) {
     return totalNonvoting.add(getElection().getTotalVotes());
   }
 
   /**
-   * @notice Returns the total amount of locked gold not being used to vote in elections.
-   * @return The total amount of locked gold not being used to vote in elections.
+   * @notice Returns the total amount of locked CELO not being used to vote in elections.
+   * @return The total amount of locked CELO not being used to vote in elections.
    */
   function getNonvotingLockedGold() external view returns (uint256) {
     return totalNonvoting;
   }
 
+  /**
+   * @notice Queries if the given address is an approved slasher.
+   * @param slasher The address to check.
+   * @return Whether or not the address is an approved slasher.
+   */
   function isSlasher(address slasher) external view returns (bool) {
     return (registry.isOneOf(slashingWhitelist, slasher));
   }
 
   /**
-   * Return percentage and amount that delegator assigned to delegateee.
+   * @notice Return percentage and amount that delegator assigned to delegateee.
    * Please note that amount doesn't have to be up to date.
    * In such case please use `updateDelegatedBalance`.
    * @param delegator The delegator address.
@@ -544,16 +571,16 @@ contract LockedGold is
   }
 
   /**
-   * @notice Returns the total amount of non-voting locked gold for an account.
+   * @notice Returns the total amount of non-voting locked CELO for an account.
    * @param account The account.
-   * @return The total amount of non-voting locked gold for an account.
+   * @return The total amount of non-voting locked CELO for an account.
    */
   function getAccountNonvotingLockedGold(address account) external view returns (uint256) {
     return balances[account].nonvoting;
   }
 
   /**
-   * @notice Returns the total amount to withdraw from unlocked gold for an account.
+   * @notice Returns the total amount to withdraw from unlocked CELO for an account.
    * @param account The address of the account.
    * @return Total amount to withdraw.
    */
@@ -566,6 +593,10 @@ contract LockedGold is
     return pendingWithdrawalSum;
   }
 
+  /**
+   * @notice Returns the list of approved slashers.
+   * @return List of Registry identifiers for the approved slashers.
+   */
   function getSlashingWhitelist() external view returns (bytes32[] memory) {
     return slashingWhitelist;
   }
@@ -616,7 +647,7 @@ contract LockedGold is
   }
 
   /**
-   * @notice Sets the duration in seconds users must wait before withdrawing gold after unlocking.
+   * @notice Sets the duration in seconds users must wait before withdrawing CELO after unlocking.
    * @param value The unlocking period in seconds.
    */
   function setUnlockingPeriod(uint256 value) public onlyOwner {
@@ -635,8 +666,8 @@ contract LockedGold is
   }
 
   /**
-   * Updates real delegated amount to delegatee.
-   * There might be discrepancy because of validator rewards or extra locked gold.
+   * @notice Updates real delegated amount to delegatee.
+   * There might be discrepancy because of validator rewards or extra locked CELO.
    * Voting power will always be smaller or equal to what it is supposed to be.
    * @param delegator The delegator address.
    * @param delegatee The delegatee address.
@@ -649,8 +680,8 @@ contract LockedGold is
   }
 
   /**
-   * Updates real delegated amount to all delegator's delegatees.
-   * There might be discrepancy because of validator rewards or extra locked gold.
+   * @notice Updates real delegated amount to all delegator's delegatees.
+   * There might be discrepancy because of validator rewards or extra locked CELO.
    * @param delegator The delegator address.
    */
   function updateDelegatedAmount(address delegator) public {
@@ -668,7 +699,7 @@ contract LockedGold is
   }
 
   /**
-   * Retuns all delegatees of delegator
+   * @notice Retuns all delegatees of delegator
    * @param delegator The delegator address.
    */
   function getDelegateesOfDelegator(address delegator) public view returns (address[] memory) {
@@ -708,7 +739,7 @@ contract LockedGold is
   }
 
   /**
-   * Returns how many percents of CELO is account delegating.
+   * @notice Returns how many percents of CELO is account delegating.
    * @param account The account address.
    */
   function getAccountTotalDelegatedFraction(address account) public view returns (uint256) {
@@ -717,9 +748,9 @@ contract LockedGold is
   }
 
   /**
-   * @notice Returns the total amount of locked gold for an account.
+   * @notice Returns the total amount of locked CELO for an account.
    * @param account The account.
-   * @return The total amount of locked gold for an account.
+   * @return The total amount of locked CELO for an account.
    */
   function getAccountTotalLockedGold(address account) public view returns (uint256) {
     uint256 total = balances[account].nonvoting;
@@ -727,9 +758,9 @@ contract LockedGold is
   }
 
   /**
-   * @notice Returns the total amount of locked gold + delegated gold for an account.
+   * @notice Returns the total amount of locked CELO + delegated CELO for an account.
    * @param account The account.
-   * @return The total amount of locked gold + delegated gold for an account.
+   * @return The total amount of locked CELO + delegated CELO for an account.
    */
   function getAccountTotalGovernanceVotingPower(address account) public view returns (uint256) {
     FixidityLib.Fraction memory availableUndelegatedPercents = FixidityLib.fixed1().subtract(
@@ -746,7 +777,7 @@ contract LockedGold is
   }
 
   /**
-   * Returns expected vs real delegated amount.
+   * @notice Returns expected and real delegated amount.
    * If there is a discrepancy it can be fixed by calling `updateDelegatedAmount` function.
    * @param delegator The delegator address.
    * @param delegatee The delegatee address.
@@ -767,8 +798,8 @@ contract LockedGold is
   }
 
   /**
-   * Updates real delegated amount to delegatee.
-   * There might be discrepancy because of validator rewards or extra locked gold.
+   * @notice Updates real delegated amount to delegatee.
+   * There might be discrepancy because of validator rewards or extra locked CELO.
    * Voting power will always be smaller or equal to what it is supposed to be.
    * @param delegator The delegator address.
    * @param delegatee The delegatee address.
@@ -819,7 +850,7 @@ contract LockedGold is
   }
 
   /**
-   * Revokes amount during unlocking. It will revoke votes from voted proposals if necessary.
+   * @notice Revokes amount during unlocking. It will revoke votes from voted proposals if necessary.
    * @param delegator The delegator account.
    * @param amountToRevoke The amount to revoke.
    */
@@ -847,7 +878,7 @@ contract LockedGold is
   }
 
   /**
-   * Decreases delegatee voting power when removing or unlocking delegated votes.
+   * @notice Decreases delegatee voting power when removing or unlocking delegated votes.
    * @param delegatee The delegatee.
    * @param amountToRevoke Amount to revoke.
    * @param delegateeInfo Delegatee info.
@@ -890,7 +921,7 @@ contract LockedGold is
   }
 
   /**
-   * Returns expected vs real delegated amount.
+   * @notice Returns expected and real delegated amount.
    * If there is a discrepancy it can be fixed by calling `updateDelegatedAmount` function.
    * @param delegator The delegator address.
    * @param delegatee The delegatee address.

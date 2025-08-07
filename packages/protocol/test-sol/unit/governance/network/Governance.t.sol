@@ -1,6 +1,7 @@
 pragma solidity ^0.5.13;
 
-import "celo-foundry/Test.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 
@@ -11,36 +12,14 @@ import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/governance/test/TestTransactions.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/Signatures.sol";
-import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 
 contract GovernanceMock is Governance(true) {
   address[] validatorSet;
 
-  // Minimally override core functions from UsingPrecompiles
-  function numberValidatorsInCurrentSet() public view returns (uint256) {
-    return validatorSet.length;
-  }
-
-  function numberValidatorsInSet(uint256) public view returns (uint256) {
-    return validatorSet.length;
-  }
-
-  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
-    return validatorSet[index];
-  }
-
   // Expose test utilities
   function addValidator(address validator) external {
     validatorSet.push(validator);
-  }
-
-  // exposes removeVotesWhenRevokingDelegatedVotes for tests
-  function removeVotesWhenRevokingDelegatedVotesTest(
-    address account,
-    uint256 maxAmountAllowed
-  ) public {
-    _removeVotesWhenRevokingDelegatedVotes(account, maxAmountAllowed);
   }
 
   function setDeprecatedWeight(
@@ -54,9 +33,30 @@ contract GovernanceMock is Governance(true) {
     voteRecord.deprecated_weight = weight;
     voteRecord.proposalId = proposalId;
   }
+
+  // exposes removeVotesWhenRevokingDelegatedVotes for tests
+  function removeVotesWhenRevokingDelegatedVotesTest(
+    address account,
+    uint256 maxAmountAllowed
+  ) public {
+    _removeVotesWhenRevokingDelegatedVotes(account, maxAmountAllowed);
+  }
+
+  // Minimally override core functions from UsingPrecompiles
+  function numberValidatorsInCurrentSet() public view returns (uint256) {
+    return validatorSet.length;
+  }
+
+  function numberValidatorsInSet(uint256) public view returns (uint256) {
+    return validatorSet.length;
+  }
+
+  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
+    return validatorSet[index];
+  }
 }
 
-contract GovernanceTest is Test {
+contract GovernanceTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
   using BytesLib for bytes;
 
@@ -71,6 +71,7 @@ contract GovernanceTest is Test {
   address accVoter;
   address accOwner;
   address accApprover;
+  address accCouncil;
   uint256 constant DEPOSIT = 5;
   uint256 constant VOTER_GOLD = 100;
   uint256 constant REFERENDUM_STAGE_DURATION = 5 * 60;
@@ -95,12 +96,17 @@ contract GovernanceTest is Test {
   FixidityLib.Fraction participationBaseline;
   FixidityLib.Fraction participationFloor;
   FixidityLib.Fraction baselineQuorumFactor;
+  uint256 NEW_VALUE = 45;
+  uint256 proposalId;
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   function setUp() public {
+    super.setUp();
     // Define Accounts
     accVoter = actor("voter");
     accOwner = actor("owner");
     accApprover = actor("approver");
+    accCouncil = actor("council");
 
     baselineUpdateFactor = FixidityLib.newFixedFraction(1, 5);
     participationBaseline = FixidityLib.newFixedFraction(5, 10);
@@ -120,83 +126,11 @@ contract GovernanceTest is Test {
     vm.warp(100 * 60);
 
     setUpContracts();
+
     setUpVoterAccount();
+
     setUpProposalStubs();
-  }
-
-  function setUpVoterAccount() private {
-    vm.prank(accVoter);
-    accounts.createAccount();
-
-    mockLockedGold.setAccountTotalLockedGold(accVoter, VOTER_GOLD);
-    mockLockedGold.setAccountTotalGovernancePower(accVoter, VOTER_GOLD);
-  }
-
-  function setUpContracts() private {
-    vm.startPrank(accOwner);
-
-    Registry registry = new Registry(true);
-
-    mockValidators = new MockValidators();
-    registry.setAddressFor("Validators", address(mockValidators));
-
-    mockLockedGold = new MockLockedGold();
-    mockLockedGold.setTotalLockedGold(VOTER_GOLD);
-    registry.setAddressFor("LockedGold", address(mockLockedGold));
-
-    accounts = new Accounts(true);
-    accounts.initialize(address(registry));
-    registry.setAddressFor("Accounts", address(accounts));
-
-    governance = new GovernanceMock();
-    governance.initialize(
-      address(registry),
-      accApprover,
-      CONCURRENT_PROPOSALS,
-      DEPOSIT,
-      QUERY_EXPIRY,
-      DEQUEUE_FREQUENCY,
-      REFERENDUM_STAGE_DURATION,
-      EXECUTION_STAGE_DURATION,
-      participationBaseline.unwrap(),
-      participationFloor.unwrap(),
-      baselineUpdateFactor.unwrap(),
-      baselineQuorumFactor.unwrap()
-    );
-    vm.stopPrank();
-  }
-
-  function setUpProposalStubs() private {
-    testTransactions = new TestTransactions();
-
-    string memory setValueSignature = "setValue(uint256,uint256,bool)";
-
-    // Define OK Proposal
-    okProp.data = abi.encodeWithSignature(setValueSignature, 1, 1, true);
-    okProp.dataLengths.push(okProp.data.length);
-    okProp.values.push(0);
-    okProp.destinations.push(address(testTransactions));
-    okProp.description = "1 tx proposal";
-
-    // Define two TX proposal
-    bytes memory txDataFirst = abi.encodeWithSignature(setValueSignature, 1, 1, true);
-    bytes memory txDataSecond = abi.encodeWithSignature(setValueSignature, 2, 1, true);
-
-    twoTxProp.values.push(0);
-    twoTxProp.values.push(0);
-    twoTxProp.destinations.push(address(testTransactions));
-    twoTxProp.destinations.push(address(testTransactions));
-    twoTxProp.data = txDataFirst.concat(txDataSecond);
-    twoTxProp.dataLengths.push(txDataFirst.length);
-    twoTxProp.dataLengths.push(txDataSecond.length);
-    twoTxProp.description = "2 txs proposal";
-
-    // Define failing proposal
-    failingProp.data = abi.encodeWithSignature(setValueSignature, 3, 1, false);
-    failingProp.dataLengths.push(failingProp.data.length);
-    failingProp.values.push(0);
-    failingProp.destinations.push(address(testTransactions));
-    failingProp.description = "failing proposal";
+    whenL2WithEpochManagerInitialization();
   }
 
   function assertNotEq(uint256 a, uint256 b) internal {
@@ -208,7 +142,7 @@ contract GovernanceTest is Test {
     }
   }
 
-  function makeValidProposal() internal returns (uint256 proposalId) {
+  function makeValidProposal() internal returns (uint256) {
     return
       governance.propose.value(DEPOSIT)(
         okProp.values,
@@ -219,7 +153,7 @@ contract GovernanceTest is Test {
       );
   }
 
-  function makeEmptyProposal() internal returns (uint256 proposalId) {
+  function makeEmptyProposal() internal returns (uint256) {
     Proposal memory emptyProposal;
     return
       governance.propose.value(DEPOSIT)(
@@ -254,9 +188,91 @@ contract GovernanceTest is Test {
     vm.prank(account);
     accounts.authorizeVoteSigner(vm.addr(signerPk), v, r, s);
   }
+  function setUpVoterAccount() public {
+    vm.prank(accVoter);
+    accounts.createAccount();
+
+    mockLockedGold.setAccountTotalLockedGold(accVoter, VOTER_GOLD);
+    mockLockedGold.setAccountTotalGovernancePower(accVoter, VOTER_GOLD);
+  }
+
+  function setUpContracts() public {
+    vm.startPrank(accOwner);
+
+    mockValidators = new MockValidators();
+
+    mockLockedGold = new MockLockedGold();
+    mockLockedGold.setTotalLockedGold(VOTER_GOLD);
+
+    accounts = new Accounts(true);
+    accounts.initialize(address(registry));
+
+    governance = new GovernanceMock();
+    governance.initialize(
+      address(registry),
+      accApprover,
+      CONCURRENT_PROPOSALS,
+      DEPOSIT,
+      QUERY_EXPIRY,
+      DEQUEUE_FREQUENCY,
+      REFERENDUM_STAGE_DURATION,
+      EXECUTION_STAGE_DURATION,
+      participationBaseline.unwrap(),
+      participationFloor.unwrap(),
+      baselineUpdateFactor.unwrap(),
+      baselineQuorumFactor.unwrap()
+    );
+    vm.stopPrank();
+
+    registry.setAddressFor("Validators", address(mockValidators));
+    registry.setAddressFor("LockedGold", address(mockLockedGold));
+    registry.setAddressFor("Accounts", address(accounts));
+  }
+
+  function setUpProposalStubs() public {
+    testTransactions = new TestTransactions();
+
+    string memory setValueSignature = "setValue(uint256,uint256,bool)";
+
+    // Define OK Proposal
+    okProp.data = abi.encodeWithSignature(setValueSignature, 1, 1, true);
+    okProp.dataLengths.push(okProp.data.length);
+    okProp.values.push(0);
+    okProp.destinations.push(address(testTransactions));
+    okProp.description = "1 tx proposal";
+
+    // Define two TX proposal
+    bytes memory txDataFirst = abi.encodeWithSignature(setValueSignature, 1, 1, true);
+    bytes memory txDataSecond = abi.encodeWithSignature(setValueSignature, 2, 1, true);
+
+    twoTxProp.values.push(0);
+    twoTxProp.values.push(0);
+    twoTxProp.destinations.push(address(testTransactions));
+    twoTxProp.destinations.push(address(testTransactions));
+    twoTxProp.data = txDataFirst.concat(txDataSecond);
+    twoTxProp.dataLengths.push(txDataFirst.length);
+    twoTxProp.dataLengths.push(txDataSecond.length);
+    twoTxProp.description = "2 txs proposal";
+
+    // Define failing proposal
+    failingProp.data = abi.encodeWithSignature(setValueSignature, 3, 1, false);
+    failingProp.dataLengths.push(failingProp.data.length);
+    failingProp.values.push(0);
+    failingProp.destinations.push(address(testTransactions));
+    failingProp.description = "failing proposal";
+  }
 }
 
 contract GovernanceTest_initialize is GovernanceTest {
+  function setUp() public {
+    super.setUp();
+
+    setUpContracts();
+
+    setUpVoterAccount();
+
+    setUpProposalStubs();
+  }
   function test_SetsTheOwner() public {
     assertEq(governance.owner(), accOwner);
   }
@@ -316,9 +332,9 @@ contract GovernanceTest_initialize is GovernanceTest {
 }
 
 contract GovernanceTest_setApprover is GovernanceTest {
-  event ApproverSet(address indexed approver);
-
   address NEW_APPROVER = address(7777);
+
+  event ApproverSet(address indexed approver);
 
   function test_SetsValue() public {
     vm.prank(accOwner);
@@ -333,19 +349,28 @@ contract GovernanceTest_setApprover is GovernanceTest {
     governance.setApprover(NEW_APPROVER);
   }
 
-  function test_RevertIf_NullAddress() public {
+  function test_Reverts_IfNullAddress() public {
     vm.expectRevert("Approver cannot be 0");
     vm.prank(accOwner);
     governance.setApprover(address(0));
   }
 
-  function test_RevertIf_Unchanged() public {
+  function test_Reverts_IfUnchanged() public {
     vm.expectRevert("Approver unchanged");
     vm.prank(accOwner);
     governance.setApprover(accApprover);
   }
 
-  function test_RevertWhen_CalledByNotOwner() public {
+  function test_Reverts_WhenSetToSecurityCouncilAddress() public {
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+
+    vm.expectRevert("Approver cannot be council");
+    vm.prank(accOwner);
+    governance.setApprover(accCouncil);
+  }
+
+  function test_Reverts_WhenCalledByNotOwner() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(address(9999));
     governance.setApprover(NEW_APPROVER);
@@ -353,9 +378,8 @@ contract GovernanceTest_setApprover is GovernanceTest {
 }
 
 contract GovernanceTest_setMinDeposit is GovernanceTest {
-  event MinDepositSet(uint256 minDeposit);
-
   uint256 NEW_MINDEPOSIT = 45;
+  event MinDepositSet(uint256 minDeposit);
 
   function test_SetsValue() public {
     vm.prank(accOwner);
@@ -384,9 +408,8 @@ contract GovernanceTest_setMinDeposit is GovernanceTest {
 }
 
 contract GovernanceTest_setConcurrentProposals is GovernanceTest {
-  event ConcurrentProposalsSet(uint256 concurrentProposals);
-
   uint256 NEW_CONCURRENT_PROPOSALS = 45;
+  event ConcurrentProposalsSet(uint256 concurrentProposals);
 
   function test_SetsValue() public {
     vm.prank(accOwner);
@@ -423,8 +446,6 @@ contract GovernanceTest_setConcurrentProposals is GovernanceTest {
 contract GovernanceTest_setQueueExpiry is GovernanceTest {
   event QueueExpirySet(uint256 queueExpiry);
 
-  uint256 NEW_VALUE = 45;
-
   function test_SetsValue() public {
     vm.prank(accOwner);
     governance.setQueueExpiry(NEW_VALUE);
@@ -459,8 +480,6 @@ contract GovernanceTest_setQueueExpiry is GovernanceTest {
 
 contract GovernanceTest_setDequeueFrequency is GovernanceTest {
   event DequeueFrequencySet(uint256 dequeueFrequency);
-
-  uint256 NEW_VALUE = 45;
 
   function test_SetsValue() public {
     vm.prank(accOwner);
@@ -497,8 +516,6 @@ contract GovernanceTest_setDequeueFrequency is GovernanceTest {
 contract GovernanceTest_setReferendumStageDuration is GovernanceTest {
   event ReferendumStageDurationSet(uint256 value);
 
-  uint256 NEW_VALUE = 45;
-
   function test_SetsValue() public {
     vm.prank(accOwner);
     governance.setReferendumStageDuration(NEW_VALUE);
@@ -533,8 +550,6 @@ contract GovernanceTest_setReferendumStageDuration is GovernanceTest {
 
 contract GovernanceTest_setExecutionStageDuration is GovernanceTest {
   event ExecutionStageDurationSet(uint256 dequeueFrequency);
-
-  uint256 NEW_VALUE = 45;
 
   function test_SetsValue() public {
     vm.prank(accOwner);
@@ -571,17 +586,10 @@ contract GovernanceTest_setExecutionStageDuration is GovernanceTest {
 contract GovernanceTest_setParticipationFloor is GovernanceTest {
   event ParticipationFloorSet(uint256 value);
 
-  uint256 NEW_VALUE = 45;
-
   function test_SetsValue() public {
     vm.prank(accOwner);
     governance.setParticipationFloor(NEW_VALUE);
-    (
-      uint256 baseline,
-      uint256 baselineFloor,
-      uint256 _baselineUpdateFactor,
-      uint256 _baselineQuorumFactor
-    ) = governance.getParticipationParameters();
+    (, uint256 baselineFloor, , ) = governance.getParticipationParameters();
     assertEq(baselineFloor, NEW_VALUE);
   }
 
@@ -608,17 +616,10 @@ contract GovernanceTest_setParticipationFloor is GovernanceTest {
 contract GovernanceTest_setBaselineUpdateFactor is GovernanceTest {
   event ParticipationBaselineUpdateFactorSet(uint256 value);
 
-  uint256 NEW_VALUE = 45;
-
   function test_SetsValue() public {
     vm.prank(accOwner);
     governance.setBaselineUpdateFactor(NEW_VALUE);
-    (
-      uint256 baseline,
-      uint256 baselineFloor,
-      uint256 _baselineUpdateFactor,
-      uint256 _baselineQuorumFactor
-    ) = governance.getParticipationParameters();
+    (, , uint256 _baselineUpdateFactor, ) = governance.getParticipationParameters();
     assertEq(_baselineUpdateFactor, NEW_VALUE);
   }
 
@@ -645,17 +646,10 @@ contract GovernanceTest_setBaselineUpdateFactor is GovernanceTest {
 contract GovernanceTest_setBaselineQuorumFactor is GovernanceTest {
   event ParticipationBaselineQuorumFactorSet(uint256 value);
 
-  uint256 NEW_VALUE = 45;
-
   function test_SetsValue() public {
     vm.prank(accOwner);
     governance.setBaselineQuorumFactor(NEW_VALUE);
-    (
-      uint256 baseline,
-      uint256 baselineFloor,
-      uint256 _baselineUpdateFactor,
-      uint256 _baselineQuorumFactor
-    ) = governance.getParticipationParameters();
+    (, , , uint256 _baselineQuorumFactor) = governance.getParticipationParameters();
     assertEq(_baselineQuorumFactor, NEW_VALUE);
   }
 
@@ -755,6 +749,81 @@ contract GovernanceTest_setConstitution is GovernanceTest {
   }
 }
 
+contract GovernanceTest_setSecurityCouncil is GovernanceTest {
+  event SecurityCouncilSet(address indexed council);
+
+  function test_ShouldSetSecurityCouncil() public {
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+
+    assertEq(governance.securityCouncil(), accCouncil);
+  }
+
+  function test_Emits_SecurityCouncilSetEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit SecurityCouncilSet(accCouncil);
+
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+  }
+
+  function test_Reverts_WhenCalledByNonOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    governance.setSecurityCouncil(accCouncil);
+  }
+
+  function test_Reverts_WhenSetToAddressZero() public {
+    vm.expectRevert("Council cannot be address zero");
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(address(0));
+  }
+
+  function test_Reverts_WhenSetToSameAddress() public {
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+
+    vm.expectRevert("Council unchanged");
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+  }
+
+  function test_Reverts_WhenSetToApproverAddress() public {
+    vm.expectRevert("Council cannot be approver");
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accApprover);
+  }
+}
+
+contract GovernanceTest_setHotfixExecutionTimeWindow is GovernanceTest {
+  event HotfixExecutionTimeWindowSet(uint256 timeDelta);
+
+  function test_ShouldSetHotfixExecutionTimeWindow() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+
+    assertEq(governance.hotfixExecutionTimeWindow(), DAY);
+  }
+
+  function test_Emits_HotfixExecutionTimeWindowSetEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit HotfixExecutionTimeWindowSet(DAY);
+
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+  }
+
+  function test_Reverts_WhenCalledByNonOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    governance.setHotfixExecutionTimeWindow(DAY);
+  }
+
+  function test_Reverts_WhenSetToZero() public {
+    vm.expectRevert("Execution time window cannot be zero");
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(0);
+  }
+}
+
 contract GovernanceTest_propose is GovernanceTest {
   event ProposalQueued(
     uint256 indexed proposalId,
@@ -784,69 +853,6 @@ contract GovernanceTest_propose is GovernanceTest {
 
     assertEq(proposalIds[0], 1);
     assertEq(upVotes[0], 0);
-  }
-
-  function check_registerProposal(Proposal memory proposal) private {
-    uint256 id = governance.propose.value(DEPOSIT)(
-      proposal.values,
-      proposal.destinations,
-      proposal.data,
-      proposal.dataLengths,
-      proposal.description
-    );
-
-    (
-      address proposer,
-      uint256 deposit,
-      uint256 timestamp,
-      uint256 txCount,
-      string memory description,
-      uint256 networkWeight,
-      bool approved
-    ) = governance.getProposal(id);
-
-    assertEq(proposer, address(this));
-    assertEq(deposit, DEPOSIT);
-    assertEq(timestamp, block.timestamp);
-    assertEq(txCount, proposal.values.length);
-    assertEq(description, proposal.description);
-    assertEq(networkWeight, 0);
-    assertEq(approved, false);
-  }
-
-  function check_registerProposalTransactions(Proposal memory proposal) private {
-    uint256 id = governance.propose.value(DEPOSIT)(
-      proposal.values,
-      proposal.destinations,
-      proposal.data,
-      proposal.dataLengths,
-      proposal.description
-    );
-
-    uint256 dataPosition = 0;
-    for (uint256 i = 0; i < proposal.values.length; i++) {
-      (uint256 value, address destination, bytes memory data) = governance.getProposalTransaction(
-        id,
-        i
-      );
-      assertEq(proposal.values[i], value);
-      assertEq(proposal.destinations[i], destination);
-      bytes memory expectedData = proposal.data.slice(dataPosition, proposal.dataLengths[i]);
-      assertEq(data, expectedData);
-      dataPosition = dataPosition + proposal.dataLengths[i];
-    }
-  }
-
-  function check_emitsProposalQueuedEvents(Proposal memory proposal) private {
-    vm.expectEmit(true, true, true, true);
-    emit ProposalQueued(1, address(this), proposal.values.length, DEPOSIT, block.timestamp);
-    governance.propose.value(DEPOSIT)(
-      proposal.values,
-      proposal.destinations,
-      proposal.data,
-      proposal.dataLengths,
-      proposal.description
-    );
   }
 
   function test_registerTheProposal_whenProposalHasZeroTransactions() public {
@@ -927,13 +933,74 @@ contract GovernanceTest_propose is GovernanceTest {
     assertEq(governance.getQueueLength(), 1);
     assertEq(governance.lastDequeue(), originalLastDequeue);
   }
+
+  function check_registerProposal(Proposal memory proposal) private {
+    uint256 id = governance.propose.value(DEPOSIT)(
+      proposal.values,
+      proposal.destinations,
+      proposal.data,
+      proposal.dataLengths,
+      proposal.description
+    );
+
+    (
+      address proposer,
+      uint256 deposit,
+      uint256 timestamp,
+      uint256 txCount,
+      string memory description,
+      uint256 networkWeight,
+      bool approved
+    ) = governance.getProposal(id);
+
+    assertEq(proposer, address(this));
+    assertEq(deposit, DEPOSIT);
+    assertEq(timestamp, block.timestamp);
+    assertEq(txCount, proposal.values.length);
+    assertEq(description, proposal.description);
+    assertEq(networkWeight, 0);
+    assertEq(approved, false);
+  }
+
+  function check_registerProposalTransactions(Proposal memory proposal) private {
+    uint256 id = governance.propose.value(DEPOSIT)(
+      proposal.values,
+      proposal.destinations,
+      proposal.data,
+      proposal.dataLengths,
+      proposal.description
+    );
+
+    uint256 dataPosition = 0;
+    for (uint256 i = 0; i < proposal.values.length; i++) {
+      (uint256 value, address destination, bytes memory data) = governance.getProposalTransaction(
+        id,
+        i
+      );
+      assertEq(proposal.values[i], value);
+      assertEq(proposal.destinations[i], destination);
+      bytes memory expectedData = proposal.data.slice(dataPosition, proposal.dataLengths[i]);
+      assertEq(data, expectedData);
+      dataPosition = dataPosition + proposal.dataLengths[i];
+    }
+  }
+
+  function check_emitsProposalQueuedEvents(Proposal memory proposal) private {
+    vm.expectEmit(true, true, true, true);
+    emit ProposalQueued(1, address(this), proposal.values.length, DEPOSIT, block.timestamp);
+    governance.propose.value(DEPOSIT)(
+      proposal.values,
+      proposal.destinations,
+      proposal.data,
+      proposal.dataLengths,
+      proposal.description
+    );
+  }
 }
 
 contract GovernanceTest_upvote is GovernanceTest {
   event ProposalUpvoted(uint256 indexed proposalId, address indexed account, uint256 upvotes);
   event ProposalExpired(uint256 indexed proposalId);
-
-  uint256 proposalId;
 
   function setUp() public {
     super.setUp();
@@ -985,27 +1052,6 @@ contract GovernanceTest_upvote is GovernanceTest {
 
     assertEq(proposalIds[0], newProposalId);
     assertEq(upvotes[0], VOTER_GOLD);
-  }
-
-  function setUp_whenUpvotedProposalIsExpired() private {
-    uint256 queueExpiry = governance.queueExpiry();
-
-    // Prevent dequeues for the sake of this test.
-    vm.prank(accOwner);
-    governance.setDequeueFrequency(queueExpiry * 2);
-
-    // make another proposal (id=2)
-    uint256 newProposalId = makeValidProposal();
-
-    address accOtherVoter = actor("otherVoter");
-    vm.startPrank(accOtherVoter);
-    accounts.createAccount();
-    mockLockedGold.setAccountTotalLockedGold(accOtherVoter, VOTER_GOLD);
-    mockLockedGold.setAccountTotalGovernancePower(accOtherVoter, VOTER_GOLD);
-    governance.upvote(newProposalId, proposalId, 0);
-    vm.stopPrank();
-
-    vm.warp(block.timestamp + queueExpiry);
   }
 
   function test_returnsFalse_whenUpvotedProposalIsExpired() public {
@@ -1064,21 +1110,6 @@ contract GovernanceTest_upvote is GovernanceTest {
     governance.upvote(proposalId, 0, 0);
   }
 
-  function setUp_whenPreviousUpvotedProposalIsInQueueAndExpired()
-    private
-    returns (uint256 newProposalId)
-  {
-    uint256 queueExpiry = 60;
-    vm.prank(accOwner);
-    governance.setQueueExpiry(queueExpiry);
-
-    vm.prank(accVoter);
-    governance.upvote(proposalId, 0, 0);
-
-    vm.warp(block.timestamp + queueExpiry);
-    return makeValidProposal();
-  }
-
   function test_increaseNumberOfUpvotesForTheProposal_whenPreviousUpvotedProposalIsInQueueAndExpired()
     public
   {
@@ -1128,6 +1159,42 @@ contract GovernanceTest_upvote is GovernanceTest {
     vm.prank(accVoter);
     governance.upvote(newProposalId, 0, 0);
   }
+
+  function setUp_whenUpvotedProposalIsExpired() private {
+    uint256 queueExpiry = governance.queueExpiry();
+
+    // Prevent dequeues for the sake of this test.
+    vm.prank(accOwner);
+    governance.setDequeueFrequency(queueExpiry * 2);
+
+    // make another proposal (id=2)
+    uint256 newProposalId = makeValidProposal();
+
+    address accOtherVoter = actor("otherVoter");
+    vm.startPrank(accOtherVoter);
+    accounts.createAccount();
+    mockLockedGold.setAccountTotalLockedGold(accOtherVoter, VOTER_GOLD);
+    mockLockedGold.setAccountTotalGovernancePower(accOtherVoter, VOTER_GOLD);
+    governance.upvote(newProposalId, proposalId, 0);
+    vm.stopPrank();
+
+    vm.warp(block.timestamp + queueExpiry);
+  }
+
+  function setUp_whenPreviousUpvotedProposalIsInQueueAndExpired()
+    private
+    returns (uint256 newProposalId)
+  {
+    uint256 queueExpiry = 60;
+    vm.prank(accOwner);
+    governance.setQueueExpiry(queueExpiry);
+
+    vm.prank(accVoter);
+    governance.upvote(proposalId, 0, 0);
+
+    vm.warp(block.timestamp + queueExpiry);
+    return makeValidProposal();
+  }
 }
 
 contract GovernanceTest_revokeUpvote is GovernanceTest {
@@ -1137,8 +1204,6 @@ contract GovernanceTest_revokeUpvote is GovernanceTest {
     address indexed account,
     uint256 revokedUpvotes
   );
-
-  uint256 proposalId;
 
   function setUp() public {
     super.setUp();
@@ -1213,7 +1278,6 @@ contract GovernanceTest_revokeUpvote is GovernanceTest {
   function test_markAccountAsNotHavingUpvoted_whenMoreThanDequeueFrequencySinceLastDequeue()
     public
   {
-    uint256 originalLastDequeue = governance.lastDequeue();
     vm.warp(block.timestamp + governance.dequeueFrequency());
     governance.revokeUpvote(0, 0);
     (uint256 recordId, uint256 recordWeight) = governance.getUpvoteRecord(accVoter);
@@ -1223,8 +1287,6 @@ contract GovernanceTest_revokeUpvote is GovernanceTest {
 }
 
 contract GovernanceTest_withdraw is GovernanceTest {
-  uint256 proposalId;
-
   address accProposer;
 
   function setUp() public {
@@ -1262,11 +1324,10 @@ contract GovernanceTest_withdraw is GovernanceTest {
 }
 
 contract GovernanceTest_approve is GovernanceTest {
+  uint256 INDEX = 0; // first proposal index
+
   event ProposalDequeued(uint256 indexed proposalId, uint256 timestamp);
   event ProposalApproved(uint256 indexed proposalId);
-
-  uint256 INDEX = 0; // first proposal index
-  uint256 proposalId;
 
   function setUp() public {
     super.setUp();
@@ -1437,6 +1498,8 @@ contract GovernanceTest_approve is GovernanceTest {
 }
 
 contract GovernanceTest_revokeVotes is GovernanceTest {
+  uint256 numVoted;
+
   event ProposalVoteRevokedV2(
     uint256 indexed proposalId,
     address indexed account,
@@ -1444,28 +1507,6 @@ contract GovernanceTest_revokeVotes is GovernanceTest {
     uint256 noVotes,
     uint256 abstainVotes
   );
-
-  uint256 numVoted;
-
-  function setUp() public {
-    super.setUp();
-    vm.prank(accOwner);
-    governance.setConcurrentProposals(3);
-
-    makeValidProposal();
-    makeValidProposal();
-    makeValidProposal();
-
-    vm.warp(block.timestamp + governance.dequeueFrequency());
-
-    vm.startPrank(accApprover);
-    governance.approve(1, 0);
-    governance.approve(2, 1);
-    governance.approve(3, 2);
-    vm.stopPrank();
-
-    vm.startPrank(accVoter);
-  }
 
   modifier voteForEachNumVoted() {
     for (uint256 _numVoted = 0; _numVoted < 3; _numVoted++) {
@@ -1493,6 +1534,26 @@ contract GovernanceTest_revokeVotes is GovernanceTest {
       _;
       vm.revertTo(snapshot);
     }
+  }
+
+  function setUp() public {
+    super.setUp();
+    vm.prank(accOwner);
+    governance.setConcurrentProposals(3);
+
+    makeValidProposal();
+    makeValidProposal();
+    makeValidProposal();
+
+    vm.warp(block.timestamp + governance.dequeueFrequency());
+
+    vm.startPrank(accApprover);
+    governance.approve(1, 0);
+    governance.approve(2, 1);
+    governance.approve(3, 2);
+    vm.stopPrank();
+
+    vm.startPrank(accVoter);
   }
 
   function test_unsetMostRecentReferendumProposalVotedOn_whenAccountHasVotedOnXProposal()
@@ -1572,10 +1633,7 @@ contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest {
     uint256 noVotes,
     uint256 abstainVotes
   );
-
   event ParticipationBaselineUpdated(uint256 participationBaseline);
-
-  uint256 proposalId;
 
   function setUp() public {
     super.setUp();
@@ -1689,7 +1747,7 @@ contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest {
     vm.startPrank(accVoter);
     governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
     governance.vote(proposalId, 0, Proposals.VoteValue.No);
-    (uint256 yes, uint256 no, uint256 abstain) = governance.getVoteTotals(proposalId);
+    (uint256 yes, uint256 no, ) = governance.getVoteTotals(proposalId);
     assertEq(yes, 0);
     assertEq(no, VOTER_GOLD);
   }
@@ -1698,8 +1756,7 @@ contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest {
     vm.startPrank(accVoter);
     governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
     governance.vote(proposalId, 0, Proposals.VoteValue.No);
-    (uint256 id, uint256 _1, uint256 _2, uint256 yes, uint256 no, uint256 abstain) = governance
-      .getVoteRecord(accVoter, 0);
+    (uint256 id, , , uint256 yes, uint256 no, ) = governance.getVoteRecord(accVoter, 0);
     assertEq(id, proposalId);
     assertEq(yes, 0);
     assertEq(no, VOTER_GOLD);
@@ -1709,7 +1766,7 @@ contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest {
     vm.startPrank(accVoter);
     governance.vote(proposalId, 0, Proposals.VoteValue.No);
     governance.vote(proposalId, 0, Proposals.VoteValue.Abstain);
-    (uint256 yes, uint256 no, uint256 abstain) = governance.getVoteTotals(proposalId);
+    (, uint256 no, uint256 abstain) = governance.getVoteTotals(proposalId);
     assertEq(no, 0);
     assertEq(abstain, VOTER_GOLD);
   }
@@ -1718,8 +1775,7 @@ contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest {
     vm.startPrank(accVoter);
     governance.vote(proposalId, 0, Proposals.VoteValue.No);
     governance.vote(proposalId, 0, Proposals.VoteValue.Abstain);
-    (uint256 id, uint256 _1, uint256 _2, uint256 yes, uint256 no, uint256 abstain) = governance
-      .getVoteRecord(accVoter, 0);
+    (uint256 id, , , , uint256 no, uint256 abstain) = governance.getVoteRecord(accVoter, 0);
     assertEq(id, proposalId);
     assertEq(no, 0);
     assertEq(abstain, VOTER_GOLD);
@@ -1729,7 +1785,7 @@ contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest {
     vm.startPrank(accVoter);
     governance.vote(proposalId, 0, Proposals.VoteValue.Abstain);
     governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
-    (uint256 yes, uint256 no, uint256 abstain) = governance.getVoteTotals(proposalId);
+    (uint256 yes, , uint256 abstain) = governance.getVoteTotals(proposalId);
     assertEq(abstain, 0);
     assertEq(yes, VOTER_GOLD);
   }
@@ -1738,8 +1794,7 @@ contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest {
     vm.startPrank(accVoter);
     governance.vote(proposalId, 0, Proposals.VoteValue.Abstain);
     governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
-    (uint256 id, uint256 _1, uint256 _2, uint256 yes, uint256 no, uint256 abstain) = governance
-      .getVoteRecord(accVoter, 0);
+    (uint256 id, , , uint256 yes, , uint256 abstain) = governance.getVoteRecord(accVoter, 0);
     assertEq(id, proposalId);
     assertEq(abstain, 0);
     assertEq(yes, VOTER_GOLD);
@@ -1809,6 +1864,8 @@ contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest {
 }
 
 contract GovernanceTest_vote_WhenProposalIsApprovedAndHaveSigner is GovernanceTest {
+  address accSigner;
+
   event ProposalVotedV2(
     uint256 indexed proposalId,
     address indexed account,
@@ -1816,9 +1873,6 @@ contract GovernanceTest_vote_WhenProposalIsApprovedAndHaveSigner is GovernanceTe
     uint256 noVotes,
     uint256 abstainVotes
   );
-
-  address accSigner;
-  uint256 proposalId;
 
   function setUp() public {
     super.setUp();
@@ -1896,7 +1950,6 @@ contract GovernanceTest_vote_WhenProposalIsNotApproved is GovernanceTest {
     uint256 noVotes,
     uint256 abstainVotes
   );
-  uint256 proposalId;
 
   function setUp() public {
     super.setUp();
@@ -2029,8 +2082,6 @@ contract GovernanceTest_vote_PartiallyWhenProposalIsApproved is GovernanceTest {
   );
 
   event ParticipationBaselineUpdated(uint256 participationBaseline);
-
-  uint256 proposalId;
 
   function setUp() public {
     super.setUp();
@@ -2176,8 +2227,10 @@ contract GovernanceTest_vote_PartiallyWhenProposalIsApproved is GovernanceTest {
     vm.startPrank(accVoter);
     governance.votePartially(proposalId, 0, 10, 50, 30);
     governance.votePartially(proposalId, 0, 30, 20, 40);
-    (uint256 id, uint256 _1, uint256 _2, uint256 yes, uint256 no, uint256 abstain) = governance
-      .getVoteRecord(accVoter, 0);
+    (uint256 id, , , uint256 yes, uint256 no, uint256 abstain) = governance.getVoteRecord(
+      accVoter,
+      0
+    );
     assertEq(id, proposalId);
     assertEq(yes, 30);
     assertEq(no, 20);
@@ -2248,6 +2301,8 @@ contract GovernanceTest_vote_PartiallyWhenProposalIsApproved is GovernanceTest {
 }
 
 contract GovernanceTest_votePartially_WhenProposalIsApprovedAndHaveSigner is GovernanceTest {
+  address accSigner;
+
   event ProposalVotedV2(
     uint256 indexed proposalId,
     address indexed account,
@@ -2255,9 +2310,6 @@ contract GovernanceTest_votePartially_WhenProposalIsApprovedAndHaveSigner is Gov
     uint256 noVotes,
     uint256 abstainVotes
   );
-
-  address accSigner;
-  uint256 proposalId;
 
   function setUp() public {
     super.setUp();
@@ -2370,7 +2422,6 @@ contract GovernanceTest_votePartially_WhenProposalIsNotApproved is GovernanceTes
     uint256 noVotes,
     uint256 abstainVotes
   );
-  uint256 proposalId;
 
   function setUp() public {
     super.setUp();
@@ -2497,15 +2548,6 @@ contract GovernanceTest_execute is GovernanceTest {
   event ParticipationBaselineUpdated(uint256 participationBaseline);
   event ProposalExecuted(uint256 indexed proposalId);
 
-  uint256 proposalId;
-
-  function setupProposalCanExecute() private {
-    proposalId = makeAndApproveProposal(0);
-    vm.prank(accVoter);
-    governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
-    vm.warp(block.timestamp + REFERENDUM_STAGE_DURATION);
-  }
-
   function test_returnTrue_WhenProposalCanExecute() public {
     setupProposalCanExecute();
     assertTrue(governance.execute(proposalId, 0));
@@ -2548,16 +2590,6 @@ contract GovernanceTest_execute is GovernanceTest {
     setupProposalCanExecute();
     vm.expectRevert("Provided index greater than dequeue length.");
     governance.execute(proposalId, 1);
-  }
-
-  function setupWhenProposalApprovedInExecutionStage() private {
-    proposalId = makeValidProposal();
-    vm.warp(block.timestamp + governance.dequeueFrequency());
-    vm.prank(accVoter);
-    governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
-    vm.warp(block.timestamp + REFERENDUM_STAGE_DURATION);
-    vm.prank(accApprover);
-    governance.approve(proposalId, 0);
   }
 
   function test_returnTrue_WhenProposalApprovedInExecutionStage() public {
@@ -2659,23 +2691,6 @@ contract GovernanceTest_execute is GovernanceTest {
     governance.execute(proposalId, 0);
   }
 
-  function setup2TxProposal() private {
-    proposalId = governance.propose.value(DEPOSIT)(
-      twoTxProp.values,
-      twoTxProp.destinations,
-      twoTxProp.data,
-      twoTxProp.dataLengths,
-      twoTxProp.description
-    );
-    vm.warp(block.timestamp + governance.dequeueFrequency());
-
-    vm.prank(accApprover);
-    governance.approve(proposalId, 0);
-    vm.prank(accVoter);
-    governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
-    vm.warp(block.timestamp + REFERENDUM_STAGE_DURATION);
-  }
-
   function test_returnTrue_When2TxProposal() public {
     setup2TxProposal();
     assertTrue(governance.execute(proposalId, 0));
@@ -2769,14 +2784,6 @@ contract GovernanceTest_execute is GovernanceTest {
 
     vm.expectRevert("Proposal execution failed");
     governance.execute(proposalId, 0);
-  }
-
-  function setupProposalPastExecutionStage() private {
-    proposalId = makeAndApproveProposal(0);
-    vm.prank(accVoter);
-    governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
-    vm.warp(block.timestamp + REFERENDUM_STAGE_DURATION);
-    vm.warp(block.timestamp + governance.getExecutionStageDuration());
   }
 
   function test_returnFalse_WhenProposalIsPastExecutionStage() public {
@@ -2924,226 +2931,232 @@ contract GovernanceTest_execute is GovernanceTest {
     emit ParticipationBaselineUpdated(expectedParticipationBaseline);
     governance.execute(proposalId, 0);
   }
+
+  function setupProposalPastExecutionStage() private {
+    proposalId = makeAndApproveProposal(0);
+    vm.prank(accVoter);
+    governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
+    vm.warp(block.timestamp + REFERENDUM_STAGE_DURATION);
+    vm.warp(block.timestamp + governance.getExecutionStageDuration());
+  }
+
+  function setup2TxProposal() private {
+    proposalId = governance.propose.value(DEPOSIT)(
+      twoTxProp.values,
+      twoTxProp.destinations,
+      twoTxProp.data,
+      twoTxProp.dataLengths,
+      twoTxProp.description
+    );
+    vm.warp(block.timestamp + governance.dequeueFrequency());
+
+    vm.prank(accApprover);
+    governance.approve(proposalId, 0);
+    vm.prank(accVoter);
+    governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
+    vm.warp(block.timestamp + REFERENDUM_STAGE_DURATION);
+  }
+
+  function setupWhenProposalApprovedInExecutionStage() private {
+    proposalId = makeValidProposal();
+    vm.warp(block.timestamp + governance.dequeueFrequency());
+    vm.prank(accVoter);
+    governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
+    vm.warp(block.timestamp + REFERENDUM_STAGE_DURATION);
+    vm.prank(accApprover);
+    governance.approve(proposalId, 0);
+  }
+
+  function setupProposalCanExecute() private {
+    proposalId = makeAndApproveProposal(0);
+    vm.prank(accVoter);
+    governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
+    vm.warp(block.timestamp + REFERENDUM_STAGE_DURATION);
+  }
 }
 
 contract GovernanceTest_approveHotfix is GovernanceTest {
-  event HotfixApproved(bytes32 indexed hash);
-
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
+  event HotfixApproved(bytes32 indexed hash, address approver);
+  function setUp() public {
+    super.setUp();
+
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+  }
 
   function test_markHotfixRecordApprovedWhenCalledByApprover() public {
     vm.prank(accApprover);
     governance.approveHotfix(HOTFIX_HASH);
-    (bool approved, , ) = governance.getHotfixRecord(HOTFIX_HASH);
+
+    (bool approved, , , ) = governance.getHotfixRecord(HOTFIX_HASH);
+    assertTrue(approved);
+  }
+  function test_markHotfixRecordApprovedWhenCalledBySecurityCouncil() public {
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+
+    vm.prank(accCouncil);
+    governance.approveHotfix(HOTFIX_HASH);
+
+    (, bool approved, , ) = governance.getHotfixRecord(HOTFIX_HASH);
     assertTrue(approved);
   }
 
-  function test_emitHotfixApprovedEvent() public {
+  function test_Emits_HotfixApprovedEvent() public {
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+
     vm.expectEmit(true, true, true, true);
-    emit HotfixApproved(HOTFIX_HASH);
+    emit HotfixApproved(HOTFIX_HASH, accApprover);
     vm.prank(accApprover);
     governance.approveHotfix(HOTFIX_HASH);
-  }
-
-  function test_RevertIf_CalledByNonApprover() public {
-    vm.expectRevert("msg.sender not approver");
-    governance.approveHotfix(HOTFIX_HASH);
-  }
-}
-
-contract GovernanceTest_whitelistHotfix is GovernanceTest {
-  event HotfixWhitelisted(bytes32 indexed hash, address whitelister);
-
-  bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
-
-  function test_EmitHotfixWhitelistEvent() public {
-    address validator = actor("validator1");
-    governance.addValidator(validator);
-    governance.addValidator(actor("validator2"));
 
     vm.expectEmit(true, true, true, true);
-    emit HotfixWhitelisted(HOTFIX_HASH, validator);
-    vm.prank(validator);
-    governance.whitelistHotfix(HOTFIX_HASH);
-  }
-}
-
-contract GovernanceTest_hotfixWhitelistValidatorTally is GovernanceTest {
-  bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
-
-  address[] validators;
-  address[] signers;
-
-  function setUp() public {
-    super.setUp();
-    for (uint256 i = 1; i < 4; i++) {
-      address validator = vm.addr(i);
-      uint256 signerPk = i * 10;
-      address signer = vm.addr(signerPk);
-
-      vm.prank(validator);
-      accounts.createAccount();
-      authorizeValidatorSigner(signerPk, validator);
-
-      governance.addValidator(signer);
-
-      validators.push(validator);
-      signers.push(signer);
-    }
+    emit HotfixApproved(HOTFIX_HASH, accCouncil);
+    vm.prank(accCouncil);
+    governance.approveHotfix(HOTFIX_HASH);
   }
 
-  function test_countValidatorAccountsThatHaveWhitelisted() public {
-    for (uint256 i = 0; i < 3; i++) {
-      vm.prank(validators[i]);
-      governance.whitelistHotfix(HOTFIX_HASH);
-    }
-
-    assertEq(governance.hotfixWhitelistValidatorTally(HOTFIX_HASH), 3);
+  function test_Reverts_WhenCalledByNonApproverOrCouncil() public {
+    vm.expectRevert("msg.sender not approver or Security Council");
+    governance.approveHotfix(HOTFIX_HASH);
   }
 
-  function test_count_authorizedValidatorSignersThatHaveWhitelisted() public {
-    for (uint256 i = 0; i < 3; i++) {
-      vm.prank(signers[i]);
-      governance.whitelistHotfix(HOTFIX_HASH);
-    }
+  function test_Reverts_WhenSecurityCouncilIsNotSet() public {
+    vm.prank(accCouncil);
+    vm.expectRevert("msg.sender not approver or Security Council");
+    governance.approveHotfix(HOTFIX_HASH);
 
-    assertEq(governance.hotfixWhitelistValidatorTally(HOTFIX_HASH), 3);
-  }
-
-  function test_notDoubleCountValidatorAccountAndAuthorizedSignerAccounts() public {
-    for (uint256 i = 0; i < 3; i++) {
-      vm.prank(validators[i]);
-      governance.whitelistHotfix(HOTFIX_HASH);
-      vm.prank(signers[i]);
-      governance.whitelistHotfix(HOTFIX_HASH);
-    }
-
-    assertEq(governance.hotfixWhitelistValidatorTally(HOTFIX_HASH), 3);
-  }
-
-  function test_returnTheCorrectTallyAfterKeyRotation() public {
-    for (uint256 i = 0; i < 3; i++) {
-      vm.prank(signers[i]);
-      governance.whitelistHotfix(HOTFIX_HASH);
-    }
-
-    // rotate signer
-    uint256 signerPk = 44;
-    authorizeValidatorSigner(signerPk, validators[0]);
-
-    assertEq(governance.hotfixWhitelistValidatorTally(HOTFIX_HASH), 3);
-  }
-}
-
-contract GovernanceTest_isHotfixPassing is GovernanceTest {
-  bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
-
-  function setUp() public {
-    super.setUp();
-    address val1 = actor("validator1");
-    governance.addValidator(val1);
-    vm.prank(val1);
-    accounts.createAccount();
-
-    address val2 = actor("validator2");
-    governance.addValidator(val2);
-    vm.prank(val2);
-    accounts.createAccount();
-  }
-
-  function test_returnFalseWhenHotfixHasNotBeenWhitelisted() public {
-    assertFalse(governance.isHotfixPassing(HOTFIX_HASH));
-  }
-
-  function test_returnFalseWhenHotfixHasBeenWhitelistedButNotByQuorum() public {
-    vm.prank(actor("validator1"));
-    governance.whitelistHotfix(HOTFIX_HASH);
-    assertFalse(governance.isHotfixPassing(HOTFIX_HASH));
-  }
-
-  function test_returnTrueWhenHotfixIsWhitelistedByQuorum() public {
-    vm.prank(actor("validator1"));
-    governance.whitelistHotfix(HOTFIX_HASH);
-    vm.prank(actor("validator2"));
-    governance.whitelistHotfix(HOTFIX_HASH);
-    assertTrue(governance.isHotfixPassing(HOTFIX_HASH));
+    vm.expectRevert("msg.sender cannot be address zero");
+    vm.prank(address(0));
+    governance.approveHotfix(HOTFIX_HASH);
   }
 }
 
 contract GovernanceTest_prepareHotfix is GovernanceTest {
-  event HotfixPrepared(bytes32 indexed hash, uint256 indexed epoch);
-
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
+  event HotfixPrepared(bytes32 indexed hash, uint256 indexed epoch);
 
   function setUp() public {
     super.setUp();
-    address val1 = actor("validator1");
-    governance.addValidator(val1);
-    vm.prank(val1);
-    accounts.createAccount();
+
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
   }
 
-  function test_RevertIf_HotfixIsNotPassing() public {
-    vm.expectRevert("hotfix not whitelisted by 2f+1 validators");
+  function test_shouldMarkHotfixRecordExecutionTimeLimit_whenHotfixApproved() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+
+    vm.prank(accCouncil);
+    governance.approveHotfix(HOTFIX_HASH);
+    vm.prank(accApprover);
+    governance.approveHotfix(HOTFIX_HASH);
+
     governance.prepareHotfix(HOTFIX_HASH);
+    (, , , uint256 preparedTimeLimit) = governance.getHotfixRecord(HOTFIX_HASH);
+
+    assertEq(preparedTimeLimit, block.timestamp + DAY);
   }
 
-  function test_markHotfixRecordPreparedEpoch_whenHotfixIsPassing() public {
-    vm.roll(block.number + governance.getEpochSize());
-    vm.prank(actor("validator1"));
-    governance.whitelistHotfix(HOTFIX_HASH);
+  function test_ShouldUpdateExecutionTimeLimitAfterApproval_WhenHotfixRecordWasReset() public {
+    uint256 _preparedTimeLimit;
+    bool _approved;
+    bool _councilApproved;
+
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+
+    vm.prank(accCouncil);
+    governance.approveHotfix(HOTFIX_HASH);
+    vm.prank(accApprover);
+    governance.approveHotfix(HOTFIX_HASH);
+
     governance.prepareHotfix(HOTFIX_HASH);
-    (, , uint256 preparedEpoch) = governance.getHotfixRecord(HOTFIX_HASH);
+    timeTravel(DAY + 3600);
+    governance.resetHotFixRecord(HOTFIX_HASH);
 
-    assertEq(preparedEpoch, governance.getEpochNumber());
+    (_approved, _councilApproved, , _preparedTimeLimit) = governance.getHotfixRecord(HOTFIX_HASH);
+
+    assertFalse(_approved);
+    assertFalse(_councilApproved);
+    assertEq(_preparedTimeLimit, 0);
+
+    vm.prank(accCouncil);
+    governance.approveHotfix(HOTFIX_HASH);
+    vm.prank(accApprover);
+    governance.approveHotfix(HOTFIX_HASH);
+
+    governance.prepareHotfix(HOTFIX_HASH);
+    (_approved, _councilApproved, , _preparedTimeLimit) = governance.getHotfixRecord(HOTFIX_HASH);
+
+    assertTrue(_approved);
+    assertTrue(_councilApproved);
+    assertEq(_preparedTimeLimit, block.timestamp + DAY);
   }
 
-  function test_emitHotfixPreparedEvent_whenHotfixIsPassing() public {
-    vm.roll(block.number + governance.getEpochSize());
-    vm.prank(actor("validator1"));
-    governance.whitelistHotfix(HOTFIX_HASH);
+  function test_Emits_HotfixPreparedEvent_whenHotfixApproved() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+    vm.prank(accCouncil);
+    governance.approveHotfix(HOTFIX_HASH);
+    vm.prank(accApprover);
+    governance.approveHotfix(HOTFIX_HASH);
 
-    uint256 epoch = governance.getEpochNumber();
     vm.expectEmit(true, true, true, true);
-    emit HotfixPrepared(HOTFIX_HASH, epoch);
+    emit HotfixPrepared(HOTFIX_HASH, block.timestamp + DAY);
     governance.prepareHotfix(HOTFIX_HASH);
   }
 
-  function test_RevertIf_EpochEqualsPreparedEpoch_whenHotfixIsPassing() public {
-    vm.roll(block.number + governance.getEpochSize());
-    vm.prank(actor("validator1"));
-    governance.whitelistHotfix(HOTFIX_HASH);
+  function test_Reverts_IfHotfixExecutionTimeWindowNotSet() public {
+    vm.prank(accCouncil);
+    governance.approveHotfix(HOTFIX_HASH);
+    vm.prank(accApprover);
+    governance.approveHotfix(HOTFIX_HASH);
+
+    vm.expectRevert("Hotfix execution time window not set");
     governance.prepareHotfix(HOTFIX_HASH);
-    vm.expectRevert("hotfix already prepared for this epoch");
+  }
+  function test_Reverts_IfHotfixIsNotApproved() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+
+    vm.expectRevert("Hotfix not approved by approvers.");
+    governance.prepareHotfix(HOTFIX_HASH);
+
+    vm.prank(accApprover);
+    governance.approveHotfix(HOTFIX_HASH);
+    vm.expectRevert("Hotfix not approved by security council.");
     governance.prepareHotfix(HOTFIX_HASH);
   }
 
-  function test_succeedForEpochDifferentPreparedEpoch_whenHotfixIsPassing() public {
-    vm.roll(block.number + governance.getEpochSize());
-    vm.prank(actor("validator1"));
-    governance.whitelistHotfix(HOTFIX_HASH);
+  function test_Reverts_IfPreparedTwiceWithinExecutionTimeLimit() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+    vm.prank(accCouncil);
+    governance.approveHotfix(HOTFIX_HASH);
+    vm.prank(accApprover);
+    governance.approveHotfix(HOTFIX_HASH);
+
     governance.prepareHotfix(HOTFIX_HASH);
-    vm.roll(block.number + governance.getEpochSize());
+    vm.expectRevert("Hotfix already prepared for this timeframe.");
     governance.prepareHotfix(HOTFIX_HASH);
   }
 }
 
-contract GovernanceTest_executeHotfix is GovernanceTest {
-  event HotfixExecuted(bytes32 indexed hash);
-
-  bytes32 SALT = 0x657ed9d64e84fa3d1af43b3a307db22aba2d90a158015df1c588c02e24ca08f0;
+contract GovernanceTest_resetHotfix_setup is GovernanceTest {
+  bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
+  bytes32 constant SALT = 0x657ed9d64e84fa3d1af43b3a307db22aba2d90a158015df1c588c02e24ca08f0;
   bytes32 hotfixHash;
-
-  address validator;
+  address validator1;
+  event HotfixRecordReset(bytes32 indexed hash);
 
   function setUp() public {
     super.setUp();
-    validator = actor("validator");
-    vm.prank(validator);
-    accounts.createAccount();
-    governance.addValidator(validator);
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
 
-    // call governance test method to generate proper hotfix (needs calldata arguments)
     hotfixHash = governance.getHotfixHash(
       okProp.values,
       okProp.destinations,
@@ -3151,6 +3164,180 @@ contract GovernanceTest_executeHotfix is GovernanceTest {
       okProp.dataLengths,
       SALT
     );
+  }
+}
+
+contract GovernanceTest_resetHotfix is GovernanceTest, GovernanceTest_resetHotfix_setup {
+  function test_ShouldResetHotfixRecordWhenExecutionTimeLimitHasPassed() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+
+    vm.prank(accCouncil);
+    governance.approveHotfix(HOTFIX_HASH);
+
+    vm.prank(accApprover);
+    governance.approveHotfix(HOTFIX_HASH);
+
+    (bool approved, bool councilApproved, , uint256 _preparedTimeLimit) = governance
+      .getHotfixRecord(HOTFIX_HASH);
+
+    assertTrue(approved);
+    assertTrue(councilApproved);
+
+    governance.prepareHotfix(HOTFIX_HASH);
+    timeTravel(DAY + 1);
+    governance.resetHotFixRecord(HOTFIX_HASH);
+
+    (approved, councilApproved, , _preparedTimeLimit) = governance.getHotfixRecord(HOTFIX_HASH);
+    assertFalse(approved);
+    assertFalse(councilApproved);
+  }
+  function test_Emits_HotfixRecordResetWhenExecutionTimeLimitHasPassed() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+
+    vm.prank(accCouncil);
+    governance.approveHotfix(HOTFIX_HASH);
+    vm.prank(accApprover);
+    governance.approveHotfix(HOTFIX_HASH);
+
+    governance.prepareHotfix(HOTFIX_HASH);
+    timeTravel(DAY + 1);
+    vm.expectEmit(true, true, true, true);
+    emit HotfixRecordReset(HOTFIX_HASH);
+    governance.resetHotFixRecord(HOTFIX_HASH);
+  }
+
+  function test_Reverts_WhenHotfixAlreadyExecuted() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+
+    vm.prank(accCouncil);
+    governance.approveHotfix(hotfixHash);
+    vm.prank(accApprover);
+    governance.approveHotfix(hotfixHash);
+
+    governance.prepareHotfix(hotfixHash);
+
+    governance.executeHotfix(
+      okProp.values,
+      okProp.destinations,
+      okProp.data,
+      okProp.dataLengths,
+      SALT
+    );
+    vm.expectRevert("hotfix already executed");
+    governance.resetHotFixRecord(hotfixHash);
+  }
+  function test_Reverts_WhenHotfixNotPrepared() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+
+    vm.prank(accCouncil);
+    governance.approveHotfix(HOTFIX_HASH);
+    vm.prank(accApprover);
+    governance.approveHotfix(HOTFIX_HASH);
+
+    vm.expectRevert("hotfix not prepared");
+    governance.resetHotFixRecord(HOTFIX_HASH);
+  }
+  function test_Reverts_WhenExecutionTimeLimitNotReached() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+
+    vm.prank(accCouncil);
+    governance.approveHotfix(HOTFIX_HASH);
+    vm.prank(accApprover);
+    governance.approveHotfix(HOTFIX_HASH);
+
+    governance.prepareHotfix(HOTFIX_HASH);
+    vm.expectRevert("hotfix execution time limit not reached");
+    governance.resetHotFixRecord(HOTFIX_HASH);
+  }
+}
+
+contract GovernanceTest_executeHotfix is GovernanceTest {
+  bytes32 SALT = 0x657ed9d64e84fa3d1af43b3a307db22aba2d90a158015df1c588c02e24ca08f0;
+  bytes32 hotfixHash;
+
+  address validator;
+
+  event HotfixExecuted(bytes32 indexed hash);
+
+  function setUp() public {
+    super.setUp();
+
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+
+    hotfixHash = governance.getHotfixHash(
+      okProp.values,
+      okProp.destinations,
+      okProp.data,
+      okProp.dataLengths,
+      SALT
+    );
+  }
+
+  function test_ShouldExecuteHotfix_WhenApprovedByApproverAndSecurityCouncil() public {
+    approveAndPrepareHotfix();
+
+    executeHotfixTx();
+    assertEq(testTransactions.getValue(1), 1);
+  }
+
+  function test_ShouldMarkHotfixAsExecuted_WhenApprovedByApproverAndSecurityCouncil() public {
+    approveAndPrepareHotfix();
+
+    executeHotfixTx();
+    (, , bool executed, ) = governance.getHotfixRecord(hotfixHash);
+    assertTrue(executed);
+  }
+
+  function test_Emits_HotfixExecutedEventWhenApprovedByApproverAndSecurityCouncil() public {
+    approveAndPrepareHotfix();
+
+    vm.expectEmit(true, true, true, true);
+    emit HotfixExecuted(hotfixHash);
+    executeHotfixTx();
+  }
+
+  function test_Reverts_WhenExecutingSameHotfixTwice() public {
+    approveAndPrepareHotfix();
+
+    executeHotfixTx();
+    vm.expectRevert("hotfix already executed");
+    executeHotfixTx();
+  }
+
+  function test_Reverts_IfHotfixNotApprovedByApprover() public {
+    vm.expectRevert("hotfix not approved");
+    executeHotfixTx();
+  }
+
+  function test_Reverts_IfHotfixNotApprovedBySecurityCouncil() public {
+    vm.prank(accApprover);
+    governance.approveHotfix(hotfixHash);
+    vm.expectRevert("hotfix not approved by security council");
+    executeHotfixTx();
+  }
+
+  function test_Reverts_WhenHotfixNotPrepared() public {
+    vm.prank(accApprover);
+    governance.approveHotfix(hotfixHash);
+    vm.prank(accCouncil);
+    governance.approveHotfix(hotfixHash);
+    vm.expectRevert("Execution time limit has already been reached.");
+    executeHotfixTx();
+  }
+  function test_Reverts_WhenExecutedBeyondTheExecutionTimeLimit() public {
+    approveAndPrepareHotfix();
+
+    timeTravel(2 * DAY);
+    vm.expectRevert("Execution time limit has already been reached.");
+    executeHotfixTx();
   }
 
   function executeHotfixTx() private {
@@ -3166,68 +3353,13 @@ contract GovernanceTest_executeHotfix is GovernanceTest {
   function approveAndPrepareHotfix() private {
     vm.prank(accApprover);
     governance.approveHotfix(hotfixHash);
-    vm.roll(block.number + governance.getEpochSize());
-    vm.prank(validator);
-    governance.whitelistHotfix(hotfixHash);
-    governance.prepareHotfix(hotfixHash);
-  }
-
-  function test_RevertIf_hotfixNotApproved() public {
-    vm.expectRevert("hotfix not approved");
-    executeHotfixTx();
-  }
-
-  function test_RevertIf_hotfixNotPreparedForCurrentEpoch() public {
-    vm.roll(block.number + governance.getEpochSize());
-    vm.prank(accApprover);
+    vm.prank(accCouncil);
     governance.approveHotfix(hotfixHash);
-
-    vm.expectRevert("hotfix must be prepared for this epoch");
-    executeHotfixTx();
-  }
-
-  function test_RevertIf_hotfixPreparedButNotForCurrentEpoch() public {
-    vm.prank(accApprover);
-    governance.approveHotfix(hotfixHash);
-    vm.prank(validator);
-    governance.whitelistHotfix(hotfixHash);
     governance.prepareHotfix(hotfixHash);
-    vm.roll(block.number + governance.getEpochSize());
-    vm.expectRevert("hotfix must be prepared for this epoch");
-    executeHotfixTx();
-  }
-
-  function test_executeHotfix_WhenApprovedAndPreparedForCurrentEpoch() public {
-    approveAndPrepareHotfix();
-    executeHotfixTx();
-    assertEq(testTransactions.getValue(1), 1);
-  }
-
-  function test_markHotfixAsExecuted_WhenApprovedAndPreparedForCurrentEpoch() public {
-    approveAndPrepareHotfix();
-    executeHotfixTx();
-    (, bool executed, ) = governance.getHotfixRecord(hotfixHash);
-    assertTrue(executed);
-  }
-
-  function test_emitHotfixExecutedEvent_WhenApprovedAndPreparedForCurrentEpoch() public {
-    approveAndPrepareHotfix();
-    vm.expectEmit(true, true, true, true);
-    emit HotfixExecuted(hotfixHash);
-    executeHotfixTx();
-  }
-
-  function test_notBeExecutableAgain_WhenApprovedAndPreparedForCurrentEpoch() public {
-    approveAndPrepareHotfix();
-    executeHotfixTx();
-    vm.expectRevert("hotfix already executed");
-    executeHotfixTx();
   }
 }
 
 contract GovernanceTest_isVoting is GovernanceTest {
-  uint256 proposalId;
-
   function setUp() public {
     super.setUp();
     proposalId = makeValidProposal();
@@ -3282,7 +3414,6 @@ contract GovernanceTest_isVoting is GovernanceTest {
 }
 
 contract GovernanceTest_isProposalPassing is GovernanceTest {
-  uint256 proposalId;
   address accSndVoter;
 
   function setUp() public {
@@ -3364,25 +3495,25 @@ contract GovernanceTest_getProposalStage is GovernanceTest {
   }
 
   function test_returnQueuedWhenNotExpired() public {
-    uint256 proposalId = makeValidProposal();
+    proposalId = makeValidProposal();
     assertEq(uint256(governance.getProposalStage(proposalId)), uint256(Proposals.Stage.Queued));
   }
 
   function test_returnExpirationWhenExpired() public {
-    uint256 proposalId = makeValidProposal();
+    proposalId = makeValidProposal();
     vm.warp(block.timestamp + governance.queueExpiry());
     assertEq(uint256(governance.getProposalStage(proposalId)), uint256(Proposals.Stage.Expiration));
   }
 
   function test_returnReferendumWhenNotVotedAndNotExpired() public {
-    uint256 proposalId = makeValidProposal();
+    proposalId = makeValidProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
     governance.dequeueProposalsIfReady();
     assertEq(uint256(governance.getProposalStage(proposalId)), uint256(Proposals.Stage.Referendum));
   }
 
   function test_returnExpirationWhenExpiredButDequeued() public {
-    uint256 proposalId = makeValidProposal();
+    proposalId = makeValidProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
     governance.dequeueProposalsIfReady();
     vm.warp(block.timestamp + REFERENDUM_STAGE_DURATION);
@@ -3390,7 +3521,7 @@ contract GovernanceTest_getProposalStage is GovernanceTest {
   }
 
   function test_returnReferendumWhenNotExpiredButApproved() public {
-    uint256 proposalId = makeValidProposal();
+    proposalId = makeValidProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
     governance.dequeueProposalsIfReady();
     vm.prank(accApprover);
@@ -3400,7 +3531,7 @@ contract GovernanceTest_getProposalStage is GovernanceTest {
   }
 
   function test_returnExpirationWhenExpiredButApproved() public {
-    uint256 proposalId = makeValidProposal();
+    proposalId = makeValidProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
     governance.dequeueProposalsIfReady();
     vm.prank(accApprover);
@@ -3410,7 +3541,7 @@ contract GovernanceTest_getProposalStage is GovernanceTest {
   }
 
   function test_returnExecutionWhenInExecutionStageAndNotExpired() public {
-    uint256 proposalId = makeValidProposal();
+    proposalId = makeValidProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
     governance.dequeueProposalsIfReady();
     vm.prank(accApprover);
@@ -3422,7 +3553,7 @@ contract GovernanceTest_getProposalStage is GovernanceTest {
   }
 
   function test_returnExpirationWhenExpiredAfterExecutionState() public {
-    uint256 proposalId = makeValidProposal();
+    proposalId = makeValidProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
     governance.dequeueProposalsIfReady();
     vm.prank(accApprover);
@@ -3437,7 +3568,7 @@ contract GovernanceTest_getProposalStage is GovernanceTest {
   }
 
   function test_returnExpirationPastTheExecutionStageWhenNotApproved_WithEmptyProposal() public {
-    uint256 proposalId = makeEmptyProposal();
+    proposalId = makeEmptyProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
     governance.dequeueProposalsIfReady();
     vm.prank(accVoter);
@@ -3450,7 +3581,7 @@ contract GovernanceTest_getProposalStage is GovernanceTest {
   }
 
   function test_returnExpirationPastTheExecutionStageWhenNotPassing_WithEmptyProposal() public {
-    uint256 proposalId = makeEmptyProposal();
+    proposalId = makeEmptyProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
     governance.dequeueProposalsIfReady();
     vm.prank(accApprover);
@@ -3463,7 +3594,7 @@ contract GovernanceTest_getProposalStage is GovernanceTest {
   }
 
   function test_returnExecutionWhenInExecutionStageAndNotExpired_WithEmptyProposal() public {
-    uint256 proposalId = makeEmptyProposal();
+    proposalId = makeEmptyProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
     governance.dequeueProposalsIfReady();
     vm.prank(accApprover);
@@ -3475,7 +3606,7 @@ contract GovernanceTest_getProposalStage is GovernanceTest {
   }
 
   function test_returnExecutionPastTheExecutionStageIfPassedAndApproved_WithEmptyProposal() public {
-    uint256 proposalId = makeEmptyProposal();
+    proposalId = makeEmptyProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
     governance.dequeueProposalsIfReady();
     vm.prank(accApprover);
@@ -3490,20 +3621,6 @@ contract GovernanceTest_getProposalStage is GovernanceTest {
 }
 
 contract GovernanceTest_getAmountOfGoldUsedForVoting is GovernanceTest {
-  function makeAndApprove3ConcurrentProposals() private {
-    vm.prank(accOwner);
-    governance.setConcurrentProposals(3);
-    makeValidProposal();
-    makeValidProposal();
-    makeValidProposal();
-    vm.warp(block.timestamp + governance.dequeueFrequency());
-    vm.startPrank(accApprover);
-    governance.approve(1, 0);
-    governance.approve(2, 1);
-    governance.approve(3, 2);
-    vm.stopPrank();
-  }
-
   function test_showCorrectNumberOfVotes_whenVotingOn1ConcurrentProposal() public {
     makeAndApprove3ConcurrentProposals();
 
@@ -3543,7 +3660,7 @@ contract GovernanceTest_getAmountOfGoldUsedForVoting is GovernanceTest {
   }
 
   function test_returnNumberOfVotes_WhenDequeuedAndVotingHappenInV8() public {
-    uint256 proposalId = makeValidProposal();
+    proposalId = makeValidProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
     vm.prank(accApprover);
     governance.approve(proposalId, 0);
@@ -3552,7 +3669,7 @@ contract GovernanceTest_getAmountOfGoldUsedForVoting is GovernanceTest {
   }
 
   function test_returnNumberOfVotes_whenDequeuedAndVotedPartially() public {
-    uint256 proposalId = makeValidProposal();
+    proposalId = makeValidProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
     vm.prank(accApprover);
     governance.approve(proposalId, 0);
@@ -3564,7 +3681,7 @@ contract GovernanceTest_getAmountOfGoldUsedForVoting is GovernanceTest {
   }
 
   function test_return0Votes_whenDequeuedAndVotedPartiallyButExpired() public {
-    uint256 proposalId = makeValidProposal();
+    proposalId = makeValidProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
     vm.prank(accApprover);
     governance.approve(proposalId, 0);
@@ -3577,7 +3694,7 @@ contract GovernanceTest_getAmountOfGoldUsedForVoting is GovernanceTest {
   }
 
   function test_return0Votes_WhenIndexOfProposalGetsReused() public {
-    uint256 proposalId = makeValidProposal();
+    proposalId = makeValidProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
     vm.prank(accApprover);
     governance.approve(proposalId, 0);
@@ -3600,7 +3717,7 @@ contract GovernanceTest_getAmountOfGoldUsedForVoting is GovernanceTest {
   function test_returnFullWeightWhenUpvoting_WhenProposalInQueue() public {
     vm.prank(accOwner);
     governance.setConcurrentProposals(3);
-    uint256 proposalId = makeValidProposal();
+    proposalId = makeValidProposal();
     vm.prank(accVoter);
     governance.upvote(proposalId, 0, 0);
     assertEq(governance.getAmountOfGoldUsedForVoting(accVoter), VOTER_GOLD);
@@ -3609,11 +3726,25 @@ contract GovernanceTest_getAmountOfGoldUsedForVoting is GovernanceTest {
   function test_return0IfProposalExpired_WhenProposalInQueue() public {
     vm.prank(accOwner);
     governance.setConcurrentProposals(3);
-    uint256 proposalId = makeValidProposal();
+    proposalId = makeValidProposal();
     vm.prank(accVoter);
     governance.upvote(proposalId, 0, 0);
     vm.warp(block.timestamp + governance.queueExpiry());
     assertEq(governance.getAmountOfGoldUsedForVoting(accVoter), 0);
+  }
+
+  function makeAndApprove3ConcurrentProposals() private {
+    vm.prank(accOwner);
+    governance.setConcurrentProposals(3);
+    makeValidProposal();
+    makeValidProposal();
+    makeValidProposal();
+    vm.warp(block.timestamp + governance.dequeueFrequency());
+    vm.startPrank(accApprover);
+    governance.approve(1, 0);
+    governance.approve(2, 1);
+    governance.approve(3, 2);
+    vm.stopPrank();
   }
 }
 
@@ -3627,72 +3758,6 @@ contract GovernanceTest_removeVotesWhenRevokingDelegatedVotes is GovernanceTest 
 
   function test_shouldPassWhenNoProposalIsDequeued() public {
     governance.removeVotesWhenRevokingDelegatedVotesTest(address(0), 0);
-  }
-
-  function assertVotesTotal(
-    uint256 proposalId,
-    uint256 expectedYes,
-    uint256 expectedNo,
-    uint256 expectedAbstain
-  ) private {
-    (uint256 yes, uint256 no, uint256 abstain) = governance.getVoteTotals(proposalId);
-
-    assertEq(yes, expectedYes);
-    assertEq(no, expectedNo);
-    assertEq(abstain, expectedAbstain);
-  }
-
-  function assertVoteRecord(
-    uint256 index,
-    uint256 expectedProposalId,
-    uint256 expectedYes,
-    uint256 expectedNo,
-    uint256 expectedAbstain
-  ) private {
-    (uint256 proposalId, , , uint256 yes, uint256 no, uint256 abstain) = governance.getVoteRecord(
-      accVoter,
-      index
-    );
-    assertEq(proposalId, expectedProposalId);
-    assertEq(yes, expectedYes);
-    assertEq(no, expectedNo);
-    assertEq(abstain, expectedAbstain);
-  }
-
-  function makeAndApprove3Proposals() private {
-    vm.prank(accOwner);
-    governance.setConcurrentProposals(3);
-    vm.prank(accOwner);
-    governance.setDequeueFrequency(60);
-
-    proposalIds.push(makeValidProposal());
-    proposalIds.push(makeValidProposal());
-    proposalIds.push(makeValidProposal());
-
-    vm.warp(block.timestamp + governance.dequeueFrequency());
-    vm.prank(accApprover);
-    governance.approve(proposalIds[0], 0);
-
-    vm.warp(block.timestamp + governance.dequeueFrequency());
-    vm.prank(accApprover);
-    governance.approve(proposalIds[1], 1);
-
-    vm.warp(block.timestamp + governance.dequeueFrequency());
-    vm.prank(accApprover);
-    governance.approve(proposalIds[2], 2);
-  }
-
-  function setUpVotingOnlyforYes() private {
-    vm.prank(accVoter);
-    governance.votePartially(proposalIds[0], 0, 100, 0, 0);
-    vm.prank(accVoter);
-    governance.votePartially(proposalIds[1], 1, 0, 100, 0);
-
-    assertVoteRecord(0, proposalIds[0], 100, 0, 0);
-    assertVoteRecord(1, proposalIds[1], 0, 100, 0);
-
-    assertVotesTotal(proposalIds[0], 100, 0, 0);
-    assertVotesTotal(proposalIds[1], 0, 100, 0);
   }
 
   function test_adjustVotesCorrectlyTo0_WhenVotingOnlyforYes() public {
@@ -3717,19 +3782,6 @@ contract GovernanceTest_removeVotesWhenRevokingDelegatedVotes is GovernanceTest 
 
     assertVotesTotal(proposalIds[0], 30, 0, 0);
     assertVotesTotal(proposalIds[1], 0, 30, 0);
-  }
-
-  function setupVotingForAllChoices() private {
-    vm.prank(accVoter);
-    governance.votePartially(proposalIds[0], 0, 50, 20, 30);
-    vm.prank(accVoter);
-    governance.votePartially(proposalIds[1], 1, 0, 40, 60);
-    vm.prank(accVoter);
-    governance.votePartially(proposalIds[2], 2, 0, 0, 51);
-
-    assertVoteRecord(0, proposalIds[0], 50, 20, 30);
-    assertVoteRecord(1, proposalIds[1], 0, 40, 60);
-    assertVoteRecord(2, proposalIds[2], 0, 0, 51);
   }
 
   function test_adjustVotesCorrectlyTo0_WhenVotingForAllChoices() public {
@@ -3775,5 +3827,84 @@ contract GovernanceTest_removeVotesWhenRevokingDelegatedVotes is GovernanceTest 
     vm.warp(block.timestamp + governance.queueExpiry());
     assertVoteRecord(0, proposalIds[0], 50, 20, 30);
     assertVoteRecord(1, proposalIds[1], 0, 40, 60);
+  }
+
+  function assertVotesTotal(
+    uint256 _proposalId,
+    uint256 expectedYes,
+    uint256 expectedNo,
+    uint256 expectedAbstain
+  ) private {
+    (uint256 yes, uint256 no, uint256 abstain) = governance.getVoteTotals(_proposalId);
+
+    assertEq(yes, expectedYes);
+    assertEq(no, expectedNo);
+    assertEq(abstain, expectedAbstain);
+  }
+
+  function assertVoteRecord(
+    uint256 index,
+    uint256 expectedProposalId,
+    uint256 expectedYes,
+    uint256 expectedNo,
+    uint256 expectedAbstain
+  ) private {
+    (uint256 _proposalId, , , uint256 yes, uint256 no, uint256 abstain) = governance.getVoteRecord(
+      accVoter,
+      index
+    );
+    assertEq(_proposalId, expectedProposalId);
+    assertEq(yes, expectedYes);
+    assertEq(no, expectedNo);
+    assertEq(abstain, expectedAbstain);
+  }
+
+  function makeAndApprove3Proposals() private {
+    vm.prank(accOwner);
+    governance.setConcurrentProposals(3);
+    vm.prank(accOwner);
+    governance.setDequeueFrequency(60);
+
+    proposalIds.push(makeValidProposal());
+    proposalIds.push(makeValidProposal());
+    proposalIds.push(makeValidProposal());
+
+    vm.warp(block.timestamp + governance.dequeueFrequency());
+    vm.prank(accApprover);
+    governance.approve(proposalIds[0], 0);
+
+    vm.warp(block.timestamp + governance.dequeueFrequency());
+    vm.prank(accApprover);
+    governance.approve(proposalIds[1], 1);
+
+    vm.warp(block.timestamp + governance.dequeueFrequency());
+    vm.prank(accApprover);
+    governance.approve(proposalIds[2], 2);
+  }
+
+  function setUpVotingOnlyforYes() private {
+    vm.prank(accVoter);
+    governance.votePartially(proposalIds[0], 0, 100, 0, 0);
+    vm.prank(accVoter);
+    governance.votePartially(proposalIds[1], 1, 0, 100, 0);
+
+    assertVoteRecord(0, proposalIds[0], 100, 0, 0);
+    assertVoteRecord(1, proposalIds[1], 0, 100, 0);
+
+    assertVotesTotal(proposalIds[0], 100, 0, 0);
+    assertVotesTotal(proposalIds[1], 0, 100, 0);
+  }
+
+  function setupVotingForAllChoices() private {
+    vm.prank(accVoter);
+    governance.votePartially(proposalIds[0], 0, 50, 20, 30);
+    vm.prank(accVoter);
+    governance.votePartially(proposalIds[1], 1, 0, 40, 60);
+    vm.prank(accVoter);
+    governance.votePartially(proposalIds[2], 2, 0, 0, 51);
+
+    assertVoteRecord(0, proposalIds[0], 50, 20, 30);
+    assertVoteRecord(1, proposalIds[1], 0, 40, 60);
+    assertVoteRecord(2, proposalIds[2], 0, 0, 51);
   }
 }

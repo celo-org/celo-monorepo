@@ -1,21 +1,25 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 
-import "celo-foundry/Test.sol";
+import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 import "@celo-contracts/governance/Proposals.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 
-contract ProposalTest_getSupportWithQuorumPadding is Test {
+contract ProposalTest is TestWithUtils {
   using Proposals for Proposals.Proposal;
   using FixidityLib for FixidityLib.Fraction;
 
-  Proposals.Proposal private proposal;
+  Proposals.Proposal internal proposal;
 
   function setUp() public {
+    super.setUp();
     proposal.networkWeight = 100;
+    whenL2WithEpochManagerInitialization();
   }
+}
 
+contract ProposalTest_getSupportWithQuorumPadding is ProposalTest {
   function test_ShouldReturnSupportRatioWhenParticipationAboveCriticalBaseline() public {
     proposal.votes.yes = 15;
     proposal.votes.no = 10;

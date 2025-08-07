@@ -310,7 +310,7 @@ describe('governance tests', () => {
     if (myceloAddress === groupAddress) {
       return '0x' + generatePrivateKey(mnemonic, AccountType.VALIDATOR_GROUP, 0)
     }
-    // Otherwise, the validator group key is encoded in its name (see 25_elect_validators.ts)
+    // Otherwise, the validator group key is encoded in its name (see 30_elect_validators.ts)
     const name = await accounts.methods.getName(groupAddress).call()
     const encryptedKeystore64 = name.split(' ')[1]
     const encryptedKeystore = JSON.parse(Buffer.from(encryptedKeystore64, 'base64').toString())
@@ -376,9 +376,11 @@ describe('governance tests', () => {
     assertGoldTokenTotalSupplyChanged(blockNumber, new BigNumber(0))
 
   const assertGoldTokenTotalSupplyChanged = async (blockNumber: number, expected: BigNumber) => {
-    const currentSupply = new BigNumber(await goldToken.methods.totalSupply().call({}, blockNumber))
+    const currentSupply = new BigNumber(
+      await goldToken.methods.allocatedSupply().call({}, blockNumber)
+    )
     const previousSupply = new BigNumber(
-      await goldToken.methods.totalSupply().call({}, blockNumber - 1)
+      await goldToken.methods.allocatedSupply().call({}, blockNumber - 1)
     )
     assertAlmostEqual(currentSupply.minus(previousSupply), expected)
   }

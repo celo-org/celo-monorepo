@@ -13,7 +13,7 @@ import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
-import "../common/UsingPrecompiles.sol";
+import "../common/PrecompilesOverride.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
@@ -27,7 +27,7 @@ contract Governance is
   Initializable,
   ReentrancyGuard,
   UsingRegistry,
-  UsingPrecompiles
+  PrecompilesOverride
 {
   using Proposals for Proposals.Proposal;
   using FixidityLib for FixidityLib.Fraction;
@@ -74,8 +74,10 @@ contract Governance is
   struct HotfixRecord {
     bool executed;
     bool approved;
-    uint256 preparedEpoch;
-    mapping(address => bool) whitelisted;
+    uint256 deprecated_preparedEpoch; // obsolete
+    mapping(address => bool) deprecated_whitelisted; // obsolete
+    bool councilApproved;
+    uint256 executionTimeLimit;
   }
 
   // The baseline is updated as
@@ -110,6 +112,8 @@ contract Governance is
   uint256[] public dequeued;
   uint256[] public emptyIndices;
   ParticipationParameters private participationParameters;
+  address public securityCouncil;
+  uint256 public hotfixExecutionTimeWindow;
 
   event ApproverSet(address indexed approver);
 
@@ -189,26 +193,53 @@ contract Governance is
 
   event ParticipationBaselineQuorumFactorSet(uint256 baselineQuorumFactor);
 
-  event HotfixWhitelisted(bytes32 indexed hash, address whitelister);
+  event HotfixApproved(bytes32 indexed hash, address approver);
 
-  event HotfixApproved(bytes32 indexed hash);
-
-  event HotfixPrepared(bytes32 indexed hash, uint256 indexed epoch);
+  event HotfixPrepared(bytes32 indexed hash, uint256 indexed executionLimit);
 
   event HotfixExecuted(bytes32 indexed hash);
 
+  event SecurityCouncilSet(address indexed council);
+
+  event HotfixExecutionTimeWindowSet(uint256 timeDelta);
+
+  event HotfixRecordReset(bytes32 indexed hash);
+
+  /**
+   * @notice Ensures a hotfix can be executed only once.
+   * @param hash Hash of the hotfix.
+   * @dev Reverts if the hotfix has already been executed.
+   */
   modifier hotfixNotExecuted(bytes32 hash) {
     require(!hotfixes[hash].executed, "hotfix already executed");
     _;
   }
 
+  /**
+   * @notice Ensures function can only be called by the approver address.
+   */
   modifier onlyApprover() {
     require(msg.sender == approver, "msg.sender not approver");
     _;
   }
 
+  /**
+   * @notice Ensures function can only be called by the LockedGold contract.
+   */
   modifier onlyLockedGold() {
     require(msg.sender == address(getLockedGold()), "msg.sender not lockedGold");
+    _;
+  }
+
+  /**
+   * @notice Ensures a hotfix cannot be executed after the time limit.
+   * @param hash Hash of the hotfix.
+   * @dev Reverts if the hotfix time limit has been reached, or the hotfix is
+   * not prepared yet.
+   */
+  modifier hotfixTimedOut(bytes32 hash) {
+    require(hotfixes[hash].executionTimeLimit > 0, "hotfix not prepared");
+    require(hotfixes[hash].executionTimeLimit < now, "hotfix execution time limit not reached");
     _;
   }
 
@@ -296,6 +327,30 @@ contract Governance is
       constitution[destination].functionThresholds[functionId] = FixidityLib.wrap(threshold);
     }
     emit ConstitutionSet(destination, functionId, threshold);
+  }
+
+  /**
+   * @notice Updates the address that has permission to whitelist hotfix proposals.
+   * @param _council The address that has permission to whitelist hotfix proposals.
+   */
+  function setSecurityCouncil(address _council) external onlyOwner {
+    require(_council != address(0), "Council cannot be address zero");
+    require(_council != securityCouncil, "Council unchanged");
+    require(_council != approver, "Council cannot be approver");
+
+    securityCouncil = _council;
+    emit SecurityCouncilSet(_council);
+  }
+
+  /**
+   * @notice Sets the time window during which a hotfix has to be executed.
+   * @param timeWindow The time (in seconds) during which a hotfix can be
+   * executed after it has been prepared.
+   */
+  function setHotfixExecutionTimeWindow(uint256 timeWindow) external onlyOwner {
+    require(timeWindow > 0, "Execution time window cannot be zero");
+    hotfixExecutionTimeWindow = timeWindow;
+    emit HotfixExecutionTimeWindowSet(timeWindow);
   }
 
   /**
@@ -615,30 +670,36 @@ contract Governance is
    * @notice Approves the hash of a hotfix transaction(s).
    * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be approved.
    */
-  function approveHotfix(bytes32 hash) external hotfixNotExecuted(hash) onlyApprover {
-    hotfixes[hash].approved = true;
-    emit HotfixApproved(hash);
+  function approveHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
+    require(msg.sender != address(0), "msg.sender cannot be address zero");
+    require(
+      msg.sender == approver || msg.sender == securityCouncil,
+      "msg.sender not approver or Security Council"
+    );
+
+    if (msg.sender == approver) {
+      hotfixes[hash].approved = true;
+    } else {
+      hotfixes[hash].councilApproved = true;
+    }
+    emit HotfixApproved(hash, msg.sender);
   }
 
   /**
-   * @notice Whitelists the hash of a hotfix transaction(s).
-   * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
-   */
-  function whitelistHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
-    hotfixes[hash].whitelisted[msg.sender] = true;
-    emit HotfixWhitelisted(hash, msg.sender);
-  }
-
-  /**
-   * @notice Gives hotfix a prepared epoch for execution.
+   * @notice Gives hotfix a time limit for execution.
    * @param hash The hash of the hotfix to be prepared.
    */
   function prepareHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
-    require(isHotfixPassing(hash), "hotfix not whitelisted by 2f+1 validators");
-    uint256 epoch = getEpochNumber();
-    require(hotfixes[hash].preparedEpoch < epoch, "hotfix already prepared for this epoch");
-    hotfixes[hash].preparedEpoch = epoch;
-    emit HotfixPrepared(hash, epoch);
+    HotfixRecord storage _currentHotfix = hotfixes[hash];
+
+    uint256 _currentTime = now;
+    require(hotfixExecutionTimeWindow > 0, "Hotfix execution time window not set");
+    require(_currentHotfix.executionTimeLimit == 0, "Hotfix already prepared for this timeframe.");
+    require(_currentHotfix.approved, "Hotfix not approved by approvers.");
+    require(_currentHotfix.councilApproved, "Hotfix not approved by security council.");
+
+    _currentHotfix.executionTimeLimit = _currentTime.add(hotfixExecutionTimeWindow);
+    emit HotfixPrepared(hash, _currentTime.add(hotfixExecutionTimeWindow));
   }
 
   /**
@@ -659,11 +720,16 @@ contract Governance is
   ) external {
     bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths, salt));
 
-    (bool approved, bool executed, uint256 preparedEpoch) = getHotfixRecord(hash);
+    (
+      bool approved,
+      bool councilApproved,
+      bool executed,
+      uint256 executionTimeLimit
+    ) = getHotfixRecord(hash);
     require(!executed, "hotfix already executed");
     require(approved, "hotfix not approved");
-    require(preparedEpoch == getEpochNumber(), "hotfix must be prepared for this epoch");
-
+    require(councilApproved, "hotfix not approved by security council");
+    require(executionTimeLimit >= now, "Execution time limit has already been reached.");
     Proposals.makeMem(values, destinations, data, dataLengths, msg.sender, 0).executeMem();
 
     hotfixes[hash].executed = true;
@@ -941,7 +1007,7 @@ contract Governance is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 4, 1, 1);
+    return (1, 5, 0, 0);
   }
 
   /**
@@ -969,6 +1035,7 @@ contract Governance is
   function setApprover(address _approver) public onlyOwner {
     require(_approver != address(0), "Approver cannot be 0");
     require(_approver != approver, "Approver unchanged");
+    require(_approver != securityCouncil, "Approver cannot be council");
     approver = _approver;
     emit ApproverSet(_approver);
   }
@@ -1170,45 +1237,31 @@ contract Governance is
   }
 
   /**
-   * @notice Returns number of validators from current set which have whitelisted the given hotfix.
+   * @notice Resets the hotfix record when after the execution time limit has elapsed.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
-   * @return Whitelist tally
    */
-  function hotfixWhitelistValidatorTally(bytes32 hash) public view returns (uint256) {
-    uint256 tally = 0;
-    uint256 n = numberValidatorsInCurrentSet();
-    IAccounts accounts = getAccounts();
-    for (uint256 i = 0; i < n; i = i.add(1)) {
-      address validatorSigner = validatorSignerAddressFromCurrentSet(i);
-      address validatorAccount = accounts.signerToAccount(validatorSigner);
-      if (
-        isHotfixWhitelistedBy(hash, validatorSigner) ||
-        isHotfixWhitelistedBy(hash, validatorAccount)
-      ) {
-        tally = tally.add(1);
-      }
-    }
-    return tally;
-  }
-
-  /**
-   * @notice Checks if a byzantine quorum of validators has whitelisted the given hotfix.
-   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
-   * @return Whether validator whitelist tally >= validator byzantine quorum
-   */
-  function isHotfixPassing(bytes32 hash) public view returns (bool) {
-    return hotfixWhitelistValidatorTally(hash) >= minQuorumSizeInCurrentSet();
+  function resetHotFixRecord(bytes32 hash) public hotfixNotExecuted(hash) hotfixTimedOut(hash) {
+    hotfixes[hash].approved = false;
+    hotfixes[hash].councilApproved = false;
+    hotfixes[hash].executionTimeLimit = 0;
+    emit HotfixRecordReset(hash);
   }
 
   /**
    * @notice Gets information about a hotfix.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
-   * @return Hotfix approved.
+   * @return Hotfix approved by approver.
+   * @return Hotfix approved by SecurityCouncil.
    * @return Hotfix executed.
-   * @return Hotfix preparedEpoch.
+   * @return Hotfix exection time limit.
    */
-  function getHotfixRecord(bytes32 hash) public view returns (bool, bool, uint256) {
-    return (hotfixes[hash].approved, hotfixes[hash].executed, hotfixes[hash].preparedEpoch);
+  function getHotfixRecord(bytes32 hash) public view returns (bool, bool, bool, uint256) {
+    return (
+      hotfixes[hash].approved,
+      hotfixes[hash].councilApproved,
+      hotfixes[hash].executed,
+      hotfixes[hash].executionTimeLimit
+    );
   }
 
   /**
@@ -1219,15 +1272,6 @@ contract Governance is
    */
   function isQueued(uint256 proposalId) public view returns (bool) {
     return queue.contains(proposalId);
-  }
-
-  /**
-   * @notice Returns whether given hotfix hash has been whitelisted by given address.
-   * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
-   * @param whitelister Address to check whitelist status of.
-   */
-  function isHotfixWhitelistedBy(bytes32 hash, address whitelister) public view returns (bool) {
-    return hotfixes[hash].whitelisted[whitelister];
   }
 
   /**
