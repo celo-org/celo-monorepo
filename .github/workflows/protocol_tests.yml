@@ -167,12 +167,7 @@ jobs:
 
       - name: Set up anvil devchain from generated state
         if: success() || failure()
-        run: |
-          cd $GITHUB_WORKSPACE/celo-optimism/packages/contracts-bedrock
-          anvil --celo --port 9545 --code-size-limit 245760 --load-state anvil-state.json &
-          while ! nc -z localhost 9545; do
-            sleep 0.5
-          done
+        run: OP_DIR=${GITHUB_WORKSPACE}/celo-optimism/packages/contracts-bedrock ./scripts/foundry/start_op_anvil.sh
             
       - name: Generate migrations on local devchain
         if: success() || failure()
