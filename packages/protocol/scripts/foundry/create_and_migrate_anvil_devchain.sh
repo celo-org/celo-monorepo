@@ -15,14 +15,6 @@ echo "Library flags are: $CACHED_LIBRARIES_FLAG"
 START_TIME=$SECONDS
 echo "Forge version: $(forge --version)"
 
-# Create temporary directory
-if [ -d "$TMP_FOLDER" ]; then
-    # Remove temporary directory first it if exists
-    echo "Removing existing temporary folder..."
-    rm -rf $TMP_FOLDER
-fi
-mkdir -p $TMP_FOLDER
-
 # Deploy libraries to the anvil instance
 source $PWD/scripts/foundry/deploy_libraries.sh
 echo "Library flags are: $LIBRARY_FLAGS"
