@@ -52,9 +52,7 @@ jobs:
       # Adding a initial comma so ',<path>' matches also for the first file
       all_modified_files: ',${{ steps.changed-files.outputs.all_modified_files }}'
       artifacts_to_cache: ${{ steps.get_artifacts_to_cache.outputs.artifacts_to_cache }}
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:34b1c5e90f9613964160cdf6bc292b410362ec6d
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -144,22 +142,21 @@ jobs:
           fetch_depth: '150'
       - run: echo ",${{ steps.changed-files.outputs.all_modified_files }}"
 
-  # ignore lint check
-  # lint-checks:
-  #   name: Lint code
-  #   runs-on: ['self-hosted', 'monorepo-node18']
-  #   timeout-minutes: 30
-  #   needs: install-dependencies
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         submodules: recursive
-  #     - name: Sync workspace
-  #       uses: ./.github/actions/sync-workspace
-  #       with:
-  #         artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-  #     - run: yarn run prettify:diff
-  #     - run: yarn run lint
+  lint-checks:
+    name: Lint code
+    runs-on: ['self-hosted', 'monorepo-node18']
+    timeout-minutes: 30
+    needs: install-dependencies
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
+      - run: yarn run prettify:diff
+      - run: yarn run lint
 
   protocol-test-release:
     name: Protocol Test Release
