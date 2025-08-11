@@ -57,6 +57,6 @@ if ! nc -z 127.0.0.1 8545 ; then
   echo "Warning: port 8545 not open" >&2
 fi
 
-yarn run build:truffle-ts && \
+# yarn run build:truffle-ts && \
 yarn run truffle exec ./scripts/truffle/deploy_release_contracts.js \
-  --network $NETWORK --from $FROM --grants $GRANTS_FILE --start_gold $START_GOLD --deployed_grants $DEPLOYED_GRANTS --output_file $OUTPUT_FILE $REALLY --build_directory $CONTRACT_ARTIFACTS_DIR \
+  --network $NETWORK --from $FROM --grants $GRANTS_FILE --start_gold $START_GOLD --deployed_grants $DEPLOYED_GRANTS --output_file $OUTPUT_FILE $REALLY --build_directory $CONTRACT_ARTIFACTS_DIR --forno\
