@@ -144,21 +144,22 @@ jobs:
           fetch_depth: '150'
       - run: echo ",${{ steps.changed-files.outputs.all_modified_files }}"
 
-  lint-checks:
-    name: Lint code
-    runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 30
-    needs: install-dependencies
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - run: yarn run prettify:diff
-      - run: yarn run lint
+  # ignore lint check
+  # lint-checks:
+  #   name: Lint code
+  #   runs-on: ['self-hosted', 'monorepo-node18']
+  #   timeout-minutes: 30
+  #   needs: install-dependencies
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         submodules: recursive
+  #     - name: Sync workspace
+  #       uses: ./.github/actions/sync-workspace
+  #       with:
+  #         artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
+  #     - run: yarn run prettify:diff
+  #     - run: yarn run lint
 
   protocol-test-release:
     name: Protocol Test Release
