@@ -1,8 +1,10 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://i.imgur.com/OxWGKrK.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://imgur.com/0Uqjx0q.png">
-  <img alt="Celo logo" title="Go to celo.org" width="600" style="border:none;" src="https://images.ctfassets.net/wr0no19kwov9/38SgqWR0SdxYbRubhUYdBE/ae8b83c598da4de679cf55d06b3d1f27/brand-kit-color-image-05.png">
-</picture>
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://i.imgur.com/OxWGKrK.png">
+    <source media="(prefers-color-scheme: light)" srcset="https://imgur.com/0Uqjx0q.png">
+    <img alt="Celo logo" title="Go to celo.org" width="600" style="border:none;" src="https://images.ctfassets.net/wr0no19kwov9/38SgqWR0SdxYbRubhUYdBE/ae8b83c598da4de679cf55d06b3d1f27/brand-kit-color-image-05.png">
+  </picture>
+</div>
 
 # Celo Monorepo
 
