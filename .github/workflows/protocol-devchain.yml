@@ -26,7 +26,7 @@ jobs:
           - tag: core-contracts.v12-renamed
             node-version: 18
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ matrix.tag }}
           fetch-depth: 0
