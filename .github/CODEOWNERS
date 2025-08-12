@@ -3,12 +3,14 @@
 # For details on acceptable file patterns, please refer to the [Github Documentation](https://help.github.com/articles/about-codeowners/)
 
 # default owners, overridden by package specific owners below
-* @celo-org/default-owners
 
-# directory and file-level owners. Feel free to add to this!
+* @celo-org/primitives
+
+# directory and file-level owners
 
 .github/actions/ @celo-org/devopsre
 .github/workflows/ @celo-org/devopsre
+.github/renovate.json5 @celo-org/devopsre
 
 /dockerfiles/ @celo-org/devopsre
 
