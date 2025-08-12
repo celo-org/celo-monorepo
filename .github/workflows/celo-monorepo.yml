@@ -58,7 +58,7 @@ jobs:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:34b1c5e90f9613964160cdf6bc292b410362ec6d
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: Restore node cache
@@ -149,7 +149,7 @@ jobs:
     timeout-minutes: 30
     needs: install-dependencies
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: Sync workspace
@@ -173,7 +173,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: recursive
@@ -235,7 +235,7 @@ jobs:
             command: |
               yarn --cwd packages/protocol test:scripts
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: Sync workspace
@@ -326,7 +326,7 @@ jobs:
 
           #     ./ci_test_validator_order.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: Sync workspace
@@ -385,7 +385,7 @@ jobs:
               cd packages/protocol
               ./specs/scripts/reserve.sh
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: Sync workspace
