@@ -26,7 +26,7 @@ jobs:
       # Adding a initial comma so ',<path>' matches also for the first file
       all_modified_files: ',${{ steps.changed-files.outputs.all_modified_files }}'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Detect files changed in PR (or commit), and expose as output
         id: changed-files
         uses: step-security/changed-files@3dbe17c78367e7d60f00d78ae6781a35be47b4a1
