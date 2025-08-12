@@ -31,10 +31,9 @@ jobs:
         with:
           # Using comma as separator to be able to easily match full paths (using ,<path>)
           separator: ','
-
   # All monorepo
   celomonorepo-build-dev:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.0.4
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.0.5
     name: Build us-west1-docker.pkg.dev/devopsre/dev-images/monorepo:${{ github.sha }}
     needs: changed-files
     if: |
@@ -50,7 +49,7 @@ jobs:
       file: dockerfiles/all-monorepo/Dockerfile
       trivy: false
   celomonorepo-build:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.0.4
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.0.5
     name: Build us-west1-docker.pkg.dev/devopsre/celo-monorepo/monorepo:${{ github.sha }}
     needs: changed-files
     if: |
