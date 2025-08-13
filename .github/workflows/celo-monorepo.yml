@@ -52,10 +52,7 @@ jobs:
       # Adding a initial comma so ',<path>' matches also for the first file
       all_modified_files: ',${{ steps.changed-files.outputs.all_modified_files }}'
       artifacts_to_cache: ${{ steps.get_artifacts_to_cache.outputs.artifacts_to_cache }}
-    # runs-on: ubuntu-latest
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:34b1c5e90f9613964160cdf6bc292b410362ec6d
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -73,6 +70,10 @@ jobs:
           key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-
+      - name: Double check node version
+        run: |
+          echo "Node version: $(node --version)"
+          echo "Yarn version: $(yarn --version)"
       - name: Install yarn dependencies
         run: git config --global url."https://".insteadOf ssh:// && yarn generate-lock-entry && yarn install --frozen-lockfile --network-timeout 1000000
         if: steps.cache_node.outputs.cache-hit != 'true'
@@ -143,9 +144,7 @@ jobs:
 
   lint-checks:
     name: Lint code
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:34b1c5e90f9613964160cdf6bc292b410362ec6d
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     timeout-minutes: 30
     needs: install-dependencies
     steps:
@@ -161,9 +160,7 @@ jobs:
 
   protocol-test-release:
     name: Protocol Test Release
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:34b1c5e90f9613964160cdf6bc292b410362ec6d
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     timeout-minutes: 500
     needs: [install-dependencies, lint-checks]
     if: |
@@ -200,9 +197,7 @@ jobs:
   protocol-test-matrix:
     # Keeping name short because GitHub UI does not handle long names well
     name: ${{ matrix.name }}
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:34b1c5e90f9613964160cdf6bc292b410362ec6d
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks]
     if: |
