@@ -119,7 +119,7 @@ The following table lists the configurable parameters of the vault chart and the
 | Parameter                   | Description                                                        | Default                      |
 | --------------------------- | ------------------------------------------------------------------ | ---------------------------- |
 | `imagePullPolicy`           | Container pull policy                                              | `IfNotPresent`               |
-| `nodeSelector`              | Node labels for pod assignmen                                      |                              |
+| `nodeSelector`              | Node labels for pod assignment, assign men                                      |                              |
 | `bootnode.image.repository` | bootnode container image to use                                    | `ethereum/client-go`         |
 | `bootnode.image.tag`        | bootnode container image tag to deploy                             | `alltools-v1.7.3`            |
 | `geth.image.repository`     | geth container image to use                                        | `ethereum/client-go`         |

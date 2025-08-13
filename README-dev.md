@@ -2,7 +2,7 @@
 
 ## How to run a local testnet
 
-Often when developing, it is useful to create a test network localy using the full celo-blockchain binary to go beyond what can be done with other options such as [Ganache](https://www.trufflesuite.com/ganache)
+Often when developing, it is useful to create a test network locally using the full celo-blockchain binary to go beyond what can be done with other options such as [Ganache](https://www.trufflesuite.com/ganache)
 
 The quickest way to get started with a local testnet is by running `yarn celotool local-testnet` from the `monorepo` root.
 
