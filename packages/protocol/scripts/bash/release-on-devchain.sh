@@ -21,28 +21,33 @@ while getopts 'b:l:d:' flag; do
   esac
 done
 
-[ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
+# [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 
-# if BUILD_DIR was not set as a parameter, we generate the build and the chain for that specific branch
-if [ -z "$BUILD_DIR" ]
-then
-    RE_BUILD_REPO="yes"
-    BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
-fi
+# # if BUILD_DIR was not set as a parameter, we generate the build and the chain for that specific branch
+# if [ -z "$BUILD_DIR" ]
+# then
+#     RE_BUILD_REPO="yes"
+#     BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
+# fi
 
 
-echo "- Run local network"
-yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz
+# echo "- Run local network"
+# yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz
 
-GANACHE_PID=
-if command -v lsof; then
-    GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
-    echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
-fi
+# GANACHE_PID=
+# if command -v lsof; then
+#     GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
+#     echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
+# fi
 
-echo "- Verify bytecode of the network"
+# echo "- Verify bytecode of the network"
 
-yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts --build_artifacts08 $BUILD_DIR/contracts-0.8 --branch $BRANCH --librariesFile libraries.json
+# this commands assumes the build artifacts are already present in the $BUILD_DIR
+# yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network anvil --build_artifacts $BUILD_DIR/contracts --build_artifacts08 $BUILD_DIR/contracts-0.8 --branch $BRANCH --librariesFile libraries.json
+
+# this commands compiles the output
+yarn --cwd packages/protocol verify-deployed -n anvil -b $BRANCH
+
 
 echo "- Check versions of current branch"
 # From check-versions.sh
