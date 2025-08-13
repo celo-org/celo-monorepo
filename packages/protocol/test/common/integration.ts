@@ -15,8 +15,7 @@ import {
   makeTruffleContractForMigration,
 } from '@celo/protocol/lib/web3-utils'
 import { build_directory, config } from '@celo/protocol/migrationsConfig'
-import { EpochManagerEnablerInstance, ValidatorsInstance } from '@celo/protocol/types/typechain-0.8'
-import { linkedListChanges, zip } from '@celo/utils/lib/collections'
+import { EpochManagerEnablerInstance } from '@celo/protocol/types/typechain-0.8'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
@@ -52,62 +51,62 @@ enum VoteValue {
   Yes,
 }
 
-async function getGroups(election: ElectionInstance) {
-  const response = await election.getTotalVotesForEligibleValidatorGroups()
-  console.info('response', response)
-  const lst1 = response[0]
-  const lst2 = response[1]
-  return zip(
-    (address, value) => {
-      return { address, value }
-    },
-    lst1,
-    lst2
-  )
-}
+// async function getGroups(election: ElectionInstance) {
+//   const response = await election.getTotalVotesForEligibleValidatorGroups()
+//   console.info('response', response)
+//   const lst1 = response[0]
+//   const lst2 = response[1]
+//   return zip(
+//     (address, value) => {
+//       return { address, value }
+//     },
+//     lst1,
+//     lst2
+//   )
+// }
 
 // Returns how much voting gold will be decremented from the groups voted by an account
-async function slashingOfGroups(
-  account: string,
-  penalty: BigNumber,
-  lockedGold: LockedGoldInstance,
-  election: ElectionInstance
-) {
-  // first check how much voting gold has to be slashed
-  const nonVoting = await lockedGold.getAccountNonvotingLockedGold(account)
-  if (penalty.isLessThan(nonVoting)) {
-    return []
-  }
-  let difference = penalty.minus(nonVoting)
-  // find voted groups
-  const groups = await election.getGroupsVotedForByAccount(account)
-  const res = []
-  //
-  for (let i = groups.length - 1; i >= 0; i--) {
-    const group = groups[i]
-    const totalVotes = await election.getTotalVotesForGroup(group)
-    const votes = await election.getTotalVotesForGroupByAccount(group, account)
-    const slashedVotes = votes.lt(difference) ? votes : difference
-    res.push({ address: group, value: totalVotes.minus(slashedVotes), index: i })
-    difference = difference.minus(slashedVotes)
-    if (difference.eq(new BigNumber(0))) {
-      break
-    }
-  }
-  return res
-}
+// async function slashingOfGroups(
+//   account: string,
+//   penalty: BigNumber,
+//   lockedGold: LockedGoldInstance,
+//   election: ElectionInstance
+// ) {
+//   // first check how much voting gold has to be slashed
+//   const nonVoting = await lockedGold.getAccountNonvotingLockedGold(account)
+//   if (penalty.isLessThan(nonVoting)) {
+//     return []
+//   }
+//   let difference = penalty.minus(nonVoting)
+//   // find voted groups
+//   const groups = await election.getGroupsVotedForByAccount(account)
+//   const res = []
+//   //
+//   for (let i = groups.length - 1; i >= 0; i--) {
+//     const group = groups[i]
+//     const totalVotes = await election.getTotalVotesForGroup(group)
+//     const votes = await election.getTotalVotesForGroupByAccount(group, account)
+//     const slashedVotes = votes.lt(difference) ? votes : difference
+//     res.push({ address: group, value: totalVotes.minus(slashedVotes), index: i })
+//     difference = difference.minus(slashedVotes)
+//     if (difference.eq(new BigNumber(0))) {
+//       break
+//     }
+//   }
+//   return res
+// }
 
-async function findLessersAndGreaters(
-  account: string,
-  penalty: BigNumber,
-  lockedGold: LockedGoldInstance,
-  election: ElectionInstance
-) {
-  const groups = await getGroups(election)
-  const changed = await slashingOfGroups(account, penalty, lockedGold, election)
-  const changes = linkedListChanges(groups, changed)
-  return { ...changes, indices: changed.map((a) => a.index) }
-}
+// async function findLessersAndGreaters(
+//   account: string,
+//   penalty: BigNumber,
+//   lockedGold: LockedGoldInstance,
+//   election: ElectionInstance
+// ) {
+//   const groups = await getGroups(election)
+//   const changed = await slashingOfGroups(account, penalty, lockedGold, election)
+//   const changes = linkedListChanges(groups, changed)
+//   return { ...changes, indices: changed.map((a) => a.index) }
+// }
 
 contract('Integration: Running elections', (_accounts: string[]) => {
   let election: ElectionInstance
@@ -134,23 +133,23 @@ contract.skip('Integration: Governance slashing', (accounts: string[]) => {
   const proposalId = 1
   const dequeuedIndex = 0
   let lockedGold: LockedGoldInstance
-  let election: ElectionInstance
-  let validators: ValidatorsInstance
+  // let election: ElectionInstance
+  // let validators: ValidatorsInstance
   let epochManagerEnabler: EpochManagerEnablerInstance
   let multiSig: GovernanceApproverMultiSigInstance
   let governance: GovernanceInstance
   let governanceSlasher: GovernanceSlasherInstance
   let proposalTransactions: any
   let value: BigNumber
-  let valueOfSlashed: BigNumber
+  // let valueOfSlashed: BigNumber
   const penalty = new BigNumber('100')
   const slashedAccount = accounts[9]
 
   before(async () => {
     const artifacts08 = ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE, artifacts)
     lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
-    election = await getDeployedProxiedContract('Election', artifacts)
-    validators = await getDeployedProxiedContract('Validators', artifacts08)
+    // election = await getDeployedProxiedContract('Election', artifacts)
+    // validators = await getDeployedProxiedContract('Validators', artifacts08)
 
     epochManagerEnabler = await getDeployedProxiedContract('EpochManagerEnabler', artifacts08)
     // @ts-ignore
@@ -276,34 +275,34 @@ contract.skip('Integration: Governance slashing', (accounts: string[]) => {
     })
   })
 
-  describe('When performing slashing', () => {
-    before(async () => {
-      await timeTravel(config.governance.referendumStageDuration, web3)
-      valueOfSlashed = await lockedGold.getAccountTotalLockedGold(slashedAccount)
-      const { lessers, greaters, indices } = await findLessersAndGreaters(
-        slashedAccount,
-        penalty,
-        lockedGold,
-        election
-      )
-      let group = await validators.getMembershipInLastEpochFromSigner(slashedAccount)
+  // describe('When performing slashing', () => {
+  //   before(async () => {
+  //     await timeTravel(config.governance.referendumStageDuration, web3)
+  //     valueOfSlashed = await lockedGold.getAccountTotalLockedGold(slashedAccount)
+  //     const { lessers, greaters, indices } = await findLessersAndGreaters(
+  //       slashedAccount,
+  //       penalty,
+  //       lockedGold,
+  //       election
+  //     )
+  //     let group = await validators.getMembershipInLastEpochFromSigner(slashedAccount)
 
-      await governanceSlasher.slash(slashedAccount, group, lessers, greaters, indices, {
-        from: accounts[0],
-      })
-    })
+  //     await governanceSlasher.slash(slashedAccount, group, lessers, greaters, indices, {
+  //       from: accounts[0],
+  //     })
+  //   })
 
-    it('should set approved slashing to zero', async () => {
-      assert.equal((await governanceSlasher.getApprovedSlashing(slashedAccount)).toNumber(), 0)
-    })
+  //   it('should set approved slashing to zero', async () => {
+  //     assert.equal((await governanceSlasher.getApprovedSlashing(slashedAccount)).toNumber(), 0)
+  //   })
 
-    it('should slash the account', async () => {
-      assertEqualBN(
-        await lockedGold.getAccountTotalLockedGold(slashedAccount),
-        valueOfSlashed.minus(penalty)
-      )
-    })
-  })
+  //   it('should slash the account', async () => {
+  //     assertEqualBN(
+  //       await lockedGold.getAccountTotalLockedGold(slashedAccount),
+  //       valueOfSlashed.minus(penalty)
+  //     )
+  //   })
+  // })
 })
 
 contract('Integration: Governance', (accounts: string[]) => {
