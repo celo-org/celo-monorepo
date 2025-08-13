@@ -95,8 +95,10 @@ async function main(buildTargets: BuildOptions) {
       method: 'POST',
       body: formData,
     })
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       .then((res) => res.json())
       .then((json) =>
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         fetch(
           `https://${network}-blockscout.celo-testnet.org/address/${json.result[0].address}/contracts`
         )

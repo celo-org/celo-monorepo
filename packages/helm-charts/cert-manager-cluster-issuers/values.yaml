@@ -1,9 +1,0 @@
-imagePullPolicy: IfNotPresent
-
-# Values that are used for the dependency `cert-manager`
-cert-manager:
-  ingressShim:
-    defaultIssuerKind: ClusterIssuer
-    defaultIssuerName: letsencrypt-prod
-  webhook:
-    enabled: false

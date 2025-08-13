@@ -129,7 +129,7 @@ twitter intent generator - http://tech.cymi.org/tweet-intents
 
 - [Website](https://celo.org/)
 - [Docs](https://docs.celo.org/)
-- [Blog](https://medium.com/celohq)
+- [Blog](https://blog.celo.org/)
 - [YouTube](https://www.youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw/videos?view=0&sort=p&flow=grid)
 - [Forum](https://forum.celo.org)
 - [Discord](https://discord.com/invite/celo)
