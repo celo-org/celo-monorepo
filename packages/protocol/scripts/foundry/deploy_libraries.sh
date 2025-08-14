@@ -64,4 +64,3 @@ popd
 
 # Remove the temporary directory
 rm -rf $TEMP_DIR
-
