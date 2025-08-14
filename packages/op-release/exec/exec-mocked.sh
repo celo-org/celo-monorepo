@@ -1,0 +1,262 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# behaviour (values: 'approve', 'sign')
+APPROVE_OR_SIGN='sign'
+
+# optionally allow to specify signer
+EXTERNAL_SIG=${SIG:-}
+EXTERNAL_ACCOUNT=${ACCOUNT:-}
+EXTERNAL_TEAM=${TEAM:-}
+GRAND_CHILD_MULTISIG=${GC_MULTISIG:-}
+if [ -n "$EXTERNAL_SIG" ] && [ -n "$EXTERNAL_ACCOUNT" ]; then
+  echo "Detected external account: $EXTERNAL_ACCOUNT"
+  case $EXTERNAL_TEAM in
+    "clabs"|"council")
+      echo "Detected valid team: $EXTERNAL_TEAM"
+      ;;
+    *)
+      echo "Invalid team: $EXTERNAL_TEAM" && exit 1
+      ;;
+  esac
+  echo "External sig: $EXTERNAL_SIG"
+fi
+if [ -n "$GRAND_CHILD_MULTISIG" ] && [ $EXTERNAL_TEAM != "council" ]; then
+  echo "Grand Child multisig is not supported for other team than council" && exit 1
+fi
+
+# required envs
+[ -z "${VERSION:-}" ] && echo "Need to set the VERSION via env" && exit 1;
+[ -z "${PK:-}" ] && echo "Need to set the PK via env" && exit 1;
+if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ]; then
+  [ -z "${SIGNER_1_PK:-}" ] && echo "Need to set the SIGNER_1_PK via env" && exit 1;
+fi
+[ -z "${SIGNER_2_PK:-}" ] && echo "Need to set the SIGNER_2_PK via env" && exit 1;
+if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
+  [ -z "${SIGNER_3_PK:-}" ] && echo "Need to set the SIGNER_3_PK via env" && exit 1;
+fi
+[ -z "${SIGNER_4_PK:-}" ] && echo "Need to set the SIGNER_4_PK via env" && exit 1;
+
+# check version
+case $VERSION in
+  "v2"|"v3")
+    echo "Detected supported version: $VERSION"
+    ;;
+  *)
+    echo "Invalid version: $VERSION" && exit 1
+    ;;
+esac
+
+# addresses
+SENDER=0xe571b94CF7e95C46DFe6bEa529335f4A11d15D92
+if [ $SENDER != $(cast wallet address --private-key $PK) ]; then
+  echo "Invalid PK"; exit 1;
+fi
+if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ]; then
+  MOCKED_SIGNER_1=0x899a864C6bE2c573a98d8493961F4D4c0F7Dd0CC
+  if [ $MOCKED_SIGNER_1 != $(cast wallet address --private-key $SIGNER_1_PK) ]; then
+    echo "Invalid SIGNER_1_PK"; exit 1;
+  fi
+fi
+MOCKED_SIGNER_2=0x865d05C8bB46E7AF16D6Dc99ddfb2e64BBec1345
+if [ $MOCKED_SIGNER_2 != $(cast wallet address --private-key $SIGNER_2_PK) ]; then
+  echo "Invalid SIGNER_2_PK"; exit 1;
+fi
+if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
+  MOCKED_SIGNER_3=0x8Af6f11c501c082bD880B3ceC83e6bB249Fa32c9
+  if [ $MOCKED_SIGNER_3 != $(cast wallet address --private-key $SIGNER_3_PK) ]; then
+    echo "Invalid SIGNER_3_PK"; exit 1;
+  fi
+fi
+MOCKED_SIGNER_4=0x480C5f2340f9E7A46ee25BAa815105B415a7c2e2
+if [ $MOCKED_SIGNER_4 != $(cast wallet address --private-key $SIGNER_4_PK) ]; then
+  echo "Invalid SIGNER_4_PK"; exit 1;
+fi
+
+# rpc
+RPC_URL=http://127.0.0.1:8545
+
+# defaults
+VALUE=0
+OP_CALL=0
+OP_DELEGATECALL=1
+SAFE_TX_GAS=0
+BASE_GAS=0
+GAS_PRICE=0
+GAS_TOKEN=0x0000000000000000000000000000000000000000
+REFUND_RECEIVER=0x0000000000000000000000000000000000000000
+
+# safes
+PARENT_SAFE_ADDRESS=0x4092A77bAF58fef0309452cEaCb09221e556E112
+CLABS_SAFE_ADDRESS=0x9Eb44Da23433b5cAA1c87e35594D15FcEb08D34d
+COUNCIL_SAFE_ADDRESS=0xC03172263409584f7860C25B6eB4985f0f6F4636
+
+# tx data
+if [ $VERSION = 'v2' ]; then
+  PARENT_SAFE_NONCE=22
+  CLABS_SAFE_NONCE=19
+  COUNCIL_SAFE_NONCE=21
+  OPCM_ADDRESS=0x597f110a3bee7f260b1657ab63c36d86b3740f36
+  OPCM_UPGRADE_CALLDATA=0xa458978000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000089e31965d844a309231b1f17759ccaf1b7c09861000000000000000000000000783a434532ee94667979213af1711505e8bfe37403b357b30095022ecbb44ef00d1de19df39cf69ee92a60683a6be2c6f8fe6a3e
+else
+  PARENT_SAFE_NONCE=23
+  CLABS_SAFE_NONCE=20
+  COUNCIL_SAFE_NONCE=22
+  OPCM_ADDRESS=0x2e8cd74af534f5eeb53f889d92fd4220546a15e7
+  OPCM_UPGRADE_CALLDATA=0xa458978000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000089e31965d844a309231b1f17759ccaf1b7c09861000000000000000000000000783a434532ee94667979213af1711505e8bfe374034b32d11f017711ce7122ac71d87b1c6cc73e10a0dbd957d8b27f6360acaf8f
+fi
+
+echo "--- Parent prep ---"
+
+# parent hash
+PARENT_TX_HASH=$(cast call $PARENT_SAFE_ADDRESS \
+  "getTransactionHash(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,uint256)(bytes32)" \
+  $OPCM_ADDRESS $VALUE $OPCM_UPGRADE_CALLDATA $OP_DELEGATECALL $SAFE_TX_GAS $BASE_GAS $GAS_PRICE $GAS_TOKEN $REFUND_RECEIVER $PARENT_SAFE_NONCE \
+  -r $RPC_URL
+)
+echo "Parent hash: $PARENT_TX_HASH"
+
+echo "--- cLabs part ---"
+
+# cLabs approve
+APPROVE_ON_PARENT_CALLDATA=$(cast calldata 'approveHash(bytes32)' $PARENT_TX_HASH)
+CLABS_TX_HASH=$(cast call $CLABS_SAFE_ADDRESS \
+  "getTransactionHash(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,uint256)(bytes32)" \
+  $PARENT_SAFE_ADDRESS $VALUE $APPROVE_ON_PARENT_CALLDATA $OP_CALL $SAFE_TX_GAS $BASE_GAS $GAS_PRICE $GAS_TOKEN $REFUND_RECEIVER $CLABS_SAFE_NONCE \
+  -r $RPC_URL
+)
+echo "cLabs hash: $CLABS_TX_HASH"
+
+# approve or sign cLabs
+if [ $APPROVE_OR_SIGN = 'approve' ]; then
+  echo "Approve cLabs hash"
+  CLABS_APPROVE_FROM_SIGNER_CALLDATA=$(cast calldata 'approveHash(bytes32)' $CLABS_TX_HASH)
+  cast send $CLABS_SAFE_ADDRESS $CLABS_APPROVE_FROM_SIGNER_CALLDATA --private-key $SIGNER_1_PK -r $RPC_URL
+  cast send $CLABS_SAFE_ADDRESS $CLABS_APPROVE_FROM_SIGNER_CALLDATA --private-key $SIGNER_2_PK -r $RPC_URL
+  echo "cLabs hash approved"
+else
+  echo "Sign cLabs hash"
+  if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ]; then
+    CLABS_SIG_1=$(cast wallet sign --no-hash $CLABS_TX_HASH --private-key $SIGNER_1_PK)
+  else
+    CLABS_SIG_1=$EXTERNAL_SIG
+  fi
+  echo "Sig 1: $CLABS_SIG_1"
+  CLABS_SIG_2=$(cast wallet sign --no-hash $CLABS_TX_HASH --private-key $SIGNER_2_PK)
+  echo "Sig 2: $CLABS_SIG_2"
+  echo "cLabs hash signed"
+fi
+
+# exec cLabs
+echo "Exec cLabs approval"
+if [ $APPROVE_OR_SIGN = 'approve' ]; then
+  CLABS_SIG=0x000000000000000000000000${MOCKED_SIGNER_2:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000${MOCKED_SIGNER_1:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000
+else
+  if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ]; then
+    CLABS_SIG=0x${CLABS_SIG_2:2}${CLABS_SIG_1:2}
+  elif [[ ${MOCKED_SIGNER_2:2} < ${EXTERNAL_ACCOUNT:2} ]]; then
+    CLABS_SIG=0x${CLABS_SIG_2:2}${EXTERNAL_SIG:2}
+  else
+    CLABS_SIG=0x${EXTERNAL_SIG:2}${CLABS_SIG_2:2}
+  fi
+fi
+echo "cLabs sig: $CLABS_SIG"
+cast send $CLABS_SAFE_ADDRESS \
+  "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)" \
+  $PARENT_SAFE_ADDRESS $VALUE $APPROVE_ON_PARENT_CALLDATA $OP_CALL $SAFE_TX_GAS $BASE_GAS $GAS_PRICE $GAS_TOKEN $REFUND_RECEIVER $CLABS_SIG \
+  --private-key $PK \
+  -r $RPC_URL
+echo "cLabs approval executed"
+
+echo "--- Council part ---"
+
+# Council approve
+COUNCIL_TX_HASH=$(cast call $COUNCIL_SAFE_ADDRESS \
+  "getTransactionHash(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,uint256)(bytes32)" \
+  $PARENT_SAFE_ADDRESS $VALUE $APPROVE_ON_PARENT_CALLDATA $OP_CALL $SAFE_TX_GAS $BASE_GAS $GAS_PRICE $GAS_TOKEN $REFUND_RECEIVER $COUNCIL_SAFE_NONCE \
+  -r $RPC_URL
+)
+echo "Council hash: $COUNCIL_TX_HASH"
+
+# approve or sign Council
+if [ -n "$GRAND_CHILD_MULTISIG" ]; then
+  echo "Detected Grand Child multisig: $GRAND_CHILD_MULTISIG"
+
+  GRAND_CHILD_NONCE=$(cast call $GRAND_CHILD_MULTISIG "nonce()(uint256)" -r $RPC_URL)
+  echo "Grand Child nonce: $GRAND_CHILD_NONCE"
+
+  APPROVE_ON_CHILD_CALLDATA=$(cast calldata 'approveHash(bytes32)' $COUNCIL_TX_HASH)
+  GRAND_CHILD_TX_HASH=$(cast call $GRAND_CHILD_MULTISIG \
+    "getTransactionHash(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,uint256)(bytes32)" \
+    $COUNCIL_SAFE_ADDRESS $VALUE $APPROVE_ON_CHILD_CALLDATA $OP_CALL $SAFE_TX_GAS $BASE_GAS $GAS_PRICE $GAS_TOKEN $REFUND_RECEIVER $GRAND_CHILD_NONCE \
+    -r $RPC_URL
+  )
+  echo "Grand Child hash: $GRAND_CHILD_TX_HASH"
+  echo "Grand Child sig: $EXTERNAL_SIG"
+  cast send $GRAND_CHILD_MULTISIG \
+    "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)" \
+    $COUNCIL_SAFE_ADDRESS $VALUE $APPROVE_ON_CHILD_CALLDATA $OP_CALL $SAFE_TX_GAS $BASE_GAS $GAS_PRICE $GAS_TOKEN $REFUND_RECEIVER $EXTERNAL_SIG \
+    --private-key $PK \
+    -r $RPC_URL
+  echo "Grand Child approval executed"
+fi
+
+if [ $APPROVE_OR_SIGN = 'approve' ]; then
+  echo "Approve Council hash"
+  COUNCIL_APPROVE_FROM_SIGNER_CALLDATA=$(cast calldata 'approveHash(bytes32)' $COUNCIL_TX_HASH)
+  cast send $COUNCIL_SAFE_ADDRESS $COUNCIL_APPROVE_FROM_SIGNER_CALLDATA --private-key $SIGNER_3_PK -r $RPC_URL
+  cast send $COUNCIL_SAFE_ADDRESS $COUNCIL_APPROVE_FROM_SIGNER_CALLDATA --private-key $SIGNER_4_PK -r $RPC_URL
+  echo "Council hash approved"
+else
+  echo "Sign Council hash"
+  if [ -z "$GRAND_CHILD_MULTISIG" ]; then
+    if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
+      COUNCIL_SIG_1=$(cast wallet sign --no-hash $COUNCIL_TX_HASH --private-key $SIGNER_3_PK)
+    else
+      COUNCIL_SIG_1=$EXTERNAL_SIG
+    fi
+    echo "Sig 1: $COUNCIL_SIG_1"
+  fi
+  COUNCIL_SIG_2=$(cast wallet sign --no-hash $COUNCIL_TX_HASH --private-key $SIGNER_4_PK)
+  echo "Sig 2: $COUNCIL_SIG_2"
+  echo "Council hash signed"
+fi
+
+# exec Council
+echo "Exec Council approval"
+if [ $APPROVE_OR_SIGN = 'approve' ]; then
+  COUNCIL_SIG=0x000000000000000000000000${MOCKED_SIGNER_4:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000${MOCKED_SIGNER_3:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000
+else
+  if [ -z "$GRAND_CHILD_MULTISIG" ]; then
+    if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
+      COUNCIL_SIG=0x${COUNCIL_SIG_2:2}${COUNCIL_SIG_1:2}
+    elif [[ ${MOCKED_SIGNER_4:2} < ${EXTERNAL_ACCOUNT:2} ]]; then
+      COUNCIL_SIG=0x${COUNCIL_SIG_2:2}${EXTERNAL_SIG:2}
+    else
+      COUNCIL_SIG=0x${EXTERNAL_SIG:2}${COUNCIL_SIG_2:2}
+    fi
+  else
+    COUNCIL_SIG=0x${COUNCIL_SIG_2:2}000000000000000000000000${GRAND_CHILD_MULTISIG:2}000000000000000000000000000000000000000000000000000000000000000001
+  fi
+fi
+echo "Council sig: $COUNCIL_SIG"
+cast send $COUNCIL_SAFE_ADDRESS \
+  "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)" \
+  $PARENT_SAFE_ADDRESS $VALUE $APPROVE_ON_PARENT_CALLDATA $OP_CALL $SAFE_TX_GAS $BASE_GAS $GAS_PRICE $GAS_TOKEN $REFUND_RECEIVER $COUNCIL_SIG \
+  --private-key $PK \
+  -r $RPC_URL
+echo "Council approval executed"
+
+echo "--- Parent exec ---"
+
+# exec parent tx
+echo "Exec OPCM upgrade"
+PARENT_SIG=0x000000000000000000000000${CLABS_SAFE_ADDRESS:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000${COUNCIL_SAFE_ADDRESS:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000
+echo "Parent sig: $PARENT_SIG"
+cast send $PARENT_SAFE_ADDRESS \
+  "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)" \
+  $OPCM_ADDRESS $VALUE $OPCM_UPGRADE_CALLDATA $OP_DELEGATECALL $SAFE_TX_GAS $BASE_GAS $GAS_PRICE $GAS_TOKEN $REFUND_RECEIVER $PARENT_SIG \
+  --gas-limit 16000000 \
+  --private-key $PK \
+  -r $RPC_URL
+echo "OPCM upgrade executed"
