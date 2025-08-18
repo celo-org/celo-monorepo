@@ -32,7 +32,7 @@ jobs:
       run:
         working-directory: packages/protocol
     name: Generate anvil
-    runs-on: ['self-hosted', 'org', 'npm-publish']
+    runs-on: ['self-hosted', 'monorepo-node18']
     permissions:
       contents: read
       pull-requests: read
@@ -126,12 +126,10 @@ jobs:
       - name: 'Install packages'
         shell: bash
         run: yarn
-
       - name: Generate L2 migration and run migration tests
         if: success() || failure()
         run: |
           source ./scripts/foundry/constants.sh
-
           echo "Starting L2 from scratch to circumvent Anvil bug"
           ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
 
