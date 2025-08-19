@@ -493,7 +493,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     Arbitrary intrinsic gas number take from existing `FeeCurrencyDirectory.t.sol` tests
     Source: https://github.com/celo-org/celo-monorepo/blob/2cec07d43328cf4216c62491a35eacc4960fffb6/packages/protocol/test-sol/common/FeeCurrencyDirectory.t.sol#L27 
     */
-    uint256 mockIntrinsicGas = 21000;
+    uint256 mockIntrinsicGas = 50_000;
 
     IFeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory"))
       .setCurrencyConfig(stableTokenProxyAddress, address(getSortedOracles()), mockIntrinsicGas);
