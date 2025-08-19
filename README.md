@@ -21,7 +21,7 @@ and other packages. The source code for the Celo Blockchain which operates a nod
 <!-- row 2 - links & profiles -->
 
 [![Website celo.org](https://img.shields.io/website-up-down-green-red/https/celo.org.svg)](https://celo.org)
-[![Blog](https://img.shields.io/badge/blog-up-green)](https://medium.com/celoorg)
+[![Blog](https://img.shields.io/badge/blog-up-green)]( https://blog.celo.org/)
 [![docs](https://img.shields.io/badge/docs-up-green)](https://docs.celo.org/)
 [![Youtube](https://img.shields.io/badge/YouTube%20channel-up-green)](https://www.youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw/videos?view=0&sort=p&flow=grid)
 [![forum](https://img.shields.io/badge/forum-up-green)](https://forum.celo.org)
