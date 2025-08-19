@@ -12,7 +12,6 @@ import { IAccounts } from "../../contracts/common/interfaces/IAccounts.sol";
 import { ICeloUnreleasedTreasury } from "../../contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 import { IEpochManagerEnabler } from "../../contracts/common/interfaces/IEpochManagerEnabler.sol";
 import { IEpochManager } from "../../contracts/common/interfaces/IEpochManager.sol";
-// import { IFeeCurrencyWhitelist } from "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import { IFeeHandler } from "../../contracts/common/interfaces/IFeeHandler.sol";
 import { IFreezer } from "../../contracts/common/interfaces/IFreezer.sol";
 import { IRegistry } from "../../contracts/common/interfaces/IRegistry.sol";

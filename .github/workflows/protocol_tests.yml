@@ -132,11 +132,11 @@ jobs:
 
       - name: Generate migrations and run devchain
         if: success() || failure()
-        run: ANVIL_LOGGING=true ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
+        run: ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
       
       - name: Run migration tests against local anvil devchain
         run: |
-          ANVIL_LOGGING=true source ./scripts/foundry/constants.sh
+          source ./scripts/foundry/constants.sh
 
           FOUNDRY_PROFILE=devchain forge test -vvv \
           --match-path "test-sol/devchain/migration/*" \
@@ -144,7 +144,7 @@ jobs:
       
       - name: Run e2e tests against local anvil devchain
         run: |
-          ANVIL_LOGGING=true source ./scripts/foundry/constants.sh
+          source ./scripts/foundry/constants.sh
 
           FOUNDRY_PROFILE=devchain forge test -vvv \
           --match-path "test-sol/devchain/e2e/*" \
