@@ -82,8 +82,10 @@ export function instantiateArtifacts(buildDirectory: string): BuildArtifacts {
 
 function listForgeBuildArtifacts(buildDirectory: string): string[] {
   const buildInfoPathPattern = /build-info/
-  const coreContractPathPattern = /^contracts(-0\.8)?\//
-  const nonFoundryDependencyPathPattern = /^lib\/(?!celo)/
+  const coreContractPathPattern = /contracts(-0\.8)?\//
+  const nonFoundryDependencyPathPattern = /lib\/(?!celo)/
+  const foundryTestContractPathPattern = /test-sol-resources\//
+  const pathPatterns = [ coreContractPathPattern, nonFoundryDependencyPathPattern, foundryTestContractPathPattern ]
   const artifactsGlobPattern = `${buildDirectory}/**/*.json`
   const allArtifactPaths = globSync(artifactsGlobPattern)
   const coreContracts = allArtifactPaths.filter(artifactPath => {
@@ -92,7 +94,7 @@ function listForgeBuildArtifacts(buildDirectory: string): string[] {
     }
     const artifact = readJsonSync(artifactPath)
     const sourcePath = artifact.ast.absolutePath
-    return sourcePath.match(coreContractPathPattern) || sourcePath.match(nonFoundryDependencyPathPattern)
+    return pathPatterns.some((pattern: RegExp) => sourcePath.match(pattern))
   })
 
   return coreContracts

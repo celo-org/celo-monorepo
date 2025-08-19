@@ -259,8 +259,14 @@ export function reportASTIncompatibilities(
   for (const newArtifacts of newArtifactsSets) {
     const reports = newArtifacts.listArtifacts()
       .filter((newArtifact) => {
-        const coreContractPathPattern = /^(project:\/)?contracts(-0\.8)?\//
-        return coreContractPathPattern.test(newArtifact.ast.absolutePath)
+        // Matches all Truffle project artifacts (core contracts and test resource contracts)
+        const truffleProjectContractPathPattern = /^project:/
+        // Matches Foundry core contracts
+        const foundryCoreContractPathPattern = /^contracts(-0\.8)?\//
+        // Matches Foundry test resource contracts
+        const foundryTestContractPathPattern = /^test-sol-resources/
+        const path = newArtifact.ast.absolutePath
+        return truffleProjectContractPathPattern.test(path) || foundryCoreContractPathPattern.test(path) || foundryTestContractPathPattern.test(path)
       })
       .map((newArtifact) => {
         for (const oldArtifacts of oldArtifactsSet) {
