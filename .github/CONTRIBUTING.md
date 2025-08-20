@@ -10,4 +10,4 @@ If you wish to submit more complex changes, please sync with a core developer fi
 This will help ensure those changes are in line with the general philosophy of the project
 and enable you to get some early feedback.
 
-See the [contributing guide](https://docs.celo.org/community/contributing) for details on how to participate.
+See the [contributing guide](https://docs.celo.org/what-is-celo/joining-celo/contributors/code-contributors) for details on how to participate.
