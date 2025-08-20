@@ -7,7 +7,7 @@ files=(
   ".env.mnemonic:celo-testnet"
   ".env.mnemonic.alfajores:celo-testnet"
   ".env.mnemonic.baklava:celo-testnet"
-  ".env.mnemonic.rc1:celo-testnet-production"
+  ".env.mnemonic.mainnet:celo-testnet-production"
 )
 
 if [[ -z "$1" ]]; then

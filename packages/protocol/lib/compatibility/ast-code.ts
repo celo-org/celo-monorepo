@@ -237,9 +237,10 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
 
   const report = doASTCompatibilityReport(contractName, oldAST, newAST)
   // Check deployed byte code change
-  if (stripMetadata(oldContract.schema.deployedBytecode) !== stripMetadata(newContract.schema.deployedBytecode)) {
+  if ((stripMetadata(oldContract.schema.deployedBytecode) !== stripMetadata(newContract.schema.deployedBytecode))) {
     report.push(new DeployedBytecodeChange(contractName))
   }
+
   return report
 }
 

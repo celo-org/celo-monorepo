@@ -52,10 +52,7 @@ jobs:
       # Adding a initial comma so ',<path>' matches also for the first file
       all_modified_files: ',${{ steps.changed-files.outputs.all_modified_files }}'
       artifacts_to_cache: ${{ steps.get_artifacts_to_cache.outputs.artifacts_to_cache }}
-    # runs-on: ubuntu-latest
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:34b1c5e90f9613964160cdf6bc292b410362ec6d
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -73,6 +70,10 @@ jobs:
           key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-
+      - name: Double check node version
+        run: |
+          echo "Node version: $(node --version)"
+          echo "Yarn version: $(yarn --version)"
       - name: Install yarn dependencies
         run: git config --global url."https://".insteadOf ssh:// && yarn generate-lock-entry && yarn install --frozen-lockfile --network-timeout 1000000
         if: steps.cache_node.outputs.cache-hit != 'true'
@@ -143,9 +144,7 @@ jobs:
 
   lint-checks:
     name: Lint code
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:34b1c5e90f9613964160cdf6bc292b410362ec6d
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     timeout-minutes: 30
     needs: install-dependencies
     steps:
@@ -161,9 +160,7 @@ jobs:
 
   protocol-test-release:
     name: Protocol Test Release
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:34b1c5e90f9613964160cdf6bc292b410362ec6d
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     timeout-minutes: 500
     needs: [install-dependencies, lint-checks]
     if: |
@@ -200,9 +197,7 @@ jobs:
   protocol-test-matrix:
     # Keeping name short because GitHub UI does not handle long names well
     name: ${{ matrix.name }}
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:34b1c5e90f9613964160cdf6bc292b410362ec6d
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks]
     if: |
@@ -227,10 +222,10 @@ jobs:
               fi
           - name: Protocol Common tests
             command: |
-              yarn --cwd packages/protocol test common/
+              yarn --cwd packages/protocol test:truffle common/
           - name: Protocol Compatibility
             command: |
-              yarn --cwd packages/protocol test compatibility/
+              yarn --cwd packages/protocol test:truffle compatibility/
           - name: Protocol scripts test
             command: |
               yarn --cwd packages/protocol test:scripts
@@ -247,95 +242,6 @@ jobs:
         uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
         with:
           timeout_minutes: 40
-          max_attempts: 3
-          command: |
-            ${{ matrix.command }}
-
-  end-to-end-geth-matrix:
-    # Keeping name short because GitHub UI does not handle long names well
-    name: e2e ${{ matrix.name }}
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:34b1c5e90f9613964160cdf6bc292b410362ec6d
-    timeout-minutes: 60
-    needs: [install-dependencies, lint-checks]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'release') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: Geth e2e test
-            command: echo "Skipping these tests as they are running against a deprecated GETH version"
-          #   command: |
-          # - name: Transfer test
-          #   command: |
-          #     set -e
-          #     # Forcing to load go and rust paths
-          #     export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-          #     cd packages/celotool
-          #     ./ci_test_transfers.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          # - name: Blockchain Parameters test
-          #   command: |
-          #     set -e
-          #     export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-          #     cd packages/celotool
-          #     ./ci_test_blockchain_parameters.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          # - name: Slashing test
-          #   command: |
-          #     set -e
-          #     export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-          #     cd packages/celotool
-          #     ./ci_test_slashing.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          # - name: Governance test
-          #   command: |
-          #     set -e
-          #     export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-          #     cd packages/celotool
-          #     ./ci_test_governance.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          # - name: Replica test
-          #   command: |
-          #     set -e
-          #     export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-          #     cd packages/celotool
-          #     ./ci_test_replicas.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          # - name: Sync test
-          #   command: |
-          #     set -e
-          #     export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-          #     cd packages/celotool
-          #     ./ci_test_sync.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          # - name: CIP35 eth compatibility test
-          #   command: |
-          #     set -e
-          #     export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-          #     cd packages/celotool
-          #     echo "Test is skipped because migrations somehow fail"
-          #     # ./ci_test_cip35.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          # - name: Validator order test
-          #   command: |
-          #     set -e
-          #     export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-          #     cd packages/celotool
-
-          #     ./ci_test_validator_order.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Execute matrix command for test
-        uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
-        with:
-          timeout_minutes: 30
           max_attempts: 3
           command: |
             ${{ matrix.command }}

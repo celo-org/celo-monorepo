@@ -6,12 +6,10 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./UsingRegistry.sol";
-import "./CalledByVm.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
 import "./interfaces/ICeloTokenInitializer.sol";
 import "./interfaces/ICeloVersionedContract.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
 
 /**
  * @title ERC20 interface for the CELO token.
@@ -24,13 +22,11 @@ import "../../contracts-0.8/common/IsL2Check.sol";
  */
 contract GoldToken is
   Initializable,
-  CalledByVm,
   UsingRegistry,
   IERC20,
   ICeloToken,
   ICeloTokenInitializer,
-  ICeloVersionedContract,
-  IsL2Check
+  ICeloVersionedContract
 {
   using SafeMath for uint256;
 
@@ -41,7 +37,7 @@ contract GoldToken is
   string constant SYMBOL = "CELO";
   uint8 constant DECIMALS = 18;
   uint256 constant CELO_SUPPLY_CAP = 1000000000 ether; // 1 billion CELO
-  uint256 internal totalSupply_;
+  uint256 internal deprecated_totalSupply_; // this variable is deprecated
   // solhint-enable state-visibility
 
   mapping(address => mapping(address => uint256)) internal allowed;
@@ -66,7 +62,6 @@ contract GoldToken is
    * @param registryAddress Address of the Registry contract.
    */
   function initialize(address registryAddress) external initializer {
-    totalSupply_ = 0;
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
   }
@@ -177,38 +172,6 @@ contract GoldToken is
   }
 
   /**
-   * @notice Mints new CELO and gives it to 'to'.
-   * @param to The account for which to mint tokens.
-   * @param value The amount of CELO to mint.
-   * @dev This function will be deprecated in L2.
-   */
-  function mint(address to, uint256 value) external onlyL1 onlyVm returns (bool) {
-    if (value == 0) {
-      return true;
-    }
-
-    require(to != address(0), "mint attempted to reserved address 0x0");
-    totalSupply_ = totalSupply_.add(value);
-
-    bool success;
-    (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(address(0), to, value));
-    require(success, "CELO transfer failed");
-
-    emit Transfer(address(0), to, value);
-    return true;
-  }
-
-  /**
-   * @notice Increases the variable for total amount of CELO in existence.
-   * @param amount The amount to increase counter by
-   * @dev This function will be deprecated in L2. The onlyway to increase
-   * the supply is with the mint function.
-   */
-  function increaseSupply(uint256 amount) external onlyL1 onlyVm {
-    totalSupply_ = totalSupply_.add(amount);
-  }
-
-  /**
    * @return The name of the CELO token.
    */
   function name() external view returns (string memory) {
@@ -230,13 +193,6 @@ contract GoldToken is
   }
 
   /**
-   * @return The total amount of CELO in existence, not including what the burn address holds.
-   */
-  function circulatingSupply() external view returns (uint256) {
-    return allocatedSupply().sub(getBurnedAmount()).sub(balanceOf(address(0)));
-  }
-
-  /**
    * @notice Gets the amount of owner's CELO allowed to be spent by spender.
    * @param _owner The owner of the CELO.
    * @param spender The spender of the CELO.
@@ -254,7 +210,7 @@ contract GoldToken is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 3, 0);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -278,22 +234,14 @@ contract GoldToken is
    * @return The total amount of allocated CELO.
    */
   function allocatedSupply() public view returns (uint256) {
-    if (isL2()) {
-      return CELO_SUPPLY_CAP - getCeloUnreleasedTreasury().getRemainingBalanceToRelease();
-    } else {
-      return totalSupply();
-    }
+    return CELO_SUPPLY_CAP - getCeloUnreleasedTreasury().getRemainingBalanceToRelease();
   }
 
   /**
    * @return The total amount of CELO in existence, including what the burn address holds.
    */
-  function totalSupply() public view returns (uint256) {
-    if (isL2()) {
-      return CELO_SUPPLY_CAP;
-    } else {
-      return totalSupply_;
-    }
+  function totalSupply() external view returns (uint256) {
+    return CELO_SUPPLY_CAP;
   }
 
   /**

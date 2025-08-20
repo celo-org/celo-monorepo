@@ -1,6 +1,5 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloTxObject } from '@celo/connect'
-import { getBlsPoP, getBlsPublicKey } from '@celo/cryptographic-utils/lib/bls'
 import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { ArtifactsSingleton } from '@celo/protocol/lib/artifactsSingleton'
 import {
@@ -166,11 +165,9 @@ async function registerValidator(
 
   console.info(`    - registerValidator ${valName}`)
   const publicKey = privateKeyToPublicKey(validatorPrivateKey)
-  const blsPublicKey = getBlsPublicKey(validatorPrivateKey)
-  const blsPoP = getBlsPoP(privateKeyToAddress(validatorPrivateKey), validatorPrivateKey)
 
   // @ts-ignore
-  const registerTx = validators.contract.methods.registerValidator(publicKey, blsPublicKey, blsPoP)
+  const registerTx = validators.contract.methods.registerValidatorNoBls(publicKey)
 
   await sendTransaction(web3, registerTx, validatorPrivateKey, {
     to: validators.address,
