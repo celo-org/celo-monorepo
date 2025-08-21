@@ -25,7 +25,6 @@
     "keys:decrypt": "bash scripts/key_placer.sh decrypt",
     "keys:encrypt": "bash scripts/key_placer.sh encrypt",
     "check:packages": "node ./scripts/check-packages.js",
-    "celotool": "yarn --cwd packages/celotool run --silent cli",
     "prepare": "husky install"
   },
   "workspaces": {
