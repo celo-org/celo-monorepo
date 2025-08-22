@@ -31,7 +31,7 @@ contract Devchain is TestWithUtils08 {
   ICeloToken celoTokenContract;
 
   constructor() {
-    // Fetch all core contracts that are expeceted to be in the Registry on the devchain
+    // Fetch all core contracts that are expected to be in the Registry on the devchain
     sortedOracles = getSortedOracles();
     feeCurrencyDirectory = FeeCurrencyDirectory(
       registryContract.getAddressForStringOrDie("FeeCurrencyDirectory")
