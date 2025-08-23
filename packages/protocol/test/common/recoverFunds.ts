@@ -34,7 +34,7 @@ contract('Proxy', (accounts: string[]) => {
       await proxy._setImplementation(getSet.address)
     })
 
-    it('recovers funds from an incorrectly intialized implementation', async () => {
+    it('recovers funds from an incorrectly initialized implementation', async () => {
       const Freezer: FreezerContract = artifacts.require('Freezer')
       const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
       const CeloUnreleasedTreasury: CeloUnreleasedTreasuryContract =
