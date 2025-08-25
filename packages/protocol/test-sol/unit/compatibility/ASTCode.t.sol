@@ -18,6 +18,14 @@ contract ASTCodeTest is CompatibilityTestBase {
     string type_;
   }
 
+  struct MethodValueChange {
+    string contract_;
+    string newValue;
+    string oldValue;
+    string signature;
+    string type_;
+  }
+
   function reportASTIncompatibilities(
     string memory case1,
     string memory case2
@@ -102,6 +110,69 @@ contract ASTCodeTest is CompatibilityTestBase {
     assertEq(change.signature, signature);
   }
 
+  function assertMethodMutabilityChange(
+    string memory report,
+    uint256 reportIndex,
+    string memory contract_,
+    string memory signature,
+    string memory oldValue,
+    string memory newValue
+  ) internal {
+    bytes memory changeBytes = vm.parseJson(
+      report,
+      string.concat(".changes[", Strings.toString(reportIndex), "]")
+    );
+    MethodValueChange memory change = abi.decode(changeBytes, (MethodValueChange));
+
+    assertEq(change.contract_, contract_);
+    assertEq(change.type_, "MethodMutability");
+    assertEq(change.signature, signature);
+    assertEq(change.oldValue, oldValue);
+    assertEq(change.newValue, newValue);
+  }
+
+  function assertMethodReturnChange(
+    string memory report,
+    uint256 reportIndex,
+    string memory contract_,
+    string memory signature,
+    string memory oldValue,
+    string memory newValue
+  ) internal {
+    bytes memory changeBytes = vm.parseJson(
+      report,
+      string.concat(".changes[", Strings.toString(reportIndex), "]")
+    );
+    MethodValueChange memory change = abi.decode(changeBytes, (MethodValueChange));
+
+    assertEq(change.contract_, contract_);
+    assertEq(change.type_, "MethodReturn");
+    assertEq(change.signature, signature);
+    assertEq(change.oldValue, oldValue);
+    assertEq(change.newValue, newValue);
+  }
+
+  function assertMethodVisibilityChange(
+    string memory report,
+    uint256 reportIndex,
+    string memory contract_,
+    string memory signature,
+    string memory oldValue,
+    string memory newValue
+  ) internal {
+    bytes memory changeBytes = vm.parseJson(
+      report,
+      string.concat(".changes[", Strings.toString(reportIndex), "]")
+    );
+    MethodValueChange memory change = abi.decode(changeBytes, (MethodValueChange));
+
+    assertEq(change.contract_, contract_);
+    assertEq(change.type_, "MethodVisibility");
+    assertEq(change.signature, signature);
+    assertEq(change.oldValue, oldValue);
+    assertEq(change.newValue, newValue);
+  }
+
   function assertJsonArrayLength(string memory json, string memory path, uint256 length) internal {
     // vm.parseJson returns empty bytes when reading an out-of-bound array index. We can use this to
     // check an arbitrary JSON array's length without actually parsing it (which could get difficult
@@ -154,5 +225,53 @@ contract ASTCodeTest is CompatibilityTestBase {
     assertMethodRemovedChange(report, 0, "TestContract", "newMethod1(uint256)");
     assertMethodRemovedChange(report, 1, "TestContract", "newMethod2(uint256)");
     assertBytecodeChange(report, 2, "TestContract");
+  }
+
+  function test_whenManyChangesAreMade() public {
+    string memory report = reportASTIncompatibilities("big_original", "big_original_modified");
+
+    assertJsonArrayLength(report, ".changes", 13);
+
+    assertNewContractChange(report, 0, "NewContract");
+    assertMethodRemovedChange(report, 1, "MethodsRemovedContract", "someMethod1(uint256)");
+    assertMethodRemovedChange(report, 2, "MethodsRemovedContract", "someMethod2(uint256)");
+    assertBytecodeChange(report, 3, "MethodsRemovedContract");
+    assertMethodVisibilityChange(
+      report,
+      4,
+      "MethodsModifiedContract",
+      "someMethod1(uint256)",
+      "external",
+      "public"
+    );
+    assertMethodMutabilityChange(
+      report,
+      5,
+      "MethodsModifiedContract",
+      "someMethod2(uint256)",
+      "pure",
+      "view"
+    );
+    assertMethodReturnChange(
+      report,
+      6,
+      "MethodsModifiedContract",
+      "someMethod3(uint256,string)",
+      "uint256, memory string",
+      "uint256, memory string, uint256"
+    );
+    assertMethodMutabilityChange(
+      report,
+      7,
+      "MethodsModifiedContract",
+      "someMethod4(uint256)",
+      "payable",
+      "nonpayable"
+    );
+    assertBytecodeChange(report, 8, "MethodsModifiedContract");
+    assertMethodAddedChange(report, 9, "MethodsAddedContract", "newMethod1()");
+    assertMethodAddedChange(report, 10, "MethodsAddedContract", "newMethod2(uint256)");
+    assertBytecodeChange(report, 11, "MethodsAddedContract");
+    assertBytecodeChange(report, 12, "ImplementationChangeContract");
   }
 }
