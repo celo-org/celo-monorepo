@@ -5,9 +5,16 @@ import { CompatibilityTestBase } from "./utils/CompatibilityTestBase.sol";
 import { console2 as console } from "forge-std-8/console2.sol";
 
 contract ASTCodeTest is CompatibilityTestBase {
-  struct Change {
+  // Change that only specifies a contract and the type of change
+  struct SimpleChange {
     // Append `_` because can't use reserved Solidity word
     string contract_;
+    string type_;
+  }
+
+  struct MethodChange {
+    string contract_;
+    string signature;
     string type_;
   }
 
@@ -31,15 +38,51 @@ contract ASTCodeTest is CompatibilityTestBase {
     return json;
   }
 
-  function assertBytecodeChange(string memory report, uint256 reportIndex, string memory contract_) internal {
+  function assertBytecodeChange(
+    string memory report,
+    uint256 reportIndex,
+    string memory contract_
+  ) internal {
     bytes memory changeBytes = vm.parseJson(
       report,
       string.concat(".changes[", Strings.toString(reportIndex), "]")
     );
-    Change memory change = abi.decode(changeBytes, (Change));
+    SimpleChange memory change = abi.decode(changeBytes, (SimpleChange));
 
     assertEq(change.contract_, contract_);
     assertEq(change.type_, "DeployedBytecode");
+  }
+
+  function assertNewContractChange(
+    string memory report,
+    uint256 reportIndex,
+    string memory contract_
+  ) internal {
+    bytes memory changeBytes = vm.parseJson(
+      report,
+      string.concat(".changes[", Strings.toString(reportIndex), "]")
+    );
+    SimpleChange memory change = abi.decode(changeBytes, (SimpleChange));
+
+    assertEq(change.contract_, contract_);
+    assertEq(change.type_, "NewContract");
+  }
+
+  function assertMethodAddedChange(
+    string memory report,
+    uint256 reportIndex,
+    string memory contract_,
+    string memory signature
+  ) internal {
+    bytes memory changeBytes = vm.parseJson(
+      report,
+      string.concat(".changes[", Strings.toString(reportIndex), "]")
+    );
+    MethodChange memory change = abi.decode(changeBytes, (MethodChange));
+
+    assertEq(change.contract_, contract_);
+    assertEq(change.type_, "MethodAdded");
+    assertEq(change.signature, signature);
   }
 
   function assertJsonArrayLength(string memory json, string memory path, uint256 length) internal {
@@ -60,7 +103,6 @@ contract ASTCodeTest is CompatibilityTestBase {
     assertEq(pastLastBytes.length, 0);
   }
 
-
   function test_whenContractsAreTheSame() public {
     string memory report = reportASTIncompatibilities("original", "original_copy");
     string[] memory changes = vm.parseJsonStringArray(report, ".changes");
@@ -78,5 +120,15 @@ contract ASTCodeTest is CompatibilityTestBase {
     string memory report = reportASTIncompatibilities("original", "inserted_constant");
     assertJsonArrayLength(report, ".changes", 1);
     assertBytecodeChange(report, 0, "TestContract");
+  }
+
+  function test_whenAContractAndMethodsAreAdded() public {
+    string memory report = reportASTIncompatibilities("original", "added_methods_and_contracts");
+    bytes memory changesBytes = vm.parseJson(report, ".changes");
+    assertJsonArrayLength(report, ".changes", 4);
+    assertNewContractChange(report, 0, "TestContractNew");
+    assertMethodAddedChange(report, 1, "TestContract", "newMethod1(uint256)");
+    assertMethodAddedChange(report, 2, "TestContract", "newMethod2(uint256)");
+    assertBytecodeChange(report, 3, "TestContract");
   }
 }
