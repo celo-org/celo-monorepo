@@ -28,5 +28,13 @@ contract ASTCodeTest is CompatibilityTestBase {
     string memory report = reportASTIncompatibilities("original", "original_copy");
     string[] memory changes = vm.parseJsonStringArray(report, ".changes");
     assertEq(changes.length, 0);
+    assertJsonArrayLength(report, ".changes", 0);
+  }
+
+  function test_whenOnlyMetadataChanges() public {
+    string memory report = reportASTIncompatibilities("original", "metadata_changed");
+    string[] memory changes = vm.parseJsonStringArray(report, ".changes");
+    assertEq(changes.length, 0);
+    assertJsonArrayLength(report, ".changes", 0);
   }
 }
