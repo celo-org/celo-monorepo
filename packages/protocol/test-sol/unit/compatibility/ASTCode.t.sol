@@ -141,7 +141,6 @@ contract ASTCodeTest is CompatibilityTestBase {
 
   function test_whenAContractAndMethodsAreAdded() public {
     string memory report = reportASTIncompatibilities("original", "added_methods_and_contracts");
-    bytes memory changesBytes = vm.parseJson(report, ".changes");
     assertJsonArrayLength(report, ".changes", 4);
     assertNewContractChange(report, 0, "TestContractNew");
     assertMethodAddedChange(report, 1, "TestContract", "newMethod1(uint256)");
@@ -151,7 +150,6 @@ contract ASTCodeTest is CompatibilityTestBase {
 
   function test_whenMethodsAreRemoved() public {
     string memory report = reportASTIncompatibilities("added_methods_and_contracts", "original");
-    bytes memory changesBytes = vm.parseJson(report, ".changes");
     assertJsonArrayLength(report, ".changes", 3);
     assertMethodRemovedChange(report, 0, "TestContract", "newMethod1(uint256)");
     assertMethodRemovedChange(report, 1, "TestContract", "newMethod2(uint256)");
