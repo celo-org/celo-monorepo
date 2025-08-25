@@ -120,9 +120,9 @@ contract FeeHandlerTest is TestWithUtils {
     mockReserve.addToken(address(stableTokenEUR));
 
     address[] memory tokenAddresses;
-    uint256[] memory newMininumReports;
+    uint256[] memory newMinimumReports;
 
-    mentoSeller.initialize(address(registry), tokenAddresses, newMininumReports);
+    mentoSeller.initialize(address(registry), tokenAddresses, newMinimumReports);
     celoToken.initialize(address(registry));
     stableToken.initialize(
       "Celo Dollar",

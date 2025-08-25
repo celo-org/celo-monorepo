@@ -220,11 +220,11 @@ contract CompileExchange is
 
   /**
    * @notice Allows owner to set the minimum number of reports required
-   * @param newMininumReports The new update minimum number of reports required
+   * @param newMinimumReports The new update minimum number of reports required
    */
-  function setMinimumReports(uint256 newMininumReports) public onlyOwner {
-    minimumReports = newMininumReports;
-    emit MinimumReportsSet(newMininumReports);
+  function setMinimumReports(uint256 newMinimumReports) public onlyOwner {
+    minimumReports = newMinimumReports;
+    emit MinimumReportsSet(newMinimumReports);
   }
 
   /**
