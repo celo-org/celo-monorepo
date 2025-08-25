@@ -1,9 +1,16 @@
 pragma solidity >=0.5.13 <0.9.0;
 
+import { Strings } from "@openzeppelin/contracts8/utils/Strings.sol";
 import { CompatibilityTestBase } from "./utils/CompatibilityTestBase.sol";
 import { console2 as console } from "forge-std-8/console2.sol";
 
 contract ASTCodeTest is CompatibilityTestBase {
+  struct Change {
+    // Append `_` because can't use reserved Solidity word
+    string contract_;
+    string type_;
+  }
+
   function reportASTIncompatibilities(
     string memory case1,
     string memory case2
@@ -24,6 +31,36 @@ contract ASTCodeTest is CompatibilityTestBase {
     return json;
   }
 
+  function assertBytecodeChange(string memory report, uint256 reportIndex, string memory contract_) internal {
+    bytes memory changeBytes = vm.parseJson(
+      report,
+      string.concat(".changes[", Strings.toString(reportIndex), "]")
+    );
+    Change memory change = abi.decode(changeBytes, (Change));
+
+    assertEq(change.contract_, contract_);
+    assertEq(change.type_, "DeployedBytecode");
+  }
+
+  function assertJsonArrayLength(string memory json, string memory path, uint256 length) internal {
+    // vm.parseJson returns empty bytes when reading an out-of-bound array index. We can use this to
+    // check an arbitrary JSON array's length without actually parsing it (which could get difficult
+    // with arrays that contain variable types of elements).
+    // Specifically we check `path[length - 1]`, which should be non-null, and `path[length]`, which
+    // should be null if the array's length is exactly `length`.
+    if (length > 0) {
+      string memory lastPath = string.concat(path, "[", Strings.toString(length - 1), "]");
+      bytes memory lastBytes = vm.parseJson(json, lastPath);
+      assertGt(lastBytes.length, 0);
+    }
+
+    string memory pastLastPath = string.concat(path, "[", Strings.toString(length), "]");
+    bytes memory pastLastBytes = vm.parseJson(json, pastLastPath);
+
+    assertEq(pastLastBytes.length, 0);
+  }
+
+
   function test_whenContractsAreTheSame() public {
     string memory report = reportASTIncompatibilities("original", "original_copy");
     string[] memory changes = vm.parseJsonStringArray(report, ".changes");
@@ -34,7 +71,12 @@ contract ASTCodeTest is CompatibilityTestBase {
   function test_whenOnlyMetadataChanges() public {
     string memory report = reportASTIncompatibilities("original", "metadata_changed");
     string[] memory changes = vm.parseJsonStringArray(report, ".changes");
-    assertEq(changes.length, 0);
     assertJsonArrayLength(report, ".changes", 0);
+  }
+
+  function test_whenAConstantIsInserted() public {
+    string memory report = reportASTIncompatibilities("original", "inserted_constant");
+    assertJsonArrayLength(report, ".changes", 1);
+    assertBytecodeChange(report, 0, "TestContract");
   }
 }
