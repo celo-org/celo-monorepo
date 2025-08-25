@@ -85,6 +85,23 @@ contract ASTCodeTest is CompatibilityTestBase {
     assertEq(change.signature, signature);
   }
 
+  function assertMethodRemovedChange(
+    string memory report,
+    uint256 reportIndex,
+    string memory contract_,
+    string memory signature
+  ) internal {
+    bytes memory changeBytes = vm.parseJson(
+      report,
+      string.concat(".changes[", Strings.toString(reportIndex), "]")
+    );
+    MethodChange memory change = abi.decode(changeBytes, (MethodChange));
+
+    assertEq(change.contract_, contract_);
+    assertEq(change.type_, "MethodRemoved");
+    assertEq(change.signature, signature);
+  }
+
   function assertJsonArrayLength(string memory json, string memory path, uint256 length) internal {
     // vm.parseJson returns empty bytes when reading an out-of-bound array index. We can use this to
     // check an arbitrary JSON array's length without actually parsing it (which could get difficult
@@ -130,5 +147,14 @@ contract ASTCodeTest is CompatibilityTestBase {
     assertMethodAddedChange(report, 1, "TestContract", "newMethod1(uint256)");
     assertMethodAddedChange(report, 2, "TestContract", "newMethod2(uint256)");
     assertBytecodeChange(report, 3, "TestContract");
+  }
+
+  function test_whenMethodsAreRemoved() public {
+    string memory report = reportASTIncompatibilities("added_methods_and_contracts", "original");
+    bytes memory changesBytes = vm.parseJson(report, ".changes");
+    assertJsonArrayLength(report, ".changes", 3);
+    assertMethodRemovedChange(report, 0, "TestContract", "newMethod1(uint256)");
+    assertMethodRemovedChange(report, 1, "TestContract", "newMethod2(uint256)");
+    assertBytecodeChange(report, 2, "TestContract");
   }
 }
