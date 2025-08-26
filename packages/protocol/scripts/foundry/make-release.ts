@@ -86,7 +86,7 @@ class ContractAddresses {
     return new ContractAddresses(addresses)
   }
 
-  constructor(public addresses: Map<string, string>) { }
+  constructor(public addresses: Map<string, string>) {}
 
   public get = (contract: string): string => {
     if (this.addresses.has(contract)) {
@@ -589,9 +589,7 @@ const performRelease = async (
 
   const artifactPath = contractArtifactPaths.get(contractName)
   if (!artifactPath) {
-    throw new Error(
-      `Artifact path for ${contractName} not found in map.`
-    )
+    throw new Error(`Artifact path for ${contractName} not found in map.`)
   }
 
   let contractViemArtifact: ViemContract
@@ -726,9 +724,7 @@ async function main() {
       transport: http(transportUrl),
     })
     const fullReport = readJsonSync(argv.report)
-    const libraryMapping: LibraryAddresses['addresses'] = readJsonSync(
-      argv.librariesFile
-    )
+    const libraryMapping: LibraryAddresses['addresses'] = readJsonSync(argv.librariesFile)
     const report: ASTDetailedVersionedReport = fullReport.report
     const branch = (argv.branch ?? '') as string
     const initializationData: Record<string, unknown[]> = readJsonSync(String(argv.initialize_data))
@@ -753,9 +749,9 @@ async function main() {
     if (!registryArtifactPath) {
       throw new Error(
         `Registry.json artifact not found in ${buildDir} or its subdirectories. ` +
-        `Please ensure it is compiled and present in the Foundry output format (e.g., ${String(
-          buildDir
-        )}/Registry.sol/Registry.json).`
+          `Please ensure it is compiled and present in the Foundry output format (e.g., ${String(
+            buildDir
+          )}/Registry.sol/Registry.json).`
       )
     }
     const registryArtifact = loadContractArtifact('Registry', registryArtifactPath)

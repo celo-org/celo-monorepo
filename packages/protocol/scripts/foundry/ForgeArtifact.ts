@@ -10,7 +10,7 @@ export interface ForgeArtifact {
       [sourcePath: string]: {
         [key: string]: any
       }
-    },
+    }
     compiler?: {
       version?: string
     }
