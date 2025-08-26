@@ -10,10 +10,15 @@ export interface ForgeArtifact {
       [sourcePath: string]: {
         [key: string]: any
       }
+    },
+    compiler?: {
+      version?: string
     }
   }
   contractName?: string
-  deployedBytecode?: string
+  deployedBytecode?: {
+    object?: string
+  }
   sourceMap?: string
   deployedSourceMap?: string
   sourcePath?: string
@@ -35,4 +40,10 @@ export interface ForgeArtifact {
   updatedAt?: string
   devdoc?: any
   userdoc?: any
+  methodIdentifiers?: object
+  gasEstimates?: object
+  storageLayout?: {
+    storage?: any
+    types?: any
+  }
 }
