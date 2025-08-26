@@ -5,7 +5,7 @@ import { getCeloContractDependencies } from '@celo/protocol/lib/contract-depende
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { ForgeArtifact } from '@celo/protocol/scripts/foundry/ForgeArtifact'
 import { NULL_ADDRESS, eqAddress } from '@celo/utils/lib/address'
-import { readJsonSync, readdirSync, writeJsonSync } from 'fs-extra'
+import { existsSync, readJsonSync, readdirSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
 import { TextEncoder } from 'util'
 import {
@@ -61,14 +61,17 @@ class ContractAddresses {
     libraryAddresses: LibraryAddresses['addresses']
   ) {
     const addresses = new Map<string, string>()
+    const functionName = 'getAddressForString'
+    const abi = registryAbi
     await Promise.all(
       contracts.map(async (contract: string) => {
         try {
           const registeredAddress = (await publicClient.readContract({
             address: registryAddress,
-            abi: registryAbi,
-            functionName: 'getAddressForString',
+            abi,
+            functionName,
             args: [contract],
+            authorizationList: [],
           })) as string
           if (registeredAddress && !eqAddress(registeredAddress, NULL_ADDRESS)) {
             addresses.set(contract, registeredAddress)
@@ -689,6 +692,9 @@ async function main() {
 
     const networkName = argv.network!
     const buildDir = argv.build_directory
+    if (!existsSync(buildDir)) {
+      throw new Error(`${buildDir} directory not found. Make sure to run foundry build first`)
+    }
     const viemChain = getViemChain(networkName)
 
     if (!viemChain.rpcUrls.default?.http?.[0]) {
@@ -708,7 +714,10 @@ async function main() {
     let account: Account
 
     if (argv.privateKey) {
-      account = privateKeyToAccount(argv.privateKey as Hex)
+      const privateKey = argv.privateKey.startsWith('0x')
+        ? (argv.privateKey as Hex)
+        : (`0x${argv.privateKey}` as Hex)
+      account = privateKeyToAccount(privateKey)
     } else {
       account = mnemonicToAccount(argv.mnemonic as string)
     }

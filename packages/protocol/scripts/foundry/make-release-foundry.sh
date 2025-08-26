@@ -31,7 +31,10 @@ while getopts 'b:n:p:i:r:f:l:F' flag; do
     r) REPORT="${OPTARG}" ;;
     f) FROM="${OPTARG}" ;;
     l) LIBRARIES="${OPTARG}" ;;
-    *) error "Unexpected option ${flag}" ;;
+    *)
+      echo "Unexpected option ${flag}" >&2
+      exit 1
+      ;;
   esac
 done
 
