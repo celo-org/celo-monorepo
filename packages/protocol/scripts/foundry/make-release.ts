@@ -32,12 +32,11 @@ import { getReleaseVersion, ignoredContractsV9 } from '../../lib/compatibility/i
 
 interface MakeReleaseArgv {
   report: string
-  from?: string
   proposal: string
   librariesFile: string
   initialize_data: string
   build_directory: string
-  branch?: string
+  branch: string
   network: string
   privateKey?: string
   mnemonic?: string
@@ -650,11 +649,6 @@ async function main() {
         demandOption: true,
         description: 'Path to the compatibility report JSON file.',
       })
-      .option('from', {
-        type: 'string',
-        description:
-          'Address to deploy from (not directly used in this script but kept for compatibility or future use).',
-      })
       .option('proposal', {
         type: 'string',
         demandOption: true,
@@ -662,7 +656,7 @@ async function main() {
       })
       .option('librariesFile', {
         type: 'string',
-        default: 'libraries.json',
+        demandOption: true,
         description: 'Path to the libraries.json file.',
       })
       .option('initialize_data', {
@@ -675,10 +669,14 @@ async function main() {
         demandOption: true,
         description: 'Path to the Foundry build output directory (e.g., out/).',
       })
-      .option('branch', { type: 'string', description: 'Git branch name (used for versioning).' })
+      .option('branch', {
+        type: 'string',
+        demandOption: true,
+        description: 'Git branch name (used for versioning).',
+      })
       .option('network', {
         type: 'string',
-        default: 'development',
+        demandOption: true,
         description: 'Network name (e.g., alfajores, mainnet, development).',
       })
       .option('privateKey', { type: 'string', description: 'Private key for deployment.' })

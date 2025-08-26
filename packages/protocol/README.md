@@ -109,13 +109,13 @@ Compared to the normal test command, quicktest will:
 To create a new release using the Foundry script, run the following command:
 
 ```bash
-./scripts/foundry/make-release-foundry.sh -n <network> -b <build-meta> -p <proposal-path> -i <initialization-data-path> -r <report-path> -l <libraries-path> -f <private-key>
+./scripts/foundry/make-release-foundry.sh -n <network> -b <build-meta> -p <proposal-path> -i <initialization-data-path> -r <report-path> -l <libraries-path> -k <private-key>
 ```
 
 Example:
 
 ```bash
-./scripts/foundry/make-release-foundry.sh -n alfajores -b core-contracts.v13.post-audit -p proposal.json -i releaseData/initializationData/release13.json -r report.json -l libraries.json -f $PRIVATE_KEY
+./scripts/foundry/make-release-foundry.sh -n alfajores -b core-contracts.v13.post-audit -p proposal.json -i releaseData/initializationData/release13.json -r report.json -l libraries.json -k $PRIVATE_KEY
 ```
 
 ### Parameters
@@ -126,7 +126,7 @@ Example:
 - `-i`: The path to the initialization data JSON file.
 - `-r`: The path to the report JSON file.
 - `-l`: The path to the libraries JSON file.
-- `-f`: The private key for signing.
+- `-k`: The private key for signing.
 
 ## Verify released smart contracts
 
