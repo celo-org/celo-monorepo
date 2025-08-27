@@ -198,7 +198,7 @@ export const reportLayoutIncompatibilities = (oldArtifactsSet: BuildArtifacts[],
         // Matches Foundry core contracts
         const foundryCoreContractPathPattern = /^contracts(-0\.8)?\//
         // Matches Foundry test resource contracts
-        const foundryTestContractPathPattern = /^test-sol-resources/
+        const foundryTestContractPathPattern = /^test-ts/
         const path = newArtifact.ast.absolutePath
         return truffleProjectContractPathPattern.test(path) || foundryCoreContractPathPattern.test(path) || foundryTestContractPathPattern.test(path)
       })

@@ -84,7 +84,7 @@ function listForgeBuildArtifacts(buildDirectory: string): string[] {
   const buildInfoPathPattern = /build-info/
   const coreContractPathPattern = /contracts(-0\.8)?\//
   const nonFoundryDependencyPathPattern = /lib\/(?!celo)/
-  const foundryTestContractPathPattern = /test-sol-resources\//
+  const foundryTestContractPathPattern = /test-ts\//
   const pathPatterns = [ coreContractPathPattern, nonFoundryDependencyPathPattern, foundryTestContractPathPattern ]
   const artifactsGlobPattern = `${buildDirectory}/**/*.json`
   const allArtifactPaths = globSync(artifactsGlobPattern)
