@@ -1,3 +1,0 @@
-[profile.default]
-optimizer = true
-libs = ['../../lib', '../../node_modules']
