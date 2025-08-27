@@ -1,38 +1,11 @@
-import { Contract as Web3Contract } from '@celo/connect';
-import { Artifact, TypeInfo } from '@celo/protocol/lib/compatibility/internal';
+import { Artifact, TypeInfo, makeZContract, getContractName, getArtifactByName } from '@celo/protocol/lib/compatibility/internal';
 import {
   BuildArtifacts,
   Operation,
   StorageLayoutInfo,
-  Contract as ZContract,
   compareStorageLayouts,
   getStorageLayout
 } from '@openzeppelin/upgrades';
-const Web3 = require('web3')
-
-const web3 = new Web3(null)
-
-// getStorageLayout needs an oz-sdk Contract class instance. This class is a
-// subclass of Contract from web3-eth-contract, with an added .schema member and
-// several methods.
-//
-// Couldn't find an easy way of getting one just from contract artifacts. But
-// for getStorageLayout we really only need .schema.ast and .schema.contractName.
-const addSchemaForLayoutChecking = (web3Contract: Web3Contract, artifact: any): ZContract => {
-  // @ts-ignore
-  const contract = web3Contract as Contract
-  // @ts-ignore
-  contract.schema = {}
-  contract.schema.ast = artifact.ast
-  contract.schema.contractName = artifact.contractName
-  return contract
-}
-
-const makeZContract = (artifact: any): ZContract => {
-  const contract = new web3.eth.Contract(artifact.abi)
-
-  return addSchemaForLayoutChecking(contract, artifact)
-}
 
 export const getLayout = (artifact: Artifact, artifacts: BuildArtifacts) => {
   const contract = makeZContract(artifact)
@@ -200,15 +173,15 @@ export const generateCompatibilityReport = (oldArtifact: Artifact, oldArtifacts:
   const structsReport = generateStructsCompatibilityReport(oldLayout, newLayout)
 
   if (!layoutReport.compatible) {
-    console.log(newArtifact.contractName, "layoutReport incompatible", JSON.stringify(layoutReport.errors));
+    console.log(getContractName(newArtifact), "layoutReport incompatible", JSON.stringify(layoutReport.errors));
   }
 
   if (!structsReport.compatible) {
-    console.log(newArtifact.contractName, "structsReport incompatible", JSON.stringify(structsReport.errors));
+    console.log(getContractName(newArtifact), "structsReport incompatible", JSON.stringify(structsReport.errors));
   }
 
   return {
-    contract: newArtifact.contractName,
+    contract: getContractName(newArtifact),
     compatible: layoutReport.compatible && structsReport.compatible,
     errors: layoutReport.errors.concat(structsReport.errors),
     expanded: structsReport.expanded
@@ -218,10 +191,20 @@ export const generateCompatibilityReport = (oldArtifact: Artifact, oldArtifacts:
 export const reportLayoutIncompatibilities = (oldArtifactsSet: BuildArtifacts[], newArtifactsSets: BuildArtifacts[]): ASTStorageCompatibilityReport[] => {
   let out: ASTStorageCompatibilityReport[] = []
   for (const newArtifacts of newArtifactsSets) {
-    const reports = newArtifacts.listArtifacts().map((newArtifact) => {
-
+    const reports = newArtifacts.listArtifacts()
+      .filter((newArtifact: any) => {
+        // Matches all Truffle project artifacts (core contracts and test resource contracts)
+        const truffleProjectContractPathPattern = /^project:/
+        // Matches Foundry core contracts
+        const foundryCoreContractPathPattern = /^contracts(-0\.8)?\//
+        // Matches Foundry test resource contracts
+        const foundryTestContractPathPattern = /^test-ts/
+        const path = newArtifact.ast.absolutePath
+        return truffleProjectContractPathPattern.test(path) || foundryCoreContractPathPattern.test(path) || foundryTestContractPathPattern.test(path)
+      })
+      .map((newArtifact: any) => {
       for (const oldArtifacts of oldArtifactsSet) {
-        const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
+        const oldArtifact: any = getArtifactByName(getContractName(newArtifact), oldArtifacts)
         if (oldArtifact !== undefined) {
           return generateCompatibilityReport(oldArtifact, oldArtifacts, newArtifact, newArtifacts)
         }
@@ -230,7 +213,7 @@ export const reportLayoutIncompatibilities = (oldArtifactsSet: BuildArtifacts[],
       // Generate an empty report for new contracts, which are, by definition, backwards
       // compatible.
       return {
-        contract: newArtifact.contractName,
+        contract: getContractName(newArtifact),
         compatible: true,
         errors: []
       }

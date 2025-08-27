@@ -5,7 +5,7 @@ import {
   MethodMutabilityChange, MethodRemovedChange, MethodReturnChange,
   MethodVisibilityChange, NewContractChange
 } from '@celo/protocol/lib/compatibility/change'
-import { makeZContract } from '@celo/protocol/lib/compatibility/internal'
+import { makeZContract, getContractName, getArtifactByName } from '@celo/protocol/lib/compatibility/internal'
 import {
   BuildArtifacts,
   Contract as ZContract
@@ -259,10 +259,19 @@ export function reportASTIncompatibilities(
   let out: ASTCodeCompatibilityReport[] = []
   for (const newArtifacts of newArtifactsSets) {
     const reports = newArtifacts.listArtifacts()
+      .filter((newArtifact) => {
+        // Matches all Truffle project artifacts (core contracts and test resource contracts)
+        const truffleProjectContractPathPattern = /^project:/
+        // Matches Foundry core contracts
+        const foundryCoreContractPathPattern = /^contracts(-0\.8)?\//
+        // Matches Foundry test resource contracts
+        const foundryTestContractPathPattern = /^test-ts/
+        const path = newArtifact.ast.absolutePath
+        return truffleProjectContractPathPattern.test(path) || foundryCoreContractPathPattern.test(path) || foundryTestContractPathPattern.test(path)
+      })
       .map((newArtifact) => {
-
         for (const oldArtifacts of oldArtifactsSet) {
-          const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
+          const oldArtifact = getArtifactByName(getContractName(newArtifact), oldArtifacts)
           if (oldArtifact) {
             return generateASTCompatibilityReport(makeZContract(oldArtifact), oldArtifacts, makeZContract(newArtifact), newArtifacts)
           }
@@ -271,7 +280,6 @@ export function reportASTIncompatibilities(
         return generateASTCompatibilityReport(null, oldArtifactsSet[0], makeZContract(newArtifact), newArtifacts)
       })
     out = [...out, ...reports]
-
   }
 
   return mergeReports(out)
