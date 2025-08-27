@@ -51,6 +51,7 @@
     "test:release-snapshots": "./scripts/bash/release-snapshots.sh",
     "test:scripts": "yarn ts-node scripts/run-scripts-tests.ts --testPathPattern=scripts/",
     "test:truffle": "rm test/**/*.js ; node runTests.js",
+    "test:ts": "yarn mocha --recursive test-ts/",
     "truffle:console": "./scripts/bash/console.sh",
     "truffle:govern": "./scripts/bash/govern.sh",
     "truffle:migrate": "truffle migrate",
