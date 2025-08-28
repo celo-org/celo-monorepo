@@ -9,7 +9,6 @@ import {
 } from '@celo/protocol/lib/bytecode'
 import { verifyProxyStorageProof } from '@celo/protocol/lib/proxy-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
-import { ZERO_ADDRESS } from '@celo/protocol/test/constants'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { ProxyInstance, RegistryInstance } from 'types'
 import Web3 from 'web3'
@@ -44,6 +43,7 @@ interface InitializationData {
 }
 
 const ContractNameExtractorRegex = new RegExp(/(.*)Proxy/)
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 // Checks if the given transaction is a repointing of the Proxy for the given
 // contract.
