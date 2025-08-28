@@ -290,10 +290,11 @@ contract E2E_EpochManager_InitializeSystem is E2E_EpochManager {
     epochManagerContract.initializeSystem(1, 1, firstElected);
   }
 }
+
 contract E2E_EpochManager_GetCurrentEpoch is E2E_EpochManager {
   function test_ReturnExpectedValues() public {
-    assertEq(epochManagerContract.firstKnownEpoch(), 4);
-    assertEq(epochManagerContract.getCurrentEpochNumber(), 4);
+    assertEq(epochManagerContract.firstKnownEpoch(), 5);
+    assertEq(epochManagerContract.getCurrentEpochNumber(), 5);
 
     (
       uint256 firstBlock,
@@ -301,7 +302,7 @@ contract E2E_EpochManager_GetCurrentEpoch is E2E_EpochManager {
       uint256 startTimestamp,
       uint256 rewardsBlock
     ) = epochManagerContract.getCurrentEpoch();
-    assertEq(firstBlock, 300);
+    assertEq(firstBlock, 400);
     assertEq(lastBlock, 0);
     assertEq(startTimestamp, block.timestamp);
     assertEq(rewardsBlock, 0);
@@ -333,8 +334,8 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
   }
 
   function test_shouldHaveInitialValues() public {
-    assertEq(epochManagerContract.firstKnownEpoch(), 4);
-    assertEq(epochManagerContract.getCurrentEpochNumber(), 4);
+    assertEq(epochManagerContract.firstKnownEpoch(), 5);
+    assertEq(epochManagerContract.getCurrentEpochNumber(), 5);
 
     // get getEpochProcessingState
     (
