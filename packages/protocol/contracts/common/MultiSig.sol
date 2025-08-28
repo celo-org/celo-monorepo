@@ -1,10 +1,13 @@
 pragma solidity ^0.5.13;
 /* solhint-disable no-inline-assembly, avoid-low-level-calls, func-name-mixedcase, func-order */
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+// OpenZeppelin imports
+import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-import "./ExternalCall.sol";
-import "./Initializable.sol";
+// Local imports
+import { ExternalCall } from "./ExternalCall.sol";
+import { Initializable } from "./Initializable.sol";
+import { IMultiSig } from "./interfaces/IMultiSig.sol";
 
 /**
  * @title Multisignature wallet - Allows multiple parties to agree on transactions before
@@ -26,7 +29,7 @@ import "./Initializable.sol";
  * simple, minimal multi-signature API that's easy to understand even for novice
  * Solidity users.
  */
-contract MultiSig is Initializable {
+contract MultiSig is Initializable, IMultiSig {
   using SafeMath for uint256;
 
   struct Transaction {
