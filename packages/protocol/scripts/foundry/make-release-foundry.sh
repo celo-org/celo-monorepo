@@ -50,9 +50,9 @@ BUILD_DIR="./out/"
 yarn ts-node ./scripts/foundry/make-release.ts \
   --branch "$BRANCH" \
   --privateKey "$PRIVATE_KEY" \
-  --initialize_data "$INITIALIZE_DATA" \
+  --initializeData "$INITIALIZE_DATA" \
   --librariesFile "$LIBRARIES" \
   --network "$NETWORK" \
   --proposal "$PROPOSAL" \
   --report "$REPORT" \
-  --build_directory "$BUILD_DIR"
+  --buildDirectory "$BUILD_DIR"

@@ -34,8 +34,8 @@ interface MakeReleaseArgv {
   report: string
   proposal: string
   librariesFile: string
-  initialize_data: string
-  build_directory: string
+  initializeData: string
+  buildDirectory: string
   branch: string
   network: string
   privateKey?: string
@@ -86,7 +86,7 @@ class ContractAddresses {
     return new ContractAddresses(addresses)
   }
 
-  constructor(public addresses: Map<string, string>) {}
+  constructor(public addresses: Map<string, string>) { }
 
   public get = (contract: string): string => {
     if (this.addresses.has(contract)) {
@@ -294,7 +294,7 @@ const deployProxy = async (
     bytecode: proxyArtifact.bytecode,
     account: walletClient.account!,
     chain: walletClient.chain!,
-    gas: gas ?? BigInt(3000000),
+    gas: gas ?? BigInt(20_000_000),
   })
   const receipt = await publicClient.waitForTransactionReceipt({ hash })
   if (receipt.status !== 'success' || !receipt.contractAddress) {
@@ -461,6 +461,18 @@ const getViemChain = (networkName: string): Chain => {
     case 'mainnet':
     case 'rc1':
       return viemChains.celo
+    case 'celo-sepolia':
+      return {
+        id: 11142220,
+        name: 'Celo Sepolia',
+        nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 },
+        rpcUrls: {
+          default: { http: ['https://forno.celo-sepolia.celo-testnet.org'] },
+
+        },
+        blockExplorers: { default: { name: 'CeloScan', url: 'https://celo-sepolia.blockscout.com' } },
+        testnet: true,
+      }
     case 'baklava':
       return {
         id: 62320,
@@ -657,12 +669,12 @@ async function main() {
         demandOption: true,
         description: 'Path to the libraries.json file.',
       })
-      .option('initialize_data', {
+      .option('initializeData', {
         type: 'string',
         demandOption: true,
         description: 'Path to the JSON file with initialization data for contracts.',
       })
-      .option('build_directory', {
+      .option('buildDirectory', {
         type: 'string',
         demandOption: true,
         description: 'Path to the Foundry build output directory (e.g., out/).',
@@ -687,7 +699,7 @@ async function main() {
       }).argv
 
     const networkName = argv.network!
-    const buildDir = argv.build_directory
+    const buildDir = argv.buildDirectory
     if (!existsSync(buildDir)) {
       throw new Error(`${buildDir} directory not found. Make sure to run foundry build first`)
     }
@@ -727,7 +739,7 @@ async function main() {
     const libraryMapping: LibraryAddresses['addresses'] = readJsonSync(argv.librariesFile)
     const report: ASTDetailedVersionedReport = fullReport.report
     const branch = (argv.branch ?? '') as string
-    const initializationData: Record<string, unknown[]> = readJsonSync(String(argv.initialize_data))
+    const initializationData: Record<string, unknown[]> = readJsonSync(String(argv.initializeData))
     const dependencies = getCeloContractDependencies()
     const version = getReleaseVersion(branch)
 
@@ -749,9 +761,9 @@ async function main() {
     if (!registryArtifactPath) {
       throw new Error(
         `Registry.json artifact not found in ${buildDir} or its subdirectories. ` +
-          `Please ensure it is compiled and present in the Foundry output format (e.g., ${String(
-            buildDir
-          )}/Registry.sol/Registry.json).`
+        `Please ensure it is compiled and present in the Foundry output format (e.g., ${String(
+          buildDir
+        )}/Registry.sol/Registry.json).`
       )
     }
     const registryArtifact = loadContractArtifact('Registry', registryArtifactPath)
