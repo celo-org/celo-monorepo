@@ -22,7 +22,7 @@ export function getReleaseVersion(tag: string) {
   const matches = regexp.exec(tag)
   const version = parseInt(matches?.groups?.version ?? '0', 10)
   if ((version) == 0) {
-    throw `Tag doesn't have the correct format ${tag}`
+    throw `Tag doesn't have the correct format ${tag} instead of core-contracts.vX`
   }
   return version
 }
