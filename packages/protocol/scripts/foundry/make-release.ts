@@ -162,6 +162,21 @@ function getDefaultValueForSolidityType(
   solidityType: string,
   components?: readonly AbiParameter[]
 ): SolidityDefaultValue {
+
+  if (solidityType.endsWith('[]')) {
+    return []
+  }
+
+  const fixedArrayMatch = solidityType.match(/^(.*)\[(\d+)\]$/)
+  if (fixedArrayMatch) {
+    const baseType = fixedArrayMatch[1]
+    const size = parseInt(fixedArrayMatch[2], 10)
+    const elementComponents = baseType === 'tuple' ? components : undefined
+    return Array(size)
+      .fill(null)
+      .map(() => getDefaultValueForSolidityType(baseType, elementComponents))
+  }
+
   if (solidityType.startsWith('uint') || solidityType.startsWith('int')) {
     return BigInt(0)
   }
@@ -182,18 +197,8 @@ function getDefaultValueForSolidityType(
     }
     return '0x'
   }
-  if (solidityType.endsWith('[]')) {
-    return []
-  }
-  const fixedArrayMatch = solidityType.match(/^(.*)\[(\d+)\]$/)
-  if (fixedArrayMatch) {
-    const baseType = fixedArrayMatch[1]
-    const size = parseInt(fixedArrayMatch[2], 10)
-    const elementComponents = baseType === 'tuple' ? components : undefined
-    return Array(size)
-      .fill(null)
-      .map(() => getDefaultValueForSolidityType(baseType, elementComponents))
-  }
+
+
   if (solidityType.startsWith('tuple')) {
     if (!components || components.length === 0) {
       console.warn(
