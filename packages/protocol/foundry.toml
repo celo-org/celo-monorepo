@@ -3,7 +3,7 @@ src = 'contracts-0.8'
 out = 'out'
 test = 'test-sol'
 libs = ['lib', 'node_modules']
-optimizer = false
+optimizer = true
 
 no_match_test = "skip"
 
