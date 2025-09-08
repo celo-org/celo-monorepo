@@ -86,7 +86,7 @@ class ContractAddresses {
     return new ContractAddresses(addresses)
   }
 
-  constructor(public addresses: Map<string, string>) { }
+  constructor(public addresses: Map<string, string>) {}
 
   public get = (contract: string): string => {
     if (this.addresses.has(contract)) {
@@ -162,7 +162,6 @@ function getDefaultValueForSolidityType(
   solidityType: string,
   components?: readonly AbiParameter[]
 ): SolidityDefaultValue {
-
   if (solidityType.endsWith('[]')) {
     return []
   }
@@ -197,7 +196,6 @@ function getDefaultValueForSolidityType(
     }
     return '0x'
   }
-
 
   if (solidityType.startsWith('tuple')) {
     if (!components || components.length === 0) {
@@ -473,9 +471,10 @@ const getViemChain = (networkName: string): Chain => {
         nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 },
         rpcUrls: {
           default: { http: ['https://forno.celo-sepolia.celo-testnet.org'] },
-
         },
-        blockExplorers: { default: { name: 'CeloScan', url: 'https://celo-sepolia.blockscout.com' } },
+        blockExplorers: {
+          default: { name: 'CeloScan', url: 'https://celo-sepolia.blockscout.com' },
+        },
         testnet: true,
       }
     case 'baklava':
@@ -766,9 +765,9 @@ async function main() {
     if (!registryArtifactPath) {
       throw new Error(
         `Registry.json artifact not found in ${buildDir} or its subdirectories. ` +
-        `Please ensure it is compiled and present in the Foundry output format (e.g., ${String(
-          buildDir
-        )}/Registry.sol/Registry.json).`
+          `Please ensure it is compiled and present in the Foundry output format (e.g., ${String(
+            buildDir
+          )}/Registry.sol/Registry.json).`
       )
     }
     const registryArtifact = loadContractArtifact('Registry', registryArtifactPath)
