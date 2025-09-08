@@ -106,6 +106,8 @@ Compared to the normal test command, quicktest will:
 
 ## Verify released smart contracts
 
+### Using Truffle
+
 1. Update CeloScanApi in env.json file
 2. Run verification command
 
@@ -117,6 +119,34 @@ example:
 
 ```bash
 yarn truffle:verify MentoFeeHandlerSeller@0x4efa274b7e33476c961065000d58ee09f7921a74 --network mainnet --forno https://forno.celo.org
+```
+
+### Using Foundry
+
+For contracts that need to match Truffle compilation settings (like SortedOracles), use the `truffle-compat` profile:
+
+```bash
+FOUNDRY_PROFILE=truffle-compat forge verify-contract [CONTRACT_ADDRESS] [CONTRACT_PATH]:[CONTRACT_NAME] \
+  --chain-id [CHAIN_ID] \
+  --etherscan-api-key=[API_KEY] \
+  --verifier-url=[BLOCKSCOUT_URL] \
+  --verifier=blockscout \
+  --constructor-args $(cast abi-encode "constructor([CONSTRUCTOR_SIGNATURE])" [CONSTRUCTOR_ARGS]) \
+  --skip-is-verified-check \
+  --watch
+```
+
+Example for SortedOracles on Celo Sepolia:
+
+```bash
+FOUNDRY_PROFILE=truffle-compat forge verify-contract 0xAb077999e5fA13bCda1599926F8927dDEADe533C contracts/stability/SortedOracles.sol:SortedOracles \
+  --chain-id 11142220 \
+  --etherscan-api-key=0e91e215-39d5-4933-ae44-8eed11f89352 \
+  --verifier-url=https://celo-sepolia.blockscout.com/api/ \
+  --verifier=blockscout \
+  --constructor-args $(cast abi-encode "constructor(bool)" false) \
+  --skip-is-verified-check \
+  --watch
 ```
 
 ### Possible problems
