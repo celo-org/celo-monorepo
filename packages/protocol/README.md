@@ -141,7 +141,7 @@ Example for SortedOracles on Celo Sepolia:
 ```bash
 FOUNDRY_PROFILE=truffle-compat forge verify-contract 0xAb077999e5fA13bCda1599926F8927dDEADe533C contracts/stability/SortedOracles.sol:SortedOracles \
   --chain-id 11142220 \
-  --etherscan-api-key=0e91e215-39d5-4933-ae44-8eed11f89352 \
+  --etherscan-api-key=[API_KEY] \
   --verifier-url=https://celo-sepolia.blockscout.com/api/ \
   --verifier=blockscout \
   --constructor-args $(cast abi-encode "constructor(bool)" false) \
