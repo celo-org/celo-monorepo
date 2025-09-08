@@ -9,7 +9,7 @@ const testCases = {
   linked_libraries_upgraded_lib: getTestArtifacts('linked_libraries_upgraded_lib'),
 }
 
-describe.only('reportLibraryLinkingIncompatibilities', () => {
+describe('reportLibraryLinkingIncompatibilities', () => {
   it('detects when a linked library has changed', () => {
     const codeReport = reportASTIncompatibilities(
       testCases.linked_libraries,
