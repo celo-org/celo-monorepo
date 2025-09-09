@@ -37,6 +37,7 @@
     "release:check-versions:foundry": "./scripts/bash/check-versions-foundry.sh",
     "release:determine-release-version": "yarn --silent ts-node --preferTsExts ./scripts/determine-release-version.ts",
     "release:make": "./scripts/bash/make-release.sh",
+    "release:make:foundry": "./scripts/foundry/make-release-foundry.sh",
     "release:verify-deployed": "./scripts/bash/verify-deployed.sh",
     "release:verify-release": "./scripts/bash/verify-release.sh",
     "size:onchain": "./scripts/bash/get_smart_contract_size_from_onchain_address.sh",
@@ -120,7 +121,8 @@
     "web3-core-helpers": "1.10.0",
     "web3-provider-engine": "^16.0.5",
     "web3-utils": "1.10.0",
-    "truffle-plugin-verify": "^0.6.5"
+    "truffle-plugin-verify": "^0.6.5",
+    "viem": "^2.29.4"
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.3",

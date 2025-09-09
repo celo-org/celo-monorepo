@@ -16,6 +16,7 @@ no_match_path = "{**/test/BLS12Passthrough.sol,**/test/RandomTest.sol,**/test-so
 fs_permissions = [
   { access = "read", path = "./out"},
   { access = "read", path = "./migrations_sol/migrationsConfig.json"},
+  { access = "read", path = "./migrations_sol/"},
   { access = "read", path = "./governanceConstitution.json"},
   { access = "read", path = "./artifacts/"},
   { access = "read", path = "./.tmp/selectors" }
@@ -26,4 +27,28 @@ test = 'test-sol/devchain'
 match_path = "**/test-sol/devchain/**"
 no_match_path = "{**/test/BLS12Passthrough.sol,**/test/RandomTest.sol}"
 
+# Profile to match Truffle configuration for 0.5.13 contracts
+[profile.truffle-compat]
+src = 'contracts'
+out = 'out-truffle-compat'
+libs = ['lib', 'node_modules']
+solc_version = '0.5.13'
+optimizer = false
+evm_version = 'istanbul'
+metadata_literal = true
+via_ir = false
+
+# Profile to match Truffle configuration for 0.8.19 contracts
+[profile.truffle-compat8]
+src = 'contracts-0.8'
+out = 'out-truffle-compat-0.8'
+libs = ['lib', 'node_modules']
+solc_version = '0.8.19'
+optimizer = true
+optimizer_runs = 200
+use_literal_content = true
+via_ir = false
+evm_version = 'paris'
+bytecode_hash = 'ipfs'
+cbor_metadata = true
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config

@@ -104,7 +104,33 @@ Compared to the normal test command, quicktest will:
 1. Not run the pretest script of building solidity (will still be run as part of truffle test) and compiling typescript. This works because truffle can run typescript "natively".
 2. Only migrate selected migrations as set in `backupmigrations.sh` (you'll likely need at least one compilation step since truffle seems to only run compiled migrations)
 
+## Making a new release (Foundry)
+
+To create a new release using the Foundry script, run the following command:
+
+```bash
+./scripts/foundry/make-release-foundry.sh -n <network> -b <build-meta> -p <proposal-path> -i <initialization-data-path> -r <report-path> -l <libraries-path> -k <private-key>
+```
+
+Example:
+
+```bash
+./scripts/foundry/make-release-foundry.sh -n alfajores -b core-contracts.v13.post-audit -p proposal.json -i releaseData/initializationData/release13.json -r report.json -l libraries.json -k $PRIVATE_KEY
+```
+
+### Parameters
+
+- `-n`: The network name (e.g., `alfajores`, `mainnet`).
+- `-b`: The build metadata (e.g., `core-contracts.v13.post-audit`).
+- `-p`: The path to the proposal JSON file.
+- `-i`: The path to the initialization data JSON file.
+- `-r`: The path to the report JSON file.
+- `-l`: The path to the libraries JSON file.
+- `-k`: The private key for signing.
+
 ## Verify released smart contracts
+
+### Using Truffle
 
 1. Update CeloScanApi in env.json file
 2. Run verification command
@@ -117,6 +143,34 @@ example:
 
 ```bash
 yarn truffle:verify MentoFeeHandlerSeller@0x4efa274b7e33476c961065000d58ee09f7921a74 --network mainnet --forno https://forno.celo.org
+```
+
+### Using Foundry
+
+For contracts that need to match Truffle compilation settings (like SortedOracles), use the `truffle-compat` profile:
+
+```bash
+FOUNDRY_PROFILE=truffle-compat forge verify-contract [CONTRACT_ADDRESS] [CONTRACT_PATH]:[CONTRACT_NAME] \
+  --chain-id [CHAIN_ID] \
+  --etherscan-api-key=[API_KEY] \
+  --verifier-url=[BLOCKSCOUT_URL] \
+  --verifier=blockscout \
+  --constructor-args $(cast abi-encode "constructor([CONSTRUCTOR_SIGNATURE])" [CONSTRUCTOR_ARGS]) \
+  --skip-is-verified-check \
+  --watch
+```
+
+Example for SortedOracles on Celo Sepolia:
+
+```bash
+FOUNDRY_PROFILE=truffle-compat forge verify-contract 0xAb077999e5fA13bCda1599926F8927dDEADe533C contracts/stability/SortedOracles.sol:SortedOracles \
+  --chain-id 11142220 \
+  --etherscan-api-key=[API_KEY] \
+  --verifier-url=https://celo-sepolia.blockscout.com/api/ \
+  --verifier=blockscout \
+  --constructor-args $(cast abi-encode "constructor(bool)" false) \
+  --skip-is-verified-check \
+  --watch
 ```
 
 ### Possible problems
