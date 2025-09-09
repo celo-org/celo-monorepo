@@ -26,6 +26,7 @@ scTopics
 build
 .tmp
 .*.tar.gz
+out*
 
 types/*.js
 types/contracts/*
