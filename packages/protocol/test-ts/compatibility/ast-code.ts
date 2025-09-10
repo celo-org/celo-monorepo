@@ -22,7 +22,6 @@ const testCases = {
   big_original_modified: getTestArtifacts('big_original_modified'),
 }
 
-// @ts-ignore
 const comp = (c1: Change, c2: Change): number => {
   const v1 = JSON.stringify(c1)
   const v2 = JSON.stringify(c2)
