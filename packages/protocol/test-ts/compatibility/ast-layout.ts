@@ -1,4 +1,7 @@
-import { reportLayoutIncompatibilities } from '@celo/protocol/lib/compatibility/ast-layout'
+import {
+  reportLayoutIncompatibilities,
+  ASTStorageCompatibilityReport,
+} from '@celo/protocol/lib/compatibility/ast-layout'
 import { getTestArtifacts } from '@celo/protocol/test-ts/util/compatibility'
 import { assert } from 'chai'
 
@@ -38,15 +41,18 @@ const testCases = {
   deprecated_prefixed_variable: getTestArtifacts('deprecated_prefixed_variable'),
 }
 
-const assertCompatible = (report) => {
+const assertCompatible = (report: ASTStorageCompatibilityReport[]) => {
   assert.isTrue(report.every((contractReport) => contractReport.compatible))
 }
 
-const assertNotCompatible = (report) => {
+const assertNotCompatible = (report: ASTStorageCompatibilityReport[]) => {
   assert.isFalse(report.every((contractReport) => contractReport.compatible))
 }
 
-const selectReportFor = (report, contractName) => {
+const selectReportFor = (
+  report: ASTStorageCompatibilityReport[],
+  contractName: string
+): ASTStorageCompatibilityReport => {
   return report.find((contractReport) => contractReport.contract === contractName)
 }
 
@@ -56,7 +62,11 @@ const selectReportFor = (report, contractName) => {
  * @param expectedMatches The regular expressions that each successive error for
  * `contractName` should match.
  */
-const assertContractErrorsMatch = (report, contractName: string, expectedMatches) => {
+const assertContractErrorsMatch = (
+  report: ASTStorageCompatibilityReport[],
+  contractName: string,
+  expectedMatches: RegExp[]
+) => {
   const contractReport = selectReportFor(report, contractName)
   assert.equal(contractReport.errors.length, 1)
 
