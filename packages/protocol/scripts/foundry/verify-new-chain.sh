@@ -2,11 +2,9 @@
 
 # Require env vars
 [ -z "${BLOCKSCOUT_API_KEY:-}" ] && echo "Need to set the BLOCKSCOUT_API_KEY via env" && exit 1;
-
-# Config
-BLOCKSCOUT_URL=https://celo-sepolia.blockscout.com/api/
-CHAIN_ID=11142220
-RPC_URL=https://forno.celo-sepolia.celo-testnet.org
+[ -z "${BLOCKSCOUT_URL:-}" ] && echo "Need to set the BLOCKSCOUT_URL via env (example value: https://celo-sepolia.blockscout.com/api)" && exit 1;
+[ -z "${CHAIN_ID:-}" ] && echo "Need to set the CHAIN_ID via env (example value: 11142220)" && exit 1;
+[ -z "${RPC_URL:-}" ] && echo "Need to set the RPC_URL via env (example value: https://forno.celo-sepolia.celo-testnet.org)" && exit 1;
 
 verify() {
     CONSTRUCTOR_SIG=${3:-}
