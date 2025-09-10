@@ -30,7 +30,7 @@ function exec(cmd: string) {
 }
 
 // Return the latest modification time of a file in the given directory
-function getLatestUpdateTime(dir) {
+function getLatestUpdateTime(dir: string) {
   if (!fs.existsSync(dir)) {
     return 0
   }
