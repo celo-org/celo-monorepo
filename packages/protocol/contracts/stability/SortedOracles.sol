@@ -188,8 +188,8 @@ contract SortedOracles is
 
   /**
    * @notice Sets the equivalent token for a token.
-   * @param token The address of the token.
-   * @param equivalentToken The address of the equivalent token.
+   * @param token The address of the token. (eg USDC)
+   * @param equivalentToken The address of the equivalent token. (eg cUSD)
    */
   function setEquivalentToken(address token, address equivalentToken) external onlyOwner {
     require(token != address(0), "token address cannot be 0");
