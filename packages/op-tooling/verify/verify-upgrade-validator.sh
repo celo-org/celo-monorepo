@@ -9,7 +9,7 @@ set -euo pipefail
 
 # Require env vars
 [ -z "${VERSION:-}" ] && echo "Need to set the VERSION via env" && exit 1;
-[ -z "${VALIDATOR:-}" ] && echo "Need to set the VERSION via env" && exit 1;
+[ -z "${VALIDATOR:-}" ] && echo "Need to set the VALIDATOR via env" && exit 1;
 
 # Optional env vars
 if [ -z "${CHAIN_ID:-}" ]; then

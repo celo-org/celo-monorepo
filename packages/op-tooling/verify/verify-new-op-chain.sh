@@ -2,9 +2,9 @@
 
 # Require env vars
 [ -z "${NETWORK:-}" ] && echo "Need to set the NETWORK via env" && exit 1;
+[ -z "${RELEASE:-}" ] && echo "Need to set the RELEASE via env (example value: celo-contracts/v3.0.0)" && exit 1;
 
 # Config
-RELEASE="celo-contracts/v3.0.0"
 DEPLOYER="0x95a40aA01d2d72b4122C19c86160710D01224ada"
 USE_INTEROP="false" # Set to true if you interop is enabled and contracts are deployed on L2
 
@@ -148,7 +148,7 @@ verify_proxy() {
     verify $IMPL_ADDRESS ${@:2}
 }
 
-if [ network = "l1" ]; then
+if [ "$NETWORK" = "l1" ]; then
     echo ">>> [L1] Verifying contracts on $NETWORK"
     # start verifying contracts
     OPCM_CONTAINER=$(cast call $OPCM_GTA "contractsContainer()(address)" -r $RPC_URL)

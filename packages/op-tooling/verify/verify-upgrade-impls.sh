@@ -90,7 +90,7 @@ set -euo pipefail
 # PVI=0x37e15e4d6dffa9e5e320ee1ec036922e563cb76c
 
 # Require env vars
-[ -z "${NETWORK:-}" ] && echo "Need to set the VERSION via env" && exit 1;
+[ -z "${NETWORK:-}" ] && echo "Need to set the NETWORK via env" && exit 1;
 [ -z "${VERSION:-}" ] && echo "Need to set the VERSION via env" && exit 1;
 
 # Check network
