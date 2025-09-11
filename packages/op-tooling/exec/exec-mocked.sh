@@ -28,6 +28,7 @@ fi
 # required envs
 [ -z "${VERSION:-}" ] && echo "Need to set the VERSION via env" && exit 1;
 [ -z "${PK:-}" ] && echo "Need to set the PK via env" && exit 1;
+[ -z "${SENDER:-}" ] && echo "Need to set the SENDER via env" && exit 1;
 if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ]; then
   [ -z "${SIGNER_1_PK:-}" ] && echo "Need to set the SIGNER_1_PK via env" && exit 1;
 fi
@@ -48,30 +49,19 @@ case $VERSION in
 esac
 
 # addresses
-SENDER=0xe571b94CF7e95C46DFe6bEa529335f4A11d15D92
 if [ $SENDER != $(cast wallet address --private-key $PK) ]; then
   echo "Invalid PK"; exit 1;
 fi
 if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ]; then
-  MOCKED_SIGNER_1=0x899a864C6bE2c573a98d8493961F4D4c0F7Dd0CC
-  if [ $MOCKED_SIGNER_1 != $(cast wallet address --private-key $SIGNER_1_PK) ]; then
-    echo "Invalid SIGNER_1_PK"; exit 1;
-  fi
+  # if EXTERNAL_SIG & EXTERNAL_ACCOUNT are set and EXTERNAL_TEAM is clabs than MOCKED_SIGNER_1 = EXTERNAL_ACCOUNT
+  MOCKED_SIGNER_1=$(cast wallet address --private-key $SIGNER_1_PK)
 fi
-MOCKED_SIGNER_2=0x865d05C8bB46E7AF16D6Dc99ddfb2e64BBec1345
-if [ "$MOCKED_SIGNER_2" != $(cast wallet address --private-key $SIGNER_2_PK) ]; then
-  echo "Invalid SIGNER_2_PK"; exit 1;
-fi
+MOCKED_SIGNER_2=$(cast wallet address --private-key $SIGNER_2_PK)
 if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
-  MOCKED_SIGNER_3=0x8Af6f11c501c082bD880B3ceC83e6bB249Fa32c9
-  if [ "$MOCKED_SIGNER_3" != $(cast wallet address --private-key $SIGNER_3_PK) ]; then
-    echo "Invalid SIGNER_3_PK"; exit 1;
-  fi
+  # if EXTERNAL_SIG & EXTERNAL_ACCOUNT are set and EXTERNAL_TEAM is council than MOCKED_SIGNER_3 = EXTERNAL_ACCOUNT
+  MOCKED_SIGNER_3=$(cast wallet address --private-key $SIGNER_3_PK)
 fi
-MOCKED_SIGNER_4=0x480C5f2340f9E7A46ee25BAa815105B415a7c2e2
-if [ "$MOCKED_SIGNER_4" != $(cast wallet address --private-key $SIGNER_4_PK) ]; then
-  echo "Invalid SIGNER_4_PK"; exit 1;
-fi
+MOCKED_SIGNER_4=$(cast wallet address --private-key $SIGNER_4_PK)
 
 # rpc
 RPC_URL=http://127.0.0.1:8545
@@ -92,6 +82,9 @@ CLABS_SAFE_ADDRESS=0x9Eb44Da23433b5cAA1c87e35594D15FcEb08D34d
 COUNCIL_SAFE_ADDRESS=0xC03172263409584f7860C25B6eB4985f0f6F4636
 
 # tx data
+# @dev OPCM_UPGRADE_CALLDATA is the calldata for performing the upgrade through OPCM...
+# ...it was generated during last step of interaction with op-deployer (op-deployer upgrade)
+# ...bytes4(keccak256(abi.encodePacked("upgrade((address,address,bytes32)[],bool)"))) = 0xa4589780
 if [ "$VERSION" = "v2" ]; then
   PARENT_SAFE_NONCE=22
   CLABS_SAFE_NONCE=19

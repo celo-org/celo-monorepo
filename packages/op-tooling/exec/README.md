@@ -85,18 +85,28 @@ Simplified and mocked simulation of network upgrade with support for providing a
 
 **Features:**
 - Mocked multisig environment for testing
-- Support for external account signatures
+- Support for external account signatures with enhanced validation
 - Configurable approval or signing behavior
 - Grand Child multisig support for Council team
 - Simplified execution flow for development
+- Sender address validation for security
 
 **Required Environment Variables:**
 - `VERSION` - Target version (`v2` or `v3`)
 - `PK` - Private key for transaction execution
+- `SENDER` - Expected sender address (must match the address derived from `PK`)
 - `SIGNER_1_PK` - Private key for first signer (unless external account used)
 - `SIGNER_2_PK` - Private key for second signer
 - `SIGNER_3_PK` - Private key for third signer (unless external account used)
 - `SIGNER_4_PK` - Private key for fourth signer
+
+> **Important**: The signer addresses used in `exec-mocked.sh` must correspond exactly to the mocked signers configured in `mock-mainnet.sh`:
+> - `SIGNER_1_PK` → `MOCKED_SIGNER_1` (cLabs team signer)
+> - `SIGNER_2_PK` → `MOCKED_SIGNER_2` (cLabs team signer)  
+> - `SIGNER_3_PK` → `MOCKED_SIGNER_3` (Council team signer)
+> - `SIGNER_4_PK` → `MOCKED_SIGNER_4` (Council team signer)
+> 
+> The `SENDER` address is validated against the `PK` to ensure proper account control.
 
 **Optional Environment Variables:**
 - `SIG` - External signature (used with `ACCOUNT` and `TEAM`)
@@ -112,22 +122,22 @@ Simplified and mocked simulation of network upgrade with support for providing a
 
 #### Basic Mocked Execution
 ```bash
-VERSION="v3" PK="0x..." SIGNER_1_PK="0x..." SIGNER_2_PK="0x..." SIGNER_3_PK="0x..." SIGNER_4_PK="0x..." ./exec-mocked.sh
+VERSION="v3" PK="0x..." SENDER="0x..." SIGNER_1_PK="0x..." SIGNER_2_PK="0x..." SIGNER_3_PK="0x..." SIGNER_4_PK="0x..." ./exec-mocked.sh
 ```
 
 #### With External cLabs Account
 ```bash
-VERSION="v3" PK="0x..." SIG="0x..." ACCOUNT="0x..." TEAM="clabs" SIGNER_2_PK="0x..." SIGNER_3_PK="0x..." SIGNER_4_PK="0x..." ./exec-mocked.sh
+VERSION="v3" PK="0x..." SENDER="0x..." SIG="0x..." ACCOUNT="0x..." TEAM="clabs" SIGNER_2_PK="0x..." SIGNER_3_PK="0x..." SIGNER_4_PK="0x..." ./exec-mocked.sh
 ```
 
 #### With External Council Account
 ```bash
-VERSION="v3" PK="0x..." SIG="0x..." ACCOUNT="0x..." TEAM="council" SIGNER_1_PK="0x..." SIGNER_2_PK="0x..." SIGNER_4_PK="0x..." ./exec-mocked.sh
+VERSION="v3" PK="0x..." SENDER="0x..." SIG="0x..." ACCOUNT="0x..." TEAM="council" SIGNER_1_PK="0x..." SIGNER_2_PK="0x..." SIGNER_4_PK="0x..." ./exec-mocked.sh
 ```
 
 #### With Mento Member from External Council Account and Grand Child Multisig
 ```bash
-VERSION="v3" PK="0x..." SIG="0x..." ACCOUNT="0x..." TEAM="council" GC_MULTISIG="0x..." SIGNER_1_PK="0x..." SIGNER_2_PK="0x..." SIGNER_4_PK="0x..." ./exec-mocked.sh
+VERSION="v3" PK="0x..." SENDER="0x..." SIG="0x..." ACCOUNT="0x..." TEAM="council" GC_MULTISIG="0x..." SIGNER_1_PK="0x..." SIGNER_2_PK="0x..." SIGNER_4_PK="0x..." ./exec-mocked.sh
 ```
 
 ## Execution Flow
@@ -175,3 +185,4 @@ The upgrade calldata follows the format:
 - The `exec-mocked.sh` script is designed for development and testing scenarios
 - Gas limits are set to 16,000,000 for OPCM upgrade transactions
 - Nonces must be sequential and match the current multisig state
+- **Critical**: The signer private keys in `exec-mocked.sh` must correspond to the addresses configured in `mock-mainnet.sh` for proper multisig operation
