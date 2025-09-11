@@ -1,12 +1,12 @@
 # L2 to L1 Withdrawals
 
-This directory contains tooling for performing L2 to L1 withdrawals on Celo's L2 testnet (Celo Sepolia). The workflow follows the Optimism-style withdrawal process with a 7-day challenge period.
+This directory contains tooling for performing L2 to L1 withdrawals of CELO from Celo's L2 testnet (Celo Sepolia). The workflow follows the Optimism-style withdrawal process with a 7-day challenge period (exact challenge period dictated by `PROOF_MATURITY_DELAY_SECONDS` in Optimism Portal).
 
 ## Important Notes
 
 - **Private Keys**: Always provide private keys without `0x` prefix to all scripts
 - **Values**: All VALUE parameters should be specified in wei
-- **Timing**: Generating proofs may take up to 1 hour after initiation of withdrawal
+- **Timing**: You may need to wait up to 1 hour before it's possible to generate a proof after initiation
 
 ## Workflow Overview
 
@@ -30,7 +30,7 @@ RECIPIENT=0x... VALUE=1000000000000000000 PK=123... ./initiate.sh
 - `PK`: Private key (without 0x prefix) of the sender
 
 **Optional Environment Variables:**
-- `GAS_LIMIT`: Gas limit for the transaction (default: 0)
+- `GAS_LIMIT`: Gas limit for the transaction (default: 0 - which means no gas limit)
 - `DATA`: Additional data to include (default: "0x00")
 - `L2_RPC_URL`: Custom L2 RPC URL (default: Celo Sepolia)
 
@@ -67,7 +67,7 @@ WITHDRAWAL_NONCE=123... SENDER=0x... RECIPIENT=0x... VALUE=1000000000000000000 \
 - `SENDER`: Address that initiated the withdrawal
 - `RECIPIENT`: Address that will receive the funds
 - `VALUE`: Amount being withdrawn in wei
-- `GAME_INDEX`: Game index (usually 0)
+- `GAME_INDEX`: Game index (output from Step 2)
 - `OUTPUT_ROOT_PROOF__VERSION`: Version from proof building
 - `OUTPUT_ROOT_PROOF__STATE_ROOT`: State root from proof building
 - `OUTPUT_ROOT_PROOF__MESSAGE_PASSER_STORAGE_ROOT`: Storage root from proof building
@@ -76,7 +76,7 @@ WITHDRAWAL_NONCE=123... SENDER=0x... RECIPIENT=0x... VALUE=1000000000000000000 \
 - `PK`: Private key (without 0x prefix) for submitting the proof
 
 **Optional Environment Variables:**
-- `GAS_LIMIT`: Gas limit for the transaction (default: 0)
+- `GAS_LIMIT`: Gas limit for the transaction (default: 0 - which means no gas limit)
 - `DATA`: Additional data to include (default: "0x00")
 - `RPC_URL`: Custom L1 RPC URL (if not using Alchemy)
 - `ALCHEMY_KEY`: Alchemy API key (required if RPC_URL not provided)
@@ -138,7 +138,7 @@ WITHDRAWAL_NONCE=123... SENDER=0x... RECIPIENT=0x... VALUE=1000000000000000000 \
 - `PK`: Private key (without 0x prefix) for finalizing
 
 **Optional Environment Variables:**
-- `GAS_LIMIT`: Gas limit for the transaction (default: 0)
+- `GAS_LIMIT`: Gas limit for the transaction (default: 0 - which means no gas limit)
 - `DATA`: Additional data to include (default: "0x00")
 - `RPC_URL`: Custom L1 RPC URL (if not using Alchemy)
 - `ALCHEMY_KEY`: Alchemy API key (required if RPC_URL not provided)
