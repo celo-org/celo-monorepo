@@ -22,4 +22,4 @@ cast send $L2_L1_MESSAGE_PASSER \
   $DATA \
   --value $VALUE \
   --private-key $PK \
-  -r $L2_RPC_URL
+  --rpc-url $L2_RPC_URL

@@ -22,4 +22,4 @@ cast call $L1_OPTIMISM_PORTAL \
   "provenWithdrawals(bytes32,address)" \
   $WITHDRAWAL_HASH \
   $PROOF_SUBMITTER \
-  -r $L1_RPC_URL
+  --rpc-url $L1_RPC_URL
