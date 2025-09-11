@@ -21,7 +21,7 @@ if [ -n "$EXTERNAL_SIG" ] && [ -n "$EXTERNAL_ACCOUNT" ]; then
   esac
   echo "External sig: $EXTERNAL_SIG"
 fi
-if [ -n "$GRAND_CHILD_MULTISIG" ] && [ $EXTERNAL_TEAM != "council" ]; then
+if [ -n "$GRAND_CHILD_MULTISIG" ] && [ "$EXTERNAL_TEAM" != "council" ]; then
   echo "Grand Child multisig is not supported for other team than council" && exit 1
 fi
 
@@ -59,17 +59,17 @@ if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" !=
   fi
 fi
 MOCKED_SIGNER_2=0x865d05C8bB46E7AF16D6Dc99ddfb2e64BBec1345
-if [ $MOCKED_SIGNER_2 != $(cast wallet address --private-key $SIGNER_2_PK) ]; then
+if [ "$MOCKED_SIGNER_2" != $(cast wallet address --private-key $SIGNER_2_PK) ]; then
   echo "Invalid SIGNER_2_PK"; exit 1;
 fi
 if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
   MOCKED_SIGNER_3=0x8Af6f11c501c082bD880B3ceC83e6bB249Fa32c9
-  if [ $MOCKED_SIGNER_3 != $(cast wallet address --private-key $SIGNER_3_PK) ]; then
+  if [ "$MOCKED_SIGNER_3" != $(cast wallet address --private-key $SIGNER_3_PK) ]; then
     echo "Invalid SIGNER_3_PK"; exit 1;
   fi
 fi
 MOCKED_SIGNER_4=0x480C5f2340f9E7A46ee25BAa815105B415a7c2e2
-if [ $MOCKED_SIGNER_4 != $(cast wallet address --private-key $SIGNER_4_PK) ]; then
+if [ "$MOCKED_SIGNER_4" != $(cast wallet address --private-key $SIGNER_4_PK) ]; then
   echo "Invalid SIGNER_4_PK"; exit 1;
 fi
 
@@ -92,7 +92,7 @@ CLABS_SAFE_ADDRESS=0x9Eb44Da23433b5cAA1c87e35594D15FcEb08D34d
 COUNCIL_SAFE_ADDRESS=0xC03172263409584f7860C25B6eB4985f0f6F4636
 
 # tx data
-if [ $VERSION = 'v2' ]; then
+if [ "$VERSION" = "v2" ]; then
   PARENT_SAFE_NONCE=22
   CLABS_SAFE_NONCE=19
   COUNCIL_SAFE_NONCE=21
@@ -128,7 +128,7 @@ CLABS_TX_HASH=$(cast call $CLABS_SAFE_ADDRESS \
 echo "cLabs hash: $CLABS_TX_HASH"
 
 # approve or sign cLabs
-if [ $APPROVE_OR_SIGN = 'approve' ]; then
+if [ "$APPROVE_OR_SIGN" = "approve" ]; then
   echo "Approve cLabs hash"
   CLABS_APPROVE_FROM_SIGNER_CALLDATA=$(cast calldata 'approveHash(bytes32)' $CLABS_TX_HASH)
   cast send $CLABS_SAFE_ADDRESS $CLABS_APPROVE_FROM_SIGNER_CALLDATA --private-key $SIGNER_1_PK -r $RPC_URL
@@ -201,7 +201,7 @@ if [ -n "$GRAND_CHILD_MULTISIG" ]; then
   echo "Grand Child approval executed"
 fi
 
-if [ $APPROVE_OR_SIGN = 'approve' ]; then
+if [ "$APPROVE_OR_SIGN" = "approve" ]; then
   echo "Approve Council hash"
   COUNCIL_APPROVE_FROM_SIGNER_CALLDATA=$(cast calldata 'approveHash(bytes32)' $COUNCIL_TX_HASH)
   cast send $COUNCIL_SAFE_ADDRESS $COUNCIL_APPROVE_FROM_SIGNER_CALLDATA --private-key $SIGNER_3_PK -r $RPC_URL
@@ -224,7 +224,7 @@ fi
 
 # exec Council
 echo "Exec Council approval"
-if [ $APPROVE_OR_SIGN = 'approve' ]; then
+if [ "$APPROVE_OR_SIGN" = "approve" ]; then
   COUNCIL_SIG=0x000000000000000000000000${MOCKED_SIGNER_4:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000${MOCKED_SIGNER_3:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000
 else
   if [ -z "$GRAND_CHILD_MULTISIG" ]; then
