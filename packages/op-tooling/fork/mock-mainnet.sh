@@ -24,19 +24,19 @@ if [ -n "$EXTERNAL_ACCOUNT" ]; then
       ;;
   esac
 fi
-if [ -n "$GRAND_CHILD_MULTISIG" ] && [ $EXTERNAL_TEAM != "council" ]; then
+if [ -n "$GRAND_CHILD_MULTISIG" ] && [ "$EXTERNAL_TEAM" != "council" ]; then
   echo "Grand Child multisig is not supported for other team than council" && exit 1
 fi
 
 # signers
-if [ -z "$EXTERNAL_ACCOUNT" ] || [ $EXTERNAL_TEAM != "clabs" ]; then
+if [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ]; then
   [ -z "${MOCKED_SIGNER_1:-}" ] && echo "Need to set the MOCKED_SIGNER_1 via env" && exit 1;
 else
   # if EXTERNAL_ACCOUNT is set and EXTERNAL_TEAM is clabs than MOCKED_SIGNER_1 = EXTERNAL_ACCOUNT
   MOCKED_SIGNER_1=$EXTERNAL_ACCOUNT
 fi
 [ -z "${MOCKED_SIGNER_2:-}" ] && echo "Need to set the MOCKED_SIGNER_2 via env" && exit 1;
-if [ -z "$EXTERNAL_ACCOUNT" ] || [ $EXTERNAL_TEAM != "council" ]; then
+if [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
   [ -z "${MOCKED_SIGNER_3:-}" ] && echo "Need to set the MOCKED_SIGNER_3 via env" && exit 1;
 else
   # if EXTERNAL_ACCOUNT is set and EXTERNAL_TEAM is council than MOCKED_SIGNER_3 = EXTERNAL_ACCOUNT
