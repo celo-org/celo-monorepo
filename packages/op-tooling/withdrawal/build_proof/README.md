@@ -33,7 +33,7 @@ The script requires the following environment variables:
 To build a proof for a withdrawal, run:
 
 ```sh
-PK=1234567890abcdef... TX_HASH=0x1234567890abcdef... yarn build_proof
+PK=1234567890abcdef... TX_HASH=0x1234567890abcdef... yarn build
 ```
 
 ## Waiting Period

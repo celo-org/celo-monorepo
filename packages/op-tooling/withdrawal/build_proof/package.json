@@ -12,6 +12,6 @@
     "viem": "^2.33.1"
   },
   "scripts": {
-    "build_proof": "node --loader ts-node/esm build_proof.ts"
+    "build": "node --loader ts-node/esm build_proof.ts"
   }
 }

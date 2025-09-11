@@ -27,4 +27,4 @@ cast send $L1_OPTIMISM_PORTAL \
   "finalizeWithdrawalTransaction((uint256, address, address, uint256, uint256, bytes))" \
   "($WITHDRAWAL_NONCE,$SENDER,$RECIPIENT,$VALUE,$GAS_LIMIT,$DATA)" \
   --private-key $PK \
-  --rpc-url $L1_RPC_URL
+  -r $L1_RPC_URL
