@@ -110,6 +110,9 @@ function performUpgrade() {
   esac
 
   # tx data
+  # @dev OPCM_UPGRADE_CALLDATA is the calldata for performing the upgrade through OPCM...
+# ...it was generated during last step of interaction with op-deployer (op-deployer upgrade)
+# ...bytes4(keccak256(abi.encodePacked("upgrade((address,address,bytes32)[],bool)"))) = 0xa4589780
   if [ $VERSION = 'v2' ]; then
     PARENT_SAFE_NONCE=22
     CLABS_SAFE_NONCE=19
@@ -232,6 +235,7 @@ function performUpgrade() {
 
   # exec parent tx
   echo "Exec OPCM upgrade"
+  # signature in format where signer is nested safe (https://github.com/safe-global/safe-smart-account/blob/main/contracts/Safe.sol#L349C17-L351C94)
   PARENT_SIG=0x000000000000000000000000${CLABS_SAFE_ADDRESS:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000${COUNCIL_SAFE_ADDRESS:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000
   echo "Parent sig: $PARENT_SIG"
   cast send $PARENT_SAFE_ADDRESS \
