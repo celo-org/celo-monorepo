@@ -12,7 +12,7 @@ PK=${PK:-}; [ -z "${PK:-}" ] && echo "Need to set the PK via env" && exit 1;
 # Optional environment variables
 GAS_LIMIT=${GAS_LIMIT:-0}
 DATA=${DATA:-"0x00"}
-L2_RPC_URL=${L2_PRC_URL:-"https://forno.celo-sepolia.celo-testnet.org"}
+L2_RPC_URL=${L2_RPC_URL:-"https://forno.celo-sepolia.celo-testnet.org"}
 
 # Initiation of withdrawal on L2
 cast send $L2_L1_MESSAGE_PASSER \
