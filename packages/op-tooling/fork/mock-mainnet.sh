@@ -30,17 +30,19 @@ fi
 
 # signers
 if [ -z "$EXTERNAL_ACCOUNT" ] || [ $EXTERNAL_TEAM != "clabs" ]; then
-  MOCKED_SIGNER_1=0x899a864C6bE2c573a98d8493961F4D4c0F7Dd0CC
+  [ -z "${MOCKED_SIGNER_1:-}" ] && echo "Need to set the MOCKED_SIGNER_1 via env" && exit 1;
 else
+  # if EXTERNAL_ACCOUNT is set and EXTERNAL_TEAM is clabs than MOCKED_SIGNER_1 = EXTERNAL_ACCOUNT
   MOCKED_SIGNER_1=$EXTERNAL_ACCOUNT
 fi
-MOCKED_SIGNER_2=0x865d05C8bB46E7AF16D6Dc99ddfb2e64BBec1345
+[ -z "${MOCKED_SIGNER_2:-}" ] && echo "Need to set the MOCKED_SIGNER_2 via env" && exit 1;
 if [ -z "$EXTERNAL_ACCOUNT" ] || [ $EXTERNAL_TEAM != "council" ]; then
-  MOCKED_SIGNER_3=0x8Af6f11c501c082bD880B3ceC83e6bB249Fa32c9
+  [ -z "${MOCKED_SIGNER_3:-}" ] && echo "Need to set the MOCKED_SIGNER_3 via env" && exit 1;
 else
+  # if EXTERNAL_ACCOUNT is set and EXTERNAL_TEAM is council than MOCKED_SIGNER_3 = EXTERNAL_ACCOUNT
   MOCKED_SIGNER_3=$EXTERNAL_ACCOUNT
 fi
-MOCKED_SIGNER_4=0x480C5f2340f9E7A46ee25BAa815105B415a7c2e2
+[ -z "${MOCKED_SIGNER_4:-}" ] && echo "Need to set the MOCKED_SIGNER_4 via env" && exit 1;
 
 # safe internal
 SENTINEL_ADDRESS=0x0000000000000000000000000000000000000001
