@@ -6,6 +6,9 @@ import { console2 as console } from "forge-std/console2.sol";
 
 import { ECDSA } from "@openzeppelin/contracts8/utils/cryptography/ECDSA.sol";
 
+/// @notice Recover the address of signer of a hash
+/// @dev Useful while working with multiple external signatures from Security Council or cLabs
+/// @dev Particulary during performing OpStack upgrades or interacting with Core Contracts governance
 contract Recover is Script {
   function run() external {
     bytes32 hash_ = vm.envBytes32("HASH");
