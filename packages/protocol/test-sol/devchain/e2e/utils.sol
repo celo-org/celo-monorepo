@@ -68,7 +68,7 @@ contract Devchain is TestWithUtils08 {
     governance = getGovernance();
     lockedCelo = getLockedGold();
     odisPayments = getOdisPayments();
-    randomContract = getRandom();
+    // randomContract = getRandom();
     scoreManager = IScoreManager(address(getScoreReader()));
     sortedOracles = getSortedOracles();
     validators = getValidators();

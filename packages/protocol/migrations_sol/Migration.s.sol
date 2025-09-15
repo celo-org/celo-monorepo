@@ -9,6 +9,9 @@ import { Script } from "forge-std-8/Script.sol";
 import { console } from "forge-std/console.sol";
 import { stdJson } from "forge-std/StdJson.sol";
 
+// OpenZeppelin
+import { Ownable } from "@openzeppelin/contracts8/access/Ownable.sol";
+
 // Helper contract imports
 import { IReserveInitializer, IReserve, IStableTokenInitialize, IExchangeInitializer, IExchange, IReserveSpenderMultiSig } from "@migrations-sol/HelperInterFaces.sol";
 import { MigrationsConstants } from "@migrations-sol/constants.sol";

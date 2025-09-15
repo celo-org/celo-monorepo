@@ -256,7 +256,7 @@ contract E2E_GovernanceSlashing is E2E_Governance {
     );
 
     // transfer out ownership to governance
-    vm.prank(ownerAddress);
+    vm.prank(Ownable(address(governanceSlasher)).owner());
     Ownable(address(governanceSlasher)).transferOwnership(address(governance));
 
     // setup slashed account
