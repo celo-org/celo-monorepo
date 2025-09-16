@@ -21,7 +21,10 @@ describe('#getContractVersion()', () => {
 
   describe('when the contract does not implement getVersionNumber()', () => {
     it('returns the default version number', async () => {
-      const version = await getContractVersion(testCases.original.getArtifactByName('TestContract'), false)
+      const version = await getContractVersion(
+        testCases.original.getArtifactByName('TestContract'),
+        false
+      )
       assert.equal(version.toString(), DEFAULT_VERSION_STRING)
     })
   })
