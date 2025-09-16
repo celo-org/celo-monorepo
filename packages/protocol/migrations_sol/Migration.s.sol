@@ -245,7 +245,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateEpochRewards(json);
     migrateEscrow();
     migrateGovernanceSlasher();
-    // migrateGovernanceApproverMultiSig(json);
+    migrateGovernanceApproverMultiSig(json);
     migrateFederatedAttestations();
     migrateMentoFeeHandlerSeller();
     migrateUniswapFeeHandlerSeller();
