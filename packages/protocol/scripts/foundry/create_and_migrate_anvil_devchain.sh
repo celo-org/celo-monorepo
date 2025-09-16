@@ -30,10 +30,6 @@ source $PWD/scripts/foundry/build_constitution_selectors_map.sh
 echo "Compiling with libraries..."
 time FOUNDRY_PROFILE=devchain forge build $LIBRARY_FLAGS
 
-# TODO: Move to L2Gensis.s.sol?
-# Deploy precompile contracts
-#source $PWD/scripts/foundry/deploy_precompiles.s
-
 # Pre-deploy Election
 echo "Deploying Election contract..."
 forge create -r $ANVIL_RPC_URL --private-key $DEPLOYER_PK $LIBRARY_FLAGS \

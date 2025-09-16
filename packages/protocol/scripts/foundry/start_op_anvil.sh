@@ -14,9 +14,8 @@ source $PWD/scripts/foundry/constants.sh
 mkdir -p $ANVIL_FOLDER
 echo "Anvil state will be saved to $ANVIL_FOLDER"
 
-# create package.json
+# create package.json & README.md (required in step: "Prepare package for publishing" in protocol-devchain-anvil.yml)
 echo "{\"name\": \"@celo/devchain-anvil\",\"version\": \"1.0.0\",\"repository\": { \"url\": \"https://github.com/celo-org/celo-monorepo\", \"directory\": \"packages/protocol/migrations_sol\" },\"homepage\": \"https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/migrations_sol/README.md\",\"description\": \"Anvil based devchain that contains core smart contracts of celo\",\"author\":\"Celo\",\"license\": \"LGPL-3.0\"}" > $TMP_FOLDER/package.json
-
 cp $PWD/migrations_sol/README.md $TMP_FOLDER/README.md
 
 if nc -z localhost $ANVIL_PORT; then
@@ -42,11 +41,9 @@ anvil \
 
 # alternatively:
 # ANVIL_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
-
 export ANVIL_PID=$!
 
 echo "Waiting Anvil to launch on $ANVIL_PORT..."
-
 while ! nc -z localhost $ANVIL_PORT; do
   sleep 0.1 # wait for 1/10 of the second before check again
 done

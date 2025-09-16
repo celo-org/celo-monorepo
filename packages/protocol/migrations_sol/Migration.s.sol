@@ -215,19 +215,16 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
    * Entry point of the script
    */
   function run() external {
-    // TODO check that this matches DEPLOYER_ACCOUNT and the pK can be avoided with --unlock
+    // TODO check that this matches DEPLOYER_ACCOUNT and the PK can be avoided with --unlock
     vm.startBroadcast(DEPLOYER_ACCOUNT);
-
-    string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
 
     proxyFactory = IProxyFactory(
       create2deploy(0, vm.getCode("./out/ProxyFactory.sol/ProxyFactory.json"))
     );
+    string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
 
-    // Proxy for Registry is already set, just deploy implementation
     migrateRegistry();
     setupUsingRegistry();
-
     migrateFreezer();
     migrateFeeCurrencyDirectory();
     migrateCeloToken(json);
@@ -239,9 +236,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateAccount();
     migrateLockedCelo(json);
     migrateValidators(json);
-
     migrateElection(json);
-
     migrateEpochRewards(json);
     migrateEscrow();
     migrateGovernanceSlasher();
@@ -253,15 +248,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateOdisPayments();
     migrateCeloUnreleasedTreasury();
     vm.stopBroadcast();
-
-    // needs to broadcast from a pre-funded account
-    // run + bash + run2
-    // this could be done in genesis L2 as native funds in optimism repo (TBD with Javi)
-    // if anvil is underneath it might be possible to 'deal'
-    // fundCeloUnreleasedTreasury(json);
-
-    // Functions with broadcast with different addresses
-    // Validators needs to lock, which can be only used by the msg.sender
   }
 
   function run2() public {
@@ -278,7 +264,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     setupUsingRegistry();
     console.log("Account owner:", IProxy(address(getAccounts()))._getOwner());
 
-    // Proxy for Registry is already set, just deploy implementation
     migrateEpochManagerEnabler();
     migrateEpochManager(json);
     migrateScoreManager();
@@ -291,9 +276,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     vm.stopBroadcast();
 
     electValidators(json);
-
-    // vm.broadcast(DEPLOYER_ACCOUNT);
-    // captureEpochManagerEnablerValidators();
   }
 
   /**
