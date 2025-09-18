@@ -619,7 +619,7 @@ contract EpochManager is
   }
 
   /**
-   * @return Whether epoch is being processed by individually group by group.
+   * @return Whether the epoch is being processed individually, group by group.
    */
   function isIndividualProcessing() public view returns (bool) {
     return epochProcessing.status == EpochProcessStatus.IndivudualGroupsProcessing;
