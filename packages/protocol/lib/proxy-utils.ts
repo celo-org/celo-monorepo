@@ -68,6 +68,7 @@ export async function setAndInitializeImplementation(
       return retryTx(proxy._setAndInitializeImplementation, [implementationAddress, callData as any])
     }
   } catch (error) {
-    console.log("errror", error);
+    console.error("error", error);
+    throw error
   }
 }
