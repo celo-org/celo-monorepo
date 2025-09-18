@@ -38,8 +38,7 @@ if [[ $1 == "decrypt" ]]; then
   done
 fi
 
-command -v gcloud > /dev/null 2>&1
-if [[ $? -eq 1 ]]; then
+if ! command -v gcloud > /dev/null 2>&1; then
   echo "gcloud is not installed - skipping ${1}ion"
   exit 0
 fi
@@ -74,7 +73,7 @@ done
 if [[ $1 == "decrypt" ]]; then
   echo "Encrypted files decrypted"
 elif [[ $1 == "encrypt" ]]; then
-  echo "Decrypted files encrypted"
+  echo "Files encrypted"
 fi
 
 exit 0
