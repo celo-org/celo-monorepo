@@ -136,7 +136,7 @@ contract FeeHandler is
     for (uint256 i = 0; i < tokens.length; i++) {
       _addToken(tokens[i], handlers[i]);
       _setDailySellLimit(tokens[i], newLimits[i]);
-      _setMaxSplippage(tokens[i], newMaxSlippages[i]);
+      _setMaxSlippage(tokens[i], newMaxSlippages[i]);
     }
   }
 
@@ -264,10 +264,10 @@ contract FeeHandler is
   /**
    * @notice Allows owner to set max slippage for a token.
    * @param token Address of the token to set.
-   * @param newMax New sllipage to set, as Fixidity fraction.
+   * @param newMax New slippage to set, as Fixidity fraction.
    */
-  function setMaxSplippage(address token, uint256 newMax) external onlyOwner {
-    _setMaxSplippage(token, newMax);
+  function setMaxSlippage(address token, uint256 newMax) external onlyOwner {
+    _setMaxSllippage(token, newMax);
   }
 
   /**
@@ -517,7 +517,7 @@ contract FeeHandler is
 
   function _setCarbonFraction(uint256 _newFraction) internal {
     FixidityLib.Fraction memory newFraction = FixidityLib.wrap(_newFraction);
-    require(newFraction.lte(FixidityLib.fixed1()), "New cargon fraction can't be greather than 1");
+    require(newFraction.lte(FixidityLib.fixed1()), "New carbon fraction can't be greater than 1");
     ignoreRenaming_inverseCarbonFraction = FixidityLib.fixed1().subtract(newFraction);
     checkTotalBeneficiary();
     emit CarbonFractionSet(_newFraction);
@@ -676,7 +676,7 @@ contract FeeHandler is
       FixidityLib.unwrap(tokenState.maxSlippage)
     );
 
-    // substract from toBurn only the amount that was burned
+    // subtract from toBurn only the amount that was burned
     tokenState.toBurn = tokenState.toBurn.sub(balanceToBurn);
     getCeloTokenState().toBurn = getCeloTokenState().toBurn.add(celoReceived);
     tokenState.pastBurn = tokenState.pastBurn.add(balanceToBurn);
@@ -735,13 +735,13 @@ contract FeeHandler is
     tokenState.toDistribute = 0;
   }
 
-  function _setMaxSplippage(address token, uint256 newMax) private {
+  function _setMaxSlippage(address token, uint256 newMax) private {
     TokenState storage tokenState = tokenStates[token];
     require(newMax != 0, "Cannot set max slippage to zero");
     tokenState.maxSlippage = FixidityLib.wrap(newMax);
     require(
       FixidityLib.lte(tokenState.maxSlippage, FixidityLib.fixed1()),
-      "Splippage must be less than or equal to 1"
+      "Slippage must be less than or equal to 1"
     );
     emit MaxSlippageSet(token, newMax);
   }
