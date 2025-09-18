@@ -49,7 +49,6 @@
     "test": "forge test",
     "test:coverage": "yarn run test:truffle --coverage",
     "test:gas": "yarn run test:truffle --gas",
-    "test:quicktest": "./scripts/bash/quicktest.sh",
     "test:release-snapshots": "./scripts/bash/release-snapshots.sh",
     "test:scripts": "yarn ts-node scripts/run-scripts-tests.ts --testPathPattern=scripts/",
     "test:truffle": "rm test/**/*.js ; node runTests.js",
