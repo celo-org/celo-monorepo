@@ -6,19 +6,21 @@ This directory contains scripts for forking various blockchain networks for loca
 
 ### `fork_l1.sh`
 
-Forks an L1 network (Ethereum mainnet or Holesky testnet) using Anvil.
+Forks an L1 network (Ethereum mainnet, Sepolia testnet, or Holesky testnet) using Anvil.
 
 **Required Environment Variables:**
 - `ALCHEMY_API_KEY` - Your Alchemy API key
-- `NETWORK` - Network to fork (`mainnet` or `holesky`)
+- `NETWORK` - Network to fork (`mainnet`, `sepolia`, or `holesky`)
+- `BLOCK_NUMBER` - Block number to fork from
 
 **Supported Networks:**
-- **mainnet**: Chain ID 1, Block 22830470
-- **holesky**: Chain ID 17000, Block 4050838
+- **mainnet**: Chain ID 1
+- **sepolia**: Chain ID 11155111
+- **holesky**: Chain ID 17000
 
 **Example Execution:**
 ```bash
-ALCHEMY_API_KEY="..." NETWORK="mainnet" ./fork_l1.sh
+ALCHEMY_API_KEY="..." NETWORK="mainnet" BLOCK_NUMBER="..." ./fork_l1.sh
 ```
 
 The script will start an Anvil instance on port 8545 with the specified network forked.
@@ -95,6 +97,7 @@ ACCOUNT="0x..." TEAM="council" GC_MULTISIG="0x..." MOCKED_SIGNER_1="0x..." MOCKE
    ```bash
    export ALCHEMY_API_KEY="your_key"
    export NETWORK="mainnet"
+   export BLOCK_NUMBER="desired_block"
    ./fork_l1.sh
    ```
 
