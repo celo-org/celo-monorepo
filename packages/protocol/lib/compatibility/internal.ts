@@ -4,7 +4,7 @@ const web3 = new Web3(null)
 
 // Foundry build artifacts do not have a `.contractName` field, so we get it from the
 // `ContractDefinition` expression in the AST.
-const getContractNameFromDefinition = (artifact: any): string => {
+const getContractNameFromDefinition = (artifact: Artifact): string => {
   for (let i = 0; i < artifact.ast.nodes.length; i++) {
     const node = artifact.ast.nodes[i]
     if (node.nodeType === 'ContractDefinition') {
@@ -15,7 +15,7 @@ const getContractNameFromDefinition = (artifact: any): string => {
   return ''
 }
 
-export const getContractName = (artifact: any): string => {
+export const getContractName = (artifact: Artifact): string => {
   if (artifact.contractName) {
     return artifact.contractName
   } else {
@@ -35,7 +35,7 @@ export const getArtifactByName = (contractName: string, artifacts: BuildArtifact
 //
 // Couldn't find an easy way of getting one just from contract artifacts. But
 // for getStorageLayout we really only need .schema.ast and .schema.contractName.
-export function makeZContract(artifact: any): ZContract {
+export function makeZContract(artifact: Artifact): ZContract {
   const web3Contract = new web3.eth.Contract(artifact.abi)
   // @ts-ignore
   const contract = web3Contract as Contract
@@ -44,7 +44,11 @@ export function makeZContract(artifact: any): ZContract {
   contract.schema.ast = artifact.ast
   contract.contractName = getContractName(artifact)
   contract.schema.contractName = contract.contractName
-  contract.schema.deployedBytecode = artifact.deployedBytecode.object || artifact.deployedBytecode
+  if (typeof artifact.deployedBytecode === "string") {
+    contract.schema.deployedBytecode = artifact.deployedBytecode
+  } else {
+    contract.schema.deployedBytecode = artifact.deployedBytecode.object
+  }
   return contract
 }
 
@@ -55,7 +59,7 @@ export interface Artifact {
   bytecode: string
   compiler: any
   contractName: string
-  deployedBytecode: string
+  deployedBytecode: (string | { object: string })
   deployedSourceMap: string
   fileName: string
   legacyAST?: any
