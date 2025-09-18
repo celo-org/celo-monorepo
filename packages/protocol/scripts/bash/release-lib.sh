@@ -77,12 +77,7 @@ function build_tag_foundry() {
   checkout_build_sources $BRANCH $LOG_FILE
 
   if [ ! -d $BUILD_DIR ]; then
-    if [[ $RELEASE_NUMBER -le 12 ]]; then
-        foundryup --install nightly-f625d0fa7c51e65b4bf1e8f7931cd1c6e2e285e9
-        create_import
-    else
-        foundryup --install 1.0.0
-    fi
+    foundryup --install 1.0.0
 
     echo " - Build contract artifacts at $BUILD_DIR"
     forge build --out $BUILD_DIR --ast >> $LOG_FILE
@@ -91,45 +86,4 @@ function build_tag_foundry() {
   fi
 
   checkout_build_sources $CURRENT_HASH $LOG_FILE -s
-  cleanup_import
-}
-
-IMPORT_EXTRA_FILE=test-sol/devchain/ImportAdditionalDependencies.sol
-
-function cleanup_import() {
-  rm -f $IMPORT_EXTRA_FILE
-}
-
-IMPORT_EXTRA_FILE_CONTENT='
-pragma solidity ^0.5.13;
-
-// this file only exists so that foundry compiles this contracts
-import { Proxy } from "@celo-contracts/common/Proxy.sol";
-import { GoldToken } from "@celo-contracts/common/GoldToken.sol";
-import { Accounts } from "@celo-contracts/common/Accounts.sol";
-import { Election } from "@celo-contracts/governance/Election.sol";
-import { Governance } from "@celo-contracts/governance/Governance.sol";
-import { LockedGold } from "@celo-contracts/governance/LockedGold.sol";
-import { GovernanceApproverMultiSig } from "@celo-contracts/governance/GovernanceApproverMultiSig.sol";
-import { Escrow } from "@celo-contracts/identity/Escrow.sol";
-import { FederatedAttestations } from "@celo-contracts/identity/FederatedAttestations.sol";
-import { SortedOracles } from "@celo-contracts/stability/SortedOracles.sol";
-import { ReserveSpenderMultiSig } from "@mento-core/contracts/ReserveSpenderMultiSig.sol";
-import { Reserve } from "@mento-core/contracts/Reserve.sol";
-import { StableToken } from "@mento-core/contracts/StableToken.sol";
-import { StableTokenEUR } from "@mento-core/contracts/StableTokenEUR.sol";
-import { StableTokenBRL } from "@mento-core/contracts/StableTokenBRL.sol";
-import { Exchange } from "@mento-core/contracts/Exchange.sol";
-
-import { IValidators } from "@celo-contracts/governance/interfaces/IValidators.sol";
-
-contract Import05 {}
-'
-
-function create_import() {
-  mkdir -p "test-sol/devchain"
-  touch "$IMPORT_EXTRA_FILE"
-  echo "$IMPORT_EXTRA_FILE_CONTENT" > $IMPORT_EXTRA_FILE
-  echo >> "remappings.txt"
-  echo "@mento-core/=lib/mento-core" >> remappings.txt
 }
