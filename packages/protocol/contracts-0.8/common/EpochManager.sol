@@ -16,7 +16,7 @@ import "./libraries/ReentrancyGuard08.sol";
 
 /**
  * @title Contract used for managing CELO L2 epoch and elections.
- * @dev DESIGN_DESICION: we assume that the first epoch on the L2 starts as soon as the system is initialized
+ * @dev DESIGN_DECISION: we assume that the first epoch on the L2 starts as soon as the system is initialized
  * to minimize amount of "limbo blocks" the network should stop relatively close to an epoch number (but with enough time)
  * to have time to call the function `EpochInitializer.migrateEpochAndValidators()`
  */
@@ -137,7 +137,7 @@ contract EpochManager is
   }
 
   /**
-   * @notice Throws if called when EpochManager system has not yet been initalized.
+   * @notice Throws if called when EpochManager system has not yet been initialized.
    */
   modifier onlySystemAlreadyInitialized() {
     require(systemAlreadyInitialized(), "Epoch system not initialized");
@@ -619,7 +619,7 @@ contract EpochManager is
   }
 
   /**
-   * @return Whether epoch is being processed by individualy group by group.
+   * @return Whether the epoch is being processed individually, group by group.
    */
   function isIndividualProcessing() public view returns (bool) {
     return epochProcessing.status == EpochProcessStatus.IndivudualGroupsProcessing;
