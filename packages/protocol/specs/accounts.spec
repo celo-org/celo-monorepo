@@ -155,7 +155,7 @@ rule authorizedBy_can_not_be_removed(method f, address signer) filtered { f -> !
 	address _account = _getAuthorizedBy(signer); 
 	callArbitrary(f);
 	address account_ = _getAuthorizedBy(signer); 
-	// Whatever transacation occurs, if `_account` was authorized before, it remains authorized.
+	// Whatever transaction occurs, if `_account` was authorized before, it remains authorized.
   	// If `_account` was null, then we could authorize a new account `account_`.
 	assert _account == account_ || _account == 0, 
 		"Account delegating to $signer cannot change from one non-zero value to another non-zero value";
@@ -258,7 +258,7 @@ rule viewFunctionsDoNotRevert(method f) filtered { f ->
 }
 
 /**
- * the authorizedBy should never be reflexive, i.e. an account cannot be its own signer, or a signer cannot be authroize itself.
+ * the authorizedBy should never be reflexive, i.e. an account cannot be its own signer, or a signer cannot be authorized itself.
  */
 invariant authorizedByIsNeverReflexive(address a)
 	a != 0 => _getAuthorizedBy(a) != a
@@ -314,7 +314,7 @@ rule cantMakeASignerForNonLegacyRoleWithoutApprovalOfSigner(method f) filtered {
 	address account;
 	bytes32 role;
 	
-	// Leagcy roles can be updated using a signature
+	// Legacy roles can be updated using a signature
 	require !isLegacyRole(role);
 
 	address signer;
