@@ -85,25 +85,6 @@ yarn run test:truffle ${contract name}
 
 Adding the optional `--gas` flag will print out a report of contract gas usage.
 
-For quick test iterations run:
-
-```bash
-yarn run test:quicktest
-```
-
-or for a single contract:
-
-```bash
-yarn run test:quicktest ${contract name}
-```
-
-For `test:quicktest` to work correctly a contract's migration dependencies have to be uncommented in `scripts/bash/backupmigrations.sh`.
-
-Compared to the normal test command, quicktest will:
-
-1. Not run the pretest script of building solidity (will still be run as part of truffle test) and compiling typescript. This works because truffle can run typescript "natively".
-2. Only migrate selected migrations as set in `backupmigrations.sh` (you'll likely need at least one compilation step since truffle seems to only run compiled migrations)
-
 ## Making a new release (Foundry)
 
 To create a new release using the Foundry script, run the following command:
