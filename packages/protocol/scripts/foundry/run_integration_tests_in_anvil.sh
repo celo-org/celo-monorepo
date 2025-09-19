@@ -6,7 +6,7 @@ source $PWD/scripts/foundry/constants.sh
 
 # Generate and run devchain
 echo "Generating and running devchain before running integration tests..."
-source $PWD/scripts/foundry/create_and_migrate_anvil_devchain.sh
+source $PWD/scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
 
 # Run integration tests
 echo "Running integration tests..."

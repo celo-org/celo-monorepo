@@ -9,6 +9,7 @@ contract MockCeloToken08 {
   uint256 public totalSupply_;
   uint8 public constant decimals = 18;
   mapping(address => uint256) balances;
+  uint256 public _totalSupply;
 
   function setTotalSupply(uint256 value) external {
     totalSupply_ = value;
