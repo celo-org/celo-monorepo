@@ -292,7 +292,7 @@ contract EpochManager is
    */
   function processGroup(address group, address lesser, address greater) public {
     EpochProcessState storage _epochProcessing = epochProcessing;
-    require(isIndividualProcessing(), "Indivudual epoch process is not started");
+    require(isIndividualProcessing(), "Individual epoch process is not started");
     require(toProcessGroups > 0, "no more groups to process");
 
     uint256 epochRewards = processedGroups[group];
