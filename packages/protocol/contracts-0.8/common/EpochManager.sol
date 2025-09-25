@@ -72,13 +72,13 @@ contract EpochManager is
   uint256 public toProcessGroups = 0;
 
   /**
-   * @notice Event emited when epochProcessing has begun.
+   * @notice Event emitted when epochProcessing has begun.
    * @param epochNumber The epoch number that is being processed.
    */
   event EpochProcessingStarted(uint256 indexed epochNumber);
 
   /**
-   * @notice Event emited when epochProcessing has ended.
+   * @notice Event emitted when epochProcessing has ended.
    * @param epochNumber The epoch number that is finished being processed.
    */
   event EpochProcessingEnded(uint256 indexed epochNumber);
@@ -552,7 +552,7 @@ contract EpochManager is
 
   /**
    * @notice Returns the epoch number of a specified blockNumber.
-   * @param _blockNumber Block number of the epoch info is retreived.
+   * @param _blockNumber Block number of the epoch info is retrieved.
    */
   function getEpochNumberOfBlock(
     uint256 _blockNumber
@@ -563,7 +563,7 @@ contract EpochManager is
 
   /**
    * @notice Returns the epoch info of a specified blockNumber.
-   * @param _blockNumber Block number of the epoch info is retreived.
+   * @param _blockNumber Block number of the epoch info is retrieved.
    * @return firstEpoch The first block of the given block number.
    * @return lastBlock The first block of the given block number.
    * @return startTimestamp The starting timestamp of the given block number.
@@ -655,7 +655,7 @@ contract EpochManager is
 
   /**
    * @notice Returns the epoch info of a specified epoch.
-   * @param epochNumber Epoch number where the epoch info is retreived.
+   * @param epochNumber Epoch number where the epoch info is retrieved.
    * @return firstEpoch The first block of the given epoch.
    * @return lastBlock The first block of the given epoch.
    * @return startTimestamp The starting timestamp of the given epoch.
@@ -762,7 +762,7 @@ contract EpochManager is
   /**
    * @notice Returns the epoch info of a specified blockNumber.
    * @dev This function is here for backward compatibility. It is rather gas heavy and can run out of gas.
-   * @param _blockNumber Block number of the epoch info is retreived.
+   * @param _blockNumber Block number of the epoch info is retrieved.
    * @return firstEpoch The first block of the given block number.
    * @return lastBlock The first block of the given block number.
    * @return startTimestamp The starting timestamp of the given block number.
