@@ -920,7 +920,7 @@ contract Election is
    *         Fundamentally calls `revokePending` and `revokeActive` but only resorts groups once.
    * @param account The account whose votes to `group` should be decremented.
    * @param group The validator group to decrement votes from.
-   * @param maxValue The maxinum number of votes to decrement and revoke.
+   * @param maxValue The maximum number of votes to decrement and revoke.
    * @param lesser The group receiving fewer votes than the group for which the vote was revoked,
    *               or 0 if that group has the fewest votes of any validator group.
    * @param greater The group receiving more votes than the group for which the vote was revoked,
