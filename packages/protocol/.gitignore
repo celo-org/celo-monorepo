@@ -18,6 +18,8 @@ scripts/**/*.js.map
 test/**/*.js
 test/**/*.js.map
 
+test-ts/**/*.js
+
 types/**/*.js
 types/**/*.js.map
 
