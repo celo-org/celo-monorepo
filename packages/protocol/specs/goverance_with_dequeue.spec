@@ -43,7 +43,7 @@ rule promote_proposal(method f, uint256 p, uint256 index) filtered { f -> !f.isV
 	require !f.isView;
 	sinvoke f(eF,arg);
 
-	// deqeued index should contain p now only if eF.block.timestamp is not past p's timestamp+queueExpiry
+	// dequeued index should contain p now only if eF.block.timestamp is not past p's timestamp+queueExpiry
 	assert getFromDequeued(index) == p => eF.block.timestamp <= _proposalTimestamp + _queueExpiry, 
 		"Managed to promote $p in ${eF.block.timestamp} after proposal timestamp ${_proposalTimestamp} + ${_queueExpiry}";
 }
