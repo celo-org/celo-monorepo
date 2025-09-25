@@ -230,22 +230,22 @@ export async function getDeployedProxiedContract<ContractInstance extends Truffl
   return Contract.at(proxy.address) as ContractInstance
 }
 
-/*
- * Abstracts away the overhead of a typical Proxy+Implementation contract deployment.
+/**
+ * Abstracts away the overhead of a typical Proxy+Implementation contract 
+ * deployment.
  *
- * Arguments:
- * - artifacts: the Resolver object provided by Truffle
- * - name: name of the contract to deploy
- * - args: array of arguments to the contract's initializer
- * - then: a callback that can perform additional migration operations after deployment
- *
- * The callback will be called with the deployed proxied contract, a web3
- * instance (derived from the provider of the deployer given by Truffle), and the
- * name of the network (as given by Truffle).
- *
- * Returns:
- * A function with a signature as expected to be exported from a Truffle
- * migration script.
+ * @param web3 - Web3 instance for blockchain interactions
+ * @param artifacts - The Resolver object provided by Truffle
+ * @param name - Name of the contract to deploy
+ * @param args - Function that returns array of arguments to the contract's 
+ *   initializer
+ * @param then - A callback that can perform additional migration operations 
+ *   after deployment. The callback will be called with the deployed proxied 
+ *   contract, a web3 instance (derived from the provider of the deployer 
+ *   given by Truffle), and the name of the network (as given by Truffle).
+ * @param artifactPath - Optional contract package path
+ * @returns A function with a signature as expected to be exported from a 
+ *   Truffle migration script
  */
 export function deploymentForCoreContract<ContractInstance extends Truffle.ContractInstance>(
   web3: Web3,
