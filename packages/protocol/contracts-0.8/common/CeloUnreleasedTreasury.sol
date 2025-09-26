@@ -68,7 +68,7 @@ contract CeloUnreleasedTreasury is
    * @param to The address to release the amount to.
    * @param amount The amount to release.
    */
-  function releaseOwner(address to, uint256 amount) external onlyOwner {
+  function releaseByOwner(address to, uint256 amount) external onlyOwner {
     _release(to, amount);
   }
 
