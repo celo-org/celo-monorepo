@@ -21,6 +21,9 @@ while getopts 'b:l:d:' flag; do
   esac
 done
 
+# TODO use a cache here
+############ yarn anvil-devchain:start-L2 
+
 # [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 
 # # if BUILD_DIR was not set as a parameter, we generate the build and the chain for that specific branch
