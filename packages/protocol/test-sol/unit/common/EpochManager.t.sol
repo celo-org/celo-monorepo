@@ -301,10 +301,13 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
   function test_ShouldReleaseCorrectAmountToReserve() public {
     setupAndElectValidators();
     epochManagerContract.startNextEpochProcess();
+    (uint256 numerator, uint256 denominator) = sortedOracles.getExchangeRate(address(stableToken));
     uint256 reserveBalanceAfter = celoToken.balanceOf(reserveAddress);
+    uint256 CELOequivalent = (denominator * (validator1Reward + validator2Reward)) / numerator;
+
     assertEq(
       reserveBalanceAfter,
-      (stableAmountForRate * (validator1Reward + validator2Reward)) / 1e24
+      CELOequivalent
     );
   }
 }

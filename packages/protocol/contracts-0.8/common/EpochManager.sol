@@ -14,6 +14,7 @@ import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IEpochManagerInitializer.sol";
 import "./libraries/ReentrancyGuard08.sol";
 
+
 /**
  * @title Contract used for managing CELO L2 epoch and elections.
  * @dev DESIGN_DESICION: we assume that the first epoch on the L2 starts as soon as the system is initialized
@@ -699,7 +700,7 @@ contract EpochManager is
       address(getStableToken())
     );
 
-    uint256 CELOequivalent = (numerator * totalRewards) / denominator;
+    uint256 CELOequivalent = (denominator * totalRewards) / numerator;
     getCeloUnreleasedTreasury().release(
       registry.getAddressForOrDie(RESERVE_REGISTRY_ID),
       CELOequivalent
