@@ -26,11 +26,9 @@ import { ILockedCelo } from "../../contracts/governance/interfaces/ILockedCelo.s
 import { IValidators } from "../../contracts/governance/interfaces/IValidators.sol";
 
 // Identity imports
-import { IAttestations } from "../../contracts/identity/interfaces/IAttestations.sol";
 import { IEscrow } from "../../contracts/identity/interfaces/IEscrow.sol";
 import { IFederatedAttestations } from "../../contracts/identity/interfaces/IFederatedAttestations.sol";
 import { IOdisPayments } from "../../contracts/identity/interfaces/IOdisPayments.sol";
-import { IRandom } from "../../contracts/identity/interfaces/IRandom.sol";
 
 // Stability imports
 import { ISortedOracles } from "../../contracts/stability/interfaces/ISortedOracles.sol";
@@ -40,17 +38,10 @@ contract UsingRegistryV2NoMento {
   IRegistry public constant registryContract = IRegistry(registryAddress);
 
   bytes32 internal constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
-  bytes32 internal constant ATTESTATIONS_REGISTRY_ID = keccak256(abi.encodePacked("Attestations"));
-  bytes32 internal constant BLOCKCHAIN_PARAMETERS_REGISTRY_ID =
-    keccak256(abi.encodePacked("BlockchainParameters"));
   bytes32 internal constant CELO_UNRELEASED_TREASURY_REGISTRY_ID =
     keccak256(abi.encodePacked("CeloUnreleasedTreasury"));
   bytes32 internal constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("GoldToken"));
   bytes32 internal constant CELO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("CeloToken"));
-  bytes32 internal constant DOUBLE_SIGNING_SLASHER_REGISTRY_ID =
-    keccak256(abi.encodePacked("DoubleSigningSlasher"));
-  bytes32 internal constant DOWNTIME_SLASHER_REGISTRY_ID =
-    keccak256(abi.encodePacked("DowntimeSlasher"));
   bytes32 internal constant ELECTION_REGISTRY_ID = keccak256(abi.encodePacked("Election"));
   bytes32 internal constant EPOCH_REWARDS_REGISTRY_ID = keccak256(abi.encodePacked("EpochRewards"));
   bytes32 internal constant EPOCH_MANAGER_ENABLER_REGISTRY_ID =
@@ -63,15 +54,12 @@ contract UsingRegistryV2NoMento {
     keccak256(abi.encodePacked("FeeCurrencyDirectory"));
   bytes32 internal constant FEE_HANDLER_REGISTRY_ID = keccak256(abi.encodePacked("FeeHandler"));
   bytes32 internal constant FREEZER_REGISTRY_ID = keccak256(abi.encodePacked("Freezer"));
-  bytes32 internal constant GAS_PRICE_MINIMUM_REGISTRY_ID =
-    keccak256(abi.encodePacked("GasPriceMinimum"));
   bytes32 internal constant GOVERNANCE_REGISTRY_ID = keccak256(abi.encodePacked("Governance"));
   bytes32 internal constant GOVERNANCE_SLASHER_REGISTRY_ID =
     keccak256(abi.encodePacked("GovernanceSlasher"));
   bytes32 internal constant LOCKED_GOLD_REGISTRY_ID = keccak256(abi.encodePacked("LockedGold"));
   bytes32 internal constant LOCKED_CELO_REGISTRY_ID = keccak256(abi.encodePacked("LockedCelo"));
   bytes32 internal constant ODIS_PAYMENT_REGISTRY_ID = keccak256(abi.encodePacked("OdisPayments"));
-  bytes32 internal constant RANDOM_REGISTRY_ID = keccak256(abi.encodePacked("Random"));
   bytes32 internal constant SCORE_MANAGER_REGISTRY_ID = keccak256(abi.encodePacked("ScoreManager"));
   bytes32 internal constant SORTED_ORACLES_REGISTRY_ID =
     keccak256(abi.encodePacked("SortedOracles"));
@@ -159,10 +147,6 @@ contract UsingRegistryV2NoMento {
 
   function getOdisPayments() internal view returns (IOdisPayments) {
     return IOdisPayments(registryContract.getAddressForOrDie(ODIS_PAYMENT_REGISTRY_ID));
-  }
-
-  function getRandom() internal view returns (IRandom) {
-    return IRandom(registryContract.getAddressForOrDie(RANDOM_REGISTRY_ID));
   }
 
   function getScoreReader() internal view returns (IScoreReader) {
