@@ -60,6 +60,19 @@ contract CeloUnreleasedTreasury is
    * @param amount The amount to release.
    */
   function release(address to, uint256 amount) external onlyEpochManager {
+    _release(to, amount);
+  }
+
+  /**
+   * @notice Releases the Celo to the specified address.
+   * @param to The address to release the amount to.
+   * @param amount The amount to release.
+   */
+  function releaseOwner(address to, uint256 amount) external onlyOwner {
+    _release(to, amount);
+  }
+
+  function _release(address to, uint256 amount) private nonReentrant {
     if (!hasAlreadyReleased) {
       remainingBalanceToRelease = address(this).balance;
       hasAlreadyReleased = true;
