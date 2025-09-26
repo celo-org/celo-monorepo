@@ -305,10 +305,7 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     uint256 reserveBalanceAfter = celoToken.balanceOf(reserveAddress);
     uint256 CELOequivalent = (denominator * (validator1Reward + validator2Reward)) / numerator;
 
-    assertEq(
-      reserveBalanceAfter,
-      CELOequivalent
-    );
+    assertEq(reserveBalanceAfter, CELOequivalent);
   }
 }
 
