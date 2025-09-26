@@ -1,4 +1,3 @@
-// @ts-expect-error module started failing
 import Logger, { createLogger, levelFromName, LogLevelString, stdSerializers } from 'bunyan'
 import bunyanDebugStream from 'bunyan-debug-stream'
 import { createStream } from 'bunyan-gke-stackdriver'

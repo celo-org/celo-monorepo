@@ -2,7 +2,12 @@ import { ASTContractVersionsChecker } from '@celo/protocol/lib/compatibility/ast
 import { DefaultCategorizer } from '@celo/protocol/lib/compatibility/categorizer'
 import { getReleaseVersion } from '@celo/protocol/lib/compatibility/ignored-contracts-v9'
 import { CategorizedChanges } from '@celo/protocol/lib/compatibility/report'
-import { ASTBackwardReport, instantiateArtifacts } from '@celo/protocol/lib/compatibility/utils'
+import {
+  ASTBackwardReport,
+  instantiateArtifacts,
+  instantiateArtifactsFromForge,
+} from '@celo/protocol/lib/compatibility/utils'
+import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { writeJsonSync } from 'fs-extra'
 import path from 'path'
 import tmp from 'tmp'
@@ -34,6 +39,11 @@ const argv = yargs
     type: 'string',
     demandOption: true,
   })
+  .option('forge', {
+    description: 'Specifies that Forge artifacts are provided, rather than Truffle artifacts',
+    type: 'boolean',
+    default: false,
+  })
   .option('output_file', {
     alias: 'f',
     description: 'Destination file output for the compatibility report',
@@ -56,34 +66,94 @@ const argv = yargs
   .demandCommand()
   .strict().argv
 
-// old artifacts folder needs to be generalized https://github.com/celo-org/celo-monorepo/issues/10567
-const oldArtifactsFolder = path.relative(process.cwd(), argv.old_contracts)
-const oldArtifactsFolder08 = path.relative(process.cwd(), argv.old_contracts + '-0.8')
-const newArtifactsFolder = path.relative(process.cwd(), argv.new_contracts)
-const newArtifactsFolder08 = path.relative(process.cwd(), argv.new_contracts + '-0.8')
-const newArtifactsFolders = [newArtifactsFolder, newArtifactsFolder08]
-const oldArtifactsFolders = [oldArtifactsFolder, oldArtifactsFolder08]
-
 const out = (msg: string, force?: boolean): void => {
   if (force || !argv.quiet) {
     process.stdout.write(msg)
   }
 }
 
+interface ArtifactsFolders {
+  old: string[]
+  new: string[]
+}
+
+const getForgeArtifactsFolders = (): ArtifactsFolders => {
+  const oldArtifactsFolder = path.relative(process.cwd(), argv.old_contracts)
+  const newArtifactsFolder = path.relative(process.cwd(), argv.new_contracts)
+
+  return {
+    old: [oldArtifactsFolder],
+    new: [newArtifactsFolder],
+  }
+}
+
+const getTruffleArtifactsFolders = (): ArtifactsFolders => {
+  const oldArtifactsFolder = path.relative(process.cwd(), argv.old_contracts)
+  const oldArtifactsFolder08 = path.relative(process.cwd(), argv.old_contracts + '-0.8')
+  const newArtifactsFolder = path.relative(process.cwd(), argv.new_contracts)
+  const newArtifactsFolder08 = path.relative(process.cwd(), argv.new_contracts + '-0.8')
+  const newArtifactsFolders = [newArtifactsFolder, newArtifactsFolder08]
+  const oldArtifactsFolders = [oldArtifactsFolder, oldArtifactsFolder08]
+
+  return {
+    old: oldArtifactsFolders,
+    new: newArtifactsFolders,
+  }
+}
+
+const getArtifactFolders = (): ArtifactsFolders => {
+  if (argv.forge) {
+    return getForgeArtifactsFolders()
+  } else {
+    return getTruffleArtifactsFolders()
+  }
+}
+
 const outFile = argv.output_file ? argv.output_file : tmp.tmpNameSync({})
 const exclude: RegExp = argv.exclude ? new RegExp(argv.exclude) : null
-// old artifacts needs to be generalized https://github.com/celo-org/celo-monorepo/issues/10567
-const oldArtifacts = instantiateArtifacts(oldArtifactsFolder)
-const oldArtifacts08 = instantiateArtifacts(oldArtifactsFolder08)
-const newArtifacts = instantiateArtifacts(newArtifactsFolder)
-const newArtifacts08 = instantiateArtifacts(newArtifactsFolder08)
+
+const artifactFolders = getArtifactFolders()
+
+interface BuildArtifactSets {
+  old: BuildArtifacts[]
+  new: BuildArtifacts[]
+}
+
+const getForgeArtifactSets = (folders: ArtifactsFolders): BuildArtifactSets => {
+  return {
+    old: instantiateArtifactsFromForge(folders.old[0]),
+    new: instantiateArtifactsFromForge(folders.new[0]),
+  }
+}
+
+const getTruffleArtifactSets = (folders: ArtifactsFolders): BuildArtifactSets => {
+  const oldArtifacts = instantiateArtifacts(folders.old[0])
+  const oldArtifacts08 = instantiateArtifacts(folders.old[1])
+  const newArtifacts = instantiateArtifacts(folders.new[0])
+  const newArtifacts08 = instantiateArtifacts(folders.new[1])
+
+  return {
+    old: [oldArtifacts, oldArtifacts08],
+    new: [newArtifacts, newArtifacts08],
+  }
+}
+
+const getArtifactSets = (folders: ArtifactsFolders): BuildArtifactSets => {
+  if (argv.forge) {
+    return getForgeArtifactSets(folders)
+  } else {
+    return getTruffleArtifactSets(folders)
+  }
+}
+
+const buildArtifacts = getArtifactSets(artifactFolders)
 
 try {
   const backward = ASTBackwardReport.create(
-    oldArtifactsFolders,
-    newArtifactsFolders,
-    [oldArtifacts, oldArtifacts08],
-    [newArtifacts, newArtifacts08],
+    artifactFolders.old,
+    artifactFolders.new,
+    buildArtifacts.old,
+    buildArtifacts.new,
     exclude,
     new DefaultCategorizer(),
     out
@@ -109,9 +179,10 @@ try {
   } else if (argv._.includes(COMMAND_SEM_CHECK)) {
     const doVersionCheck = async () => {
       const versionChecker = await ASTContractVersionsChecker.create(
-        [oldArtifacts, oldArtifacts08],
-        [newArtifacts, newArtifacts08],
-        backward.report.versionDeltas()
+        buildArtifacts.old,
+        buildArtifacts.new,
+        backward.report.versionDeltas(),
+        argv.forge
       )
       const mismatches = versionChecker.excluding(exclude).mismatches()
       if (mismatches.isEmpty()) {
