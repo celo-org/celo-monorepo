@@ -29,6 +29,14 @@ export const getArtifactByName = (contractName: string, artifacts: BuildArtifact
   )
 }
 
+export const getDeployedBytecode = (artifact: Artifact): string => {
+  if (typeof artifact.deployedBytecode === "string") {
+    return artifact.deployedBytecode
+  } else {
+    return artifact.deployedBytecode.object
+  }
+}
+
 // getStorageLayout needs an oz-sdk Contract class instance. This class is a
 // subclass of Contract from web3-eth-contract, with an added .schema member and
 // several methods.

@@ -10,9 +10,24 @@ import {
 import { verifyProxyStorageProof } from '@celo/protocol/lib/proxy-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
-import { ProxyInstance, RegistryInstance } from 'types'
-import Web3 from 'web3'
 import { ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9'
+import { getArtifactByName, getContractName, getDeployedBytecode } from '@celo/protocol/lib/compatibility/internal'
+
+interface RegistryLookup {
+  getAddressForString: (name: string) => Promise<string>
+}
+
+interface ProxyLookup {
+  getImplementation: (address: string) => Promise<string>
+}
+
+interface ChainLookup {
+  getCode: (address: string) => Promise<string>
+  // TODO more specific typing
+  encodeFunctionCall: (abi: any, args: any[]) => string
+  // TODO more specific typing
+  getProof: (address: string, slots: string[]) => Promise<any>
+}
 
 let ignoredContracts = [
   // This contract is not proxied
@@ -31,11 +46,11 @@ let ignoredContracts = [
 interface VerificationContext {
   artifacts: BuildArtifacts[]
   libraryAddresses: LibraryAddresses
-  registry: RegistryInstance
+  registry: RegistryLookup
   governanceAddress: string
   proposal: ProposalTx[]
-  Proxy: Truffle.Contract<ProxyInstance>
-  web3: Web3
+  proxyLookup: ProxyLookup
+  chainLookup: ChainLookup
   network: string
 }
 interface InitializationData {
@@ -83,13 +98,13 @@ export const getProposedProxyAddress = (contract: string, proposal: ProposalTx[]
 }
 
 const getSourceBytecodeFromArtifacts = (contract: string, artifacts: BuildArtifacts[]): string =>
-  stripMetadata(artifacts.map(a => a.getArtifactByName(contract)).find(a => a).deployedBytecode)
+  stripMetadata(getDeployedBytecode(artifacts.map(a => getArtifactByName(contract, a)).find(a => a)))
 
 const getSourceBytecode = (contract: string, context: VerificationContext): string =>
   getSourceBytecodeFromArtifacts(contract, context.artifacts)
 
 const getOnchainBytecode = async (address: string, context: VerificationContext) =>
-  stripMetadata(await context.web3.eth.getCode(address))
+  stripMetadata(await context.chainLookup.getCode(address))
 
 const isLibrary = (contract: string, context: VerificationContext) =>
   contract in context.libraryAddresses.addresses
@@ -105,7 +120,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
     // ganache does not support eth_getProof
     if (
       context.network !== 'development' &&
-      !(await verifyProxyStorageProof(context.web3, proxyAddress, context.governanceAddress))
+      !(await verifyProxyStorageProof(context.chainLookup, proxyAddress, context.governanceAddress))
     ) {
       throw new Error(`Proposed ${contract}Proxy has impure storage`)
     }
@@ -133,8 +148,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
       console.log(`Contract ${contract} is not in registry - skipping bytecode verification`)
       return;
     }
-    const proxy = await context.Proxy.at(proxyAddress) // necessary await
-    implementationAddress = await proxy._getImplementation()
+    implementationAddress = await context.proxyLookup.getImplementation(proxyAddress)
   }
 
   let onchainBytecode = await getOnchainBytecode(implementationAddress, context)
@@ -177,7 +191,7 @@ const assertValidProposalTransactions = (proposal: ProposalTx[]) => {
 const assertValidInitializationData = (
   artifacts: BuildArtifacts[],
   proposal: ProposalTx[],
-  web3: Web3,
+  chainLookup: ChainLookup,
   initializationData: InitializationData
 ) => {
   const initializingProposals = proposal.filter(isProxyRepointAndInitializeTransaction)
@@ -196,7 +210,7 @@ const assertValidInitializationData = (
       (abi: any) => abi.type === 'function' && abi.name === 'initialize'
     )
     const args = initializationData[contractName]
-    const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
+    const callData = chainLookup.encodeFunctionCall(initializeAbi, args)
 
     if (callData.toLowerCase() !== proposalTx.args[1].toLowerCase()) {
       throw new Error(
@@ -226,18 +240,18 @@ const assertValidInitializationData = (
 export const verifyBytecodes = async (
   contracts: string[],
   artifacts: BuildArtifacts[],
-  registry: RegistryInstance,
+  registry: RegistryLookup,
   proposal: ProposalTx[],
-  Proxy: Truffle.Contract<ProxyInstance>,
-  _web3: Web3,
+  proxyLookup: ProxyLookup,
+  chainLookup: ChainLookup,
   initializationData: InitializationData = {},
   version?: number,
   network = 'development'
 ) => {
   assertValidProposalTransactions(proposal)
-  assertValidInitializationData(artifacts, proposal, _web3, initializationData)
+  assertValidInitializationData(artifacts, proposal, chainLookup, initializationData)
 
-  const compiledContracts = Array.prototype.concat.apply([], artifacts.map(a => a.listArtifacts())).map((a) => a.contractName)
+  const compiledContracts = Array.prototype.concat.apply([], artifacts.map(a => a.listArtifacts())).map((a) => getContractName(a))
 
   if (version > 9) {
     ignoredContracts = [...ignoredContracts, ...ignoredContractsV9]
@@ -253,9 +267,6 @@ export const verifyBytecodes = async (
 
   const visited: Set<string> = new Set(queue)
 
-  // truffle web3 version does not have getProof
-  const web3 = new Web3(_web3.currentProvider)
-
   const governanceAddress = await registry.getAddressForString('Governance')
   const context: VerificationContext = {
     artifacts,
@@ -263,8 +274,8 @@ export const verifyBytecodes = async (
     registry,
     governanceAddress,
     proposal,
-    Proxy,
-    web3,
+    proxyLookup,
+    chainLookup,
     network,
   }
 
