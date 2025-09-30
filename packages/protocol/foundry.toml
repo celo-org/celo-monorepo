@@ -1,6 +1,7 @@
 [profile.default]
 src = 'contracts-0.8'
 out = 'out'
+ast = true
 test = 'test-sol'
 libs = ['lib', 'node_modules']
 optimizer = true
