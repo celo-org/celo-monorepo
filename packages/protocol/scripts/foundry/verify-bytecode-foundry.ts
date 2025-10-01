@@ -1,29 +1,10 @@
 import { verifyBytecodes } from '@celo/protocol/lib/compatibility/verify-bytecode'
-//import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
-//import { ProxyInstance, RegistryInstance } from 'types'
 import { getReleaseVersion } from '../../lib/compatibility/ignored-contracts-v9'
 
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 
-// TODO probably a lot unneeded
-import { existsSync, readJsonSync, /*readdirSync,*/ writeJsonSync } from 'fs-extra'
-import {
-  //Abi,
-  //AbiParameter,
-  //Account,
-  Chain,
-  //Hex,
-  //PublicClient,
-  //Address as ViemAddress,
-  //WalletClient,
-  createPublicClient,
-  //createWalletClient,
-  encodeFunctionData,
-  http,
-  //keccak256,
-  //toHex,
-} from 'viem'
-//import { mnemonicToAccount, privateKeyToAccount } from 'viem/accounts'
+import { existsSync, readJsonSync, writeJsonSync } from 'fs-extra'
+import { Chain, createPublicClient, encodeFunctionData, http } from 'viem'
 import * as viemChains from 'viem/chains'
 import { instantiateArtifactsFromForge } from '@celo/protocol/lib/compatibility/utils'
 
