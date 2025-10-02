@@ -1,8 +1,23 @@
 #!/bin/bash
 set -euo pipefail
 
-# Constants (on Sepolia for Celo Sepolia)
-L1_OPTIMISM_PORTAL=0x44ae3d41a335a7d05eb533029917aad35662dcc2
+# Determine network
+NETWORK=${NETWORK:-"sepolia"}
+case $NETWORK in
+  alfajores)
+    L1_OPTIMISM_PORTAL=0x82527353927d8D069b3B452904c942dA149BA381
+    ;;
+  baklava)
+    L1_OPTIMISM_PORTAL=0x87e9cB54f185a32266689138fbA56F0C994CF50c
+    ;;
+  sepolia)
+    L1_OPTIMISM_PORTAL=0x44ae3d41a335a7d05eb533029917aad35662dcc2
+    ;;
+  *)
+    echo "Unsupported network: $NETWORK"
+    exit 1
+    ;;
+esac
 
 # Required environment variables
 WITHDRAWAL_NONCE=${WITHDRAWAL_NONCE:-}; [ -z "${WITHDRAWAL_NONCE:-}" ] && echo "Need to set the WITHDRAWAL_NONCE via env" && exit 1;

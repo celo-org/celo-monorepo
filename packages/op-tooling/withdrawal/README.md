@@ -1,6 +1,16 @@
 # L2 to L1 Withdrawals
 
-This directory contains tooling for performing L2 to L1 withdrawals of CELO from Celo's L2 testnet (Celo Sepolia). The workflow follows the Optimism-style withdrawal process with a 7-day challenge period (exact challenge period dictated by `PROOF_MATURITY_DELAY_SECONDS` in Optimism Portal).
+This directory contains tooling for performing L2 to L1 withdrawals of CELO from Celo's L2 testnets. The workflow follows the Optimism-style withdrawal process with a 7-day challenge period (exact challenge period dictated by `PROOF_MATURITY_DELAY_SECONDS` in Optimism Portal).
+
+## Supported Networks
+
+The tooling supports three network configurations:
+
+- **Alfajores**: L1 (Holesky) ↔ L2 (Celo Alfajores)
+- **Baklava**: L1 (Holesky) ↔ L2 (Celo Baklava)  
+- **Sepolia**: L1 (Sepolia) ↔ L2 (Celo Sepolia) - *Default*
+
+Set the `NETWORK` environment variable to specify which network to use (defaults to `sepolia` if not specified).
 
 ## Important Notes
 
@@ -30,9 +40,10 @@ RECIPIENT=0x... VALUE=1000000000000000000 PK=123... ./initiate.sh
 - `PK`: Private key (without 0x prefix) of the sender
 
 **Optional Environment Variables:**
+- `NETWORK`: Network to use (`alfajores`, `baklava`, or `sepolia` - defaults to `sepolia`)
 - `GAS_LIMIT`: Gas limit for the transaction (default: 0 - which means no gas limit)
 - `DATA`: Additional data to include (default: "0x00")
-- `L2_RPC_URL`: Custom L2 RPC URL (default: Celo Sepolia)
+- `L2_RPC_URL`: Custom L2 RPC URL
 
 **Output:** Transaction hash - **save this for the next step!**
 
@@ -41,12 +52,15 @@ RECIPIENT=0x... VALUE=1000000000000000000 PK=123... ./initiate.sh
 Builds the withdrawal proof from L2 transaction data. May require waiting up to 1 hour for the message to become provable.
 
 ```sh
-cd build_proof && yarn install && PK=123... TX_HASH=0x... yarn build
+cd build_proof && yarn install && PK=123... TX_HASH=0x... yarn build_proof
 ```
 
 **Required Environment Variables:**
 - `PK`: Private key (without 0x prefix) of the sender
 - `TX_HASH`: Transaction hash from the initiation step
+
+**Optional Environment Variables:**
+- `NETWORK`: Network to use (`alfajores`, `baklava`, or `sepolia` - defaults to `sepolia`)
 
 For detailed information about proof building, see [build_proof README](./build_proof/).
 
@@ -76,6 +90,7 @@ WITHDRAWAL_NONCE=123... SENDER=0x... RECIPIENT=0x... VALUE=1000000000000000000 \
 - `PK`: Private key (without 0x prefix) for submitting the proof
 
 **Optional Environment Variables:**
+- `NETWORK`: Network to use (`alfajores`, `baklava`, or `sepolia` - defaults to `sepolia`)
 - `GAS_LIMIT`: Gas limit for the transaction (default: 0 - which means no gas limit)
 - `DATA`: Additional data to include (default: "0x00")
 - `RPC_URL`: Custom L1 RPC URL (if not using Alchemy)
@@ -94,6 +109,7 @@ WITHDRAWAL_HASH=0x... PROOF_SUBMITTER=0x... ALCHEMY_KEY=your_key ./get.sh
 - `PROOF_SUBMITTER`: Address that submitted the proof
 
 **Optional Environment Variables:**
+- `NETWORK`: Network to use (`alfajores`, `baklava`, or `sepolia` - defaults to `sepolia`)
 - `RPC_URL`: Custom L1 RPC URL (if not using Alchemy)
 - `ALCHEMY_KEY`: Alchemy API key (required if RPC_URL not provided)
 
@@ -114,6 +130,7 @@ WITHDRAWAL_HASH=0x... PROOF_SUBMITTER=0x... ALCHEMY_KEY=your_key ./check.sh
 - `PROOF_SUBMITTER`: Address that submitted the proof
 
 **Optional Environment Variables:**
+- `NETWORK`: Network to use (`alfajores`, `baklava`, or `sepolia` - defaults to `sepolia`)
 - `RPC_URL`: Custom L1 RPC URL (if not using Alchemy)
 - `ALCHEMY_KEY`: Alchemy API key (required if RPC_URL not provided)
 
@@ -138,6 +155,7 @@ WITHDRAWAL_NONCE=123... SENDER=0x... RECIPIENT=0x... VALUE=1000000000000000000 \
 - `PK`: Private key (without 0x prefix) for finalizing
 
 **Optional Environment Variables:**
+- `NETWORK`: Network to use (`alfajores`, `baklava`, or `sepolia` - defaults to `sepolia`)
 - `GAS_LIMIT`: Gas limit for the transaction (default: 0 - which means no gas limit)
 - `DATA`: Additional data to include (default: "0x00")
 - `RPC_URL`: Custom L1 RPC URL (if not using Alchemy)
@@ -145,6 +163,17 @@ WITHDRAWAL_NONCE=123... SENDER=0x... RECIPIENT=0x... VALUE=1000000000000000000 \
 
 ## Contract Addresses
 
+### Network-Specific Contract Addresses
+
+**Alfajores (L1: Holesky, L2: Celo Alfajores):**
+- **L2_L1_MESSAGE_PASSER**: `0x4200000000000000000000000000000000000016` (Celo Alfajores)
+- **L1_OPTIMISM_PORTAL**: `0x82527353927d8D069b3B452904c942dA149BA381` (Holesky)
+
+**Baklava (L1: Holesky, L2: Celo Baklava):**
+- **L2_L1_MESSAGE_PASSER**: `0x4200000000000000000000000000000000000016` (Celo Baklava)
+- **L1_OPTIMISM_PORTAL**: `0x87e9cB54f185a32266689138fbA56F0C994CF50c` (Holesky)
+
+**Sepolia (L1: Sepolia, L2: Celo Sepolia) - Default:**
 - **L2_L1_MESSAGE_PASSER**: `0x4200000000000000000000000000000000000016` (Celo Sepolia)
 - **L1_OPTIMISM_PORTAL**: `0x44ae3d41a335a7d05eb533029917aad35662dcc2` (Sepolia)
 
@@ -155,6 +184,8 @@ WITHDRAWAL_NONCE=123... SENDER=0x... RECIPIENT=0x... VALUE=1000000000000000000 \
 - **Gas issues**: Adjust GAS_LIMIT environment variable
 - **Private key format**: Ensure PK is provided without 0x prefix
 - **Value format**: Ensure VALUE is in wei (not ETH)
+- **Network errors**: Ensure NETWORK is set to one of: `alfajores`, `baklava`, or `sepolia`
+- **Unsupported network**: Check that you're using a supported network configuration
 
 ## Example Withdrawal Proof
 

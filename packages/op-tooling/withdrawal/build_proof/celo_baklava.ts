@@ -1,21 +1,21 @@
 import { chainConfig } from 'viem/op-stack'
 import { defineChain } from 'viem/utils'
 
-const sourceId = 11155111 // sepolia
+const sourceId = 17000 // holesky
 
-export const celoSepolia = /*#__PURE__*/ defineChain({
+export const celoBaklava = /*#__PURE__*/ defineChain({
   ...chainConfig,
-  id: 11142220,
-  name: 'Celo Sepolia',
+  id: 62320,
+  name: 'Celo Baklava',
   nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 },
   rpcUrls: {
     default: {
-      http: ['https://forno.celo-sepolia.celo-testnet.org/'],
+      http: ['https://baklava-forno.celo-testnet.org/'],
     },
   },
   blockExplorers: {
     default: {
-      name: 'Celo Sepolia Explorer',
+      name: 'Celo Baklava Explorer',
       url: '',
       apiUrl: '',
     },
@@ -28,17 +28,17 @@ export const celoSepolia = /*#__PURE__*/ defineChain({
     },
     portal: {
       [sourceId]: {
-        address: '0x44ae3d41a335a7d05eb533029917aad35662dcc2',
+        address: '0x87e9cB54f185a32266689138fbA56F0C994CF50c',
       },
     },
     disputeGameFactory: {
       [sourceId]: {
-        address: '0x57c45d82d1a995f1e135b8d7edc0a6bb5211cfaa',
+        address: '0x788ef5850c3a51d41f59Dc4327017EF8D754eD80',
       },
     },
     l1StandardBridge: {
       [sourceId]: {
-        address: '0xec18a3c30131a0db4246e785355fbc16e2eaf408',
+        address: '0x6fd3fF186975aD8B66Ab40b705EC016b36da0486',
       },
     },
   },
