@@ -10,6 +10,7 @@ import { Blueprint } from "src/libraries/Blueprint.sol";
 import { GameType, GameTypes, Duration } from "src/dispute/lib/Types.sol";
 
 import { IAnchorStateRegistry } from "interfaces/dispute/IAnchorStateRegistry.sol";
+import { IBigStepper } from "interfaces/dispute/IBigStepper.sol";
 import { IDelayedWETH } from "interfaces/dispute/IDelayedWETH.sol";
 import { IDisputeGame } from "interfaces/dispute/IDisputeGame.sol";
 import { IDisputeGameFactory } from "interfaces/dispute/IDisputeGameFactory.sol";
@@ -68,6 +69,16 @@ contract RedeployGames is Script {
     uint256 maxClock_ = vm.envUint("MAX_CLOCK_DURATION");
     console.log("New max clock duration (seconds):", maxClock_);
 
+    uint256 clock_ = vm.envOr("CLOCK_EXTENSION", uint256(0));
+    if (clock_ != 0) {
+      console.log("Changing clock extension during deployment to:", clock_);
+    }
+
+    address mips_ = vm.envOr("MIPS", address(0));
+    if (mips_ != address(0)) {
+      console.log("Changing MIPS during deployment to:", mips_);
+    }
+
     vm.startBroadcast();
     deployAndSetNewGameImpl({
       _l2ChainId: chainId_,
@@ -75,7 +86,9 @@ contract RedeployGames is Script {
       _gameType: GameTypes.PERMISSIONED_CANNON,
       _blueprints: blueprints_,
       _systemConfig: systemConfigProxy_,
-      _maxClock: uint64(maxClock_)
+      _maxClock: uint64(maxClock_),
+      _clock: uint64(clock_),
+      _mips: mips_
     });
     if (address(oldPermissionlessGame_) != address(0)) {
       deployAndSetNewGameImpl({
@@ -84,7 +97,9 @@ contract RedeployGames is Script {
         _gameType: GameTypes.CANNON,
         _blueprints: blueprints_,
         _systemConfig: systemConfigProxy_,
-        _maxClock: uint64(maxClock_)
+        _maxClock: uint64(maxClock_),
+        _clock: uint64(clock_),
+        _mips: mips_
       });
     }
     vm.stopBroadcast();
@@ -97,7 +112,9 @@ contract RedeployGames is Script {
     GameType _gameType,
     Blueprints memory _blueprints,
     address _systemConfig,
-    uint64 _maxClock
+    uint64 _maxClock,
+    uint64 _clock,
+    address _mips
   ) internal {
     console.log("Deploying new implementation for game type:", GameType.unwrap(_gameType));
 
@@ -108,6 +125,12 @@ contract RedeployGames is Script {
 
     // Modify the params with the new vm values.
     params_.maxClockDuration = Duration.wrap(_maxClock);
+    if (_clock != 0) {
+      params_.clockExtension = Duration.wrap(_clock);
+    }
+    if (_mips != address(0)) {
+      params_.vm = IBigStepper(_mips);
+    }
 
     IDisputeGame newGame;
     if (GameType.unwrap(_gameType) == GameType.unwrap(GameTypes.PERMISSIONED_CANNON)) {
