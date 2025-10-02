@@ -113,7 +113,7 @@ contract FixidityTest is Test {
     uint256 a = fixidity.newFixedFraction(60, 10);
     uint256 b = fixidity.newFixedFraction(100, 10);
 
-    vm.expectRevert("subtraction underflow detected");
+    vm.expectRevert("substraction underflow detected");
     fixidity.subtract(a, b);
   }
 
