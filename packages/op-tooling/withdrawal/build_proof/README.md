@@ -1,10 +1,20 @@
 # Building Withdrawal Proofs
 
-This package builds cryptographic proofs required for L2 to L1 withdrawals on Celo's L2 testnet (Celo Sepolia). It uses [Viem](https://viem.sh/) to interact with both L1 (Sepolia) and L2 (Celo Sepolia) networks and generates the necessary proof data for withdrawal finalization.
+This package builds cryptographic proofs required for L2 to L1 withdrawals on Celo's L2 testnets. It uses [Viem](https://viem.sh/) to interact with both L1 and L2 networks and generates the necessary proof data for withdrawal finalization.
+
+## Supported Networks
+
+The package supports three network configurations:
+
+- **Alfajores**: L1 (Holesky) ↔ L2 (Celo Alfajores)
+- **Baklava**: L1 (Holesky) ↔ L2 (Celo Baklava)  
+- **Sepolia**: L1 (Sepolia) ↔ L2 (Celo Sepolia) - *Default*
+
+Set the `NETWORK` environment variable to specify which network to use (defaults to `sepolia` if not specified).
 
 ## Overview
 
-When withdrawing assets from Celo L2 to Sepolia L1, a cryptographic proof must be generated to verify the withdrawal transaction on L1. This package automates the proof building process by:
+When withdrawing assets from Celo L2 to L1, a cryptographic proof must be generated to verify the withdrawal transaction on L1. This package automates the proof building process by:
 
 1. Fetching withdrawal transaction data from L2
 2. Waiting for the withdrawal to become provable (up to 1 hour)
@@ -27,13 +37,23 @@ The script requires the following environment variables:
 - `PK`: Private key of the account that initiated the withdrawal (without 0x prefix)
 - `TX_HASH`: Transaction hash of the withdrawal initiation on L2 (with 0x prefix)
 
+**Optional:**
+- `NETWORK`: Network to use (`alfajores`, `baklava`, or `sepolia` - defaults to `sepolia`)
+
 
 ## Usage
 
 To build a proof for a withdrawal, run:
 
 ```sh
+# For Sepolia (default)
 PK=1234567890abcdef... TX_HASH=0x1234567890abcdef... yarn build_proof
+
+# For Alfajores
+NETWORK=alfajores PK=1234567890abcdef... TX_HASH=0x1234567890abcdef... yarn build_proof
+
+# For Baklava
+NETWORK=baklava PK=1234567890abcdef... TX_HASH=0x1234567890abcdef... yarn build_proof
 ```
 
 ## Waiting Period
@@ -112,7 +132,21 @@ The "Prove Args" output contains all the data needed for the `prove.sh` script:
 
 ## Network Configuration
 
-The package is configured for:
+The package supports multiple network configurations:
+
+### Alfajores
+- **L1**: Holesky testnet (Ethereum)
+- **L2**: Celo Alfajores testnet
+- **L2L1MessagePasser**: `0x4200000000000000000000000000000000000016` (Celo Alfajores)
+- **Portal Contract**: `0x82527353927d8D069b3B452904c942dA149BA381` (Holesky)
+
+### Baklava
+- **L1**: Holesky testnet (Ethereum)
+- **L2**: Celo Baklava testnet
+- **L2L1MessagePasser**: `0x4200000000000000000000000000000000000016` (Celo Baklava)
+- **Portal Contract**: `0x87e9cB54f185a32266689138fbA56F0C994CF50c` (Holesky)
+
+### Sepolia (Default)
 - **L1**: Sepolia testnet (Ethereum)
 - **L2**: Celo Sepolia testnet
 - **L2L1MessagePasser**: `0x4200000000000000000000000000000000000016` (Celo Sepolia)
@@ -122,3 +156,5 @@ The package is configured for:
 
 - **"waiting-to-prove" status**: Wait up to 1 hour after withdrawal initiation
 - **Private key format**: Ensure PK is provided without 0x prefix
+- **Network errors**: Ensure NETWORK is set to one of: `alfajores`, `baklava`, or `sepolia`
+- **Unsupported network**: Check that you're using a supported network configuration
