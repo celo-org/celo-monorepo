@@ -160,7 +160,7 @@ library SortedLinkedList {
   }
 
   /**
-   * @notice Returns the keys of the elements greaterKey than and less than the provided value.
+   * @notice Returns the keys of the elements greater than and less than the provided value.
    * @param list A storage pointer to the underlying list.
    * @param value The element value.
    * @param lesserKey The key of the element which could be just left of the new value.

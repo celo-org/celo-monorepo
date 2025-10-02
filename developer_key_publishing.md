@@ -6,7 +6,7 @@ In support of these uses, [OpenPGP](https://www.openpgp.org/) public keys can be
 
 If you want to read more about OpenPGP keys, including their structure and metadata, check out [Anatomy of a GPG Key by Dave Steele](https://davesteele.github.io/gpg/2014/09/20/anatomy-of-a-gpg-key/).
 
-> Note: This guide assumes you have an @clabs.co email address, but if you do not, simply change the email domain to your primary developer email (e.g. @example.com for alice@example.com) Some additional setup will be required in the DNS records for your domain to configure [OpenPGP WKD]((https://gnupg.org/blog/20161027-hosting-a-web-key-directory.html)).
+> Note: This guide assumes you have an @clabs.co email address, but if you do not, simply change the email domain to your primary developer email (e.g. @example.com for alice@example.com) Some additional setup will be required in the DNS records for your domain to configure [OpenPGP WKD](https://gnupg.org/blog/20161027-hosting-a-web-key-directory.html).
 
 ## Setup
 
@@ -60,7 +60,7 @@ We recommend generating your developer key pair with a YubiKey. Generating your 
         4. You may add a comment, but it is not required.
     4. `quit`
 
-See the [official YubiKey documentation](https://support.yubico.com/support/solutions/articles/15000006420-using-your-yubikey-with-openpgp) for more information.
+See the [official YubiKey documentation](https://support.yubico.com/hc/en-us/articles/360013790259-Using-Your-YubiKey-with-OpenPGP) for more information.
 
 ### On your machine
 
@@ -87,7 +87,7 @@ If you've generated a key on your local machine, it can be imported onto your Yu
    2. `keytocard` and select `3` to set the authentication key on the YubiKey.
    3. `quit` and save your changes.
 
-See the [official YubiKey documentation](https://support.yubico.com/support/solutions/articles/15000006420-using-your-yubikey-with-openpgp)
+See the [official YubiKey documentation](https://support.yubico.com/hc/en-us/articles/360013790259-Using-Your-YubiKey-with-OpenPGP)
 
 #### Verify your signing key
 
