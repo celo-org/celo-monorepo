@@ -5,7 +5,7 @@ const chalk = require('chalk')
 const FirebaseOrGAEProjects = ['faucet', 'web', 'notification-service']
 
 // Set CWD to monorepo root
-process.cwd(path.join(__dirname, '..'))
+process.chdir(path.join(__dirname, '..'))
 
 const pkgJsonPath = (name) => path.join('./packages', name, 'package.json')
 const readJSON = (path) => JSON.parse(fs.readFileSync(path))
@@ -40,7 +40,7 @@ function getErrors(pkgJson) {
     )
 
   const errors = []
-  for ([name, versionString] of interDependencies) {
+  for (const [name, versionString] of interDependencies) {
     if (extractVersionNumber(versionString) != versionMap.get(name)) {
       errors.push({
         from: pkgJson.name,
