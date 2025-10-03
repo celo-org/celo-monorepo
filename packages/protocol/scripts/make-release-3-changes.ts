@@ -30,7 +30,7 @@ try {
   )
   const releaseProposal: ProposalTx[] = readJsonSync(argv.input_proposal)
   writeJsonSync(argv.output_proposal, makeRelease3Changes(releaseProposal), { spaces: 2 })
-  console.info(`Modifications made sucessfully; written to ${argv.output_proposal}`)
+  console.info(`Modifications made successfully; written to ${argv.output_proposal}`)
 } catch (e) {
   console.error(`Something went wrong: ${e?.message || e?.toString()}`)
 }

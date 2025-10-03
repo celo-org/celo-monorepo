@@ -8,7 +8,7 @@ The contents of this package are licensed under the terms of the GNU Lesser Publ
 
 ### Initial deployment
 
-See the [testnet helm chart README](../helm-charts/testnet/README.md) for how to expose the RPC endpoint.
+See the [testnet helm chart README](https://github.com/celo-org/charts/blob/main/charts/testnet/README.md) for how to expose the RPC endpoint.
 
 Then, to deploy contracts to a network run:
 

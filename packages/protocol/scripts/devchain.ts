@@ -15,7 +15,7 @@ const gasLimit = 20000000
 
 const ProtocolRoot = path.normalize(path.join(__dirname, '../'))
 
-// As documented https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
+// As documented https://circleci.com/docs/reference/variables/#built-in-environment-variables
 const isCI = process.env.CI === 'true'
 
 // Move to where the caller made the call So to have relative paths
