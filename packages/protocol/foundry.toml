@@ -51,4 +51,4 @@ via_ir = false
 evm_version = 'paris'
 bytecode_hash = 'ipfs'
 cbor_metadata = true
-# See more config options https://github.com/foundry-rs/foundry/tree/master/config
+# See more config options https://github.com/foundry-rs/foundry/tree/master/crates/config
