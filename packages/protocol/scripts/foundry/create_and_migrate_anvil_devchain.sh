@@ -31,16 +31,16 @@ echo "Library flags 0.8 are: $LIBRARY_FLAGS_08"
 # Including contracts that depend on libraries. This step replaces the library placeholder
 # in the bytecode with the address of the actually deployed library.
 echo "Compiling 0.5 with libraries..."
-time FOUNDRY_PROFILE=profile.truffle-compat forge build $LIBRARY_FLAGS 
+time FOUNDRY_PROFILE=truffle-compat forge build $LIBRARY_FLAGS 
 echo "Compiling 0.8 with libraries..."
 
-time FOUNDRY_PROFILE=profile.truffle-compat8 forge build $LIBRARY_FLAGS_08 
+time FOUNDRY_PROFILE=truffle-compat8 forge build $LIBRARY_FLAGS_08 
 
 # Deploy precompile contracts
 source $PWD/scripts/foundry/deploy_precompiles.sh
 
 echo "Setting Registry Proxy"
-PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode.object' ./out/Proxy.sol/Proxy.json)
+PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode.object' ./out-truffle-compat/Proxy.sol/Proxy.json)
 cast rpc anvil_setCode $REGISTRY_ADDRESS $PROXY_DEPLOYED_BYTECODE --rpc-url $ANVIL_RPC_URL
 
 # Sets the storage of the registry so that it has an owner we control

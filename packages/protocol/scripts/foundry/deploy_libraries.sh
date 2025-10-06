@@ -54,7 +54,7 @@ pushd $TEMP_DIR
 
 # Build libraries
 echo "Building with 0.5 libraries..."
-time FOUNDRY_PROFILE=profile.truffle-compat forge build
+time FOUNDRY_PROFILE=truffle-compat forge build
 
 # Deploy libraries and building library flag
 echo "Deploying libraries 0.5..."
@@ -65,7 +65,7 @@ for LIB_PATH in "${LIBRARIES_PATH[@]}"; do
     # LIB_PATH = "contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
     # LIB_NAME = AddressSortedLinkedListWithMedian
     echo "Deploying library: $LIB_NAME"
-    create_library_out=`FOUNDRY_PROFILE=profile.truffle-compat forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url $ANVIL_RPC_URL --unlocked --broadcast --json`
+    create_library_out=`FOUNDRY_PROFILE=truffle-compat forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url $ANVIL_RPC_URL --unlocked --broadcast --json`
     LIB_ADDRESS=`echo $create_library_out | jq -r '.deployedTo'`
     # Constructing library flag so the remaining contracts can be built and linkeded to these libraries
     LIBRARY_FLAGS="$LIBRARY_FLAGS --libraries $LIB_PATH:$LIB_ADDRESS"
@@ -80,7 +80,7 @@ for LIB_PATH in "${LIBRARIES_PATH_08[@]}"; do
     # LIB_PATH = "contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
     # LIB_NAME = AddressSortedLinkedListWithMedian
     echo "Deploying library: $LIB_NAME"
-    create_library_out=`FOUNDRY_PROFILE=profile.truffle-compat8 forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url $ANVIL_RPC_URL --unlocked --broadcast --json`
+    create_library_out=`FOUNDRY_PROFILE=truffle-compat8 forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url $ANVIL_RPC_URL --unlocked --broadcast --json`
     LIB_ADDRESS=`echo $create_library_out | jq -r '.deployedTo'`
     # Constructing library flag so the remaining contracts can be built and linkeded to these libraries
     LIBRARY_FLAGS_08="$LIBRARY_FLAGS_08 --libraries $LIB_PATH:$LIB_ADDRESS"

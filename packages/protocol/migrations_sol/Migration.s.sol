@@ -134,10 +134,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function setImplementationOnProxy(
     IProxy proxy,
     string memory contractName,
-    bytes memory initializeCalldata
+    bytes memory initializeCalldata,
+    uint8 version
   ) public {
+    string memory versionString = version == 5 ? "out-truffle-compat/" : "out-truffle-compat-0.8/";
     bytes memory implementationBytecode = vm.getCode(
-      string.concat("out/", contractName, ".sol/", contractName, ".json")
+      string.concat(versionString, contractName, ".sol/", contractName, ".json")
     );
     bool testingDeployment = false;
     bytes memory initialCode = abi.encodePacked(
@@ -155,14 +157,15 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function deployProxiedContract(
     string memory contractName,
     address toProxy,
-    bytes memory initializeCalldata
+    bytes memory initializeCalldata,
+    uint8 version
   ) public {
     console.log("Deploying: ", contractName);
     deployCodeTo("Proxy.sol", abi.encode(false), toProxy);
     IProxy proxy = IProxy(toProxy);
     console.log(" Proxy deployed to:", toProxy);
 
-    setImplementationOnProxy(proxy, contractName, initializeCalldata);
+    setImplementationOnProxy(proxy, contractName, initializeCalldata, version);
     addToRegistry(contractName, address(proxy));
     console.log(" Done deploying:", contractName);
     console.log("------------------------------");
@@ -170,7 +173,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function deployProxiedContract(
     string memory contractName,
-    bytes memory initializeCalldata
+    bytes memory initializeCalldata,
+    uint8 version
   ) public returns (address proxyAddress) {
     console.log("Deploying: ", contractName);
 
@@ -185,7 +189,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     IProxy proxy = IProxy(proxyAddress);
     console.log(" Proxy deployed to:", address(proxy));
 
-    setImplementationOnProxy(proxy, contractName, initializeCalldata);
+    setImplementationOnProxy(proxy, contractName, initializeCalldata, version);
     addToRegistry(contractName, address(proxy));
 
     console.log(" Done deploying:", contractName);
@@ -202,7 +206,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
 
     proxyFactory = IProxyFactory(
-      create2deploy(0, vm.getCode("./out/ProxyFactory.sol/ProxyFactory.json"))
+      create2deploy(0, vm.getCode("./out-truffle-compat/ProxyFactory.sol/ProxyFactory.json"))
     );
 
     // Proxy for Registry is already set, just deploy implementation
@@ -269,7 +273,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     setImplementationOnProxy(
       IProxy(REGISTRY_ADDRESS),
       "Registry",
-      abi.encodeWithSelector(IRegistryInitializer.initialize.selector)
+      abi.encodeWithSelector(IRegistryInitializer.initialize.selector),
+      5
     );
     // set registry in registry itself
     console.log("Owner of the Registry Proxy is", IProxy(REGISTRY_ADDRESS)._getOwner());
@@ -280,21 +285,24 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function migrateFreezer() public {
     deployProxiedContract(
       "Freezer",
-      abi.encodeWithSelector(IFreezerInitializer.initialize.selector)
+      abi.encodeWithSelector(IFreezerInitializer.initialize.selector),
+      5
     );
   }
 
   function migrateFeeCurrencyWhitelist() public {
     deployProxiedContract(
       "FeeCurrencyWhitelist",
-      abi.encodeWithSelector(IFeeCurrencyWhitelist.initialize.selector)
+      abi.encodeWithSelector(IFeeCurrencyWhitelist.initialize.selector),
+      5
     );
   }
 
   function migrateFeeCurrencyDirectory() public {
     deployProxiedContract(
       "FeeCurrencyDirectory",
-      abi.encodeWithSelector(IFeeCurrencyDirectoryInitializer.initialize.selector)
+      abi.encodeWithSelector(IFeeCurrencyDirectoryInitializer.initialize.selector),
+      8
     );
   }
 
@@ -302,7 +310,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // TODO change pre-funded addresses to make it match circulation supply
     address celoProxyAddress = deployProxiedContract(
       "GoldToken",
-      abi.encodeWithSelector(ICeloTokenInitializer.initialize.selector, REGISTRY_ADDRESS)
+      abi.encodeWithSelector(ICeloTokenInitializer.initialize.selector, REGISTRY_ADDRESS),
+      5
     );
 
     addToRegistry("CeloToken", celoProxyAddress);
@@ -319,7 +328,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     );
     deployProxiedContract(
       "SortedOracles",
-      abi.encodeWithSelector(ISortedOraclesInitializer.initialize.selector, reportExpirySeconds)
+      abi.encodeWithSelector(ISortedOraclesInitializer.initialize.selector, reportExpirySeconds),
+      5
     );
   }
 
@@ -347,7 +357,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         targetDensity,
         adjustmentSpeed,
         baseFeeOpCodeActivationBlock
-      )
+      ),
+      8
     );
   }
 
@@ -371,7 +382,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         owners,
         required,
         internalRequired
-      )
+      ),
+      5
     );
   }
 
@@ -412,7 +424,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         assetAllocationWeights,
         tobinTax,
         tobinTaxReserveRatio
-      )
+      ),
+      5
     );
 
     // TODO this should be a transfer from the deployer rather than a deal
@@ -454,7 +467,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         initialBalanceAddresses,
         initialBalanceValues,
         exchangeIdentifier
-      )
+      ),
+      5
     );
 
     if (frozen) {
@@ -548,7 +562,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         reserveFraction,
         updateFrequency,
         minimumReports
-      )
+      ),
+      5
     );
 
     bool frozen = abi.decode(json.parseRaw(".exchange.frozen"), (bool));
@@ -562,7 +577,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function migrateAccount() public {
     address accountsProxyAddress = deployProxiedContract(
       "Accounts",
-      abi.encodeWithSelector(IAccountsInitializer.initialize.selector, REGISTRY_ADDRESS)
+      abi.encodeWithSelector(IAccountsInitializer.initialize.selector, REGISTRY_ADDRESS),
+      5
     );
 
     IAccounts(accountsProxyAddress).setEip712DomainSeparator();
@@ -577,7 +593,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         ILockedGoldInitializer.initialize.selector,
         REGISTRY_ADDRESS,
         unlockingPeriod
-      )
+      ),
+      5
     );
 
     addToRegistry("LockedCelo", LockedCeloProxyAddress);
@@ -631,7 +648,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         slashingMultiplierResetPeriod,
         maxGroupSize,
         initParamsTunnel
-      )
+      ),
+      8
     );
   }
 
@@ -662,7 +680,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         maxElectableValidators,
         maxNumGroupsVotedFor,
         electabilityThreshold
-      )
+      ),
+      5
     );
   }
 
@@ -728,7 +747,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         communityRewardFraction,
         carbonOffsettingPartner,
         carbonOffsettingFraction
-      )
+      ),
+      5
     );
 
     bool frozen = abi.decode(json.parseRaw(".epochRewards.frozen"), (bool));
@@ -746,12 +766,20 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     deployProxiedContract(
       "Random",
-      abi.encodeWithSelector(IRandomInitializer.initialize.selector, randomnessBlockRetentionWindow)
+      abi.encodeWithSelector(
+        IRandomInitializer.initialize.selector,
+        randomnessBlockRetentionWindow
+      ),
+      5
     );
   }
 
   function migrateEscrow() public {
-    deployProxiedContract("Escrow", abi.encodeWithSelector(IEscrowInitializer.initialize.selector));
+    deployProxiedContract(
+      "Escrow",
+      abi.encodeWithSelector(IEscrowInitializer.initialize.selector),
+      5
+    );
   }
 
   function migrateBlockchainParameters(string memory json) public {
@@ -772,14 +800,16 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         gasForNonGoldCurrencies,
         gasLimit,
         lookbackWindow
-      )
+      ),
+      5
     );
   }
 
   function migrateGovernanceSlasher() public {
     deployProxiedContract(
       "GovernanceSlasher",
-      abi.encodeWithSelector(IGovernanceSlasherInitializer.initialize.selector, REGISTRY_ADDRESS)
+      abi.encodeWithSelector(IGovernanceSlasherInitializer.initialize.selector, REGISTRY_ADDRESS),
+      5
     );
 
     getLockedGold().addSlasher("GovernanceSlasher");
@@ -796,7 +826,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         REGISTRY_ADDRESS,
         penalty,
         reward
-      )
+      ),
+      5
     );
 
     getLockedGold().addSlasher("DoubleSigningSlasher");
@@ -818,7 +849,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         penalty,
         reward,
         slashableDowntime
-      )
+      ),
+      5
     );
 
     getLockedGold().addSlasher("DowntimeSlasher");
@@ -843,14 +875,16 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         owners,
         required,
         internalRequired
-      )
+      ),
+      5
     );
   }
 
   function migrateFederatedAttestations() public {
     deployProxiedContract(
       "FederatedAttestations",
-      abi.encodeWithSelector(IFederatedAttestationsInitializer.initialize.selector)
+      abi.encodeWithSelector(IFederatedAttestationsInitializer.initialize.selector),
+      5
     );
   }
 
@@ -865,7 +899,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         REGISTRY_ADDRESS,
         tokenAddresses,
         minimumReports
-      )
+      ),
+      5
     );
   }
 
@@ -880,7 +915,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         REGISTRY_ADDRESS,
         tokenAddresses,
         minimumReports
-      )
+      ),
+      5
     );
   }
 
@@ -903,7 +939,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         handlers,
         newLimits,
         newMaxSlippages
-      )
+      ),
+      5
     );
 
     IFeeHandler(feeHandlerProxyAddress).addToken(
@@ -915,7 +952,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function migrateOdisPayments() public {
     deployProxiedContract(
       "OdisPayments",
-      abi.encodeWithSelector(IOdisPaymentsInitializer.initialize.selector)
+      abi.encodeWithSelector(IOdisPaymentsInitializer.initialize.selector),
+      5
     );
   }
 
@@ -925,21 +963,24 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       abi.encodeWithSelector(
         ICeloUnreleasedTreasuryInitializer.initialize.selector,
         REGISTRY_ADDRESS
-      )
+      ),
+      8
     );
   }
 
   function migrateEpochManagerEnabler() public {
     deployProxiedContract(
       "EpochManagerEnabler",
-      abi.encodeWithSelector(IEpochManagerEnablerInitializer.initialize.selector, REGISTRY_ADDRESS)
+      abi.encodeWithSelector(IEpochManagerEnablerInitializer.initialize.selector, REGISTRY_ADDRESS),
+      8
     );
   }
 
   function migrateScoreManager() public {
     deployProxiedContract(
       "ScoreManager",
-      abi.encodeWithSelector(IScoreManagerInitializer.initialize.selector)
+      abi.encodeWithSelector(IScoreManagerInitializer.initialize.selector),
+      8
     );
   }
 
@@ -955,7 +996,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         IEpochManagerInitializer.initialize.selector,
         REGISTRY_ADDRESS,
         newEpochDuration
-      )
+      ),
+      8
     );
   }
 
@@ -1013,7 +1055,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         participationFloor,
         baselineUpdateFactor,
         baselineQuorumFactor
-      )
+      ),
+      5
     );
 
     _setConstitution(governanceProxyAddress, json);
