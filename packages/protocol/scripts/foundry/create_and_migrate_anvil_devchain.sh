@@ -24,13 +24,17 @@ source $PWD/scripts/foundry/start_anvil.sh
 
 # Deploy libraries to the anvil instance
 source $PWD/scripts/foundry/deploy_libraries.sh
-echo "Library flags are: $LIBRARY_FLAGS"
+echo "Library flags 0.5 are: $LIBRARY_FLAGS"
+echo "Library flags 0.8 are: $LIBRARY_FLAGS_08"
 
 # Build all contracts with deployed libraries
 # Including contracts that depend on libraries. This step replaces the library placeholder
 # in the bytecode with the address of the actually deployed library.
-echo "Compiling with libraries..."
-time FOUNDRY_PROFILE=devchain forge build $LIBRARY_FLAGS
+echo "Compiling 0.5 with libraries..."
+time FOUNDRY_PROFILE=profile.truffle-compat forge build $LIBRARY_FLAGS 
+echo "Compiling 0.8 with libraries..."
+
+time FOUNDRY_PROFILE=profile.truffle-compat8 forge build $LIBRARY_FLAGS_08 
 
 # Deploy precompile contracts
 source $PWD/scripts/foundry/deploy_precompiles.sh
@@ -57,6 +61,7 @@ forge script \
   $SKIP_SIMULATION \
   $NON_INTERACTIVE \
   $LIBRARY_FLAGS \
+  $LIBRARY_FLAGS_08 \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
 
 CELO_EPOCH_REWARDS_ADDRESS=$(
