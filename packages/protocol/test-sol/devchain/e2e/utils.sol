@@ -49,7 +49,7 @@ contract Devchain is TestWithUtils08 {
   IValidators validators;
 
   constructor() {
-    // Fetch all core contracts that are expeceted to be in the Registry on the devchain
+    // Fetch all core contracts that are expected to be in the Registry on the devchain
     // TODO: Ensure all contracts have getters in UsingRegistry
     accounts = getAccounts();
     celoUnreleasedTreasuryContract = getCeloUnreleasedTreasury();

@@ -120,9 +120,9 @@ contract FeeHandlerTest is TestWithUtils {
     mockReserve.addToken(address(stableTokenEUR));
 
     address[] memory tokenAddresses;
-    uint256[] memory newMininumReports;
+    uint256[] memory newMinimumReports;
 
-    mentoSeller.initialize(address(registry), tokenAddresses, newMininumReports);
+    mentoSeller.initialize(address(registry), tokenAddresses, newMinimumReports);
     celoToken.initialize(address(registry));
     stableToken.initialize(
       "Celo Dollar",
@@ -239,7 +239,7 @@ contract FeeHandlerTest_SetCarbonFraction is FeeHandlerTest {
   }
 
   function test_Reverts_WhenFractionsGreaterThanOne() public {
-    vm.expectRevert("New cargon fraction can't be greather than 1");
+    vm.expectRevert("New carbon fraction can't be greater than 1");
     feeHandler.setCarbonFraction(FixidityLib.newFixedFraction(3, 2).unwrap());
   }
 
