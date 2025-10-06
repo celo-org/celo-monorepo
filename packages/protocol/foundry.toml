@@ -1,3 +1,4 @@
+# docs: https://getfoundry.sh/config/reference/default-config
 [profile.default]
 src = 'contracts-0.8'
 out = 'out'
@@ -31,6 +32,7 @@ no_match_path = "{**/test/BLS12Passthrough.sol,**/test/RandomTest.sol}"
 
 # Profile to match Truffle configuration for 0.5.13 contracts
 [profile.truffle-compat]
+skip=["test-sol/**"]
 src = 'contracts'
 out = 'out-truffle-compat'
 libs = ['lib', 'node_modules']
