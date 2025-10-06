@@ -3,7 +3,7 @@ export FROM_ACCOUNT_NO_ZERO="f39Fd6e51aad88F6F4ce6aB8827279cffFb92266" # Anvil d
 export FROM_ACCOUNT="0x$FROM_ACCOUNT_NO_ZERO" # Anvil default account (1)
 
 # Anvil configurations (Source: https://book.getfoundry.sh/reference/anvil/)
-export ANVIL_PORT=8546
+export ANVIL_PORT=8545
 export ANVIL_RPC_URL="http://127.0.0.1:$ANVIL_PORT"
 export GAS_LIMIT=50000000
 export CODE_SIZE_LIMIT=245760 # EIP-170: Contract code size limit in bytes. Useful to increase for tests. [default: 0x6000 (~25kb)]
