@@ -196,6 +196,7 @@ jobs:
           version: 'v1.0.0'
 
       - name: Install forge dependencies
+        working-directory: packages/protocol
         run: forge install
       - name: Test against current release
         run: |
