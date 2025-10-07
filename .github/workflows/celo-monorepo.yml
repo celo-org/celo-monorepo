@@ -190,6 +190,13 @@ jobs:
       #   run: |
       #     BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
       #     (cp -r packages/protocol/.tmp/devchain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
+        with:
+          version: 'v1.0.0'
+
+      - name: Install forge dependencies
+        run: forge install
       - name: Test against current release
         run: |
           echo "Comparing against $RELEASE_TAG"
