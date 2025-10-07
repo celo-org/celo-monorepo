@@ -25,4 +25,4 @@ test = 'test-sol/devchain'
 match_path = "**/test-sol/devchain/**"
 no_match_path = "{**/test/BLS12Passthrough.sol,**/test/RandomTest.sol}"
 
-# See more config options https://github.com/foundry-rs/foundry/tree/master/config
+# See more config options https://github.com/foundry-rs/foundry/tree/master/crates/config

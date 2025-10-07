@@ -9,6 +9,7 @@ import "../common/Freezable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/PrecompilesOverride.sol";
+import "../common/Permissioned.sol";
 import "../common/interfaces/ICeloToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
@@ -22,7 +23,8 @@ contract EpochRewards is
   Initializable,
   UsingRegistry,
   PrecompilesOverride,
-  Freezable
+  Freezable,
+  Permissioned
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -85,14 +87,6 @@ contract EpochRewards is
 
   event TargetVotingYieldUpdated(uint256 fraction);
 
-  modifier onlyVmOrPermitted(address permittedAddress) {
-    if (isL2()) require(msg.sender == permittedAddress, "Only permitted address can call");
-    else {
-      require(msg.sender == address(0), "Only VM can call");
-    }
-    _;
-  }
-
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -154,31 +148,10 @@ contract EpochRewards is
    */
   function updateTargetVotingYield()
     external
-    onlyVmOrPermitted(registry.getAddressFor(EPOCH_MANAGER_REGISTRY_ID))
+    onlyPermitted(registry.getAddressFor(EPOCH_MANAGER_REGISTRY_ID))
     onlyWhenNotFrozen
   {
     _updateTargetVotingYield();
-  }
-
-  /**
-   * @notice Determines if the reserve is low enough to demand a diversion from
-   *    the community reward. Targets initial critical ratio of 2 with a linear
-   *    decline until 25 years have passed where the critical ratio will be 1.
-   */
-  function isReserveLow() external view returns (bool) {
-    // critical reserve ratio = 2 - time in second / 25 years
-    FixidityLib.Fraction memory timeSinceInitialization = FixidityLib.newFixed(now.sub(startTime));
-    FixidityLib.Fraction memory m = FixidityLib.newFixed(25 * 365 * 1 days);
-    FixidityLib.Fraction memory b = FixidityLib.newFixed(2);
-    FixidityLib.Fraction memory criticalRatio;
-    // Don't let the critical reserve ratio go under 1 after 25 years.
-    if (timeSinceInitialization.gte(m)) {
-      criticalRatio = FixidityLib.fixed1();
-    } else {
-      criticalRatio = b.subtract(timeSinceInitialization.divide(m));
-    }
-    FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserve().getReserveRatio());
-    return ratio.lte(criticalRatio);
   }
 
   /**
@@ -278,7 +251,7 @@ contract EpochRewards is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 0);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -451,18 +424,12 @@ contract EpochRewards is
   function getTargetTotalEpochPaymentsInGold() public view returns (uint256) {
     address stableTokenAddress = registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID);
     (uint256 numerator, uint256 denominator) = getSortedOracles().medianRate(stableTokenAddress);
-    if (isL2()) {
-      return
-        getEpochManager()
-          .numberOfElectedInCurrentSet()
-          .mul(targetValidatorEpochPayment)
-          .mul(denominator)
-          .div(numerator);
-    }
     return
-      numberValidatorsInCurrentSet().mul(targetValidatorEpochPayment).mul(denominator).div(
-        numerator
-      );
+      getEpochManager()
+        .numberOfElectedInCurrentSet()
+        .mul(targetValidatorEpochPayment)
+        .mul(denominator)
+        .div(numerator);
   }
 
   /**
