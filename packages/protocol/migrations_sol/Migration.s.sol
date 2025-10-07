@@ -927,7 +927,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       for (uint256 i = 0; i < contractsInRegistry.length; i++) {
         string memory contractToTransfer = contractsInRegistry[i];
         console.log("Transferring ownership of: ", contractToTransfer);
-        
+
         // Transfer proxy ownership
         IProxy proxy = IProxy(registry.getAddressForStringOrDie(contractToTransfer));
         console.log("Previous proxy owner was: ", proxy._getOwner());
