@@ -78,6 +78,7 @@ yarn truffle exec --network anvil ./scripts/truffle/make-release.js --build_dire
 echo "- Verify release"
 yarn truffle exec --network anvil ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json --branch $BRANCH --initialize_data $INITIALIZATION_FILE
 
-if [[ -n $GANACHE_PID ]]; then
-    kill $GANACHE_PID
-fi
+# TODO replace with anvil
+# if [[ -n $GANACHE_PID ]]; then
+#     kill $GANACHE_PID
+# fi
