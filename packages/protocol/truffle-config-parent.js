@@ -72,6 +72,7 @@ const networks = {
     gasPrice: 0,
     gas: gasLimit,
     defaultBalance: 200000000,
+    network_id: 31337, // same as anvil
     mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
   },
   rc1: {
