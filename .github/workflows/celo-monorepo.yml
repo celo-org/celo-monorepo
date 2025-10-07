@@ -180,16 +180,16 @@ jobs:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
         
           # this is using ganache
-      - name: Download protocol devchain artifact
-        uses: dawidd6/action-download-artifact@20319c5641d495c8a52e688b7dc5fada6c3a9fbc
-        with:
-          workflow: protocol-devchain.yml
-          name: devchain-${{ env.RELEASE_TAG }}
-          path: packages/protocol/.tmp/devchain
-      - name: Copy DevChain and Build generated from released tag
-        run: |
-          BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
-          (cp -r packages/protocol/.tmp/devchain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
+      # - name: Download protocol devchain artifact
+      #   uses: dawidd6/action-download-artifact@20319c5641d495c8a52e688b7dc5fada6c3a9fbc
+      #   with:
+      #     workflow: protocol-devchain.yml
+      #     name: devchain-${{ env.RELEASE_TAG }}
+      #     path: packages/protocol/.tmp/devchain
+      # - name: Copy DevChain and Build generated from released tag
+      #   run: |
+      #     BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
+      #     (cp -r packages/protocol/.tmp/devchain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
       - name: Test against current release
         run: |
           echo "Comparing against $RELEASE_TAG"
