@@ -22,7 +22,9 @@ while getopts 'b:l:d:' flag; do
 done
 
 # TODO use a cache here
-############ yarn anvil-devchain:start-L2 
+git checkout martinvol/WIPCR13makeItMatchTruffle
+yarn anvil-devchain:start-L2 
+git checkout -
 
 # [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 
