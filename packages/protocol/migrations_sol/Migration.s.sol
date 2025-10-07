@@ -7,6 +7,7 @@ import { Script } from "forge-std-8/Script.sol";
 
 // Foundry imports
 import { console } from "forge-std/console.sol";
+import { console2 } from "forge-std/console2.sol";
 import { stdJson } from "forge-std/StdJson.sol";
 
 // OpenZeppelin
@@ -84,9 +85,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 commissionUpdateDelay;
   }
 
-  IProxyFactory proxyFactory;
-
-  uint256 proxyNonce = 0;
+  IProxyFactory internal proxyFactory;
+  uint256 internal proxyNonce = 0;
 
   ConstitutionHelper.ConstitutionEntry[] internal constitutionEntries;
 
@@ -212,9 +212,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   /**
-   * Entry point of the script
+   * First part of the migration, deploys most contracts
    */
-  function run() external {
+  function runMigration() external {
     // TODO check that this matches DEPLOYER_ACCOUNT and the PK can be avoided with --unlock
     vm.startBroadcast(DEPLOYER_ACCOUNT);
 
@@ -226,7 +226,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateRegistry();
     setupUsingRegistry();
     migrateFreezer();
-    migrateFeeCurrencyDirectory();
+    migrateFeeCurrencyDirectory(json);
     migrateCeloToken(json);
     migrateSortedOracles(json);
     migrateReserveSpenderMultiSig(json);
@@ -246,13 +246,15 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateUniswapFeeHandlerSeller();
     migrateFeeHandler(json);
     migrateOdisPayments();
-    migrateCeloUnreleasedTreasury();
+    migrateCeloUnreleasedTreasury(json);
     vm.stopBroadcast();
   }
 
-  function run2() public {
+  /**
+   * Second part of the migration, deploys EpochManager and Governance
+   */
+  function runAfterMigration() public {
     vm.startBroadcast(DEPLOYER_ACCOUNT);
-
     proxyFactory = IProxyFactory(
       create2deploy(
         bytes32(uint256(block.number)),
@@ -260,10 +262,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       )
     );
     string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
-
     setupUsingRegistry();
-    console.log("Account owner:", IProxy(address(getAccounts()))._getOwner());
-
+    checkUnreleasedTreasuryBalance();
     migrateEpochManagerEnabler();
     migrateEpochManager(json);
     migrateScoreManager();
@@ -276,6 +276,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     vm.stopBroadcast();
 
     electValidators(json);
+  }
+
+  function checkUnreleasedTreasuryBalance() internal {
+    address celoUnreleasedTreasury = address(getCeloUnreleasedTreasury());
+    uint256 balance = getCeloToken().balanceOf(celoUnreleasedTreasury);
+    console2.log("Unreleased Treasury balance: ", balance, "CELO");
   }
 
   /**
@@ -302,15 +308,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     );
   }
 
-  function migrateFeeCurrencyWhitelist() public {
-    deployProxiedContract(
-      "FeeCurrencyWhitelist",
-      abi.encodeWithSelector(IFeeCurrencyWhitelist.initialize.selector)
-    );
-  }
-
-  function migrateFeeCurrencyDirectory() public {
-    address feeCurrencyDirectoryProxyAddress = 0x9212Fb72ae65367A7c887eC4Ad9bE310BAC611BF;
+  function migrateFeeCurrencyDirectory(string memory json) public {
+    address feeCurrencyDirectoryProxyAddress = json.readAddress(".proxies.feeCurrencyDirectory");
     deployImplementationAndAddToRegistry(
       "FeeCurrencyDirectory",
       IProxy(feeCurrencyDirectoryProxyAddress),
@@ -323,7 +322,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function migrateCeloToken(string memory json) public {
     // TODO: change pre-funded addresses to make it match circulation supply
     // pre deployed celo token proxy address from L2Genesis.s.sol
-    address celoProxyAddress = 0x471EcE3750Da237f93B8E339c536989b8978a438;
+    address celoProxyAddress = json.readAddress(".proxies.celoToken");
 
     deployImplementationAndAddToRegistry(
       "GoldToken",
@@ -344,27 +343,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     deployProxiedContract(
       "SortedOracles",
       abi.encodeWithSelector(ISortedOraclesInitializer.initialize.selector, reportExpirySeconds)
-    );
-  }
-
-  function migrateGasPriceMinimum(string memory json) public {
-    uint256 gasPriceMinimumFloor = json.readUint(".gasPriceMinimum.minimumFloor");
-    uint256 targetDensity = json.readUint(".gasPriceMinimum.targetDensity");
-    uint256 adjustmentSpeed = json.readUint(".gasPriceMinimum.adjustmentSpeed");
-    uint256 baseFeeOpCodeActivationBlock = json.readUint(
-      ".gasPriceMinimum.baseFeeOpCodeActivationBlock"
-    );
-
-    deployProxiedContract(
-      "GasPriceMinimum",
-      abi.encodeWithSelector(
-        IGasPriceMinimumInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
-        gasPriceMinimumFloor,
-        targetDensity,
-        adjustmentSpeed,
-        baseFeeOpCodeActivationBlock
-      )
     );
   }
 
@@ -390,6 +368,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateReserve(string memory json) public {
+    console.log(
+      "WARNING: The Reserve contract is not really a smart contract relevant to us anymore. \n"
+      "We only have it because the StableTokens need it for compatibility."
+    );
+
     uint256 tobinTaxStalenessThreshold = json.readUint(".reserve.tobinTaxStalenessThreshold");
     uint256 spendingRatio = json.readUint(".reserve.spendingRatio");
     uint256 frozenGold = json.readUint(".reserve.frozenGold");
@@ -485,6 +468,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateStableToken(string memory json) public {
+    console.log(
+      "WARNING: The Mento integration in this migration script is from a very old Mento version. \n"
+      "At this point, it mostly serves as an example of an ERC20 token with support for fee abstraction."
+    );
+
     string[] memory names = json.readStringArray(".stableTokens.names");
     string[] memory symbols = json.readStringArray(".stableTokens.symbols");
     string[] memory contractSufixs = json.readStringArray(".stableTokens.contractSufixs");
@@ -687,37 +675,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     }
   }
 
-  function migrateRandom(string memory json) public {
-    uint256 randomnessBlockRetentionWindow = json.readUint(
-      ".random.randomnessBlockRetentionWindow"
-    );
-
-    deployProxiedContract(
-      "Random",
-      abi.encodeWithSelector(IRandomInitializer.initialize.selector, randomnessBlockRetentionWindow)
-    );
-  }
-
   function migrateEscrow() public {
     deployProxiedContract("Escrow", abi.encodeWithSelector(IEscrowInitializer.initialize.selector));
-  }
-
-  function migrateBlockchainParameters(string memory json) public {
-    uint256 gasForNonGoldCurrencies = json.readUint(
-      ".blockchainParameters.gasForNonGoldCurrencies"
-    );
-    uint256 gasLimit = json.readUint(".blockchainParameters.gasLimit");
-    uint256 lookbackWindow = json.readUint(".blockchainParameters.lookbackWindow");
-
-    deployProxiedContract(
-      "BlockchainParameters",
-      abi.encodeWithSelector(
-        IBlockchainParametersInitializer.initialize.selector,
-        gasForNonGoldCurrencies,
-        gasLimit,
-        lookbackWindow
-      )
-    );
   }
 
   function migrateGovernanceSlasher() public {
@@ -744,25 +703,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     );
 
     getLockedGold().addSlasher("DoubleSigningSlasher");
-  }
-
-  function migrateDowntimeSlasher(string memory json) public {
-    uint256 penalty = json.readUint(".downtimeSlasher.penalty");
-    uint256 reward = json.readUint(".downtimeSlasher.reward");
-    uint256 slashableDowntime = json.readUint(".downtimeSlasher.slashableDowntime");
-
-    deployProxiedContract(
-      "DowntimeSlasher",
-      abi.encodeWithSelector(
-        IDowntimeSlasherInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
-        penalty,
-        reward,
-        slashableDowntime
-      )
-    );
-
-    getLockedGold().addSlasher("DowntimeSlasher");
   }
 
   function migrateGovernanceApproverMultiSig(string memory json) public {
@@ -830,7 +770,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256[] memory newMaxSlippages;
 
     // pre deployed fee handler proxy address from L2Genesis.s.sol
-    address feeHandlerProxyAddress = 0xcD437749E43A154C07F3553504c68fBfD56B8778;
+    address feeHandlerProxyAddress = json.readAddress(".proxies.feeHandler");
 
     deployImplementationAndAddToRegistry(
       "FeeHandler",
@@ -860,9 +800,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     );
   }
 
-  function migrateCeloUnreleasedTreasury() public {
+  function migrateCeloUnreleasedTreasury(string memory json) public {
     // pre deployed celo unreleased treasury proxy address from L2Genesis.s.sol
-    address celoUnreleasedTreasury = 0xB76D502Ad168F9D545661ea628179878DcA92FD5;
+    address celoUnreleasedTreasury = json.readAddress(".proxies.celoUnreleasedTreasury");
 
     deployImplementationAndAddToRegistry(
       "CeloUnreleasedTreasury",
@@ -873,21 +813,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       )
     );
     addToRegistry("CeloUnreleasedTreasury", celoUnreleasedTreasury);
-  }
-
-  function fundCeloUnreleasedTreasury(string memory json) public {
-    console.log("Funding CeloUnreleasedTreasury");
-    address celoUnreleasedTreasury = address(getCeloUnreleasedTreasury());
-
-    // broadcast as first validator
-    uint256 firstValidatorPk = json.readUint(".validators.valKeys[0]");
-    vm.startBroadcast(firstValidatorPk);
-    getCeloToken().transfer(celoUnreleasedTreasury, 400_000_000 ether);
-    console.log(
-      "Balance of CeloUnreleasedTreasury is",
-      getCeloToken().balanceOf(celoUnreleasedTreasury)
-    );
-    vm.stopBroadcast();
   }
 
   function migrateEpochManagerEnabler() public {
@@ -923,12 +848,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         );
 
         vm.startBroadcast(valKeys[validatorKeyIndex]);
-        // PK -> Address
+        // TODO: ForceTx only exists to retrieve Address from PrivateKey -> explore alternatives
         address accountAddress = (new ForceTx()).identity();
-        // On mainnet potentially singer & account should be different
+        // TODO: On mainnet potentially singer & account should be different
         // 1 -> list of accounts
         // 2 -> list of signers
-        // Double check on mainnet & with Javi
         address signer = accountAddress;
         signers[signerIndexCount] = signer;
         signerIndexCount++;
@@ -1226,21 +1150,5 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         vm.stopBroadcast();
       }
     }
-  }
-
-  function captureEpochManagerEnablerValidators() public {
-    address numberValidatorsInCurrentSetPrecompileAddress = 0x00000000000000000000000000000000000000f9;
-    numberValidatorsInCurrentSetPrecompileAddress.call(
-      abi.encodeWithSignature("setNumberOfValidators()")
-    );
-
-    address validatorSignerAddressFromCurrentSetPrecompileAddress = 0x00000000000000000000000000000000000000fa;
-    validatorSignerAddressFromCurrentSetPrecompileAddress.call(
-      abi.encodeWithSignature("setValidators()")
-    );
-
-    address epochManagerEnabler = registry.getAddressForString("EpochManagerEnabler");
-    IEpochManagerEnabler epochManagerEnablerContract = IEpochManagerEnabler(epochManagerEnabler);
-    epochManagerEnablerContract.captureEpochAndValidators();
   }
 }

@@ -5,15 +5,13 @@ set -euo pipefail
 
 # Read environment variables and constants
 source $PWD/scripts/foundry/constants.sh
-DEPLOYER_PK=0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
-MIGRATION_PK=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
 CACHED_LIBRARIES_FLAG=`cat $TMP_FOLDER/library_flags.txt || echo ""`
 echo "Library flags are: $CACHED_LIBRARIES_FLAG"
 
 # Keeping track of start time to measure how long it takes to run the script entirely
 START_TIME=$SECONDS
-echo "Forge version: $(forge --version)"
+echo "Forge version: $($FORGE --version)"
 
 # Deploy libraries to the anvil instance
 source $PWD/scripts/foundry/deploy_libraries.sh
@@ -28,22 +26,16 @@ source $PWD/scripts/foundry/build_constitution_selectors_map.sh
 # Including contracts that depend on libraries. This step replaces the library placeholder
 # in the bytecode with the address of the actually deployed library.
 echo "Compiling with libraries..."
-time FOUNDRY_PROFILE=devchain forge build $LIBRARY_FLAGS
-
-# Pre-deploy Election
-echo "Deploying Election contract..."
-forge create -r $ANVIL_RPC_URL --private-key $DEPLOYER_PK $LIBRARY_FLAGS \
-  --broadcast \
-  contracts/governance/Election.sol:Election \
-  --constructor-args false
+time FOUNDRY_PROFILE=devchain $FORGE build $LIBRARY_FLAGS
 
 # Run migrations
 echo "Running migration script..."
-forge script \
+$FORGE script \
   $MIGRATION_SCRIPT_PATH \
   --target-contract $MIGRATION_TARGET_CONTRACT \
   --sender $FROM_ACCOUNT \
-  --private-key $MIGRATION_PK \
+  --private-key $FROM_PK \
+  --sig "runMigration()" \
   $VERBOSITY_LEVEL \
   $BROADCAST \
   $SKIP_SIMULATION \
@@ -51,23 +43,22 @@ forge script \
   $LIBRARY_FLAGS \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
   
-# TODO: Combine run + unrealesed treasury + run2 into single Foundry script
+# TODO: Combine both runs & funding of treasury into single Foundry script
 echo "Transfering funds to Unreleased Treasury..."
-CELO_TOKEN_ADDRESS=`cast call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string calldata identifier) external view returns (address)" "CeloToken" --rpc-url $ANVIL_RPC_URL`
-CELO_UNRELEASED_TREASURY_ADDRESS=0xB76D502Ad168F9D545661ea628179878DcA92FD5
+CELO_TOKEN_ADDRESS=`$CAST call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string)(address)" "CeloToken" --rpc-url $ANVIL_RPC_URL`
+CELO_UNRELEASED_TREASURY_ADDRESS=`$CAST call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string)(address)" "CeloUnreleasedTreasury" --rpc-url $ANVIL_RPC_URL`
 UNRELEASE_TREASURY_PRE_MINT=390000000000000000000000000
-cast send $CELO_TOKEN_ADDRESS "function transfer(address to, uint256 value) external returns (bool)" $CELO_UNRELEASED_TREASURY_ADDRESS $UNRELEASE_TREASURY_PRE_MINT --gas-limit 100000 --rpc-url  $ANVIL_RPC_URL --private-key $DEPLOYER_PK
 
-TREASURY_BALANCE=$(cast call $CELO_TOKEN_ADDRESS "balanceOf(address account) external view returns (uint256)" $CELO_UNRELEASED_TREASURY_ADDRESS --rpc-url $ANVIL_RPC_URL)
-echo "Unreleased Treasury balance: $TREASURY_BALANCE CELO"
+# without explicit `--gas-limit 100000` it fails with "Error: Internal error: Insufficient gas for Celo transfer precompile"
+$CAST send $CELO_TOKEN_ADDRESS "function transfer(address to, uint256 value) external returns (bool)" $CELO_UNRELEASED_TREASURY_ADDRESS $UNRELEASE_TREASURY_PRE_MINT --gas-limit 100000 --rpc-url  $ANVIL_RPC_URL --private-key $DEPLOYER_PK
 
 echo "Running second part of migration script..."
-forge script \
+$FORGE script \
   $MIGRATION_SCRIPT_PATH \
   --target-contract $MIGRATION_TARGET_CONTRACT \
   --sender $FROM_ACCOUNT \
-  --private-key $MIGRATION_PK \
-  --sig "run2()" \
+  --private-key $FROM_PK \
+  --sig "runAfterMigration()" \
   $VERBOSITY_LEVEL \
   $BROADCAST \
   $SKIP_SIMULATION \
@@ -77,7 +68,7 @@ forge script \
 
 echo "Getting address for Epoch Rewards..."
 CELO_EPOCH_REWARDS_ADDRESS=$(
-  cast call \
+  $CAST call \
     $REGISTRY_ADDRESS \
     "getAddressForStringOrDie(string calldata identifier)(address)" \
     "EpochRewards" \

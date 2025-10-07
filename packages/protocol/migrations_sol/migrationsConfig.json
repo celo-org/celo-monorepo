@@ -180,5 +180,11 @@
     "baselineQuorumFactor": 1000000000000000000000000,
     "skipSetConstitution": false,
     "skipTransferOwnership": false
+  },
+  "proxies": {
+    "feeCurrencyDirectory": "0x9212Fb72ae65367A7c887eC4Ad9bE310BAC611BF",
+    "celoToken": "0x471EcE3750Da237f93B8E339c536989b8978a438",
+    "feeHandler": "0xcD437749E43A154C07F3553504c68fBfD56B8778",
+    "celoUnreleasedTreasury": "0xB76D502Ad168F9D545661ea628179878DcA92FD5"
   }
 }

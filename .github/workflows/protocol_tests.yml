@@ -28,11 +28,6 @@ jobs:
     name: Run tests
     runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     steps:
-      # TODO: Determine if we need to set swap space
-      # - name: Set Swap Space
-      #   uses: pierotofy/set-swap-space@0404882bc4666c0ff2f6fd8b3d32af69a730183c
-      #   with:
-      #     swap-size-gb: 32
       - uses: actions/checkout@v4
         with:
           submodules: recursive

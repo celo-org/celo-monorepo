@@ -24,7 +24,6 @@ contract MigrationsConstants is TestConstants {
     "GovernanceSlasher",
     "LockedGold",
     "OdisPayments",
-    // "Registry", // Registry is deployed by the migration script and has a different proxy FIXME
     "SortedOracles",
     "Validators",
     "MentoFeeHandlerSeller",
