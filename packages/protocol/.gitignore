@@ -38,6 +38,8 @@ deployedGrants.json
 # Foundry
 cache/
 out/
+out-truffle-compat/
+out-truffle-compat-0.8/
 
 wagmi.config.js
 wagmi.config.js.map

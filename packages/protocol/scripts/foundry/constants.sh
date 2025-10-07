@@ -3,7 +3,7 @@ export FROM_ACCOUNT_NO_ZERO="f39Fd6e51aad88F6F4ce6aB8827279cffFb92266" # Anvil d
 export FROM_ACCOUNT="0x$FROM_ACCOUNT_NO_ZERO" # Anvil default account (1)
 
 # Anvil configurations (Source: https://book.getfoundry.sh/reference/anvil/)
-export ANVIL_PORT=8546
+export ANVIL_PORT=8545
 export ANVIL_RPC_URL="http://127.0.0.1:$ANVIL_PORT"
 export GAS_LIMIT=50000000
 export CODE_SIZE_LIMIT=245760 # EIP-170: Contract code size limit in bytes. Useful to increase for tests. [default: 0x6000 (~25kb)]
@@ -48,11 +48,13 @@ export RESERVE_INITIAL_BALANCE="5000000" # setting this here because it gets ove
 # Contract libraries
 export LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
                 "contracts/common/Signatures.sol:Signatures"
-                "contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
                 "contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList"
                 "contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"
                 "contracts/governance/Proposals.sol:Proposals"
 )
+
+export LIBRARIES_PATH_08=("contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList")
+
 export LIBRARY_DEPENDENCIES_PATH=(
     "contracts/common/FixidityLib.sol"
     "contracts/common/linkedlists/LinkedList.sol"

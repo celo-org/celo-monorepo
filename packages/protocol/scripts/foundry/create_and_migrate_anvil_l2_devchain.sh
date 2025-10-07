@@ -56,7 +56,7 @@ registered_validators=$(cast call \
 echo "### registered_validators: $registered_validators"
 
 # Increase the block number using anvil cast rpc
-BLOCKS_TO_ADVANCE=17280
+BLOCKS_TO_ADVANCE=101
 cast rpc anvil_mine $BLOCKS_TO_ADVANCE --rpc-url $ANVIL_RPC_URL --rpc-timeout 30000
 
 # Check if registered_validators is empty or invalid
