@@ -144,7 +144,7 @@ library TypedMemView {
 
     assembly {
       // solium-disable-previous-line security/no-inline-assembly
-      // store the legnth
+      // store the length
       mstore(ptr, _written)
       // new pointer is old + 0x20 + the footprint of the body
       mstore(0x40, add(add(ptr, _footprint), 0x20))

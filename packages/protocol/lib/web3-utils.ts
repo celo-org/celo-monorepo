@@ -156,7 +156,7 @@ export async function setInitialProxyImplementation<
   const Contract = wrappedArtifacts.require(contractName)
 
   // getProxy function supports the case the proxy is in a different package
-  // which is the case for GasPriceMimimum
+  // which is the case for GasPriceMinimum
   const ContractProxy = wrappedArtifacts.getProxy(contractName, artifacts)
 
   await Contract.detectNetwork()

@@ -16,7 +16,7 @@ import "./libraries/ReentrancyGuard08.sol";
 
 /**
  * @title Contract used for managing CELO L2 epoch and elections.
- * @dev DESIGN_DESICION: we assume that the first epoch on the L2 starts as soon as the system is initialized
+ * @dev DESIGN_DECISION: we assume that the first epoch on the L2 starts as soon as the system is initialized
  * to minimize amount of "limbo blocks" the network should stop relatively close to an epoch number (but with enough time)
  * to have time to call the function `EpochInitializer.migrateEpochAndValidators()`
  */
@@ -72,13 +72,13 @@ contract EpochManager is
   uint256 public toProcessGroups = 0;
 
   /**
-   * @notice Event emited when epochProcessing has begun.
+   * @notice Event emitted when epochProcessing has begun.
    * @param epochNumber The epoch number that is being processed.
    */
   event EpochProcessingStarted(uint256 indexed epochNumber);
 
   /**
-   * @notice Event emited when epochProcessing has ended.
+   * @notice Event emitted when epochProcessing has ended.
    * @param epochNumber The epoch number that is finished being processed.
    */
   event EpochProcessingEnded(uint256 indexed epochNumber);
@@ -137,7 +137,7 @@ contract EpochManager is
   }
 
   /**
-   * @notice Throws if called when EpochManager system has not yet been initalized.
+   * @notice Throws if called when EpochManager system has not yet been initialized.
    */
   modifier onlySystemAlreadyInitialized() {
     require(systemAlreadyInitialized(), "Epoch system not initialized");
@@ -297,7 +297,7 @@ contract EpochManager is
    */
   function processGroup(address group, address lesser, address greater) public {
     EpochProcessState storage _epochProcessing = epochProcessing;
-    require(isIndividualProcessing(), "Indivudual epoch process is not started");
+    require(isIndividualProcessing(), "Individual epoch process is not started");
     require(toProcessGroups > 0, "no more groups to process");
 
     uint256 epochRewards = processedGroups[group];
@@ -557,7 +557,7 @@ contract EpochManager is
 
   /**
    * @notice Returns the epoch number of a specified blockNumber.
-   * @param _blockNumber Block number of the epoch info is retreived.
+   * @param _blockNumber Block number of the epoch info is retrieved.
    */
   function getEpochNumberOfBlock(
     uint256 _blockNumber
@@ -568,7 +568,7 @@ contract EpochManager is
 
   /**
    * @notice Returns the epoch info of a specified blockNumber.
-   * @param _blockNumber Block number of the epoch info is retreived.
+   * @param _blockNumber Block number of the epoch info is retrieved.
    * @return firstEpoch The first block of the given block number.
    * @return lastBlock The first block of the given block number.
    * @return startTimestamp The starting timestamp of the given block number.
@@ -624,7 +624,7 @@ contract EpochManager is
   }
 
   /**
-   * @return Whether epoch is being processed by individualy group by group.
+   * @return Whether the epoch is being processed individually, group by group.
    */
   function isIndividualProcessing() public view returns (bool) {
     return epochProcessing.status == EpochProcessStatus.IndivudualGroupsProcessing;
@@ -660,7 +660,7 @@ contract EpochManager is
 
   /**
    * @notice Returns the epoch info of a specified epoch.
-   * @param epochNumber Epoch number where the epoch info is retreived.
+   * @param epochNumber Epoch number where the epoch info is retrieved.
    * @return firstEpoch The first block of the given epoch.
    * @return lastBlock The first block of the given epoch.
    * @return startTimestamp The starting timestamp of the given epoch.
@@ -767,7 +767,7 @@ contract EpochManager is
   /**
    * @notice Returns the epoch info of a specified blockNumber.
    * @dev This function is here for backward compatibility. It is rather gas heavy and can run out of gas.
-   * @param _blockNumber Block number of the epoch info is retreived.
+   * @param _blockNumber Block number of the epoch info is retrieved.
    * @return firstEpoch The first block of the given block number.
    * @return lastBlock The first block of the given block number.
    * @return startTimestamp The starting timestamp of the given block number.

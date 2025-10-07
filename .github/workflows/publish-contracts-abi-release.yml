@@ -86,7 +86,7 @@ jobs:
           NPM_TAG: ${{ inputs.npm_tag }}
       - name: 'Build packages'
         shell: bash
-        run:  yarn build --ignore @celo/celotool --ignore @celo/env-tests --include-dependencies
+        run:  yarn build --ignore @celo/env-tests --include-dependencies
       - name: Compile solidity contracts and typescript files
         run: yarn utils:prepare-contracts-and-abis-publishing
         working-directory: packages/protocol

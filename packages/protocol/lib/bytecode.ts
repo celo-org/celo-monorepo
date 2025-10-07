@@ -52,7 +52,7 @@ const padForLink = (name: string): string => {
 export const linkLibraries = (bytecode: string, libraryLinks: LibraryLinks): string => {
   Object.keys(libraryLinks).forEach((libraryName) => {
     const linkString = padForLink(libraryName)
-    // Use g flag to iterate through for all occurences.
+    // Use g flag to iterate through for all occurrences.
     bytecode = bytecode.replace(RegExp(linkString, 'g'), libraryLinks[libraryName])
   })
 
@@ -92,7 +92,7 @@ export class LibraryPositions {
    */
   constructor(bytecode: string) {
     this.positions = {}
-    // Use g flag to iterate through for all occurences.
+    // Use g flag to iterate through for all occurrences.
     const libraryLinkRegExp = new RegExp(LibraryPositions.libraryLinkRegExpString, 'g')
     let match = libraryLinkRegExp.exec(bytecode)
     while (match != null) {
