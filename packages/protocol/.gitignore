@@ -44,3 +44,6 @@ abis/lib/
 contracts/0.8
 
 broadcast/
+
+out-truffle-compat-0.8
+out-truffle-compat

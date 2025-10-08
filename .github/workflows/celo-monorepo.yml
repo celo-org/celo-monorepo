@@ -232,15 +232,9 @@ jobs:
                 echo "If these changes are intended, update the 'releaseData/versionReports' accordingly"
                 exit 1
               fi
-          # - name: Protocol Common tests
-          #   command: |
-          #     yarn --cwd packages/protocol test:truffle common/
-          # - name: Protocol Compatibility
-          #   command: |
-          #     yarn --cwd packages/protocol test:truffle compatibility/
-          # - name: Protocol scripts test
-          #   command: |
-          #     yarn --cwd packages/protocol test:scripts
+          - name: Protocol Compatibility
+            command: |
+              yarn --cwd packages/protocol test:truffle:compatibility
     steps:
       - uses: actions/checkout@v4
         with:
