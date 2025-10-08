@@ -4,6 +4,12 @@ set -euo pipefail
 # Read environment variables and constants
 source $PWD/scripts/foundry/constants.sh
 
+# Deploy to Optimism Anvil or local Anvil based on the flag
+USE_OP_ANVIL=${USE_OP_ANVIL:-false}
+if [ "$USE_OP_ANVIL" = true ] ; then
+  ANVIL_RPC_URL=$ANVIL_OP_RPC_URL
+fi
+
 # Create a temporary directory or remove it first it if exists
 if [ -d "$TEMP_DIR" ]; then
     echo "Removing existing temporary folder..."

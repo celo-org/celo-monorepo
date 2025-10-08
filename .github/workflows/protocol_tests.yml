@@ -174,7 +174,7 @@ jobs:
 
           FOUNDRY_PROFILE=devchain forge test -vvv \
           --match-path "test-sol/devchain/migration/*" \
-          --fork-url $ANVIL_RPC_URL
+          --fork-url $ANVIL_OP_RPC_URL
       
       - name: Run e2e tests against local devchain
         run: |
@@ -182,4 +182,4 @@ jobs:
 
           FOUNDRY_PROFILE=devchain forge test -vvv \
           --match-path "test-sol/devchain/e2e/*" \
-          --fork-url $ANVIL_RPC_URL
+          --fork-url $ANVIL_OP_RPC_URL

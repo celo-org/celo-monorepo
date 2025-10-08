@@ -14,7 +14,7 @@ START_TIME=$SECONDS
 echo "Forge version: $($FORGE --version)"
 
 # Deploy libraries to the anvil instance
-source $PWD/scripts/foundry/deploy_libraries.sh
+USE_OP_ANVIL=true source $PWD/scripts/foundry/deploy_libraries.sh
 echo "Library flags are: $LIBRARY_FLAGS"
 echo $LIBRARY_FLAGS > $TMP_FOLDER/library_flags.txt
 
@@ -41,16 +41,16 @@ $FORGE script \
   $SKIP_SIMULATION \
   $NON_INTERACTIVE \
   $LIBRARY_FLAGS \
-  --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
+  --rpc-url $ANVIL_OP_RPC_URL || { echo "Migration script failed"; exit 1; }
   
 # TODO: Combine both runs & funding of treasury into single Foundry script
 echo "Transfering funds to Unreleased Treasury..."
-CELO_TOKEN_ADDRESS=`$CAST call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string)(address)" "CeloToken" --rpc-url $ANVIL_RPC_URL`
-CELO_UNRELEASED_TREASURY_ADDRESS=`$CAST call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string)(address)" "CeloUnreleasedTreasury" --rpc-url $ANVIL_RPC_URL`
+CELO_TOKEN_ADDRESS=`$CAST call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string)(address)" "CeloToken" --rpc-url $ANVIL_OP_RPC_URL`
+CELO_UNRELEASED_TREASURY_ADDRESS=`$CAST call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string)(address)" "CeloUnreleasedTreasury" --rpc-url $ANVIL_OP_RPC_URL`
 UNRELEASE_TREASURY_PRE_MINT=390000000000000000000000000
 
 # without explicit `--gas-limit 100000` it fails with "Error: Internal error: Insufficient gas for Celo transfer precompile"
-$CAST send $CELO_TOKEN_ADDRESS "function transfer(address to, uint256 value) external returns (bool)" $CELO_UNRELEASED_TREASURY_ADDRESS $UNRELEASE_TREASURY_PRE_MINT --gas-limit 100000 --rpc-url  $ANVIL_RPC_URL --private-key $DEPLOYER_PK
+$CAST send $CELO_TOKEN_ADDRESS "function transfer(address to, uint256 value) external returns (bool)" $CELO_UNRELEASED_TREASURY_ADDRESS $UNRELEASE_TREASURY_PRE_MINT --gas-limit 100000 --rpc-url  $ANVIL_OP_RPC_URL --private-key $DEPLOYER_PK
 
 echo "Running second part of migration script..."
 $FORGE script \
@@ -64,7 +64,7 @@ $FORGE script \
   $SKIP_SIMULATION \
   $NON_INTERACTIVE \
   $LIBRARY_FLAGS \
-  --rpc-url $ANVIL_RPC_URL || { echo "Migration script (part 2) failed"; exit 1; }
+  --rpc-url $ANVIL_OP_RPC_URL || { echo "Migration script (part 2) failed"; exit 1; }
 
 echo "Getting address for Epoch Rewards..."
 CELO_EPOCH_REWARDS_ADDRESS=$(
@@ -72,7 +72,7 @@ CELO_EPOCH_REWARDS_ADDRESS=$(
     $REGISTRY_ADDRESS \
     "getAddressForStringOrDie(string calldata identifier)(address)" \
     "EpochRewards" \
-    --rpc-url $ANVIL_RPC_URL
+    --rpc-url $ANVIL_OP_RPC_URL
 )
 
 # Keeping track of the finish time to measure how long it takes to run the script entirely

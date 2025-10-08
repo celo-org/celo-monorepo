@@ -10,8 +10,10 @@ export FORGE=${CELO_FOUNDRY_PATH:-}"forge"
 export CAST=${CELO_FOUNDRY_PATH:-}"cast"
 
 # Anvil configurations (Source: https://book.getfoundry.sh/reference/anvil/)
-export ANVIL_PORT=9545 # Port for op-geth
+export ANVIL_PORT=8546 # Port for anvil
+export ANVIL_OP_PORT=9545 # Port for anvil running with Optimism state (check start_op_anvil.sh)
 export ANVIL_RPC_URL="http://127.0.0.1:$ANVIL_PORT"
+export ANVIL_OP_RPC_URL="http://127.0.0.1:$ANVIL_OP_PORT"
 export ANVIL_LOGGING_ENABLED=${ANVIL_LOGGING:=false} # Flag to enable or disable logging. Useful for local development
 export GAS_LIMIT=50000000
 export CODE_SIZE_LIMIT=245760 # EIP-170: Contract code size limit in bytes. Useful to increase for tests. [default: 0x6000 (~25kb)]
