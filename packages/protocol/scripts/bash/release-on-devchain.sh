@@ -39,11 +39,12 @@ git checkout -
 # echo "- Run local network"
 # yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz
 
-# GANACHE_PID=
-# if command -v lsof; then
-#     GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
-#     echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
-# fi
+ANVIL_PID=
+if command -v lsof; then
+    # TODO replace harcoded port
+    ANVIL_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
+    echo "Network started with PID $ANVIL_PID, if exit 1, you will need to manually stop the process"
+fi
 
 # echo "- Verify bytecode of the network"
 
@@ -78,7 +79,7 @@ yarn truffle exec --network anvil ./scripts/truffle/make-release.js --build_dire
 echo "- Verify release"
 yarn truffle exec --network anvil ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json --branch $BRANCH --initialize_data $INITIALIZATION_FILE
 
-# TODO replace with anvil
-# if [[ -n $GANACHE_PID ]]; then
-#     kill $GANACHE_PID
-# fi
+
+if [[ -n $ANVIL_PID ]]; then
+    kill $ANVIL_PID
+fi
