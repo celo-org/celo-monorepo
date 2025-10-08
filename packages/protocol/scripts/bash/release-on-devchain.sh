@@ -42,7 +42,7 @@ echo "- Verify bytecode of the network"
 
 
 # this commands compiles the output
-yarn --cwd packages/protocol verify-deployed -n anvil -b $BRANCH
+yarn --cwd packages/protocol release:verify-deployed -n anvil -b $BRANCH
 
 
 echo "- Check versions of current branch"
