@@ -49,7 +49,6 @@
     "test:truffle:compatibility": "rm test/**/*.js ; node runTests.js compatibility/",
     "truffle:console": "./scripts/bash/console.sh",
     "truffle:govern": "./scripts/bash/govern.sh",
-    "truffle:migrate": "truffle migrate",
     "truffle:set-block-gas-limit": "./scripts/bash/set_block_gas_limit.sh",
     "truffle:verify": "yarn truffle run verify",
     "utils:prepare-contracts-and-abis-publishing": "yarn ts-node --preferTsExts ./scripts/prepare-contracts-and-abis-publishing.ts",
