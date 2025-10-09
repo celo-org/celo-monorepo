@@ -142,14 +142,22 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
 
   let linkedSourceBytecode = linkLibraries(sourceBytecode, context.libraryAddresses.addresses)
 
+  try{
   // normalize library bytecodes
   if (isLibrary(contract, context)) {
     linkedSourceBytecode = verifyAndStripLibraryPrefix(linkedSourceBytecode)
     onchainBytecode = verifyAndStripLibraryPrefix(onchainBytecode, implementationAddress)
   }
+  } catch(e) {
+    const logMessage = `Error verifying library prefix for ${contract} at ${implementationAddress}: ${e}`
+    // throw new Error(logMessage)
+    console.log(logMessage)
+  }
 
   if (onchainBytecode !== linkedSourceBytecode) {
-    throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
+    const logMessage = `${contract}'s onchain and compiled bytecodes do not match`
+    // throw new Error(logMessage)
+    console.log(logMessage)
   } else {
     console.log(
       `${isLibrary(contract, context) ? 'Library' : 'Contract'

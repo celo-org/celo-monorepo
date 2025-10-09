@@ -5,7 +5,7 @@ import "../Attestations.sol";
 /*
  * We need a test contract that behaves like the actual Attestations contract,
  * but mocks the implementations of the validator set getters. Otherwise we
- * couldn't test `request` with the current ganache local testnet.
+ * couldn't test `request` with the tesnet
  */
 contract AttestationsTest is Attestations(true) {
   address[] private __testValidators;
