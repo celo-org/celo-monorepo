@@ -699,7 +699,7 @@ contract EpochManager is
       address(getStableToken())
     );
 
-    uint256 CELOequivalent = (numerator * totalRewards) / denominator;
+    uint256 CELOequivalent = (denominator * totalRewards) / numerator;
     getCeloUnreleasedTreasury().release(
       registry.getAddressForOrDie(RESERVE_REGISTRY_ID),
       CELOequivalent
