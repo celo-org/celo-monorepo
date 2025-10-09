@@ -27,9 +27,15 @@ done
 # TODO
 # TODO
 git checkout martinvol/WIPCR13makeItMatchTruffle
-yarn anvil-devchain:start-L2 
+# FIX THE OZ submodule, it's probably not puuling it on the checkout
+# yarn pull submodules?
+yarn submodules:pull
+yarn anvil-devchain:start-L2 > anvil.log 2>&1
 git checkout -
 
+
+# roll back submodules
+yarn submodules:pull
 
 ANVIL_PID=
 if command -v lsof; then
