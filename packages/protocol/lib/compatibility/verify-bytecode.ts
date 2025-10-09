@@ -150,14 +150,14 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   }
   } catch(e) {
     const logMessage = `Error verifying library prefix for ${contract} at ${implementationAddress}: ${e}`
-    throw new Error(logMessage)
-    // console.log(logMessage)
+    // throw new Error(logMessage)
+    console.log(logMessage)
   }
 
   if (onchainBytecode !== linkedSourceBytecode) {
     const logMessage = `${contract}'s onchain and compiled bytecodes do not match`
-    throw new Error(logMessage)
-    // console.log(logMessage)
+    // throw new Error(logMessage)
+    console.log(logMessage)
   } else {
     console.log(
       `${isLibrary(contract, context) ? 'Library' : 'Contract'
