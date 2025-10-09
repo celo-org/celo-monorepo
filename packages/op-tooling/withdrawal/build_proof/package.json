@@ -1,0 +1,17 @@
+{
+  "name": "build-withdrawal-proof",
+  "type": "module",
+  "version": "1.0.0",
+  "main": "build_proof.ts",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^24.1.0",
+    "dotenv": "^17.2.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "viem": "^2.33.1"
+  },
+  "scripts": {
+    "build_proof": "node --loader ts-node/esm build_proof.ts"
+  }
+}
