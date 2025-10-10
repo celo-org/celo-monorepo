@@ -19,8 +19,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - tag: core-contracts.v9
-            node-version: 12
           - tag: core-contracts.v11
             node-version: 18
           - tag: core-contracts.v12-renamed
