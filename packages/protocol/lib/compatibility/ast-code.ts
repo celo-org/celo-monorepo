@@ -237,7 +237,10 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
 
   const report = doASTCompatibilityReport(contractName, oldAST, newAST)
   // Check deployed byte code change
-  if ((stripMetadata(oldContract.schema.deployedBytecode) !== stripMetadata(newContract.schema.deployedBytecode))) {
+  const oldBytecodeStripped = stripMetadata(oldContract.schema.deployedBytecode)
+  const newBytecodeStripped = stripMetadata(newContract.schema.deployedBytecode)
+
+  if (oldBytecodeStripped !== newBytecodeStripped) {
     report.push(new DeployedBytecodeChange(contractName))
   }
 
@@ -257,21 +260,83 @@ export function reportASTIncompatibilities(
   newArtifactsSets: BuildArtifacts[]): ASTCodeCompatibilityReport {
 
   let out: ASTCodeCompatibilityReport[] = []
+
+  // Helper function to get compiler version from artifacts
+  const getCompilerVersion = (artifacts: BuildArtifacts): string => {
+    const firstArtifact = artifacts.listArtifacts()[0]
+    if (firstArtifact?.compiler?.version) {
+      return firstArtifact.compiler.version
+    }
+    // Fallback: try to determine from artifact content
+    return 'unknown'
+  }
+
+  // Process each new artifacts set and find matching old artifacts by compiler version
   for (const newArtifacts of newArtifactsSets) {
-    const reports = newArtifacts.listArtifacts()
-      .map((newArtifact) => {
+    const newCompilerVersion = getCompilerVersion(newArtifacts)
+    console.log(`[INFO] Processing new artifacts with compiler version: ${newCompilerVersion}`)
 
-        for (const oldArtifacts of oldArtifactsSet) {
-          const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
+    // Find matching old artifacts with same compiler version
+    let matchingOldArtifacts: BuildArtifacts | null = null
+    for (const oldArtifacts of oldArtifactsSet) {
+      const oldCompilerVersion = getCompilerVersion(oldArtifacts)
+      if (oldCompilerVersion === newCompilerVersion) {
+        matchingOldArtifacts = oldArtifacts
+        console.log(`[INFO] Found matching old artifacts with compiler version: ${oldCompilerVersion}`)
+        break
+      }
+    }
+
+    if (matchingOldArtifacts) {
+      // Compare contracts from same compiler version
+      const reports = newArtifacts.listArtifacts()
+        .map((newArtifact) => {
+          const oldArtifact = matchingOldArtifacts!.getArtifactByName(newArtifact.contractName)
           if (oldArtifact) {
-            return generateASTCompatibilityReport(makeZContract(oldArtifact), oldArtifacts, makeZContract(newArtifact), newArtifacts)
+            return generateASTCompatibilityReport(makeZContract(oldArtifact), matchingOldArtifacts!, makeZContract(newArtifact), newArtifacts)
+          } else {
+            // Contract doesn't exist in old artifacts of same version
+            console.log(`[INFO] New contract detected: ${newArtifact.contractName} (compiler: ${newCompilerVersion})`)
+            return generateASTCompatibilityReport(null, matchingOldArtifacts!, makeZContract(newArtifact), newArtifacts)
           }
-        }
+        })
+      out = [...out, ...reports]
+    } else {
+      // No matching old artifacts found - treat all contracts as new
+      console.log(`[INFO] No matching old artifacts found for compiler version: ${newCompilerVersion}`)
+      const fallbackOldArtifacts = oldArtifactsSet.length > 0 ? oldArtifactsSet[0] : null
+      if (fallbackOldArtifacts) {
+        const reports = newArtifacts.listArtifacts()
+          .map((newArtifact) => {
+            console.log(`[INFO] New contract (no matching old version): ${newArtifact.contractName} (compiler: ${newCompilerVersion})`)
+            return generateASTCompatibilityReport(null, fallbackOldArtifacts!, makeZContract(newArtifact), newArtifacts)
+          })
+        out = [...out, ...reports]
+      } else {
+        console.log(`[WARNING] No old artifacts available for fallback comparison`)
+      }
+    }
+  }
 
-        return generateASTCompatibilityReport(null, oldArtifactsSet[0], makeZContract(newArtifact), newArtifacts)
-      })
-    out = [...out, ...reports]
+  // Check for potentially removed contracts by looking for old artifacts without matching new artifacts
+  for (const oldArtifacts of oldArtifactsSet) {
+    const oldCompilerVersion = getCompilerVersion(oldArtifacts)
 
+    // Find if there's a matching new artifacts set
+    let hasMatchingNewArtifacts = false
+    for (const newArtifacts of newArtifactsSets) {
+      const newCompilerVersion = getCompilerVersion(newArtifacts)
+      if (oldCompilerVersion === newCompilerVersion) {
+        hasMatchingNewArtifacts = true
+        break
+      }
+    }
+
+    if (!hasMatchingNewArtifacts) {
+      console.log(`[INFO] Old artifacts with compiler ${oldCompilerVersion} have no matching new artifacts - contracts may have been removed`)
+      const potentiallyRemovedContracts = oldArtifacts.listArtifacts().map(artifact => artifact.contractName)
+      console.log(`[INFO] Potentially removed contracts: ${potentiallyRemovedContracts.join(', ')}`)
+    }
   }
 
   return mergeReports(out)
