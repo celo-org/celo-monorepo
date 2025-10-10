@@ -237,7 +237,10 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
 
   const report = doASTCompatibilityReport(contractName, oldAST, newAST)
   // Check deployed byte code change
-  if ((stripMetadata(oldContract.schema.deployedBytecode) !== stripMetadata(newContract.schema.deployedBytecode))) {
+  const oldBytecodeStripped = stripMetadata(oldContract.schema.deployedBytecode)
+  const newBytecodeStripped = stripMetadata(newContract.schema.deployedBytecode)
+
+  if (oldBytecodeStripped !== newBytecodeStripped) {
     report.push(new DeployedBytecodeChange(contractName))
   }
 
@@ -257,21 +260,34 @@ export function reportASTIncompatibilities(
   newArtifactsSets: BuildArtifacts[]): ASTCodeCompatibilityReport {
 
   let out: ASTCodeCompatibilityReport[] = []
-  for (const newArtifacts of newArtifactsSets) {
+
+  // Compare artifacts with corresponding indices to ensure same Solidity versions are compared
+  // (e.g., 0.5 with 0.5, 0.8 with 0.8)
+  for (let i = 0; i < newArtifactsSets.length; i++) {
+    const newArtifacts = newArtifactsSets[i]
+    const oldArtifacts = oldArtifactsSet[i] // Use corresponding index instead of nested loop
+
+    if (!oldArtifacts) {
+      // If there's no corresponding old artifacts set, treat all contracts as new
+      const reports = newArtifacts.listArtifacts()
+        .map((newArtifact) => {
+          return generateASTCompatibilityReport(null, oldArtifactsSet[0], makeZContract(newArtifact), newArtifacts)
+        })
+      out = [...out, ...reports]
+      continue
+    }
+
     const reports = newArtifacts.listArtifacts()
       .map((newArtifact) => {
-
-        for (const oldArtifacts of oldArtifactsSet) {
-          const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
-          if (oldArtifact) {
-            return generateASTCompatibilityReport(makeZContract(oldArtifact), oldArtifacts, makeZContract(newArtifact), newArtifacts)
-          }
+        const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
+        if (oldArtifact) {
+          return generateASTCompatibilityReport(makeZContract(oldArtifact), oldArtifacts, makeZContract(newArtifact), newArtifacts)
+        } else {
+          // Contract doesn't exist in old artifacts of same version
+          return generateASTCompatibilityReport(null, oldArtifacts, makeZContract(newArtifact), newArtifacts)
         }
-
-        return generateASTCompatibilityReport(null, oldArtifactsSet[0], makeZContract(newArtifact), newArtifacts)
       })
     out = [...out, ...reports]
-
   }
 
   return mergeReports(out)
