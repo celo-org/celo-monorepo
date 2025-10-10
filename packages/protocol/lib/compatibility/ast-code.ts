@@ -261,33 +261,49 @@ export function reportASTIncompatibilities(
 
   let out: ASTCodeCompatibilityReport[] = []
 
-  // Compare artifacts with corresponding indices to ensure same Solidity versions are compared
+  // Process pairs with corresponding indices to ensure same Solidity versions are compared
   // (e.g., 0.5 with 0.5, 0.8 with 0.8)
-  for (let i = 0; i < newArtifactsSets.length; i++) {
-    const newArtifacts = newArtifactsSets[i]
-    const oldArtifacts = oldArtifactsSet[i] // Use corresponding index instead of nested loop
+  const maxLength = Math.max(oldArtifactsSet.length, newArtifactsSets.length)
 
-    if (!oldArtifacts) {
-      // If there's no corresponding old artifacts set, treat all contracts as new
+  for (let i = 0; i < maxLength; i++) {
+    const newArtifacts = newArtifactsSets[i]
+    const oldArtifacts = oldArtifactsSet[i]
+
+    if (newArtifacts && oldArtifacts) {
+      // Both exist - compare contracts of same version
       const reports = newArtifacts.listArtifacts()
         .map((newArtifact) => {
-          return generateASTCompatibilityReport(null, oldArtifactsSet[0], makeZContract(newArtifact), newArtifacts)
+          const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
+          if (oldArtifact) {
+            return generateASTCompatibilityReport(makeZContract(oldArtifact), oldArtifacts, makeZContract(newArtifact), newArtifacts)
+          } else {
+            // Contract doesn't exist in old artifacts of same version
+            console.log(`[INFO] New contract detected: ${newArtifact.contractName} (not found in old artifacts set ${i})`)
+            return generateASTCompatibilityReport(null, oldArtifacts, makeZContract(newArtifact), newArtifacts)
+          }
         })
       out = [...out, ...reports]
-      continue
-    }
 
-    const reports = newArtifacts.listArtifacts()
-      .map((newArtifact) => {
-        const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
-        if (oldArtifact) {
-          return generateASTCompatibilityReport(makeZContract(oldArtifact), oldArtifacts, makeZContract(newArtifact), newArtifacts)
-        } else {
-          // Contract doesn't exist in old artifacts of same version
-          return generateASTCompatibilityReport(null, oldArtifacts, makeZContract(newArtifact), newArtifacts)
-        }
-      })
-    out = [...out, ...reports]
+    } else if (newArtifacts && !oldArtifacts) {
+      // New artifacts exist but no corresponding old artifacts - treat all as new
+      console.log(`[INFO] Missing old artifacts set at index ${i}, treating all contracts as new`)
+      const fallbackOldArtifacts = oldArtifactsSet.length > 0 ? oldArtifactsSet[0] : null
+      if (fallbackOldArtifacts) {
+        const reports = newArtifacts.listArtifacts()
+          .map((newArtifact) => {
+            return generateASTCompatibilityReport(null, fallbackOldArtifacts, makeZContract(newArtifact), newArtifacts)
+          })
+        out = [...out, ...reports]
+      } else {
+        console.log(`[WARNING] No old artifacts available for fallback comparison`)
+      }
+
+    } else if (!newArtifacts && oldArtifacts) {
+      // Old artifacts exist but no corresponding new artifacts - contracts were removed
+      console.log(`[INFO] Old artifacts set ${i} exists but no corresponding new artifacts - contracts may have been removed`)
+      const removedContracts = oldArtifacts.listArtifacts().map(artifact => artifact.contractName)
+      console.log(`[INFO] Potentially removed contracts: ${removedContracts.join(', ')}`)
+    }
   }
 
   return mergeReports(out)
