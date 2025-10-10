@@ -22,6 +22,8 @@ env:
   FOUNDRY_CACHE_KEY: 1
   # Supported Foundry version defined at celo-org (GitHub organisation) level, for consistency across workflows.
   SUPPORTED_FOUNDRY_VERSION: ${{ vars.SUPPORTED_FOUNDRY_VERSION }}
+  # Celo Foundry (celo-org/foundry) binaries version used for devchain anvil generation
+  CELO_FOUNDRY_VERSION: "celo-0.1.0"
 
 permissions:
   contents: read
@@ -32,7 +34,7 @@ jobs:
       run:
         working-directory: packages/protocol
     name: Generate anvil
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     permissions:
       contents: read
       pull-requests: read
@@ -92,10 +94,12 @@ jobs:
         run: |
           echo "Pull Request Number: ${{ env.PR_NUMBER }}"
 
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
-        with:
-          version: 'v1.0.0'
+      - name: Install Celo Foundry binaries
+        run: |
+          curl -L -o foundry.tar.gz https://github.com/celo-org/foundry/releases/download/${{ env.CELO_FOUNDRY_VERSION }}/foundry_${{ env.CELO_FOUNDRY_VERSION }}_linux_amd64.tar.gz
+          mkdir -p celo-foundry
+          tar -xzf foundry.tar.gz -C celo-foundry
+          echo "$(pwd)/celo-foundry" >> $GITHUB_PATH
 
       - name: Install forge dependencies
         run: forge install
@@ -112,32 +116,55 @@ jobs:
           access-id: p-kf9vjzruht6l
           static-secrets: '{"/static-secrets/NPM/npm-publish-token":"NPM_TOKEN"}'
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '18.x'
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: 'Setup yarn'
-        shell: bash
-        run: |
-          npm install --global yarn
-          source ~/.bashrc
-
       - name: 'Install packages'
         shell: bash
         run: yarn
+
+      - name: Checkout Optimism repo
+        uses: actions/checkout@v4
+        if: success() || failure()
+        with:
+          repository: 'celo-org/optimism'
+          ref: 'mc01/completeMigrations'
+          path: celo-optimism
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Generate initial state for devchain
+        if: success() || failure()
+        run: |
+          cd $GITHUB_WORKSPACE/celo-optimism/packages/contracts-bedrock
+
+          anvil --celo --port 9545 --code-size-limit 245760 &
+          while ! nc -z localhost 9545; do
+            sleep 0.5
+          done
+
+          DEPLOY_CONFIG_PATH=deploy-config/celo-devnet.json forge script \
+            --rpc-url http://localhost:9545 \
+            --broadcast \
+            --private-key ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
+            --sig "runCeloDevnet()" \
+            scripts/L2Genesis.s.sol:L2Genesis
+          lsof -i :9545 | awk 'NR!=1 {print $2}' | xargs kill -9
+
+          python3 convert_to_anvil_state.py state-dump-11142220-granite.json anvil-state.json
+
+      - name: Set up anvil devchain from generated state
+        if: success() || failure()
+        run: OP_DIR=${GITHUB_WORKSPACE}/celo-optimism/packages/contracts-bedrock ./scripts/foundry/start_op_anvil.sh
 
       - name: Generate L2 migration and run migration tests
         if: success() || failure()
         run: |
           source ./scripts/foundry/constants.sh
 
-          echo "Starting L2 from scratch to circumvent Anvil bug"
-          ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
+          echo "Starting L2 migration against local devchain"
+          ./scripts/foundry/create_and_migrate_anvil_devchain.sh
 
           FOUNDRY_PROFILE=devchain forge test \
           --match-path "test-sol/devchain/migration/*" \
-          --fork-url $ANVIL_RPC_URL
+          --fork-url $ANVIL_OP_RPC_URL
 
       - name: Sanitize ref name
         id: sanitize-ref-name
