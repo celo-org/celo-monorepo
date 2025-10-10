@@ -152,6 +152,8 @@ FOUNDRY_PROFILE=[truffle-compat|truffle-compat8] forge verify-contract [ADDRESS]
 - **Sourcify**: `--verifier=sourcify`
 
 **Examples:**
+
+**Template format:**
 ```bash
 # Celoscan verification in Solidity 0.5
 FOUNDRY_PROFILE=truffle-compat forge verify-contract [ADDRESS] [CONTRACT] \
@@ -160,6 +162,36 @@ FOUNDRY_PROFILE=truffle-compat forge verify-contract [ADDRESS] [CONTRACT] \
 # Blockscout verification in Solidity 0.8
 FOUNDRY_PROFILE=truffle-compat8 forge verify-contract [ADDRESS] [CONTRACT] \
   --chain-id [CHAIN_ID] --verifier=blockscout --verifier-url=https://[NETWORK].blockscout.com/api/ --watch
+```
+
+**Real examples:**
+
+```bash
+# Celoscan verification - Solidity 0.5 (Celo Mainnet)
+FOUNDRY_PROFILE=truffle-compat forge verify-contract 0x8d6677192144292870907e3fa8a5527fe55a7ff6 Governance \
+  --chain-id 42220 --etherscan-api-key=YourCeloscanAPIKey --watch
+
+# Celoscan verification - Solidity 0.5 (Celo Sepolia)
+FOUNDRY_PROFILE=truffle-compat forge verify-contract 0x1234567890123456789012345678901234567890 Validators \
+  --chain-id 11142220 --etherscan-api-key=YourCeloscanAPIKey --watch
+
+# Blockscout verification - Solidity 0.5 (Celo Mainnet)
+FOUNDRY_PROFILE=truffle-compat forge verify-contract 0xabcdefabcdefabcdefabcdefabcdefabcdefabcd StableToken \
+  --chain-id 42220 --verifier=blockscout --verifier-url=https://celo.blockscout.com/api/ --watch
+
+# Sourcify verification - Solidity 0.5 (Celo Mainnet)
+FOUNDRY_PROFILE=truffle-compat forge verify-contract 0x471ece3750da237f93b8e339c536989b8978a438 LockedGold \
+  --chain-id 42220 --verifier=sourcify --watch
+```
+
+```bash
+# Celoscan verification - Solidity 0.8 (Celo Mainnet)
+FOUNDRY_PROFILE=truffle-compat8 forge verify-contract 0x9876543210987654321098765432109876543210 CeloToken \
+  --chain-id 42220 --etherscan-api-key=YourCeloscanAPIKey --watch
+
+# Celoscan verification - Solidity 0.8 (Celo Sepolia)
+FOUNDRY_PROFILE=truffle-compat8 forge verify-contract 0xfedcba0987654321fedcba0987654321fedcba09 LockedCelo \
+  --chain-id 11142220 --etherscan-api-key=YourCeloscanAPIKey --watch
 ```
 
 **Options for exact match verification** (upgrade from partial verified):
