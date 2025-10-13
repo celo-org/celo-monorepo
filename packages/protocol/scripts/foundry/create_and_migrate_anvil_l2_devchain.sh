@@ -9,6 +9,9 @@ CONFIG_FILE=$PWD/migrations_sol/migrationsConfig.json
 
 export KEEP_DEVCHAIN_FOLDER=true
 
+# TODO delete this file at the end
+cp compat/Import05Dependencies.sol contracts
+
 # Generate and run L1 devchain
 echo "Generating and running L1 devchain before activating L2..."
 source $PWD/scripts/foundry/create_and_migrate_anvil_devchain.sh
