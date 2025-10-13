@@ -30,7 +30,7 @@ git checkout martinvol/WIPCR13makeItMatchTruffle
 # FIX THE OZ submodule, it's probably not puuling it on the checkout
 # yarn pull submodules?
 yarn submodules:pull
-yarn anvil-devchain:start-L2 > anvil.log 2>&1
+yarn anvil-devchain:start-L2 > anvil.log #2>&1
 git checkout -
 
 
@@ -77,6 +77,6 @@ echo "- Verify release"
 yarn truffle exec --network anvil ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json --branch $BRANCH --initialize_data $INITIALIZATION_FILE
 
 
-if [[ -n $ANVIL_PID ]]; then
-    kill $ANVIL_PID
-fi
+# if [[ -n $ANVIL_PID ]]; then
+#     kill $ANVIL_PID
+# fi
