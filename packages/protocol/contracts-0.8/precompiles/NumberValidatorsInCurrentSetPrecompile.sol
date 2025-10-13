@@ -1,9 +1,8 @@
 // TODO move this to test folder
 pragma solidity >=0.8.7 <0.8.20;
 
-import "forge-std/console.sol";
-import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts/governance/interfaces/IValidators.sol";
+import "../../contracts/common/interfaces/IRegistry.sol";
+import "../../contracts/governance/interfaces/IValidators.sol";
 
 contract NumberValidatorsInCurrentSetPrecompile {
   address constant ADDRESS = address(0xff - 6);
