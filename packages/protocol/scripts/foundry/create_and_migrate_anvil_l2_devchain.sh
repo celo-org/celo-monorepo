@@ -178,4 +178,5 @@ sleep $SLEEP_DURATION
 mv $ANVIL_FOLDER/state.json $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME
 echo "Saved anvil L2 state to $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME"
 
+rm contracts/Import05Dependencies.sol
 rm -rf $ANVIL_FOLDER
