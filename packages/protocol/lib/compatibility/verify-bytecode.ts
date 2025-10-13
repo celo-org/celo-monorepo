@@ -137,6 +137,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
     implementationAddress = await proxy._getImplementation()
   }
 
+  console.log(`Verifying ${contract} at ${implementationAddress}`)
   let onchainBytecode = await getOnchainBytecode(implementationAddress, context)
   context.libraryAddresses.collect(onchainBytecode, sourceLibraryPositions)
 
@@ -155,6 +156,8 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   }
 
   if (onchainBytecode !== linkedSourceBytecode) {
+    console.log("onchainBytecode", onchainBytecode)
+    console.log("linkedSourceBytecode", linkedSourceBytecode)
     const logMessage = `${contract}'s onchain and compiled bytecodes do not match`
     throw new Error(logMessage)
     // console.log(logMessage)
