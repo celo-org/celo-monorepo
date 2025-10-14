@@ -1,4 +1,4 @@
-import { verifyBytecodes } from '@celo/protocol/lib/compatibility/verify-bytecode'
+import { verifyBytecodes } from '@celo/protocol/lib/compatibility/verify-bytecode-foundry'
 import { getReleaseVersion } from '../../lib/compatibility/ignored-contracts-v9'
 
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'

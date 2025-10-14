@@ -60,6 +60,19 @@ export function makeZContract(artifact: Artifact): ZContract {
   return contract
 }
 
+export interface LinkReference {
+  start: number
+  length: number
+}
+
+export interface LibraryLinkReference {
+  [library: string]: LinkReference[]
+}
+
+export interface LinkReferences {
+  [sourcePath: string]: LibraryLinkReference
+}
+
 // Inlined from OpenZeppelin SDK since its not exported.
 export interface Artifact {
   abi: any[]
@@ -67,7 +80,7 @@ export interface Artifact {
   bytecode: string
   compiler: any
   contractName: string
-  deployedBytecode: (string | { object: string })
+  deployedBytecode: (string | { object: string, linkReferences: LinkReferences })
   deployedSourceMap: string
   fileName: string
   legacyAST?: any
