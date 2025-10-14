@@ -34,6 +34,7 @@ import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
 import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.sol";
 import { IEpochManagerEnabler } from "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
 import { ILockedGoldInitializer } from "@celo-contracts/governance/interfaces/ILockedGoldInitializer.sol";
+import { IValidators } from "@celo-contracts/governance/interfaces/IValidators.sol";
 import { IValidatorsInitializer } from "@celo-contracts-8/governance/interfaces/IValidatorsInitializer.sol";
 import { IElectionInitializer } from "@celo-contracts/governance/interfaces/IElectionInitializer.sol";
 import { IEpochRewardsInitializer } from "@celo-contracts/governance/interfaces/IEpochRewardsInitializer.sol";
@@ -1087,23 +1088,20 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 validatorLockedGoldRequirements = json.readUint(
       ".validators.validatorLockedGoldRequirements.value"
     );
-    // attestationKeys not migrated
+    uint256 groupCount = json.readUint(".validators.groupCount");
+    // TODO: attestationKeys not migrated
 
     if (valKeys.length == 0) {
       console.log("  No validators to register");
     }
-
     if (valKeys.length < minElectableValidators) {
       console.log(
         "Warning: Have ${valKeys.length} Validator keys but require a minimum of ${config.election.minElectableValidators} Validators in order for a new validator set to be elected."
       );
     }
 
-    uint256 groupCount = json.readUint(".validators.groupCount");
-
-    address[] memory groups = new address[](groupCount);
-
     // register 3 validator groups
+    address[] memory groups = new address[](groupCount);
     for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
       address groupAddress = registerValidatorGroup(
         valKeys[groupIndex],
@@ -1115,10 +1113,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       console.log("registered group: ", groupAddress);
     }
 
-    console.log("  * Registering validators ... Count: ", valKeys.length - groupCount);
-    // Split the validator keys into groups that will fit within the max group size.
+    console.log("  * Registering validators... Count: ", valKeys.length - groupCount);
+    // TODO: Split the validator keys into groups that will fit within the max group size.
 
-    // TODO change name of variable amount of groups for amount in group
+    IValidators validators = getValidators();
+
+    // TODO: change name of variable amount of groups for amount in group
     for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
       address groupAddress = groups[groupIndex];
       console.log("Registering members for group: ", groupAddress);
@@ -1129,6 +1129,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
           validatorIndex,
           maxGroupSize
         );
+
         console.log("Registering validator #: ", validatorIndex);
         address validator = registerValidator(
           validatorIndex,
@@ -1136,17 +1137,19 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
           validatorLockedGoldRequirements,
           groupAddress
         );
-        console.log("Adding to group...");
 
+        console.log("Adding to group...");
         vm.startBroadcast(groups[groupIndex]);
         address greater = groupIndex == 0 ? address(0) : groups[groupIndex - 1];
 
         if (validatorIndex == 0) {
-          getValidators().addFirstMember(validator, address(0), greater);
+          validators.addFirstMember(validator, address(0), greater);
           console.log("Making group vote for itself");
         } else {
-          getValidators().addMember(validator);
+          validators.addMember(validator);
         }
+
+        console.log("Voting for group...");
         getElection().vote(groupAddress, validatorLockedGoldRequirements, address(0), greater);
 
         vm.stopBroadcast();
