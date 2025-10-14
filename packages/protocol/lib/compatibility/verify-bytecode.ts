@@ -214,7 +214,7 @@ const assertValidInitializationData = (
 
     if (callData.toLowerCase() !== proposalTx.args[1].toLowerCase()) {
       throw new Error(
-        `Intialization Data for ${contractName} in proposal does not match reference file ${initializationData[contractName]}`
+        `Initialization Data for ${contractName} in proposal does not match reference file ${initializationData[contractName]}`
       )
     }
 

@@ -8,11 +8,6 @@ package.json
 packages/**/dist
 packages/**/lib
 
-# Needed because we have packages/celotool/src/lib
-!packages/celotool/src/**
-
-packages/docs/_book
-
 packages/protocol/build/
 packages/protocol/types/
 !packages/protocol/lib/**/*.ts
@@ -22,7 +17,3 @@ packages/protocol/test/**/*.js
 packages/protocol/test-ts/**/*.js
 packages/protocol/contractPackages.js
 packages/protocol/abis/src-generated/
-
-# prettier eats Latex underscore escapting and doesn't seem to have an option to disable
-packages/docs/celo-codebase/protocol/proof-of-stake/epoch-rewards.md
-
