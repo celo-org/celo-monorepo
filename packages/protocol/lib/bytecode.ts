@@ -123,8 +123,8 @@ export class LibraryAddresses {
       libraryPositions.positions[library].forEach((position) => {
         if (!this.addAddress(library, bytecode.slice(position, position + ADDRESS_LENGTH))) {
           const logMessage = `Mismatched addresses for ${library} at ${position}`
-          // throw new Error(logMessage)
-          console.log(logMessage)
+          throw new Error(logMessage)
+          // console.log(logMessage)
         }
       })
     )
