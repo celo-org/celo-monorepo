@@ -54,6 +54,7 @@ interface VerifyBytecodeArgs {
   rpc_url: string
   librariesFile?: string
   branch?: string
+  debug?: boolean
 }
 
 async function main() {
@@ -91,6 +92,11 @@ async function main() {
       description: 'Branch name for determining release version',
       default: '',
     })
+    .option('debug', {
+      type: 'boolean',
+      description: 'Enable debug logging',
+      default: false,
+    })
     .argv as VerifyBytecodeArgs
 
   const artifactsDirectory = argv.build_artifacts!
@@ -100,10 +106,13 @@ async function main() {
   const proposal = argv.proposal ? readJsonSync(argv.proposal) : []
   const initializationData = argv.initialize_data ? readJsonSync(argv.initialize_data) : {}
   const librariesFile = argv.librariesFile!
+  const debug = argv.debug || false
 
   try {
     console.log(`Connecting to network: ${network}`)
-    console.log(`RPC URL: ${argv.rpc_url}`)
+    if (debug) {
+      console.log(`RPC URL: ${argv.rpc_url}`)
+    }
 
     // Initialize Web3
     const web3 = new Web3(argv.rpc_url)
@@ -135,30 +144,31 @@ async function main() {
     const registry = new web3.eth.Contract(registryABI, celoRegistryAddress)
 
     // Load Foundry artifacts from both directories
-    console.log(`Loading Foundry artifacts from ${artifactsDirectory}...`)
-    const buildArtifacts = getFoundryBuildArtifacts(artifactsDirectory)
-    console.log(`Loading Foundry artifacts from ${artifacts08Directory}...`)
-    const artifacts08 = getFoundryBuildArtifacts(artifacts08Directory)
+    const buildArtifacts = getFoundryBuildArtifacts(artifactsDirectory, debug)
+    const artifacts08 = getFoundryBuildArtifacts(artifacts08Directory, debug)
 
-    // Show detailed artifact distribution
-    console.log(`\n📋 Artifact Set Details:`)
-    console.log(`\n${artifactsDirectory}:`)
-    const contracts05 = buildArtifacts.getAllContractNames()
-    console.log(`  ${contracts05.length} contracts total`)
-    if (contracts05.length > 0) {
-      console.log(`  First 20: ${contracts05.slice(0, 20).join(', ')}${contracts05.length > 20 ? '...' : ''}`)
+    if (debug) {
+      // Show detailed artifact distribution
+      console.log(`\n📋 Artifact Set Details:`)
+      console.log(`\n${artifactsDirectory}:`)
+      const contracts05 = buildArtifacts.getAllContractNames()
+      console.log(`  ${contracts05.length} contracts total`)
+      if (contracts05.length > 0) {
+        console.log(`  First 20: ${contracts05.slice(0, 20).join(', ')}${contracts05.length > 20 ? '...' : ''}`)
+      }
+
+      console.log(`\n${artifacts08Directory}:`)
+      const contracts08 = artifacts08.getAllContractNames()
+      console.log(`  ${contracts08.length} contracts total`)
+      if (contracts08.length > 0) {
+        console.log(`  First 20: ${contracts08.slice(0, 20).join(', ')}${contracts08.length > 20 ? '...' : ''}`)
+      }
+
+      console.log('\n' + '='.repeat(80))
+      console.log('Starting bytecode verification...')
+      console.log('='.repeat(80) + '\n')
     }
 
-    console.log(`\n${artifacts08Directory}:`)
-    const contracts08 = artifacts08.getAllContractNames()
-    console.log(`  ${contracts08.length} contracts total`)
-    if (contracts08.length > 0) {
-      console.log(`  First 20: ${contracts08.slice(0, 20).join(', ')}${contracts08.length > 20 ? '...' : ''}`)
-    }
-
-    console.log('\n' + '='.repeat(80))
-    console.log('Starting bytecode verification...')
-    console.log('='.repeat(80) + '\n')
     const libraryAddresses = await verifyBytecodesFoundry(
       Object.keys(CeloContractName),
       [buildArtifacts, artifacts08],
@@ -168,7 +178,8 @@ async function main() {
       web3,
       initializationData,
       version,
-      network
+      network,
+      debug
     )
 
     console.info('✅ Success, no bytecode mismatches found!')

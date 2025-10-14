@@ -146,11 +146,14 @@ export class LibraryAddressesFoundry {
    * 
    * @param bytecode - The deployed bytecode containing actual library addresses
    * @param libraryPositions - The positions where library addresses should appear
+   * @param debug - Enable debug logging (default: false)
    */
-  collect = (bytecode: string, libraryPositions: LibraryPositionsFoundry) => {
-    console.log(`\n=== Collecting library addresses from bytecode ===`)
-    console.log(`Bytecode length: ${bytecode.length}`)
-    console.log(`Hashes to process: ${Object.keys(libraryPositions.positions).length}`)
+  collect = (bytecode: string, libraryPositions: LibraryPositionsFoundry, debug: boolean = false) => {
+    if (debug) {
+      console.log(`\n=== Collecting library addresses from bytecode ===`)
+      console.log(`Bytecode length: ${bytecode.length}`)
+      console.log(`Hashes to process: ${Object.keys(libraryPositions.positions).length}`)
+    }
 
     Object.keys(libraryPositions.positions).forEach((hash) => {
       const libraryInfo = libraryPositions.hashToLibrary[hash]
@@ -159,14 +162,18 @@ export class LibraryAddressesFoundry {
         return
       }
 
-      console.log(`\nProcessing library: ${libraryInfo.name}`)
-      console.log(`  Source path: ${libraryInfo.sourcePath}`)
-      console.log(`  Hash: ${hash}`)
-      console.log(`  Positions to check: ${libraryPositions.positions[hash].join(', ')}`)
+      if (debug) {
+        console.log(`\nProcessing library: ${libraryInfo.name}`)
+        console.log(`  Source path: ${libraryInfo.sourcePath}`)
+        console.log(`  Hash: ${hash}`)
+        console.log(`  Positions to check: ${libraryPositions.positions[hash].join(', ')}`)
+      }
 
       libraryPositions.positions[hash].forEach((position, index) => {
         const address = bytecode.slice(position, position + ADDRESS_LENGTH)
-        console.log(`  Position ${position} (${index + 1}/${libraryPositions.positions[hash].length}): ${address}`)
+        if (debug) {
+          console.log(`  Position ${position} (${index + 1}/${libraryPositions.positions[hash].length}): ${address}`)
+        }
 
         if (!this.addAddress(libraryInfo.name, address, libraryInfo.sourcePath)) {
           const existingAddress = this.addresses[libraryInfo.name]
@@ -179,14 +186,16 @@ export class LibraryAddressesFoundry {
           console.error(`  Found address: ${address}`)
           console.error(`  Found source: ${libraryInfo.sourcePath}`)
           throw new Error(`Mismatched addresses for ${libraryInfo.name} at ${position}`)
-        } else {
+        } else if (debug) {
           console.log(`    ✓ Address accepted: ${address}`)
         }
       })
     })
 
-    console.log(`\n=== Collection complete ===`)
-    console.log(`Total libraries collected: ${Object.keys(this.addresses).length}`)
+    if (debug) {
+      console.log(`\n=== Collection complete ===`)
+      console.log(`Total libraries collected: ${Object.keys(this.addresses).length}`)
+    }
   }
 
   /**

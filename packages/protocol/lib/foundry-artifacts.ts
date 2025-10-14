@@ -232,9 +232,10 @@ function findFoundryArtifacts(baseDir: string): Map<string, string> {
  * Loads Foundry build artifacts from a directory.
  * 
  * @param buildDir - Path to Foundry output directory (e.g., "out-truffle-compat")
+ * @param debug - Enable debug logging (default: false)
  * @returns FoundryBuildArtifacts instance with loaded artifacts
  */
-export function getFoundryBuildArtifacts(buildDir: string): FoundryBuildArtifacts {
+export function getFoundryBuildArtifacts(buildDir: string, debug: boolean = false): FoundryBuildArtifacts {
   const result = new FoundryBuildArtifactsImpl(buildDir)
   const artifactPaths = findFoundryArtifacts(buildDir)
 
@@ -281,9 +282,11 @@ export function getFoundryBuildArtifacts(buildDir: string): FoundryBuildArtifact
     }
   })
 
-  const contractNames = Array.from(result.artifacts.keys()).sort()
-  console.log(`\n📦 Loaded ${contractNames.length} artifacts from ${buildDir}`)
-  console.log(`   Contracts: ${contractNames.slice(0, 10).join(', ')}${contractNames.length > 10 ? `, ... and ${contractNames.length - 10} more` : ''}`)
+  if (debug) {
+    const contractNames = Array.from(result.artifacts.keys()).sort()
+    console.log(`\n📦 Loaded ${contractNames.length} artifacts from ${buildDir}`)
+    console.log(`   Contracts: ${contractNames.slice(0, 10).join(', ')}${contractNames.length > 10 ? `, ... and ${contractNames.length - 10} more` : ''}`)
+  }
 
   return result
 }

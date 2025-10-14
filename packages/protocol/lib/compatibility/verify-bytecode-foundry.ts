@@ -50,6 +50,7 @@ interface VerificationContext {
   proxyABI: any[]
   web3: Web3
   network: string
+  debug: boolean
 }
 
 interface InitializationData {
@@ -125,44 +126,49 @@ const isLibrary = (contract: string, context: VerificationContext) =>
  */
 const getLibraryLinkReferences = (
   contract: string,
-  artifacts: FoundryBuildArtifacts[]
+  artifacts: FoundryBuildArtifacts[],
+  debug: boolean
 ): Map<string, { sourcePath: string; positions: Array<{ start: number; length: number }> }> => {
   const linkRefs = new Map<string, { sourcePath: string; positions: Array<{ start: number; length: number }> }>()
 
-  console.log(`\n>>> [getLibraryLinkReferences] Looking for ${contract}`)
+  if (debug) console.log(`\n>>> [getLibraryLinkReferences] Looking for ${contract}`)
 
   for (const artifactSet of artifacts) {
-    console.log(`>>>   [getLibraryLinkReferences] Checking artifact set from: ${artifactSet.directory}`)
+    if (debug) console.log(`>>>   [getLibraryLinkReferences] Checking artifact set from: ${artifactSet.directory}`)
     const rawArtifact = artifactSet.getRawArtifact(contract)
     if (!rawArtifact) {
-      console.log(`>>>   [getLibraryLinkReferences] No artifact in this set`)
+      if (debug) console.log(`>>>   [getLibraryLinkReferences] No artifact in this set`)
       continue
     }
 
-    console.log(`>>>   [getLibraryLinkReferences] ✓ Found artifact in ${artifactSet.directory}`)
-    console.log(`>>>   [getLibraryLinkReferences] Has deployedBytecode: ${!!rawArtifact.deployedBytecode}`)
-    console.log(`>>>   [getLibraryLinkReferences] Has deployedBytecode.linkReferences: ${!!rawArtifact.deployedBytecode?.linkReferences}`)
+    if (debug) {
+      console.log(`>>>   [getLibraryLinkReferences] ✓ Found artifact in ${artifactSet.directory}`)
+      console.log(`>>>   [getLibraryLinkReferences] Has deployedBytecode: ${!!rawArtifact.deployedBytecode}`)
+      console.log(`>>>   [getLibraryLinkReferences] Has deployedBytecode.linkReferences: ${!!rawArtifact.deployedBytecode?.linkReferences}`)
+    }
 
-    if (rawArtifact.deployedBytecode?.linkReferences) {
+    if (debug && rawArtifact.deployedBytecode?.linkReferences) {
       const deployedKeys = Object.keys(rawArtifact.deployedBytecode.linkReferences)
       console.log(`>>>   [getLibraryLinkReferences] deployedBytecode.linkReferences sources: ${JSON.stringify(deployedKeys)}`)
     }
 
-    console.log(`>>>   [getLibraryLinkReferences] Has bytecode.linkReferences: ${!!rawArtifact.bytecode?.linkReferences}`)
+    if (debug) {
+      console.log(`>>>   [getLibraryLinkReferences] Has bytecode.linkReferences: ${!!rawArtifact.bytecode?.linkReferences}`)
+    }
 
-    if (rawArtifact.bytecode?.linkReferences) {
+    if (debug && rawArtifact.bytecode?.linkReferences) {
       const bytecodeKeys = Object.keys(rawArtifact.bytecode.linkReferences)
       console.log(`>>>   [getLibraryLinkReferences] bytecode.linkReferences sources: ${JSON.stringify(bytecodeKeys)}`)
     }
 
     // Check deployedBytecode.linkReferences first (this is what we need for verification)
     if (rawArtifact.deployedBytecode?.linkReferences) {
-      console.log(`>>>   [getLibraryLinkReferences] ✓ Using deployedBytecode.linkReferences rawraw ${JSON.stringify(rawArtifact.deployedBytecode.linkReferences)}`)
+      if (debug) console.log(`>>>   [getLibraryLinkReferences] ✓ Using deployedBytecode.linkReferences rawraw ${JSON.stringify(rawArtifact.deployedBytecode.linkReferences)}`)
       // linkReferences format: { "sourcePath": { "LibraryName": [...positions] } }
       for (const sourcePath of Object.keys(rawArtifact.deployedBytecode.linkReferences)) {
         for (const libraryName of Object.keys(rawArtifact.deployedBytecode.linkReferences[sourcePath])) {
           const positions = rawArtifact.deployedBytecode.linkReferences[sourcePath][libraryName]
-          console.log(`>>>     [getLibraryLinkReferences] ${libraryName} @ ${sourcePath}: ${JSON.stringify(positions)}`)
+          if (debug) console.log(`>>>     [getLibraryLinkReferences] ${libraryName} @ ${sourcePath}: ${JSON.stringify(positions)}`)
           linkRefs.set(libraryName, { sourcePath, positions })
         }
       }
@@ -170,11 +176,11 @@ const getLibraryLinkReferences = (
 
     // Also check bytecode.linkReferences if nothing found
     if (linkRefs.size === 0 && rawArtifact.bytecode?.linkReferences) {
-      console.log(`>>>   [getLibraryLinkReferences] ⚠️ FALLBACK to bytecode.linkReferences (deployedBytecode had no refs)`)
+      if (debug) console.log(`>>>   [getLibraryLinkReferences] ⚠️ FALLBACK to bytecode.linkReferences (deployedBytecode had no refs)`)
       for (const sourcePath of Object.keys(rawArtifact.bytecode.linkReferences)) {
         for (const libraryName of Object.keys(rawArtifact.bytecode.linkReferences[sourcePath])) {
           const positions = rawArtifact.bytecode.linkReferences[sourcePath][libraryName]
-          console.log(`>>>     [getLibraryLinkReferences] ${libraryName} @ ${sourcePath}: ${JSON.stringify(positions)}`)
+          if (debug) console.log(`>>>     [getLibraryLinkReferences] ${libraryName} @ ${sourcePath}: ${JSON.stringify(positions)}`)
           linkRefs.set(libraryName, { sourcePath, positions })
         }
       }
@@ -182,12 +188,12 @@ const getLibraryLinkReferences = (
 
     // If we found some, we're done
     if (linkRefs.size > 0) {
-      console.log(`>>>   [getLibraryLinkReferences] Found ${linkRefs.size} references, breaking`)
+      if (debug) console.log(`>>>   [getLibraryLinkReferences] Found ${linkRefs.size} references, breaking`)
       break
     }
   }
 
-  console.log(`>>> [getLibraryLinkReferences] Returning ${linkRefs.size} references\n`)
+  if (debug) console.log(`>>> [getLibraryLinkReferences] Returning ${linkRefs.size} references\n`)
   return linkRefs
 }
 
@@ -220,30 +226,39 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   const sourceBytecode = getSourceBytecode(contract, context)
   const sourceLibraryPositions = new LibraryPositionsFoundry()
 
-  console.log(`\n>>> Verifying contract: ${contract}`)
+  if (context.debug) console.log(`\n>>> Verifying contract: ${contract}`)
 
   // Find library dependencies from linkReferences and register them in LibraryPositions
   // This gives us library name, source path, AND exact positions from the artifact
-  const libraryLinkRefs = getLibraryLinkReferences(contract, context.artifacts)
-  console.log(`>>> Found ${libraryLinkRefs.size} library dependencies from linkReferences:`)
+  const libraryLinkRefs = getLibraryLinkReferences(contract, context.artifacts, context.debug)
+
+  if (context.debug) {
+    console.log(`>>> Found ${libraryLinkRefs.size} library dependencies from linkReferences:`)
+
+    libraryLinkRefs.forEach((linkRefData, libName) => {
+      const { sourcePath, positions } = linkRefData
+      const hash = computeFoundryLibraryHash(sourcePath, libName)
+      console.log(`>>>   ${libName}: ${sourcePath}`)
+      console.log(`>>>     Hash: ${hash}`)
+      console.log(`>>>     Positions: ${positions.map(p => p.start).join(', ')}`)
+    })
+  }
 
   libraryLinkRefs.forEach((linkRefData, libName) => {
     const { sourcePath, positions } = linkRefData
-    const hash = computeFoundryLibraryHash(sourcePath, libName)
-    console.log(`>>>   ${libName}: ${sourcePath}`)
-    console.log(`>>>     Hash: ${hash}`)
-    console.log(`>>>     Positions: ${positions.map(p => p.start).join(', ')}`)
     sourceLibraryPositions.registerLibraryFromLinkReferences(libName, sourcePath, positions)
   })
 
-  console.log(`>>> LibraryPositions after registration:`)
-  console.log(`>>>   Total hashes in positions: ${Object.keys(sourceLibraryPositions.positions).length}`)
-  console.log(`>>>   Total libraries registered: ${Object.keys(sourceLibraryPositions.hashToLibrary).length}`)
-  Object.keys(sourceLibraryPositions.hashToLibrary).forEach(hash => {
-    const lib = sourceLibraryPositions.hashToLibrary[hash]
-    const positions = sourceLibraryPositions.positions[hash] || []
-    console.log(`>>>     ${hash} -> ${lib.name} (${lib.sourcePath}) at positions: ${positions.join(', ')}`)
-  })
+  if (context.debug) {
+    console.log(`>>> LibraryPositions after registration:`)
+    console.log(`>>>   Total hashes in positions: ${Object.keys(sourceLibraryPositions.positions).length}`)
+    console.log(`>>>   Total libraries registered: ${Object.keys(sourceLibraryPositions.hashToLibrary).length}`)
+    Object.keys(sourceLibraryPositions.hashToLibrary).forEach(hash => {
+      const lib = sourceLibraryPositions.hashToLibrary[hash]
+      const positions = sourceLibraryPositions.positions[hash] || []
+      console.log(`>>>     ${hash} -> ${lib.name} (${lib.sourcePath}) at positions: ${positions.join(', ')}`)
+    })
+  }
 
   let implementationAddress: string
   if (isImplementationChanged(contract, context.proposal)) {
@@ -253,7 +268,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   } else {
     const proxyAddress = await context.registry.methods.getAddressForString(contract).call()
     if (proxyAddress === ZERO_ADDRESS) {
-      console.log(`Contract ${contract} is not in registry - skipping bytecode verification`)
+      if (context.debug) console.log(`Contract ${contract} is not in registry - skipping bytecode verification`)
       return
     }
     const proxy = new context.web3.eth.Contract(context.proxyABI, proxyAddress)
@@ -261,12 +276,14 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   }
 
   let onchainBytecode = await getOnchainBytecode(implementationAddress, context)
-  console.log("contract name", contract);
-  console.log("implementationAddress", implementationAddress);
-  console.log("onchainBytecode", onchainBytecode);
-  context.libraryAddresses.collect(onchainBytecode, sourceLibraryPositions)
+  if (context.debug) {
+    console.log("contract name", contract);
+    console.log("implementationAddress", implementationAddress);
+    console.log("onchainBytecode", onchainBytecode);
+  }
+  context.libraryAddresses.collect(onchainBytecode, sourceLibraryPositions, context.debug)
 
-  console.log("sourceLibraryPositions", sourceLibraryPositions);
+  if (context.debug) console.log("sourceLibraryPositions", sourceLibraryPositions);
 
   // Build library links and source paths for linking
   const libraryLinks: LibraryLinksFoundry = {}
@@ -288,8 +305,8 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   if (onchainBytecode !== linkedSourceBytecode) {
     throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
   } else {
-    console.log(
-      `${isLibrary(contract, context) ? 'Library' : 'Contract'} deployed at ${implementationAddress} matches ${contract}`
+    console.info(
+      `✅ ${isLibrary(contract, context) ? 'Library' : 'Contract'} ${contract} matches (deployed at ${implementationAddress})`
     )
   }
 
@@ -298,7 +315,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   queue.push(...libraryNames.filter((library) => !visited.has(library)))
 }
 
-const assertValidProposalTransactions = (proposal: ProposalTx[]) => {
+const assertValidProposalTransactions = (proposal: ProposalTx[], debug: boolean) => {
   const invalidTransactions = proposal.filter(
     (tx) => !isProxyRepointTransaction(tx) && !isRegistryRepointTransaction(tx)
   )
@@ -306,14 +323,15 @@ const assertValidProposalTransactions = (proposal: ProposalTx[]) => {
     throw new Error(`Proposal contains invalid release transactions ${invalidTransactions}`)
   }
 
-  console.info('Proposal contains only valid release transactions!')
+  if (debug) console.info('Proposal contains only valid release transactions!')
 }
 
 const assertValidInitializationData = (
   artifacts: FoundryBuildArtifacts[],
   proposal: ProposalTx[],
   web3: Web3,
-  initializationData: InitializationData
+  initializationData: InitializationData,
+  debug: boolean
 ) => {
   const initializingProposals = proposal.filter(isProxyRepointAndInitializeTransaction)
   const contractsInitialized = new Set()
@@ -372,7 +390,7 @@ const assertValidInitializationData = (
     }
   }
 
-  console.info('Initialization Data was verified!')
+  if (debug) console.info('Initialization Data was verified!')
 }
 
 /**
@@ -400,10 +418,11 @@ export const verifyBytecodesFoundry = async (
   _web3: Web3,
   initializationData: InitializationData = {},
   version?: number,
-  network = 'development'
+  network = 'development',
+  debug = false
 ) => {
-  assertValidProposalTransactions(proposal)
-  assertValidInitializationData(artifacts, proposal, _web3, initializationData)
+  assertValidProposalTransactions(proposal, debug)
+  assertValidInitializationData(artifacts, proposal, _web3, initializationData, debug)
 
   const compiledContracts = Array.prototype.concat
     .apply(
@@ -437,6 +456,7 @@ export const verifyBytecodesFoundry = async (
     proxyABI,
     web3,
     network,
+    debug,
   }
 
   while (queue.length > 0) {
