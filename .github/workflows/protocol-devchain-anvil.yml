@@ -155,7 +155,6 @@ jobs:
           NPM_PACKAGE: '@celo/devchain-anvil'
           NPM_TAG: ${{ inputs.npm_tag }}
 
-      # this is where anvil is updated
       - name: Prepare package for publishing
         run: yarn utils:prepare-devchain-anvil-publishing
         working-directory: packages/protocol

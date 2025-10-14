@@ -1,4 +1,3 @@
-// TODO migrate those?
 import { reportASTIncompatibilities } from '@celo/protocol/lib/compatibility/ast-code'
 import {
   Change,
