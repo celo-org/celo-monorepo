@@ -173,16 +173,9 @@ async function main() {
 
     console.info('✅ Success, no bytecode mismatches found!')
 
-    // Write library addresses to file for debugging
+    // Write library addresses to file (flat format: name -> address)
     console.info(`Writing linked library addresses to ${librariesFile}`)
-    writeJsonSync(
-      librariesFile,
-      {
-        addresses: libraryAddresses.addresses,
-        sourcePaths: libraryAddresses.sourcePaths,
-      },
-      { spaces: 2 }
-    )
+    writeJsonSync(librariesFile, libraryAddresses.addresses, { spaces: 2 })
 
     process.exit(0)
   } catch (error) {

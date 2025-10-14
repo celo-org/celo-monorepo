@@ -37,9 +37,18 @@ source scripts/bash/release-lib.sh
 echo "Checking out branch $BRANCH..."
 CURRENT_HASH=$(git log -n 1 --oneline | cut -c 1-9)
 
-# Cleanup function to restore original branch
+# Save the current foundry.toml to preserve profiles
+FOUNDRY_TOML_BACKUP=$(mktemp)
+cp foundry.toml "$FOUNDRY_TOML_BACKUP"
+
+# Cleanup function to restore original branch and foundry.toml
 cleanup() {
   local exit_code=$?
+  # Restore foundry.toml first
+  if [ -f "$FOUNDRY_TOML_BACKUP" ]; then
+    cp "$FOUNDRY_TOML_BACKUP" foundry.toml
+    rm "$FOUNDRY_TOML_BACKUP"
+  fi
   if [ -n "$CURRENT_HASH" ]; then
     echo "Restoring original branch contracts..."
     checkout_build_sources "$CURRENT_HASH" /dev/null -s 2>/dev/null
@@ -53,6 +62,9 @@ trap cleanup EXIT INT TERM
 # Checkout the contracts from the specified branch
 git fetch origin +'refs/tags/core-contracts.v*:refs/tags/core-contracts.v*' >/dev/null 2>&1
 checkout_build_sources "$BRANCH" /dev/null
+
+# Restore the foundry.toml from current branch (which has the profiles we need)
+cp "$FOUNDRY_TOML_BACKUP" foundry.toml
 
 echo "Building contracts with Foundry..."
 
@@ -68,30 +80,6 @@ BUILD_DIR_05="out-truffle-compat"
 BUILD_DIR_08="out-truffle-compat-0.8"
 
 echo "Build completed. Output directories: $BUILD_DIR_05 and $BUILD_DIR_08"
-
-# Handle special case for Mento core contracts if needed (similar to original script)
-if [ "$BRANCH" = "core-contracts.v10" ]; then
-  echo "Detected core-contracts.v10 branch, checking for Mento core integration..."
-  
-  if [ ! -d "build/mento" ]; then
-    echo "Setting up Mento core v2.2.1..."
-    mkdir -p build/mento
-    cd build/mento
-    git clone --depth 1 --branch v2.2.1 https://github.com/mento-protocol/mento-core.git
-    cd mento-core
-    yarn 
-    forge install
-    forge build
-    cd ../../../
-  else 
-    echo "Mento core already set up."
-  fi
-
-  # Note: Library linking for Mento contracts may need special handling
-  # The original script replaces Foundry hashes with Truffle placeholders
-  # For Foundry verification, we keep the Foundry format
-  echo "Using Mento core contracts as-is with Foundry format"
-fi
 
 # Determine RPC URL based on network
 case "$NETWORK" in
