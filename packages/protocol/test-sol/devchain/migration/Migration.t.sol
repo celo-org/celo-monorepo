@@ -19,7 +19,8 @@ import { FeeCurrencyDirectory } from "@celo-contracts-8/common/FeeCurrencyDirect
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 import "@celo-contracts-8/common/interfaces/IScoreManager.sol";
 
-import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
+import { IERC20 } from "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
+import { Ownable } from "@openzeppelin/contracts8/access/Ownable.sol";
 
 import { console2 } from "forge-std-8/console2.sol";
 
@@ -194,7 +195,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   }
 
   function test_Reverts_whenAlreadyInitialized() public {
-    vm.prank(address(epochManagerEnablerContract));
+    vm.prank(Ownable(address(epochManagerContract)).owner());
     vm.expectRevert("Epoch system already initialized");
     epochManagerContract.initializeSystem(100, block.number, firstElected);
   }

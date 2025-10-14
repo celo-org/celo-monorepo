@@ -110,12 +110,33 @@ contract EpochManagerTest is TestWithUtils08 {
 
     scoreManager.setValidatorScore(validator1, 1);
 
-    epochManagerContract.initialize(REGISTRY_ADDRESS, 10);
+    epochManagerContract.initialize(REGISTRY_ADDRESS, 10, address(sortedOracles));
     epochRewards.setCarbonOffsettingPartner(carbonOffsettingPartner);
 
     validators.setEpochRewards(validator1, validator1Reward);
     validators.setEpochRewards(validator2, validator2Reward);
+
+    // change ownership to epochManagerEnabler to allow initialization
+    epochManagerContract.transferOwnership(address(epochManagerEnabler));
     whenL2WithEpochManagerInitialization();
+    revertOwnershipEpochManager();
+  }
+
+  function revertOwnershipEpochManager() internal {
+    // load slot 0
+    bytes32 slot0_ = vm.load(address(epochManagerContract), bytes32(uint256(0)));
+    // extract initialized from slot 0
+    uint8 initialized_ = uint8(uint256(slot0_));
+    // extract owner from slot 0
+    address owner_ = address(uint160(uint256(slot0_) >> 8));
+    // assert that owner is correctly extracted
+    assertEq(owner_, epochManager.owner());
+    // create new slot 0 with the original owner and initialized value
+    bytes32 newSlot0_ = bytes32(
+      abi.encodePacked(hex"0000000000000000000000", address(this), initialized_)
+    );
+    // store new slot 0
+    vm.store(address(epochManagerContract), bytes32(uint256(0)), newSlot0_);
   }
 
   function setupAndElectValidators() public {
@@ -189,7 +210,7 @@ contract EpochManagerTest_initialize is EpochManagerTest {
 
   function test_Reverts_WhenAlreadyInitialized() public virtual {
     vm.expectRevert("contract already initialized");
-    epochManagerContract.initialize(REGISTRY_ADDRESS, 10);
+    epochManagerContract.initialize(REGISTRY_ADDRESS, 10, address(sortedOracles));
   }
 }
 
@@ -224,7 +245,6 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
   }
 
   function test_Reverts_processCannotBeStartedAgain() public virtual {
-    vm.prank(address(epochManagerEnabler));
     vm.expectRevert("Epoch system already initialized");
     epochManagerContract.initializeSystem(
       lastKnownEpochNumber,
@@ -233,8 +253,9 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
     );
   }
 
-  function test_Reverts_WhenSystemInitializedByOtherContract() public virtual {
-    vm.expectRevert("msg.sender is not Enabler");
+  function test_Reverts_WhenSystemInitializedByNotOwner() public virtual {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(actor("otherContract"));
     epochManagerContract.initializeSystem(
       lastKnownEpochNumber,
       lastKnownFirstBlockOfEpoch,

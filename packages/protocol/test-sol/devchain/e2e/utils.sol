@@ -20,7 +20,6 @@ import { IFreezer } from "@celo-contracts/common/interfaces/IFreezer.sol";
 import { IGovernance } from "@celo-contracts/governance/interfaces/IGovernance.sol";
 import { ILockedGold } from "@celo-contracts/governance/interfaces/ILockedGold.sol";
 import { IOdisPayments } from "@celo-contracts/identity/interfaces/IOdisPayments.sol";
-import { IRandom } from "@celo-contracts/identity/interfaces/IRandom.sol";
 import { IScoreManager } from "@celo-contracts-8/common/interfaces/IScoreManager.sol";
 import { ISortedOracles } from "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import { IValidators } from "@celo-contracts/governance/interfaces/IValidators.sol";
@@ -43,7 +42,6 @@ contract Devchain is TestWithUtils08 {
   IGovernance governance;
   ILockedGold lockedCelo;
   IOdisPayments odisPayments;
-  IRandom randomContract;
   IScoreManager scoreManager;
   ISortedOracles sortedOracles;
   IValidators validators;
@@ -68,7 +66,6 @@ contract Devchain is TestWithUtils08 {
     governance = getGovernance();
     lockedCelo = getLockedGold();
     odisPayments = getOdisPayments();
-    randomContract = getRandom();
     scoreManager = IScoreManager(address(getScoreReader()));
     sortedOracles = getSortedOracles();
     validators = getValidators();

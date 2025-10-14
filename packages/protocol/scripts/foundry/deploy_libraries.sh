@@ -4,6 +4,12 @@ set -euo pipefail
 # Read environment variables and constants
 source $PWD/scripts/foundry/constants.sh
 
+# Deploy to Optimism Anvil or local Anvil based on the flag
+USE_OP_ANVIL=${USE_OP_ANVIL:-false}
+if [ "$USE_OP_ANVIL" = true ] ; then
+  ANVIL_RPC_URL=$ANVIL_OP_RPC_URL
+fi
+
 # Create a temporary directory or remove it first it if exists
 if [ -d "$TEMP_DIR" ]; then
     echo "Removing existing temporary folder..."
@@ -42,7 +48,7 @@ pushd $TEMP_DIR
 
 # Build libraries
 echo "Building libraries..."
-forge build
+$FORGE build
 
 # Deploy libraries and building library flag
 echo "Deploying libraries..."
@@ -53,7 +59,7 @@ for LIB_PATH in "${LIBRARIES_PATH[@]}"; do
     # LIB_PATH = "contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
     # LIB_NAME = AddressSortedLinkedListWithMedian
     echo "Deploying library: $LIB_NAME"
-    create_library_out=`forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url $ANVIL_RPC_URL --unlocked --broadcast --json`
+    create_library_out=`$FORGE create $LIB_PATH --from $FROM_ACCOUNT --rpc-url $ANVIL_RPC_URL --private-key $FROM_PK --broadcast --json`
     LIB_ADDRESS=`echo $create_library_out | jq -r '.deployedTo'`
     # Constructing library flag so the remaining contracts can be built and linkeded to these libraries
     LIBRARY_FLAGS="$LIBRARY_FLAGS --libraries $LIB_PATH:$LIB_ADDRESS"
@@ -64,4 +70,3 @@ popd
 
 # Remove the temporary directory
 rm -rf $TEMP_DIR
-
