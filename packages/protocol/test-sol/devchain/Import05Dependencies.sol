@@ -19,8 +19,4 @@ import { StableTokenEUR } from "@mento-core/contracts/StableTokenEUR.sol";
 import { StableTokenBRL } from "@mento-core/contracts/StableTokenBRL.sol";
 import { Exchange } from "@mento-core/contracts/Exchange.sol";
 
-import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.sol"; // TODO remove this?
-import { IValidators } from "@celo-contracts/governance/interfaces/IValidators.sol";
-import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
-
 contract Import05 {}
