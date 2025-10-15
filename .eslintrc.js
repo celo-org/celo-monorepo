@@ -25,7 +25,6 @@ module.exports = {
     '**/*.js',
     'packages/protocol/build/**',
     'packages/protocol/types/**',
-    '/packages/protocol/migrations_ts/**',
     'packages/protocol/scripts/truffle/**',
     // ignoring any files that for which "TSConfig does not include this file" error was given
     'packages/protocol/scripts/utils.test.ts',

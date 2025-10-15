@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 N=`echo -n $RELEASE_TAG | tail -c -1`
 
