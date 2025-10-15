@@ -280,7 +280,7 @@ contract FeeHandlerTest_changeOtherBeneficiaryAllocation is FeeHandlerTest {
     );
   }
 
-  function test_changedSucsesfully() public {
+  function test_changedSuccessfully() public {
     feeHandler.changeOtherBeneficiaryAllocation(op, (30 * 1e24) / 100);
     (uint256 fraction, , ) = feeHandler.getOtherBeneficiariesInfo(op);
     assertEq(fraction, (30 * 1e24) / 100);
@@ -432,7 +432,7 @@ contract FeeHandlerTestAbstract is FeeHandlerTest {
   }
 
   function setMaxSlippage(address stableTokenAddress, uint256 slippage) internal {
-    feeHandler.setMaxSplippage(stableTokenAddress, slippage);
+    feeHandler.setMaxSlippage(stableTokenAddress, slippage);
   }
 
   function fundFeeHandlerWithCelo() public {
@@ -443,7 +443,7 @@ contract FeeHandlerTestAbstract is FeeHandlerTest {
 
 contract FeeHandlerTest_AddOtherBeneficiary is FeeHandlerTestAbstract {
   // TODO only owner
-  function test_addsSucsesfully() public {
+  function test_addsSuccessfully() public {
     feeHandler.addOtherBeneficiary(
       op,
       (20 * 1e24) / 100, // TODO use fixidity
@@ -759,7 +759,7 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellM
     celoToken.approve(address(exchangeEUR), celoAmount);
     exchangeEUR.sell(celoAmount, 0, true);
     uint256 stableAmount = 3000;
-    feeHandler.setMaxSplippage(address(stableTokenEUR), FIXED1);
+    feeHandler.setMaxSlippage(address(stableTokenEUR), FIXED1);
     stableTokenEUR.transfer(address(feeHandler), stableAmount);
     feeHandler.addToken(address(stableTokenEUR), address(mentoSeller));
     feeHandler.activateToken(address(stableTokenEUR));
@@ -919,7 +919,7 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
   }
 
   function test_Reverts_WhenSlippageIsTooHigh() public setUpLiquidity(1e19, 5e18) {
-    feeHandler.setMaxSplippage(address(tokenA), maxSlippage);
+    feeHandler.setMaxSlippage(address(tokenA), maxSlippage);
     vm.expectRevert("UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT");
     feeHandler.sell(address(tokenA));
     assertEq(tokenA.balanceOf(address(feeHandler)), 1e19);
@@ -962,7 +962,7 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
     uint256 quote1after = uniswapRouter.getAmountsOut(1e18, tokenAddresses)[1];
     uint256 quote2after = uniswapRouter.getAmountsOut(1e18, tokenAddresses)[1];
     assertEq(quote1before, quote1after); // uniswap1 quote should be untouched, since liquidity hasn't changed
-    assertGt(quote2before, quote2after); // uniswap2 quoute should be lower, since it now has more tokenA per Celo
+    assertGt(quote2before, quote2after); // uniswap2 quote should be lower, since it now has more tokenA per Celo
     assertEq(tokenA.balanceOf(address(feeHandler)), 4e18); // check that it burned
   }
 }
@@ -1123,28 +1123,28 @@ contract FeeHandlerTest_SetDailySellLimit is FeeHandlerTest {
 }
 
 contract FeeHandlerTest_SetMaxSlippage is FeeHandlerTest {
-  uint256 newMaxSlipapge;
+  uint256 newMaxSlippage;
 
   function setUp() public {
     super.setUp();
-    newMaxSlipapge = maxSlippage * 2;
+    newMaxSlippage = maxSlippage * 2;
   }
 
   function test_Reverts_WhenCallerNotOwner() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(user);
-    feeHandler.setMaxSplippage(address(stableToken), maxSlippage);
+    feeHandler.setMaxSlippage(address(stableToken), maxSlippage);
   }
 
   function test_SetsMaxSlippage() public {
-    feeHandler.setMaxSplippage(address(stableToken), newMaxSlipapge);
-    assertEq(feeHandler.getTokenMaxSlippage(address(stableToken)), newMaxSlipapge);
+    feeHandler.setMaxSlippage(address(stableToken), newMaxSlippage);
+    assertEq(feeHandler.getTokenMaxSlippage(address(stableToken)), newMaxSlippage);
   }
 
   function test_Emits_MaxSlippageSet() public {
     vm.expectEmit(true, true, true, true);
     emit MaxSlippageSet(address(stableToken), maxSlippage);
-    feeHandler.setMaxSplippage(address(stableToken), maxSlippage);
+    feeHandler.setMaxSlippage(address(stableToken), maxSlippage);
   }
 }
 
@@ -1159,7 +1159,7 @@ contract FeeHandlerTest_RemoveOtherBeneficiary is FeeHandlerTestAbstract {
     );
   }
 
-  function test_removedSucsesfully() public {
+  function test_removedSuccessfully() public {
     feeHandler.removeOtherBeneficiary(op);
     assertEq(feeHandler.getOtherBeneficiariesAddresses().length, 0);
     vm.expectRevert("Beneficiary not found");
@@ -1196,7 +1196,7 @@ contract FeeHandlerTest_SetBeneficiaryFraction is FeeHandlerTestAbstract {
     );
   }
 
-  function test_setFractionSucsesfully() public {
+  function test_setFractionSuccessfully() public {
     feeHandler.setBeneficiaryFraction(op, (30 * 1e24) / 100);
     (uint256 fraction, , ) = feeHandler.getOtherBeneficiariesInfo(op);
     assertEq(fraction, (30 * 1e24) / 100);
@@ -1229,7 +1229,7 @@ contract FeeHandlerTest_SetBeneficiaryName is FeeHandlerTestAbstract {
     );
   }
 
-  function test_setNameSucsesfully() public {
+  function test_setNameSuccessfully() public {
     feeHandler.setBeneficiaryName(op, "OP revenue share updated");
     (, string memory name, ) = feeHandler.getOtherBeneficiariesInfo(op);
     assertEq(name, "OP revenue share updated");
