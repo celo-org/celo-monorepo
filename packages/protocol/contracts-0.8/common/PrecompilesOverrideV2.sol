@@ -10,7 +10,7 @@ import "./UsingRegistryV2NoMento.sol";
 /**
  * @title PrecompilesOverride Contract
  * @notice This contract allows for a smoother transition from L1 to L2
- * by abstracting away the usingPrecompile contract, and taking care of the L1 to L2 swtiching logic.
+ * by abstracting away the usingPrecompile contract, and taking care of the L1 to L2 switching logic.
  **/
 abstract contract PrecompilesOverrideV2 is UsingPrecompiles, UsingRegistryV2NoMento {
   /**
