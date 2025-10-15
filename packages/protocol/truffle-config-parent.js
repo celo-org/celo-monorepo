@@ -80,7 +80,7 @@ const networks = {
     network_id: 42220,
     gas: gasLimit,
     gasPrice: 100000000000,
-    privateKeyAvailable: true,
+    privateKeyAvailable: false,
   },
   coverage: {
     host: 'localhost',

@@ -1,10 +1,13 @@
 {
-  "oldArtifactsFolder": "build/core-contracts.v4/contracts",
+  "oldArtifactsFolder": [
+    "build/core-contracts.v4/contracts",
+    "build/core-contracts.v4/contracts-0.8"
+  ],
   "newArtifactsFolder": [
     "build/core-contracts.v5/contracts",
     "build/core-contracts.v5/contracts-0.8"
   ],
-  "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles/",
+  "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles|CeloFeeCurrencyAdapterOwnable|FeeCurrencyAdapter|FeeCurrencyAdapterOwnable|IsL2Check|Blockable|PrecompilesOverride|CompileExchange|PrecompilesOverrideV2|UsingRegistryV2NoMento/",
   "report": {
     "contracts": {
       "GrandaMento": {
