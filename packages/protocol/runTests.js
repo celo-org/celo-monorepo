@@ -9,7 +9,7 @@ const network = require('./truffle-config.js').networks[networkName]
 
 const sleep = (seconds) => new Promise((resolve) => setTimeout(resolve, 1000 * seconds))
 
-// As documented https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
+// As documented https://circleci.com/docs/reference/variables/#built-in-environment-variables
 const isCI = process.env.CI === 'true'
 
 async function startGanache() {
