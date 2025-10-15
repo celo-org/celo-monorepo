@@ -2,7 +2,7 @@
 
 In the development life cycle, there are a number of points where it is useful to have a published [public key](https://en.wikipedia.org/wiki/Public-key_cryptography). Examples include build signing, Git commit signing, and communicating with other community members securely. Build signing in particular is a required part of the release process for the Celo blockchain client.
 
-In support of these uses, [OpenPGP](https://www.openpgp.org/) public keys can be published to [celo.org](https://celo.org), where they can downloaded securely by anyone.
+In support of these uses, [OpenPGP](https://www.openpgp.org/) public keys can be published to [celo.org](https://celo.org), where they can be downloaded securely by anyone.
 
 If you want to read more about OpenPGP keys, including their structure and metadata, check out [Anatomy of a GPG Key by Dave Steele](https://davesteele.github.io/gpg/2014/09/20/anatomy-of-a-gpg-key/).
 
@@ -56,7 +56,7 @@ We recommend generating your developer key pair with a YubiKey. Generating your 
     3. `generate`
         1. When asked if you want to backup your encryption key, specify `n` for no.
         2. Specify an expiration date, for example `2y` for 2 years.
-        3. Enter you full name and `@clabs.co` email address when prompted.
+        3. Enter your full name and `@clabs.co` email address when prompted.
         4. You may add a comment, but it is not required.
     4. `quit`
 
@@ -155,7 +155,7 @@ This command will produce the signature file `doc.txt.asc` for `doc.txt`. The si
 
 #### Signature Verification
 
-A signature file produced with the method above can be verified by any user that possesses your public key with the following command.
+A signature file produced with the method above can be verified by any user who possesses your public key with the following command.
 
 ```bash
 gpg --verify doc.txt.asc doc.txt
