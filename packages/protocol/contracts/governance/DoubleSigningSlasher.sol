@@ -109,7 +109,7 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
    * @param index Validator index at the block.
    * @param headerA First double signed block header.
    * @param headerB Second double signed block header.
-   * @return Block number where double signing occured. Throws if no double signing is detected.
+   * @return Block number where double signing occurred. Throws if no double signing is detected.
    */
   function checkForDoubleSigning(
     address signer,
