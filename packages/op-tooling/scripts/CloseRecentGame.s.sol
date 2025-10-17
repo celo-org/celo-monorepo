@@ -9,6 +9,7 @@ import { GameType, GameStatus, Timestamp, BondDistributionMode } from "src/dispu
 
 import { IDisputeGameFactory } from "interfaces/dispute/IDisputeGameFactory.sol";
 import { IDisputeGame } from "interfaces/dispute/IDisputeGame.sol";
+import { IFaultDisputeGame } from "interfaces/dispute/IFaultDisputeGame.sol";
 import { IAnchorStateRegistry } from "interfaces/dispute/IAnchorStateRegistry.sol";
 
 contract CloseRecentGame is Script {
@@ -52,12 +53,12 @@ contract CloseRecentGame is Script {
         gameIndex_
       );
       console.log("Checking game at:", address(game_));
-      console2.log("  Type:", uint256(gameType_.unwrap()));
-      console2.log("  Created:", uint64(created_.unwrap()));
+      console2.log("  Type:", uint32(gameType_.raw()));
+      console2.log("  Created:", uint64(created_.raw()));
 
       // check game status
       GameStatus status_ = game_.status();
-      console2.log("  Status:", uint256(status_.unwrap()));
+      console2.log("  Status:", uint8(status_));
       if (status_ == GameStatus.IN_PROGRESS) {
         console.log("    >>> Game still in progress. Skipping...");
         continue;
@@ -76,7 +77,8 @@ contract CloseRecentGame is Script {
       }
 
       // check if game already closed
-      if (game_.bondDistributionMode() != BondDistributionMode.UNDECIDED) {
+      IFaultDisputeGame fdg_ = IFaultDisputeGame(address(game_));
+      if (fdg_.bondDistributionMode() != BondDistributionMode.UNDECIDED) {
         console.log("    >>> Game already closed. Anchor state up to date...");
 
         foundEligibleGame = true;
@@ -87,7 +89,7 @@ contract CloseRecentGame is Script {
       // update anchor state by closing the game
       vm.startBroadcast();
       console.log("    >>> Closing game at:", address(game_));
-      game_.closeGame();
+      fdg_.closeGame();
       vm.stopBroadcast();
 
       foundEligibleGame = true;

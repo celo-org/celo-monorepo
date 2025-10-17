@@ -15,10 +15,12 @@ check_env_var() {
 
 echo "Checking environment variables..."
 check_env_var "L1_RPC_URL"
+check_env_var "OP_DIR"
 check_env_var "PK"
 
 echo "Closing recent fault dispute game..."
 forge script CloseRecentGame.s.sol \
   --rpc-url $L1_RPC_URL \
+  --root $OP_DIR/packages/contracts-bedrock \
   --private-key $PK \
   --broadcast
