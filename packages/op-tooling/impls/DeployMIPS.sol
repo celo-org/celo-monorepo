@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
+// This script requires running with --root and the following env vars:
+// PREIMAGE_ORACLE (optional) - if not provided, MIN_PROPOSAL_SIZE and CHALLENGE_PERIOD must be provided
+// MIN_PROPOSAL_SIZE (optional) - minimum proposal size for a new PreimageOracle if PREIMAGE_ORACLE is not provided
+// CHALLENGE_PERIOD (optional) - challenge period for a new PreimageOracle if PREIMAGE_ORACLE is not provided
+
 import { Script } from "forge-std/Script.sol";
 import { console } from "forge-std/console.sol";
 
