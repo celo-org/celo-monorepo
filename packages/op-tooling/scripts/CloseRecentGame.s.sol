@@ -27,8 +27,6 @@ contract CloseRecentGame is Script {
   event NoGamesFound();
   event NoEligibleGamesFound();
 
-  uint256 constant MAX_GAMES_TO_CHECK = 50;
-
   bool private foundEligibleGame;
 
   function run() external {
@@ -37,6 +35,8 @@ contract CloseRecentGame is Script {
 
     IAnchorStateRegistry registry_ = IAnchorStateRegistry(vm.envAddress("REGISTRY"));
     console.log("Registry present at:", address(registry_));
+
+    uint256 MAX_GAMES_TO_CHECK = vm.envOr("MAX", uint256(50));
 
     uint256 gamesCount_ = factory_.gameCount();
     console2.log("Total games:", gamesCount_);
