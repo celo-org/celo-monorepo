@@ -16,6 +16,7 @@ contract CloseRecentGame is Script {
   // This script requires running with --root and the following env vars:
   // FACTORY (required) - address of the dispute game factory
   // REGISTRY (required) - address of the anchor state registry
+  // MAX (optional) - maximum number of recent games to check (default: 50)
 
   event AnchorStateUpdated(
     address indexed game,
