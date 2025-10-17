@@ -9,6 +9,11 @@ import { IPreimageOracle } from "interfaces/cannon/IPreimageOracle.sol";
 import { DeployUtils } from "scripts/libraries/DeployUtils.sol";
 
 contract DeployMIPS is Script {
+  // This script requires running with --root and the following env vars:
+  // PREIMAGE_ORACLE (optional) - if not provided, MIN_PROPOSAL_SIZE and CHALLENGE_PERIOD must be provided
+  // MIN_PROPOSAL_SIZE (optional) - minimum proposal size for a new PreimageOracle if PREIMAGE_ORACLE is not provided
+  // CHALLENGE_PERIOD (optional) - challenge period for a new PreimageOracle if PREIMAGE_ORACLE is not provided
+
   error MissingEnvVars();
 
   function run() external {
