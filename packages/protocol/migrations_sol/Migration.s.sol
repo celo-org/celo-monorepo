@@ -121,6 +121,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function deployCodeTo(string memory what, address where) internal {
     deployCodeTo(what, "", 0, where);
   }
+
   function deployCodeTo(string memory what, bytes memory args, address where) internal {
     deployCodeTo(what, args, 0, where);
   }
@@ -512,7 +513,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     /*
     Arbitrary intrinsic gas number take from existing `FeeCurrencyDirectory.t.sol` tests
     Source: https://github.com/celo-org/celo-monorepo/blob/2cec07d43328cf4216c62491a35eacc4960fffb6/packages/protocol/test-sol/common/FeeCurrencyDirectory.t.sol#L27 
-    */
+        */
     uint256 mockIntrinsicGas = 21000;
 
     IFeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory"))
@@ -599,7 +600,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     address accountsProxyAddress = deployProxiedContract(
       "Accounts",
       abi.encodeWithSelector(IAccountsInitializer.initialize.selector, REGISTRY_ADDRESS),
-      5
+      SolidityVersions.SOLIDITY_05
     );
 
     IAccounts(accountsProxyAddress).setEip712DomainSeparator();
@@ -848,7 +849,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         penalty,
         reward
       ),
-      5
+      SolidityVersions.SOLIDITY_05
     );
 
     getLockedGold().addSlasher("DoubleSigningSlasher");
@@ -905,7 +906,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     deployProxiedContract(
       "FederatedAttestations",
       abi.encodeWithSelector(IFederatedAttestationsInitializer.initialize.selector),
-      5
+      SolidityVersions.SOLIDITY_05
     );
   }
 
