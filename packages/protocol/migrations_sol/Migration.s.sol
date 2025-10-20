@@ -990,7 +990,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     deployProxiedContract(
       "EpochManagerEnabler",
       abi.encodeWithSelector(IEpochManagerEnablerInitializer.initialize.selector, REGISTRY_ADDRESS),
-      8
+      SolidityVersions.SOLIDITY_08
     );
   }
 
