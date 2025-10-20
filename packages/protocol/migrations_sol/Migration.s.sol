@@ -154,10 +154,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     bytes memory initializeCalldata,
     SolidityVersions solidityVersion
   ) public {
-    // check if works casting version manually
-    // SolidityVersions solidityVersion = version == 5
-    //   ? SolidityVersions.SOLIDITY_05
-    //   : SolidityVersions.SOLIDITY_08;
     string memory versionString = getSolidityVersionPath(solidityVersion);
 
     bytes memory implementationBytecode = vm.getCode(
