@@ -699,7 +699,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         maxNumGroupsVotedFor,
         electabilityThreshold
       ),
-      5
+      SolidityVersions.SOLIDITY_05
     );
   }
 
