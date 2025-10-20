@@ -19,6 +19,14 @@ import { IPermissionedDisputeGame } from "interfaces/dispute/IPermissionedDisput
 import { IOPContractsManager } from "interfaces/L1/IOPContractsManager.sol";
 
 contract RedeployGames is Script {
+  // This script requires running with --root and the following env vars:
+  // OPCM (required) - address of the old OPContractsManager
+  // FACTORY (required) - address of the DisputeGameFactory
+  // SYSTEM_CONFIG (required) - address of the SystemConfig proxy
+  // MAX_CLOCK_DURATION (required) - new max clock duration for the dispute games
+  // CLOCK_EXTENSION (optional) - new clock extension for the dispute games
+  // MIPS (optional) - new MIPS address for the dispute games
+
   struct Blueprints {
     address permissionedDisputeGame1;
     address permissionedDisputeGame2;
