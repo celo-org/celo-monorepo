@@ -11,6 +11,14 @@ import { Enum } from "safe-contracts/common/Enum.sol";
 import { IProxyAdmin } from "interfaces/universal/IProxyAdmin.sol";
 
 contract SafeSetPortal is Script {
+  // This script requires running with --root and the following env vars:
+  // PORTAL_PROXY (required) - address of the OptimismPortal2 proxy
+  // PORTAL_IMPL (required) - address of the new OptimismPortal2 implementation
+  // PROXY_ADMIN (required) - address of the ProxyAdmin managing the OptimismPortal
+  // SAFE (required) - address of the Gnosis Safe to execute the transaction
+  // SENDER (required) - address of the sender in the Gnosis Safe
+  // SIG (optional) - signatures for the Safe transaction; if not provided, the transaction
+
   error MissingSignatures();
 
   struct EnvConfig {
