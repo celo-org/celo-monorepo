@@ -166,7 +166,7 @@ contract FixidityTest is Test {
     assertEq(fixidity.reciprocal(FIXED1_UINT), FIXED1_UINT);
   }
 
-  function test_divide_intergers() public {
+  function test_divide_integers() public {
     uint256 a = fixidity.newFixedFraction(840, 10);
     uint256 b = fixidity.newFixedFraction(20, 10);
     uint256 expected = fixidity.newFixedFraction(420, 10);
