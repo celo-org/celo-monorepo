@@ -127,7 +127,7 @@ contract ScoreManagerTest_setValidatorScore is ScoreManagerTest {
 }
 
 contract ScoreManagerTest_setScoreManagerSetter is ScoreManagerTest {
-  function test_onlyOwnwerCanSetScoreManager() public {
+  function test_onlyOwnerCanSetScoreManager() public {
     vm.prank(nonOwner);
     vm.expectRevert("Ownable: caller is not the owner");
     scoreManager.setScoreManagerSetter(owner);
