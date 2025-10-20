@@ -237,10 +237,14 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
 
   const report = doASTCompatibilityReport(contractName, oldAST, newAST)
   // Check deployed byte code change
+<<<<<<< HEAD
   const oldBytecodeStripped = stripMetadata(oldContract.schema.deployedBytecode)
   const newBytecodeStripped = stripMetadata(newContract.schema.deployedBytecode)
 
   if (oldBytecodeStripped !== newBytecodeStripped) {
+=======
+  if ((stripMetadata(oldContract.schema.deployedBytecode) !== stripMetadata(newContract.schema.deployedBytecode))) {
+>>>>>>> b47a9627d (Tooling update for CR13 (#11437))
     report.push(new DeployedBytecodeChange(contractName))
   }
 
