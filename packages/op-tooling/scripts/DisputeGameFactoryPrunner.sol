@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.15;
+pragma solidity ^0.8.15;
 
 import { Hash, GameId, GameType, Timestamp, Claim } from "src/dispute/lib/Types.sol";
 import { IDisputeGame } from "interfaces/dispute/IDisputeGame.sol";
