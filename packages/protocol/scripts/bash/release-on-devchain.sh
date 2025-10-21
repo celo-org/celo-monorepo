@@ -37,10 +37,9 @@ git checkout -
 # roll back submodules
 yarn submodules:pull
 
-ANVIL_PID=
 if command -v lsof; then
     # TODO replace harcoded port
-    ANVIL_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
+    ANVIL_PID=`lsof -i tcp:8546 | tail -n 1 | awk '{print $2}'`
     echo "Network started with PID $ANVIL_PID, if exit 1, you will need to manually stop the process"
 fi
 
