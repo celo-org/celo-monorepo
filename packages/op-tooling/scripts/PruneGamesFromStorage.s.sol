@@ -15,7 +15,7 @@ contract PruneGamesFromStorage is Script {
   // This script requires running with --root and the following env vars:
   // FACTORY (required) - address of the dispute game factory
   // PROXY_ADMIN (required) - address of the proxy admin
-  // OLDEST_INDEX (required) - oldest game index to stay
+  // RETENTION_INDEX (required) - index up to which games are retained
 
   function run() external {
     IDisputeGameFactory factory_ = IDisputeGameFactory(vm.envAddress("FACTORY"));
@@ -24,8 +24,8 @@ contract PruneGamesFromStorage is Script {
     IProxyAdmin proxyAdmin_ = IProxyAdmin(vm.envAddress("PROXY_ADMIN"));
     console.log("ProxyAdmin present at:", address(proxyAdmin_));
 
-    uint256 oldestIndex_ = vm.envUint("OLDEST_INDEX");
-    console.log("Oldest index to stay:", oldestIndex_);
+    uint256 retentionIndex_ = vm.envUint("RETENTION_INDEX");
+    console.log("Game index to retain:", retentionIndex_);
 
     // Store factory impl
     address factoryImpl_ = proxyAdmin_.getProxyImplementation(address(factory_));
@@ -41,7 +41,7 @@ contract PruneGamesFromStorage is Script {
 
     // Prune games from storage
     console.log("Pruning games from storage...");
-    uint256 targetLength_ = oldestIndex_ + 1;
+    uint256 targetLength_ = retentionIndex_ + 1;
     DisputeGameFactoryPrunner(payable(address(factory_))).pruneGames(targetLength_);
     console.log("Pruning completed.");
 
@@ -57,11 +57,11 @@ contract PruneGamesFromStorage is Script {
     uint256 gameCount_ = factory_.gameCount();
     console.log("Current game count in factory:", gameCount_);
 
-    // Log oldest game retained
+    // Log retained game at retention index
     (GameType gameType_, Timestamp timestamp_, IDisputeGame proxy_) = factory_.gameAtIndex(
-      oldestIndex_
+      retentionIndex_
     );
-    console.log("Oldest game retained at index:", oldestIndex_);
+    console.log("Game retained at index:", retentionIndex_);
     console2.log("  Type:", uint32(gameType_.raw()));
     console2.log("  Created:", uint64(timestamp_.raw()));
     console.log("  Proxy:", address(proxy_));
