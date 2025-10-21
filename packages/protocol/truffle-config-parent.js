@@ -27,7 +27,7 @@ const BAKLAVA_FROM = '0x3e206e0674d5050f7b33e7e79Cace768050eE06f'
 const gasLimit = 20000000
 const hostAddress = process.env.CELO_NODE_ADDRESS || '127.0.0.1'
 const hostPort = parseInt(process.env.CELO_NODE_PORT || '8545')
-const devPort = 9546
+const devPort = 8546
 
 const defaultConfig = {
   host: hostAddress,
