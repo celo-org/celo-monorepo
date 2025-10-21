@@ -1,22 +1,22 @@
 pragma solidity >=0.5.13 <0.9.0;
 
-import { Test as ForgeTest } from "@lib/celo-foundry-8/lib/forge-std/src/Test.sol";
+import { Test as ForgeTest } from "forge-std-8/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 import { PrecompileHandler } from "@test-sol/utils/PrecompileHandler.sol";
 import { IEpochManagerEnablerMock } from "@test-sol/unit/common/interfaces/IEpochManagerEnablerMock.sol";
 import { EpochManagerEnablerMock } from "@test-sol/mocks/EpochManagerEnablerMock.sol";
 import { MockCeloUnreleasedTreasury } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasury.sol";
-import "@celo-contracts-8/common/test/MockCeloToken.sol";
+import { MockCeloToken08 } from "@celo-contracts-8/common/test/MockCeloToken.sol";
 
-import "@celo-contracts/common/interfaces/IRegistry.sol";
+import { IRegistry } from "@celo-contracts/common/interfaces/IRegistry.sol";
 import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
 
-import "@celo-contracts-8/common/mocks/EpochManager_WithMocks.sol";
-import "@celo-contracts-8/common/IsL2Check.sol";
-import "@celo-contracts-8/common/PrecompilesOverrideV2.sol";
+import { EpochManager_WithMocks } from "@celo-contracts-8/common/mocks/EpochManager_WithMocks.sol";
+import { IsL2Check } from "@celo-contracts-8/common/IsL2Check.sol";
+import { PrecompilesOverrideV2 } from "@celo-contracts-8/common/PrecompilesOverrideV2.sol";
 
 contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOverrideV2 {
-  IRegistry registry;
+  IRegistry registry; // TODO: Remove since registryContract already present in UsingRegistry
   PrecompileHandler ph;
   EpochManager_WithMocks public epochManager;
   EpochManagerEnablerMock epochManagerEnabler;
@@ -137,11 +137,6 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
     address addr = vm.addr(pk);
     vm.label(addr, name);
     return (addr, pk);
-  }
-
-  // This function can be also found in OpenZeppelin's library, but in a newer version than the one we use.
-  function compareStrings(string memory a, string memory b) public pure returns (bool) {
-    return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
   }
 
   function _registerAndElectValidatorsForL2() internal {

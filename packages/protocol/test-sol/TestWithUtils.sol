@@ -134,11 +134,6 @@ contract TestWithUtils is Test, TestConstants, IsL2Check, PrecompilesOverrideV2 
         (max - min + 1)) + min;
   }
 
-  // This function can be also found in OpenZeppelin's library, but in a newer version than the one
-  function compareStrings(string memory a, string memory b) public pure returns (bool) {
-    return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
-  }
-
   function containsLog(
     Vm.Log[] memory logs,
     string memory signatureString

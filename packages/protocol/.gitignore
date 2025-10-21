@@ -14,6 +14,8 @@ scripts/**/*.js.map
 test/**/*.js
 test/**/*.js.map
 
+test-ts/**/*.js
+
 types/**/*.js
 types/**/*.js.map
 
@@ -22,6 +24,7 @@ scTopics
 build
 .tmp
 .*.tar.gz
+out*
 
 types/*.js
 types/contracts/*

@@ -7,6 +7,7 @@
   "license": "LGPL-3.0",
   "scripts": {
     "anvil-devchain:e2e-tests": "./scripts/foundry/run_e2e_tests_in_anvil.sh",
+    "anvil-devchain:e2e-tests:rpc-logs": "ANVIL_LOGGING=true ./scripts/foundry/run_e2e_tests_in_anvil.sh",
     "anvil-devchain:integration-tests": "./scripts/foundry/run_integration_tests_in_anvil.sh",
     "anvil-devchain:start-L1": "./scripts/foundry/create_and_migrate_anvil_devchain.sh",
     "anvil-devchain:start-L2": "./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh",
@@ -33,8 +34,10 @@
     "lint:ts": "yarn run --top-level eslint .",
     "release:check-opcodes": "yarn ts-node scripts/check-opcodes.ts",
     "release:check-versions": "./scripts/bash/check-versions.sh",
+    "release:check-versions:foundry": "./scripts/bash/check-versions-foundry.sh",
     "release:determine-release-version": "yarn --silent ts-node --preferTsExts ./scripts/determine-release-version.ts",
     "release:make": "./scripts/bash/make-release.sh",
+    "release:make:foundry": "./scripts/foundry/make-release-foundry.sh",
     "release:verify-deployed": "./scripts/bash/verify-deployed.sh",
     "release:verify-release": "./scripts/bash/verify-release.sh",
     "size:onchain": "./scripts/bash/get_smart_contract_size_from_onchain_address.sh",
@@ -113,7 +116,8 @@
     "web3-core-helpers": "1.10.0",
     "web3-provider-engine": "^16.0.5",
     "web3-utils": "1.10.0",
-    "truffle-plugin-verify": "^0.6.5"
+    "truffle-plugin-verify": "^0.6.5",
+    "viem": "^2.29.4"
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.3",
