@@ -173,13 +173,13 @@ library SortedLinkedList {
   }
 
   /**
-   * @notice Returns the keys of the elements greaterKey than and less than the provided value.
+   * @notice Returns the keys of the elements greater than and less than the provided value.
    * @param list A storage pointer to the underlying list.
    * @param value The element value.
    * @param lesserKey The key of the element which could be just left of the new value.
    * @param greaterKey The key of the element which could be just right of the new value.
-   * @return The correct lesserKey keys.
-   * @return The correct greaterKey keys.
+   * @return The correct lesser keys.
+   * @return The correct greater keys.
    */
   function getLesserAndGreater(
     List storage list,
@@ -217,8 +217,8 @@ library SortedLinkedList {
    * @notice Returns whether or not a given element is between two other elements.
    * @param list A storage pointer to the underlying list.
    * @param value The element value.
-   * @param lesserKey The key of the element whose value should be lesserKey.
-   * @param greaterKey The key of the element whose value should be greaterKey.
+   * @param lesserKey The key of the element whose value should be lesser.
+   * @param greaterKey The key of the element whose value should be greater.
    * @return True if the given element is between the two other elements.
    */
   function isValueBetween(
