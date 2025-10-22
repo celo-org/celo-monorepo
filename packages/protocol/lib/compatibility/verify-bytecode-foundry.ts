@@ -110,8 +110,10 @@ const getSourceBytecode = (contract: string, context: VerificationContext): stri
 const getOnchainBytecode = async (address: string, context: VerificationContext) =>
   stripMetadata(await context.chainLookup.getCode(address))
 
-const isLibrary = (contract: string, context: VerificationContext) =>
-  contract in context.libraryAddresses.addresses
+const isLibrary = (contract: string, context: VerificationContext) => {
+  const answer = Object.keys(context.libraryAddresses.addresses).includes(contract)
+  return answer
+}
 
 const dfsStep = async (queue: string[], visited: Set<string>, context: VerificationContext) => {
   const contract = queue.pop()
@@ -146,7 +148,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   if (isImplementationChanged(contract, context.proposal)) {
     implementationAddress = getProposedImplementationAddress(contract, context.proposal)
   } else if (isLibrary(contract, context)) {
-    implementationAddress = ensureLeading0x(context.libraryAddresses.addresses[contract])
+    implementationAddress = ensureLeading0x(context.libraryAddresses.addresses[contract].address)
   } else {
     const proxyAddress = await context.registry.getAddressForString(contract)
     if (proxyAddress === ZERO_ADDRESS) {

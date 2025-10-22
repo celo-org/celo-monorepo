@@ -63,6 +63,8 @@ function checkout_build_sources() {
 function build_tag_foundry() {
   local BRANCH="$1"
   local LOG_FILE="$2"
+  local PROFILE="$3"
+  local CONFIG="$4"
 
   local RELEASE_NUMBER=$(echo "$BRANCH" | grep -o 'v[0-9]\+' | tr -dc '0-9')
 
@@ -73,13 +75,19 @@ function build_tag_foundry() {
   git fetch origin +'refs/tags/core-contracts.v*:refs/tags/core-contracts.v*' >> $LOG_FILE
   echo " - Checkout contracts source code at $BRANCH"
   BUILD_DIR=$(echo out-$(echo $BRANCH | sed -e 's/\//_/g'))
+  if [[ -n "$PROFILE" ]]; then
+    BUILD_DIR=${BUILD_DIR}-$PROFILE
+  fi
 
   checkout_build_sources $BRANCH $LOG_FILE
 
-  if [ ! -d $BUILD_DIR ]; then
-    foundryup --install 1.0.0
+  if [[ -n "$CONFIG" ]]; then
+    cp "$CONFIG" foundry.toml
+  fi
 
+  if [ ! -d $BUILD_DIR ]; then
     echo " - Build contract artifacts at $BUILD_DIR"
+    export FOUNDRY_PROFILE=$PROFILE
     forge build --out $BUILD_DIR --ast >> $LOG_FILE
   else
     echo " - Contract artifacts already built at $BUILD_DIR"

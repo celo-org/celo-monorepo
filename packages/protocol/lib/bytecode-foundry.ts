@@ -39,7 +39,10 @@ export const stripMetadata = (bytecode: string): string => {
 
 // Maps library fully qualified library names to their onchain addresses (formatted without "0x" prefix).
 export interface LibraryLinks {
-  [name: string]: string
+  [name: string]: {
+    address: string,
+    placeholder: string
+  }
 }
 
 /*
@@ -47,16 +50,17 @@ export interface LibraryLinks {
  * solc. The length of the entire string is 40 characters (accounting for the 20
  * bytes of the address that should be substituted in).
  */
-const getPlaceholder = (name: string): string => {
+const getPlaceholderHash = (name: string): string => {
   const hash = keccak256(toHex(name))
-  return `__$${hash.slice(0, 34)}$__`
+  return hash.slice(2, 2 + 34)
 }
+
 
 export const linkLibraries = (bytecode: string, libraryLinks: LibraryLinks): string => {
   Object.keys(libraryLinks).forEach((libraryName) => {
-    const linkString = getPlaceholder(libraryName)
+    const linkString = `__\\$${libraryLinks[libraryName].placeholder}\\$__`
     // Use g flag to iterate through for all occurences.
-    bytecode = bytecode.replace(RegExp(linkString, 'g'), libraryLinks[libraryName])
+    bytecode = bytecode.replace(RegExp(linkString, 'g'), libraryLinks[libraryName].address)
   })
 
   return bytecode
@@ -84,7 +88,12 @@ export const verifyAndStripLibraryPrefix = (bytecode: string, address = NULL_ADD
 }
 
 export class LibraryPositions {
-  positions: { [library: string]: number[] }
+  positions: {
+    [library: string]: {
+      pos: number[]
+      fullQualified: string
+    }
+  }
 
   /*
    * Creates a LibraryPositions object, which, for each yet to be linked library,
@@ -105,50 +114,57 @@ export class LibraryPositions {
       const libraryLinks = references[sourceFile]
       Object.keys(libraryLinks).forEach(library => {
         libraryLinks[library].forEach(reference => {
-          this.addPosition(`${sourceFile}:${library}`, reference.start, reference.length)
+          this.addPositionFromByte(library, `${sourceFile}:${library}`, reference.start, reference.length)
         })
       })
     })
   }
 
-  private addPosition(library: string, position: number, length: number) {
+  private addPositionFromByte(libName: string, library: string, startByte: number, length: number) {
     if (length !== 20) {
-      throw new Error(`Unexpected library link length for ${library} at ${position}: ${length}`)
+      throw new Error(`Unexpected library link length for ${library} at ${startByte}: ${length}`)
     }
 
-    if (!this.positions[library]) {
-      this.positions[library] = []
+    if (!this.positions[libName]) {
+      this.positions[libName] = { pos: [], fullQualified: library }
     }
 
-    this.positions[library].push(position)
+    // The `linkReferences` `start` value refers to the byte index in the deployed bytecode.
+    // We will be using the position as an index into the hex string representing the bytecode
+    // so we need to convert:
+    // - Multiply by 2 because every byte takes up two hex characters.
+    // - Add 2 to account for the "0x" characters at the start of the bytecode hex string.
+    this.positions[libName].pos.push(startByte * 2 + 2)
   }
 }
 
 export class LibraryAddresses {
-  addresses: { [library: string]: string }
+  addresses: { [library: string]: { address: string, placeholder: string } }
 
   constructor() {
     this.addresses = {}
   }
 
   collect = (bytecode: string, libraryPositions: LibraryPositions) =>
-    Object.keys(libraryPositions.positions).forEach((library) =>
-      libraryPositions.positions[library].forEach((position) => {
-        console.log(`Found library ${library} at position ${position} with address ${bytecode.slice(position, position + ADDRESS_LENGTH)}`)
-        if (!this.addAddress(library, bytecode.slice(position, position + ADDRESS_LENGTH))) {
+    Object.keys(libraryPositions.positions).forEach((library) => {
+      libraryPositions.positions[library].pos.forEach((position) => {
+        if (!this.addAddress(library, libraryPositions.positions[library].fullQualified, bytecode.slice(position, position + ADDRESS_LENGTH))) {
           throw new Error(`Mismatched addresses for ${library} at ${position}`)
         }
       })
-    )
+    })
 
   /*
    * Tries to add a library name -> address mapping. If the library has already
    * had an address added, checks that the new address matches the old one.
    */
-  private addAddress(library: string, address: string): boolean {
+  private addAddress(library: string, fullQualified: string, address: string): boolean {
     if (!this.addresses[library]) {
-      this.addresses[library] = address
+      this.addresses[library] = {
+        address,
+        placeholder: getPlaceholderHash(fullQualified)
+      }
     }
-    return this.addresses[library] === address
+    return this.addresses[library].address === address
   }
 }

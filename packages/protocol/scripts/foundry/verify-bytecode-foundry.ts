@@ -31,15 +31,20 @@ const argv = require('minimist')(process.argv.slice(2), {
   string: ['build_artifacts', 'proposal', 'initialize_data', 'network', 'librariesFile', 'branch'],
 })
 
-const buildDir = argv.build_artifacts ? argv.build_artifacts : './out'
 const branch = (argv.branch ? argv.branch : '') as string
+const buildDir05 = `./out-${branch}-truffle-compat`
+const buildDir08 = `./out-${branch}-truffle-compat8`
 const network = argv.network ?? 'development'
 const proposal = argv.proposal ? readJsonSync(argv.proposal) : []
 const initializationData = argv.initialize_data ? readJsonSync(argv.initialize_data) : {}
 const librariesFile = argv.librariesFile ?? 'libraries.json'
 
-if (!existsSync(buildDir)) {
-  throw new Error(`${buildDir} directory not found. Make sure to run foundry build first`)
+if (!existsSync(buildDir05)) {
+  throw new Error(`${buildDir05} directory not found. Make sure to run foundry build first`)
+}
+
+if (!existsSync(buildDir08)) {
+  throw new Error(`${buildDir08} directory not found. Make sure to run foundry build first`)
 }
 
 // TODO deduplicate with make-release
@@ -90,8 +95,8 @@ const publicClient = createPublicClient({
 const version = getReleaseVersion(branch)
 
 const registryAddress = '0x000000000000000000000000000000000000ce10'
-const registryAbi = readJsonSync('./out/Registry.sol/Registry.json')['abi']
-const proxyAbi = readJsonSync('./out/Proxy.sol/Proxy.json')['abi']
+const registryAbi = readJsonSync(`${buildDir05}/Registry.sol/Registry.json`)['abi']
+const proxyAbi = readJsonSync(`${buildDir05}/Proxy.sol/Proxy.json`)['abi']
 
 const getAddressForString = (contract: string) => {
   return publicClient.readContract({
@@ -131,10 +136,11 @@ const chainLookup = {
     })
   },
 }
-const [buildArtifacts, artifacts08] = instantiateArtifactsFromForge(buildDir)
+const [artifacts05] = instantiateArtifactsFromForge(buildDir05)
+const [artifacts08] = instantiateArtifactsFromForge(buildDir08)
 verifyBytecodes(
   Object.keys(CeloContractName),
-  [buildArtifacts, artifacts08],
+  [artifacts05, artifacts08],
   registryLookup,
   proposal,
   proxyLookup,

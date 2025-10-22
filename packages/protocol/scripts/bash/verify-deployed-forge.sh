@@ -29,7 +29,13 @@ done
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
 
-source scripts/bash/release-lib.sh
-build_tag_foundry $BRANCH $LOG_FILE
+cp foundry.toml foundry.toml.bak
 
-yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts  --branch $BRANCH --librariesFile "libraries.json" $FORNO
+source scripts/bash/release-lib.sh
+
+build_tag_foundry $BRANCH $LOG_FILE truffle-compat foundry.toml.bak
+build_tag_foundry $BRANCH $LOG_FILE truffle-compat8 foundry.toml.bak
+
+mv foundry.toml.bak foundry.toml
+
+yarn node ./scripts/foundry/verify-bytecode-foundry.js --network $NETWORK --branch $BRANCH --librariesFile "libraries.json" $FORNO

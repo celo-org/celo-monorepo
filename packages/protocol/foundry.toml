@@ -31,9 +31,10 @@ no_match_path = "{**/test/BLS12Passthrough.sol,**/test/RandomTest.sol}"
 # Profile to match Truffle configuration for 0.5.13 contracts
 [profile.truffle-compat]
 src = 'contracts'
+skip= [ "test-sol/**" ]
 out = 'out-truffle-compat'
 libs = ['lib', 'node_modules']
-solc_version = '0.5.13'
+solc_version = '0.5.14'
 optimizer = false
 evm_version = 'istanbul'
 metadata_literal = true
@@ -42,6 +43,7 @@ via_ir = false
 # Profile to match Truffle configuration for 0.8.19 contracts
 [profile.truffle-compat8]
 src = 'contracts-0.8'
+skip= [ "test-sol/**" ]
 out = 'out-truffle-compat-0.8'
 libs = ['lib', 'node_modules']
 solc_version = '0.8.19'
