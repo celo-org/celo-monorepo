@@ -44,7 +44,7 @@ Putting it all together, you might run something like
 forge test --match-path ./path/to/file.t.sol --match-test test_ToMatch -vvv
 ```
 
-You can read more about the `forge test` command [here](https://book.getfoundry.sh/reference/forge/forge-test).
+You can read more about the `forge test` command [here](https://getfoundry.sh/forge/reference/test/).
 
 To skip a specific test, you can add `vm.skip(true);` as the first line of the test.
 
