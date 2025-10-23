@@ -1,6 +1,6 @@
 # @celo/devchain-anvil
 
-This package contains anvil state that allows you to start an [anvil](https://book.getfoundry.sh/reference/anvil/) instance in seconds.
+This package contains anvil state that allows you to start an [anvil](https://getfoundry.sh/anvil/overview#anvil) instance in seconds.
 
 This anvil instance serves at `localhost:8545` on your machine, and comes pre-configured with core contracts like the [`Registry`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Registry.sol) contract (at `0x000000000000000000000000000000000000ce10`). You can make RPC calls against this anvil instance as if you were interacting with Celo on `Alfajores` or `Mainnet`.
 
