@@ -62,7 +62,7 @@ Files in this package:
 
 ## Background
 
-[Foundry](https://book.getfoundry.sh/reference/anvil/) allows you to start anvil instances with state you read from `json` files.
+[Foundry](https://getfoundry.sh/anvil/overview#anvil) allows you to start anvil instances with state you read from `json` files.
 The idea is to save the state of an anvil instance at a certain point in time, and then load it back up later.
 
 ```sh
