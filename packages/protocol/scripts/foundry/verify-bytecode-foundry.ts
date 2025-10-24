@@ -136,6 +136,7 @@ const chainLookup = {
     })
   },
 }
+
 const [artifacts05] = instantiateArtifactsFromForge(buildDir05)
 const [artifacts08] = instantiateArtifactsFromForge(buildDir08)
 verifyBytecodes(
