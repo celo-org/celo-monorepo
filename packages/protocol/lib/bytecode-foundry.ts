@@ -41,7 +41,7 @@ export const stripMetadata = (bytecode: string): string => {
 export interface LibraryLinks {
   [name: string]: {
     address: string,
-    placeholder: string
+    placeholderHash: string
   }
 }
 
@@ -58,7 +58,7 @@ const getPlaceholderHash = (name: string): string => {
 
 export const linkLibraries = (bytecode: string, libraryLinks: LibraryLinks): string => {
   Object.keys(libraryLinks).forEach((libraryName) => {
-    const linkString = `__\\$${libraryLinks[libraryName].placeholder}\\$__`
+    const linkString = `__\\$${libraryLinks[libraryName].placeholderHash}\\$__`
     // Use g flag to iterate through for all occurences.
     bytecode = bytecode.replace(RegExp(linkString, 'g'), libraryLinks[libraryName].address)
   })
@@ -87,21 +87,23 @@ export const verifyAndStripLibraryPrefix = (bytecode: string, address = NULL_ADD
   return bytecode.slice(4 + ADDRESS_LENGTH, bytecode.length)
 }
 
-export class LibraryPositions {
-  positions: {
+/*
+ * Stores info about libraries linked in an artifact.
+ * Specifically, for each library, it stores:
+ * - `positions`: an array of indices into the `deployedBytecode` string indicating the locations
+ *    where the library should be linked.
+ * - `placeholderHash`: the hexadecimal 34-character hash used as a placeholder before linking.
+ */
+export class ArtifactLibraryLinking {
+  links: {
     [library: string]: {
-      pos: number[]
-      fullQualified: string
+      positions: number[]
+      placeholderHash: string
     }
   }
 
-  /*
-   * Creates a LibraryPositions object, which, for each yet to be linked library,
-   * contains the bytecode offsets of where the library address should be
-   * inserted.
-   */
   constructor(artifact: Artifact) {
-    this.positions = {}
+    this.links = {}
     if (typeof artifact.deployedBytecode !== 'string') {
       this.parseLibraryPositions(artifact.deployedBytecode.linkReferences)
     } else {
@@ -114,19 +116,22 @@ export class LibraryPositions {
       const libraryLinks = references[sourceFile]
       Object.keys(libraryLinks).forEach(library => {
         libraryLinks[library].forEach(reference => {
-          this.addPositionFromByte(library, `${sourceFile}:${library}`, reference.start, reference.length)
+          this.addPositionFromByte(library, sourceFile, reference.start, reference.length)
         })
       })
     })
   }
 
-  private addPositionFromByte(libName: string, library: string, startByte: number, length: number) {
+  private addPositionFromByte(library: string, sourceFile: string, startByte: number, length: number) {
     if (length !== 20) {
       throw new Error(`Unexpected library link length for ${library} at ${startByte}: ${length}`)
     }
 
-    if (!this.positions[libName]) {
-      this.positions[libName] = { pos: [], fullQualified: library }
+    if (!this.links[library]) {
+      this.links[library] = {
+        positions: [],
+        placeholderHash: getPlaceholderHash(`${sourceFile}:${library}`)
+      }
     }
 
     // The `linkReferences` `start` value refers to the byte index in the deployed bytecode.
@@ -134,37 +139,55 @@ export class LibraryPositions {
     // so we need to convert:
     // - Multiply by 2 because every byte takes up two hex characters.
     // - Add 2 to account for the "0x" characters at the start of the bytecode hex string.
-    this.positions[libName].pos.push(startByte * 2 + 2)
+    this.links[library].positions.push(startByte * 2 + 2)
   }
 }
 
-export class LibraryAddresses {
-  addresses: { [library: string]: { address: string, placeholder: string } }
+/*
+ * Stores information about linked libraries that is necessary for linking.
+ * Specifically, for each library:
+ * - `address`: the on-chain address.
+ * - `placeholderHash`: the 34-character hexadecimal placeholder hash.
+ */
+export class LibraryLinkingInfo {
+  info: LibraryLinks
 
   constructor() {
-    this.addresses = {}
+    this.info = {}
   }
 
-  collect = (bytecode: string, libraryPositions: LibraryPositions) =>
-    Object.keys(libraryPositions.positions).forEach((library) => {
-      libraryPositions.positions[library].pos.forEach((position) => {
-        if (!this.addAddress(library, libraryPositions.positions[library].fullQualified, bytecode.slice(position, position + ADDRESS_LENGTH))) {
+  /*
+   * Collects and/or checks addresses of linked libraries in a contract, given its deployed bytecode
+   * and the expected library linking positions.
+   */
+  collect = (bytecode: string, artifactLinking: ArtifactLibraryLinking) =>
+    Object.keys(artifactLinking.links).forEach((library) => {
+      artifactLinking.links[library].positions.forEach((position) => {
+        if (!this.addAddress(library, artifactLinking.links[library].placeholderHash, bytecode.slice(position, position + ADDRESS_LENGTH))) {
           throw new Error(`Mismatched addresses for ${library} at ${position}`)
         }
       })
     })
 
+  getAddressMapping = (): { [library: string]: string } => {
+    const mapping = {}
+    Object.keys(this.info).map(library => {
+      mapping[library] = this.info[library].address
+    })
+    return mapping
+  }
+
   /*
    * Tries to add a library name -> address mapping. If the library has already
    * had an address added, checks that the new address matches the old one.
    */
-  private addAddress(library: string, fullQualified: string, address: string): boolean {
-    if (!this.addresses[library]) {
-      this.addresses[library] = {
+  private addAddress(library: string, placeholderHash: string, address: string): boolean {
+    if (!this.info[library]) {
+      this.info[library] = {
         address,
-        placeholder: getPlaceholderHash(fullQualified)
+        placeholderHash
       }
     }
-    return this.addresses[library].address === address
+    return this.info[library].address === address
   }
 }

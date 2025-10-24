@@ -149,13 +149,13 @@ verifyBytecodes(
   version,
   network
 )
-  .then((libraryAddresses) => {
+  .then((libraryLinkingInfo) => {
     // eslint-disable-next-line: no-console
     console.info('Success, no bytecode mismatches found!')
 
     // eslint-disable-next-line: no-console
     console.info(`Writing linked library addresses to ${librariesFile}`)
-    writeJsonSync(librariesFile, libraryAddresses.addresses, { spaces: 2 })
+    writeJsonSync(librariesFile, libraryLinkingInfo.getAddressMapping(), { spaces: 2 })
   })
   .catch((error) => {
     console.log('Script errored!', error)

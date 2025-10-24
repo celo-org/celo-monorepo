@@ -1,8 +1,8 @@
 /* eslint-disable no-console: 0 */
 import { ensureLeading0x } from '@celo/base/lib/address'
 import {
-  LibraryAddresses,
-  LibraryPositions,
+  LibraryLinkingInfo,
+  ArtifactLibraryLinking,
   linkLibraries,
   stripMetadata,
   verifyAndStripLibraryPrefix,
@@ -45,7 +45,7 @@ let ignoredContracts = [
 
 interface VerificationContext {
   artifacts: BuildArtifacts[]
-  libraryAddresses: LibraryAddresses
+  libraryLinkingInfo: LibraryLinkingInfo
   registry: RegistryLookup
   governanceAddress: string
   proposal: ProposalTx[]
@@ -111,7 +111,7 @@ const getOnchainBytecode = async (address: string, context: VerificationContext)
   stripMetadata(await context.chainLookup.getCode(address))
 
 const isLibrary = (contract: string, context: VerificationContext) => {
-  const answer = Object.keys(context.libraryAddresses.addresses).includes(contract)
+  const answer = Object.keys(context.libraryLinkingInfo.info).includes(contract)
   return answer
 }
 
@@ -142,13 +142,13 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
 
   // check implementation deployment
   const sourceBytecode = getSourceBytecode(contract, context)
-  const sourceLibraryPositions = new LibraryPositions(artifact)
+  const sourceArtifactLinking = new ArtifactLibraryLinking(artifact)
 
   let implementationAddress: string
   if (isImplementationChanged(contract, context.proposal)) {
     implementationAddress = getProposedImplementationAddress(contract, context.proposal)
   } else if (isLibrary(contract, context)) {
-    implementationAddress = ensureLeading0x(context.libraryAddresses.addresses[contract].address)
+    implementationAddress = ensureLeading0x(context.libraryLinkingInfo.info[contract].address)
   } else {
     const proxyAddress = await context.registry.getAddressForString(contract)
     if (proxyAddress === ZERO_ADDRESS) {
@@ -159,9 +159,9 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   }
 
   let onchainBytecode = await getOnchainBytecode(implementationAddress, context)
-  context.libraryAddresses.collect(onchainBytecode, sourceLibraryPositions)
+  context.libraryLinkingInfo.collect(onchainBytecode, sourceArtifactLinking)
 
-  let linkedSourceBytecode = linkLibraries(sourceBytecode, context.libraryAddresses.addresses)
+  let linkedSourceBytecode = linkLibraries(sourceBytecode, context.libraryLinkingInfo.info)
 
   // normalize library bytecodes
   if (isLibrary(contract, context)) {
@@ -180,7 +180,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
 
   // push unvisited libraries to DFS queue
   queue.push(
-    ...Object.keys(sourceLibraryPositions.positions).filter((library) => !visited.has(library))
+    ...Object.keys(sourceArtifactLinking.links).filter((library) => !visited.has(library))
   )
 }
 
@@ -277,7 +277,7 @@ export const verifyBytecodes = async (
   const governanceAddress = await registry.getAddressForString('Governance')
   const context: VerificationContext = {
     artifacts,
-    libraryAddresses: new LibraryAddresses(),
+    libraryLinkingInfo: new LibraryLinkingInfo(),
     registry,
     governanceAddress,
     proposal,
@@ -290,5 +290,5 @@ export const verifyBytecodes = async (
     await dfsStep(queue, visited, context)
   }
 
-  return context.libraryAddresses
+  return context.libraryLinkingInfo
 }
