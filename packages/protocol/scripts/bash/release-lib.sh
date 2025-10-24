@@ -63,8 +63,11 @@ function checkout_build_sources() {
 function build_tag_foundry() {
   local BRANCH="$1"
   local LOG_FILE="$2"
+  # Temporarily allow unset variables to handle optional parameters.
+  set +u
   local PROFILE="$3"
   local CONFIG="$4"
+  set -u
 
   local RELEASE_NUMBER=$(echo "$BRANCH" | grep -o 'v[0-9]\+' | tr -dc '0-9')
 
