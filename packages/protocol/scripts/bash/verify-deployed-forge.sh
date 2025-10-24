@@ -29,9 +29,9 @@ done
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
 
-cp foundry.toml foundry.toml.bak
-
 source scripts/bash/release-lib.sh
+
+cp foundry.toml foundry.toml.bak
 
 build_tag_foundry $BRANCH $LOG_FILE truffle-compat foundry.toml.bak
 build_tag_foundry $BRANCH $LOG_FILE truffle-compat8 foundry.toml.bak
