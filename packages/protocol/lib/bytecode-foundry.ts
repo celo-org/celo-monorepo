@@ -1,14 +1,14 @@
 /* eslint-disable max-classes-per-file: 0 */
-/*
- * The Solidity compiler appends a Swarm Hash of compilation metadata to the end
- * of bytecode. We find this hash based on the specification here:
- * https://solidity.readthedocs.io/en/develop/metadata.html#encoding-of-the-metadata-hash-in-the-bytecode
- */
 
 import { NULL_ADDRESS, trimLeading0x } from '@celo/base/lib/address'
 import { Artifact, LinkReferences } from '@celo/protocol/lib/compatibility/internal'
 import { keccak256, toHex } from 'viem'
 
+/*
+ * The Solidity compiler appends a Swarm Hash of compilation metadata to the end
+ * of bytecode. We find this hash based on the specification here:
+ * https://solidity.readthedocs.io/en/develop/metadata.html#encoding-of-the-metadata-hash-in-the-bytecode
+ */
 const CONTRACT_METADATA_REGEXPS = [
   // 0.5.8
   'a165627a7a72305820.{64}0029',
@@ -36,8 +36,10 @@ export const stripMetadata = (bytecode: string): string => {
   }
   return match[1]
 }
-
-// Maps library fully qualified library names to their onchain addresses (formatted without "0x" prefix).
+/*
+ * Maps library names to their onchain addresses (formatted without "0x" prefix) and 34-character
+ * linking placeholder hash.
+ */
 export interface LibraryLinks {
   [name: string]: {
     address: string,
@@ -46,15 +48,17 @@ export interface LibraryLinks {
 }
 
 /*
- * Unresolved libraries appear as "__$<hash>$__..." in bytecode output by
+ * Unresolved libraries appear as "__$<hash>$__" in bytecode output by
  * solc. The length of the entire string is 40 characters (accounting for the 20
  * bytes of the address that should be substituted in).
+ * The hash is the first 34 characters of the keccak256 hash of the fully qualified library name,
+ * i.e. `sourcePath:libraryName`.
+ * See https://docs.soliditylang.org/en/v0.8.13/using-the-compiler.html#library-linking
  */
 const getPlaceholderHash = (name: string): string => {
   const hash = keccak256(toHex(name))
   return hash.slice(2, 2 + 34)
 }
-
 
 export const linkLibraries = (bytecode: string, libraryLinks: LibraryLinks): string => {
   Object.keys(libraryLinks).forEach((libraryName) => {
@@ -68,15 +72,17 @@ export const linkLibraries = (bytecode: string, libraryLinks: LibraryLinks): str
 
 const ADDRESS_LENGTH = 40
 const PUSH20_OPCODE = '73'
-// To check that a library isn't being called directly, the Solidity
-// compiler starts a library's bytecode with a comparison of the current
-// address with the address the library was deployed to (it has to differ
-// to ensure the library is being called with CALLCODE or DELEGATECALL
-// instead of a regular CALL).
-// The address is only known at contract construction time, so
-// the compiler's output contains a placeholder 0-address, while the onchain
-// bytecode has the correct address inserted.
-// Reference: https://solidity.readthedocs.io/en/v0.5.12/contracts.html#call-protection-for-libraries
+/*
+ * To check that a library isn't being called directly, the Solidity
+ * compiler starts a library's bytecode with a comparison of the current
+ * address with the address the library was deployed to (it has to differ
+ * to ensure the library is being called with CALLCODE or DELEGATECALL
+ * instead of a regular CALL).
+ * The address is only known at contract construction time, so
+ * the compiler's output contains a placeholder 0-address, while the onchain
+ * bytecode has the correct address inserted.
+ * Reference: https://solidity.readthedocs.io/en/v0.5.12/contracts.html#call-protection-for-libraries
+ */
 export const verifyAndStripLibraryPrefix = (bytecode: string, address = NULL_ADDRESS) => {
   if (bytecode.slice(2, 4) !== PUSH20_OPCODE) {
     throw new Error(`Library bytecode doesn't start with address load`)
@@ -134,11 +140,13 @@ export class ArtifactLibraryLinking {
       }
     }
 
-    // The `linkReferences` `start` value refers to the byte index in the deployed bytecode.
-    // We will be using the position as an index into the hex string representing the bytecode
-    // so we need to convert:
-    // - Multiply by 2 because every byte takes up two hex characters.
-    // - Add 2 to account for the "0x" characters at the start of the bytecode hex string.
+    /*
+     * The `linkReferences` `start` value refers to the byte index in the deployed bytecode.
+     * We will be using the position as an index into the hex string representing the bytecode
+     * so we need to convert:
+     * - Multiply by 2 because every byte takes up two hex characters.
+     * - Add 2 to account for the "0x" characters at the start of the bytecode hex string.
+     */
     this.links[library].positions.push(startByte * 2 + 2)
   }
 }
