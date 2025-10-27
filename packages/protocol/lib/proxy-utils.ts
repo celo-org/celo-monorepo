@@ -32,7 +32,6 @@ export async function verifyProxyStorageProof(web3: Web3, proxy: string, owner: 
 }
 
 interface ProofLookup {
-  // TODO more specific typing
   getProof: (address: string, slots: string[]) => Promise<any>
 }
 

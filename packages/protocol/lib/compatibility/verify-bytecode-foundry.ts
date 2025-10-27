@@ -23,9 +23,7 @@ interface ProxyLookup {
 
 interface ChainLookup {
   getCode: (address: string) => Promise<string>
-  // TODO more specific typing
   encodeFunctionCall: (abi: any, args: any[]) => string
-  // TODO more specific typing
   getProof: (address: string, slots: string[]) => Promise<any>
 }
 
