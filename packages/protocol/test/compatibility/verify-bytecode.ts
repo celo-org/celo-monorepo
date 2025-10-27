@@ -16,26 +16,6 @@ import truffleContract = require('@truffle/contract')
 
 const Registry = artifacts.require('Registry')
 const Proxy = artifacts.require('Proxy')
-const proxyLookup = {
-  getImplementation: async (address: string) => {
-    const proxy = await Proxy.at(address)
-    return proxy._getImplementation()
-  },
-}
-
-const chainLookup = {
-  getCode: async (address: string) => {
-    return web3.eth.getCode(address)
-  },
-
-  encodeFunctionCall: (abi: any, args: any[]) => {
-    return web3.eth.abi.encodeFunctionCall(abi, args)
-  },
-
-  getProof: (address: string, slots: string[]) => {
-    return web3.eth.getProof(web3.utils.toChecksumAddress(address), slots, 'latest')
-  },
-}
 
 const makeTruffleContract = (artifact: Artifact) => {
   const Contract = truffleContract({
@@ -126,11 +106,8 @@ contract('', (accounts) => {
     let library2
     let library3
     let testContract
-    let registryLookup
-
     beforeEach(async () => {
       registry = await Registry.new(true)
-      registryLookup = { getAddressForString: (name: string) => registry.getAddressForString(name) }
 
       library1 = await LinkedLibrary1.new({ from: accounts[0] })
       library3 = await LinkedLibrary3.new({ from: accounts[0] })
@@ -146,14 +123,7 @@ contract('', (accounts) => {
 
     describe('verifyBytecodes', () => {
       it(`doesn't throw on matching contracts`, async () => {
-        await verifyBytecodes(
-          ['TestContract'],
-          [buildArtifacts],
-          registryLookup,
-          [],
-          proxyLookup,
-          chainLookup
-        )
+        await verifyBytecodes(['TestContract'], [buildArtifacts], registry, [], Proxy, web3)
         assert(true)
       })
 
@@ -161,14 +131,7 @@ contract('', (accounts) => {
         const oldBytecode = artifact.deployedBytecode
         artifact.deployedBytecode = '0x0' + oldBytecode.slice(3, artifact.deployedBytecode.length)
         await assertThrowsAsync(
-          verifyBytecodes(
-            ['TestContract'],
-            [buildArtifacts],
-            registryLookup,
-            [],
-            proxyLookup,
-            chainLookup
-          )
+          verifyBytecodes(['TestContract'], [buildArtifacts], registry, [], Proxy, web3)
         )
         artifact.deployedBytecode = oldBytecode
       })
@@ -179,14 +142,7 @@ contract('', (accounts) => {
         libraryArtifact.deployedBytecode =
           oldBytecode.slice(0, 44) + '00' + oldBytecode.slice(46, oldBytecode.length)
         await assertThrowsAsync(
-          verifyBytecodes(
-            ['TestContract'],
-            [buildArtifacts],
-            registryLookup,
-            [],
-            proxyLookup,
-            chainLookup
-          )
+          verifyBytecodes(['TestContract'], [buildArtifacts], registry, [], Proxy, web3)
         )
         libraryArtifact.deployedBytecode = oldBytecode
       })
@@ -216,10 +172,10 @@ contract('', (accounts) => {
           await verifyBytecodes(
             ['TestContract'],
             [upgradedLibBuildArtifacts],
-            registryLookup,
+            registry,
             proposal,
-            proxyLookup,
-            chainLookup
+            Proxy,
+            web3
           )
           assert(true)
         })
@@ -235,14 +191,7 @@ contract('', (accounts) => {
           ]
 
           await assertThrowsAsync(
-            verifyBytecodes(
-              ['TestContract'],
-              [buildArtifacts],
-              registryLookup,
-              proposal,
-              proxyLookup,
-              chainLookup
-            )
+            verifyBytecodes(['TestContract'], [buildArtifacts], registry, proposal, Proxy, web3)
           )
         })
 
@@ -257,14 +206,7 @@ contract('', (accounts) => {
           ]
 
           await assertThrowsAsync(
-            verifyBytecodes(
-              ['TestContract'],
-              [buildArtifacts],
-              registryLookup,
-              proposal,
-              proxyLookup,
-              chainLookup
-            )
+            verifyBytecodes(['TestContract'], [buildArtifacts], registry, proposal, Proxy, web3)
           )
         })
       })
@@ -292,10 +234,10 @@ contract('', (accounts) => {
           await verifyBytecodes(
             ['TestContract'],
             [upgradedContractBuildArtifacts],
-            registryLookup,
+            registry,
             proposal,
-            proxyLookup,
-            chainLookup
+            Proxy,
+            web3
           )
           assert(true)
         })
@@ -311,14 +253,7 @@ contract('', (accounts) => {
           ]
 
           await assertThrowsAsync(
-            verifyBytecodes(
-              ['TestContract'],
-              [buildArtifacts],
-              registryLookup,
-              proposal,
-              proxyLookup,
-              chainLookup
-            )
+            verifyBytecodes(['TestContract'], [buildArtifacts], registry, proposal, Proxy, web3)
           )
         })
 
@@ -333,14 +268,7 @@ contract('', (accounts) => {
           ]
 
           await assertThrowsAsync(
-            verifyBytecodes(
-              ['TestContract'],
-              [buildArtifacts],
-              registryLookup,
-              proposal,
-              proxyLookup,
-              chainLookup
-            )
+            verifyBytecodes(['TestContract'], [buildArtifacts], registry, proposal, Proxy, web3)
           )
         })
 
@@ -351,10 +279,10 @@ contract('', (accounts) => {
             verifyBytecodes(
               ['TestContract'],
               [upgradedContractBuildArtifacts],
-              registryLookup,
+              registry,
               proposal,
-              proxyLookup,
-              chainLookup
+              Proxy,
+              web3
             )
           )
         })
@@ -384,10 +312,10 @@ contract('', (accounts) => {
           await verifyBytecodes(
             ['TestContract'],
             [upgradedContractBuildArtifacts],
-            registryLookup,
+            registry,
             proposal,
-            proxyLookup,
-            chainLookup
+            Proxy,
+            web3
           )
           assert(true)
         })
@@ -403,14 +331,7 @@ contract('', (accounts) => {
           ]
 
           await assertThrowsAsync(
-            verifyBytecodes(
-              ['TestContract'],
-              [buildArtifacts],
-              registryLookup,
-              proposal,
-              proxyLookup,
-              chainLookup
-            )
+            verifyBytecodes(['TestContract'], [buildArtifacts], registry, proposal, Proxy, web3)
           )
         })
 
@@ -425,14 +346,7 @@ contract('', (accounts) => {
           ]
 
           await assertThrowsAsync(
-            verifyBytecodes(
-              ['TestContract'],
-              [buildArtifacts],
-              registryLookup,
-              proposal,
-              proxyLookup,
-              chainLookup
-            )
+            verifyBytecodes(['TestContract'], [buildArtifacts], registry, proposal, Proxy, web3)
           )
         })
       })
@@ -451,10 +365,10 @@ contract('', (accounts) => {
           verifyBytecodes(
             ['TestContract'],
             [upgradedContractBuildArtifacts],
-            registryLookup,
+            registry,
             proposal,
-            proxyLookup,
-            chainLookup
+            Proxy,
+            web3
           )
         )
       })

@@ -50,39 +50,15 @@ module.exports = async (callback: (error?: any) => number) => {
     const version = getReleaseVersion(branch)
 
     const registry = await Registry.at(celoRegistryAddress)
-    const registryLookup = {
-      getAddressForString: (name: string) => registry.getAddressForString(name),
-    }
-    const proxyLookup = {
-      getImplementation: async (address: string) => {
-        const proxy = await Proxy.at(address)
-        return proxy._getImplementation()
-      },
-    }
-
-    const chainLookup = {
-      getCode: async (address: string) => {
-        return web3.eth.getCode(address)
-      },
-
-      encodeFunctionCall: (abi: any, args: any[]) => {
-        return web3.eth.abi.encodeFunctionCall(abi, args)
-      },
-
-      getProof: (address: string, slots: string[]) => {
-        return web3.eth.getProof(web3.utils.toChecksumAddress(address), slots, 'latest')
-      },
-    }
     const buildArtifacts = getBuildArtifacts(artifactsDirectory)
     const artifacts08 = getBuildArtifacts(artifacts08Directory)
     const libraryAddresses = await verifyBytecodes(
       Object.keys(CeloContractName),
       [buildArtifacts, artifacts08],
-      registryLookup,
+      registry,
       proposal,
-      //Proxy,
-      proxyLookup,
-      chainLookup,
+      Proxy,
+      web3,
       initializationData,
       version,
       network

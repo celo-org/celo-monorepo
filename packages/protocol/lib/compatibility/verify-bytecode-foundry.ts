@@ -7,7 +7,7 @@ import {
   stripMetadata,
   verifyAndStripLibraryPrefix,
 } from '@celo/protocol/lib/bytecode-foundry'
-import { verifyProxyStorageProof } from '@celo/protocol/lib/proxy-utils'
+import { verifyProxyStorageProofFoundry } from '@celo/protocol/lib/proxy-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9'
@@ -127,7 +127,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
     // ganache does not support eth_getProof
     if (
       context.network !== 'development' &&
-      !(await verifyProxyStorageProof(context.chainLookup, proxyAddress, context.governanceAddress))
+      !(await verifyProxyStorageProofFoundry(context.chainLookup, proxyAddress, context.governanceAddress))
     ) {
       throw new Error(`Proposed ${contract}Proxy has impure storage`)
     }

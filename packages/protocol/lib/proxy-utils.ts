@@ -17,12 +17,26 @@ const OWNER_POSITION = '0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717
 // );
 const IMPLEMENTATION_POSITION = '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc'
 
+export async function verifyProxyStorageProof(web3: Web3, proxy: string, owner: string) {
+  const proof = await web3.eth.getProof(
+    web3.utils.toChecksumAddress(proxy),
+    [OWNER_POSITION, IMPLEMENTATION_POSITION],
+    'latest'
+  )
+
+  const trie = new SecureTrie()
+  await trie.put(hexToBuffer(OWNER_POSITION), rlpEncode(owner))
+
+  // @ts-ignore
+  return proof.storageHash === bufferToHex(trie.root)
+}
+
 interface ProofLookup {
   // TODO more specific typing
   getProof: (address: string, slots: string[]) => Promise<any>
 }
 
-export async function verifyProxyStorageProof(proofLookup: ProofLookup, proxy: string, owner: string) {
+export async function verifyProxyStorageProofFoundry(proofLookup: ProofLookup, proxy: string, owner: string) {
   const proof = await proofLookup.getProof(
     proxy,
     [OWNER_POSITION, IMPLEMENTATION_POSITION]
