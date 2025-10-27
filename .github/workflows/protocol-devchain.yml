@@ -42,6 +42,7 @@ jobs:
           version: 'v1.0.0'
       - name: Install forge dependencies
         run: forge install
+        working-directory: packages/protocol
       # Workaround for https://stackoverflow.com/questions/72978485/git-submodule-update-failed-with-fatal-detected-dubious-ownership-in-repositor
       # This is needed because some runners messup with permissions of git files and submodules. Particularly problematic for DinD runners (e.g. self-hosted+container arg)
       - name: Configure git safe directories
