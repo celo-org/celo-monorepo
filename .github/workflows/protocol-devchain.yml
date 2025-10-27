@@ -2,11 +2,12 @@ name: 'CoreContracts: Devchain For Contract Release'
 run-name: 'CoreContracts: Devchain For Contract Release'
 
 on:
-  schedule:
-    # monthly on 1 at 0:00 UTC
-    - cron: 0 0 1 * *
+  # schedule:
+  #   # monthly on 1 at 0:00 UTC
+  #   - cron: 0 0 1 * *
   workflow_dispatch:
-
+  push:
+    branches: ['martinvol/*']
 permissions:
   contents: read
 
@@ -31,13 +32,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
-        with:
-          version: 'v1.0.0'
-
-      - name: Install forge dependencies
-        run: forge install # this actually just builds the contracts
       - name: Install yarn dependencies
         run: git config --global url."https://".insteadOf ssh:// && yarn install
       - name: Build packages
@@ -48,7 +42,6 @@ jobs:
         run: git config --global --add safe.directory '*'
       - name: Generate devchain of previous release
         run: |
-          echo "not building contracts"
           # mkdir devchain
           # GRANTS_FILE=scripts/truffle/releaseGoldExampleConfigs.json
           # yarn --cwd packages/protocol devchain generate-tar devchain/devchain.tar.gz --release_gold_contracts $GRANTS_FILE
