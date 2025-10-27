@@ -44,6 +44,7 @@ jobs:
         run: git config --global --add safe.directory '*'
       - name: Generate devchain of previous release
         run: |
+          cd  packages/protocol/.tmp
           yarn anvil-devchain:start-L2
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4
