@@ -9,7 +9,7 @@ module.exports = async (deployer: any, network: any) => {
   const currentNetwork = { ...networks[network], name: network }
 
   console.log('Current network is', JSON.stringify(currentNetwork))
-  // Instad of setting this in a singleton, it could have been set in every migration
+  // Instead of setting this in a singleton, it could have been set in every migration
   // but it would have required quite a lot of refactoring
   ArtifactsSingleton.setNetwork(currentNetwork)
 }
