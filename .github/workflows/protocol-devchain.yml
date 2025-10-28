@@ -52,11 +52,11 @@ jobs:
           yarn anvil-devchain:start-L2
           ls .tmp
         working-directory: packages/protocol
-      - name: Stop anvil
-        run: |
-          killall anvil
-          ls .tmp
-        working-directory: packages/protocol
+      # - name: Stop anvil
+      #   run: |
+      #     killall anvil
+      #     ls .tmp
+      #   working-directory: packages/protocol
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4
         with:
