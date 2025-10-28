@@ -51,11 +51,13 @@ jobs:
         run: |
           cd  packages/protocol/
           yarn anvil-devchain:start-L2
-          ls packages/protocol/.tmp
+          ls .tmp
+        working-directory: packages/protocol
       - name: Stop anvil
         run: |
           killall anvil
-          ls packages/protocol/.tmp
+          ls .tmp
+        working-directory: packages/protocol
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4
         with:
