@@ -57,6 +57,8 @@ anvil  --load-state .tmp/devchain/l2-devchain.json \
 --balance $BALANCE \
 --steps-tracing &
 
+# sleep a little (TODO not needed after using start_devchain)
+sleep 10
 
 if command -v lsof; then
     # TODO replace harcoded port
