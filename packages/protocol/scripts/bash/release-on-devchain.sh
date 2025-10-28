@@ -49,12 +49,7 @@ echo `ls .tmp/`
 echo `ls .tmp/devchain`
 
 echo "- Run local network"
-anvil  --load-state .tmp/devchain/l2-devchain.json \
---port $ANVIL_PORT \
---gas-limit $GAS_LIMIT \
---code-size-limit $CODE_SIZE_LIMIT \
---balance $BALANCE \
---steps-tracing &
+./scripts/foundry/start_anvil.sh -p $ANVIL_PORT -l .tmp/devchain/l2-devchain.json
 
 
 if command -v lsof; then
