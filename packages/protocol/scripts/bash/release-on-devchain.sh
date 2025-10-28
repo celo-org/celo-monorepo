@@ -2,6 +2,7 @@
 set -euo pipefail
 
 source ./scripts/bash/utils.sh
+source ./scripts/foundry/constants.sh
 
 # Simulates a release of the current contracts against a target git ref on a local network
 #
@@ -51,6 +52,8 @@ echo `ls .tmp/devchain`
 echo "- Run local network"
 ./scripts/foundry/start_anvil.sh -p $ANVIL_PORT -l .tmp/devchain/l2-devchain.json
 
+# sleep a little (TODO not needed after using start_devchain)
+sleep 10
 
 if command -v lsof; then
     # TODO replace harcoded port
