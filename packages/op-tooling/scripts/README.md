@@ -148,6 +148,61 @@ event GamePruned(
 
 **Note:** This contract is only temporarily set as the factory implementation during the pruning operation and is immediately replaced with the original implementation afterwards.
 
+### `ResetAnchorGame.s.sol`
+
+Maintenance script that directly sets the anchor game in the AnchorStateRegistry by manipulating storage slot 3. This is a critical operation that temporarily upgrades the registry to StorageSetter, updates the anchorGame storage slot, then restores the original implementation.
+
+**Features:**
+- Temporarily upgrades AnchorStateRegistry to StorageSetter
+- Directly sets storage slot 3 (anchorGame) to a new game address
+- Automatically restores original registry implementation
+- Verifies anchor game after restoration
+- Emits AnchorGameReset event for tracking
+
+**Required Environment Variables:**
+- `REGISTRY` - Address of the AnchorStateRegistry proxy
+- `PROXY_ADMIN` - Address of the ProxyAdmin contract
+- `ANCHOR_GAME` - Address of the new anchor game to set
+
+**Example Execution:**
+```bash
+REGISTRY="0x..." PROXY_ADMIN="0x..." ANCHOR_GAME="0x..." forge script ResetAnchorGame.s.sol --root $PATH_TO_OP_REPO/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
+```
+
+**Process Flow:**
+1. Store original registry implementation address
+2. Read current anchor game from slot 3
+3. Deploy and upgrade to StorageSetter
+4. Call setAddress() to set slot 3 to new anchor game
+5. Restore original registry implementation
+6. Verify anchor game via registry.anchorGame()
+7. Emit AnchorGameReset event
+
+**Storage Slot Modified:**
+- **Slot 3**: `anchorGame` (IFaultDisputeGame) - The game whose claim is currently being used as the anchor state
+
+**Event:**
+```solidity
+event AnchorGameReset(
+  address indexed previousGame,
+  address indexed newGame
+)
+```
+
+**Safety Considerations:**
+- This operation modifies critical registry storage - use with extreme caution
+- Requires ProxyAdmin privileges to upgrade registry
+- The anchor game address is used for proving withdrawals and disputes
+- Ensure ANCHOR_GAME points to a valid, finalized fault dispute game
+- Setting an invalid anchor game can break the withdrawal system
+- Verify the game type and status before setting
+- Consider impact on in-flight withdrawals
+
+**Use Cases:**
+- Emergency recovery when anchor state needs manual correction
+- Testing anchor state behavior in non-production environments
+- Fixing anchor state after disputed game resolution issues
+
 ## Notes
 
 - **Critical**: All Foundry scripts must be executed from the Optimism contracts-bedrock directory using `--root` flag
@@ -157,3 +212,7 @@ event GamePruned(
 - Pruning games does not affect the deployed game contracts themselves, only the factory's internal tracking
 - Always verify the RETENTION_INDEX value before pruning to avoid removing games that should be retained
 - Consider the gas cost implications of pruning large numbers of games in a single transaction
+- The `ResetAnchorGame.s.sol` script is a **highly sensitive operation** that directly modifies anchor state
+- Only use `ResetAnchorGame.s.sol` in emergency situations or testing environments
+- Setting an incorrect anchor game can break withdrawals and dispute resolution
+- Both `PruneGamesFromStorage.s.sol` and `ResetAnchorGame.s.sol` use the temporary upgrade pattern for safety
