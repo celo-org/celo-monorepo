@@ -37,12 +37,12 @@ done
 
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 
-# if BUILD_DIR was not set as a parameter, we generate the build and the chain for that specific branch
-if [ -z "$BUILD_DIR" ]
-then
-    RE_BUILD_REPO="yes"
-    BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
-fi
+# # if BUILD_DIR was not set as a parameter, we generate the build and the chain for that specific branch
+# if [ -z "$BUILD_DIR" ]
+# then
+#     RE_BUILD_REPO="yes"
+#     BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
+# fi
 
 echo "ls"
 echo `ls .tmp/`
