@@ -50,7 +50,9 @@ jobs:
       - name: Generate devchain of previous release
         run: |
           yarn anvil-devchain:start-L2
-          ls .tmp
+          mkdir .tmp/devchain
+          mv .tmp/devchain.json .tmp/devchain
+          mv .tmp/l2-devchain.json .tmp/devchain
         working-directory: packages/protocol
       # - name: Stop anvil
       #   run: |
