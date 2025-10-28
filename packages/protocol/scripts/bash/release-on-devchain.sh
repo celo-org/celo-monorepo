@@ -26,16 +26,30 @@ done
 #  THIS SHOULD BE REPLACED BY PROPER DEVCHAIN PROCESS
 # TODO
 # TODO
-git checkout martinvol/WIPCR13makeItMatchTruffle
-# FIX THE OZ submodule, it's probably not puuling it on the checkout
-# yarn pull submodules?
-yarn submodules:pull
-yarn anvil-devchain:start-L2 > anvil.log #2>&1
-git checkout -
+# git checkout martinvol/WIPCR13makeItMatchTruffle
+# # FIX THE OZ submodule, it's probably not puuling it on the checkout
 
+# yarn submodules:pull
+# yarn anvil-devchain:start-L2 > anvil.log #2>&1
+# git checkout -
+# # roll back submodules
+# yarn submodules:pull
 
-# roll back submodules
-yarn submodules:pull
+[ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
+
+# if BUILD_DIR was not set as a parameter, we generate the build and the chain for that specific branch
+if [ -z "$BUILD_DIR" ]
+then
+    RE_BUILD_REPO="yes"
+    BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
+fi
+
+echo "ls"
+echo `ls .tmp/`
+echo `ls .tmp/devchain`
+
+echo "- Run local network"
+anvil --load-state .tmp/devchain/state.json 
 
 if command -v lsof; then
     # TODO replace harcoded port
