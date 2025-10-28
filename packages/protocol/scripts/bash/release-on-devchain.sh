@@ -49,7 +49,7 @@ echo `ls .tmp/`
 echo `ls .tmp/devchain`
 
 echo "- Run local network"
-anvil \ --load-state .tmp/devchain/l2-devchain.json \
+anvil  --load-state .tmp/devchain/l2-devchain.json \
 --port $ANVIL_PORT \
 --gas-limit $GAS_LIMIT \
 --code-size-limit $CODE_SIZE_LIMIT \
