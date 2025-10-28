@@ -51,11 +51,16 @@ jobs:
         run: |
           cd  packages/protocol/
           yarn anvil-devchain:start-L2
+          ls packages/protocol/.tmp
+      - name: Stop anvil
+        run: |
+          killall anvil
+          ls packages/protocol/.tmp
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4
         with:
           name: devchain-${{ matrix.tag }}
-          path: packages/protocol/.tmp
+          path: packages/protocol/.tmp/devchain
           # Max retention time is 90 days for public repos
           # https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy
           retention-days: 90
