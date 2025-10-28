@@ -2,6 +2,7 @@
 set -euo pipefail
 
 source ./scripts/bash/utils.sh
+source $PWD/scripts/foundry/constants.sh
 
 # Simulates a release of the current contracts against a target git ref on a local network
 #
