@@ -28,9 +28,6 @@ done
 echo "- Run local network"
 ./scripts/foundry/start_anvil.sh -p $ANVIL_PORT -l .tmp/devchain/l2-devchain.json
 
-# sleep a little (TODO not needed after using start_devchain)
-sleep 10
-
 if command -v lsof; then
     ANVIL_PID=`lsof -i tcp:$ANVIL_PORT | tail -n 1 | awk '{print $2}'`
     echo "Network started with PID $ANVIL_PID, if exit 1, you will need to manually stop the process"
@@ -69,6 +66,6 @@ echo "- Verify release"
 yarn truffle exec --network anvil ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json --branch $BRANCH --initialize_data $INITIALIZATION_FILE
 
 
-# if [[ -n $ANVIL_PID ]]; then
-#     kill $ANVIL_PID
-# fi
+if [[ -n $ANVIL_PID ]]; then
+    kill $ANVIL_PID
+fi
