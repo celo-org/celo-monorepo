@@ -22,32 +22,8 @@ while getopts 'b:l:d:' flag; do
   esac
 done
 
-# TODO
-# TODO
-#  THIS SHOULD BE REPLACED BY PROPER DEVCHAIN PROCESS
-# TODO
-# TODO
-# git checkout martinvol/WIPCR13makeItMatchTruffle
-# # FIX THE OZ submodule, it's probably not puuling it on the checkout
-
-# yarn submodules:pull
-# yarn anvil-devchain:start-L2 > anvil.log #2>&1
-# git checkout -
-# # roll back submodules
-# yarn submodules:pull
 
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
-
-# # if BUILD_DIR was not set as a parameter, we generate the build and the chain for that specific branch
-# if [ -z "$BUILD_DIR" ]
-# then
-#     RE_BUILD_REPO="yes"
-#     BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
-# fi
-
-echo "ls"
-echo `ls .tmp/`
-echo `ls .tmp/devchain`
 
 echo "- Run local network"
 ./scripts/foundry/start_anvil.sh -p $ANVIL_PORT -l .tmp/devchain/l2-devchain.json
@@ -56,8 +32,7 @@ echo "- Run local network"
 sleep 10
 
 if command -v lsof; then
-    # TODO replace harcoded port
-    ANVIL_PID=`lsof -i tcp:8546 | tail -n 1 | awk '{print $2}'`
+    ANVIL_PID=`lsof -i tcp:$ANVIL_PORT | tail -n 1 | awk '{print $2}'`
     echo "Network started with PID $ANVIL_PID, if exit 1, you will need to manually stop the process"
 fi
 
