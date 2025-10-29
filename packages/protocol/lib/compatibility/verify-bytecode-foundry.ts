@@ -51,7 +51,8 @@ interface VerificationContext {
   chainLookup: ChainLookup
   network: string
 }
-interface InitializationData {
+
+export interface InitializationData {
   [contractName: string]: any[]
 }
 

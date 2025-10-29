@@ -1,7 +1,11 @@
-import { verifyBytecodes } from '@celo/protocol/lib/compatibility/verify-bytecode-foundry'
+import {
+  verifyBytecodes,
+  InitializationData,
+} from '@celo/protocol/lib/compatibility/verify-bytecode-foundry'
 import { getReleaseVersion } from '../../lib/compatibility/ignored-contracts-v9'
 
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 
 import { existsSync, readJsonSync, writeJsonSync } from 'fs-extra'
 import { Chain, createPublicClient, encodeFunctionData, http } from 'viem'
@@ -34,9 +38,11 @@ const argv = require('minimist')(process.argv.slice(2), {
 const branch = (argv.branch ? argv.branch : '') as string
 const buildDir05 = `./out-${branch}-truffle-compat`
 const buildDir08 = `./out-${branch}-truffle-compat8`
-const network = argv.network ?? 'development'
-const proposal = argv.proposal ? readJsonSync(argv.proposal) : []
-const initializationData = argv.initialize_data ? readJsonSync(argv.initialize_data) : {}
+const network: string = argv.network ?? 'development'
+const proposal: ProposalTx[] = argv.proposal ? readJsonSync(argv.proposal) : []
+const initializationData: InitializationData = argv.initialize_data
+  ? readJsonSync(argv.initialize_data)
+  : {}
 const librariesFile = argv.librariesFile ?? 'libraries.json'
 
 if (!existsSync(buildDir05)) {
@@ -95,8 +101,8 @@ const publicClient = createPublicClient({
 const version = getReleaseVersion(branch)
 
 const registryAddress = '0x000000000000000000000000000000000000ce10'
-const registryAbi = readJsonSync(`${buildDir05}/Registry.sol/Registry.json`)['abi']
-const proxyAbi = readJsonSync(`${buildDir05}/Proxy.sol/Proxy.json`)['abi']
+const registryAbi = readJsonSync(`${buildDir05}/Registry.sol/Registry.json`).abi
+const proxyAbi = readJsonSync(`${buildDir05}/Proxy.sol/Proxy.json`).abi
 
 const getAddressForString = (contract: string) => {
   return publicClient.readContract({
@@ -109,7 +115,7 @@ const getAddressForString = (contract: string) => {
 
 const getImplementation = (address: string) => {
   return publicClient.readContract({
-    address: address,
+    address,
     abi: proxyAbi,
     functionName: '_getImplementation',
     args: [],
@@ -151,13 +157,11 @@ verifyBytecodes(
   network
 )
   .then((libraryLinkingInfo) => {
-    // eslint-disable-next-line: no-console
     console.info('Success, no bytecode mismatches found!')
 
-    // eslint-disable-next-line: no-console
     console.info(`Writing linked library addresses to ${librariesFile}`)
     writeJsonSync(librariesFile, libraryLinkingInfo.getAddressMapping(), { spaces: 2 })
   })
   .catch((error) => {
-    console.log('Script errored!', error)
+    console.info('Script errored!', error)
   })
