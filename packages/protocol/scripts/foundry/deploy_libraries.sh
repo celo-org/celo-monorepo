@@ -55,7 +55,7 @@ for LIB_PATH in "${LIBRARIES_PATH[@]}"; do
     echo "Deploying library: $LIB_NAME"
     CREATE_LIBRARY_OUT=`forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url $ANVIL_RPC_URL --unlocked --broadcast --json`
     echo "Create library out: $CREATE_LIBRARY_OUT" 
-    LIB_ADDRESS=`echo $create_library_out | jq -r '.deployedTo'`
+    LIB_ADDRESS=`echo $CREATE_LIBRARY_OUT | jq -r '.deployedTo'`
     # Constructing library flag so the remaining contracts can be built and linkeded to these libraries
     LIBRARY_FLAGS="$LIBRARY_FLAGS --libraries $LIB_PATH:$LIB_ADDRESS"
 done
