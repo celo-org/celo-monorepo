@@ -44,7 +44,7 @@
     "submodules:delete": "rm -rf $(git submodule | awk '{ print $2 }')",
     "tags:compare": "./scripts/bash/compare-git-tags.sh",
     "tags:view": "git for-each-ref 'refs/tags/core-contracts.*' --sort=-committerdate --format='%(color:magenta)%(committerdate:short) %(color:blue)%(tree) %(color:green)github.com/celo-org/celo-monorepo/releases/tag/%(color:yellow)%(refname:short)'",
-    "test": "forge test",,
+    "test": "forge test",
     "test:release-snapshots": "./scripts/bash/release-snapshots.sh",
     "test:truffle:compatibility": "rm test/**/*.js ; node runTests.js compatibility/",
     "truffle:console": "./scripts/bash/console.sh",
