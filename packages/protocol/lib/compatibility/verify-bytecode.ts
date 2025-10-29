@@ -143,7 +143,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
 
   let linkedSourceBytecode = linkLibraries(sourceBytecode, context.libraryAddresses.addresses)
 
-  try{
+  try {
     if (isLibrary(contract, context)) {
       linkedSourceBytecode = verifyAndStripLibraryPrefix(linkedSourceBytecode)
       onchainBytecode = verifyAndStripLibraryPrefix(onchainBytecode, implementationAddress)
