@@ -4,6 +4,10 @@ set -euo pipefail
 # Read environment variables and constants
 source $PWD/scripts/foundry/constants.sh
 
+# Parse command line options:
+#   -p: Custom port number for Anvil to listen on (overrides default ANVIL_PORT)
+#   -l: Path to load existing Anvil state from (instead of creating new state)
+
 while getopts 'p:l:' flag; do
   case "${flag}" in
     p) CUSTOM_PORT="${OPTARG}" ;;
