@@ -1,5 +1,9 @@
 #! /usr/bin/env bash
 set -euo pipefail
+
+# Revokes a ReleaseGold contract
+
+set -euo pipefail
 rejects=()
 
 if [ "$#" -ne 1 ]; then
