@@ -13,6 +13,9 @@ case $NETWORK in
   sepolia)
     L1_OPTIMISM_PORTAL=0x44ae3d41a335a7d05eb533029917aad35662dcc2
     ;;
+  chaos_v2)
+    L1_OPTIMISM_PORTAL=0x37e3521cc2c2e3fc12ad4adc36aa8f6b6b686473
+    ;;
   *)
     echo "Unsupported network: $NETWORK"
     exit 1
