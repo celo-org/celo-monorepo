@@ -27,6 +27,16 @@ contract PruneGamesFromStorage is Script {
     uint256 retentionIndex_ = vm.envUint("RETENTION_INDEX");
     console.log("Game index to retain:", retentionIndex_);
 
+    // Validate amount of games to prune
+    uint256 currentGameCount_ = factory_.gameCount();
+    if (currentGameCount_ - retentionIndex_ > 500) {
+      console.log(
+        "Too many games to prune at once (%d). Max is 500. Aborting.",
+        currentGameCount_ - retentionIndex_
+      );
+      return;
+    }
+
     // Store factory impl
     address factoryImpl_ = proxyAdmin_.getProxyImplementation(address(factory_));
 
