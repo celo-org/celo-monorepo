@@ -264,7 +264,7 @@ invariant authorizedByIsNeverReflexive(address a)
 	a != 0 => _getAuthorizedBy(a) != a
 
 /**
- * If we set signerAuthroization to be completed, it means the signer is marked as authorizedBy the account.
+ * If we set signerAuthorization to be completed, it means the signer is marked as authorizedBy the account.
  * The other direction may not be correct because authorizedBy is persistent while signer authorizations can be removed. 
  */
 invariant mustHaveAuthorizedByIfCompletedSignerAuthorization(address account, bytes32 role, address signer) 
