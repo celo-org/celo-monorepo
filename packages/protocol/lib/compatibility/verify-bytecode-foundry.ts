@@ -169,7 +169,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   }
 
   if (onchainBytecode !== linkedSourceBytecode) {
-    throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
+    throw new Error(`${contract}'s onchain (deployed at ${implementationAddress}) and compiled bytecodes do not match`)
   } else {
     console.log(
       `${isLibrary(contract, context) ? 'Library' : 'Contract'
