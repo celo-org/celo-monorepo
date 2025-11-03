@@ -40,6 +40,7 @@
     "release:make:foundry": "./scripts/foundry/make-release-foundry.sh",
     "release:verify-deployed": "./scripts/bash/verify-deployed.sh",
     "release:verify-release": "./scripts/bash/verify-release.sh",
+    "release:verify-deployed:foundry": "./scripts/bash/verify-deployed-forge.sh",
     "size:onchain": "./scripts/bash/get_smart_contract_size_from_onchain_address.sh",
     "size:artifacts": "./scripts/bash/get_smart_contract_size_from_build_artifacts.sh",
     "submodules:pull": "git submodule update --init --recursive",
