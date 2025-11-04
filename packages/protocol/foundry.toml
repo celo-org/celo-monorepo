@@ -1,7 +1,6 @@
 [profile.default]
 src = 'contracts-0.8'
 out = 'out'
-ast = true
 test = 'test-sol'
 libs = ['lib', 'node_modules']
 optimizer = true
@@ -35,6 +34,7 @@ skip= [ "test-sol/**" ]
 out = 'out-truffle-compat'
 libs = ['lib', 'node_modules']
 solc_version = '0.5.14'
+ast = true
 optimizer = false
 evm_version = 'istanbul'
 metadata_literal = true
@@ -47,6 +47,7 @@ skip= [ "test-sol/**" ]
 out = 'out-truffle-compat-0.8'
 libs = ['lib', 'node_modules']
 solc_version = '0.8.19'
+ast = true
 optimizer = true
 optimizer_runs = 200
 use_literal_content = true
