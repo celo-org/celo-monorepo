@@ -56,8 +56,6 @@ if (!existsSync(buildDir08)) {
 // TODO deduplicate with make-release
 const getViemChain = (networkName: string): Chain => {
   switch (networkName.toLowerCase()) {
-    case 'alfajores':
-      return viemChains.celoAlfajores
     case 'celo':
     case 'mainnet':
     case 'rc1':
@@ -73,18 +71,6 @@ const getViemChain = (networkName: string): Chain => {
         blockExplorers: {
           default: { name: 'CeloScan', url: 'https://celo-sepolia.blockscout.com' },
         },
-        testnet: true,
-      }
-    case 'baklava':
-      return {
-        id: 62320,
-        name: 'Celo Baklava',
-        nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 },
-        rpcUrls: {
-          default: { http: ['https://baklava-forno.celo-testnet.org'] },
-          public: { http: ['https://baklava-forno.celo-testnet.org'] },
-        },
-        blockExplorers: { default: { name: 'CeloScan', url: 'https://baklava.celoscan.io' } },
         testnet: true,
       }
     default:
