@@ -69,8 +69,6 @@
     "chai": "^4.3.6",
     "chai-subset": "^1.6.0",
     "chalk": "^2.4.2",
-    "csv-parser": "^2.0.0",
-    "csv-stringify": "^4.3.1",
     "elliptic": "^6.5.4",
     "ethereum-cryptography": "1.2.0",
     "ethereumjs-abi": "^0.6.8",
