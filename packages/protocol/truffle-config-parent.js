@@ -1,11 +1,6 @@
 /* tslint:disable: object-literal-sort-keys */
 require('ts-node/register')
-const ProviderEngine = require('web3-provider-engine')
-const WebsocketSubprovider = require('web3-provider-engine/subproviders/websocket.js')
-const { TruffleArtifactAdapter } = require('@0x/sol-trace')
-const { CoverageSubprovider } = require('@0x/sol-coverage')
 var Web3 = require('web3')
-var net = require('net')
 
 const HDWalletProvider = require('@truffle/hdwallet-provider')
 
@@ -82,56 +77,6 @@ const networks = {
     gas: gasLimit,
     gasPrice: 100000000000,
     privateKeyAvailable: false,
-  },
-  coverage: {
-    host: 'localhost',
-    network_id: '*',
-    gasPrice: 0,
-    gas: gasLimit,
-    from: DEVELOPMENT_FROM,
-    provider: function () {
-      if (coverageProvider == null) {
-        coverageProvider = new ProviderEngine()
-
-        const projectRoot = ''
-        const artifactAdapter = new TruffleArtifactAdapter(projectRoot, SOLC_VERSION)
-        global.coverageSubprovider = new CoverageSubprovider(artifactAdapter, DEVELOPMENT_FROM, {
-          isVerbose: true,
-          ignoreFilesGlobs: [
-            // Proxies
-            '**/*Proxy.sol',
-
-            // Test contracts
-            '**/test/*.sol',
-
-            // Interfaces
-            '**/interfaces/*.sol',
-          ],
-        })
-        coverageProvider.addProvider(global.coverageSubprovider)
-
-        coverageProvider.addProvider(
-          new WebsocketSubprovider({
-            rpcUrl: `http://localhost:${defaultConfig.port}`,
-            debug: false,
-          })
-        )
-
-        coverageProvider.start((err) => {
-          if (err !== undefined) {
-            // eslint-disable-next-line: no-console
-            console.error(err)
-            process.exit(1)
-          }
-        })
-        /**
-         * HACK: Truffle providers should have `send` function, while `ProviderEngine` creates providers with `sendAsync`,
-         * but it can be easily fixed by assigning `sendAsync` to `send`.
-         */
-        coverageProvider.send = coverageProvider.sendAsync.bind(coverageProvider)
-      }
-      return coverageProvider
-    },
   },
   testnet_prod: defaultConfig,
   anvil: {
