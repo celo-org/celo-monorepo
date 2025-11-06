@@ -69,7 +69,6 @@
     "chai": "^4.3.6",
     "chai-subset": "^1.6.0",
     "chalk": "^2.4.2",
-    "ethereum-cryptography": "1.2.0",
     "ethereumjs-abi": "^0.6.8",
     "form-data": "^3.0.0",
     "fs-extra": "^5.0.0",
