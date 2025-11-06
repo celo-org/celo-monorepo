@@ -1474,13 +1474,6 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
-"@ganache/console.log@0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@ganache/console.log/-/console.log-0.3.0.tgz#be7bb0875e883d7c219c3543cc7e854203c5233d"
-  integrity sha512-cRkjY3gn1zxPxy+PKK/xl12p3KbGwXeS7oGTkXFeey4bhQgd5QBa/+HNMVPflT2BcWLZ91Ir+CRRiRekeyHUWQ==
-  dependencies:
-    "@ethereumjs/util" "8.0.2"
-    "@ganache/utils" "0.3.0"
 
 "@ganache/utils@0.3.0":
   version "0.3.0"
@@ -4113,7 +4106,22 @@
   dependencies:
     "@truffle/config" "^1.3.61"
 
-"@truffle/resolver@9.0.53", "@truffle/resolver@^9.0.35":
+"@truffle/resolver@^5.0.18":
+  version "5.1.12"
+  resolved "https://registry.yarnpkg.com/@truffle/resolver/-/resolver-5.1.12.tgz#69c220973bb3326c3513a8e3e5a524f3aaa30f62"
+  integrity sha512-xiv7okPFT9mUZ9kc4iNMVPE85bGDdDwpMYE/LTmcpLNechmXlphgc3DzwJdQypZd6NjCrc/C1XMF178UiS+Szg==
+  dependencies:
+    "@truffle/contract" "^4.2.3"
+    "@truffle/expect" "^0.0.13"
+    "@truffle/provisioner" "^0.2.0"
+    debug "^4.1.1"
+    detect-installed "^2.0.4"
+    get-installed-path "^4.0.8"
+    glob "^7.1.6"
+    source-map-support "^0.5.16"
+    supports-color "^7.1.0"
+
+"@truffle/resolver@^9.0.35":
   version "9.0.53"
   resolved "https://registry.yarnpkg.com/@truffle/resolver/-/resolver-9.0.53.tgz#1864463c17b4aa54136ae015a40d19d15a33c97b"
   integrity sha512-jYqHIucs6yMCOpKFwnvcW6cfpn/WEWJQ8FN0EUhf0r0HMz9TjG9HnabBZSvfMBFPAmKklGR/GI0GESWf3alpXQ==
@@ -4131,21 +4139,6 @@
     get-installed-path "^4.0.8"
     glob "^7.1.6"
     web3-utils "1.10.0"
-
-"@truffle/resolver@^5.0.18":
-  version "5.1.12"
-  resolved "https://registry.yarnpkg.com/@truffle/resolver/-/resolver-5.1.12.tgz#69c220973bb3326c3513a8e3e5a524f3aaa30f62"
-  integrity sha512-xiv7okPFT9mUZ9kc4iNMVPE85bGDdDwpMYE/LTmcpLNechmXlphgc3DzwJdQypZd6NjCrc/C1XMF178UiS+Szg==
-  dependencies:
-    "@truffle/contract" "^4.2.3"
-    "@truffle/expect" "^0.0.13"
-    "@truffle/provisioner" "^0.2.0"
-    debug "^4.1.1"
-    detect-installed "^2.0.4"
-    get-installed-path "^4.0.8"
-    glob "^7.1.6"
-    source-map-support "^0.5.16"
-    supports-color "^7.1.0"
 
 "@truffle/source-map-utils@^1.3.111":
   version "1.3.111"
