@@ -74,7 +74,6 @@
     "elliptic": "^6.5.4",
     "ethereum-cryptography": "1.2.0",
     "ethereumjs-abi": "^0.6.8",
-    "ethereumjs-wallet": "^0.6.3",
     "form-data": "^3.0.0",
     "fs-extra": "^5.0.0",
     "ganache": "npm:@celo/ganache@7.8.0-unofficial.0",
