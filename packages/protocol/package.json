@@ -71,7 +71,6 @@
     "fs-extra": "^5.0.0",
     "ganache": "npm:@celo/ganache@7.8.0-unofficial.0",
     "glob-fs": "^0.1.7",
-    "j6": "^1.0.2",
     "lodash": "^4.17.21",
     "mathjs": "^7.0.0",
     "minimist": "^1.2.0",
