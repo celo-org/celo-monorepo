@@ -6007,11 +6007,6 @@ blakejs@^1.1.0:
   resolved "https://registry.yarnpkg.com/blakejs/-/blakejs-1.2.1.tgz#5057e4206eadb4a97f7c0b6e197a505042fc3814"
   integrity sha512-QXUSXI3QVc/gJME0dBpXrag1kbzOqCjCX8/b54ntNyW6sjtoqxqRk3LTmXzaJoh71zMsDCjM+47jS7XiwN/+fQ==
 
-"blind-threshold-bls@npm:@celo/blind-threshold-bls@1.0.0-beta":
-  version "1.0.0-beta"
-  resolved "https://registry.yarnpkg.com/@celo/blind-threshold-bls/-/blind-threshold-bls-1.0.0-beta.tgz#6c46e55c3720d99929d6d34dd3770b1623a09900"
-  integrity sha512-sk9XLvbv0M0TJKJPHPc8FkIRTfP/PiPHeyKXPBTMZBW8URL4pRix9IfcT98zT5sA7hvMDJwgw3p3tM/L6Z1iGw==
-
 bluebird@^2.9.33:
   version "2.11.0"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-2.11.0.tgz#534b9033c022c9579c56ba3b3e5a5caafbb650e1"
