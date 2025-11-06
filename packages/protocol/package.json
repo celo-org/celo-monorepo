@@ -63,7 +63,6 @@
     "@ethereumjs/vm": "npm:@celo/ethereumjs-vm@6.4.1-unofficial.0",
     "@openzeppelin/contracts8": "npm:@openzeppelin/contracts@^4.4.2",
     "@openzeppelin/upgrades": "^2.8.0",
-    "@truffle/artifactor": "4.0.180",
     "@truffle/contract": "4.6.10",
     "bignumber.js": "9.1.0",
     "bn.js": "^5.1.0",

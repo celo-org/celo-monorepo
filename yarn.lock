@@ -1474,6 +1474,13 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
+"@ganache/console.log@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@ganache/console.log/-/console.log-0.3.0.tgz#be7bb0875e883d7c219c3543cc7e854203c5233d"
+  integrity sha512-cRkjY3gn1zxPxy+PKK/xl12p3KbGwXeS7oGTkXFeey4bhQgd5QBa/+HNMVPflT2BcWLZ91Ir+CRRiRekeyHUWQ==
+  dependencies:
+    "@ethereumjs/util" "8.0.2"
+    "@ganache/utils" "0.3.0"
 
 "@ganache/utils@0.3.0":
   version "0.3.0"
@@ -3486,15 +3493,6 @@
     change-case "3.0.2"
     fast-check "3.1.1"
     web3-utils "1.10.0"
-
-"@truffle/artifactor@4.0.180":
-  version "4.0.180"
-  resolved "https://registry.yarnpkg.com/@truffle/artifactor/-/artifactor-4.0.180.tgz#5dded58d923d5c2e6442d09d4d3d3d9b10646c05"
-  integrity sha512-XWY1w5KMYsYQ9XN+QbR5W95HXLKumxdi3so70SRUkmmEx9+vTlvhzJ/aeyCtuOzRO6WjdZ6pOaUxMNcW5BqQDg==
-  dependencies:
-    "@truffle/contract-schema" "^3.4.11"
-    fs-extra "^9.1.0"
-    lodash "^4.17.21"
 
 "@truffle/artifactor@^4.0.36":
   version "4.0.188"
