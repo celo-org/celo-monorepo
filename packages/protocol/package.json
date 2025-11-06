@@ -55,7 +55,6 @@
   },
   "dependencies": {
     "@celo/base": "^6.0.0",
-    "@celo/bls12377js": "0.1.1",
     "@celo/connect": "^5.1.2",
     "@celo/cryptographic-utils": "^5.0.7",
     "@celo/utils": "^5.0.6",
@@ -65,7 +64,6 @@
     "@ganache/console.log": "0.3.0",
     "@openzeppelin/contracts8": "npm:@openzeppelin/contracts@^4.4.2",
     "@openzeppelin/upgrades": "^2.8.0",
-    "@summa-tx/memview.sol": "^1.1.0",
     "@truffle/artifactor": "4.0.180",
     "@truffle/contract": "4.6.10",
     "@truffle/resolver": "9.0.53",
