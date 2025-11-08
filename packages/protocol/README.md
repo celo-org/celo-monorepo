@@ -8,7 +8,7 @@ The contents of this package are licensed under the terms of the GNU Lesser Publ
 
 ### Initial deployment
 
-See the [testnet helm chart README](../helm-charts/testnet/README.md) for how to expose the RPC endpoint.
+See the [testnet helm chart README](https://github.com/celo-org/charts/blob/main/charts/testnet/README.md) for how to expose the RPC endpoint.
 
 Then, to deploy contracts to a network run:
 
@@ -121,9 +121,9 @@ yarn truffle:verify MentoFeeHandlerSeller@0x4efa274b7e33476c961065000d58ee09f792
 
 ### Possible problems
 
-1.  Some of old smart contracts have slightly different bytecode when verified (it is usually just few bytes difference). Some of the smart contracts were originally deployed with version 0.5.8 instead of 0.5.13 even though there is no history trace about this in our monorepo.
+1.  Some of the old smart contracts have slightly different bytecode when verified (it is usually just few bytes difference). Some of the smart contracts were originally deployed with version 0.5.8 instead of 0.5.13 even though there is no history trace about this in our monorepo.
 
-2.  Bytecode differs because of missing library addresses on CeloScan. Json file that will be manually uploaded to CeloScan needs to have libraries root element updated. Library addresses is possible to get either manually or with command which will generate libraries.json.
+2.  Bytecode differs because of missing library addresses on CeloScan. Json file that will be manually uploaded to CeloScan needs to have libraries root element updated. Library addresses are possible to get either manually or with command which will generate libraries.json.
 
     ```bash
     yarn release:verify-deployed -n $NETWORK -b $PREVIOUS_RELEASE -f
@@ -268,5 +268,5 @@ Example output:
 
 PRs that made these changes:
 
-16442165a Deactivate BlochainParameters Contract on L2 (#11008)
+16442165a Deactivate BlockchainParameters Contract on L2 (#11008)
 198f6215a SortedLinkedList Foundry Migration (#10846)
