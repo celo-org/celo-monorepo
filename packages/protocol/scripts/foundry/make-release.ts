@@ -477,18 +477,6 @@ const getViemChain = (networkName: string): Chain => {
         },
         testnet: true,
       }
-    case 'baklava':
-      return {
-        id: 62320,
-        name: 'Celo Baklava',
-        nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 },
-        rpcUrls: {
-          default: { http: ['https://baklava-forno.celo-testnet.org'] },
-          public: { http: ['https://baklava-forno.celo-testnet.org'] },
-        },
-        blockExplorers: { default: { name: 'CeloScan', url: 'https://baklava.celoscan.io' } },
-        testnet: true,
-      }
     default:
       return { ...viemChains.hardhat, id: 31337 }
   }
