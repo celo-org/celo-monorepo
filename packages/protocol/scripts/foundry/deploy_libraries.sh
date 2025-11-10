@@ -9,10 +9,22 @@ if [ -d "$TEMP_DIR" ]; then
     echo "Removing existing temporary folder..."
     rm -rf $TEMP_DIR
 fi
+
 mkdir $TEMP_DIR
 
 # Copy libraries to the directory
 for LIB_PATH in "${LIBRARIES_PATH[@]}"; do
+    IFS=":" read -r SOURCE DEST <<< "$LIB_PATH"
+    echo "SOURCE: $SOURCE"
+    echo "DEST: $DEST"
+    DEST_FILE="$TEMP_DIR/$SOURCE"
+    DEST_DIR=$(dirname "$DEST_FILE")
+    mkdir -p "$DEST_DIR"
+    echo "Copying file $SOURCE to $DEST_FILE"
+    cp "$SOURCE" "$DEST_FILE"
+done
+
+for LIB_PATH in "${LIBRARIES_PATH_08[@]}"; do
     IFS=":" read -r SOURCE DEST <<< "$LIB_PATH"
     DEST_FILE="$TEMP_DIR/$SOURCE"
     DEST_DIR=$(dirname "$DEST_FILE")
@@ -41,11 +53,11 @@ cp $SOURCE_DIR/remappings.txt $DEST_DIR/remappings.txt
 pushd $TEMP_DIR
 
 # Build libraries
-echo "Building libraries..."
-forge build
+echo "Building with 0.5 libraries..."
+time FOUNDRY_PROFILE=truffle-compat forge build
 
 # Deploy libraries and building library flag
-echo "Deploying libraries..."
+echo "Deploying libraries 0.5..."
 export LIBRARY_FLAGS=""
 for LIB_PATH in "${LIBRARIES_PATH[@]}"; do
     LIB_NAME="${LIB_PATH#*:}" 
@@ -53,12 +65,27 @@ for LIB_PATH in "${LIBRARIES_PATH[@]}"; do
     # LIB_PATH = "contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
     # LIB_NAME = AddressSortedLinkedListWithMedian
     echo "Deploying library: $LIB_NAME"
-    CREATE_LIBRARY_OUT=`forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url $ANVIL_RPC_URL --unlocked --broadcast --json`
-    echo "Create library out: $CREATE_LIBRARY_OUT" 
-    LIB_ADDRESS=`echo $CREATE_LIBRARY_OUT | jq -r '.deployedTo'`
+    create_library_out=`FOUNDRY_PROFILE=truffle-compat forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url $ANVIL_RPC_URL --unlocked --broadcast --json`
+    LIB_ADDRESS=`echo $create_library_out | jq -r '.deployedTo'`
     # Constructing library flag so the remaining contracts can be built and linkeded to these libraries
     LIBRARY_FLAGS="$LIBRARY_FLAGS --libraries $LIB_PATH:$LIB_ADDRESS"
 done
+
+# TODO remove duplicated code
+export LIBRARY_FLAGS_08=""
+echo "Deploying libraries 0.8..."
+for LIB_PATH in "${LIBRARIES_PATH_08[@]}"; do
+    LIB_NAME="${LIB_PATH#*:}" 
+    # For example:
+    # LIB_PATH = "contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
+    # LIB_NAME = AddressSortedLinkedListWithMedian
+    echo "Deploying library: $LIB_NAME"
+    create_library_out=`FOUNDRY_PROFILE=truffle-compat8 forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url $ANVIL_RPC_URL --unlocked --broadcast --json`
+    LIB_ADDRESS=`echo $create_library_out | jq -r '.deployedTo'`
+    # Constructing library flag so the remaining contracts can be built and linkeded to these libraries
+    LIBRARY_FLAGS_08="$LIBRARY_FLAGS_08 --libraries $LIB_PATH:$LIB_ADDRESS"
+done
+
 
 # Move out of the temporary directory
 popd

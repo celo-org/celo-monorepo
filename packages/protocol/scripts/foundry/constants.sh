@@ -55,14 +55,15 @@ export CELO_UNRELEASED_TREASURY_INITIAL_BALANCE="$(($GOLD_TOKEN_CELO_SUPPLY_CAP 
 export RESERVE_INITIAL_BALANCE="5000000" # setting this here because it gets overwritten in the L2 migration script
 
 # Contract libraries
-export LIBRARIES_PATH=(
-  "contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
-  "contracts/common/Signatures.sol:Signatures"
-  "contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
-  "contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList"
-  "contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"
-  "contracts/governance/Proposals.sol:Proposals"
+export LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
+                "contracts/common/Signatures.sol:Signatures"
+                "contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList"
+                "contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"
+                "contracts/governance/Proposals.sol:Proposals"
 )
+
+export LIBRARIES_PATH_08=("contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList")
+
 export LIBRARY_DEPENDENCIES_PATH=(
   "contracts/common/FixidityLib.sol"
   "contracts/common/linkedlists/LinkedList.sol"

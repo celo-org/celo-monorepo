@@ -21,7 +21,7 @@
     "cheatsheet": "cat CHEATSHEET.md",
     "ci:test-make-release": "./scripts/bash/release-on-devchain.sh",
     "clean": "rm -rf ./types/typechain && rm -rf build/* && rm -rf .0x-artifacts/* && rm -rf test/**/*.js* && rm -f lib/*.js* && rm -f lib/**/*.js* && rm -f scripts/*.js* && yarn clean:foundry",
-    "clean:foundry": "forge clean && rm -rf cache out",
+    "clean:foundry": "forge clean && rm -rf cache out out-truffle-compat out-truffle-compat-0.8",
     "devchain": "yarn ts-node scripts/devchain.ts",
     "devchain:generate-old-devchain-and-build": "./scripts/bash/generate-old-devchain-and-build.sh",
     "lint": "yarn run lint:ts && yarn run lint:sol",
