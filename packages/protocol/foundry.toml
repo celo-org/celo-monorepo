@@ -16,12 +16,15 @@ no_match_path = "{**/test/BLS12Passthrough.sol,**/test/RandomTest.sol,**/test-so
 
 fs_permissions = [
   { access = "read", path = "./out"},
+    { access = "read", path = "./out-truffle-compat"},
+    { access = "read", path = "./out-truffle-compat-0.8"},
   { access = "read", path = "./migrations_sol/migrationsConfig.json"},
   { access = "read", path = "./migrations_sol/"},
   { access = "read", path = "./governanceConstitution.json"},
   { access = "read", path = "./artifacts/"},
   { access = "read", path = "./.tmp/selectors" }
 ]
+
 
 [profile.devchain] # Special profile for the tests that require an anvil devchain
 test = 'test-sol/devchain'
