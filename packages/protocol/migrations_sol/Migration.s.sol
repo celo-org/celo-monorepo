@@ -78,6 +78,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 commissionUpdateDelay;
   }
 
+  enum SolidityVersions {
+    SOLIDITY_05,
+    SOLIDITY_08
+  }
+
   IProxyFactory proxyFactory;
 
   uint256 proxyNonce = 0;
@@ -116,6 +121,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function deployCodeTo(string memory what, address where) internal {
     deployCodeTo(what, "", 0, where);
   }
+
   function deployCodeTo(string memory what, bytes memory args, address where) internal {
     deployCodeTo(what, args, 0, where);
   }
@@ -131,13 +137,27 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     registry.setAddressFor(contractName, proxyAddress);
   }
 
+  function getSolidityVersionPath(
+    SolidityVersions version
+  ) public pure returns (string memory versionPath) {
+    if (version == SolidityVersions.SOLIDITY_05) {
+      return "out-truffle-compat/";
+    } else {
+      return "out-truffle-compat-0.8/";
+    }
+    revert("Solidity version not supported");
+  }
+
   function setImplementationOnProxy(
     IProxy proxy,
     string memory contractName,
-    bytes memory initializeCalldata
+    bytes memory initializeCalldata,
+    SolidityVersions solidityVersion
   ) public {
+    string memory versionString = getSolidityVersionPath(solidityVersion);
+
     bytes memory implementationBytecode = vm.getCode(
-      string.concat("out/", contractName, ".sol/", contractName, ".json")
+      string.concat(versionString, contractName, ".sol/", contractName, ".json")
     );
     bool testingDeployment = false;
     bytes memory initialCode = abi.encodePacked(
@@ -155,14 +175,15 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function deployProxiedContract(
     string memory contractName,
     address toProxy,
-    bytes memory initializeCalldata
+    bytes memory initializeCalldata,
+    SolidityVersions solidityVersion
   ) public {
     console.log("Deploying: ", contractName);
     deployCodeTo("Proxy.sol", abi.encode(false), toProxy);
     IProxy proxy = IProxy(toProxy);
     console.log(" Proxy deployed to:", toProxy);
 
-    setImplementationOnProxy(proxy, contractName, initializeCalldata);
+    setImplementationOnProxy(proxy, contractName, initializeCalldata, solidityVersion);
     addToRegistry(contractName, address(proxy));
     console.log(" Done deploying:", contractName);
     console.log("------------------------------");
@@ -170,7 +191,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function deployProxiedContract(
     string memory contractName,
-    bytes memory initializeCalldata
+    bytes memory initializeCalldata,
+    SolidityVersions solidityVersion
   ) public returns (address proxyAddress) {
     console.log("Deploying: ", contractName);
 
@@ -185,7 +207,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     IProxy proxy = IProxy(proxyAddress);
     console.log(" Proxy deployed to:", address(proxy));
 
-    setImplementationOnProxy(proxy, contractName, initializeCalldata);
+    setImplementationOnProxy(proxy, contractName, initializeCalldata, solidityVersion);
     addToRegistry(contractName, address(proxy));
 
     console.log(" Done deploying:", contractName);
@@ -202,7 +224,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
 
     proxyFactory = IProxyFactory(
-      create2deploy(0, vm.getCode("./out/ProxyFactory.sol/ProxyFactory.json"))
+      create2deploy(0, vm.getCode("./out-truffle-compat/ProxyFactory.sol/ProxyFactory.json"))
     );
 
     // Proxy for Registry is already set, just deploy implementation
@@ -269,7 +291,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     setImplementationOnProxy(
       IProxy(REGISTRY_ADDRESS),
       "Registry",
-      abi.encodeWithSelector(IRegistryInitializer.initialize.selector)
+      abi.encodeWithSelector(IRegistryInitializer.initialize.selector),
+      SolidityVersions.SOLIDITY_05
     );
     // set registry in registry itself
     console.log("Owner of the Registry Proxy is", IProxy(REGISTRY_ADDRESS)._getOwner());
@@ -280,21 +303,24 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function migrateFreezer() public {
     deployProxiedContract(
       "Freezer",
-      abi.encodeWithSelector(IFreezerInitializer.initialize.selector)
+      abi.encodeWithSelector(IFreezerInitializer.initialize.selector),
+      SolidityVersions.SOLIDITY_05
     );
   }
 
   function migrateFeeCurrencyWhitelist() public {
     deployProxiedContract(
       "FeeCurrencyWhitelist",
-      abi.encodeWithSelector(IFeeCurrencyWhitelist.initialize.selector)
+      abi.encodeWithSelector(IFeeCurrencyWhitelist.initialize.selector),
+      SolidityVersions.SOLIDITY_05
     );
   }
 
   function migrateFeeCurrencyDirectory() public {
     deployProxiedContract(
       "FeeCurrencyDirectory",
-      abi.encodeWithSelector(IFeeCurrencyDirectoryInitializer.initialize.selector)
+      abi.encodeWithSelector(IFeeCurrencyDirectoryInitializer.initialize.selector),
+      SolidityVersions.SOLIDITY_08
     );
   }
 
@@ -302,7 +328,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // TODO change pre-funded addresses to make it match circulation supply
     address celoProxyAddress = deployProxiedContract(
       "GoldToken",
-      abi.encodeWithSelector(ICeloTokenInitializer.initialize.selector, REGISTRY_ADDRESS)
+      abi.encodeWithSelector(ICeloTokenInitializer.initialize.selector, REGISTRY_ADDRESS),
+      SolidityVersions.SOLIDITY_05
     );
 
     addToRegistry("CeloToken", celoProxyAddress);
@@ -319,7 +346,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     );
     deployProxiedContract(
       "SortedOracles",
-      abi.encodeWithSelector(ISortedOraclesInitializer.initialize.selector, reportExpirySeconds)
+      abi.encodeWithSelector(ISortedOraclesInitializer.initialize.selector, reportExpirySeconds),
+      SolidityVersions.SOLIDITY_05
     );
   }
 
@@ -347,7 +375,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         targetDensity,
         adjustmentSpeed,
         baseFeeOpCodeActivationBlock
-      )
+      ),
+      SolidityVersions.SOLIDITY_08
     );
   }
 
@@ -371,7 +400,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         owners,
         required,
         internalRequired
-      )
+      ),
+      SolidityVersions.SOLIDITY_05
     );
   }
 
@@ -412,7 +442,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         assetAllocationWeights,
         tobinTax,
         tobinTaxReserveRatio
-      )
+      ),
+      SolidityVersions.SOLIDITY_05
     );
 
     // TODO this should be a transfer from the deployer rather than a deal
@@ -454,7 +485,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         initialBalanceAddresses,
         initialBalanceValues,
         exchangeIdentifier
-      )
+      ),
+      SolidityVersions.SOLIDITY_05
     );
 
     if (frozen) {
@@ -477,7 +509,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     /*
     Arbitrary intrinsic gas number take from existing `FeeCurrencyDirectory.t.sol` tests
     Source: https://github.com/celo-org/celo-monorepo/blob/2cec07d43328cf4216c62491a35eacc4960fffb6/packages/protocol/test-sol/common/FeeCurrencyDirectory.t.sol#L27 
-    */
+        */
     uint256 mockIntrinsicGas = 21000;
 
     IFeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory"))
@@ -548,7 +580,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         reserveFraction,
         updateFrequency,
         minimumReports
-      )
+      ),
+      SolidityVersions.SOLIDITY_05
     );
 
     bool frozen = abi.decode(json.parseRaw(".exchange.frozen"), (bool));
@@ -562,7 +595,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function migrateAccount() public {
     address accountsProxyAddress = deployProxiedContract(
       "Accounts",
-      abi.encodeWithSelector(IAccountsInitializer.initialize.selector, REGISTRY_ADDRESS)
+      abi.encodeWithSelector(IAccountsInitializer.initialize.selector, REGISTRY_ADDRESS),
+      SolidityVersions.SOLIDITY_05
     );
 
     IAccounts(accountsProxyAddress).setEip712DomainSeparator();
@@ -577,7 +611,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         ILockedGoldInitializer.initialize.selector,
         REGISTRY_ADDRESS,
         unlockingPeriod
-      )
+      ),
+      SolidityVersions.SOLIDITY_05
     );
 
     addToRegistry("LockedCelo", LockedCeloProxyAddress);
@@ -631,7 +666,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         slashingMultiplierResetPeriod,
         maxGroupSize,
         initParamsTunnel
-      )
+      ),
+      SolidityVersions.SOLIDITY_08
     );
   }
 
@@ -662,7 +698,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         maxElectableValidators,
         maxNumGroupsVotedFor,
         electabilityThreshold
-      )
+      ),
+      SolidityVersions.SOLIDITY_05
     );
   }
 
@@ -728,7 +765,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         communityRewardFraction,
         carbonOffsettingPartner,
         carbonOffsettingFraction
-      )
+      ),
+      SolidityVersions.SOLIDITY_05
     );
 
     bool frozen = abi.decode(json.parseRaw(".epochRewards.frozen"), (bool));
@@ -746,12 +784,20 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     deployProxiedContract(
       "Random",
-      abi.encodeWithSelector(IRandomInitializer.initialize.selector, randomnessBlockRetentionWindow)
+      abi.encodeWithSelector(
+        IRandomInitializer.initialize.selector,
+        randomnessBlockRetentionWindow
+      ),
+      SolidityVersions.SOLIDITY_05
     );
   }
 
   function migrateEscrow() public {
-    deployProxiedContract("Escrow", abi.encodeWithSelector(IEscrowInitializer.initialize.selector));
+    deployProxiedContract(
+      "Escrow",
+      abi.encodeWithSelector(IEscrowInitializer.initialize.selector),
+      SolidityVersions.SOLIDITY_05
+    );
   }
 
   function migrateBlockchainParameters(string memory json) public {
@@ -772,14 +818,16 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         gasForNonGoldCurrencies,
         gasLimit,
         lookbackWindow
-      )
+      ),
+      SolidityVersions.SOLIDITY_05
     );
   }
 
   function migrateGovernanceSlasher() public {
     deployProxiedContract(
       "GovernanceSlasher",
-      abi.encodeWithSelector(IGovernanceSlasherInitializer.initialize.selector, REGISTRY_ADDRESS)
+      abi.encodeWithSelector(IGovernanceSlasherInitializer.initialize.selector, REGISTRY_ADDRESS),
+      SolidityVersions.SOLIDITY_05
     );
 
     getLockedGold().addSlasher("GovernanceSlasher");
@@ -796,7 +844,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         REGISTRY_ADDRESS,
         penalty,
         reward
-      )
+      ),
+      SolidityVersions.SOLIDITY_05
     );
 
     getLockedGold().addSlasher("DoubleSigningSlasher");
@@ -818,7 +867,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         penalty,
         reward,
         slashableDowntime
-      )
+      ),
+      SolidityVersions.SOLIDITY_05
     );
 
     getLockedGold().addSlasher("DowntimeSlasher");
@@ -843,14 +893,16 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         owners,
         required,
         internalRequired
-      )
+      ),
+      SolidityVersions.SOLIDITY_05
     );
   }
 
   function migrateFederatedAttestations() public {
     deployProxiedContract(
       "FederatedAttestations",
-      abi.encodeWithSelector(IFederatedAttestationsInitializer.initialize.selector)
+      abi.encodeWithSelector(IFederatedAttestationsInitializer.initialize.selector),
+      SolidityVersions.SOLIDITY_05
     );
   }
 
@@ -865,7 +917,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         REGISTRY_ADDRESS,
         tokenAddresses,
         minimumReports
-      )
+      ),
+      SolidityVersions.SOLIDITY_05
     );
   }
 
@@ -880,7 +933,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         REGISTRY_ADDRESS,
         tokenAddresses,
         minimumReports
-      )
+      ),
+      SolidityVersions.SOLIDITY_05
     );
   }
 
@@ -903,7 +957,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         handlers,
         newLimits,
         newMaxSlippages
-      )
+      ),
+      SolidityVersions.SOLIDITY_05
     );
 
     IFeeHandler(feeHandlerProxyAddress).addToken(
@@ -915,7 +970,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function migrateOdisPayments() public {
     deployProxiedContract(
       "OdisPayments",
-      abi.encodeWithSelector(IOdisPaymentsInitializer.initialize.selector)
+      abi.encodeWithSelector(IOdisPaymentsInitializer.initialize.selector),
+      SolidityVersions.SOLIDITY_05
     );
   }
 
@@ -925,21 +981,24 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       abi.encodeWithSelector(
         ICeloUnreleasedTreasuryInitializer.initialize.selector,
         REGISTRY_ADDRESS
-      )
+      ),
+      SolidityVersions.SOLIDITY_08
     );
   }
 
   function migrateEpochManagerEnabler() public {
     deployProxiedContract(
       "EpochManagerEnabler",
-      abi.encodeWithSelector(IEpochManagerEnablerInitializer.initialize.selector, REGISTRY_ADDRESS)
+      abi.encodeWithSelector(IEpochManagerEnablerInitializer.initialize.selector, REGISTRY_ADDRESS),
+      SolidityVersions.SOLIDITY_08
     );
   }
 
   function migrateScoreManager() public {
     deployProxiedContract(
       "ScoreManager",
-      abi.encodeWithSelector(IScoreManagerInitializer.initialize.selector)
+      abi.encodeWithSelector(IScoreManagerInitializer.initialize.selector),
+      SolidityVersions.SOLIDITY_08
     );
   }
 
@@ -955,7 +1014,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         IEpochManagerInitializer.initialize.selector,
         REGISTRY_ADDRESS,
         newEpochDuration
-      )
+      ),
+      SolidityVersions.SOLIDITY_08
     );
   }
 
@@ -1013,7 +1073,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         participationFloor,
         baselineUpdateFactor,
         baselineQuorumFactor
-      )
+      ),
+      SolidityVersions.SOLIDITY_05
     );
 
     _setConstitution(governanceProxyAddress, json);
