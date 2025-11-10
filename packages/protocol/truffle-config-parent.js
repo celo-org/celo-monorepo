@@ -10,14 +10,12 @@ const argv = require('minimist')(process.argv.slice(2), {
 })
 
 const ALFAJORES_NETWORKID = 44787
-const BAKLAVA_NETWORKID = 62320
 
 const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
 const INTEGRATION_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const INTEGRATION_TESTING_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const ALFAJORES_FROM = '0x59A60D2B488154dc5CB48c42347Df222e13C70Ba'
-const BAKLAVA_FROM = '0x3e206e0674d5050f7b33e7e79Cace768050eE06f'
 
 const gasLimit = 20000000
 const hostAddress = process.env.CELO_NODE_ADDRESS || '127.0.0.1'
@@ -55,7 +53,6 @@ let coverageProvider = null
 
 const fornoUrls = {
   alfajores: 'https://alfajores-forno.celo-testnet.org',
-  baklava: 'https://baklava-forno.celo-testnet.org',
   rc1: 'https://forno.celo.org',
   mainnet: 'https://forno.celo.org',
   staging: 'https://staging-forno.celo-networks-dev.org',
@@ -101,12 +98,6 @@ const networks = {
     ...defaultConfig,
     network_id: ALFAJORES_NETWORKID,
     from: ALFAJORES_FROM,
-    privateKeyAvailable: true,
-  },
-  baklava: {
-    ...defaultConfig,
-    from: BAKLAVA_FROM,
-    network_id: BAKLAVA_NETWORKID,
     privateKeyAvailable: true,
   },
 }

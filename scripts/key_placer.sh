@@ -6,7 +6,6 @@ echo "Processing encrypted files v2"
 files=(
   ".env.mnemonic:celo-testnet"
   ".env.mnemonic.alfajores:celo-testnet"
-  ".env.mnemonic.baklava:celo-testnet"
   ".env.mnemonic.mainnet:celo-testnet-production"
 )
 
