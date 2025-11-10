@@ -7,9 +7,6 @@
 [submodule "packages/protocol/lib/mento-core"]
 	path = packages/protocol/lib/mento-core
 	url = https://github.com/celo-org/mento-core
-[submodule "packages/protocol/lib/memview.sol"]
-	path = packages/protocol/lib/memview.sol
-	url = https://github.com/summa-tx/memview.sol
 [submodule "packages/protocol/lib/openzeppelin-contracts8"]
 	path = packages/protocol/lib/openzeppelin-contracts8
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
