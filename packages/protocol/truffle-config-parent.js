@@ -9,7 +9,7 @@ const argv = require('minimist')(process.argv.slice(2), {
   boolean: ['reset'],
 })
 
-const ALFAJORES_NETWORKID = 44787
+const ALFAJORES_NETWORKID = 11142220
 
 const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
@@ -48,14 +48,10 @@ function readMnemonic(networkName) {
   return process.env.DEPLOYER_PRIVATE_KEY
 }
 
-// Here to avoid recreating it each time
-let coverageProvider = null
-
 const fornoUrls = {
-  alfajores: 'https://alfajores-forno.celo-testnet.org',
+  alfajores: 'https://forno.celo-sepolia.celo-testnet.org',
   rc1: 'https://forno.celo.org',
   mainnet: 'https://forno.celo.org',
-  staging: 'https://staging-forno.celo-networks-dev.org',
 }
 
 const networks = {
