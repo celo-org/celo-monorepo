@@ -2,9 +2,9 @@ name: 'CoreContracts: Devchain For Contract Release'
 run-name: 'CoreContracts: Devchain For Contract Release'
 
 on:
-  # schedule:
-  #   # monthly on 1 at 0:00 UTC
-  #   - cron: 0 0 1 * *
+  schedule:
+    # monthly on 1 at 0:00 UTC
+    - cron: 0 0 1 * *
   workflow_dispatch:
   push:
     branches: ['martinvol/*']
@@ -32,10 +32,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      # - name: Install yarn dependencies
-      #   run: git config --global url."https://".insteadOf ssh:// && yarn install
-      # - name: Build packages
-      #   run: yarn build --ignore docs --include-dependencies
       - name: install foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
@@ -54,11 +50,6 @@ jobs:
           mv .tmp/devchain.json .tmp/devchain
           mv .tmp/l2-devchain.json .tmp/devchain
         working-directory: packages/protocol
-      # - name: Stop anvil
-      #   run: |
-      #     killall anvil
-      #     ls .tmp
-      #   working-directory: packages/protocol
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4
         with:
