@@ -6,8 +6,6 @@ on:
     # monthly on 1 at 0:00 UTC
     - cron: 0 0 1 * *
   workflow_dispatch:
-  push:
-    branches: ['martinvol/*']
 permissions:
   contents: read
 
