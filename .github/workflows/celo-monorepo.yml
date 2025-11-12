@@ -182,7 +182,8 @@ jobs:
           workflow: protocol-devchain.yml
           name: devchain-${{ env.RELEASE_TAG }}
           path: packages/protocol/.tmp/devchain
-          branch: release/core-contracts/14-anvil # TODO change this after CR15 ends up in master
+          # branch: release/core-contracts/14-anvil # TODO change this after CR15 ends up in master
+          branch: martinvol/donRunTestAnvilCR14
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
         with:
