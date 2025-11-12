@@ -41,7 +41,6 @@ skip=[
     "test-sol/**",          # skip everything under test-sol
   ]
 src = 'contracts'
-skip= [ "test-sol/**" ]
 out = 'out-truffle-compat'
 libs = ['lib', 'node_modules']
 solc_version = '0.5.14'
@@ -57,7 +56,6 @@ skip=[
     "test-sol/**",          # skip everything under test-sol
 ]
 src = 'contracts-0.8'
-skip= [ "test-sol/**" ]
 out = 'out-truffle-compat-0.8'
 libs = ['lib', 'node_modules']
 solc_version = '0.8.19'
