@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Baklava: V3
-# VALIDATOR=0x9df52e41189e89485bb7aee1e5cc93874dd89712
 
 # Alfajores: V3
 # VALIDATOR=0xc6bacfa8421117677e03c3eb81d44b37a9ceef31
