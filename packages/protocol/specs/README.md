@@ -18,3 +18,6 @@ This directory contains all necessary material in order to execute the Certora P
 - `governance_with_dequeue.spec` - rules for Governance that require reasoning about the dequeue mechanism
 - `governance_old_rules.spec` - rules used in the 2019 formal verification project, and require some re-formulation.
 - `governance-referendumVotes.spec` - a rule checking the consistency of referendum votes.
+
+### Reserve
+- `reserve.spec` - general rules for the Reserve contract.
