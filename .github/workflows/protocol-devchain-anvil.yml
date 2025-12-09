@@ -109,6 +109,14 @@ jobs:
         id: date
         run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
+#      - name: Akeyless Get Secrets
+#        id: get_auth_token
+#        uses: docker://us-west1-docker.pkg.dev/devopsre/akeyless-public/akeyless-action:latest
+#        with:
+#          api-url: https://api.gateway.akeyless.celo-networks-dev.org
+#          access-id: p-kf9vjzruht6l
+#          static-secrets: '{"/static-secrets/NPM/npm-publish-token":"NPM_TOKEN"}'
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20.x'
@@ -205,6 +213,7 @@ jobs:
           npm publish $RELEASE_TYPE $DRY_RUN --access public
         working-directory: package
         env:
+
           RELEASE_TYPE: --tag ${{ needs.build.outputs.release_type != '' && needs.build.outputs.release_type || 'canary' }}
           RELEASE_VERSION: ${{ needs.build.outputs.release_version }}
           DRY_RUN: ${{ needs.build.outputs.release_version == '' && '--dry-run' || '' }}
