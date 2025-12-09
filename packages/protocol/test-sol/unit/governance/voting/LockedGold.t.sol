@@ -1404,6 +1404,99 @@ contract LockedGoldTest_slash is LockedGoldTest {
     assertEq(lockedGold.getAccountTotalLockedGold(delegator), 0);
     assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegatee1), 0);
   }
+
+  function test_ShouldUpdateReporterDelegatedAmount_WhenReporterIsDelegatingAndReceivesReward()
+    public
+  {
+    uint256 penalty = value;
+    uint256 reward = value / 2;
+    uint256 reporterDelegationPercent = 50;
+
+    // Setup: Give reporter funds and lock CELO, then delegate to delegatee2
+    vm.deal(reporter, 10 ether);
+    vm.prank(reporter);
+    lockedGold.lock.value(value)();
+    vm.prank(reporter);
+    lockedGold.delegateGovernanceVotes(
+      delegatee2,
+      FixidityLib.newFixedFraction(reporterDelegationPercent, 100).unwrap()
+    );
+
+    // Verify initial state
+    uint256 initialReporterBalance = lockedGold.getAccountNonvotingLockedGold(reporter);
+    uint256 initialDelegatedAmount = (value * reporterDelegationPercent) / 100;
+    assertEq(initialReporterBalance, value);
+    assertEq(lockedGold.totalDelegatedCelo(delegatee2), initialDelegatedAmount);
+
+    // Slash the account, reporter receives reward
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, caller);
+
+    // Verify reporter's balance increased
+    uint256 newReporterBalance = lockedGold.getAccountNonvotingLockedGold(reporter);
+    assertEq(newReporterBalance, value + reward);
+
+    // Verify reporter's delegated amount was updated correctly
+    uint256 expectedDelegatedAmount = ((value + reward) * reporterDelegationPercent) / 100;
+    (uint256 fraction, uint256 currentAmount) = lockedGold.getDelegatorDelegateeInfo(
+      reporter,
+      delegatee2
+    );
+    assertEq(FixidityLib.wrap(fraction * 100).fromFixed(), reporterDelegationPercent);
+    assertEq(currentAmount, expectedDelegatedAmount);
+    assertEq(lockedGold.totalDelegatedCelo(delegatee2), expectedDelegatedAmount);
+
+    // Verify delegatee's voting power was updated
+    assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegatee2), expectedDelegatedAmount);
+  }
+
+  function test_ShouldUpdateBothAccountAndReporterDelegatedAmounts_WhenBothAreDelegating() public {
+    uint256 penalty = value;
+    uint256 reward = value / 2;
+    uint256 accountDelegationPercent = 40;
+    uint256 reporterDelegationPercent = 60;
+
+    // Setup: Account locks CELO and delegates to delegatee1
+    whenVoteSigner_LockedGoldDelegateGovernanceVotes();
+    vm.prank(delegator);
+    lockedGold.delegateGovernanceVotes(
+      delegatee1,
+      FixidityLib.newFixedFraction(accountDelegationPercent, 100).unwrap()
+    );
+
+    // Setup: Give reporter funds, lock CELO and delegate to delegatee2
+    vm.deal(reporter, 10 ether);
+    vm.prank(reporter);
+    lockedGold.lock.value(value)();
+    vm.prank(reporter);
+    lockedGold.delegateGovernanceVotes(
+      delegatee2,
+      FixidityLib.newFixedFraction(reporterDelegationPercent, 100).unwrap()
+    );
+
+    // Record initial delegated amounts
+    uint256 initialAccountDelegated = (value * accountDelegationPercent) / 100;
+    uint256 initialReporterDelegated = (value * reporterDelegationPercent) / 100;
+    assertEq(lockedGold.totalDelegatedCelo(delegatee1), initialAccountDelegated);
+    assertEq(lockedGold.totalDelegatedCelo(delegatee2), initialReporterDelegated);
+
+    // Slash the account
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward, delegator);
+
+    // Verify account (delegator) was slashed and delegation removed
+    assertEq(lockedGold.getAccountNonvotingLockedGold(delegator), 0);
+    assertEq(lockedGold.getAccountTotalLockedGold(delegator), 0);
+    assertEq(lockedGold.totalDelegatedCelo(delegatee1), 0);
+    assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegatee1), 0);
+
+    // Verify reporter received reward and delegation was updated
+    assertEq(lockedGold.getAccountNonvotingLockedGold(reporter), value + reward);
+    uint256 expectedReporterDelegated = ((value + reward) * reporterDelegationPercent) / 100;
+    assertEq(lockedGold.totalDelegatedCelo(delegatee2), expectedReporterDelegated);
+    assertEq(
+      lockedGold.getAccountTotalGovernanceVotingPower(delegatee2),
+      expectedReporterDelegated
+    );
+  }
 }
 
 contract LockedGoldTest_delegateGovernanceVotes is LockedGoldTest {

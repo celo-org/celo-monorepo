@@ -507,6 +507,7 @@ contract LockedGold is
     }
 
     _updateDelegatedAmount(account);
+    _updateDelegatedAmount(reporter);
 
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
     address payable communityFundPayable = address(uint160(communityFund));
