@@ -4,10 +4,10 @@ run-name: 'CoreContracts: Devchain For Contract Release'
 on:
   schedule:
     # monthly on 1 at 0:00 UTC
-    - cron: 0 0 1 * *
+    # TODO bring back to daily after it run on master once
+    - cron: 0 1 * * *
   workflow_dispatch:
-  push: # TODO remove this after CR15 lands on master
-    branches: ['martinvol/*'] # TODO remove this after CR15 lands on master
+  # WARNING: chaning this trigger could lead up to npm being pushed from a branch, instead of master 
 permissions:
   contents: read
 
