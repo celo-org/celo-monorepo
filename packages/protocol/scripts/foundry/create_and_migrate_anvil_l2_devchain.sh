@@ -9,7 +9,7 @@ CONFIG_FILE=$PWD/migrations_sol/migrationsConfig.json
 
 export KEEP_DEVCHAIN_FOLDER=true
 
-# TODO delete this file at the end
+# this temp file is deleted at the end
 cp test-sol/devchain/Import05Dependencies.sol contracts
 
 # Generate and run L1 devchain
