@@ -33,6 +33,8 @@ jobs:
         working-directory: packages/protocol
     name: Generate anvil
     runs-on: ['self-hosted', 'monorepo-node18']
+    environment:
+      name: production
     permissions:
       contents: read
       pull-requests: read
