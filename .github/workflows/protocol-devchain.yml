@@ -7,6 +7,7 @@ on:
     # TODO bring back to daily after it run on mainnet for a little while
     - cron: 0 1 * * *
   workflow_dispatch:
+  # WARNING: chaning this trigger could lead up to npm being pushed from a branch, instead of master 
 permissions:
   contents: read
 
