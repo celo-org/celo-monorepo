@@ -1,3 +1,4 @@
+# docs: https://getfoundry.sh/config/reference/default-config
 [profile.default]
 src = 'contracts-0.8'
 out = 'out'
@@ -15,6 +16,8 @@ no_match_path = "{**/test/BLS12Passthrough.sol,**/test/RandomTest.sol,**/test-so
 
 fs_permissions = [
   { access = "read", path = "./out"},
+  { access = "read", path = "./out-truffle-compat"},
+  { access = "read", path = "./out-truffle-compat-0.8"},
   { access = "read", path = "./migrations_sol/migrationsConfig.json"},
   { access = "read", path = "./migrations_sol/"},
   { access = "read", path = "./governanceConstitution.json"},
@@ -22,15 +25,22 @@ fs_permissions = [
   { access = "read", path = "./.tmp/selectors" }
 ]
 
+
 [profile.devchain] # Special profile for the tests that require an anvil devchain
 test = 'test-sol/devchain'
 match_path = "**/test-sol/devchain/**"
 no_match_path = "{**/test/BLS12Passthrough.sol,**/test/RandomTest.sol}"
 
+# See more config options https://github.com/foundry-rs/foundry/tree/master/config
+
+# from https://github.com/celo-org/celo-monorepo/pull/11488/
+
 # Profile to match Truffle configuration for 0.5.13 contracts
 [profile.truffle-compat]
+skip=[
+    "test-sol/**",          # skip everything under test-sol
+  ]
 src = 'contracts'
-skip= [ "test-sol/**" ]
 out = 'out-truffle-compat'
 libs = ['lib', 'node_modules']
 solc_version = '0.5.14'
@@ -42,8 +52,10 @@ via_ir = false
 
 # Profile to match Truffle configuration for 0.8.19 contracts
 [profile.truffle-compat8]
+skip=[
+    "test-sol/**",          # skip everything under test-sol
+]
 src = 'contracts-0.8'
-skip= [ "test-sol/**" ]
 out = 'out-truffle-compat-0.8'
 libs = ['lib', 'node_modules']
 solc_version = '0.8.19'

@@ -9,6 +9,9 @@ CONFIG_FILE=$PWD/migrations_sol/migrationsConfig.json
 
 export KEEP_DEVCHAIN_FOLDER=true
 
+# this temp file is deleted at the end
+cp test-sol/devchain/Import05Dependencies.sol contracts
+
 # Generate and run L1 devchain
 echo "Generating and running L1 devchain before activating L2..."
 source $PWD/scripts/foundry/create_and_migrate_anvil_devchain.sh
@@ -56,7 +59,7 @@ registered_validators=$(cast call \
 echo "### registered_validators: $registered_validators"
 
 # Increase the block number using anvil cast rpc
-BLOCKS_TO_ADVANCE=110
+BLOCKS_TO_ADVANCE=101
 cast rpc anvil_mine $BLOCKS_TO_ADVANCE --rpc-url $ANVIL_RPC_URL --rpc-timeout 30000
 
 # Check if registered_validators is empty or invalid
@@ -176,4 +179,5 @@ sleep $SLEEP_DURATION
 mv $ANVIL_FOLDER/state.json $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME
 echo "Saved anvil L2 state to $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME"
 
+rm contracts/Import05Dependencies.sol
 rm -rf $ANVIL_FOLDER
