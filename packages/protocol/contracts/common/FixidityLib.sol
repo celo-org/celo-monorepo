@@ -155,7 +155,7 @@ library FixidityLib {
    * Test subtract(6, 10) fails
    */
   function subtract(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
-    require(x.value >= y.value, "substraction underflow detected");
+    require(x.value >= y.value, "subtraction underflow detected");
     return Fraction(x.value - y.value);
   }
 

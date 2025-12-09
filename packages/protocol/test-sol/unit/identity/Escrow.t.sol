@@ -733,7 +733,7 @@ contract EscrowTestsWithTokens is EscrowTest {
   }
 
   function test_Transfer_WhenNoDefaultTrustedIssuersAreSet_ShouldSetThemToEmptyList() public {
-    // when no defaut trustedIssuers are set; should set trustedIssuersPerPaymentId to empty list
+    // when no default trustedIssuers are set; should set trustedIssuersPerPaymentId to empty list
     vm.prank(sender);
     escrowContract.transfer(
       aPhoneHash,
@@ -754,7 +754,7 @@ contract EscrowTestsWithTokens is EscrowTest {
   function test_Transfer_WhenDefaultTrustedIssuersAreSet_ShouldSetTrustedIssuersPerPaymentIdToDefaultWhenMinAttestationsGt0()
     public
   {
-    // when defaut trustedIssuers are set; should set trustedIssuersPerPaymentId to default when minAttestations>0
+    // when default trustedIssuers are set; should set trustedIssuersPerPaymentId to default when minAttestations>0
 
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
     escrowContract.addDefaultTrustedIssuer(trustedIssuer2);
@@ -782,7 +782,7 @@ contract EscrowTestsWithTokens is EscrowTest {
   function test_Transfer_WhenDefaultTrustedIssuersAreSet_ShouldSetTrustedIssuersPerPaymentIdToEmptyListWhenMinAttestationsEq0()
     public
   {
-    // when defaut trustedIssuers are set; should set trustedIssuersPerPaymentId to empty list when minAttestations==0
+    // when default trustedIssuers are set; should set trustedIssuersPerPaymentId to empty list when minAttestations==0
 
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
     escrowContract.addDefaultTrustedIssuer(trustedIssuer2);
