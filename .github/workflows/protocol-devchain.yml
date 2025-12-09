@@ -4,7 +4,7 @@ run-name: 'CoreContracts: Devchain For Contract Release'
 on:
   schedule:
     # monthly on 1 at 0:00 UTC
-    # TODO bring back to daily after it run on mainnet for a little while
+    # TODO bring back to daily after it run on master once
     - cron: 0 1 * * *
   workflow_dispatch:
   # WARNING: chaning this trigger could lead up to npm being pushed from a branch, instead of master 
