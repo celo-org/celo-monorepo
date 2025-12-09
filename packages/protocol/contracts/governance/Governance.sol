@@ -1203,7 +1203,9 @@ contract Governance is
           proposal.deposit
         );
         // solhint-disable-next-line not-rely-on-time
-        proposal.timestamp = now;
+        uint256 currentTimestamp = now;
+        // solhint-disable-next-line not-rely-on-time
+        currentTimestamp.timestamp = now;
         if (emptyIndices.length != 0) {
           uint256 indexOfLastEmptyIndex = emptyIndices.length.sub(1);
           dequeued[emptyIndices[indexOfLastEmptyIndex]] = proposalId;
@@ -1213,7 +1215,7 @@ contract Governance is
           dequeued.push(proposalId);
         }
         // solhint-disable-next-line not-rely-on-time
-        emit ProposalDequeued(proposalId, now);
+        emit ProposalDequeued(proposalId, currentTimestamp);
         wasAnyProposalDequeued = true;
       }
       if (wasAnyProposalDequeued) {
