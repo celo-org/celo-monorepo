@@ -7,7 +7,7 @@ contract ProofOfPossesionPrecompile {
 
   fallback(bytes calldata) external payable returns (bytes memory) {
     console.log(
-      "WARNING, Proof Of Possesion Precompile called but not implemented in VM. Check not performed."
+      "WARNING, Proof Of Possession Precompile called but not implemented in VM. Check not performed."
     );
     return abi.encodePacked(false);
   }
