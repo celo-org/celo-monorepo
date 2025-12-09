@@ -4,10 +4,9 @@ run-name: 'CoreContracts: Devchain For Contract Release'
 on:
   schedule:
     # monthly on 1 at 0:00 UTC
-    - cron: 0 0 1 * *
+    # TODO bring back to daily after it run on mainnet for a little while
+    - cron: 0 1 * * *
   workflow_dispatch:
-  push: # TODO remove this after CR15 lands on master
-    branches: ['martinvol/*'] # TODO remove this after CR15 lands on master
 permissions:
   contents: read
 
