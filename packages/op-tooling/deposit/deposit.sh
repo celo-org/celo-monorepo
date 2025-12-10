@@ -1,9 +1,22 @@
 #!/bin/bash
 set -euo pipefail
 
-# Constants
-SYSTEM_CONFIG=0x760a5f022c9940f4a074e0030be682f560d29818
-OPTIMISM_PORTAL=0x44ae3d41a335a7d05eb533029917aad35662dcc2
+# Determine network
+NETWORK=${NETWORK:-"sepolia"}
+case $NETWORK in
+  sepolia)
+    SYSTEM_CONFIG=0x760a5f022c9940f4a074e0030be682f560d29818
+    OPTIMISM_PORTAL=0x44ae3d41a335a7d05eb533029917aad35662dcc2
+    ;;
+  mainnet)
+    SYSTEM_CONFIG=0x89E31965D844a309231B1f17759Ccaf1b7c09861
+    OPTIMISM_PORTAL=0xc5c5D157928BDBD2ACf6d0777626b6C75a9EAEDC
+    ;;
+  *)
+    echo "Unsupported network: $NETWORK"
+    exit 1
+    ;;
+esac
 
 # Required environment variables
 RECIPIENT=${RECIPIENT:-}; [ -z "${RECIPIENT:-}" ] && echo "Need to set the RECIPIENT via env" && exit 1;
