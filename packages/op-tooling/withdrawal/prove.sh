@@ -4,17 +4,11 @@ set -euo pipefail
 # Determine network
 NETWORK=${NETWORK:-"sepolia"}
 case $NETWORK in
-  alfajores)
-    L1_OPTIMISM_PORTAL=0x82527353927d8D069b3B452904c942dA149BA381
-    ;;
-  baklava)
-    L1_OPTIMISM_PORTAL=0x87e9cB54f185a32266689138fbA56F0C994CF50c
-    ;;
   sepolia)
     L1_OPTIMISM_PORTAL=0x44ae3d41a335a7d05eb533029917aad35662dcc2
     ;;
-  chaos_v2)
-    L1_OPTIMISM_PORTAL=0x37e3521cc2c2e3fc12ad4adc36aa8f6b6b686473
+  mainnet)
+    L1_OPTIMISM_PORTAL=0xc5c5D157928BDBD2ACf6d0777626b6C75a9EAEDC
     ;;
   *)
     echo "Unsupported network: $NETWORK"
@@ -34,6 +28,7 @@ OUTPUT_ROOT_PROOF__MESSAGE_PASSER_STORAGE_ROOT=${OUTPUT_ROOT_PROOF__MESSAGE_PASS
 OUTPUT_ROOT_PROOF__LATEST_BLOCKHASH=${OUTPUT_ROOT_PROOF__LATEST_BLOCKHASH:-} && [ -z "${OUTPUT_ROOT_PROOF__LATEST_BLOCKHASH:-}" ] && echo "Need to set the OUTPUT_ROOT_PROOF__LATEST_BLOCKHASH via env" && exit 1;
 WITHDRAWAL_PROOF=${WITHDRAWAL_PROOF:-}; [ -z "${WITHDRAWAL_PROOF:-}" ] && echo "Need to set the WITHDRAWAL_PROOF via env" && exit 1;
 PK=${PK:-}; [ -z "${PK:-}" ] && echo "Need to set the PK via env" && exit 1;
+L1_RPC_URL=${L1_RPC_URL:-}; [ -z "${L1_RPC_URL:-}" ] && echo "Need to set the L1_RPC_URL via env" && exit 1;
 
 ### Example value of WITHDRAWAL_PROOF:
 # WITHDRAWAL_PROOF="[0xf8918080808080a0231eba9c2bc1784b944714d5260873e3f92b58434c1879123d58f995b342865180a0b3b0303113429f394c506a530c83a8fdbd3125d95b2310b05191cd2dbc978aa8808080a0236e8f61ecde6abfebc6c529441f782f62469d8a2cc47b7aace2c136bd3b1ff080a06babe3fe3879f4972e397c7e516ceb2699945beb318afa0ddee8e7381796f5ff808080,0xf8518080808080a0ea006b1384a4bf0219939e5483e6e82c22d13290d5055e2042541adfb1b47ec380808080a05aa8408d8bac30771c33c39b02167ad094fff70f16e4aa667623d999d04725c9808080808080,0xe2a02005084db35fe36c140bc6d2bc4d520dafa807b5e774c7276c91658a496f59cc01]"
@@ -41,13 +36,6 @@ PK=${PK:-}; [ -z "${PK:-}" ] && echo "Need to set the PK via env" && exit 1;
 # Optional environment variables
 GAS_LIMIT=${GAS_LIMIT:-0}
 DATA=${DATA:-"0x00"}
-L1_RPC_URL=${RPC_URL:-}
-
-# Optionally required environment variables
-if [ -z "${L1_RPC_URL:-}" ]; then
-  ALCHEMY_KEY=${ALCHEMY_KEY:-}; [ -z "${ALCHEMY_KEY:-}" ] && echo "Need to specify full RPC_URL or to set the ALCHEMY_KEY via env" && exit 1;
-  L1_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/$ALCHEMY_KEY
-fi
 
 # Proves withdrawal transaction on L1
 cast send $L1_OPTIMISM_PORTAL \
