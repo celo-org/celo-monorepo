@@ -185,7 +185,7 @@ jobs:
           # branch: release/core-contracts/14-anvil # TODO change this after CR15 ends up in master
           branch: martinvol/donRunTestAnvilCR14
       - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
+        uses: foundry-rs/foundry-toolchain@4b41dd68b098e0474673a50e6b902a234ca7ac6b
         with:
           version: 'v1.0.0'
 
