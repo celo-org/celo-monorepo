@@ -1,8 +1,9 @@
 import { privateKeyToAccount } from 'viem/accounts'
 import { createPublicClient, createWalletClient, http } from 'viem'
-import { sepolia, mainnet, celo, celoSepolia } from 'viem/chains'
+import { sepolia, mainnet, celoSepolia } from 'viem/chains'
 import { publicActionsL1, publicActionsL2, walletActionsL1, walletActionsL2 } from 'viem/op-stack'
 import { PRIVATE_KEY, NETWORK } from './env.ts'
+import { celo } from './celo.ts'
 
 export const account = privateKeyToAccount(`0x${PRIVATE_KEY}`)
 
