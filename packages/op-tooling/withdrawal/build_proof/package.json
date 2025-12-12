@@ -8,10 +8,11 @@
     "@types/node": "^24.1.0",
     "dotenv": "^17.2.1",
     "ts-node": "^10.9.2",
+    "tsx": "^4.7.0",
     "typescript": "^5.8.3",
     "viem": "^2.33.1"
   },
   "scripts": {
-    "build_proof": "node --loader ts-node/esm build_proof.ts"
+    "build_proof": "tsx build_proof.ts"
   }
 }
