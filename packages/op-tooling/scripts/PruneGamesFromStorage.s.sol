@@ -29,10 +29,11 @@ contract PruneGamesFromStorage is Script {
 
     // Validate amount of games to prune
     uint256 currentGameCount_ = factory_.gameCount();
-    if (currentGameCount_ - retentionIndex_ > 500) {
+    require(retentionIndex_ < currentGameCount_, "Retention index out of bounds");
+    if ((currentGameCount_ - 1) - retentionIndex_ > 500) {
       console.log(
         "Too many games to prune at once (%d). Max is 500. Aborting.",
-        currentGameCount_ - retentionIndex_
+        (currentGameCount_ - 1) - retentionIndex_
       );
       return;
     }

@@ -53,9 +53,6 @@ contract ResetAnchorGame is Script {
     proxyAdmin_.upgrade(payable(address(registry_)), registryImpl_);
     console.log("Registry implementation restored to:", registryImpl_);
 
-    // Stop broadcast
-    vm.stopBroadcast();
-
     // Verify anchor game was set
     address anchorGame_ = address(registry_.anchorGame());
     console.log("Verified anchor game:", anchorGame_);
@@ -64,5 +61,8 @@ contract ResetAnchorGame is Script {
 
     // Emit event
     emit AnchorGameReset(currentAnchorGame_, newAnchorGame_);
+
+    // Stop broadcast
+    vm.stopBroadcast();
   }
 }
