@@ -69,45 +69,7 @@ truffle(rc1)> let exchange = await kit.contracts.getExchange()
 
 Warning / TODO: We are migrating our tests to Foundry, so this section may be out of date. For instruction on how to run tests with Foundry see [here](./test-sol/README.md).
 
-To test the smart contracts, run:
-
-```bash
-yarn run test:truffle
-```
-
-Adding the optional `--gas` flag will print out a report of contract gas usage.
-
-To test a single smart contract, run:
-
-```bash
-yarn run test:truffle ${contract name}
-```
-
-Adding the optional `--gas` flag will print out a report of contract gas usage.
-
-## Making a new release (Foundry)
-
-To create a new release using the Foundry script, run the following command:
-
-```bash
-./scripts/foundry/make-release-foundry.sh -n <network> -b <build-meta> -p <proposal-path> -i <initialization-data-path> -r <report-path> -l <libraries-path> -k <private-key>
-```
-
-Example:
-
-```bash
-./scripts/foundry/make-release-foundry.sh -n alfajores -b core-contracts.v13.post-audit -p proposal.json -i releaseData/initializationData/release13.json -r report.json -l libraries.json -k $PRIVATE_KEY
-```
-
-### Parameters
-
-- `-n`: The network name (e.g., `alfajores`, `mainnet`).
-- `-b`: The build metadata (e.g., `core-contracts.v13.post-audit`).
-- `-p`: The path to the proposal JSON file.
-- `-i`: The path to the initialization data JSON file.
-- `-r`: The path to the report JSON file.
-- `-l`: The path to the libraries JSON file.
-- `-k`: The private key for signing.
+Truffle tests have been deprecated.
 
 ## Verify released smart contracts
 

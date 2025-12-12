@@ -22,9 +22,13 @@ mkdir -p $TMP_FOLDER
 # Start a local anvil instance
 source $PWD/scripts/foundry/start_anvil.sh
 
+# build standard forge artifacts, needed to deploy precompiles
+forge build
+
 # Deploy libraries to the anvil instance
 source $PWD/scripts/foundry/deploy_libraries.sh
-echo "Library flags are: $LIBRARY_FLAGS"
+echo "Library flags 0.5 are: $LIBRARY_FLAGS"
+echo "Library flags 0.8 are: $LIBRARY_FLAGS_08"
 
 # Build map of selectors from governanceConstitution.json
 source $PWD/scripts/foundry/build_constitution_selectors_map.sh
@@ -32,14 +36,17 @@ source $PWD/scripts/foundry/build_constitution_selectors_map.sh
 # Build all contracts with deployed libraries
 # Including contracts that depend on libraries. This step replaces the library placeholder
 # in the bytecode with the address of the actually deployed library.
-echo "Compiling with libraries..."
-time FOUNDRY_PROFILE=devchain forge build $LIBRARY_FLAGS
+echo "Compiling 0.5 with libraries..."
+time FOUNDRY_PROFILE=truffle-compat forge build $LIBRARY_FLAGS 
+echo "Compiling 0.8 with libraries..."
+
+time FOUNDRY_PROFILE=truffle-compat8 forge build $LIBRARY_FLAGS_08 
 
 # Deploy precompile contracts
 source $PWD/scripts/foundry/deploy_precompiles.sh
 
 echo "Setting Registry Proxy"
-PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode.object' ./out/Proxy.sol/Proxy.json)
+PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode.object' ./out-truffle-compat/Proxy.sol/Proxy.json)
 cast rpc anvil_setCode $REGISTRY_ADDRESS $PROXY_DEPLOYED_BYTECODE --rpc-url $ANVIL_RPC_URL
 
 # Sets the storage of the registry so that it has an owner we control
@@ -60,6 +67,7 @@ forge script \
   $SKIP_SIMULATION \
   $NON_INTERACTIVE \
   $LIBRARY_FLAGS \
+  $LIBRARY_FLAGS_08 \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
 
 CELO_EPOCH_REWARDS_ADDRESS=$(

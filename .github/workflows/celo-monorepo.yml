@@ -29,9 +29,7 @@ env:
   TERM: dumb
   GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
   # Git Tag for contract release to use
-  RELEASE_TAG: core-contracts.v14
-  # CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
-  CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.8.x
+  RELEASE_TAG: core-contracts.v14.anvil
 
 # EXAMPLE on debug ssh step
 #  - name: Setup tmate session
@@ -184,10 +182,16 @@ jobs:
           workflow: protocol-devchain.yml
           name: devchain-${{ env.RELEASE_TAG }}
           path: packages/protocol/.tmp/devchain
-      - name: Copy DevChain and Build generated from released tag
-        run: |
-          BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
-          (cp -r packages/protocol/.tmp/devchain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
+          # branch: release/core-contracts/14-anvil # TODO change this after CR15 ends up in master
+          branch: martinvol/donRunTestAnvilCR14
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
+        with:
+          version: 'v1.0.0'
+
+      - name: Install forge dependencies
+        working-directory: packages/protocol
+        run: forge install
       - name: Test against current release
         run: |
           echo "Comparing against $RELEASE_TAG"
@@ -220,15 +224,9 @@ jobs:
                 echo "If these changes are intended, update the 'releaseData/versionReports' accordingly"
                 exit 1
               fi
-          - name: Protocol Common tests
-            command: |
-              yarn --cwd packages/protocol test:truffle common/
           - name: Protocol Compatibility
             command: |
-              yarn --cwd packages/protocol test:truffle compatibility/
-          - name: Protocol scripts test
-            command: |
-              yarn --cwd packages/protocol test:scripts
+              yarn --cwd packages/protocol test:truffle:compatibility
     steps:
       - uses: actions/checkout@v4
         with:

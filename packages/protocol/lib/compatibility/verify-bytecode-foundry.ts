@@ -1,18 +1,31 @@
 /* eslint-disable no-console: 0 */
 import { ensureLeading0x } from '@celo/base/lib/address'
 import {
-  LibraryAddresses,
-  LibraryPositions,
+  LibraryLinkingInfo,
+  ArtifactLibraryLinking,
   linkLibraries,
   stripMetadata,
   verifyAndStripLibraryPrefix,
-} from '@celo/protocol/lib/bytecode'
-import { verifyProxyStorageProof } from '@celo/protocol/lib/proxy-utils'
+} from '@celo/protocol/lib/bytecode-foundry'
+import { verifyProxyStorageProofFoundry } from '@celo/protocol/lib/proxy-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
-import { ProxyInstance, RegistryInstance } from 'types'
-import Web3 from 'web3'
 import { ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9'
+import { getArtifactByName, getContractName, getDeployedBytecode } from '@celo/protocol/lib/compatibility/internal'
+
+interface RegistryLookup {
+  getAddressForString: (name: string) => Promise<string>
+}
+
+interface ProxyLookup {
+  getImplementation: (address: string) => Promise<string>
+}
+
+interface ChainLookup {
+  getCode: (address: string) => Promise<string>
+  encodeFunctionCall: (abi: any, args: any[]) => string
+  getProof: (address: string, slots: string[]) => Promise<any>
+}
 
 let ignoredContracts = [
   // This contract is not proxied
@@ -30,20 +43,25 @@ let ignoredContracts = [
 
 interface VerificationContext {
   artifacts: BuildArtifacts[]
-  libraryAddresses: LibraryAddresses
-  registry: RegistryInstance
+  libraryLinkingInfo: LibraryLinkingInfo
+  registry: RegistryLookup
   governanceAddress: string
   proposal: ProposalTx[]
-  Proxy: Truffle.Contract<ProxyInstance>
-  web3: Web3
+  proxyLookup: ProxyLookup
+  chainLookup: ChainLookup
   network: string
 }
-interface InitializationData {
+
+export interface InitializationData {
   [contractName: string]: any[]
 }
 
 const ContractNameExtractorRegex = new RegExp(/(.*)Proxy/)
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
+
+const getArtifact = (contractName: string, context: VerificationContext) => {
+  return context.artifacts.map(a => getArtifactByName(contractName, a)).find(a => a)
+}
 
 // Checks if the given transaction is a repointing of the Proxy for the given
 // contract.
@@ -83,19 +101,22 @@ export const getProposedProxyAddress = (contract: string, proposal: ProposalTx[]
 }
 
 const getSourceBytecodeFromArtifacts = (contract: string, artifacts: BuildArtifacts[]): string =>
-  stripMetadata(artifacts.map(a => a.getArtifactByName(contract)).find(a => a).deployedBytecode)
+  stripMetadata(getDeployedBytecode(artifacts.map(a => getArtifactByName(contract, a)).find(a => a)))
 
 const getSourceBytecode = (contract: string, context: VerificationContext): string =>
   getSourceBytecodeFromArtifacts(contract, context.artifacts)
 
 const getOnchainBytecode = async (address: string, context: VerificationContext) =>
-  stripMetadata(await context.web3.eth.getCode(address))
+  stripMetadata(await context.chainLookup.getCode(address))
 
-const isLibrary = (contract: string, context: VerificationContext) =>
-  contract in context.libraryAddresses.addresses
+const isLibrary = (contract: string, context: VerificationContext) => {
+  const answer = Object.keys(context.libraryLinkingInfo.info).includes(contract)
+  return answer
+}
 
 const dfsStep = async (queue: string[], visited: Set<string>, context: VerificationContext) => {
   const contract = queue.pop()
+  const artifact = getArtifact(contract, context)
   // mark current DFS node as visited
   visited.add(contract)
 
@@ -105,7 +126,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
     // ganache does not support eth_getProof
     if (
       context.network !== 'development' &&
-      !(await verifyProxyStorageProof(context.web3, proxyAddress, context.governanceAddress))
+      !(await verifyProxyStorageProofFoundry(context.chainLookup, proxyAddress, context.governanceAddress))
     ) {
       throw new Error(`Proposed ${contract}Proxy has impure storage`)
     }
@@ -120,46 +141,35 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
 
   // check implementation deployment
   const sourceBytecode = getSourceBytecode(contract, context)
-  const sourceLibraryPositions = new LibraryPositions(sourceBytecode)
+  const sourceArtifactLinking = new ArtifactLibraryLinking(artifact)
 
   let implementationAddress: string
   if (isImplementationChanged(contract, context.proposal)) {
     implementationAddress = getProposedImplementationAddress(contract, context.proposal)
   } else if (isLibrary(contract, context)) {
-    implementationAddress = ensureLeading0x(context.libraryAddresses.addresses[contract])
+    implementationAddress = ensureLeading0x(context.libraryLinkingInfo.info[contract].address)
   } else {
     const proxyAddress = await context.registry.getAddressForString(contract)
     if (proxyAddress === ZERO_ADDRESS) {
       console.log(`Contract ${contract} is not in registry - skipping bytecode verification`)
       return;
     }
-    const proxy = await context.Proxy.at(proxyAddress) // necessary await
-    implementationAddress = await proxy._getImplementation()
+    implementationAddress = await context.proxyLookup.getImplementation(proxyAddress)
   }
 
-  console.log(`Verifying ${contract} at ${implementationAddress}`)
   let onchainBytecode = await getOnchainBytecode(implementationAddress, context)
-  context.libraryAddresses.collect(onchainBytecode, sourceLibraryPositions)
+  context.libraryLinkingInfo.collect(onchainBytecode, sourceArtifactLinking)
 
-  let linkedSourceBytecode = linkLibraries(sourceBytecode, context.libraryAddresses.addresses)
+  let linkedSourceBytecode = linkLibraries(sourceBytecode, context.libraryLinkingInfo.info)
 
-  try {
-    if (isLibrary(contract, context)) {
-      linkedSourceBytecode = verifyAndStripLibraryPrefix(linkedSourceBytecode)
-      onchainBytecode = verifyAndStripLibraryPrefix(onchainBytecode, implementationAddress)
-    }
-  } catch(e) {
-    const logMessage = `Error verifying library prefix for ${contract} at ${implementationAddress}: ${e}`
-    throw new Error(logMessage)
-    // console.log(logMessage)
+  // normalize library bytecodes
+  if (isLibrary(contract, context)) {
+    linkedSourceBytecode = verifyAndStripLibraryPrefix(linkedSourceBytecode)
+    onchainBytecode = verifyAndStripLibraryPrefix(onchainBytecode, implementationAddress)
   }
 
   if (onchainBytecode !== linkedSourceBytecode) {
-    console.log("onchainBytecode", onchainBytecode)
-    console.log("linkedSourceBytecode", linkedSourceBytecode)
-    const logMessage = `${contract}'s onchain and compiled bytecodes do not match`
-    throw new Error(logMessage)
-    // console.log(logMessage)
+    throw new Error(`${contract}'s onchain (deployed at ${implementationAddress}) and compiled bytecodes do not match`)
   } else {
     console.log(
       `${isLibrary(contract, context) ? 'Library' : 'Contract'
@@ -169,7 +179,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
 
   // push unvisited libraries to DFS queue
   queue.push(
-    ...Object.keys(sourceLibraryPositions.positions).filter((library) => !visited.has(library))
+    ...Object.keys(sourceArtifactLinking.links).filter((library) => !visited.has(library))
   )
 }
 
@@ -187,7 +197,7 @@ const assertValidProposalTransactions = (proposal: ProposalTx[]) => {
 const assertValidInitializationData = (
   artifacts: BuildArtifacts[],
   proposal: ProposalTx[],
-  web3: Web3,
+  chainLookup: ChainLookup,
   initializationData: InitializationData
 ) => {
   const initializingProposals = proposal.filter(isProxyRepointAndInitializeTransaction)
@@ -206,11 +216,11 @@ const assertValidInitializationData = (
       (abi: any) => abi.type === 'function' && abi.name === 'initialize'
     )
     const args = initializationData[contractName]
-    const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
+    const callData = chainLookup.encodeFunctionCall(initializeAbi, args)
 
     if (callData.toLowerCase() !== proposalTx.args[1].toLowerCase()) {
       throw new Error(
-        `Initialization Data for ${contractName} in proposal does not match reference file ${initializationData[contractName]}`
+        `Intialization Data for ${contractName} in proposal does not match reference file ${initializationData[contractName]}`
       )
     }
 
@@ -236,18 +246,18 @@ const assertValidInitializationData = (
 export const verifyBytecodes = async (
   contracts: string[],
   artifacts: BuildArtifacts[],
-  registry: RegistryInstance,
+  registry: RegistryLookup,
   proposal: ProposalTx[],
-  Proxy: Truffle.Contract<ProxyInstance>,
-  _web3: Web3,
+  proxyLookup: ProxyLookup,
+  chainLookup: ChainLookup,
   initializationData: InitializationData = {},
   version?: number,
   network = 'development'
 ) => {
   assertValidProposalTransactions(proposal)
-  assertValidInitializationData(artifacts, proposal, _web3, initializationData)
+  assertValidInitializationData(artifacts, proposal, chainLookup, initializationData)
 
-  const compiledContracts = Array.prototype.concat.apply([], artifacts.map(a => a.listArtifacts())).map((a) => a.contractName)
+  const compiledContracts = Array.prototype.concat.apply([], artifacts.map(a => a.listArtifacts())).map((a) => getContractName(a))
 
   if (version > 9) {
     ignoredContracts = [...ignoredContracts, ...ignoredContractsV9]
@@ -263,18 +273,15 @@ export const verifyBytecodes = async (
 
   const visited: Set<string> = new Set(queue)
 
-  // truffle web3 version does not have getProof
-  const web3 = new Web3(_web3.currentProvider)
-
   const governanceAddress = await registry.getAddressForString('Governance')
   const context: VerificationContext = {
     artifacts,
-    libraryAddresses: new LibraryAddresses(),
+    libraryLinkingInfo: new LibraryLinkingInfo(),
     registry,
     governanceAddress,
     proposal,
-    Proxy,
-    web3,
+    proxyLookup,
+    chainLookup,
     network,
   }
 
@@ -282,5 +289,5 @@ export const verifyBytecodes = async (
     await dfsStep(queue, visited, context)
   }
 
-  return context.libraryAddresses
+  return context.libraryLinkingInfo
 }
