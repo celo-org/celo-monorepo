@@ -6,10 +6,10 @@ This directory contains tooling for performing L2 to L1 withdrawals of CELO from
 
 The tooling supports two network configurations:
 
-- **Sepolia**: L1 (Ethereum Sepolia) ↔ L2 (Celo Sepolia) - *Default Testnet*
+- **Sepolia**: L1 (Ethereum Sepolia) ↔ L2 (Celo Sepolia) - *Testnet*
 - **Mainnet**: L1 (Ethereum Mainnet) ↔ L2 (Celo Mainnet)
 
-Set the `NETWORK` environment variable to specify which network to use (defaults to `sepolia` if not specified).
+Set the `NETWORK` environment variable to specify which network to use (`sepolia` or `mainnet`). This variable is **required**.
 
 ## Important Notes
 
@@ -39,7 +39,6 @@ RECIPIENT=0x... VALUE=1000000000000000000 PK=123... ./initiate.sh
 - `PK`: Private key (without 0x prefix) of the sender
 
 **Optional Environment Variables:**
-- `NETWORK`: Network to use (`sepolia` or `mainnet` - defaults to `sepolia`)
 - `GAS_LIMIT`: Gas limit for the transaction (default: 0 - which means no gas limit)
 - `DATA`: Additional data to include (default: "0x00")
 - `L2_RPC_URL`: Custom L2 RPC URL
@@ -57,9 +56,7 @@ cd build_proof && yarn install && PK=123... TX_HASH=0x... yarn build_proof
 **Required Environment Variables:**
 - `PK`: Private key (without 0x prefix) of the sender
 - `TX_HASH`: Transaction hash from the initiation step
-
-**Optional Environment Variables:**
-- `NETWORK`: Network to use (`sepolia` or `mainnet` - defaults to `sepolia`)
+- `NETWORK`: Network to use (`sepolia` or `mainnet`)
 
 For detailed information about proof building, see [build_proof README](./build_proof/).
 
@@ -88,9 +85,9 @@ WITHDRAWAL_NONCE=123... SENDER=0x... RECIPIENT=0x... VALUE=1000000000000000000 \
 - `WITHDRAWAL_PROOF`: Array of proof bytes from proof building
 - `PK`: Private key (without 0x prefix) for submitting the proof
 - `L1_RPC_URL`: L1 RPC URL to use for the proof submission
+- `NETWORK`: Network to use (`sepolia` or `mainnet`)
 
 **Optional Environment Variables:**
-- `NETWORK`: Network to use (`sepolia` or `mainnet` - defaults to `sepolia`)
 - `GAS_LIMIT`: Gas limit for the transaction (default: 0 - which means no gas limit)
 - `DATA`: Additional data to include (default: "0x00")
 
@@ -106,9 +103,7 @@ WITHDRAWAL_HASH=0x... PROOF_SUBMITTER=0x... L1_RPC_URL=https://... ./get.sh
 - `WITHDRAWAL_HASH`: Hash of the withdrawal transaction
 - `PROOF_SUBMITTER`: Address that submitted the proof
 - `L1_RPC_URL`: L1 RPC URL to use for checking status
-
-**Optional Environment Variables:**
-- `NETWORK`: Network to use (`sepolia` or `mainnet` - defaults to `sepolia`)
+- `NETWORK`: Network to use (`sepolia` or `mainnet`)
 
 ## Step 5: Wait 7 Days
 
@@ -126,9 +121,7 @@ WITHDRAWAL_HASH=0x... PROOF_SUBMITTER=0x... L1_RPC_URL=https://... ./check.sh
 - `WITHDRAWAL_HASH`: Hash of the withdrawal transaction
 - `PROOF_SUBMITTER`: Address that submitted the proof
 - `L1_RPC_URL`: L1 RPC URL to use for checking readiness
-
-**Optional Environment Variables:**
-- `NETWORK`: Network to use (`sepolia` or `mainnet` - defaults to `sepolia`)
+- `NETWORK`: Network to use (`sepolia` or `mainnet`)
 
 **Output:** 
 - Reverts with error message if withdrawal has issues
@@ -150,9 +143,9 @@ WITHDRAWAL_NONCE=123... SENDER=0x... RECIPIENT=0x... VALUE=1000000000000000000 \
 - `VALUE`: Amount being withdrawn in wei
 - `PK`: Private key (without 0x prefix) for finalizing
 - `L1_RPC_URL`: L1 RPC URL to use for finalizing the withdrawal
+- `NETWORK`: Network to use (`sepolia` or `mainnet`)
 
 **Optional Environment Variables:**
-- `NETWORK`: Network to use (`sepolia` or `mainnet` - defaults to `sepolia`)
 - `GAS_LIMIT`: Gas limit for the transaction (default: 0 - which means no gas limit)
 - `DATA`: Additional data to include (default: "0x00")
 
@@ -160,7 +153,7 @@ WITHDRAWAL_NONCE=123... SENDER=0x... RECIPIENT=0x... VALUE=1000000000000000000 \
 
 ### Network-Specific Contract Addresses
 
-**Sepolia (L1: Ethereum Sepolia, L2: Celo Sepolia) - Default Testnet:**
+**Sepolia (L1: Ethereum Sepolia, L2: Celo Sepolia):**
 - **L2_L1_MESSAGE_PASSER**: `0x4200000000000000000000000000000000000016` (Celo Sepolia)
 - **L1_OPTIMISM_PORTAL**: `0x44ae3d41a335a7d05eb533029917aad35662dcc2` (Ethereum Sepolia)
 

@@ -6,10 +6,10 @@ This directory contains tooling for performing L1 to L2 deposits of CELO to Celo
 
 The tooling supports two network configurations:
 
-- **Sepolia**: L1 (Ethereum Sepolia) ↔ L2 (Celo Sepolia) - *Default Testnet*
+- **Sepolia**: L1 (Ethereum Sepolia) ↔ L2 (Celo Sepolia) - *Testnet*
 - **Mainnet**: L1 (Ethereum Mainnet) ↔ L2 (Celo Mainnet)
 
-Set the `NETWORK` environment variable to specify which network to use (defaults to `sepolia` if not specified).
+Set the `NETWORK` environment variable to specify which network to use (`sepolia` or `mainnet`). This variable is **required**.
 
 ## Important Notes
 
@@ -31,9 +31,9 @@ RECIPIENT=0x... VALUE=1000000000000000000 PK=123... L1_RPC_URL=https://... ./dep
 - `VALUE`: Amount to deposit in wei
 - `PK`: Private key (without 0x prefix) of the sender
 - `L1_RPC_URL`: L1 RPC URL to use for the deposit
+- `NETWORK`: Network to use (`sepolia` or `mainnet`)
 
 **Optional Environment Variables:**
-- `NETWORK`: Network to use (`sepolia` or `mainnet` - defaults to `sepolia`)
 - `GAS_LIMIT`: Gas limit for the L2 transaction (default: 100000)
 - `IS_CREATION`: Whether this is a contract creation (default: false)
 - `DATA`: Additional data to include (default: "0x00")
@@ -52,7 +52,7 @@ The deposit script performs three automated steps:
 
 ### Network-Specific Contract Addresses
 
-**Sepolia (L1: Ethereum Sepolia, L2: Celo Sepolia) - Default Testnet:**
+**Sepolia (L1: Ethereum Sepolia, L2: Celo Sepolia):**
 - **SYSTEM_CONFIG**: `0x760a5f022c9940f4a074e0030be682f560d29818` (Ethereum Sepolia)
 - **OPTIMISM_PORTAL**: `0x44ae3d41a335a7d05eb533029917aad35662dcc2` (Ethereum Sepolia)
 
@@ -60,15 +60,15 @@ The deposit script performs three automated steps:
 - **SYSTEM_CONFIG**: `0x89E31965D844a309231B1f17759Ccaf1b7c09861` (Ethereum Mainnet)
 - **OPTIMISM_PORTAL**: `0xc5c5D157928BDBD2ACf6d0777626b6C75a9EAEDC` (Ethereum Mainnet)
 
-**Note:** The [deposit.sh](deposit.sh) script supports both networks via the `NETWORK` environment variable (defaults to `sepolia`).
+**Note:** The [deposit.sh](deposit.sh) script supports both networks via the `NETWORK` environment variable.
 
 ## Example Usage
 
 ### Deposit 0.1 CELO to Sepolia (Testnet)
 
 ```sh
-# Using Sepolia - default testnet
-RECIPIENT=0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb VALUE=100000000000000000 PK=your_private_key L1_RPC_URL=https://sepolia.infura.io/v3/YOUR_KEY ./deposit.sh
+# Using Sepolia - testnet
+NETWORK=sepolia RECIPIENT=0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb VALUE=100000000000000000 PK=your_private_key L1_RPC_URL=https://sepolia.infura.io/v3/YOUR_KEY ./deposit.sh
 ```
 
 ### Deposit 0.1 CELO to Mainnet

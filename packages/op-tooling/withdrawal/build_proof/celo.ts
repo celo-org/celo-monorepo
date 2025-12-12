@@ -44,5 +44,6 @@ export const celo = /*#__PURE__*/ defineChain({
       },
     },
   },
+  sourceId,
   testnet: false,
 })

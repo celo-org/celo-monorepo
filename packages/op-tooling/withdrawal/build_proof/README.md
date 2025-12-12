@@ -6,10 +6,10 @@ This package builds cryptographic proofs required for L2 to L1 withdrawals on Ce
 
 The package supports two network configurations:
 
-- **Sepolia**: L1 (Ethereum Sepolia) ↔ L2 (Celo Sepolia) - *Default Testnet*
+- **Sepolia**: L1 (Ethereum Sepolia) ↔ L2 (Celo Sepolia) - *Testnet*
 - **Mainnet**: L1 (Ethereum Mainnet) ↔ L2 (Celo Mainnet)
 
-Set the `NETWORK` environment variable to specify which network to use (defaults to `sepolia` if not specified).
+Set the `NETWORK` environment variable to specify which network to use (`sepolia` or `mainnet`). This variable is **required**.
 
 ## Overview
 
@@ -35,9 +35,7 @@ The script requires the following environment variables:
 **Required:**
 - `PK`: Private key of the account that initiated the withdrawal (without 0x prefix)
 - `TX_HASH`: Transaction hash of the withdrawal initiation on L2 (with 0x prefix)
-
-**Optional:**
-- `NETWORK`: Network to use (`sepolia` or `mainnet` - defaults to `sepolia`)
+- `NETWORK`: Network to use (`sepolia` or `mainnet`)
 
 
 ## Usage
@@ -45,8 +43,8 @@ The script requires the following environment variables:
 To build a proof for a withdrawal, run:
 
 ```sh
-# For Sepolia (default testnet)
-PK=1234567890abcdef... TX_HASH=0x1234567890abcdef... yarn build_proof
+# For Sepolia (testnet)
+NETWORK=sepolia PK=1234567890abcdef... TX_HASH=0x1234567890abcdef... yarn build_proof
 
 # For Mainnet
 NETWORK=mainnet PK=1234567890abcdef... TX_HASH=0x1234567890abcdef... yarn build_proof
@@ -130,7 +128,7 @@ The "Prove Args" output contains all the data needed for the `prove.sh` script:
 
 ### Network-Specific Contract Addresses
 
-**Sepolia (L1: Ethereum Sepolia, L2: Celo Sepolia) - Default Testnet:**
+**Sepolia (L1: Ethereum Sepolia, L2: Celo Sepolia):**
 - **L2L1MessagePasser**: `0x4200000000000000000000000000000000000016` (Celo Sepolia)
 - **Portal Contract**: `0x44ae3d41a335a7d05eb533029917aad35662dcc2` (Ethereum Sepolia)
 

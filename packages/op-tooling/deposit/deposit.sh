@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Determine network
-NETWORK=${NETWORK:-"sepolia"}
+NETWORK=${NETWORK:-}; [ -z "${NETWORK:-}" ] && echo "Need to set the NETWORK via env" && exit 1;
 case $NETWORK in
   sepolia)
     SYSTEM_CONFIG=0x760a5f022c9940f4a074e0030be682f560d29818
