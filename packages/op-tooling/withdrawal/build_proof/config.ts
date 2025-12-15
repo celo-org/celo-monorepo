@@ -7,7 +7,10 @@ import { celo } from './celo.ts'
 
 export const account = privateKeyToAccount(`0x${PRIVATE_KEY}`)
 
-let l1: { public?: any; wallet?: any } = {}
+let l1: { public: any; wallet: any } = {
+  public: undefined,
+  wallet: undefined,
+}
 if (NETWORK === 'sepolia') {
   l1.public = createPublicClient({
     chain: sepolia,
@@ -36,7 +39,10 @@ if (NETWORK === 'sepolia') {
 export const publicClientL1 = l1.public
 export const walletClientL1 = l1.wallet
 
-let l2: { public?: any; wallet?: any } = {}
+let l2: { public: any; wallet: any } = {
+  public: undefined,
+  wallet: undefined,
+}
 if (NETWORK === 'sepolia') {
   l2.public = createPublicClient({
     chain: celoSepolia,
