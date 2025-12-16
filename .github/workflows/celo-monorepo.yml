@@ -237,7 +237,7 @@ jobs:
           rebuild-package: 'true'
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
       - name: Execute matrix command for test
-        uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+        uses: nick-fields/retry@9417ab499314dfe692edb043ded2ff9b3f5f0a68
         with:
           timeout_minutes: 40
           max_attempts: 3
