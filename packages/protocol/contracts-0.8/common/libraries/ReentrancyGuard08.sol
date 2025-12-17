@@ -17,7 +17,7 @@ pragma solidity ^0.8.0;
  *
  * TIP: If you would like to learn more about reentrancy and alternative ways
  * to protect against it, check out our blog post
- * https://blog.openzeppelin.com/reentrancy-after-istanbul/[Reentrancy After Istanbul].
+ * https://www.openzeppelin.com/news/reentrancy-after-istanbul-part-1
  */
 abstract contract ReentrancyGuard08 {
   // Booleans are more expensive than uint256 or any type that takes up a full
