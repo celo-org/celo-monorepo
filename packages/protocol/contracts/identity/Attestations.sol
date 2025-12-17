@@ -129,7 +129,7 @@ contract Attestations is
   );
   event TransferApproval(
     address indexed approver,
-    bytes32 indexed indentifier,
+    bytes32 indexed identifier,
     address from,
     address to,
     bool approved
