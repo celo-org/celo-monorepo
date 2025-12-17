@@ -21,7 +21,7 @@ fi
 
 # this is to allow the script to be called from anywhere
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-cd $DIR
+cd "$DIR"
 cd ..
 
 # place templates to be used (if they exist) in case the environment
@@ -37,8 +37,7 @@ if [[ $1 == "decrypt" ]]; then
   done
 fi
 
-command -v gcloud > /dev/null 2>&1
-if [[ $? -eq 1 ]]; then
+if ! command -v gcloud >/dev/null 2>&1; then
   echo "gcloud is not installed - skipping ${1}ion"
   exit 0
 fi
@@ -63,17 +62,17 @@ for file_path_map in "${files[@]}"; do
   fi
 
   # Encrypt or decrypt this file.
-  gcloud kms $1 --ciphertext-file=$encrypted_file_path --plaintext-file=$file_path --key=github-mnemonic-key --keyring=celo-keyring --location=global --project $environment
-  if [[ $? -eq 1 ]]; then
+  gcloud kms $1 --ciphertext-file="$encrypted_file_path" --plaintext-file="$file_path" --key=github-mnemonic-key --keyring=celo-keyring --location=global --project "$environment"
+  if [[ $? -ne 0 ]]; then
     echo "Only cLabs employees with $environment access can $1 keys - skipping ${1}ion"
-    exit 0
+    continue
   fi
 done
 
 if [[ $1 == "decrypt" ]]; then
   echo "Encrypted files decrypted"
 elif [[ $1 == "encrypt" ]]; then
-  echo "Decrypted files encrypted"
+  echo "Files encrypted"
 fi
 
 exit 0
