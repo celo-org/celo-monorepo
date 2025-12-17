@@ -58,7 +58,12 @@ const selectReportFor = (report, contractName) => {
  */
 const assertContractErrorsMatch = (report, contractName: string, expectedMatches) => {
   const contractReport = selectReportFor(report, contractName)
-  assert.equal(contractReport.errors.length, 1)
+  assert.isOk(contractReport, `Contract report not found: ${contractName}`)
+  assert.equal(
+    contractReport.errors.length,
+    expectedMatches.length,
+    `Expected ${expectedMatches.length} error(s), got ${contractReport.errors.length}`
+  )
 
   contractReport.errors.forEach((error, i) => {
     assert.match(error, expectedMatches[i])
