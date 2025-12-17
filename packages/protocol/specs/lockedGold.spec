@@ -14,6 +14,7 @@ methods {
 	getPendingWithdrawalsLength(address) returns uint256 envfree
 	getPendingWithdrawalsIndex(address,uint256) returns uint256 envfree	
 	getunlockingPeriod() returns uint256 envfree
+	getPendingWithdrawal(address,uint256) returns (uint256,uint256) envfree
 	incrementNonvotingAccountBalance(address, uint256) 
 	decrementNonvotingAccountBalance(address, uint256) 
 	unlock(uint256) 
@@ -111,10 +112,13 @@ rule noChangeByOther(address a, address b, method f) {
  */
 rule withdraw(uint256 index) {
 	env e;
-	uint256 _balance = sinvoke ercBalanceOf(e.msg.sender);
-	uint256 val = sinvoke getPendingWithdrawalsIndex(e.msg.sender, index);
-	sinvoke withdraw(e, index);
 	require (e.msg.sender != currentContract);
+	uint256 _balance = sinvoke ercBalanceOf(e.msg.sender);
+	uint256 val;
+	uint256 ts;
+	(val, ts) = sinvoke getPendingWithdrawal(e.msg.sender, index);
+	require(e.block.timestamp >= ts);
+	sinvoke withdraw(e, index);
 	uint256 balance_ = sinvoke ercBalanceOf(e.msg.sender);
 	assert(
     _balance + val == balance_,
