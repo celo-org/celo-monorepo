@@ -122,7 +122,7 @@ contract GovernanceTest is TestWithUtils {
       )
       .unwrap();
 
-    // change block.tiemstamp so we're not on timestamp = 0
+    // change block.timestamp so we're not on timestamp = 0
     vm.warp(100 * 60);
 
     setUpContracts();
