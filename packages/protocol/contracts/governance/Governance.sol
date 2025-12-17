@@ -903,7 +903,7 @@ contract Governance is
    * @param index The index in `dequeued`.
    * @return The corresponding proposal ID, vote value, and weight.
    * @return The depreciated vote value.
-   * @return The deprecieated weight.
+   * @return The depreciated weight.
    * @return The yes weight.
    * @return The no weight.
    * @return The abstain weight.
