@@ -5,7 +5,7 @@ set -euo pipefail
 [ -z "${PK:-}" ] && echo "Need to set the PK via env" && exit 1;
 [ -z "${OPCM_ADDRESS:-}" ] && echo "Need to set the OPCM_ADDRESS via env" && exit 1;
 [ -z "${OPCM_UPGRADE_CALLDATA:-}" ] && echo "Need to set the OPCM_UPGRADE_CALLDATA via env" && exit 1;
-[ -z "${MENTO_SIG:-}" ] && echo "Need to set the MENTO_SIG via env" && exit 1;
+[ -z "${GC_SIG:-}" ] && echo "Need to set the GC_SIG via env" && exit 1;
 [ -z "${COUNCIL_SIG:-}" ] && echo "Need to set the COUNCIL_SIG via env" && exit 1;
 [ -z "${CLABS_SIG:-}" ] && echo "Need to set the CLABS_SIG via env" && exit 1;
 echo "Logged in as wallet: $(cast wallet address --private-key $PK)"
@@ -19,7 +19,7 @@ RPC_URL=${RPC_URL:-"http://127.0.0.1:8545"}
 PARENT_SAFE_ADDRESS=0x4092A77bAF58fef0309452cEaCb09221e556E112
 CLABS_SAFE_ADDRESS=0x9Eb44Da23433b5cAA1c87e35594D15FcEb08D34d
 COUNCIL_SAFE_ADDRESS=0xC03172263409584f7860C25B6eB4985f0f6F4636
-MENTO_SAFE_ADDRESS=0xD1C635987B6Aa287361d08C6461491Fa9df087f2
+GC_SAFE_ADDRESS=0xD1C635987B6Aa287361d08C6461491Fa9df087f2
 
 # defaults
 VALUE=0
@@ -36,7 +36,7 @@ function performUpgrade() {
   PARENT_SAFE_NONCE=$(cast call $PARENT_SAFE_ADDRESS "nonce()(uint256)" -r $RPC_URL)
   CLABS_SAFE_NONCE=$(cast call $CLABS_SAFE_ADDRESS "nonce()(uint256)" -r $RPC_URL)
   COUNCIL_SAFE_NONCE=$(cast call $COUNCIL_SAFE_ADDRESS "nonce()(uint256)" -r $RPC_URL)
-  MENTO_SAFE_NONCE=$(cast call $MENTO_SAFE_ADDRESS "nonce()(uint256)" -r $RPC_URL)
+  GC_SAFE_NONCE=$(cast call $GC_SAFE_ADDRESS "nonce()(uint256)" -r $RPC_URL)
 
   echo "--- Parent prep ---"
 
@@ -59,31 +59,31 @@ function performUpgrade() {
   )
   echo "Council hash: $COUNCIL_TX_HASH"
 
-  echo "--- Mento part ---"
+  echo "--- Grand child part ---"
 
-  # mento hash
+  # gc hash
   APPROVE_COUNCIL_CALLDATA=$(cast calldata 'approveHash(bytes32)' $COUNCIL_TX_HASH)
-  MENTO_TX_HASH=$(cast call $MENTO_SAFE_ADDRESS \
+  GC_TX_HASH=$(cast call $GC_SAFE_ADDRESS \
     "getTransactionHash(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,uint256)(bytes32)" \
-    $COUNCIL_SAFE_ADDRESS $VALUE $APPROVE_COUNCIL_CALLDATA $OP_CALL $SAFE_TX_GAS $BASE_GAS $GAS_PRICE $GAS_TOKEN $REFUND_RECEIVER $MENTO_SAFE_NONCE \
+    $COUNCIL_SAFE_ADDRESS $VALUE $APPROVE_COUNCIL_CALLDATA $OP_CALL $SAFE_TX_GAS $BASE_GAS $GAS_PRICE $GAS_TOKEN $REFUND_RECEIVER $GC_SAFE_NONCE \
     -r $RPC_URL
   )
-  echo "Mento hash: $MENTO_TX_HASH"
+  echo "Grand child hash: $GC_TX_HASH"
 
-  # mento sig
-  echo "Mento sig: $MENTO_SIG"
+  # gc sig
+  echo "Grand child sig: $GC_SIG"
 
-  echo "--- Mento exec ---"
+  echo "--- Grand child exec ---"
 
-  # mento exec
-  cast send $MENTO_SAFE_ADDRESS \
+  # gc exec
+  cast send $GC_SAFE_ADDRESS \
     "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)" \
-    $COUNCIL_SAFE_ADDRESS $VALUE $APPROVE_COUNCIL_CALLDATA $OP_CALL $SAFE_TX_GAS $BASE_GAS $GAS_PRICE $GAS_TOKEN $REFUND_RECEIVER $MENTO_SIG \
+    $COUNCIL_SAFE_ADDRESS $VALUE $APPROVE_COUNCIL_CALLDATA $OP_CALL $SAFE_TX_GAS $BASE_GAS $GAS_PRICE $GAS_TOKEN $REFUND_RECEIVER $GC_SIG \
     --private-key $PK \
     -r $RPC_URL
-  echo "Mento executed"
+  echo "Grand child executed"
 
-  echo "--- Mento done ---"
+  echo "--- Grand child done ---"
 
   # council sig
   echo "Council sig: $COUNCIL_SIG"

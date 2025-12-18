@@ -2,11 +2,13 @@
 
 echo "Processing encrypted files v2"
 
-# Set list of secret files to encrypt and decrypt.
+# Set list of pairs (secret file:environment) to encrypt and decrypt.
 files=(
   ".env.mnemonic:celo-testnet"
   ".env.mnemonic.alfajores:celo-testnet"
   ".env.mnemonic.mainnet:celo-testnet-production"
+  "secrets/.env.signers.v2:celo-testnet-production"
+  "secrets/.env.signers.v3:celo-testnet-production"
 )
 
 if [[ -z "$1" ]]; then
