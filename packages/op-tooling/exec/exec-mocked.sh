@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# behaviour (values: 'approve', 'sign')
-APPROVE_OR_SIGN='sign'
-
 # optionally allow to specify signer
 EXTERNAL_SIG=${SIG:-}
 EXTERNAL_ACCOUNT=${ACCOUNT:-}
 EXTERNAL_TEAM=${TEAM:-}
 GRAND_CHILD_MULTISIG=${GC_MULTISIG:-}
+
+# determine if using internal signers
+USE_INTERNAL_CLABS=$([ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ] && echo "true" || echo "false")
+USE_INTERNAL_COUNCIL=$([ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ] && echo "true" || echo "false")
+
 if [ -n "$EXTERNAL_SIG" ] && [ -n "$EXTERNAL_ACCOUNT" ]; then
   echo "Detected external account: $EXTERNAL_ACCOUNT"
   case $EXTERNAL_TEAM in
@@ -29,13 +31,9 @@ fi
 [ -z "${VERSION:-}" ] && echo "Need to set the VERSION via env" && exit 1;
 [ -z "${PK:-}" ] && echo "Need to set the PK via env" && exit 1;
 [ -z "${SENDER:-}" ] && echo "Need to set the SENDER via env" && exit 1;
-if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ]; then
-  [ -z "${SIGNER_1_PK:-}" ] && echo "Need to set the SIGNER_1_PK via env" && exit 1;
-fi
+[ "$USE_INTERNAL_CLABS" = "true" ] && [ -z "${SIGNER_1_PK:-}" ] && echo "Need to set the SIGNER_1_PK via env" && exit 1;
 [ -z "${SIGNER_2_PK:-}" ] && echo "Need to set the SIGNER_2_PK via env" && exit 1;
-if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
-  [ -z "${SIGNER_3_PK:-}" ] && echo "Need to set the SIGNER_3_PK via env" && exit 1;
-fi
+[ "$USE_INTERNAL_COUNCIL" = "true" ] && [ -z "${SIGNER_3_PK:-}" ] && echo "Need to set the SIGNER_3_PK via env" && exit 1;
 [ -z "${SIGNER_4_PK:-}" ] && echo "Need to set the SIGNER_4_PK via env" && exit 1;
 
 # check version
@@ -52,16 +50,18 @@ esac
 if [ $SENDER != $(cast wallet address --private-key $PK) ]; then
   echo "Invalid PK"; exit 1;
 fi
-if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ]; then
-  # if EXTERNAL_SIG & EXTERNAL_ACCOUNT are set and EXTERNAL_TEAM is clabs than MOCKED_SIGNER_1 = EXTERNAL_ACCOUNT
-  MOCKED_SIGNER_1=$(cast wallet address --private-key $SIGNER_1_PK)
-fi
+[ "$USE_INTERNAL_CLABS" = "true" ] && MOCKED_SIGNER_1=$(cast wallet address --private-key $SIGNER_1_PK)
 MOCKED_SIGNER_2=$(cast wallet address --private-key $SIGNER_2_PK)
-if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
-  # if EXTERNAL_SIG & EXTERNAL_ACCOUNT are set and EXTERNAL_TEAM is council than MOCKED_SIGNER_3 = EXTERNAL_ACCOUNT
-  MOCKED_SIGNER_3=$(cast wallet address --private-key $SIGNER_3_PK)
-fi
+[ "$USE_INTERNAL_COUNCIL" = "true" ] && MOCKED_SIGNER_3=$(cast wallet address --private-key $SIGNER_3_PK)
 MOCKED_SIGNER_4=$(cast wallet address --private-key $SIGNER_4_PK)
+
+# validate signer ordering
+if [ "$USE_INTERNAL_CLABS" = "true" ] && [[ ${MOCKED_SIGNER_1:2,,} > ${MOCKED_SIGNER_2:2,,} ]]; then
+  echo "Error: MOCKED_SIGNER_1 must be < MOCKED_SIGNER_2 (addresses must be in ascending order)" && exit 1
+fi
+if [ "$USE_INTERNAL_COUNCIL" = "true" ] && [[ ${MOCKED_SIGNER_3:2,,} > ${MOCKED_SIGNER_4:2,,} ]]; then
+  echo "Error: MOCKED_SIGNER_3 must be < MOCKED_SIGNER_4 (addresses must be in ascending order)" && exit 1
+fi
 
 # rpc
 RPC_URL=http://127.0.0.1:8545
@@ -121,7 +121,7 @@ echo "Parent hash: $PARENT_TX_HASH"
 
 echo "--- cLabs part ---"
 
-# cLabs approve
+# cLabs tx
 APPROVE_ON_PARENT_CALLDATA=$(cast calldata 'approveHash(bytes32)' $PARENT_TX_HASH)
 CLABS_TX_HASH=$(cast call $CLABS_SAFE_ADDRESS \
   "getTransactionHash(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,uint256)(bytes32)" \
@@ -130,40 +130,29 @@ CLABS_TX_HASH=$(cast call $CLABS_SAFE_ADDRESS \
 )
 echo "cLabs hash: $CLABS_TX_HASH"
 
-# approve or sign cLabs
-if [ "$APPROVE_OR_SIGN" = "approve" ]; then
-  echo "Approve cLabs hash"
-  CLABS_APPROVE_FROM_SIGNER_CALLDATA=$(cast calldata 'approveHash(bytes32)' $CLABS_TX_HASH)
-  cast send $CLABS_SAFE_ADDRESS $CLABS_APPROVE_FROM_SIGNER_CALLDATA --private-key $SIGNER_1_PK -r $RPC_URL
-  cast send $CLABS_SAFE_ADDRESS $CLABS_APPROVE_FROM_SIGNER_CALLDATA --private-key $SIGNER_2_PK -r $RPC_URL
-  echo "cLabs hash approved"
+# sign by cLabs
+echo "Sign cLabs hash"
+if [ "$USE_INTERNAL_CLABS" = "true" ]; then
+  CLABS_SIG_1=$(cast wallet sign --no-hash $CLABS_TX_HASH --private-key $SIGNER_1_PK)
 else
-  echo "Sign cLabs hash"
-  if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ]; then
-    CLABS_SIG_1=$(cast wallet sign --no-hash $CLABS_TX_HASH --private-key $SIGNER_1_PK)
-  else
-    CLABS_SIG_1=$EXTERNAL_SIG
-  fi
-  echo "Sig 1: $CLABS_SIG_1"
-  CLABS_SIG_2=$(cast wallet sign --no-hash $CLABS_TX_HASH --private-key $SIGNER_2_PK)
-  echo "Sig 2: $CLABS_SIG_2"
-  echo "cLabs hash signed"
+  CLABS_SIG_1=$EXTERNAL_SIG
+fi
+echo "Sig 1: $CLABS_SIG_1"
+CLABS_SIG_2=$(cast wallet sign --no-hash $CLABS_TX_HASH --private-key $SIGNER_2_PK)
+echo "Sig 2: $CLABS_SIG_2"
+echo "cLabs hash signed"
+
+# concat cLabs sigs
+if [ "$USE_INTERNAL_CLABS" = "true" ]; then
+  CLABS_SIG=0x${CLABS_SIG_1:2}${CLABS_SIG_2:2}
+elif [[ ${EXTERNAL_ACCOUNT:2,,} < ${MOCKED_SIGNER_2:2,,} ]]; then
+  CLABS_SIG=0x${EXTERNAL_SIG:2}${CLABS_SIG_2:2}
+else
+  CLABS_SIG=0x${CLABS_SIG_2:2}${EXTERNAL_SIG:2}
 fi
 
 # exec cLabs
 echo "Exec cLabs approval"
-if [ $APPROVE_OR_SIGN = 'approve' ]; then
-  # signature in format where signer is nested safe (https://github.com/safe-global/safe-smart-account/blob/main/contracts/Safe.sol#L349C17-L351C94)
-  CLABS_SIG=0x000000000000000000000000${MOCKED_SIGNER_2:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000${MOCKED_SIGNER_1:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000
-else
-  if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ]; then
-    CLABS_SIG=0x${CLABS_SIG_2:2}${CLABS_SIG_1:2}
-  elif [[ ${MOCKED_SIGNER_2:2} < ${EXTERNAL_ACCOUNT:2} ]]; then
-    CLABS_SIG=0x${CLABS_SIG_2:2}${EXTERNAL_SIG:2}
-  else
-    CLABS_SIG=0x${EXTERNAL_SIG:2}${CLABS_SIG_2:2}
-  fi
-fi
 echo "cLabs sig: $CLABS_SIG"
 cast send $CLABS_SAFE_ADDRESS \
   "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)" \
@@ -174,7 +163,7 @@ echo "cLabs approval executed"
 
 echo "--- Council part ---"
 
-# Council approve
+# Council tx
 COUNCIL_TX_HASH=$(cast call $COUNCIL_SAFE_ADDRESS \
   "getTransactionHash(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,uint256)(bytes32)" \
   $PARENT_SAFE_ADDRESS $VALUE $APPROVE_ON_PARENT_CALLDATA $OP_CALL $SAFE_TX_GAS $BASE_GAS $GAS_PRICE $GAS_TOKEN $REFUND_RECEIVER $COUNCIL_SAFE_NONCE \
@@ -182,7 +171,7 @@ COUNCIL_TX_HASH=$(cast call $COUNCIL_SAFE_ADDRESS \
 )
 echo "Council hash: $COUNCIL_TX_HASH"
 
-# approve or sign Council
+# optional Grand child section
 if [ -n "$GRAND_CHILD_MULTISIG" ]; then
   echo "Detected Grand Child multisig: $GRAND_CHILD_MULTISIG"
 
@@ -205,45 +194,39 @@ if [ -n "$GRAND_CHILD_MULTISIG" ]; then
   echo "Grand Child approval executed"
 fi
 
-if [ "$APPROVE_OR_SIGN" = "approve" ]; then
-  echo "Approve Council hash"
-  COUNCIL_APPROVE_FROM_SIGNER_CALLDATA=$(cast calldata 'approveHash(bytes32)' $COUNCIL_TX_HASH)
-  cast send $COUNCIL_SAFE_ADDRESS $COUNCIL_APPROVE_FROM_SIGNER_CALLDATA --private-key $SIGNER_3_PK -r $RPC_URL
-  cast send $COUNCIL_SAFE_ADDRESS $COUNCIL_APPROVE_FROM_SIGNER_CALLDATA --private-key $SIGNER_4_PK -r $RPC_URL
-  echo "Council hash approved"
-else
-  echo "Sign Council hash"
-  if [ -z "$GRAND_CHILD_MULTISIG" ]; then
-    if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
-      COUNCIL_SIG_1=$(cast wallet sign --no-hash $COUNCIL_TX_HASH --private-key $SIGNER_3_PK)
-    else
-      COUNCIL_SIG_1=$EXTERNAL_SIG
-    fi
-    echo "Sig 1: $COUNCIL_SIG_1"
+# sign by Council
+echo "Sign Council hash"
+if [ -z "$GRAND_CHILD_MULTISIG" ]; then
+  if [ "$USE_INTERNAL_COUNCIL" = "true" ]; then
+    COUNCIL_SIG_1=$(cast wallet sign --no-hash $COUNCIL_TX_HASH --private-key $SIGNER_3_PK)
+  else
+    COUNCIL_SIG_1=$EXTERNAL_SIG
   fi
-  COUNCIL_SIG_2=$(cast wallet sign --no-hash $COUNCIL_TX_HASH --private-key $SIGNER_4_PK)
-  echo "Sig 2: $COUNCIL_SIG_2"
-  echo "Council hash signed"
+  echo "Sig 1: $COUNCIL_SIG_1"
 fi
+COUNCIL_SIG_2=$(cast wallet sign --no-hash $COUNCIL_TX_HASH --private-key $SIGNER_4_PK)
+echo "Sig 2: $COUNCIL_SIG_2"
+echo "Council hash signed"
 
-# exec Council
-echo "Exec Council approval"
-if [ "$APPROVE_OR_SIGN" = "approve" ]; then
-  # signature in format where signer is nested safe (https://github.com/safe-global/safe-smart-account/blob/main/contracts/Safe.sol#L349C17-L351C94)
-  COUNCIL_SIG=0x000000000000000000000000${MOCKED_SIGNER_4:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000${MOCKED_SIGNER_3:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000
+# concat Council sigs
+if [ -z "$GRAND_CHILD_MULTISIG" ]; then
+  if [ "$USE_INTERNAL_COUNCIL" = "true" ]; then
+    COUNCIL_SIG=0x${COUNCIL_SIG_1:2}${COUNCIL_SIG_2:2}
+  elif [[ ${EXTERNAL_ACCOUNT:2,,} < ${MOCKED_SIGNER_4:2,,} ]]; then
+    COUNCIL_SIG=0x${EXTERNAL_SIG:2}${COUNCIL_SIG_2:2}
+  else
+    COUNCIL_SIG=0x${COUNCIL_SIG_2:2}${EXTERNAL_SIG:2}
+  fi
 else
-  if [ -z "$GRAND_CHILD_MULTISIG" ]; then
-    if [ -z "$EXTERNAL_SIG" ] || [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
-      COUNCIL_SIG=0x${COUNCIL_SIG_2:2}${COUNCIL_SIG_1:2}
-    elif [[ ${MOCKED_SIGNER_4:2} < ${EXTERNAL_ACCOUNT:2} ]]; then
-      COUNCIL_SIG=0x${COUNCIL_SIG_2:2}${EXTERNAL_SIG:2}
-    else
-      COUNCIL_SIG=0x${EXTERNAL_SIG:2}${COUNCIL_SIG_2:2}
-    fi
+  if [[ ${GRAND_CHILD_MULTISIG:2,,} < ${MOCKED_SIGNER_4:2,,} ]]; then
+    COUNCIL_SIG=0x000000000000000000000000${GRAND_CHILD_MULTISIG:2}000000000000000000000000000000000000000000000000000000000000000001${COUNCIL_SIG_2:2}
   else
     COUNCIL_SIG=0x${COUNCIL_SIG_2:2}000000000000000000000000${GRAND_CHILD_MULTISIG:2}000000000000000000000000000000000000000000000000000000000000000001
   fi
 fi
+
+# exec Council
+echo "Exec Council approval"
 echo "Council sig: $COUNCIL_SIG"
 cast send $COUNCIL_SAFE_ADDRESS \
   "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)" \
@@ -254,11 +237,12 @@ echo "Council approval executed"
 
 echo "--- Parent exec ---"
 
-# exec parent tx
-echo "Exec tx"
 # signature in format where signer is nested safe (https://github.com/safe-global/safe-smart-account/blob/main/contracts/Safe.sol#L349C17-L351C94)
 PARENT_SIG=0x000000000000000000000000${CLABS_SAFE_ADDRESS:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000${COUNCIL_SAFE_ADDRESS:2}000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000
 echo "Parent sig: $PARENT_SIG"
+
+# exec parent tx
+echo "Exec tx"
 cast send $PARENT_SAFE_ADDRESS \
   "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)" \
   $TARGET $VALUE $TX_CALLDATA $OP_DELEGATECALL $SAFE_TX_GAS $BASE_GAS $GAS_PRICE $GAS_TOKEN $REFUND_RECEIVER $PARENT_SIG \

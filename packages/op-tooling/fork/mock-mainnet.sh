@@ -13,6 +13,11 @@ COUNCIL_MULTISIG=0xC03172263409584f7860C25B6eB4985f0f6F4636
 EXTERNAL_ACCOUNT=${ACCOUNT:-}
 EXTERNAL_TEAM=${TEAM:-}
 GRAND_CHILD_MULTISIG=${GC_MULTISIG:-}
+
+# determine if using internal signers
+USE_INTERNAL_CLABS=$([ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ] && echo "true" || echo "false")
+USE_INTERNAL_COUNCIL=$([ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ] && echo "true" || echo "false")
+
 if [ -n "$EXTERNAL_ACCOUNT" ]; then
   echo "Detected external account: $EXTERNAL_ACCOUNT"
   case $EXTERNAL_TEAM in
@@ -29,20 +34,20 @@ if [ -n "$GRAND_CHILD_MULTISIG" ] && [ "$EXTERNAL_TEAM" != "council" ]; then
 fi
 
 # signers
-if [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "clabs" ]; then
-  [ -z "${MOCKED_SIGNER_1:-}" ] && echo "Need to set the MOCKED_SIGNER_1 via env" && exit 1;
-else
-  # if EXTERNAL_ACCOUNT is set and EXTERNAL_TEAM is clabs than MOCKED_SIGNER_1 = EXTERNAL_ACCOUNT
-  MOCKED_SIGNER_1=$EXTERNAL_ACCOUNT
+[ "$USE_INTERNAL_CLABS" = "true" ] && [ -z "${MOCKED_SIGNER_1:-}" ] && echo "Need to set the MOCKED_SIGNER_1 via env" && exit 1
+[ "$USE_INTERNAL_CLABS" = "false" ] && MOCKED_SIGNER_1=$EXTERNAL_ACCOUNT
+[ -z "${MOCKED_SIGNER_2:-}" ] && echo "Need to set the MOCKED_SIGNER_2 via env" && exit 1
+[ "$USE_INTERNAL_COUNCIL" = "true" ] && [ -z "${MOCKED_SIGNER_3:-}" ] && echo "Need to set the MOCKED_SIGNER_3 via env" && exit 1
+[ "$USE_INTERNAL_COUNCIL" = "false" ] && MOCKED_SIGNER_3=$EXTERNAL_ACCOUNT
+[ -z "${MOCKED_SIGNER_4:-}" ] && echo "Need to set the MOCKED_SIGNER_4 via env" && exit 1
+
+# validate signer ordering
+if [ "$USE_INTERNAL_CLABS" = "true" ] && [[ ${MOCKED_SIGNER_1:2,,} > ${MOCKED_SIGNER_2:2,,} ]]; then
+  echo "Error: MOCKED_SIGNER_1 must be < MOCKED_SIGNER_2 (addresses must be in ascending order)" && exit 1
 fi
-[ -z "${MOCKED_SIGNER_2:-}" ] && echo "Need to set the MOCKED_SIGNER_2 via env" && exit 1;
-if [ -z "$EXTERNAL_ACCOUNT" ] || [ "$EXTERNAL_TEAM" != "council" ]; then
-  [ -z "${MOCKED_SIGNER_3:-}" ] && echo "Need to set the MOCKED_SIGNER_3 via env" && exit 1;
-else
-  # if EXTERNAL_ACCOUNT is set and EXTERNAL_TEAM is council than MOCKED_SIGNER_3 = EXTERNAL_ACCOUNT
-  MOCKED_SIGNER_3=$EXTERNAL_ACCOUNT
+if [ "$USE_INTERNAL_COUNCIL" = "true" ] && [[ ${MOCKED_SIGNER_3:2,,} > ${MOCKED_SIGNER_4:2,,} ]]; then
+  echo "Error: MOCKED_SIGNER_3 must be < MOCKED_SIGNER_4 (addresses must be in ascending order)" && exit 1
 fi
-[ -z "${MOCKED_SIGNER_4:-}" ] && echo "Need to set the MOCKED_SIGNER_4 via env" && exit 1;
 
 # safe internal
 SENTINEL_ADDRESS=0x0000000000000000000000000000000000000001
@@ -83,40 +88,57 @@ fi
 # mock ownership circular linked list
 echo "Mock ownership for multisigs"
 # [Parent]
-# Sentinel -> cLabs: cast index address 0x0000000000000000000000000000000000000001 2 -> 0xe90b7bceb6e7df5418fb78d8ee546e97c83a08bbccc01a0644d599ccd2a7c2e0
-cast rpc anvil_setStorageAt $PARENT_MULTISIG 0xe90b7bceb6e7df5418fb78d8ee546e97c83a08bbccc01a0644d599ccd2a7c2e0 0x000000000000000000000000${CLABS_MULTISIG:2} -r $RPC_URL
-# cLabs -> Council: cast index address 0x9Eb44Da23433b5cAA1c87e35594D15FcEb08D34d 2 -> 0x5b5e035df6c1a9a21134237fdf27807e2ca7277585a03f98b7ba4aa54655d04b
-cast rpc anvil_setStorageAt $PARENT_MULTISIG 0x5b5e035df6c1a9a21134237fdf27807e2ca7277585a03f98b7ba4aa54655d04b 0x000000000000000000000000${COUNCIL_MULTISIG:2} -r $RPC_URL
-# Council -> Sentinel: cast index address 0xC03172263409584f7860C25B6eB4985f0f6F4636 2 -> 0x08e26275bfea81cb6e947a60aee1cbc0cc1f1a12f3a95cfa65148dacd0073117
-cast rpc anvil_setStorageAt $PARENT_MULTISIG 0x08e26275bfea81cb6e947a60aee1cbc0cc1f1a12f3a95cfa65148dacd0073117 0x000000000000000000000000${SENTINEL_ADDRESS:2} -r $RPC_URL
+# Sentinel -> cLabs
+SENTINEL_SLOT=$(cast index address 0x0000000000000000000000000000000000000001 2)
+cast rpc anvil_setStorageAt $PARENT_MULTISIG $SENTINEL_SLOT 0x000000000000000000000000${CLABS_MULTISIG:2} -r $RPC_URL
+# cLabs -> Council
+CLABS_SLOT=$(cast index address 0x9Eb44Da23433b5cAA1c87e35594D15FcEb08D34d 2)
+cast rpc anvil_setStorageAt $PARENT_MULTISIG $CLABS_SLOT 0x000000000000000000000000${COUNCIL_MULTISIG:2} -r $RPC_URL
+# Council -> Sentinel
+COUNCIL_SLOT=$(cast index address 0xC03172263409584f7860C25B6eB4985f0f6F4636 2)
+cast rpc anvil_setStorageAt $PARENT_MULTISIG $COUNCIL_SLOT 0x000000000000000000000000${SENTINEL_ADDRESS:2} -r $RPC_URL
 # [cLabs]
-# Sentinel -> Signer #1: cast index address 0x0000000000000000000000000000000000000001 2 -> 0xe90b7bceb6e7df5418fb78d8ee546e97c83a08bbccc01a0644d599ccd2a7c2e0
-cast rpc anvil_setStorageAt $CLABS_MULTISIG 0xe90b7bceb6e7df5418fb78d8ee546e97c83a08bbccc01a0644d599ccd2a7c2e0 0x000000000000000000000000${MOCKED_SIGNER_1:2} -r $RPC_URL
-# Signer #1 -> Signer #2: cast index address 0x899a864C6bE2c573a98d8493961F4D4c0F7Dd0CC 2 -> 0xd83831d8a3ca91174d10befe3df8237dcbd55304e78f35811970b244f55f7a2b
+# Sentinel -> Signer #1
+cast rpc anvil_setStorageAt $CLABS_MULTISIG $SENTINEL_SLOT 0x000000000000000000000000${MOCKED_SIGNER_1:2} -r $RPC_URL
+# Signer #1 -> Signer #2
 SIGNER_1_SLOT=$(cast index address $MOCKED_SIGNER_1 2)
 cast rpc anvil_setStorageAt $CLABS_MULTISIG $SIGNER_1_SLOT 0x000000000000000000000000${MOCKED_SIGNER_2:2} -r $RPC_URL
-# Signer #2 -> Sentinel: cast index address 0x865d05C8bB46E7AF16D6Dc99ddfb2e64BBec1345 2 -> 0x18877be3912428d756ff6389ee4e71768eb68d3e723f7c81e68919c0a11fe761
-cast rpc anvil_setStorageAt $CLABS_MULTISIG 0x18877be3912428d756ff6389ee4e71768eb68d3e723f7c81e68919c0a11fe761 0x000000000000000000000000${SENTINEL_ADDRESS:2} -r $RPC_URL
+# Signer #2 -> Sentinel
+SIGNER_2_SLOT=$(cast index address $MOCKED_SIGNER_2 2)
+cast rpc anvil_setStorageAt $CLABS_MULTISIG $SIGNER_2_SLOT 0x000000000000000000000000${SENTINEL_ADDRESS:2} -r $RPC_URL
 # [Council]
 if [ -z "$GRAND_CHILD_MULTISIG" ]; then
-  # Sentinel -> Signer #3: cast index address 0x0000000000000000000000000000000000000001 2 -> 0xe90b7bceb6e7df5418fb78d8ee546e97c83a08bbccc01a0644d599ccd2a7c2e0
-  cast rpc anvil_setStorageAt $COUNCIL_MULTISIG 0xe90b7bceb6e7df5418fb78d8ee546e97c83a08bbccc01a0644d599ccd2a7c2e0 0x000000000000000000000000${MOCKED_SIGNER_3:2} -r $RPC_URL
-  # Signer #3 -> Signer #4: cast index address 0x8Af6f11c501c082bD880B3ceC83e6bB249Fa32c9 2 -> 0xfe2b681ac5bf197b6e6f3e6e8cb27c9abb3fa4018a18e1b5762ed302770b84e2
+  # Sentinel -> Signer #3
+  cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SENTINEL_SLOT 0x000000000000000000000000${MOCKED_SIGNER_3:2} -r $RPC_URL
+  # Signer #3 -> Signer #4
   SIGNER_3_SLOT=$(cast index address $MOCKED_SIGNER_3 2)
   cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SIGNER_3_SLOT 0x000000000000000000000000${MOCKED_SIGNER_4:2} -r $RPC_URL
-  # Signer #4 -> Sentinel: cast index address 0x480C5f2340f9E7A46ee25BAa815105B415a7c2e2 2 -> 0x883764c79926d22363d1b43b74bf18b5fea9f5910c70a2339193beb7bfdd7279
-  cast rpc anvil_setStorageAt $COUNCIL_MULTISIG 0x883764c79926d22363d1b43b74bf18b5fea9f5910c70a2339193beb7bfdd7279 0x000000000000000000000000${SENTINEL_ADDRESS:2} -r $RPC_URL
+  # Signer #4 -> Sentinel
+  SIGNER_4_SLOT=$(cast index address $MOCKED_SIGNER_4 2)
+  cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SIGNER_4_SLOT 0x000000000000000000000000${SENTINEL_ADDRESS:2} -r $RPC_URL
 else
-  # Sentinel -> Grand Child: cast index address 0x0000000000000000000000000000000000000001 2 -> 0xe90b7bceb6e7df5418fb78d8ee546e97c83a08bbccc01a0644d599ccd2a7c2e0
-  cast rpc anvil_setStorageAt $COUNCIL_MULTISIG 0xe90b7bceb6e7df5418fb78d8ee546e97c83a08bbccc01a0644d599ccd2a7c2e0 0x000000000000000000000000${GRAND_CHILD_MULTISIG:2} -r $RPC_URL
-  # Grand Child -> Signer #4
-  GC_SLOT=$(cast index address $GRAND_CHILD_MULTISIG 2)
-  cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $GC_SLOT 0x000000000000000000000000${MOCKED_SIGNER_4:2} -r $RPC_URL
-  # Signer #4 -> Sentinel: cast index address 0x480C5f2340f9E7A46ee25BAa815105B415a7c2e2 2 -> 0x883764c79926d22363d1b43b74bf18b5fea9f5910c70a2339193beb7bfdd7279
-  cast rpc anvil_setStorageAt $COUNCIL_MULTISIG 0x883764c79926d22363d1b43b74bf18b5fea9f5910c70a2339193beb7bfdd7279 0x000000000000000000000000${SENTINEL_ADDRESS:2} -r $RPC_URL
+  if [[ ${GRAND_CHILD_MULTISIG:2,,} < ${MOCKED_SIGNER_4:2,,} ]]; then
+    # Sentinel -> Grand Child
+    cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SENTINEL_SLOT 0x000000000000000000000000${GRAND_CHILD_MULTISIG:2} -r $RPC_URL
+    # Grand Child -> Signer #4
+    GC_SLOT=$(cast index address $GRAND_CHILD_MULTISIG 2)
+    cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $GC_SLOT 0x000000000000000000000000${MOCKED_SIGNER_4:2} -r $RPC_URL
+    # Signer #4 -> Sentinel
+    SIGNER_4_SLOT=$(cast index address $MOCKED_SIGNER_4 2)
+    cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SIGNER_4_SLOT 0x000000000000000000000000${SENTINEL_ADDRESS:2} -r $RPC_URL
+  else
+    # Sentinel -> Signer #4
+    cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SENTINEL_SLOT 0x000000000000000000000000${MOCKED_SIGNER_4:2} -r $RPC_URL
+    # Signer #4 -> Grand Child
+    SIGNER_4_SLOT=$(cast index address $MOCKED_SIGNER_4 2)
+    cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SIGNER_4_SLOT 0x000000000000000000000000${GRAND_CHILD_MULTISIG:2} -r $RPC_URL
+    # Grand Child -> Sentinel
+    GC_SLOT=$(cast index address $GRAND_CHILD_MULTISIG 2)
+    cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $GC_SLOT 0x000000000000000000000000${SENTINEL_ADDRESS:2} -r $RPC_URL
+  fi
 
-  # GC Sentinel -> Signer #3: cast index address 0x0000000000000000000000000000000000000001 2 -> 0xe90b7bceb6e7df5418fb78d8ee546e97c83a08bbccc01a0644d599ccd2a7c2e0
-  cast rpc anvil_setStorageAt $GRAND_CHILD_MULTISIG 0xe90b7bceb6e7df5418fb78d8ee546e97c83a08bbccc01a0644d599ccd2a7c2e0 0x000000000000000000000000${MOCKED_SIGNER_3:2} -r $RPC_URL
+  # GC Sentinel -> Signer #3
+  cast rpc anvil_setStorageAt $GRAND_CHILD_MULTISIG $SENTINEL_SLOT 0x000000000000000000000000${MOCKED_SIGNER_3:2} -r $RPC_URL
   # Signer #3 -> GC Sentinel
   SIGNER_3_SLOT=$(cast index address $MOCKED_SIGNER_3 2)
   cast rpc anvil_setStorageAt $GRAND_CHILD_MULTISIG $SIGNER_3_SLOT 0x000000000000000000000000${SENTINEL_ADDRESS:2} -r $RPC_URL
