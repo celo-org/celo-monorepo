@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# get repo root
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
 # required decoded files
-[ ! -f ../secrets/.env.signers.succinct ] && echo "Need to decode .env.signers.succinct.enc first" && exit 1;
+[ ! -f "$REPO_ROOT/secrets/.env.signers.succinct" ] && echo "Need to decode .env.signers.succinct.enc first" && exit 1;
 
 # load decoded signers
-source ../secrets/.env.signers.succinct
+source "$REPO_ROOT/secrets/.env.signers.succinct"
 
 # required envs
 [ -z "${PK:-}" ] && echo "Need to set the PK via env" && exit 1;
