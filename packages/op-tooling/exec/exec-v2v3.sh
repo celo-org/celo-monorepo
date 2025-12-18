@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# get repo root
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
 # required decoded files
-[ ! -f ../secrets/.env.signers.v2 ] && echo "Need to decode .env.signers.v2.enc first" && exit 1;
-[ ! -f ../secrets/.env.signers.v3 ] && echo "Need to decode .env.signers.v3.enc first" && exit 1;
+[ ! -f "$REPO_ROOT/secrets/.env.signers.v2" ] && echo "Need to decode .env.signers.v2.enc first" && exit 1;
+[ ! -f "$REPO_ROOT/secrets/.env.signers.v3" ] && echo "Need to decode .env.signers.v3.enc first" && exit 1;
 
 # load decoded signers
-source ../secrets/.env.signers.v2
-source ../secrets/.env.signers.v3
+source "$REPO_ROOT/secrets/.env.signers.v2"
+source "$REPO_ROOT/secrets/.env.signers.v3"
 
 # required envs
 [ -z "${PK:-}" ] && echo "Need to set the PK via env" && exit 1;
