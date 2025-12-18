@@ -9,6 +9,7 @@ files=(
   ".env.mnemonic.mainnet:celo-testnet-production"
   "secrets/.env.signers.v2:celo-testnet-production"
   "secrets/.env.signers.v3:celo-testnet-production"
+  "secrets/.env.signers.succinct:celo-testnet-production"
 )
 
 if [[ -z "$1" ]]; then
