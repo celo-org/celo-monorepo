@@ -177,7 +177,7 @@ jobs:
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
       - name: Download protocol devchain artifact
-        uses: dawidd6/action-download-artifact@20319c5641d495c8a52e688b7dc5fada6c3a9fbc
+        uses: dawidd6/action-download-artifact@0ad3579bfb84ad8f64e7144efd7b21925c40c9eb
         with:
           workflow: protocol-devchain.yml
           name: devchain-${{ env.RELEASE_TAG }}
