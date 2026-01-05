@@ -1,9 +1,0 @@
-{
-  "extends": "@tsconfig/recommended/tsconfig.json",
-  "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "lib",
-    "resolveJsonModule": true
-  },
-  "include": ["src/**/*", "types/**/*", "../../node_modules/@celo/contractkit/types", "index.d.ts"],
-}

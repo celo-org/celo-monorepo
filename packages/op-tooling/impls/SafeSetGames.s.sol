@@ -12,6 +12,14 @@ import { GameTypes } from "src/dispute/lib/Types.sol";
 import { IDisputeGameFactory } from "interfaces/dispute/IDisputeGameFactory.sol";
 
 contract SafeSetGames is Script {
+  // This script requires running with --root and the following env vars:
+  // FACTORY (required) - address of the DisputeGameFactory
+  // PERMISSIONED_GAME (required) - address of the new PermissionedDisputeGame implementation
+  // PERMISSIONLESS_GAME (required) - address of the new PermissionlessDisputeGame implementation
+  // SAFE (required) - address of the Gnosis Safe to execute the transaction
+  // SENDER (required) - address of the sender in the Gnosis Safe
+  // SIG (optional) - signatures for the Safe transaction; if not provided, the transaction
+
   error MissingSignatures();
 
   struct EnvConfig {

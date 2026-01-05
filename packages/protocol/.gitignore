@@ -7,10 +7,6 @@ contractPackages.js.map
 lib/**/*.js
 lib/**/*.js.map
 
-migrations/**/*.js
-migrations/**/*.js.map
-
-migrations_ts/**/*.js
 
 scripts/**/*.js
 scripts/**/*.js.map
@@ -41,6 +37,8 @@ deployedGrants.json
 # Foundry
 cache/
 out/
+out-truffle-compat/
+out-truffle-compat-0.8/
 
 wagmi.config.js
 wagmi.config.js.map
@@ -51,3 +49,6 @@ abis/lib/
 contracts/0.8
 
 broadcast/
+
+out-truffle-compat-0.8
+out-truffle-compat

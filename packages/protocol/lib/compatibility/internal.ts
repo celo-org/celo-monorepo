@@ -29,6 +29,14 @@ export const getArtifactByName = (contractName: string, artifacts: BuildArtifact
   )
 }
 
+export const getDeployedBytecode = (artifact: Artifact): string => {
+  if (typeof artifact.deployedBytecode === "string") {
+    return artifact.deployedBytecode
+  } else {
+    return artifact.deployedBytecode.object
+  }
+}
+
 // getStorageLayout needs an oz-sdk Contract class instance. This class is a
 // subclass of Contract from web3-eth-contract, with an added .schema member and
 // several methods.
@@ -52,6 +60,19 @@ export function makeZContract(artifact: Artifact): ZContract {
   return contract
 }
 
+export interface LinkReference {
+  start: number
+  length: number
+}
+
+export interface LibraryLinkReference {
+  [library: string]: LinkReference[]
+}
+
+export interface LinkReferences {
+  [sourcePath: string]: LibraryLinkReference
+}
+
 // Inlined from OpenZeppelin SDK since its not exported.
 export interface Artifact {
   abi: any[]
@@ -59,7 +80,7 @@ export interface Artifact {
   bytecode: string
   compiler: any
   contractName: string
-  deployedBytecode: (string | { object: string })
+  deployedBytecode: (string | { object: string, linkReferences: LinkReferences })
   deployedSourceMap: string
   fileName: string
   legacyAST?: any

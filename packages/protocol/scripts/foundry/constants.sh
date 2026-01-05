@@ -10,10 +10,16 @@ export FORGE=${CELO_FOUNDRY_PATH:-}"forge"
 export CAST=${CELO_FOUNDRY_PATH:-}"cast"
 
 # Anvil configurations (Source: https://book.getfoundry.sh/reference/anvil/)
-export ANVIL_PORT=8546 # Port for anvil
-export ANVIL_OP_PORT=9545 # Port for anvil running with Optimism state (check start_op_anvil.sh)
-export ANVIL_RPC_URL="http://127.0.0.1:$ANVIL_PORT"
-export ANVIL_OP_RPC_URL="http://127.0.0.1:$ANVIL_OP_PORT"
+export ANVIL_PORT=8546
+export ANVIL_RPC_URL_BASE="http://127.0.0.1"
+
+export ANVIL_RPC_URL="$ANVIL_RPC_URL_BASE:$ANVIL_PORT" # TODO deprecate this variable in favor of the function below
+
+get_anvil_rpc_url() {
+  echo "$ANVIL_RPC_URL_BASE:$ANVIL_PORT"
+}
+
+# Anvil logging
 export ANVIL_LOGGING_ENABLED=${ANVIL_LOGGING:=false} # Flag to enable or disable logging. Useful for local development
 export GAS_LIMIT=50000000
 export CODE_SIZE_LIMIT=245760 # EIP-170: Contract code size limit in bytes. Useful to increase for tests. [default: 0x6000 (~25kb)]
@@ -56,14 +62,15 @@ export CELO_UNRELEASED_TREASURY_INITIAL_BALANCE="$(($GOLD_TOKEN_CELO_SUPPLY_CAP 
 export RESERVE_INITIAL_BALANCE="5000000" # setting this here because it gets overwritten in the L2 migration script
 
 # Contract libraries
-export LIBRARIES_PATH=(
-  "contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
-  "contracts/common/Signatures.sol:Signatures"
-  "contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
-  "contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList"
-  "contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"
-  "contracts/governance/Proposals.sol:Proposals"
+export LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
+                "contracts/common/Signatures.sol:Signatures"
+                "contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList"
+                "contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"
+                "contracts/governance/Proposals.sol:Proposals"
 )
+
+export LIBRARIES_PATH_08=("contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList")
+
 export LIBRARY_DEPENDENCIES_PATH=(
   "contracts/common/FixidityLib.sol"
   "contracts/common/linkedlists/LinkedList.sol"

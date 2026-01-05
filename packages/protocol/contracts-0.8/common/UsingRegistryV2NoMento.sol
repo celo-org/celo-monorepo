@@ -38,6 +38,9 @@ contract UsingRegistryV2NoMento {
   IRegistry public constant registryContract = IRegistry(registryAddress);
 
   bytes32 internal constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
+  bytes32 internal constant ATTESTATIONS_REGISTRY_ID = keccak256(abi.encodePacked("Attestations"));
+  bytes32 internal constant BLOCKCHAIN_PARAMETERS_REGISTRY_ID =
+    keccak256(abi.encodePacked("BlockchainParameters"));
   bytes32 internal constant CELO_UNRELEASED_TREASURY_REGISTRY_ID =
     keccak256(abi.encodePacked("CeloUnreleasedTreasury"));
   bytes32 internal constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("GoldToken"));

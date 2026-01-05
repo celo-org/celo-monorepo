@@ -137,19 +137,29 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
     implementationAddress = await proxy._getImplementation()
   }
 
+  console.log(`Verifying ${contract} at ${implementationAddress}`)
   let onchainBytecode = await getOnchainBytecode(implementationAddress, context)
   context.libraryAddresses.collect(onchainBytecode, sourceLibraryPositions)
 
   let linkedSourceBytecode = linkLibraries(sourceBytecode, context.libraryAddresses.addresses)
 
-  // normalize library bytecodes
-  if (isLibrary(contract, context)) {
-    linkedSourceBytecode = verifyAndStripLibraryPrefix(linkedSourceBytecode)
-    onchainBytecode = verifyAndStripLibraryPrefix(onchainBytecode, implementationAddress)
+  try {
+    if (isLibrary(contract, context)) {
+      linkedSourceBytecode = verifyAndStripLibraryPrefix(linkedSourceBytecode)
+      onchainBytecode = verifyAndStripLibraryPrefix(onchainBytecode, implementationAddress)
+    }
+  } catch(e) {
+    const logMessage = `Error verifying library prefix for ${contract} at ${implementationAddress}: ${e}`
+    throw new Error(logMessage)
+    // console.log(logMessage)
   }
 
   if (onchainBytecode !== linkedSourceBytecode) {
-    throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
+    console.log("onchainBytecode", onchainBytecode)
+    console.log("linkedSourceBytecode", linkedSourceBytecode)
+    const logMessage = `${contract}'s onchain and compiled bytecodes do not match`
+    throw new Error(logMessage)
+    // console.log(logMessage)
   } else {
     console.log(
       `${isLibrary(contract, context) ? 'Library' : 'Contract'

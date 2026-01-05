@@ -48,6 +48,8 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
     firstElected = getValidators().getRegisteredValidators();
 
     epochDuration = epochManagerContract.epochDuration();
+
+    vm.deal(address(celoUnreleasedTreasuryContract), L2_INITIAL_STASH_BALANCE); // 80% of the total supply to the treasury - this will be yet distributed
   }
 
   function authorizeVoteSigner(uint256 signerPk, address account) internal {

@@ -49,6 +49,14 @@ contract Devchain is TestWithUtils08 {
   constructor() {
     // Fetch all core contracts that are expected to be in the Registry on the devchain
     // TODO: Ensure all contracts have getters in UsingRegistry
+    sortedOracles = getSortedOracles();
+    feeCurrencyDirectory = FeeCurrencyDirectory(
+      registryContract.getAddressForStringOrDie("FeeCurrencyDirectory")
+    ); // FeeCurrencyDirectory is not in UsingRegistry.sol
+
+    epochManagerContract = getEpochManager();
+    celoUnreleasedTreasuryContract = getCeloUnreleasedTreasury();
+    validators = getValidators();
     accounts = getAccounts();
     celoUnreleasedTreasuryContract = getCeloUnreleasedTreasury();
     celoTokenContract = ICeloToken(registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
