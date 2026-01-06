@@ -142,6 +142,7 @@ jobs:
 
       - name: Generate initial state for devchain
         if: success() || failure()
+        # TODO make this a script
         run: |
           cd $GITHUB_WORKSPACE/celo-optimism/packages/contracts-bedrock
 
@@ -160,14 +161,14 @@ jobs:
 
           python3 convert_to_anvil_state.py state-dump-11142220-granite.json anvil-state.json
 
-      - name: Set up anvil devchain from generated state
-        if: success() || failure()
-        run: OP_DIR=${GITHUB_WORKSPACE}/celo-optimism/packages/contracts-bedrock ./scripts/foundry/start_op_anvil.sh
+      # - name: Set up anvil devchain from generated state
+      #   if: success() || failure()
+      #   run: OP_DIR=${GITHUB_WORKSPACE}/celo-optimism/packages/contracts-bedrock ./scripts/foundry/start_op_anvil.sh
             
       - name: Generate migrations on local devchain
         if: success() || failure()
-        run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
-      
+        run: LOAD_STATE=${GITHUB_WORKSPACE}/celo-optimism/packages/contracts-bedrock/anvil-state.json ./scripts/foundry/create_and_migrate_anvil_devchain.sh
+
       - name: Run migration tests against local op-geth devchain
         run: |
           source ./scripts/foundry/constants.sh

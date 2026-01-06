@@ -15,8 +15,9 @@ echo "Forge version: $($FORGE --version)"
 
 # Start a local anvil instance
 # TODO figure out how to use start_op_anvil.sh
-OP_DIR=$HOME/celo/optimism/packages/contracts-bedrock ./scripts/foundry/start_op_anvil.sh
-# source $PWD/scripts/foundry/start_anvil.sh
+# OP_DIR=$HOME/celo/optimism/packages/contracts-bedrock ./scripts/foundry/start_op_anvil.sh
+# LOAD_STATE=$HOME/celo/optimism/packages/contracts-bedrock/anvil-state.json
+source $PWD/scripts/foundry/start_anvil.sh
 
 # build standard forge artifacts, needed to deploy precompiles
 forge build
@@ -26,9 +27,6 @@ export ANVIL_RPC_URL=$ANVIL_OP_RPC_URL
 source $PWD/scripts/foundry/deploy_libraries.sh
 echo "Library flags 0.5 are: $LIBRARY_FLAGS"
 echo "Library flags 0.8 are: $LIBRARY_FLAGS_08"
-
-# Build map of selectors from governanceConstitution.json
-source $PWD/scripts/foundry/build_constitution_selectors_map.sh
 
 # Build map of selectors from governanceConstitution.json
 source $PWD/scripts/foundry/build_constitution_selectors_map.sh

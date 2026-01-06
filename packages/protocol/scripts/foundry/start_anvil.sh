@@ -4,6 +4,8 @@ set -euo pipefail
 # Read environment variables and constants
 source $PWD/scripts/foundry/constants.sh
 
+
+ANVIL_PORT=$ANVIL_OP_PORT
 # Parse command line options:
 #   -p: Custom port number for Anvil to listen on (overrides default ANVIL_PORT)
 #   -l: Path to load existing Anvil state from (instead of creating new state)
@@ -47,13 +49,14 @@ else
   STATE_FLAGS="--dump-state $ANVIL_FOLDER --state-interval $STATE_INTERVAL"
 fi
 
-anvil \
-$STATE_FLAGS \
---port $ANVIL_PORT \
---gas-limit $GAS_LIMIT \
---code-size-limit $CODE_SIZE_LIMIT \
---balance $BALANCE \
---steps-tracing &
+$ANVIL \
+  --celo \
+  $STATE_FLAGS \
+  --port $ANVIL_PORT \
+  --gas-limit $GAS_LIMIT \
+  --code-size-limit $CODE_SIZE_LIMIT \
+  --balance $BALANCE \
+  --steps-tracing &
 
 # For context "&" tells the shell to start a command as a background process.
 # This allows you to continue executing other commands without waiting for the background command to finish.

@@ -24,7 +24,7 @@ export ANVIL_RPC_URL_BASE="http://127.0.0.1"
 export ANVIL_RPC_URL="$ANVIL_RPC_URL_BASE:$ANVIL_PORT" # TODO deprecate this variable in favor of the function below
 
 get_anvil_rpc_url() {
-  echo "$ANVIL_RPC_URL_BASE:$ANVIL_PORT"
+  echo "$ANVIL_RPC_URL_BASE:$ANVIL_OP_PORT"
 }
 
 # Anvil logging
