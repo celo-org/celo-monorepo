@@ -7,7 +7,7 @@ export FROM_PK="0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff
 export DEPLOYER_PK="0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"
 
 # Set CELO_FOUNDRY_PATH to path of foundry fork including `--celo` flag; if not set, will use `forge` from PATH
-CELO_FOUNDRY_PATH="$HOME/celo/celo-foundry/"
+# CELO_FOUNDRY_PATH="$HOME/celo/celo-foundry/"
 export FORGE=${CELO_FOUNDRY_PATH:-}"forge"
 export CAST=${CELO_FOUNDRY_PATH:-}"cast"
 export ANVIL=${CELO_FOUNDRY_PATH:-}"anvil"
