@@ -111,48 +111,115 @@ Example:
 
 ## Verify released smart contracts
 
-### Using Truffle
+> Etherscan API V1→V2 migration affects Celoscan. Use Foundry ≥1.3.5 for V2 support.
 
-1. Update CeloScanApi in env.json file
-2. Run verification command
+### Quick Start
 
+**Parameters:**
+- `[ADDRESS]` - Contract address to verify
+- `[CONTRACT]` - Contract name (e.g., `Proposals`, `Validators`)
+- `[PATH]` - Full path to contract (e.g., `contracts/.../Proposals.sol`)
+- `[NETWORK]` - Network slug (celo, celo-sepolia, celo-alfajores, celo-baklava)
+- `[CHAIN_ID]` - Network ID (42220=mainnet, 11142220=celo-sepolia, ...)
+- `[API_KEY]` - Your Celoscan/Blockscout API key
+- `[RPC_URL]` - Url to RPC (e.g., `https://forno.celo.org`)
+- `[CONSTRUCTOR_HEX]` - Result of encoding `$(cast abi-encode "constructor
+([SIGNATURE])" [ARGS])`
+
+### 1. Compile with Foundry
+
+Use the appropriate profile to match Truffle compilation settings:
 ```bash
-yarn truffle:verify [ContractName]@[Contract address]  --network [network] --forno [network rpc url]
+# Solidity 0.5 contracts
+FOUNDRY_PROFILE=truffle-compat forge build contracts/.../[CONTRACT].sol
+
+# Solidity 0.8 contracts  
+FOUNDRY_PROFILE=truffle-compat8 forge build contracts-0.8/.../[CONTRACT].sol
 ```
 
-example:
+### 2. Verify with Foundry
 
+**Base command:**
 ```bash
-yarn truffle:verify MentoFeeHandlerSeller@0x4efa274b7e33476c961065000d58ee09f7921a74 --network mainnet --forno https://forno.celo.org
-```
-
-### Using Foundry
-
-For contracts that need to match Truffle compilation settings (like SortedOracles), use the `truffle-compat` profile:
-
-```bash
-FOUNDRY_PROFILE=truffle-compat forge verify-contract [CONTRACT_ADDRESS] [CONTRACT_PATH]:[CONTRACT_NAME] \
+FOUNDRY_PROFILE=[truffle-compat|truffle-compat8] forge verify-contract [ADDRESS] [CONTRACT] \
   --chain-id [CHAIN_ID] \
-  --etherscan-api-key=[API_KEY] \
-  --verifier-url=[BLOCKSCOUT_URL] \
-  --verifier=blockscout \
-  --constructor-args $(cast abi-encode "constructor([CONSTRUCTOR_SIGNATURE])" [CONSTRUCTOR_ARGS]) \
-  --skip-is-verified-check \
   --watch
 ```
 
-Example for SortedOracles on Celo Sepolia:
+**Platform options:**
+- **Celoscan**: `--etherscan-api-key=[API_KEY]`
+- **Blockscout**: `--verifier=blockscout --verifier-url=https://[NETWORK].blockscout.com/api/`
+- **Sourcify**: `--verifier=sourcify`
+
+**Examples:**
+
+**Template format:**
+```bash
+# Celoscan verification in Solidity 0.5
+FOUNDRY_PROFILE=truffle-compat forge verify-contract [ADDRESS] [CONTRACT] \
+  --chain-id [CHAIN_ID] --etherscan-api-key=[API_KEY] --watch
+
+# Blockscout verification in Solidity 0.8
+FOUNDRY_PROFILE=truffle-compat8 forge verify-contract [ADDRESS] [CONTRACT] \
+  --chain-id [CHAIN_ID] --verifier=blockscout --verifier-url=https://[NETWORK].blockscout.com/api/ --watch
+```
+
+**Real examples:**
 
 ```bash
-FOUNDRY_PROFILE=truffle-compat forge verify-contract 0xAb077999e5fA13bCda1599926F8927dDEADe533C contracts/stability/SortedOracles.sol:SortedOracles \
-  --chain-id 11142220 \
-  --etherscan-api-key=[API_KEY] \
-  --verifier-url=https://celo-sepolia.blockscout.com/api/ \
-  --verifier=blockscout \
-  --constructor-args $(cast abi-encode "constructor(bool)" false) \
-  --skip-is-verified-check \
-  --watch
+# Celoscan verification - Solidity 0.5 (Celo Mainnet)
+FOUNDRY_PROFILE=truffle-compat forge verify-contract 0x8d6677192144292870907e3fa8a5527fe55a7ff6 Governance \
+  --chain-id 42220 --etherscan-api-key=YourCeloscanAPIKey --watch
+
+# Celoscan verification - Solidity 0.5 (Celo Sepolia)
+FOUNDRY_PROFILE=truffle-compat forge verify-contract 0x1234567890123456789012345678901234567890 Validators \
+  --chain-id 11142220 --etherscan-api-key=YourCeloscanAPIKey --watch
+
+# Blockscout verification - Solidity 0.5 (Celo Mainnet)
+FOUNDRY_PROFILE=truffle-compat forge verify-contract 0xabcdefabcdefabcdefabcdefabcdefabcdefabcd StableToken \
+  --chain-id 42220 --verifier=blockscout --verifier-url=https://celo.blockscout.com/api/ --watch
+
+# Sourcify verification - Solidity 0.5 (Celo Mainnet)
+FOUNDRY_PROFILE=truffle-compat forge verify-contract 0x471ece3750da237f93b8e339c536989b8978a438 LockedGold \
+  --chain-id 42220 --verifier=sourcify --watch
 ```
+
+```bash
+# Celoscan verification - Solidity 0.8 (Celo Mainnet)
+FOUNDRY_PROFILE=truffle-compat8 forge verify-contract 0x9876543210987654321098765432109876543210 CeloToken \
+  --chain-id 42220 --etherscan-api-key=YourCeloscanAPIKey --watch
+
+# Celoscan verification - Solidity 0.8 (Celo Sepolia)
+FOUNDRY_PROFILE=truffle-compat8 forge verify-contract 0xfedcba0987654321fedcba0987654321fedcba09 LockedCelo \
+  --chain-id 11142220 --etherscan-api-key=YourCeloscanAPIKey --watch
+```
+
+**Options for exact match verification** (upgrade from partial verified):
+```bash
+--skip-is-verified-check --constructor-args [CONSTRUCTOR_HEX]
+```
+
+### 3. Fallback: Truffle
+
+If Foundry fails:
+
+```bash
+# Compile all
+yarn build
+# or for specific contract in Solidity 0.5:
+yarn run truffle compile [PATH] --contracts_build_directory=build/contracts
+# or for specific contract in Solidity 0.8:
+yarn run truffle compile [PATH] --contracts_build_directory=build/contracts-0.8 --config truffle-config0.8.js
+
+# Verify
+yarn truffle:verify [CONTRACT]@[ADDRESS] --network [NETWORK] --forno [RPC_URL]
+```
+
+### 4. Manual Verification
+
+If Sourcify verification succeeds but Celoscan/Blockscout fails:
+1. Download the standard input JSON from Sourcify
+2. Use it to manually verify on Celoscan or Blockscout
 
 ### Possible problems
 

@@ -11,6 +11,32 @@ forge script --root $PATH_TO_OP_REPO/packages/contracts-bedrock
 
 ## Scripts
 
+### `DeployMIPS.sol`
+
+Deploys a new MIPS (MIPS Instruction Set Architecture) implementation contract with configurable preimage oracle parameters.
+
+**Features:**
+- Deploys MIPS implementation using deterministic deployment
+- Optionally deploys a new PreimageOracle if not provided
+- Configurable minimum proposal size and challenge period for the oracle
+- Uses DeployUtils for consistent deployment patterns
+- Outputs deployed MIPS and oracle addresses
+
+**Required Environment Variables:**
+- Either provide an existing oracle OR configure oracle parameters:
+  - `PREIMAGE_ORACLE` - Address of existing PreimageOracle (optional)
+  - `MIN_PROPOSAL_SIZE` - Minimum proposal size for new oracle (required if no existing oracle)
+  - `CHALLENGE_PERIOD` - Challenge period for new oracle (required if no existing oracle)
+
+**Example Execution:**
+```bash
+# Using existing oracle
+PREIMAGE_ORACLE="0x..." forge script DeployMIPS.sol --root $PATH_TO_OP_REPO/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
+
+# Deploying new oracle with MIPS
+MIN_PROPOSAL_SIZE=1000 CHALLENGE_PERIOD=3600 forge script DeployMIPS.sol --root $PATH_TO_OP_REPO/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
+```
+
 ### `DeployPortalImpl.s.sol`
 
 Deploys a new OptimismPortal2 implementation contract with configurable proof maturity and dispute game finality delays.
@@ -83,9 +109,17 @@ Redeploys dispute game implementations with updated configuration parameters, pa
 - `SYSTEM_CONFIG` - Address of the SystemConfig proxy
 - `MAX_CLOCK_DURATION` - New maximum clock duration in seconds
 
+**Optional Environment Variables:**
+- `CLOCK_EXTENSION` - Clock extension duration in seconds (defaults to existing value)
+- `MIPS` - Address of MIPS implementation to use (defaults to existing VM)
+
 **Example Execution:**
 ```bash
+# Basic redeployment with new max clock duration
 OPCM="0x..." FACTORY="0x..." SYSTEM_CONFIG="0x..." MAX_CLOCK_DURATION=604800 forge script RedeployGames.s.sol --root $PATH_TO_OP_REPO/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
+
+# Redeployment with custom clock extension and MIPS
+OPCM="0x..." FACTORY="0x..." SYSTEM_CONFIG="0x..." MAX_CLOCK_DURATION=604800 CLOCK_EXTENSION=1800 MIPS="0x..." forge script RedeployGames.s.sol --root $PATH_TO_OP_REPO/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
 ```
 
 ### `SafeSetGames.s.sol`
