@@ -26,7 +26,7 @@ if nc -z localhost $ANVIL_OP_PORT; then
 fi
 
 # Start anvil
-anvil \
+$ANVIL \
 --celo \
 --port $ANVIL_OP_PORT \
 --load-state $OP_DIR/anvil-state.json \

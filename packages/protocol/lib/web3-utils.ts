@@ -1,4 +1,6 @@
 
+// TODO most of this file is likely not used anymore
+
 // TODO(asa): Refactor and rename to 'deployment-utils.ts'
 import { Address, CeloTxObject } from '@celo/connect'
 import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
@@ -10,7 +12,7 @@ import { createInterfaceAdapter } from '@truffle/interface-adapter'
 import { BigNumber } from 'bignumber.js'
 import path from 'path'
 import prompts from 'prompts'
-import { GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance } from 'types'
+import { GoldTokenInstance, MultiSigInstance, ProxyContract, ProxyInstance, RegistryInstance } from 'types'
 import { StableTokenInstance } from 'types/mento'
 import Web3 from 'web3'
 import { ContractPackage } from '../contractPackages'
@@ -377,29 +379,6 @@ export async function submitMultiSigTransaction(
   }
   return txId
 }
-
-export async function transferOwnershipOfProxy(
-  contractName: string,
-  owner: string,
-  customArtifacts: any
-) {
-  const Proxy = ArtifactsSingleton.wrap(customArtifacts).getProxy(contractName, artifacts)
-  const proxy: ProxyInstance = await Proxy.deployed()
-  await proxy._transferOwnership(owner)
-}
-
-export async function transferOwnershipOfProxyAndImplementation<
-  ContractInstance extends OwnableInstance
->(contractName: string, owner: string, artifacts: any) {
-  console.info(`Transferring ownership of ${contractName} and its Proxy to ${owner}`)
-  const contract: ContractInstance = await getDeployedProxiedContract<ContractInstance>(
-    contractName,
-    artifacts
-  )
-  await contract.transferOwnership(owner)
-  await transferOwnershipOfProxy(contractName, owner, artifacts)
-}
-
 
 /*
 * Builds and returns mapping of function names to selectors.

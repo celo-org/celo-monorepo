@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Read environment variables and constants
-source $PWD/scripts/foundry/constants.sh
+# source $PWD/scripts/foundry/constants.sh
 
 # Deploy to Optimism Anvil or local Anvil based on the flag
 USE_OP_ANVIL=${USE_OP_ANVIL:-false}
@@ -35,7 +35,7 @@ deploy_libraries() {
     for LIB_PATH in "${lib_array[@]}"; do
         LIB_NAME="${LIB_PATH#*:}" 
         echo "Deploying library: $LIB_NAME"
-        create_library_out=`FOUNDRY_PROFILE=$profile forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url $ANVIL_RPC_URL --unlocked --broadcast --json`
+        create_library_out=`FOUNDRY_PROFILE=$profile $FORGE create $LIB_PATH --from $FROM_ACCOUNT --rpc-url $ANVIL_RPC_URL --unlocked --broadcast --json`
         LIB_ADDRESS=`echo $create_library_out | jq -r '.deployedTo'`
         # Constructing library flag so the remaining contracts can be built and linkeded to these libraries
         eval "$flags_var=\"\$$flags_var --libraries $LIB_PATH:$LIB_ADDRESS\""
@@ -75,7 +75,7 @@ pushd $TEMP_DIR
 
 # Build libraries
 echo "Building with 0.5 libraries..."
-time FOUNDRY_PROFILE=truffle-compat forge build
+time FOUNDRY_PROFILE=truffle-compat $FORGE build
 
 # Deploy libraries and building library flag
 export LIBRARY_FLAGS=""

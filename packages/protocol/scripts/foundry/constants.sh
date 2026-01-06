@@ -1,3 +1,5 @@
+# TODO library cache
+
 # Anvil accounts
 export FROM_ACCOUNT_NO_ZERO="f39Fd6e51aad88F6F4ce6aB8827279cffFb92266" # Anvil default account (1)
 export FROM_ACCOUNT="0x$FROM_ACCOUNT_NO_ZERO" # Anvil default account (1)
@@ -5,11 +7,17 @@ export FROM_PK="0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff
 export DEPLOYER_PK="0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"
 
 # Set CELO_FOUNDRY_PATH to path of foundry fork including `--celo` flag; if not set, will use `forge` from PATH
-# CELO_FOUNDRY_PATH="$HOME/Documents/Foundry/target/release/"
+CELO_FOUNDRY_PATH="$HOME/celo/celo-foundry/"
 export FORGE=${CELO_FOUNDRY_PATH:-}"forge"
 export CAST=${CELO_FOUNDRY_PATH:-}"cast"
+export ANVIL=${CELO_FOUNDRY_PATH:-}"anvil"
+
+$FORGE --version
 
 # Anvil configurations (Source: https://book.getfoundry.sh/reference/anvil/)
+# TODO use functions for this
+export ANVIL_OP_PORT=9545 # Port for anvil running with Optimism state (check start_op_anvil.sh)
+export ANVIL_OP_RPC_URL="http://127.0.0.1:$ANVIL_OP_PORT"
 export ANVIL_PORT=8546
 export ANVIL_RPC_URL_BASE="http://127.0.0.1"
 

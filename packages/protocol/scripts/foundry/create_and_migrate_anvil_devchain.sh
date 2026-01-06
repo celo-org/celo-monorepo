@@ -15,10 +15,12 @@ echo "Forge version: $($FORGE --version)"
 
 # Start a local anvil instance
 # TODO figure out how to use start_op_anvil.sh
-source $PWD/scripts/foundry/start_anvil.sh
+OP_DIR=$HOME/celo/optimism/packages/contracts-bedrock ./scripts/foundry/start_op_anvil.sh
+# source $PWD/scripts/foundry/start_anvil.sh
 
 # build standard forge artifacts, needed to deploy precompiles
 forge build
+export ANVIL_RPC_URL=$ANVIL_OP_RPC_URL
 
 # Deploy libraries to the anvil instance
 source $PWD/scripts/foundry/deploy_libraries.sh

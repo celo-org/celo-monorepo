@@ -48,7 +48,6 @@ import { IGovernanceApproverMultiSigInitializer } from "@celo-contracts/governan
 import { IGovernanceInitializer } from "@celo-contracts/governance/interfaces/IGovernanceInitializer.sol";
 import { ILockedGold } from "@celo-contracts/governance/interfaces/ILockedGold.sol";
 import { IGovernance } from "@celo-contracts/governance/interfaces/IGovernance.sol";
-import { IRandomInitializer } from "@celo-contracts/identity/interfaces/IRandomInitializer.sol";
 import { IEscrowInitializer } from "@celo-contracts/identity/interfaces/IEscrowInitializer.sol";
 import { IOdisPaymentsInitializer } from "@celo-contracts/identity/interfaces/IOdisPaymentsInitializer.sol";
 import { IFederatedAttestationsInitializer } from "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";

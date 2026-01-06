@@ -9,7 +9,8 @@ contract MigrationsConstants is TestConstants {
   // List of contracts that are expected to be in Registry.sol
   // TODO: Probably should be synced with Migration.s.sol
   // TODO: Change to be automatically populated and length calculated
-  string[26] contractsInRegistry = [
+  // TODO make constant?
+  string[22] contractsInRegistry = [
     "Accounts",
     "CeloUnreleasedTreasury",
     "CeloToken",
@@ -26,7 +27,6 @@ contract MigrationsConstants is TestConstants {
     "GovernanceSlasher",
     "LockedGold",
     "OdisPayments",
-    "Random",
     "Registry", // FIXME: Should Registry be inside Registry?
     "ScoreManager",
     "SortedOracles",
@@ -35,6 +35,7 @@ contract MigrationsConstants is TestConstants {
     "UniswapFeeHandlerSeller"
   ];
 
+  // TODO fix this
   string[26] contractsInRegistryPath = [
     string.concat("out-truffle-compat/", "Accounts", ".sol/", "Accounts", ".json"),
     string.concat(

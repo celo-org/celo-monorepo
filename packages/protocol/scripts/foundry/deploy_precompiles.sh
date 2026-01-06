@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Read environment variables and constants
-source $PWD/scripts/foundry/constants.sh
+#source $PWD/scripts/foundry/constants.sh
 
 echo "Deploying precompiles:"
 
