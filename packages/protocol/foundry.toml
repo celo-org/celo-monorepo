@@ -1,4 +1,8 @@
 # docs: https://getfoundry.sh/config/reference/default-config
+
+[lint]
+lint_on_build = false
+
 [profile.default]
 src = 'contracts-0.8'
 out = 'out'
@@ -47,7 +51,7 @@ solc_version = '0.5.14'
 ast = true
 optimizer = false
 evm_version = 'istanbul'
-metadata_literal = true
+# metadata_literal = true
 via_ir = false
 
 # Profile to match Truffle configuration for 0.8.19 contracts
