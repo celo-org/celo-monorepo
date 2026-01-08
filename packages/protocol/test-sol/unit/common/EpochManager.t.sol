@@ -65,6 +65,12 @@ contract EpochManagerTest is TestWithUtils08 {
   event OracleAddressSet(address indexed newOracleAddress);
   event GroupMarkedForProcessing(address indexed group, uint256 indexed epochNumber);
   event GroupProcessed(address indexed group, uint256 indexed epochNumber);
+  event ValidatorEpochRewardAllocated(
+    address indexed validator,
+    uint256 validatorReward,
+    address indexed group,
+    uint256 indexed epochNumber
+  );
 
   function setUp() public virtual override {
     super.setUp();
@@ -306,6 +312,18 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     uint256 CELOequivalent = (denominator * (validator1Reward + validator2Reward)) / numerator;
 
     assertEq(reserveBalanceAfter, CELOequivalent);
+  }
+
+  function test_Emits_ValidatorEpochRewardAllocatedEvent() public {
+    setupAndElectValidators();
+
+    // Expect events for both validators with their respective rewards and correct group
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorEpochRewardAllocated(validator1, validator1Reward, group, firstEpochNumber);
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorEpochRewardAllocated(validator2, validator2Reward, group, firstEpochNumber);
+
+    epochManagerContract.startNextEpochProcess();
   }
 }
 
