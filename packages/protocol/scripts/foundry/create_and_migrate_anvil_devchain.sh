@@ -20,7 +20,7 @@ echo "Forge version: $($FORGE --version)"
 source $PWD/scripts/foundry/start_anvil.sh
 
 # build standard forge artifacts, needed to deploy precompiles
-forge build
+FOUNDRY_PROFILE=truffle-compat forge build
 export ANVIL_RPC_URL=$ANVIL_OP_RPC_URL
 
 # Deploy libraries to the anvil instance
@@ -41,9 +41,6 @@ echo "Compiling 0.8 with libraries..."
 
 time FOUNDRY_PROFILE=truffle-compat8 forge build $LIBRARY_FLAGS_08 
 
-# Deploy precompile contracts
-source $PWD/scripts/foundry/deploy_precompiles.sh
-
 echo "Setting Registry Proxy"
 PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode.object' ./out-truffle-compat/Proxy.sol/Proxy.json)
 cast rpc anvil_setCode $REGISTRY_ADDRESS $PROXY_DEPLOYED_BYTECODE --rpc-url $ANVIL_RPC_URL
@@ -61,8 +58,10 @@ $FORGE script \
   $MIGRATION_SCRIPT_PATH \
   --target-contract $MIGRATION_TARGET_CONTRACT \
   --sender $FROM_ACCOUNT \
-  --private-key $FROM_PK \
+  --legacy \
+  --slow \
   --sig "runMigration()" \
+  --private-key $FROM_PK \
   $VERBOSITY_LEVEL \
   $BROADCAST \
   $SKIP_SIMULATION \
@@ -71,7 +70,7 @@ $FORGE script \
   $LIBRARY_FLAGS_08 \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
 
-
+# exit 1 # early exit to be clear this runs
   
 # TODO: Combine both runs & funding of treasury into single Foundry script
 echo "Transfering funds to Unreleased Treasury..."

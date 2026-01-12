@@ -294,21 +294,39 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateReserveSpenderMultiSig(json);
     migrateReserve(json);
     migrateStableToken(json);
+
     migrateExchange(json);
-    migrateAccount();
+
+    migrateAccount(); // <- this is the one messing up
+
     migrateLockedCelo(json);
+    registry.setAddressFor("madeIt", address(0x11));
     migrateValidators(json);
+    registry.setAddressFor("madeIt", address(0x13));
     migrateElection(json);
+    registry.setAddressFor("madeIt", address(0x14));
     migrateEpochRewards(json);
+    registry.setAddressFor("madeIt", address(0x15));
     migrateEscrow();
+    registry.setAddressFor("madeIt", address(0x16));
+
     migrateGovernanceSlasher();
+    registry.setAddressFor("madeIt", address(0x17));
     migrateGovernanceApproverMultiSig(json);
+    registry.setAddressFor("madeIt", address(0x18));
     migrateFederatedAttestations();
+    registry.setAddressFor("madeIt", address(0x19));
     migrateMentoFeeHandlerSeller();
+    registry.setAddressFor("madeIt", address(0x20));
     migrateUniswapFeeHandlerSeller();
+    registry.setAddressFor("madeIt", address(0x21));
     migrateFeeHandler(json);
+    registry.setAddressFor("madeIt", address(0x22));
     migrateOdisPayments();
+    registry.setAddressFor("madeIt", address(0x23));
     migrateCeloUnreleasedTreasury(json);
+    registry.setAddressFor("madeIt", address(0x24));
+
     vm.stopBroadcast();
   }
 
@@ -319,10 +337,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     vm.startBroadcast(DEPLOYER_ACCOUNT);
     proxyFactory = IProxyFactory(
       create2deploy(
-        bytes32(uint256(block.number)),
-        vm.getCode("./out/ProxyFactory.sol/ProxyFactory.json")
+        bytes32(uint256(1)),
+        vm.getCode("./out-truffle-compat/ProxyFactory.sol/ProxyFactory.json")
       )
     );
+
     string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
     setupUsingRegistry();
     checkUnreleasedTreasuryBalance();
@@ -610,18 +629,23 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateAccount() public {
+    registry.setAddressFor("madeIt", address(0x1));
+
     address accountsProxyAddress = deployProxiedContract(
       "Accounts",
       abi.encodeWithSelector(IAccountsInitializer.initialize.selector, REGISTRY_ADDRESS),
       SolidityVersions.SOLIDITY_05
     );
 
+    registry.setAddressFor("madeIt", address(0x2));
     IAccounts(accountsProxyAddress).setEip712DomainSeparator();
+    registry.setAddressFor("madeIt", address(0x3));
   }
 
   function migrateLockedCelo(string memory json) public {
     uint256 unlockingPeriod = json.readUint(".lockedGold.unlockingPeriod");
 
+    registry.setAddressFor("madeIt", address(0x4));
     address LockedCeloProxyAddress = deployProxiedContract(
       "LockedGold",
       abi.encodeWithSelector(
@@ -632,7 +656,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       SolidityVersions.SOLIDITY_05
     );
 
+    registry.setAddressFor("madeIt", address(0x5));
     addToRegistry("LockedCelo", LockedCeloProxyAddress);
+    registry.setAddressFor("madeIt", address(0x6));
   }
 
   function migrateValidators(string memory json) public {
