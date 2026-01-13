@@ -112,10 +112,9 @@ jobs:
           access-id: p-kf9vjzruht6l
           static-secrets: '{"/static-secrets/NPM/npm-publish-token":"NPM_TOKEN"}'
 
-      # temporaly disabling this to speed things up
-      # - name: 'Install packages'
-      #   shell: bash
-      #   run: yarn
+      - name: 'Install packages'
+        shell: bash
+        run: yarn
 
       - name: Checkout Optimism repo
         uses: actions/checkout@v4
