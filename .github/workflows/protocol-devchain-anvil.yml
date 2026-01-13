@@ -21,9 +21,7 @@ env:
   # Increment these to force cache rebuilding
   FOUNDRY_CACHE_KEY: 1
   # Supported Foundry version defined at celo-org (GitHub organisation) level, for consistency across workflows.
-  SUPPORTED_FOUNDRY_VERSION: ${{ vars.SUPPORTED_FOUNDRY_VERSION }}
   # Celo Foundry (celo-org/foundry) binaries version used for devchain anvil generation
-  CELO_FOUNDRY_VERSION: "celo-0.1.0"
 
 permissions:
   contents: read
@@ -94,12 +92,10 @@ jobs:
         run: |
           echo "Pull Request Number: ${{ env.PR_NUMBER }}"
 
-      - name: Install Celo Foundry binaries
-        run: |
-          curl -L -o foundry.tar.gz https://github.com/celo-org/foundry/releases/download/${{ env.CELO_FOUNDRY_VERSION }}/foundry_${{ env.CELO_FOUNDRY_VERSION }}_linux_amd64.tar.gz
-          mkdir -p celo-foundry
-          tar -xzf foundry.tar.gz -C celo-foundry
-          echo "$(pwd)/celo-foundry" >> $GITHUB_PATH
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
+        with:
+          version: 'v1.5.0'
 
       - name: Install forge dependencies
         run: forge install
@@ -116,9 +112,10 @@ jobs:
           access-id: p-kf9vjzruht6l
           static-secrets: '{"/static-secrets/NPM/npm-publish-token":"NPM_TOKEN"}'
 
-      - name: 'Install packages'
-        shell: bash
-        run: yarn
+      # temporaly disabling this to speed things up
+      # - name: 'Install packages'
+      #   shell: bash
+      #   run: yarn
 
       - name: Checkout Optimism repo
         uses: actions/checkout@v4
@@ -150,10 +147,13 @@ jobs:
           lsof -i :9545 | awk 'NR!=1 {print $2}' | xargs kill -9
 
           python3 convert_to_anvil_state.py state-dump-11142220-granite.json anvil-state.json
+          cat GITHUB_WORKSPACE}/celo-optimism/packages/contracts-bedrock/anvil-state.json
             
       - name: Generate migrations on local devchain
         if: success() || failure()
-        run: LOAD_STATE=${GITHUB_WORKSPACE}/celo-optimism/packages/contracts-bedrock/anvil-state.json ./scripts/foundry/create_and_migrate_anvil_devchain.sh
+        run: |
+          cat GITHUB_WORKSPACE}/celo-optimism/packages/contracts-bedrock/anvil-state.json
+          LOAD_STATE=${GITHUB_WORKSPACE}/celo-optimism/packages/contracts-bedrock/anvil-state.json ./scripts/foundry/create_and_migrate_anvil_devchain.sh
 
       - name: Run migration tests against local op-geth devchain
         run: |
@@ -193,6 +193,7 @@ jobs:
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4
         with:
