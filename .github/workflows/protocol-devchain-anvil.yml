@@ -125,13 +125,14 @@ jobs:
         if: success() || failure()
         with:
           repository: 'celo-org/optimism'
-          ref: 'mc01/completeMigrations'
+          ref: 'martinvol/completeMigrationsPython'
           path: celo-optimism
           submodules: recursive
           fetch-depth: 0
 
       - name: Generate initial state for devchain
         if: success() || failure()
+        # TODO make this a script
         run: |
           cd $GITHUB_WORKSPACE/celo-optimism/packages/contracts-bedrock
 
@@ -149,21 +150,25 @@ jobs:
           lsof -i :9545 | awk 'NR!=1 {print $2}' | xargs kill -9
 
           python3 convert_to_anvil_state.py state-dump-11142220-granite.json anvil-state.json
-
-      - name: Set up anvil devchain from generated state
+            
+      - name: Generate migrations on local devchain
         if: success() || failure()
-        run: OP_DIR=${GITHUB_WORKSPACE}/celo-optimism/packages/contracts-bedrock ./scripts/foundry/start_op_anvil.sh
+        run: LOAD_STATE=${GITHUB_WORKSPACE}/celo-optimism/packages/contracts-bedrock/anvil-state.json ./scripts/foundry/create_and_migrate_anvil_devchain.sh
 
-      - name: Generate L2 migration and run migration tests
-        if: success() || failure()
+      - name: Run migration tests against local op-geth devchain
         run: |
           source ./scripts/foundry/constants.sh
 
-          echo "Starting L2 migration against local devchain"
-          ./scripts/foundry/create_and_migrate_anvil_devchain.sh
-
-          FOUNDRY_PROFILE=devchain forge test \
+          FOUNDRY_PROFILE=devchain forge test -vvv \
           --match-path "test-sol/devchain/migration/*" \
+          --fork-url $ANVIL_OP_RPC_URL
+      
+      - name: Run e2e tests against local devchain
+        run: |
+          source ./scripts/foundry/constants.sh
+
+          FOUNDRY_PROFILE=devchain forge test -vvv \
+          --match-path "test-sol/devchain/e2e/*" \
           --fork-url $ANVIL_OP_RPC_URL
 
       - name: Sanitize ref name
