@@ -52,7 +52,9 @@ anvil_setStorageAt \
 $REGISTRY_ADDRESS $REGISTRY_STORAGE_LOCATION "0x000000000000000000000000$REGISTRY_OWNER_ADDRESS" \
 --rpc-url $ANVIL_RPC_URL
 
+
 # Run migrations
+# Not using the --slow flag causes the migrations to randomly hang
 echo "Running migration script..."
 $FORGE script \
   $MIGRATION_SCRIPT_PATH \
@@ -70,17 +72,9 @@ $FORGE script \
   $LIBRARY_FLAGS_08 \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
 
-# exit 1 # early exit to be clear this runs
-  
-# TODO: Combine both runs & funding of treasury into single Foundry script
-echo "Transfering funds to Unreleased Treasury..."
-CELO_TOKEN_ADDRESS=`$CAST call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string)(address)" "CeloToken" --rpc-url $ANVIL_OP_RPC_URL`
-CELO_UNRELEASED_TREASURY_ADDRESS=`$CAST call 000000000000000000000000000000000000ce10 "getAddressForStringOrDie(string)(address)" "CeloUnreleasedTreasury" --rpc-url $ANVIL_OP_RPC_URL`
-UNRELEASE_TREASURY_PRE_MINT=390000000000000000000000000
 
-
-# without explicit `--gas-limit 100000` it fails with "Error: Internal error: Insufficient gas for Celo transfer precompile"
-$CAST send $CELO_TOKEN_ADDRESS "function transfer(address to, uint256 value) external returns (bool)" $CELO_UNRELEASED_TREASURY_ADDRESS $UNRELEASE_TREASURY_PRE_MINT --gas-limit 100000 --rpc-url  $ANVIL_OP_RPC_URL --private-key $DEPLOYER_PK
+# if the script is not split into two, then the funding of the UnreleasedTreasury is not recognized
+# this is likely due a bug in how anvil simulates the Celo transfer precompile
 
 echo "Running second part of migration script..."
 $FORGE script \
@@ -96,14 +90,6 @@ $FORGE script \
   $LIBRARY_FLAGS \
   --rpc-url $ANVIL_OP_RPC_URL || { echo "Migration script (part 2) failed"; exit 1; }
 
-echo "Getting address for Epoch Rewards..."
-CELO_EPOCH_REWARDS_ADDRESS=$(
-  $CAST call \
-    $REGISTRY_ADDRESS \
-    "getAddressForStringOrDie(string calldata identifier)(address)" \
-    "EpochRewards" \
-    --rpc-url $ANVIL_OP_RPC_URL
-)
 
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))

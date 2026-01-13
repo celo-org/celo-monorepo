@@ -47,6 +47,7 @@ import { IDowntimeSlasherInitializer } from "@celo-contracts/governance/interfac
 import { IGovernanceApproverMultiSigInitializer } from "@celo-contracts/governance/interfaces/IGovernanceApproverMultiSigInitializer.sol";
 import { IGovernanceInitializer } from "@celo-contracts/governance/interfaces/IGovernanceInitializer.sol";
 import { ILockedGold } from "@celo-contracts/governance/interfaces/ILockedGold.sol";
+import { IERC20 } from "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import { IGovernance } from "@celo-contracts/governance/interfaces/IGovernance.sol";
 import { IEscrowInitializer } from "@celo-contracts/identity/interfaces/IEscrowInitializer.sol";
 import { IOdisPaymentsInitializer } from "@celo-contracts/identity/interfaces/IOdisPaymentsInitializer.sol";
@@ -324,9 +325,22 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     registry.setAddressFor("madeIt", address(0x22));
     migrateOdisPayments();
     registry.setAddressFor("madeIt", address(0x23));
+    console.log("Migrating CeloUnreleasedTreasury...");
     migrateCeloUnreleasedTreasury(json);
+    console.log("Done migrating CeloUnreleasedTreasury");
     registry.setAddressFor("madeIt", address(0x24));
 
+    vm.stopBroadcast();
+
+    // fund the CeloUnreleasedTreasury
+    // TODO move to json
+    vm.startBroadcast(0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d);
+
+    // doing a native transfer is not allowed by the unreleased treasury
+    IERC20(registry.getAddressForStringOrDie("GoldToken")).transfer(
+      registry.getAddressForStringOrDie("CeloUnreleasedTreasury"),
+      390000000000000000000000000
+    );
     vm.stopBroadcast();
   }
 
@@ -334,16 +348,17 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
    * Second part of the migration, deploys EpochManager and Governance
    */
   function runAfterMigration() public {
+    setupUsingRegistry();
+
     vm.startBroadcast(DEPLOYER_ACCOUNT);
     proxyFactory = IProxyFactory(
       create2deploy(
-        bytes32(uint256(1)),
+        bytes32(uint256(1)), // increase the salt to avoid address collision from previous run
         vm.getCode("./out-truffle-compat/ProxyFactory.sol/ProxyFactory.json")
       )
     );
 
     string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
-    setupUsingRegistry();
     checkUnreleasedTreasuryBalance();
     migrateEpochManagerEnabler();
     migrateEpochManager(json);
@@ -415,6 +430,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       SolidityVersions.SOLIDITY_05
     );
 
+    // TODO remove all this addToRegistry, it's already in deployImplementationAndAddToRegistry
     addToRegistry("CeloToken", celoProxyAddress);
 
     bool frozen = json.readBool(".goldToken.frozen");
@@ -947,7 +963,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function initializeEpochManager(string memory json) public {
-    console.log("Initialize epoch manager...");
+    console.log("Initialize EpochManager...");
     uint256[] memory valKeys = json.readUintArray(".validators.valKeys");
     uint256 maxGroupSize = json.readUint(".validators.maxGroupSize");
     uint256 groupCount = 3;
