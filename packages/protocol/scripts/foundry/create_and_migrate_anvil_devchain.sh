@@ -3,6 +3,9 @@ set -euo pipefail
 
 ### This scripts sets up a local Anvil instance, deploys libraries, precompiles, and runs migrations
 
+# this temp file is deleted at the end
+cp test-sol/devchain/Import05Dependencies.sol contracts
+
 # Read environment variables and constants
 source $PWD/scripts/foundry/constants.sh
 
@@ -94,3 +97,4 @@ $FORGE script \
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
 echo "Migration script total elapsed time: $ELAPSED_TIME seconds"
+rm contracts/Import05Dependencies.sol
