@@ -41,7 +41,7 @@ permissions:
 
 jobs:
   publish:
-    runs-on: ['self-hosted', 'org', 'npm-publish']
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     permissions:
       contents: write
       id-token: write
