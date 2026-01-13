@@ -98,9 +98,11 @@ contract E2E_Governance is Devchain {
     approvalDuration = config_.readUint(".governance.approvalStageDuration");
     referendumDuration = config_.readUint(".governance.referendumStageDuration");
 
+    Ownable registryContractOwnable = Ownable(address(registryContract));
+
     // transfer out ownership to governance
-    vm.prank(ownerAddress);
-    Ownable(address(registryContract)).transferOwnership(address(governance));
+    vm.prank(registryContractOwnable.owner());
+    registryContractOwnable.transferOwnership(address(governance));
 
     // setup tester account
     vm.deal(tester, 10_000_001 ether + minDeposit);
@@ -256,8 +258,16 @@ contract E2E_GovernanceSlashing is E2E_Governance {
     );
 
     // transfer out ownership to governance
-    vm.prank(Ownable(address(governanceSlasher)).owner());
-    Ownable(address(governanceSlasher)).transferOwnership(address(governance));
+    address owner_ = Ownable(address(governanceSlasher)).owner();
+    address governanceSlasherAddress = address(governanceSlasher);
+    address governanceAddress = address(governance);
+    Ownable governanceSlasherOwnable = Ownable(governanceSlasherAddress);
+
+    console.log("hola");
+
+    console.log("owner_ is:", owner_);
+    vm.prank(owner_);
+    governanceSlasherOwnable.transferOwnership(governanceAddress);
 
     // setup slashed account
     vm.deal(slashed, penalty + 1 ether);
