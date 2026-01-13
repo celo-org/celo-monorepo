@@ -36,15 +36,8 @@ contract MigrationsConstants is TestConstants {
   ];
 
   // TODO fix this
-  string[26] contractsInRegistryPath = [
+  string[22] contractsInRegistryPath = [
     string.concat("out-truffle-compat/", "Accounts", ".sol/", "Accounts", ".json"),
-    string.concat(
-      "out-truffle-compat/",
-      "BlockchainParameters",
-      ".sol/",
-      "BlockchainParameters",
-      ".json"
-    ),
     string.concat(
       "out-truffle-compat-0.8/",
       "CeloUnreleasedTreasury",
@@ -53,14 +46,6 @@ contract MigrationsConstants is TestConstants {
       ".json"
     ),
     string.concat("out-truffle-compat/", "CeloToken", ".sol/", "CeloToken", ".json"),
-    string.concat(
-      "out-truffle-compat/",
-      "DoubleSigningSlasher",
-      ".sol/",
-      "DoubleSigningSlasher",
-      ".json"
-    ),
-    string.concat("out-truffle-compat/", "DowntimeSlasher", ".sol/", "DowntimeSlasher", ".json"),
     string.concat("out-truffle-compat/", "Election", ".sol/", "Election", ".json"),
     string.concat("out-truffle-compat/", "EpochRewards", ".sol/", "EpochRewards", ".json"),
     string.concat(
@@ -98,7 +83,6 @@ contract MigrationsConstants is TestConstants {
     ),
     string.concat("out-truffle-compat/", "LockedGold", ".sol/", "LockedGold", ".json"),
     string.concat("out-truffle-compat/", "OdisPayments", ".sol/", "OdisPayments", ".json"),
-    string.concat("out-truffle-compat/", "Random", ".sol/", "Random", ".json"),
     string.concat("out-truffle-compat/", "Registry", ".sol/", "Registry", ".json"),
     string.concat("out-truffle-compat-0.8/", "ScoreManager", ".sol/", "ScoreManager", ".json"),
     string.concat("out-truffle-compat/", "SortedOracles", ".sol/", "SortedOracles", ".json"),
