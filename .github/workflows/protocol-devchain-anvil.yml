@@ -146,12 +146,12 @@ jobs:
           lsof -i :9545 | awk 'NR!=1 {print $2}' | xargs kill -9
 
           python3 convert_to_anvil_state.py state-dump-11142220-granite.json anvil-state.json
-          cat $GITHUB_WORKSPACE/celo-optimism/packages/contracts-bedrock/anvil-state.json
+          test -f $GITHUB_WORKSPACE/celo-optimism/packages/contracts-bedrock/anvil-state.json
             
       - name: Generate migrations on local devchain
         if: success() || failure()
         run: |
-          cat $GITHUB_WORKSPACE/celo-optimism/packages/contracts-bedrock/anvil-state.json
+          test -f ${GITHUB_WORKSPACE}/celo-optimism/packages/contracts-bedrock/anvil-state.json
           LOAD_STATE=${GITHUB_WORKSPACE}/celo-optimism/packages/contracts-bedrock/anvil-state.json ./scripts/foundry/create_and_migrate_anvil_devchain.sh
 
       - name: Run migration tests against local op-geth devchain
