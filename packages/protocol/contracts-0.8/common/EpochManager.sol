@@ -126,6 +126,20 @@ contract EpochManager is
   event GroupProcessed(address indexed group, uint256 indexed epochNumber);
 
   /**
+   * @notice Emitted when validator epoch reward is allocated (before claiming).
+   * @param validator Address of the validator.
+   * @param validatorReward Amount of cUSD allocated to the validator.
+   * @param group Address of the validator's group.
+   * @param epochNumber The epoch number for which the reward is allocated.
+   */
+  event ValidatorEpochRewardAllocated(
+    address indexed validator,
+    uint256 validatorReward,
+    address indexed group,
+    uint256 indexed epochNumber
+  );
+
+  /**
    * @notice Throws if called by other than EpochManagerEnabler contract.
    */
   modifier onlyEpochManagerEnabler() {
@@ -684,14 +698,20 @@ contract EpochManager is
     EpochProcessState storage _epochProcessing = epochProcessing;
 
     for (uint i = 0; i < electedAccounts.length; i++) {
-      uint256 validatorScore = scoreReader.getValidatorScore(electedAccounts[i]);
+      address validator = electedAccounts[i];
+      uint256 validatorScore = scoreReader.getValidatorScore(validator);
       uint256 validatorReward = validators.computeEpochReward(
-        electedAccounts[i],
+        validator,
         validatorScore,
         _epochProcessing.perValidatorReward
       );
-      validatorPendingPayments[electedAccounts[i]] += validatorReward;
+      validatorPendingPayments[validator] += validatorReward;
       totalRewards += validatorReward;
+
+      if (validatorReward > 0) {
+        address group = validators.getMembershipInLastEpoch(validator);
+        emit ValidatorEpochRewardAllocated(validator, validatorReward, group, currentEpochNumber);
+      }
     }
     if (totalRewards == 0) {
       return;

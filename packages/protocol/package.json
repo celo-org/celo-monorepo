@@ -50,6 +50,7 @@
     "test": "forge test",
     "test:release-snapshots": "./scripts/bash/release-snapshots.sh",
     "test:truffle:compatibility": "rm test/**/*.js ; node runTests.js compatibility/",
+    "test:ts": "yarn mocha --recursive test-ts",
     "truffle:console": "./scripts/bash/console.sh",
     "truffle:verify": "yarn truffle run verify",
     "utils:prepare-contracts-and-abis-publishing": "yarn ts-node --preferTsExts ./scripts/prepare-contracts-and-abis-publishing.ts",
