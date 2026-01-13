@@ -49,13 +49,10 @@ else
   STATE_FLAGS="--dump-state $ANVIL_FOLDER --state-interval $STATE_INTERVAL"
 fi
 
-  # --init "/Users/martinvol/celo/optimism/packages/contracts-bedrock/state-dump-11142220-granite.json" \
-  # --chain-id 31337 \
-  # $STATE_FLAGS \
 $ANVIL \
   --celo \
   --port $ANVIL_PORT \
-  --load-state $HOME/celo/optimism/packages/contracts-bedrock/anvil-state.json \
+  $STATE_FLAGS \
   --gas-limit $GAS_LIMIT \
   --code-size-limit $CODE_SIZE_LIMIT \
   --balance $BALANCE \

@@ -14,8 +14,6 @@ env:
   FOUNDRY_CACHE_KEY: 2
   # Supported Foundry version defined at celo-org (GitHub organisation) level, for consistency across workflows. Please contact DevOps to update value.
   SUPPORTED_FOUNDRY_VERSION: ${{ vars.SUPPORTED_FOUNDRY_VERSION }}
-  # Celo Foundry (celo-org/foundry) binaries version used for devchain anvil generation
-  CELO_FOUNDRY_VERSION: "celo-0.1.0"
 
 permissions:
   contents: read
@@ -52,12 +50,10 @@ jobs:
           path: ./out
           key: ${{ runner.os }}-foundry-out-${{ env.FOUNDRY_CACHE_KEY }}
 
-      - name: Install Celo Foundry binaries
-        run: |
-          curl -L -o foundry.tar.gz https://github.com/celo-org/foundry/releases/download/${{ env.CELO_FOUNDRY_VERSION }}/foundry_${{ env.CELO_FOUNDRY_VERSION }}_linux_amd64.tar.gz
-          mkdir -p celo-foundry
-          tar -xzf foundry.tar.gz -C celo-foundry
-          echo "$(pwd)/celo-foundry" >> $GITHUB_PATH
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
+        with:
+          version: 'v1.5.0'
 
       - name: Install forge dependencies
         run: forge install
@@ -135,7 +131,7 @@ jobs:
         if: success() || failure()
         with:
           repository: 'celo-org/optimism'
-          ref: 'mc01/completeMigrations'
+          ref: 'martinvol/completeMigrationsPython'
           path: celo-optimism
           submodules: recursive
           fetch-depth: 0
