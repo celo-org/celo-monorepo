@@ -1296,12 +1296,13 @@ contract Governance is
       isQueued(upvotedProposalId) &&
       !isQueuedProposalExpired(upvotedProposalId);
 
+    // Calculate queue upvote weight using full voting power (including delegated CELO)
+    uint256 queueWeight = 0;
     if (isVotingQueue) {
-      uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
-      return weight;
+      queueWeight = getLockedGold().getAccountTotalGovernanceVotingPower(account);
     }
 
-    uint256 maxUsed = 0;
+    uint256 maxReferendumUsed = 0;
     for (uint256 index = 0; index < dequeued.length; index = index.add(1)) {
       uint256 proposalId = dequeued[index];
       Proposals.Proposal storage proposal = proposals[proposalId];
@@ -1318,13 +1319,15 @@ contract Governance is
       }
 
       uint256 votesCast = voteRecord.yesVotes.add(voteRecord.noVotes).add(voteRecord.abstainVotes);
-      maxUsed = Math.max(
-        maxUsed,
+      maxReferendumUsed = Math.max(
+        maxReferendumUsed,
         // backward compatibility for transition period - this should be updated later on
         votesCast == 0 ? voteRecord.deprecated_weight : votesCast
       );
     }
-    return maxUsed;
+
+    // Return the maximum of queue upvote weight and referendum votes
+    return Math.max(queueWeight, maxReferendumUsed);
   }
 
   /**
