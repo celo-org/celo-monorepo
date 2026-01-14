@@ -125,7 +125,7 @@ contract GovernanceDelegationTest is TestWithUtils {
     governance.votePartially(prop1, idx, LOCKED_AMOUNT, 0, 0);
 
     uint256 reported = governance.getAmountOfGoldUsedForVoting(delegatee1);
-    assertEq(reported, LOCKED_AMOUNT + SMALL_LOCK);
+    assertEq(reported, LOCKED_AMOUNT, "should return referendum votes (higher than queue upvote)");
   }
 
   function test_ShouldReduceVotes_WhenRevokingDelegation() public {
@@ -191,29 +191,17 @@ contract GovernanceDelegationTest is TestWithUtils {
     assertEq(total, LOCKED_AMOUNT + SMALL_LOCK);
   }
 
-  function test_ShouldReduceVotes_WhenRevokingWithoutQueueUpvote() public {
+  function test_ShouldReturnLockedGold_WhenDelegatorUpvotesAfterDelegating() public {
     uint256 prop1 = _makeProposal(delegator);
 
     vm.prank(delegator);
     lockedGold.delegateGovernanceVotes(delegatee1, FixidityLib.fixed1().unwrap());
 
-    vm.warp(block.timestamp + DEQUEUE_FREQUENCY + 1);
-    governance.dequeueProposalsIfReady();
-    uint256 idx = _getDequeuedIndex(prop1);
-    vm.prank(approver);
-    governance.approve(prop1, idx);
-
-    vm.prank(delegatee1);
-    governance.votePartially(prop1, idx, LOCKED_AMOUNT, 0, 0);
-
-    (uint256 before, , ) = governance.getVoteTotals(prop1);
-    assertEq(before, LOCKED_AMOUNT);
-
     vm.prank(delegator);
-    lockedGold.revokeDelegatedGovernanceVotes(delegatee1, FixidityLib.fixed1().unwrap());
+    governance.upvote(prop1, 0, 0);
 
-    (uint256 after_, , ) = governance.getVoteTotals(prop1);
-    assertEq(after_, SMALL_LOCK);
+    uint256 reported = governance.getAmountOfGoldUsedForVoting(delegator);
+    assertEq(reported, LOCKED_AMOUNT, "delegator upvote should report locked gold weight");
   }
 
   function _makeProposal(address proposer) private returns (uint256) {

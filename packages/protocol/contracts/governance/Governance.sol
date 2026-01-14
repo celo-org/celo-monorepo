@@ -1296,10 +1296,10 @@ contract Governance is
       isQueued(upvotedProposalId) &&
       !isQueuedProposalExpired(upvotedProposalId);
 
-    // Calculate queue upvote weight using full voting power (including delegated CELO)
+    // Calculate queue upvote weight using locked gold (upvotes use locked gold weight)
     uint256 queueWeight = 0;
     if (isVotingQueue) {
-      queueWeight = getLockedGold().getAccountTotalGovernanceVotingPower(account);
+      queueWeight = getLockedGold().getAccountTotalLockedGold(account);
     }
 
     uint256 maxReferendumUsed = 0;
