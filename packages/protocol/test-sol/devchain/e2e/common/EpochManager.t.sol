@@ -351,13 +351,79 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
     assertEq(totalRewardsCarbonFund, 0);
   }
 
-  // TODO: check this test
-  function _shouldStartNextEpochProcessing() public {
-    // function test_shouldStartNextEpochProcessing() public {
+  // // TODO: check this test
+  // function _shouldStartNextEpochProcessing() public {
+  //   // function test_shouldStartNextEpochProcessing() public {
+  //   timeTravel(epochDuration + 1);
+  //   epochManagerContract.startNextEpochProcess();
+
+  //   // Epoch passed but votes were not activated yet, so no rewards were distributed
+  //   (
+  //     uint256 status,
+  //     uint256 perValidatorReward,
+  //     uint256 totalRewardsVote,
+  //     uint256 totalRewardsCommunity,
+  //     uint256 totalRewardsCarbonFund
+  //   ) = epochManagerContract.getEpochProcessingState();
+  //   assertEq(status, 1); // Started
+  //   assertGt(perValidatorReward, 0, "perValidatorReward1");
+  //   assertEq(totalRewardsVote, 0, "totalRewardsVote1");
+  //   assertGt(totalRewardsCommunity, 0, "totalRewardsCommunity1");
+  //   assertGt(totalRewardsCarbonFund, 0, "totalRewardsCarbonFund1");
+
+  //   // Finish epoch so votes can be activated
+  //   address[] memory lessers;
+  //   address[] memory greaters;
+  //   (lessers, greaters, ) = getLessersAndGreaters(groups);
+  //   timeTravel(epochDuration / 2);
+  //   blockTravel(100);
+  //   epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+
+  //   // Activate pending votes
+  //   for (uint256 i = 0; i < groups.length; i++) {
+  //     address account = accounts.voteSignerToAccount(groups[i]);
+
+  //     // Assert pre activation
+  //     uint256 pending = election.getPendingVotesForGroupByAccount(groups[i], account);
+  //     uint256 active = election.getActiveVotesForGroupByAccount(groups[i], account);
+  //     assertGt(pending, 0, "pending votes should be > 0");
+  //     assertEq(active, 0, "active votes should be 0");
+
+  //     // Activate group votes
+  //     vm.prank(account);
+  //     election.activate(groups[i]);
+
+  //     // Assert post activation
+  //     pending = election.getPendingVotesForGroupByAccount(groups[i], account);
+  //     active = election.getActiveVotesForGroupByAccount(groups[i], account);
+  //     assertEq(pending, 0, "pending votes should be 0");
+  //     assertGt(active, 0, "active votes should be > 0");
+  //   }
+
+  //   // Start next epoch
+  //   timeTravel(epochDuration + 1);
+  //   epochManagerContract.startNextEpochProcess();
+
+  //   // Rewards should be correctly assigned
+  //   (
+  //     status,
+  //     perValidatorReward,
+  //     totalRewardsVote,
+  //     totalRewardsCommunity,
+  //     totalRewardsCarbonFund
+  //   ) = epochManagerContract.getEpochProcessingState();
+  //   assertEq(status, 1); // Started
+  //   assertGt(perValidatorReward, 0, "perValidatorReward2");
+  //   assertGt(totalRewardsVote, 0, "totalRewardsVote2");
+  //   assertGt(totalRewardsCommunity, 0, "totalRewardsCommunity2");
+  //   assertGt(totalRewardsCarbonFund, 0, "totalRewardsCarbonFund2");
+  // }
+
+  function test_shouldStartNextEpochProcessing() public {
     timeTravel(epochDuration + 1);
+
     epochManagerContract.startNextEpochProcess();
 
-    // Epoch passed but votes were not activated yet, so no rewards were distributed
     (
       uint256 status,
       uint256 perValidatorReward,
@@ -366,57 +432,10 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
       uint256 totalRewardsCarbonFund
     ) = epochManagerContract.getEpochProcessingState();
     assertEq(status, 1); // Started
-    assertGt(perValidatorReward, 0, "perValidatorReward1");
-    assertEq(totalRewardsVote, 0, "totalRewardsVote1");
-    assertGt(totalRewardsCommunity, 0, "totalRewardsCommunity1");
-    assertGt(totalRewardsCarbonFund, 0, "totalRewardsCarbonFund1");
-
-    // Finish epoch so votes can be activated
-    address[] memory lessers;
-    address[] memory greaters;
-    (lessers, greaters, ) = getLessersAndGreaters(groups);
-    timeTravel(epochDuration / 2);
-    blockTravel(100);
-    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
-
-    // Activate pending votes
-    for (uint256 i = 0; i < groups.length; i++) {
-      address account = accounts.voteSignerToAccount(groups[i]);
-
-      // Assert pre activation
-      uint256 pending = election.getPendingVotesForGroupByAccount(groups[i], account);
-      uint256 active = election.getActiveVotesForGroupByAccount(groups[i], account);
-      assertGt(pending, 0, "pending votes should be > 0");
-      assertEq(active, 0, "active votes should be 0");
-
-      // Activate group votes
-      vm.prank(account);
-      election.activate(groups[i]);
-
-      // Assert post activation
-      pending = election.getPendingVotesForGroupByAccount(groups[i], account);
-      active = election.getActiveVotesForGroupByAccount(groups[i], account);
-      assertEq(pending, 0, "pending votes should be 0");
-      assertGt(active, 0, "active votes should be > 0");
-    }
-
-    // Start next epoch
-    timeTravel(epochDuration + 1);
-    epochManagerContract.startNextEpochProcess();
-
-    // Rewards should be correctly assigned
-    (
-      status,
-      perValidatorReward,
-      totalRewardsVote,
-      totalRewardsCommunity,
-      totalRewardsCarbonFund
-    ) = epochManagerContract.getEpochProcessingState();
-    assertEq(status, 1); // Started
-    assertGt(perValidatorReward, 0, "perValidatorReward2");
-    assertGt(totalRewardsVote, 0, "totalRewardsVote2");
-    assertGt(totalRewardsCommunity, 0, "totalRewardsCommunity2");
-    assertGt(totalRewardsCarbonFund, 0, "totalRewardsCarbonFund2");
+    assertGt(perValidatorReward, 0, "perValidatorReward");
+    assertGt(totalRewardsVote, 0, "totalRewardsVote");
+    assertGt(totalRewardsCommunity, 0, "totalRewardsCommunity");
+    assertGt(totalRewardsCarbonFund, 0, "totalRewardsCarbonFund");
   }
 }
 
