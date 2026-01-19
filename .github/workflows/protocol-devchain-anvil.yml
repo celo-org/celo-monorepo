@@ -95,8 +95,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
         with:
-          # TODO move this to 1.5 after migration is fully complete
-          version: 'v1.0.0'
+          version: 'v1.5.0'
 
       - name: Install forge dependencies
         run: forge install
