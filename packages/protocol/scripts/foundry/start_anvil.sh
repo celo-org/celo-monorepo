@@ -6,9 +6,33 @@ source $PWD/scripts/foundry/constants.sh
 
 
 ANVIL_PORT=$ANVIL_OP_PORT
+USE_CELO=""
+
 # Parse command line options:
+#   --celo: Enable Celo mode in Anvil
 #   -p: Custom port number for Anvil to listen on (overrides default ANVIL_PORT)
 #   -l: Path to load existing Anvil state from (instead of creating new state)
+
+# Check for --celo flag first (long option)
+for arg in "$@"; do
+  if [ "$arg" = "--celo" ]; then
+    USE_CELO="--celo"
+    break
+  fi
+done
+
+# Filter out --celo from arguments before getopts processing
+FILTERED_ARGS=()
+for arg in "$@"; do
+  if [ "$arg" != "--celo" ]; then
+    FILTERED_ARGS+=("$arg")
+  fi
+done
+if [ ${#FILTERED_ARGS[@]} -gt 0 ]; then
+  set -- "${FILTERED_ARGS[@]}"
+else
+  set --
+fi
 
 while getopts 'p:l:' flag; do
   case "${flag}" in
@@ -50,7 +74,7 @@ else
 fi
 
 $ANVIL \
-  --celo \
+  $USE_CELO \
   --port $ANVIL_PORT \
   $STATE_FLAGS \
   --gas-limit $GAS_LIMIT \

@@ -20,7 +20,7 @@ echo "Forge version: $($FORGE --version)"
 # TODO figure out how to use start_op_anvil.sh
 # OP_DIR=$HOME/celo/optimism/packages/contracts-bedrock ./scripts/foundry/start_op_anvil.sh
 # LOAD_STATE=$HOME/celo/optimism/packages/contracts-bedrock/anvil-state.json
-source $PWD/scripts/foundry/start_anvil.sh
+$PWD/scripts/foundry/start_anvil.sh --celo
 
 # build standard forge artifacts, needed to deploy precompiles
 FOUNDRY_PROFILE=truffle-compat forge build
