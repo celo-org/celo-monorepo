@@ -4,8 +4,6 @@ set -euo pipefail
 # Read environment variables and constants
 source $PWD/scripts/foundry/constants.sh
 
-
-ANVIL_PORT=$ANVIL_OP_PORT
 USE_CELO=""
 
 # Parse command line options:

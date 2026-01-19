@@ -24,7 +24,6 @@ $PWD/scripts/foundry/start_anvil.sh --celo
 
 # build standard forge artifacts, needed to deploy precompiles
 FOUNDRY_PROFILE=truffle-compat forge build
-export ANVIL_RPC_URL=$ANVIL_OP_RPC_URL
 
 # Deploy libraries to the anvil instance
 source $PWD/scripts/foundry/deploy_libraries.sh
@@ -91,7 +90,7 @@ $FORGE script \
   $SKIP_SIMULATION \
   $NON_INTERACTIVE \
   $LIBRARY_FLAGS \
-  --rpc-url $ANVIL_OP_RPC_URL || { echo "Migration script (part 2) failed"; exit 1; }
+  --rpc-url $ANVIL_RPC_URL || { echo "Migration script (part 2) failed"; exit 1; }
 
 
 # Keeping track of the finish time to measure how long it takes to run the script entirely
