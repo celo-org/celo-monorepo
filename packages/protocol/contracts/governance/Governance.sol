@@ -1007,7 +1007,7 @@ contract Governance is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 5, 0, 0);
+    return (1, 5, 1, 0);
   }
 
   /**
@@ -1253,7 +1253,7 @@ contract Governance is
    * @return Hotfix approved by approver.
    * @return Hotfix approved by SecurityCouncil.
    * @return Hotfix executed.
-   * @return Hotfix exection time limit.
+   * @return Hotfix execution time limit.
    */
   function getHotfixRecord(bytes32 hash) public view returns (bool, bool, bool, uint256) {
     return (

@@ -32,7 +32,7 @@ jobs:
       run:
         working-directory: packages/protocol
     name: Generate anvil
-    runs-on: ['self-hosted', 'org', 'npm-publish']
+    runs-on: ['self-hosted', 'monorepo-node18']
     permissions:
       contents: read
       pull-requests: read

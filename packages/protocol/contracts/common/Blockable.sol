@@ -9,7 +9,7 @@ import "./interfaces/IBlocker.sol";
  * @dev This contract uses an external IBlocker contract to determine if it is blocked. The owner can set the blocking contract.
  **/
 contract Blockable is IBlockable {
-  // using directly memory slot so contracts can inherit from this contract withtout breaking storage layout
+  // using directly memory slot so contracts can inherit from this contract without breaking storage layout
   bytes32 private constant BLOCKEDBY_POSITION =
     bytes32(uint256(keccak256("blocked_by_position")) - 1);
 

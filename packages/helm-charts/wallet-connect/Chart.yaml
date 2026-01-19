@@ -1,9 +1,0 @@
-apiVersion: v1
-appVersion: "0.1.0"
-description: A Helm chart for Wallet Connect app
-name: walletconnect
-version: 0.1.0
-dependencies:
-- name: redis
-  version: 12.8.3
-  repository: https://charts.bitnami.com/bitnami

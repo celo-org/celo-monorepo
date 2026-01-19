@@ -9,7 +9,6 @@ import {
 } from '@celo/protocol/lib/bytecode'
 import { verifyProxyStorageProof } from '@celo/protocol/lib/proxy-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
-import { ZERO_ADDRESS } from '@celo/protocol/test/constants'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { ProxyInstance, RegistryInstance } from 'types'
 import Web3 from 'web3'
@@ -44,6 +43,7 @@ interface InitializationData {
 }
 
 const ContractNameExtractorRegex = new RegExp(/(.*)Proxy/)
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 // Checks if the given transaction is a repointing of the Proxy for the given
 // contract.
@@ -137,19 +137,29 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
     implementationAddress = await proxy._getImplementation()
   }
 
+  console.log(`Verifying ${contract} at ${implementationAddress}`)
   let onchainBytecode = await getOnchainBytecode(implementationAddress, context)
   context.libraryAddresses.collect(onchainBytecode, sourceLibraryPositions)
 
   let linkedSourceBytecode = linkLibraries(sourceBytecode, context.libraryAddresses.addresses)
 
-  // normalize library bytecodes
-  if (isLibrary(contract, context)) {
-    linkedSourceBytecode = verifyAndStripLibraryPrefix(linkedSourceBytecode)
-    onchainBytecode = verifyAndStripLibraryPrefix(onchainBytecode, implementationAddress)
+  try {
+    if (isLibrary(contract, context)) {
+      linkedSourceBytecode = verifyAndStripLibraryPrefix(linkedSourceBytecode)
+      onchainBytecode = verifyAndStripLibraryPrefix(onchainBytecode, implementationAddress)
+    }
+  } catch(e) {
+    const logMessage = `Error verifying library prefix for ${contract} at ${implementationAddress}: ${e}`
+    throw new Error(logMessage)
+    // console.log(logMessage)
   }
 
   if (onchainBytecode !== linkedSourceBytecode) {
-    throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
+    console.log("onchainBytecode", onchainBytecode)
+    console.log("linkedSourceBytecode", linkedSourceBytecode)
+    const logMessage = `${contract}'s onchain and compiled bytecodes do not match`
+    throw new Error(logMessage)
+    // console.log(logMessage)
   } else {
     console.log(
       `${isLibrary(contract, context) ? 'Library' : 'Contract'
@@ -200,7 +210,7 @@ const assertValidInitializationData = (
 
     if (callData.toLowerCase() !== proposalTx.args[1].toLowerCase()) {
       throw new Error(
-        `Intialization Data for ${contractName} in proposal does not match reference file ${initializationData[contractName]}`
+        `Initialization Data for ${contractName} in proposal does not match reference file ${initializationData[contractName]}`
       )
     }
 

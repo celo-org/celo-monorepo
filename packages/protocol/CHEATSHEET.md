@@ -28,7 +28,6 @@ Covers changes in `package.json` scripts introduced starting with PR [#11369](ht
 | `...`                                   | `test`                                        |
 | `test:coverage`                         | `test:coverage`                               |
 | `gas`                                   | `test:gas`                                    |
-| `quicktest`                             | `test:quicktest`                              |
 | `test:release-snapshots`                | `test:release-snapshots`                      |
 | `test:scripts`                          | `test:scripts`                                |
 | `test`                                  | `test:truffle`                                |

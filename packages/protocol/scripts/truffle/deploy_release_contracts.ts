@@ -337,7 +337,7 @@ async function compile(template: ReleaseGoldTemplate): Promise<ReleaseGoldConfig
     questions.push({
       type: 'text',
       name: 'releaseStartTime',
-      inital: 'MAINNET+0',
+      initial: 'MAINNET+0',
       message: 'Release start time',
     })
   }
@@ -491,7 +491,7 @@ async function handleJSONFile(data) {
       )
       process.exit(0)
     }
-    // Sum occurences of each identifier in the grant file, if more than 1 then there is a duplicate.
+    // Sum occurrences of each identifier in the grant file, if more than 1 then there is a duplicate.
     const identifierCounts = grants.map((x) => (x.identifier === grant.identifier ? 1 : 0))
     if (identifierCounts.reduce((a, b) => a + b, 0) > 1) {
       console.info(

@@ -4,6 +4,6 @@ interface IFeeHandlerSellerInitializer {
   function initialize(
     address _registryAddress,
     address[] calldata tokenAddresses,
-    uint256[] calldata newMininumReports
+    uint256[] calldata newMinimumReports
   ) external;
 }

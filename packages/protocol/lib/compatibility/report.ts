@@ -6,7 +6,7 @@ import { ASTCodeCompatibilityReport } from '@celo/protocol/lib/compatibility/ast
 import { ASTStorageCompatibilityReport } from '@celo/protocol/lib/compatibility/ast-layout'
 import { categorize, Categorizer, ChangeType } from '@celo/protocol/lib/compatibility/categorizer'
 import { Change } from '@celo/protocol/lib/compatibility/change'
-import { makeZContract } from '@celo/protocol/lib/compatibility/internal'
+import { makeZContract, getArtifactByName } from '@celo/protocol/lib/compatibility/internal'
 import { ContractVersionDelta, ContractVersionDeltaIndex } from '@celo/protocol/lib/compatibility/version'
 /**
  * Value object holding all uncategorized storage and code reports.
@@ -125,7 +125,7 @@ export interface ASTVersionedReportIndex {
 export const isLibrary = (contract: string, artifactsSet: BuildArtifacts[]) => {
   for (const artifacts of artifactsSet){
 
-    const artifact = artifacts.getArtifactByName(contract)
+    const artifact = getArtifactByName(contract, artifacts)
     if (artifact === undefined){
       // EAFP
       // the library may be in another package

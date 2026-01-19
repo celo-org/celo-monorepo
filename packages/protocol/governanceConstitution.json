@@ -40,10 +40,6 @@
   "FederatedAttestations": {
     "default": 600000000000000000000000
   },
-  "FeeCurrencyWhitelist": {
-    "default": 800000000000000000000000,
-    "addToken": 800000000000000000000000
-  },
   "Freezer": {
     "default": 600000000000000000000000,
     "freeze": 600000000000000000000000,
@@ -92,7 +88,7 @@
   "OdisPayments": {
     "default": 600000000000000000000000
   },
-  "proxy": {
+  "Proxy": {
     "_transferOwnership": 900000000000000000000000,
     "_setAndInitializeImplementation": 900000000000000000000000,
     "_setImplementation": 900000000000000000000000

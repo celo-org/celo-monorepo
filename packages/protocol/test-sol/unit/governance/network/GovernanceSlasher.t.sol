@@ -105,7 +105,7 @@ contract GovernanceSlasherTest_approveSlashing is GovernanceSlasherTest {
 contract GovernanceSlasherTest_slash_WhenNotGroup is GovernanceSlasherTest {
   address group = address(0);
 
-  // only onwer or multisig can call
+  // only owner or multisig can call
 
   function test_ShouldDecrementCelo() public {
     governanceSlasher.approveSlashing(validator, 1000);

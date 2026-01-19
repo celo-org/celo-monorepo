@@ -5,7 +5,7 @@ import {
   MethodMutabilityChange, MethodRemovedChange, MethodReturnChange,
   MethodVisibilityChange, NewContractChange
 } from '@celo/protocol/lib/compatibility/change'
-import { makeZContract } from '@celo/protocol/lib/compatibility/internal'
+import { makeZContract, getArtifactByName, getContractName } from '@celo/protocol/lib/compatibility/internal'
 import {
   BuildArtifacts,
   Contract as ZContract
@@ -290,13 +290,24 @@ export function reportASTIncompatibilities(
     if (matchingOldArtifacts) {
       // Compare contracts from same compiler version
       const reports = newArtifacts.listArtifacts()
+        .filter((newArtifact) => {
+          // Matches all Truffle project artifacts (core contracts and test resource contracts)
+          const truffleProjectContractPathPattern = /^project:/
+          // Matches Foundry core contracts
+          const foundryCoreContractPathPattern = /^contracts(-0\.8)?\//
+          // Matches Foundry test resource contracts
+          const foundryTestContractPathPattern = /^test-ts/
+          const path = newArtifact.ast.absolutePath
+          return truffleProjectContractPathPattern.test(path) || foundryCoreContractPathPattern.test(path) || foundryTestContractPathPattern.test(path)
+        })
         .map((newArtifact) => {
-          const oldArtifact = matchingOldArtifacts!.getArtifactByName(newArtifact.contractName)
+          const newContractName = getContractName(newArtifact)
+          const oldArtifact = getArtifactByName(newContractName, matchingOldArtifacts!)
           if (oldArtifact) {
             return generateASTCompatibilityReport(makeZContract(oldArtifact), matchingOldArtifacts!, makeZContract(newArtifact), newArtifacts)
           } else {
             // Contract doesn't exist in old artifacts of same version
-            console.log(`[INFO] New contract detected: ${newArtifact.contractName} (compiler: ${newCompilerVersion})`)
+            console.log(`[INFO] New contract detected: ${newContractName} (compiler: ${newCompilerVersion})`)
             return generateASTCompatibilityReport(null, matchingOldArtifacts!, makeZContract(newArtifact), newArtifacts)
           }
         })
@@ -308,7 +319,8 @@ export function reportASTIncompatibilities(
       if (fallbackOldArtifacts) {
         const reports = newArtifacts.listArtifacts()
           .map((newArtifact) => {
-            console.log(`[INFO] New contract (no matching old version): ${newArtifact.contractName} (compiler: ${newCompilerVersion})`)
+            const newContractName = getContractName(newArtifact)
+            console.log(`[INFO] New contract (no matching old version): ${newContractName} (compiler: ${newCompilerVersion})`)
             return generateASTCompatibilityReport(null, fallbackOldArtifacts!, makeZContract(newArtifact), newArtifacts)
           })
         out = [...out, ...reports]
@@ -334,7 +346,7 @@ export function reportASTIncompatibilities(
 
     if (!hasMatchingNewArtifacts) {
       console.log(`[INFO] Old artifacts with compiler ${oldCompilerVersion} have no matching new artifacts - contracts may have been removed`)
-      const potentiallyRemovedContracts = oldArtifacts.listArtifacts().map(artifact => artifact.contractName)
+      const potentiallyRemovedContracts = oldArtifacts.listArtifacts().map(artifact => getContractName(artifact))
       console.log(`[INFO] Potentially removed contracts: ${potentiallyRemovedContracts.join(', ')}`)
     }
   }

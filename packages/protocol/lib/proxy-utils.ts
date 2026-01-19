@@ -31,6 +31,23 @@ export async function verifyProxyStorageProof(web3: Web3, proxy: string, owner: 
   return proof.storageHash === bufferToHex(trie.root)
 }
 
+interface ProofLookup {
+  getProof: (address: string, slots: string[]) => Promise<any>
+}
+
+export async function verifyProxyStorageProofFoundry(proofLookup: ProofLookup, proxy: string, owner: string) {
+  const proof = await proofLookup.getProof(
+    proxy,
+    [OWNER_POSITION, IMPLEMENTATION_POSITION]
+  )
+
+  const trie = new SecureTrie()
+  await trie.put(hexToBuffer(OWNER_POSITION), rlpEncode(owner))
+
+  // @ts-ignore
+  return proof.storageHash === bufferToHex(trie.root)
+}
+
 export async function setAndInitializeImplementation(
   web3: Web3,
   proxy: ProxyInstance,
@@ -68,6 +85,6 @@ export async function setAndInitializeImplementation(
       return retryTx(proxy._setAndInitializeImplementation, [implementationAddress, callData as any])
     }
   } catch (error) {
-    console.log("errror", error);
+    console.log("error", error);
   }
 }
