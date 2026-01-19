@@ -167,7 +167,7 @@ jobs:
 
           FOUNDRY_PROFILE=devchain forge test -vvv \
           --match-path "test-sol/devchain/e2e/*" \
-          --fork-url $ANVIL_OP_RPC_URL
+          --fork-url $ANVIL_RPC_URL
 
       - name: Sanitize ref name
         id: sanitize-ref-name
