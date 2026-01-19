@@ -16,8 +16,6 @@ $FORGE --version
 
 # Anvil configurations (Source: https://book.getfoundry.sh/reference/anvil/)
 # TODO use functions for this
-export ANVIL_OP_PORT=9545 # Port for anvil running with Optimism state (check start_op_anvil.sh)
-export ANVIL_OP_RPC_URL="http://127.0.0.1:$ANVIL_OP_PORT"
 export ANVIL_PORT=8546
 export ANVIL_RPC_URL_BASE="http://127.0.0.1"
 
