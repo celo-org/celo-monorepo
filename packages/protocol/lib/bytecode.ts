@@ -113,19 +113,34 @@ export class LibraryPositions {
 
 export class LibraryAddresses {
   addresses: { [library: string]: string }
+  mismatches: { library: string; position: number; existingAddress: string; newAddress: string }[]
 
   constructor() {
     this.addresses = {}
+    this.mismatches = []
   }
 
-  collect = (bytecode: string, libraryPositions: LibraryPositions) =>
+  collect = (bytecode: string, libraryPositions: LibraryPositions, warnOnMismatch = false) =>
     Object.keys(libraryPositions.positions).forEach((library) =>
       libraryPositions.positions[library].forEach((position) => {
-        if (!this.addAddress(library, bytecode.slice(position, position + ADDRESS_LENGTH))) {
-          throw new Error(`Mismatched addresses for ${library} at ${position}`)
+        const newAddress = bytecode.slice(position, position + ADDRESS_LENGTH)
+        if (!this.addAddress(library, newAddress)) {
+          if (warnOnMismatch) {
+            console.warn(`Warning: Mismatched addresses for ${library} at ${position} (existing: ${this.addresses[library]}, new: ${newAddress})`)
+            this.mismatches.push({
+              library,
+              position,
+              existingAddress: this.addresses[library],
+              newAddress
+            })
+          } else {
+            throw new Error(`Mismatched addresses for ${library} at ${position}`)
+          }
         }
       })
     )
+
+  hasMismatches = (): boolean => this.mismatches.length > 0
 
   /*
    * Tries to add a library name -> address mapping. If the library has already

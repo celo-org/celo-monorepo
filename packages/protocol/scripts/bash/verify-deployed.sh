@@ -10,18 +10,21 @@ set -euo pipefail
 # -f: Boolean flag to indicate if the Forno service should be used to connect to
 #     the network
 # -l: Path to a file to which logs should be appended
+# -w: Warn on library address mismatch instead of failing (still generates libraries.json)
 
 BRANCH=""
 NETWORK=""
 FORNO=""
 LOG_FILE="/dev/stdout"
+WARN_ON_MISMATCH=""
 
-while getopts 'b:n:fl:' flag; do
+while getopts 'b:n:fl:w' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
     f) FORNO="--forno" ;;
     l) LOG_FILE="${OPTARG}" ;;
+    w) WARN_ON_MISMATCH="--warn_on_mismatch" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -59,4 +62,4 @@ if [ "$BRANCH" = "core-contracts.v10" ]; then
   cd ../../../
 fi
 
-yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts  --branch $BRANCH --librariesFile "libraries.json" $FORNO
+yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts  --branch $BRANCH --librariesFile "libraries.json" $FORNO $WARN_ON_MISMATCH

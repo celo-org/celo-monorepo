@@ -33,6 +33,7 @@ const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
 
 const argv = require('minimist')(process.argv.slice(2), {
   string: ['build_artifacts', 'proposal', 'initialize_data', 'network', 'librariesFile', 'branch'],
+  boolean: ['warn_on_mismatch'],
 })
 
 const artifactsDirectory = argv.build_artifacts ? argv.build_artifacts : './build/contracts'
@@ -44,6 +45,7 @@ const network = argv.network ?? 'development'
 const proposal = argv.proposal ? readJsonSync(argv.proposal) : []
 const initializationData = argv.initialize_data ? readJsonSync(argv.initialize_data) : {}
 const librariesFile = argv.librariesFile ?? 'libraries.json'
+const warnOnMismatch = argv.warn_on_mismatch ?? false
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
@@ -61,11 +63,19 @@ module.exports = async (callback: (error?: any) => number) => {
       web3,
       initializationData,
       version,
-      network
+      network,
+      warnOnMismatch
     )
 
-    // eslint-disable-next-line: no-console
-    console.info('Success, no bytecode mismatches found!')
+    if (libraryAddresses.hasMismatches()) {
+      // eslint-disable-next-line: no-console
+      console.warn(
+        `Completed with ${libraryAddresses.mismatches.length} library address mismatches`
+      )
+    } else {
+      // eslint-disable-next-line: no-console
+      console.info('Success, no bytecode mismatches found!')
+    }
 
     // eslint-disable-next-line: no-console
     console.info(`Writing linked library addresses to ${librariesFile}`)

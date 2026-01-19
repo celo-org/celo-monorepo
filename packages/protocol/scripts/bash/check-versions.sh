@@ -9,18 +9,21 @@ set -euo pipefail
 # -b: New branch containing smart contracts, on which version numbers may be updated.
 # -r: Path that the contract compatibility report should be written to.
 # -l: Path to a file to which logs should be appended
+# -f: Force all contracts to be marked as changed (for full release)
 
 BRANCH=""
 NEW_BRANCH=""
 REPORT=""
 LOG_FILE="/tmp/celo-check-versions.log"
+FORCE_DEPLOY_ALL=""
 
-while getopts 'a:b:r:l:i' flag; do
+while getopts 'a:b:r:l:fi' flag; do
   case "${flag}" in
     a) BRANCH="${OPTARG}" ;;
     b) NEW_BRANCH="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
     l) LOG_FILE="${OPTARG}" ;;
+    f) FORCE_DEPLOY_ALL="--force_deploy_all" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -53,6 +56,7 @@ yarn ts-node scripts/check-backward.ts sem_check \
   --new_contracts $NEW_BRANCH_BUILD_DIR/contracts \
   --exclude $CONTRACT_EXCLUSION_REGEX \
   --new_branch $NEW_BRANCH \
-  $REPORT_FLAG
+  $REPORT_FLAG \
+  $FORCE_DEPLOY_ALL
 
 git checkout $CURRENT_HASH -- migrationsConfig.js

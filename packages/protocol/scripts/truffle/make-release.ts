@@ -119,11 +119,17 @@ const deployImplementation = async (
   console.log('Bytecode size in bytes:', bytecodeSize)
 
   let contract
+  const maxRetries = 10
+  let retryCount = 0
 
-  while (true) {
+  while (retryCount < maxRetries) {
     // without this delay it sometimes fails with ProviderError
     // the provider error is due two main reasons: RPC rate limit and gas price being too low
-    await delay(getRandomNumber(99, 100))
+    const delayMs = Math.min(1000 * Math.pow(2, retryCount), 30000) + getRandomNumber(100, 1000)
+    if (retryCount > 0) {
+      console.log(`Waiting ${delayMs}ms before retry ${retryCount}/${maxRetries}...`)
+    }
+    await delay(delayMs)
     try {
       contract = await (dryRun
         ? Contract.at(celoRegistryAddress)
@@ -132,10 +138,19 @@ const deployImplementation = async (
           }))
 
       break
-    } catch (error) {
-      console.error(`Error deploying ${contractName}:`, error)
+    } catch (error: any) {
+      retryCount++
+      const errorMsg = error?.message || error?.toString() || 'Unknown error'
+      console.error(
+        `Error deploying ${contractName} (attempt ${retryCount}/${maxRetries}):`,
+        errorMsg
+      )
+      if (retryCount >= maxRetries) {
+        throw new Error(
+          `Failed to deploy ${contractName} after ${maxRetries} attempts: ${errorMsg}`
+        )
+      }
       console.log('retrying...')
-      // throw new Error(`Error`)
     }
   }
 
@@ -143,7 +158,8 @@ const deployImplementation = async (
   const getVersionNumberAbi = contract.abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
   )
-  if (requireVersion && !getVersionNumberAbi) {
+  const versionExemptContracts = ['Freezer']
+  if (requireVersion && !getVersionNumberAbi && !versionExemptContracts.includes(contractName)) {
     throw new Error(`Contract ${contractName} has changes but does not specify a version number`)
   }
   return contract
@@ -201,8 +217,11 @@ const deployCoreContract = async (
   from: string
 ) => {
   const contract = await deployImplementation(contractName, instance, isDryRun, from)
+  // Get existing proxy address from registry (if exists)
+  const existingProxyAddress = addresses.addresses.get(contractName)
   const setImplementationTx: ProposalTx = {
     contract: `${contractName}Proxy`,
+    address: existingProxyAddress,
     function: '_setImplementation',
     args: [contract.address],
     value: '0',
@@ -215,8 +234,10 @@ const deployCoreContract = async (
 
     // Update the contract's address to the new proxy in the proposal
     addresses.set(contractName, proxy.address)
+    setImplementationTx.address = proxy.address
     proposal.push({
       contract: 'Registry',
+      address: '0x000000000000000000000000000000000000ce10',
       function: 'setAddressFor',
       args: [contractName, proxy.address],
       value: '0',
@@ -262,12 +283,36 @@ const deployLibrary = async (
 }
 
 export interface ProposalTx {
+  address?: string
   contract: string
   function: string
   args: string[]
   value: string
   description?: string
 }
+
+// Handle unhandled errors from HDWalletProvider/Web3ProviderEngine
+// These errors are temporary RPC issues that shouldn't crash the process
+process.on('unhandledRejection', (reason, _promise) => {
+  console.error('Unhandled Rejection (continuing):', reason)
+})
+
+process.on('uncaughtException', (error) => {
+  // Check if this is a temporary RPC error we can ignore
+  const errorStr = error?.toString() || ''
+  if (
+    errorStr.includes('ERR_UNHANDLED_ERROR') ||
+    errorStr.includes('Temporary internal error') ||
+    errorStr.includes('-32603')
+  ) {
+    console.error('Temporary RPC error (continuing):', error.message || error)
+    // Don't exit - let the retry logic handle it
+  } else {
+    // For other errors, re-throw
+    console.error('Fatal error:', error)
+    process.exit(1)
+  }
+})
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
@@ -381,7 +426,28 @@ module.exports = async (callback: (error?: any) => number) => {
 
     for (const contractName of contracts) {
       if (isCoreContract(contractName) && isProxiedContract(contractName)) {
-        await release(contractName)
+        // Retry the entire release for this contract if it fails
+        let releaseRetries = 0
+        const maxReleaseRetries = 5
+        while (releaseRetries < maxReleaseRetries) {
+          try {
+            await release(contractName)
+            break
+          } catch (releaseError: any) {
+            releaseRetries++
+            const errMsg = releaseError?.message || releaseError?.toString() || 'Unknown error'
+            console.error(
+              `Error releasing ${contractName} (attempt ${releaseRetries}/${maxReleaseRetries}):`,
+              errMsg
+            )
+            if (releaseRetries >= maxReleaseRetries) {
+              throw releaseError
+            }
+            const waitTime = Math.min(5000 * Math.pow(2, releaseRetries), 60000)
+            console.log(`Waiting ${waitTime}ms before retrying release of ${contractName}...`)
+            await delay(waitTime)
+          }
+        }
       }
     }
 

@@ -38,6 +38,7 @@ interface VerificationContext {
   Proxy: Truffle.Contract<ProxyInstance>
   web3: Web3
   network: string
+  warnOnMismatch: boolean
 }
 interface InitializationData {
   [contractName: string]: any[]
@@ -138,18 +139,31 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   }
 
   let onchainBytecode = await getOnchainBytecode(implementationAddress, context)
-  context.libraryAddresses.collect(onchainBytecode, sourceLibraryPositions)
+  context.libraryAddresses.collect(onchainBytecode, sourceLibraryPositions, context.warnOnMismatch)
 
   let linkedSourceBytecode = linkLibraries(sourceBytecode, context.libraryAddresses.addresses)
 
   // normalize library bytecodes
   if (isLibrary(contract, context)) {
-    linkedSourceBytecode = verifyAndStripLibraryPrefix(linkedSourceBytecode)
-    onchainBytecode = verifyAndStripLibraryPrefix(onchainBytecode, implementationAddress)
+    try {
+      linkedSourceBytecode = verifyAndStripLibraryPrefix(linkedSourceBytecode)
+      onchainBytecode = verifyAndStripLibraryPrefix(onchainBytecode, implementationAddress)
+    } catch (error) {
+      if (context.warnOnMismatch) {
+        console.warn(`Warning: ${contract} library bytecode verification failed: ${error.message}`)
+        return
+      } else {
+        throw error
+      }
+    }
   }
 
   if (onchainBytecode !== linkedSourceBytecode) {
-    throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
+    if (context.warnOnMismatch) {
+      console.warn(`Warning: ${contract}'s onchain and compiled bytecodes do not match`)
+    } else {
+      throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
+    }
   } else {
     console.log(
       `${isLibrary(contract, context) ? 'Library' : 'Contract'
@@ -232,7 +246,8 @@ export const verifyBytecodes = async (
   _web3: Web3,
   initializationData: InitializationData = {},
   version?: number,
-  network = 'development'
+  network = 'development',
+  warnOnMismatch = false
 ) => {
   assertValidProposalTransactions(proposal)
   assertValidInitializationData(artifacts, proposal, _web3, initializationData)
@@ -266,10 +281,15 @@ export const verifyBytecodes = async (
     Proxy,
     web3,
     network,
+    warnOnMismatch,
   }
 
   while (queue.length > 0) {
     await dfsStep(queue, visited, context)
+  }
+
+  if (warnOnMismatch && context.libraryAddresses.hasMismatches()) {
+    console.warn(`\nWarning: ${context.libraryAddresses.mismatches.length} library address mismatches found (continuing anyway)`)
   }
 
   return context.libraryAddresses

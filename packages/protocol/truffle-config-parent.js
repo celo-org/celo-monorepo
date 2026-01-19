@@ -16,6 +16,7 @@ const argv = require('minimist')(process.argv.slice(2), {
 
 const ALFAJORES_NETWORKID = 44787
 const BAKLAVA_NETWORKID = 62320
+const CELOSEPOLIA_NETWORKID = 11142220
 
 const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
@@ -63,6 +64,7 @@ const fornoUrls = {
   rc1: 'https://forno.celo.org',
   mainnet: 'https://forno.celo.org',
   staging: 'https://staging-forno.celo-networks-dev.org',
+  celosepolia: 'https://celo-sepolia.drpc.org',
 }
 
 const networks = {
@@ -135,7 +137,7 @@ const networks = {
   testnet_prod: defaultConfig,
   anvil: {
     ...defaultConfig,
-    network_id: 31337,
+    network_id: 11142220,
     from: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
   },
   // New testnets
@@ -158,6 +160,11 @@ const networks = {
     ...defaultConfig,
     from: BAKLAVA_FROM,
     network_id: BAKLAVA_NETWORKID,
+    privateKeyAvailable: true,
+  },
+  celosepolia: {
+    ...defaultConfig,
+    network_id: CELOSEPOLIA_NETWORKID,
     privateKeyAvailable: true,
   },
 }

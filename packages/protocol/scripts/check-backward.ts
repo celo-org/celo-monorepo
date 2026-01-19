@@ -1,8 +1,14 @@
 import { ASTContractVersionsChecker } from '@celo/protocol/lib/compatibility/ast-version'
 import { DefaultCategorizer } from '@celo/protocol/lib/compatibility/categorizer'
+import { DeployedBytecodeChange } from '@celo/protocol/lib/compatibility/change'
 import { getReleaseVersion } from '@celo/protocol/lib/compatibility/ignored-contracts-v9'
-import { CategorizedChanges } from '@celo/protocol/lib/compatibility/report'
+import {
+  ASTVersionedReport,
+  CategorizedChanges,
+  isLibrary,
+} from '@celo/protocol/lib/compatibility/report'
 import { ASTBackwardReport, instantiateArtifacts } from '@celo/protocol/lib/compatibility/utils'
+import { ContractVersionDelta } from '@celo/protocol/lib/compatibility/version'
 import { writeJsonSync } from 'fs-extra'
 import path from 'path'
 import tmp from 'tmp'
@@ -49,6 +55,11 @@ const argv = yargs
     alias: 'b',
     description: 'Branch name (for versioning)',
     type: 'string',
+  })
+  .option('force_deploy_all', {
+    description: 'Force all contracts to be marked as having bytecode changes (for full release)',
+    default: false,
+    type: 'boolean',
   })
   .help()
   .alias('help', 'h')
@@ -98,6 +109,81 @@ try {
     }
   } catch (error) {
     out(`Error parsing branch name: ${argv.new_branch}\n`)
+  }
+
+  // Force all contracts to be marked as having bytecode changes for full release
+  if (argv.force_deploy_all) {
+    out('Forcing all contracts to be marked as changed for full release...\n')
+    const allContracts: string[] = []
+    const artifactsSet = [newArtifacts, newArtifacts08]
+
+    for (const artifacts of artifactsSet) {
+      for (const artifact of artifacts.listArtifacts()) {
+        allContracts.push(artifact.contractName)
+      }
+    }
+    const filteredContracts = allContracts.filter((name) => !exclude || !exclude.test(name))
+
+    let contractsAdded = 0
+    let librariesAdded = 0
+    let skippedNoVersion = 0
+
+    for (const contractName of filteredContracts) {
+      // Check if this is a library
+      if (isLibrary(contractName, artifactsSet)) {
+        // Skip if already in the libraries report
+        if (backward.report.libraries[contractName]) {
+          continue
+        }
+        // Add to libraries section (libraries don't have version deltas)
+        backward.report.libraries[contractName] = {} as CategorizedChanges
+        librariesAdded++
+      } else {
+        // Skip if already in the contracts report
+        if (backward.report.contracts[contractName]) {
+          continue
+        }
+
+        // Check if the contract has getVersionNumber function
+        let hasVersionNumber = false
+        for (const artifacts of artifactsSet) {
+          try {
+            const artifact = artifacts.getArtifactByName(contractName)
+            if (artifact && artifact.abi) {
+              const getVersionNumberAbi = artifact.abi.find(
+                (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
+              )
+              if (getVersionNumberAbi) {
+                hasVersionNumber = true
+                break
+              }
+            }
+          } catch (e) {
+            // Contract not found in this artifacts set
+          }
+        }
+
+        // Skip contracts without getVersionNumber (except for specific contracts like Freezer)
+        const noVersionExceptions = ['Freezer']
+        if (!hasVersionNumber && !noVersionExceptions.includes(contractName)) {
+          skippedNoVersion++
+          continue
+        }
+
+        // Create a bytecode change entry for this contract
+        const changes = new CategorizedChanges(
+          [],
+          [],
+          [],
+          [new DeployedBytecodeChange(contractName)]
+        )
+        const versionDelta = ContractVersionDelta.fromChanges(false, false, false, true)
+        backward.report.contracts[contractName] = new ASTVersionedReport(changes, versionDelta)
+        contractsAdded++
+      }
+    }
+    out(`Added ${contractsAdded} contracts and ${librariesAdded} libraries to the report\n`)
+    out(`Skipped ${skippedNoVersion} contracts without getVersionNumber\n`)
   }
 
   out(`Writing compatibility report to ${outFile} ...`)

@@ -10,6 +10,15 @@ export const ignoredContractsV9 = [
   'StableTokenRegistry',
   'Reserve',
   'ReserveSpenderMultiSig',
+  // Slasher contracts - deprecated
+  'DowntimeSlasher',
+  'DoubleSigningSlasher',
+  // Contracts not in celocli's contract kit
+  'BlockchainParameters',
+  'FeeCurrencyWhitelist',
+  'Random',
+  'GasPriceMinimum',
+  'Attestations',
 ]
 
 export const ignoredContractsV9Only = [
