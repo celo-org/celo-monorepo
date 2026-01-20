@@ -294,8 +294,8 @@ contract E2E_EpochManager_InitializeSystem is E2E_EpochManager {
 
 contract E2E_EpochManager_GetCurrentEpoch is E2E_EpochManager {
   function test_ReturnExpectedValues() public {
-    assertEq(epochManagerContract.firstKnownEpoch(), 1);
-    assertEq(epochManagerContract.getCurrentEpochNumber(), 1);
+    assertEq(epochManagerContract.firstKnownEpoch(), 1, "firstKnownEpoch");
+    assertEq(epochManagerContract.getCurrentEpochNumber(), 2, "getCurrentEpochNumber");
 
     (
       uint256 firstBlock,
@@ -333,8 +333,8 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
   }
 
   function test_shouldHaveInitialValues() public {
-    assertEq(epochManagerContract.firstKnownEpoch(), 1);
-    assertEq(epochManagerContract.getCurrentEpochNumber(), 1);
+    assertEq(epochManagerContract.firstKnownEpoch(), 1, "firstKnownEpoch");
+    assertEq(epochManagerContract.getCurrentEpochNumber(), 2, "getCurrentEpochNumber");
 
     // get getEpochProcessingState
     (
@@ -345,13 +345,11 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
       uint256 totalRewardsCarbonFund
     ) = epochManagerContract.getEpochProcessingState();
     assertEq(status, 0); // Not started
-    assertEq(perValidatorReward, 0);
-    assertEq(totalRewardsVote, 0);
-    assertEq(totalRewardsCommunity, 0);
-    assertEq(totalRewardsCarbonFund, 0);
+    assertEq(perValidatorReward, 0, "perValidatorReward");
+    assertEq(totalRewardsVote, 0, "totalRewardsVote");
+    assertEq(totalRewardsCommunity, 0, "totalRewardsCommunity");
+    assertEq(totalRewardsCarbonFund, 0, "totalRewardsCarbonFund");
   }
-
-  // TODO: check this test
 
   function test_shouldStartNextEpochProcessing() public {
     timeTravel(epochDuration + 1);

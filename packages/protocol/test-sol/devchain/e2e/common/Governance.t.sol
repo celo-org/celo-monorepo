@@ -2,7 +2,7 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 // Foundry imports
-import { console } from "forge-std-8/console.sol";
+import { console2 } from "forge-std-8/console2.sol";
 import { stdJson } from "forge-std-8/StdJson.sol";
 
 // OpenZeppelin imports
@@ -20,6 +20,12 @@ import { IRegistry } from "@celo-contracts/common/interfaces/IRegistry.sol";
 // Test imports
 import { Devchain } from "@test-sol/devchain/e2e/utils.sol";
 import { ConstitutionHelper } from "@test-sol/utils/ConstitutionHelper.sol";
+
+// Wrapper interface for Governance functions not in IGovernance (different Solidity version)
+interface IGovernanceExtended {
+  function dequeueProposalsIfReady() external;
+  function concurrentProposals() external view returns (uint256);
+}
 
 contract E2E_Election is Devchain {
   function test_shouldElectAllValidators() public {
@@ -74,7 +80,7 @@ contract E2E_Constitution is Devchain {
   }
 }
 
-contract E2E_Governance is Devchain {
+contract E2E_GovernanceBase is Devchain {
   using stdJson for string;
 
   // config
@@ -115,33 +121,7 @@ contract E2E_Governance is Devchain {
     locked = lockedCelo.getAccountTotalLockedGold(tester);
   }
 
-  function beforeTestSetup(
-    bytes4 _testSelector
-  ) public pure virtual returns (bytes[] memory beforeCalldata_) {
-    // ensure tests inherit state
-    if (_testSelector == this.test_shouldUpvoteProposal.selector) {
-      beforeCalldata_ = new bytes[](1);
-      beforeCalldata_[0] = abi.encodePacked(this.test_shouldIncrementProposalCount.selector);
-    } else if (_testSelector == this.test_shouldApproveProposal.selector) {
-      beforeCalldata_ = new bytes[](2);
-      beforeCalldata_[0] = abi.encodePacked(this.test_shouldIncrementProposalCount.selector);
-      beforeCalldata_[1] = abi.encodePacked(this.test_shouldUpvoteProposal.selector);
-    } else if (_testSelector == this.test_shouldIncrementVoteTotals.selector) {
-      beforeCalldata_ = new bytes[](3);
-      beforeCalldata_[0] = abi.encodePacked(this.test_shouldIncrementProposalCount.selector);
-      beforeCalldata_[1] = abi.encodePacked(this.test_shouldUpvoteProposal.selector);
-      beforeCalldata_[2] = abi.encodePacked(this.test_shouldApproveProposal.selector);
-    } else if (_testSelector == this.test_shouldExecuteProposal.selector) {
-      beforeCalldata_ = new bytes[](4);
-      beforeCalldata_[0] = abi.encodePacked(this.test_shouldIncrementProposalCount.selector);
-      beforeCalldata_[1] = abi.encodePacked(this.test_shouldUpvoteProposal.selector);
-      beforeCalldata_[2] = abi.encodePacked(this.test_shouldApproveProposal.selector);
-      beforeCalldata_[3] = abi.encodePacked(this.test_shouldIncrementVoteTotals.selector);
-    }
-  }
-
-  function test_shouldIncrementProposalCount() public virtual {
-    // setup values
+  function _propose() public virtual {
     uint256[] memory values_ = new uint256[](2);
     values_[0] = 0;
     values_[1] = 0;
@@ -170,27 +150,18 @@ contract E2E_Governance is Devchain {
       dataLengths_,
       "url"
     );
-
-    // assert
-    assertEq(governance.proposalCount(), proposalId);
   }
 
-  function test_shouldUpvoteProposal() public {
-    // upvote
+  function _upvoteProposal(uint256 proposalId, uint256 lesser, uint256 greater) public {
     vm.prank(tester);
     governance.upvote(
       proposalId,
-      0, // lesser
-      0 // greater
+      lesser, // lesser
+      greater // greater
     );
-
-    // assert
-    assertEq(governance.getUpvotes(proposalId), locked);
-    assertGt(locked, 0);
   }
 
-  function test_shouldApproveProposal() public {
-    // increase time and mine 1 block
+  function _approveProposal() public {
     timeTravel(dequeueFrequency);
     blockTravel(1);
 
@@ -202,12 +173,9 @@ contract E2E_Governance is Devchain {
       0, // value
       abi.encodeWithSelector(IGovernance.approve.selector, proposalId, dequeueIndex)
     );
-
-    // assert
-    assertTrue(governance.isApproved(proposalId));
   }
 
-  function test_shouldIncrementVoteTotals() public {
+  function _vote() public {
     // increase time and mine 1 block
     timeTravel(approvalDuration);
     blockTravel(1);
@@ -219,13 +187,94 @@ contract E2E_Governance is Devchain {
       dequeueIndex,
       IGovernanceVote.VoteValue.Yes
     );
+  }
+}
+contract E2E_Governance is E2E_GovernanceBase {
+  // not responding un Foundry 1.5
+  // function beforeTestSetup(
+  //   bytes4 _testSelector
+  // ) public pure virtual returns (bytes[] memory beforeCalldata_) {
+  //   // ensure tests inherit state
+  //   if (_testSelector == this.test_shouldUpvoteProposal.selector) {
+  //   revert("before Test setup called");
+  //     beforeCalldata_ = new bytes[](1);
+  //     beforeCalldata_[0] = abi.encodePacked(this.test_shouldIncrementProposalCount.selector);
+  //   } else if (_testSelector == this.test_shouldApproveProposal.selector) {
+  //     beforeCalldata_ = new bytes[](2);
+  //     beforeCalldata_[0] = abi.encodePacked(this.test_shouldIncrementProposalCount.selector);
+  //     beforeCalldata_[1] = abi.encodePacked(this.test_shouldUpvoteProposal.selector);
+  //   } else if (_testSelector == this.test_shouldIncrementVoteTotals.selector) {
+  //     beforeCalldata_ = new bytes[](3);
+  //     beforeCalldata_[0] = abi.encodePacked(this.test_shouldIncrementProposalCount.selector);
+  //     beforeCalldata_[1] = abi.encodePacked(this.test_shouldUpvoteProposal.selector);
+  //     beforeCalldata_[2] = abi.encodePacked(this.test_shouldApproveProposal.selector);
+  //   } else if (_testSelector == this.test_shouldExecuteProposal.selector) {
+  //     beforeCalldata_ = new bytes[](4);
+  //     beforeCalldata_[0] = abi.encodePacked(this.test_shouldIncrementProposalCount.selector);
+  //     beforeCalldata_[1] = abi.encodePacked(this.test_shouldUpvoteProposal.selector);
+  //     beforeCalldata_[2] = abi.encodePacked(this.test_shouldApproveProposal.selector);
+  //     beforeCalldata_[3] = abi.encodePacked(this.test_shouldIncrementVoteTotals.selector);
+  //   }
+  // }
 
+  function test_shouldIncrementProposalCount() public virtual {
+    // setup values
+
+    // console.log("Proposed with proposalId:", proposalId);
+
+    // assert
+    _propose();
+    assertEq(governance.proposalCount(), proposalId, "proposal should be the first");
+  }
+
+  function test_shouldUpvoteProposal() public {
+    // first three are dequeued automatically
+    // TODO use concurrentProposals
+    for (uint256 i = 0; i < 4; i++) {
+      vm.deal(tester, minDeposit);
+      _propose();
+    }
+
+    console2.log(
+      "concurrentProposals:",
+      IGovernanceExtended(address(governance)).concurrentProposals()
+    );
+
+    // if a proposal is dequeuable, upvote will fail because it will try to dequeue it first
+    // that's the reason we need to dequeue the max first
+    // upvote
+    _upvoteProposal(
+      4,
+      3, // lesser
+      0 // greater
+    );
+
+    // assert
+    assertEq(governance.getUpvotes(4), locked);
+    assertGt(locked, 0);
+  }
+
+  function test_shouldApproveProposal() public {
+    _propose();
+    _approveProposal();
+
+    // assert
+    assertTrue(governance.isApproved(proposalId));
+  }
+
+  function test_shouldIncrementVoteTotals() public {
+    _propose();
+    _vote();
     // assert
     (uint256 yesVotes, , ) = governance.getVoteTotals(proposalId);
     assertEq(yesVotes, locked);
   }
 
   function test_shouldExecuteProposal() public virtual {
+    _propose();
+    _approveProposal();
+    _vote();
+
     // increase time and mine 1 block
     timeTravel(referendumDuration);
     blockTravel(1);
@@ -263,9 +312,6 @@ contract E2E_GovernanceSlashing is E2E_Governance {
     address governanceAddress = address(governance);
     Ownable governanceSlasherOwnable = Ownable(governanceSlasherAddress);
 
-    console.log("hola");
-
-    console.log("owner_ is:", owner_);
     vm.prank(owner_);
     governanceSlasherOwnable.transferOwnership(governanceAddress);
 
@@ -277,23 +323,24 @@ contract E2E_GovernanceSlashing is E2E_Governance {
     vm.stopPrank();
   }
 
-  function beforeTestSetup(
-    bytes4 _testSelector
-  ) public pure virtual override returns (bytes[] memory beforeCalldata_) {
-    if (
-      _testSelector == this.test_shouldSetApprovedSlashingZero.selector ||
-      _testSelector == this.test_shouldSlashAccount.selector
-    ) {
-      beforeCalldata_ = new bytes[](5);
-      beforeCalldata_[0] = abi.encodePacked(this.test_shouldIncrementProposalCount.selector);
-      beforeCalldata_[1] = abi.encodePacked(this.test_shouldUpvoteProposal.selector);
-      beforeCalldata_[2] = abi.encodePacked(this.test_shouldApproveProposal.selector);
-      beforeCalldata_[3] = abi.encodePacked(this.test_shouldIncrementVoteTotals.selector);
-      beforeCalldata_[4] = abi.encodePacked(this.test_shouldExecuteProposal.selector);
-    } else return super.beforeTestSetup(_testSelector);
-  }
+  // not responding under Foundry 1.5
+  // function beforeTestSetup(
+  //   bytes4 _testSelector
+  // ) public pure virtual override returns (bytes[] memory beforeCalldata_) {
+  //   if (
+  //     _testSelector == this.test_shouldSetApprovedSlashingZero.selector ||
+  //     _testSelector == this.test_shouldSlashAccount.selector
+  //   ) {
+  //     beforeCalldata_ = new bytes[](5);
+  //     beforeCalldata_[0] = abi.encodePacked(this.test_shouldIncrementProposalCount.selector);
+  //     beforeCalldata_[1] = abi.encodePacked(this.test_shouldUpvoteProposal.selector);
+  //     beforeCalldata_[2] = abi.encodePacked(this.test_shouldApproveProposal.selector);
+  //     beforeCalldata_[3] = abi.encodePacked(this.test_shouldIncrementVoteTotals.selector);
+  //     beforeCalldata_[4] = abi.encodePacked(this.test_shouldExecuteProposal.selector);
+  //   } else return super.beforeTestSetup(_testSelector);
+  // }
 
-  function test_shouldIncrementProposalCount() public virtual override {
+  function _propose() public override {
     // setup values
     uint256[] memory values_ = new uint256[](2);
     values_[0] = 0;
@@ -327,12 +374,14 @@ contract E2E_GovernanceSlashing is E2E_Governance {
       dataLengths_,
       "url"
     );
-
-    // assert
-    assertEq(governance.proposalCount(), proposalId);
   }
 
-  function test_shouldExecuteProposal() public virtual override {
+  function _passProposal() public {
+    _propose();
+    // _upvoteProposal(proposalId, 0, 0);
+    _approveProposal();
+    _vote();
+
     // increase time and mine 1 block
     timeTravel(referendumDuration);
     blockTravel(1);
@@ -340,12 +389,16 @@ contract E2E_GovernanceSlashing is E2E_Governance {
     // execute
     vm.prank(tester);
     governance.execute(proposalId, dequeueIndex);
+  }
 
+  function test_shouldExecuteProposal() public virtual override {
+    _passProposal();
     // assert
     assertEq(governanceSlasher.getApprovedSlashing(slashed), penalty);
   }
 
   function _slash() internal {
+    _passProposal();
     // increase time and mine 1 block
     timeTravel(referendumDuration);
     blockTravel(1);

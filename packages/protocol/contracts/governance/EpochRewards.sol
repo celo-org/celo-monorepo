@@ -12,6 +12,7 @@ import "../common/PrecompilesOverride.sol";
 import "../common/Permissioned.sol";
 import "../common/interfaces/ICeloToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
+import { console2 } from "forge-std-8/console2.sol";
 
 /**
  * @title Contract for calculating epoch rewards.
@@ -488,30 +489,56 @@ contract EpochRewards is
     uint256 targetGoldSupplyIncrease
   ) internal view returns (FixidityLib.Fraction memory) {
     uint256 targetSupply = getTargetGoldTotalSupply();
+    console2.log("targetSupply", targetSupply);
     uint256 allocatedSupply = ICeloToken(address(getCeloToken())).allocatedSupply();
+    console2.log("allocatedSupply", allocatedSupply);
     uint256 remainingSupply = GOLD_SUPPLY_CAP.sub(allocatedSupply.add(targetGoldSupplyIncrease));
+    console2.log("targetGoldSupplyIncrease", targetGoldSupplyIncrease);
+    console2.log("remainingSupply", remainingSupply);
     uint256 targetRemainingSupply = GOLD_SUPPLY_CAP.sub(targetSupply);
+    console2.log("targetRemainingSupply", targetRemainingSupply);
+
+    // devnet
+    // console::log("targetSupply", 600036574919668526974463047 [6e26]) [staticcall]
+    //  │   └─ ← [Return] 692702432463315819704447326 [6.927e26]
+    // │   │   ├─ [0] console::log("allocatedSupply", 692702432463315819704447326 [6.927e26]) [staticcall]
+    // │   │   │   └─ ← [Stop]
+    // │   │   ├─ [0] console::log("remainingSupply", 307295921506360643890848693 [3.072e26]) [staticcall]
+    // │   │   │   └─ ← [Stop]
+    // │   │   ├─ [0] console::log("targetRemainingSupply", 399963425080331473025536953 [3.999e26]) [staticcall]
+    // │   │   │   └─ ← [Stop]
+    // │   │   ├─ [0] console::log("remainingToTargetRatio < 1") [staticcall]
+    // │   │   │   └─ ← [Stop]
+    // │   │   ├─ [0] console::log("delta >= 1") [staticcall]
+    // │   │   │   └─ ← [Stop]
+
     FixidityLib.Fraction memory remainingToTargetRatio = FixidityLib
       .newFixed(remainingSupply)
       .divide(FixidityLib.newFixed(targetRemainingSupply));
     if (remainingToTargetRatio.gt(FixidityLib.fixed1())) {
+      console2.log("remainingToTargetRatio > 1");
       FixidityLib.Fraction memory delta = remainingToTargetRatio
         .subtract(FixidityLib.fixed1())
         .multiply(rewardsMultiplierParams.adjustmentFactors.underspend);
       FixidityLib.Fraction memory multiplier = FixidityLib.fixed1().add(delta);
       if (multiplier.lt(rewardsMultiplierParams.max)) {
+        console2.log("multiplier < max");
         return multiplier;
       } else {
+        console2.log("multiplier >= max");
         return rewardsMultiplierParams.max;
       }
     } else if (remainingToTargetRatio.lt(FixidityLib.fixed1())) {
+      console2.log("remainingToTargetRatio < 1");
       FixidityLib.Fraction memory delta = FixidityLib
         .fixed1()
         .subtract(remainingToTargetRatio)
         .multiply(rewardsMultiplierParams.adjustmentFactors.overspend);
       if (delta.lt(FixidityLib.fixed1())) {
+        console2.log("delta < 1");
         return FixidityLib.fixed1().subtract(delta);
       } else {
+        console2.log("delta >= 1");
         return FixidityLib.wrap(0);
       }
     } else {
