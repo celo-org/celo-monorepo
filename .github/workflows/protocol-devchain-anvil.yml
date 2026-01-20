@@ -150,7 +150,7 @@ jobs:
       - name: Install celocli
         run: |
           sudo npm install -g @celo/celocli@latest --unsafe-perm
-          celocli version
+          celocli --version
 
       - name: Generate migrations on local devchain
         if: success() || failure()
