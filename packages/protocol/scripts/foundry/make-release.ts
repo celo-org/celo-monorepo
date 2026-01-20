@@ -72,7 +72,7 @@ class ContractAddresses {
     await Promise.all(
       contracts.map(async (contract: string) => {
         try {
-          const registeredAddress = (await publicClient.readContract({
+          const registeredAddress = (await (publicClient.readContract as any)({
             address: registryAddress,
             abi,
             functionName,
