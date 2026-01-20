@@ -12,6 +12,7 @@ set -euo pipefail
 # -n: The network to deploy to.
 # -p: Path that the governance proposal should be written to.
 # -r: Path to the contract compatibility report.
+# -u: Custom RPC URL (optional, overrides network default).
 
 BRANCH=""
 PRIVATE_KEY=""
@@ -20,8 +21,9 @@ LIBRARIES=""
 NETWORK=""
 PROPOSAL=""
 REPORT=""
+RPC_URL=""
 
-while getopts 'b:k:i:l:n:p:r:' flag; do
+while getopts 'b:k:i:l:n:p:r:u:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     k) PRIVATE_KEY="${OPTARG}" ;;
@@ -30,6 +32,7 @@ while getopts 'b:k:i:l:n:p:r:' flag; do
     n) NETWORK="${OPTARG}" ;;
     p) PROPOSAL="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
+    u) RPC_URL="${OPTARG}" ;;
     *)
       echo "Unexpected option ${flag}" >&2
       exit 1
@@ -47,6 +50,12 @@ done
 
 BUILD_DIR="./out/"
 
+# Build the command with optional rpcUrl
+RPC_URL_FLAG=""
+if [ -n "$RPC_URL" ]; then
+  RPC_URL_FLAG="--rpcUrl $RPC_URL"
+fi
+
 yarn ts-node ./scripts/foundry/make-release.ts \
   --branch "$BRANCH" \
   --privateKey "$PRIVATE_KEY" \
@@ -55,4 +64,5 @@ yarn ts-node ./scripts/foundry/make-release.ts \
   --network "$NETWORK" \
   --proposal "$PROPOSAL" \
   --report "$REPORT" \
-  --buildDirectory "$BUILD_DIR"
+  --buildDirectory "$BUILD_DIR" \
+  $RPC_URL_FLAG

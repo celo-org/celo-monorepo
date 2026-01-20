@@ -10,7 +10,6 @@ import { basename, join } from 'path'
 import { TextEncoder } from 'util'
 import {
   Abi,
-  AbiParameter,
   Account,
   Chain,
   Hex,
@@ -29,6 +28,13 @@ import * as viemChains from 'viem/chains'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import { getReleaseVersion, ignoredContractsV9 } from '../../lib/compatibility/ignored-contracts-v9'
+// AbiParameter type is inferred from Abi entries
+type AbiParameter = {
+  name?: string
+  type: string
+  internalType?: string
+  components?: AbiParameter[]
+}
 
 interface MakeReleaseArgv {
   report: string
@@ -40,6 +46,7 @@ interface MakeReleaseArgv {
   network: string
   privateKey?: string
   mnemonic?: string
+  rpcUrl?: string
 }
 
 function bigIntReplacer(_key: string, value: any): unknown {
@@ -70,7 +77,6 @@ class ContractAddresses {
             abi,
             functionName,
             args: [contract],
-            authorizationList: [],
           })) as string
           if (registeredAddress && !eqAddress(registeredAddress, NULL_ADDRESS)) {
             addresses.set(contract, registeredAddress)
@@ -136,6 +142,12 @@ const proxiedCoreContracts = new Set<string>([
   CeloContractName.GrandaMento,
   CeloContractName.FeeHandler,
   CeloContractName.FederatedAttestations,
+  CeloContractName.EpochManager,
+  CeloContractName.EpochManagerEnabler,
+  CeloContractName.ScoreManager,
+  CeloContractName.FeeCurrencyDirectory,
+  CeloContractName.CeloUnreleasedTreasury,
+  CeloContractName.OdisPayments,
 ])
 
 const isProxiedContract = (
@@ -468,15 +480,17 @@ const getViemChain = (networkName: string): Chain => {
       return {
         id: 11142220,
         name: 'Celo Sepolia',
+        network: 'celo-sepolia',
         nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 },
         rpcUrls: {
           default: { http: ['https://forno.celo-sepolia.celo-testnet.org'] },
+          public: { http: ['https://forno.celo-sepolia.celo-testnet.org'] },
         },
         blockExplorers: {
           default: { name: 'CeloScan', url: 'https://celo-sepolia.blockscout.com' },
         },
         testnet: true,
-      }
+      } as unknown as Chain
     default:
       return { ...viemChains.hardhat, id: 31337 }
   }
@@ -683,6 +697,10 @@ async function main() {
       })
       .option('privateKey', { type: 'string', description: 'Private key for deployment.' })
       .option('mnemonic', { type: 'string', description: 'Mnemonic for deployment.' })
+      .option('rpcUrl', {
+        type: 'string',
+        description: 'Custom RPC URL (overrides network default, useful for local anvil forks).',
+      })
       .check((currentArgs) => {
         if (!currentArgs.privateKey && !currentArgs.mnemonic) {
           throw new Error('Either --privateKey or --mnemonic must be provided.')
@@ -697,11 +715,18 @@ async function main() {
     }
     const viemChain = getViemChain(networkName)
 
-    if (!viemChain.rpcUrls.default?.http?.[0]) {
-      throw new Error(`RPC URL for network ${networkName} could not be determined.`)
+    // Use custom rpcUrl if provided, otherwise use chain default
+    let transportUrl: string
+    if (argv.rpcUrl) {
+      transportUrl = argv.rpcUrl
+      console.log(`Using custom RPC URL: ${transportUrl}`)
+    } else if (viemChain.rpcUrls.default?.http?.[0]) {
+      transportUrl = viemChain.rpcUrls.default.http[0]
+    } else {
+      throw new Error(
+        `RPC URL for network ${networkName} could not be determined. Provide --rpcUrl parameter.`
+      )
     }
-
-    const transportUrl = viemChain.rpcUrls.default.http[0]
     const publicClientInternal = createPublicClient({
       chain: viemChain,
       transport: http(transportUrl),

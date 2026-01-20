@@ -263,9 +263,14 @@ export function reportASTIncompatibilities(
 
   // Helper function to get compiler version from artifacts
   const getCompilerVersion = (artifacts: BuildArtifacts): string => {
-    const firstArtifact = artifacts.listArtifacts()[0]
+    const firstArtifact = artifacts.listArtifacts()[0] as any
+    // Truffle artifacts have .compiler.version at top level
     if (firstArtifact?.compiler?.version) {
       return firstArtifact.compiler.version
+    }
+    // Foundry artifacts have .metadata.compiler.version
+    if (firstArtifact?.metadata?.compiler?.version) {
+      return firstArtifact.metadata.compiler.version
     }
     // Fallback: try to determine from artifact content
     return 'unknown'

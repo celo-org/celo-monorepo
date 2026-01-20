@@ -18,11 +18,18 @@ export const ignoredContractsV9Only = [
 ]
 
 export function getReleaseVersion(tag: string) {
-  const regexp = /core-contracts.v(?<version>.*[0-9])/gm
-  const matches = regexp.exec(tag)
+  // Support both tag format (core-contracts.vX) and branch format (release/core-contracts/X)
+  const tagRegexp = /core-contracts.v(?<version>.*[0-9])/gm
+  const branchRegexp = /release\/core-contracts\/(?<version>[0-9]+)/gm
+  
+  let matches = tagRegexp.exec(tag)
+  if (!matches) {
+    matches = branchRegexp.exec(tag)
+  }
+  
   const version = parseInt(matches?.groups?.version ?? '0', 10)
   if ((version) == 0) {
-    throw `Tag doesn't have the correct format ${tag} instead of core-contracts.vX`
+    throw `Tag doesn't have the correct format ${tag} instead of core-contracts.vX or release/core-contracts/X`
   }
   return version
 }
