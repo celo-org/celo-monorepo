@@ -1,16 +1,16 @@
 import {
-  verifyBytecodes,
   InitializationData,
+  verifyBytecodes,
 } from '@celo/protocol/lib/compatibility/verify-bytecode-foundry'
 import { getReleaseVersion } from '../../lib/compatibility/ignored-contracts-v9'
 
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 
+import { instantiateArtifactsFromForge } from '@celo/protocol/lib/compatibility/utils'
 import { existsSync, readJsonSync, writeJsonSync } from 'fs-extra'
 import { Chain, createPublicClient, encodeFunctionData, http } from 'viem'
 import * as viemChains from 'viem/chains'
-import { instantiateArtifactsFromForge } from '@celo/protocol/lib/compatibility/utils'
 
 /*
  * This script verifies that a given set of smart contract bytecodes corresponds

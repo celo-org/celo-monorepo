@@ -5,7 +5,7 @@ import {
   MethodMutabilityChange, MethodRemovedChange, MethodReturnChange,
   MethodVisibilityChange, NewContractChange
 } from '@celo/protocol/lib/compatibility/change'
-import { makeZContract, getArtifactByName, getContractName } from '@celo/protocol/lib/compatibility/internal'
+import { getArtifactByName, getContractName, makeZContract } from '@celo/protocol/lib/compatibility/internal'
 import {
   BuildArtifacts,
   Contract as ZContract
