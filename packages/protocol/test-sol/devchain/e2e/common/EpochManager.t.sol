@@ -6,7 +6,7 @@ import { Devchain } from "@test-sol/devchain/e2e/utils.sol";
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@test-sol/utils/ECDSAHelper08.sol";
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
-import { console } from "forge-std-8/console.sol";
+import { console2 } from "forge-std-8/console2.sol";
 
 import { EpochManagerEnabler } from "@celo-contracts-8/common/EpochManagerEnabler.sol";
 
@@ -353,7 +353,7 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
 
   // TODO: check this test
 
-  function shouldStartNextEpochProcessing() public {
+  function test_shouldStartNextEpochProcessing() public {
     timeTravel(epochDuration + 1);
 
     epochManagerContract.startNextEpochProcess();
@@ -365,7 +365,15 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
       uint256 totalRewardsCommunity,
       uint256 totalRewardsCarbonFund
     ) = epochManagerContract.getEpochProcessingState();
-    assertEq(status, 1); // Started
+
+    // uint256 targetVoterReward =     epochRewards.getTargetVoterRewards();
+    // console.log("targetVoterReward", targetVoterReward);
+    // uint256 targetGoldSupplyIncrease = epochRewards.getTargetGoldSupplyIncrease();
+    // console.log("targetGoldSupplyIncrease", targetGoldSupplyIncrease);
+    uint256 rewardsMultiplier = epochRewards.getRewardsMultiplier();
+    console2.log("rewardsMultiplier", rewardsMultiplier);
+
+    assertEq(status, 1, "it started"); // Started
     assertGt(perValidatorReward, 0, "perValidatorReward");
     assertGt(totalRewardsVote, 0, "totalRewardsVote");
     assertGt(totalRewardsCommunity, 0, "totalRewardsCommunity");

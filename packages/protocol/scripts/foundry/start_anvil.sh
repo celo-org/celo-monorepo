@@ -78,6 +78,7 @@ $ANVIL \
   --gas-limit $GAS_LIMIT \
   --code-size-limit $CODE_SIZE_LIMIT \
   --balance $BALANCE \
+  --block-time 1 \
   --steps-tracing &
 
 # For context "&" tells the shell to start a command as a background process.

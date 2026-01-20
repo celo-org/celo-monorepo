@@ -146,7 +146,12 @@ jobs:
 
           python3 convert_to_anvil_state.py state-dump-11142220-granite.json anvil-state.json
           test -f $GITHUB_WORKSPACE/celo-optimism/packages/contracts-bedrock/anvil-state.json
-            
+
+      - name: Install celocli
+        run: |
+          npm install -g @celo/celocli@latest
+          celocli version
+
       - name: Generate migrations on local devchain
         if: success() || failure()
         run: |

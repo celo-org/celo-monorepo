@@ -93,6 +93,9 @@ $FORGE script \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script (part 2) failed"; exit 1; }
 
 
+$PWD/scripts/foundry/activate_votes.sh
+
+
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
 echo "Migration script total elapsed time: $ELAPSED_TIME seconds"
