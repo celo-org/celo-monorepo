@@ -3,7 +3,6 @@ pragma solidity >=0.8.7 <0.8.20;
 // Note: This script should not include any cheatcode so that it can run in production
 
 // Foundry-08 imports
-// Foundry-08 imports
 import { Script } from "forge-std-8/Script.sol";
 
 // Foundry imports
@@ -298,37 +297,22 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     migrateExchange(json);
 
-    migrateAccount(); // <- this is the one messing up
+    migrateAccount();
 
     migrateLockedCelo(json);
-    registry.setAddressFor("madeIt", address(0x11));
     migrateValidators(json);
-    registry.setAddressFor("madeIt", address(0x13));
     migrateElection(json);
-    registry.setAddressFor("madeIt", address(0x14));
     migrateEpochRewards(json);
-    registry.setAddressFor("madeIt", address(0x15));
     migrateEscrow();
-    registry.setAddressFor("madeIt", address(0x16));
 
     migrateGovernanceSlasher();
-    registry.setAddressFor("madeIt", address(0x17));
     migrateGovernanceApproverMultiSig(json);
-    registry.setAddressFor("madeIt", address(0x18));
     migrateFederatedAttestations();
-    registry.setAddressFor("madeIt", address(0x19));
     migrateMentoFeeHandlerSeller();
-    registry.setAddressFor("madeIt", address(0x20));
     migrateUniswapFeeHandlerSeller();
-    registry.setAddressFor("madeIt", address(0x21));
     migrateFeeHandler(json);
-    registry.setAddressFor("madeIt", address(0x22));
     migrateOdisPayments();
-    registry.setAddressFor("madeIt", address(0x23));
-    console.log("Migrating CeloUnreleasedTreasury...");
     migrateCeloUnreleasedTreasury(json);
-    console.log("Done migrating CeloUnreleasedTreasury");
-    registry.setAddressFor("madeIt", address(0x24));
 
     vm.stopBroadcast();
 
@@ -430,7 +414,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       SolidityVersions.SOLIDITY_05
     );
 
-    // TODO remove all this addToRegistry, it's already in deployImplementationAndAddToRegistry
     addToRegistry("CeloToken", celoProxyAddress);
 
     bool frozen = json.readBool(".goldToken.frozen");
@@ -645,23 +628,18 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateAccount() public {
-    registry.setAddressFor("madeIt", address(0x1));
-
     address accountsProxyAddress = deployProxiedContract(
       "Accounts",
       abi.encodeWithSelector(IAccountsInitializer.initialize.selector, REGISTRY_ADDRESS),
       SolidityVersions.SOLIDITY_05
     );
 
-    registry.setAddressFor("madeIt", address(0x2));
     IAccounts(accountsProxyAddress).setEip712DomainSeparator();
-    registry.setAddressFor("madeIt", address(0x3));
   }
 
   function migrateLockedCelo(string memory json) public {
     uint256 unlockingPeriod = json.readUint(".lockedGold.unlockingPeriod");
 
-    registry.setAddressFor("madeIt", address(0x4));
     address LockedCeloProxyAddress = deployProxiedContract(
       "LockedGold",
       abi.encodeWithSelector(
@@ -672,9 +650,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       SolidityVersions.SOLIDITY_05
     );
 
-    registry.setAddressFor("madeIt", address(0x5));
     addToRegistry("LockedCelo", LockedCeloProxyAddress);
-    registry.setAddressFor("madeIt", address(0x6));
   }
 
   function migrateValidators(string memory json) public {
@@ -943,7 +919,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       ),
       SolidityVersions.SOLIDITY_08
     );
-    addToRegistry("CeloUnreleasedTreasury", celoUnreleasedTreasury);
   }
 
   function migrateEpochManagerEnabler() public {
