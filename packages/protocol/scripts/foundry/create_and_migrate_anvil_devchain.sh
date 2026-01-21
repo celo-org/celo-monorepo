@@ -33,7 +33,6 @@ echo "Library flags 0.8 are: $LIBRARY_FLAGS_08"
 # Build map of selectors from governanceConstitution.json
 source $PWD/scripts/foundry/build_constitution_selectors_map.sh
 
-# exit 1
 # Build all contracts with deployed libraries
 # Including contracts that depend on libraries. This step replaces the library placeholder
 # in the bytecode with the address of the actually deployed library.

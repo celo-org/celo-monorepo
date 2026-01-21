@@ -15,7 +15,6 @@ import { Ownable } from "@openzeppelin/contracts8/access/Ownable.sol";
 
 // Helper contract imports
 import { IReserveInitializer, IReserve, IStableTokenInitialize, IExchangeInitializer, IExchange, IReserveSpenderMultiSig } from "@migrations-sol/HelperInterFaces.sol";
-import { IReserveInitializer, IReserve, IStableTokenInitialize, IExchangeInitializer, IExchange, IReserveSpenderMultiSig } from "@migrations-sol/HelperInterFaces.sol";
 import { MigrationsConstants } from "@migrations-sol/constants.sol";
 
 // Core contract imports on Solidity 0.5
@@ -56,15 +55,6 @@ import { ISortedOracles } from "@celo-contracts/stability/interfaces/ISortedOrac
 
 // Core contract imports on Solidity 0.8
 import { IFeeCurrencyDirectoryInitializer } from "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectoryInitializer.sol";
-import { IGasPriceMinimumInitializer } from "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
-import { ICeloUnreleasedTreasuryInitializer } from "@celo-contracts-8/common/interfaces/ICeloUnreleasedTreasuryInitializer.sol";
-import { IEpochManagerEnablerInitializer } from "@celo-contracts-8/common/interfaces/IEpochManagerEnablerInitializer.sol";
-import { IEpochManagerInitializer } from "@celo-contracts-8/common/interfaces/IEpochManagerInitializer.sol";
-import { IScoreManagerInitializer } from "@celo-contracts-8/common/interfaces/IScoreManagerInitializer.sol";
-import { IFeeCurrencyDirectory } from "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
-import { UsingRegistry } from "@celo-contracts-8/common/UsingRegistry.sol";
-import { IFeeCurrencyDirectoryInitializer } from "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectoryInitializer.sol";
-import { IGasPriceMinimumInitializer } from "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
 import { ICeloUnreleasedTreasuryInitializer } from "@celo-contracts-8/common/interfaces/ICeloUnreleasedTreasuryInitializer.sol";
 import { IEpochManagerEnablerInitializer } from "@celo-contracts-8/common/interfaces/IEpochManagerEnablerInitializer.sol";
 import { IEpochManagerInitializer } from "@celo-contracts-8/common/interfaces/IEpochManagerInitializer.sol";
@@ -72,9 +62,6 @@ import { IScoreManagerInitializer } from "@celo-contracts-8/common/interfaces/IS
 import { IFeeCurrencyDirectory } from "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
 import { UsingRegistry } from "@celo-contracts-8/common/UsingRegistry.sol";
 
-// Test imports
-import { ISECP256K1 } from "@test-sol/utils/SECP256K1.sol";
-import { ConstitutionHelper } from "@test-sol/utils/ConstitutionHelper.sol";
 // Test imports
 import { ISECP256K1 } from "@test-sol/utils/SECP256K1.sol";
 import { ConstitutionHelper } from "@test-sol/utils/ConstitutionHelper.sol";
@@ -398,8 +385,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       abi.encodeWithSelector(IFeeCurrencyDirectoryInitializer.initialize.selector),
       SolidityVersions.SOLIDITY_08
     );
-
-    addToRegistry("FeeCurrencyDirectory", feeCurrencyDirectoryProxyAddress);
   }
 
   function migrateCeloToken(string memory json) public {
