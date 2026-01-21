@@ -493,20 +493,6 @@ contract EpochRewards is
     uint256 remainingSupply = GOLD_SUPPLY_CAP.sub(allocatedSupply.add(targetGoldSupplyIncrease));
     uint256 targetRemainingSupply = GOLD_SUPPLY_CAP.sub(targetSupply);
 
-    // devnet
-    // console::log("targetSupply", 600036574919668526974463047 [6e26]) [staticcall]
-    //  │   └─ ← [Return] 692702432463315819704447326 [6.927e26]
-    // │   │   ├─ [0] console::log("allocatedSupply", 692702432463315819704447326 [6.927e26]) [staticcall]
-    // │   │   │   └─ ← [Stop]
-    // │   │   ├─ [0] console::log("remainingSupply", 307295921506360643890848693 [3.072e26]) [staticcall]
-    // │   │   │   └─ ← [Stop]
-    // │   │   ├─ [0] console::log("targetRemainingSupply", 399963425080331473025536953 [3.999e26]) [staticcall]
-    // │   │   │   └─ ← [Stop]
-    // │   │   ├─ [0] console::log("remainingToTargetRatio < 1") [staticcall]
-    // │   │   │   └─ ← [Stop]
-    // │   │   ├─ [0] console::log("delta >= 1") [staticcall]
-    // │   │   │   └─ ← [Stop]
-
     FixidityLib.Fraction memory remainingToTargetRatio = FixidityLib
       .newFixed(remainingSupply)
       .divide(FixidityLib.newFixed(targetRemainingSupply));
