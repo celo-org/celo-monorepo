@@ -22,6 +22,7 @@
     "ci:test-make-release": "./scripts/bash/release-on-devchain.sh",
     "clean": "rm -rf ./types/typechain && rm -rf build/* && rm -rf .0x-artifacts/* && rm -rf test/**/*.js* && rm -f lib/*.js* && rm -f lib/**/*.js* && rm -f scripts/*.js* && yarn clean:foundry",
     "clean:foundry": "forge clean && rm -rf cache out out-truffle-compat out-truffle-compat-0.8",
+    "devchain:generate-initial-state": "./scripts/bash/generate-devchain-initial-state.sh",
     "devchain": "yarn ts-node scripts/devchain.ts",
     "devchain:generate-old-devchain-and-build": "./scripts/bash/generate-old-devchain-and-build.sh",
     "devchain:migrate": "./scripts/bash/migrate.sh",
