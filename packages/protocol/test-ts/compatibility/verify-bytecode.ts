@@ -1,0 +1,629 @@
+import { verifyBytecodes } from '@celo/protocol/lib/compatibility/verify-bytecode-foundry'
+import { assert } from 'chai'
+import { Abi, encodeFunctionData } from 'viem'
+
+import { assertThrowsAsync } from '@celo/protocol/lib/test-utils'
+import { startNetwork } from '@celo/protocol/test-ts/util/anvil'
+import { getTestArtifacts } from '@celo/protocol/test-ts/util/compatibility'
+import { deployViemContract } from '@celo/protocol/test-ts/util/viem'
+import {
+  getArtifactByName,
+  getBytecode,
+  getDeployedBytecode,
+  getSourceFile,
+} from '@celo/protocol/lib/compatibility/internal'
+import {
+  ArtifactLibraryLinking,
+  LibraryLinks,
+  LibraryLinkingInfo,
+  getPlaceholderHash,
+  linkLibraries,
+} from '@celo/protocol/lib/bytecode-foundry'
+
+import { readJsonSync } from 'fs-extra'
+
+const registryAbi = readJsonSync(`./out/Registry.sol/Registry.json`).abi
+const registryBytecode = readJsonSync(`./out/Registry.sol/Registry.json`).bytecode.object
+
+const proxyAbi = readJsonSync(`./out/Proxy.sol/Proxy.json`).abi
+const proxyBytecode = readJsonSync(`./out/Proxy.sol/Proxy.json`).bytecode.object
+
+const deployProxiedContract = async (abi: Abi, bytecode: string, client: any) => {
+  const proxyAddress = await deployViemContract(proxyAbi, proxyBytecode, client)
+  const implementationAddress = await deployViemContract(abi, bytecode, client)
+
+  await client.writeContract({
+    address: proxyAddress,
+    abi: proxyAbi,
+    functionName: '_setImplementation',
+    args: [implementationAddress],
+  })
+
+  return proxyAddress
+}
+
+const testCases = {
+  buildArtifacts: getTestArtifacts('linked_libraries')[0],
+  upgradedLibBuildArtifacts: getTestArtifacts('linked_libraries_upgraded_lib')[0],
+  upgradedContractBuildArtifacts: getTestArtifacts('linked_libraries_upgraded_contract')[0],
+}
+
+describe('', () => {
+  const artifact = getArtifactByName('TestContract', testCases['buildArtifacts'])
+  const placeholderHashes = {}
+
+  before(() => {
+    const libraryNames = ['LinkedLibrary1', 'LinkedLibrary2', 'LinkedLibrary3']
+    libraryNames.map((library: string) => {
+      const artifact = getArtifactByName(library, testCases.buildArtifacts)
+      const placeholderHash = getPlaceholderHash(`${getSourceFile(artifact)}:${library}`)
+      placeholderHashes[library] = placeholderHash
+    })
+  })
+
+  describe('ArtifactLibraryLinking()', () => {
+    it('collects the right number of positions for each library', () => {
+      const linking = new ArtifactLibraryLinking(artifact)
+      assert.equal(linking.links['LinkedLibrary1'].positions.length, 2)
+      assert.equal(linking.links['LinkedLibrary2'].positions.length, 2)
+    })
+  })
+
+  describe('LibraryLinkingInfo.collect()', () => {
+    describe('when libraries are linked correctly', () => {
+      it('collects the correct addresses', () => {
+        const linking = new ArtifactLibraryLinking(artifact)
+        const links: LibraryLinks = {
+          LinkedLibrary1: {
+            address: '0000000000000000000000000000000000000001',
+            placeholderHash: placeholderHashes['LinkedLibrary1'],
+          },
+          LinkedLibrary2: {
+            address: '0000000000000000000000000000000000000002',
+            placeholderHash: placeholderHashes['LinkedLibrary2'],
+          },
+        }
+        const linkedBytecode = linkLibraries(getDeployedBytecode(artifact), links)
+        const linkingInfo = new LibraryLinkingInfo()
+        linkingInfo.collect(linkedBytecode, linking)
+
+        assert.equal(
+          linkingInfo.info['LinkedLibrary1'].address,
+          '0000000000000000000000000000000000000001'
+        )
+        assert.equal(
+          linkingInfo.info['LinkedLibrary2'].address,
+          '0000000000000000000000000000000000000002'
+        )
+      })
+    })
+
+    describe('when libraries are not linked correctly', () => {
+      it('detects incorrect linking', () => {
+        const linking = new ArtifactLibraryLinking(artifact)
+        const links: LibraryLinks = {
+          LinkedLibrary1: {
+            address: '0000000000000000000000000000000000000001',
+            placeholderHash: placeholderHashes['LinkedLibrary1'],
+          },
+          LinkedLibrary2: {
+            address: '0000000000000000000000000000000000000002',
+            placeholderHash: placeholderHashes['LinkedLibrary2'],
+          },
+        }
+        const linkedBytecode = linkLibraries(getDeployedBytecode(artifact), links)
+        const incorrectBytecode =
+          linkedBytecode.slice(0, linking.links['LinkedLibrary1'].positions[0] - 1) +
+          '0000000000000000000000000000000000000003' +
+          linkedBytecode.slice(
+            linking.links['LinkedLibrary1'].positions[0] - 1 + 40,
+            linkedBytecode.length
+          )
+
+        assert.throws(() => {
+          new LibraryLinkingInfo().collect(incorrectBytecode, linking)
+        }, /Mismatched addresses for LinkedLibrary1/)
+      })
+    })
+  })
+
+  describe('on a test contract deployment', () => {
+    let network
+    let registryLookup
+    let proxyLookup
+    let chainLookup
+    let links: LibraryLinks = {}
+
+    beforeEach(async () => {
+      network = await startNetwork()
+      // Test contract deployment
+
+      const registryAddress = await deployViemContract(
+        registryAbi,
+        registryBytecode,
+        network.client,
+        [true]
+      )
+      const lib1Artifact = getArtifactByName('LinkedLibrary1', testCases.buildArtifacts)
+      const lib1Address = await deployViemContract(
+        lib1Artifact.abi,
+        getBytecode(lib1Artifact),
+        network.client
+      )
+      const lib3Artifact = getArtifactByName('LinkedLibrary3', testCases.buildArtifacts)
+      const lib3Address = await deployViemContract(
+        lib3Artifact.abi,
+        getBytecode(lib3Artifact),
+        network.client
+      )
+      links['LinkedLibrary1'] = {
+        address: lib1Address.slice(2),
+        placeholderHash: getPlaceholderHash(`${getSourceFile(lib1Artifact)}:LinkedLibrary1`),
+      }
+      links['LinkedLibrary3'] = {
+        address: lib3Address.slice(2),
+        placeholderHash: getPlaceholderHash(`${getSourceFile(lib3Artifact)}:LinkedLibrary3`),
+      }
+
+      const lib2Artifact = getArtifactByName('LinkedLibrary2', testCases.buildArtifacts)
+      const lib2Bytecode = getBytecode(lib2Artifact)
+      const lib2LinkedBytecode = linkLibraries(lib2Bytecode, links)
+      const lib2Address = await deployViemContract(
+        lib2Artifact.abi,
+        lib2LinkedBytecode,
+        network.client
+      )
+
+      links['LinkedLibrary2'] = {
+        address: lib2Address.slice(2),
+        placeholderHash: getPlaceholderHash(`${getSourceFile(lib2Artifact)}:LinkedLibrary2`),
+      }
+
+      const testContractArtifact = getArtifactByName('TestContract', testCases.buildArtifacts)
+      const testContractBytecode = getBytecode(testContractArtifact)
+      const testContractLinkedBytecode = linkLibraries(testContractBytecode, links)
+      const testContractAddress = await deployProxiedContract(
+        testContractArtifact.abi,
+        testContractLinkedBytecode,
+        network.client
+      )
+
+      registryLookup = {
+        getAddressForString: async (name: string) => {
+          return network.client.readContract({
+            address: registryAddress as `0x${string}`,
+            abi: registryAbi,
+            functionName: 'getAddressForString',
+            args: [name],
+          })
+        },
+      }
+
+      proxyLookup = {
+        getImplementation: async (address: string) => {
+          return network.client.readContract({
+            address,
+            abi: proxyAbi,
+            functionName: '_getImplementation',
+            args: [],
+          })
+        },
+      }
+
+      chainLookup = {
+        getCode: (address: `0x${string}`) => {
+          return network.client.getCode({ address })
+        },
+        encodeFunctionCall: (abi: any, args: any[]) => {
+          return encodeFunctionData({
+            abi: [abi],
+            functionName: abi.name,
+            args,
+          })
+        },
+        getProof: (address: `0x${string}`, slots: `0x${string}`[]) => {
+          return network.client.getProof({
+            address,
+            storageKeys: slots,
+          })
+        },
+      }
+
+      await network.client.writeContract({
+        address: registryAddress as `0x${string}`,
+        abi: registryAbi,
+        functionName: 'setAddressFor',
+        args: ['TestContract', testContractAddress],
+      })
+
+      // Set a dummy governance address as it's looked up in the verification logic
+      await network.client.writeContract({
+        address: registryAddress as `0x${string}`,
+        abi: registryAbi,
+        functionName: 'setAddressFor',
+        args: ['Governance', '0x0000000000000000000000000000000000000001'],
+      })
+    })
+
+    afterEach(() => {
+      network.anvil.kill()
+    })
+
+    describe('verifyBytecodes', () => {
+      it(`doesn't throw on matching contracts`, async () => {
+        await verifyBytecodes(
+          ['TestContract'],
+          [testCases.buildArtifacts],
+          registryLookup,
+          [],
+          proxyLookup,
+          chainLookup
+        )
+      })
+
+      it(`throws when a contract's bytecodes don't match`, async () => {
+        const oldBytecode = (artifact as any).deployedBytecode.object
+        ;(artifact as any).deployedBytecode.object =
+          '0x0' + oldBytecode.slice(3, oldBytecode.length)
+        await assertThrowsAsync(
+          verifyBytecodes(
+            ['TestContract'],
+            [testCases.buildArtifacts],
+            registryLookup,
+            [],
+            proxyLookup,
+            chainLookup
+          )
+        )
+        ;(artifact as any).deployedBytecode.object = oldBytecode
+      })
+
+      it(`throws when a library's bytecodes don't match`, async () => {
+        const libraryArtifact = getArtifactByName('LinkedLibrary1', testCases.buildArtifacts)
+        const oldBytecode = (libraryArtifact as any).deployedBytecode.object
+        ;(libraryArtifact as any).deployedBytecode.object =
+          oldBytecode.slice(0, 44) + '00' + oldBytecode.slice(46, oldBytecode.length)
+        await assertThrowsAsync(
+          verifyBytecodes(
+            ['TestContract'],
+            [testCases.buildArtifacts],
+            registryLookup,
+            [],
+            proxyLookup,
+            chainLookup
+          )
+        )
+        ;(libraryArtifact as any).deployedBytecode.object = oldBytecode
+      })
+
+      describe(`when a proposal upgrades a library's implementation`, () => {
+        let testContractAddress
+
+        beforeEach(async () => {
+          const lib3Artifact = getArtifactByName(
+            'LinkedLibrary3',
+            testCases.upgradedLibBuildArtifacts
+          )
+          const lib3Address = await deployViemContract(
+            lib3Artifact.abi,
+            getBytecode(lib3Artifact),
+            network.client
+          )
+          links['LinkedLibrary3'] = {
+            address: lib3Address.slice(2),
+            placeholderHash: getPlaceholderHash(`${getSourceFile(lib3Artifact)}:LinkedLibrary3`),
+          }
+
+          const lib2Artifact = getArtifactByName(
+            'LinkedLibrary2',
+            testCases.upgradedLibBuildArtifacts
+          )
+          const lib2Bytecode = getBytecode(lib2Artifact)
+          const lib2LinkedBytecode = linkLibraries(lib2Bytecode, links)
+          const lib2Address = await deployViemContract(
+            lib2Artifact.abi,
+            lib2LinkedBytecode,
+            network.client
+          )
+          links['LinkedLibrary2'] = {
+            address: lib2Address.slice(2),
+            placeholderHash: getPlaceholderHash(`${getSourceFile(lib2Artifact)}:LinkedLibrary2`),
+          }
+
+          // The new linking placeholders are source path dependent. This doesn't matter in a real
+          // deployment where contract source paths remain consistent between releases, but our test
+          // cases are organized in separate directories, so this needs to be updated.
+          links['LinkedLibrary1'].placeholderHash = getPlaceholderHash(
+            `${getSourceFile(
+              getArtifactByName('LinkedLibrary1', testCases.upgradedLibBuildArtifacts)
+            )}:LinkedLibrary1`
+          )
+
+          const testContractArtifact = getArtifactByName(
+            'TestContract',
+            testCases.upgradedLibBuildArtifacts
+          )
+          const testContractBytecode = getBytecode(testContractArtifact)
+          const testContractLinkedBytecode = linkLibraries(testContractBytecode, links)
+          testContractAddress = await deployViemContract(
+            testContractArtifact.abi,
+            testContractLinkedBytecode,
+            network.client
+          )
+        })
+
+        it(`doesn't throw on matching contracts`, async () => {
+          const proposal = [
+            {
+              contract: 'TestContractProxy',
+              function: '_setImplementation',
+              args: [testContractAddress],
+              value: '0',
+            },
+          ]
+
+          await verifyBytecodes(
+            ['TestContract'],
+            [testCases.upgradedLibBuildArtifacts],
+            registryLookup,
+            proposal,
+            proxyLookup,
+            chainLookup
+          )
+          assert(true)
+        })
+
+        it(`throws on different contracts`, async () => {
+          const proposal = [
+            {
+              contract: 'TestContractProxy',
+              function: '_setImplementation',
+              args: [testContractAddress],
+              value: '0',
+            },
+          ]
+
+          await assertThrowsAsync(
+            verifyBytecodes(
+              ['TestContract'],
+              [testCases.buildArtifacts],
+              registryLookup,
+              proposal,
+              proxyLookup,
+              chainLookup
+            )
+          )
+        })
+
+        it(`throws when the proposed address is wrong`, async () => {
+          const proposal = [
+            {
+              contract: 'TestContractProxy',
+              function: '_setImplementation',
+              args: [network.accounts[1].address],
+              value: '0',
+            },
+          ]
+
+          await assertThrowsAsync(
+            verifyBytecodes(
+              ['TestContract'],
+              [testCases.upgradedLibBuildArtifacts],
+              registryLookup,
+              proposal,
+              proxyLookup,
+              chainLookup
+            )
+          )
+        })
+      })
+
+      describe(`when a proposal upgrades a contract's implementation`, () => {
+        let testContractAddress
+        beforeEach(async () => {
+          // The new linking placeholders are source path dependent. This doesn't matter in a real
+          // deployment where contract source paths remain consistent between releases, but our test
+          // cases are organized in separate directories, so this needs to be updated.
+          links['LinkedLibrary1'].placeholderHash = getPlaceholderHash(
+            `${getSourceFile(
+              getArtifactByName('LinkedLibrary1', testCases.upgradedContractBuildArtifacts)
+            )}:LinkedLibrary1`
+          )
+          links['LinkedLibrary2'].placeholderHash = getPlaceholderHash(
+            `${getSourceFile(
+              getArtifactByName('LinkedLibrary2', testCases.upgradedContractBuildArtifacts)
+            )}:LinkedLibrary2`
+          )
+
+          const testContractArtifact = getArtifactByName(
+            'TestContract',
+            testCases.upgradedContractBuildArtifacts
+          )
+          const testContractBytecode = getBytecode(testContractArtifact)
+          const testContractLinkedBytecode = linkLibraries(testContractBytecode, links)
+          testContractAddress = await deployViemContract(
+            testContractArtifact.abi,
+            testContractLinkedBytecode,
+            network.client
+          )
+        })
+
+        it(`doesn't throw on matching contracts`, async () => {
+          const proposal = [
+            {
+              contract: 'TestContractProxy',
+              function: '_setImplementation',
+              args: [testContractAddress],
+              value: '0',
+            },
+          ]
+
+          await verifyBytecodes(
+            ['TestContract'],
+            [testCases.upgradedContractBuildArtifacts],
+            registryLookup,
+            proposal,
+            proxyLookup,
+            chainLookup
+          )
+          assert(true)
+        })
+
+        it(`throws on different contracts`, async () => {
+          const proposal = [
+            {
+              contract: 'TestContractProxy',
+              function: '_setImplementation',
+              args: [testContractAddress],
+              value: '0',
+            },
+          ]
+
+          await assertThrowsAsync(
+            verifyBytecodes(
+              ['TestContract'],
+              [testCases.buildArtifacts],
+              registryLookup,
+              proposal,
+              proxyLookup,
+              chainLookup
+            )
+          )
+        })
+
+        it(`throws when the proposed address is wrong`, async () => {
+          const proposal = [
+            {
+              contract: 'TestContractProxy',
+              function: '_setImplementation',
+              args: [network.accounts[1].address],
+              value: '0',
+            },
+          ]
+
+          await assertThrowsAsync(
+            verifyBytecodes(
+              ['TestContract'],
+              [testCases.upgradedContractBuildArtifacts],
+              registryLookup,
+              proposal,
+              proxyLookup,
+              chainLookup
+            )
+          )
+        })
+
+        it(`throws when there is no proposal`, async () => {
+          const proposal = []
+
+          await assertThrowsAsync(
+            verifyBytecodes(
+              ['TestContract'],
+              [testCases.upgradedContractBuildArtifacts],
+              registryLookup,
+              proposal,
+              proxyLookup,
+              chainLookup
+            )
+          )
+        })
+      })
+
+      describe(`when a proposal changes a contract's proxy`, () => {
+        let testContractProxyAddress
+        beforeEach(async () => {
+          // The new linking placeholders are source path dependent. This doesn't matter in a real
+          // deployment where contract source paths remain consistent between releases, but our test
+          // cases are organized in separate directories, so this needs to be updated.
+          links['LinkedLibrary1'].placeholderHash = getPlaceholderHash(
+            `${getSourceFile(
+              getArtifactByName('LinkedLibrary1', testCases.upgradedContractBuildArtifacts)
+            )}:LinkedLibrary1`
+          )
+          links['LinkedLibrary2'].placeholderHash = getPlaceholderHash(
+            `${getSourceFile(
+              getArtifactByName('LinkedLibrary2', testCases.upgradedContractBuildArtifacts)
+            )}:LinkedLibrary2`
+          )
+
+          const testContractArtifact = getArtifactByName(
+            'TestContract',
+            testCases.upgradedContractBuildArtifacts
+          )
+          const testContractBytecode = getBytecode(testContractArtifact)
+          const testContractLinkedBytecode = linkLibraries(testContractBytecode, links)
+          testContractProxyAddress = await deployProxiedContract(
+            testContractArtifact.abi,
+            testContractLinkedBytecode,
+            network.client
+          )
+        })
+
+        it(`doesn't throw on matching contracts`, async () => {
+          const proposal = [
+            {
+              contract: 'Registry',
+              function: 'setAddressFor',
+              args: ['TestContract', testContractProxyAddress],
+              value: '0',
+            },
+          ]
+
+          await verifyBytecodes(
+            ['TestContract'],
+            [testCases.upgradedContractBuildArtifacts],
+            registryLookup,
+            proposal,
+            proxyLookup,
+            chainLookup
+          )
+          assert(true)
+        })
+
+        it(`throws on different contracts`, async () => {
+          const proposal = [
+            {
+              contract: 'Registry',
+              function: 'setAddressFor',
+              args: ['TestContract', testContractProxyAddress],
+              value: '0',
+            },
+          ]
+
+          await assertThrowsAsync(
+            verifyBytecodes(
+              ['TestContract'],
+              [testCases.buildArtifacts],
+              registryLookup,
+              proposal,
+              proxyLookup,
+              chainLookup
+            )
+          )
+        })
+
+        it(`throws when the proposed address is wrong`, async () => {
+          const proposal = [
+            {
+              contract: 'Registry',
+              function: 'setAddressFor',
+              args: ['TestContract', network.accounts[0].address],
+              value: '0',
+            },
+          ]
+
+          await assertThrowsAsync(
+            verifyBytecodes(
+              ['TestContract'],
+              [testCases.upgradedContractBuildArtifacts],
+              registryLookup,
+              proposal,
+              proxyLookup,
+              chainLookup
+            )
+          )
+        })
+      })
+    })
+  })
+})
