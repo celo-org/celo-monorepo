@@ -33,6 +33,11 @@ const waitForListening = (proc) => {
   })
 }
 
+// Spawns a new process running the Anvil devnet.
+// Returns an object with
+// - `client`: a viem client with test, public, and wallet actions
+// - `anvil`: a NodeJS `ChildProcess` object to the Anvil process
+// - `accounts`: the 10 default pre-funded Anvil accounts.
 export const startNetwork = async () => {
   const anvil = spawn('anvil')
   await waitForListening(anvil)
