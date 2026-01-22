@@ -146,6 +146,9 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   let implementationAddress: string
   if (isImplementationChanged(contract, context.proposal)) {
     implementationAddress = getProposedImplementationAddress(contract, context.proposal)
+  } else if (isProxyChanged(contract, context.proposal)) {
+    const proxyAddress = getProposedProxyAddress(contract, context.proposal)
+    implementationAddress = await context.proxyLookup.getImplementation(proxyAddress)
   } else if (isLibrary(contract, context)) {
     implementationAddress = ensureLeading0x(context.libraryLinkingInfo.info[contract].address)
   } else {
