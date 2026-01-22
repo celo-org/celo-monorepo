@@ -1,17 +1,7 @@
-import { verifyBytecodes } from '@celo/protocol/lib/compatibility/verify-bytecode-foundry'
 import { assert } from 'chai'
-import { Abi, encodeFunctionData } from 'viem'
+import { encodeFunctionData } from 'viem'
+import { readJsonSync } from 'fs-extra'
 
-import { assertThrowsAsync } from '@celo/protocol/lib/test-utils'
-import { startNetwork } from '@celo/protocol/test-ts/util/anvil'
-import { getTestArtifacts } from '@celo/protocol/test-ts/util/compatibility'
-import { deployViemContract } from '@celo/protocol/test-ts/util/viem'
-import {
-  getArtifactByName,
-  getBytecode,
-  getDeployedBytecode,
-  getSourceFile,
-} from '@celo/protocol/lib/compatibility/internal'
 import {
   ArtifactLibraryLinking,
   LibraryLinks,
@@ -19,8 +9,17 @@ import {
   getPlaceholderHash,
   linkLibraries,
 } from '@celo/protocol/lib/bytecode-foundry'
-
-import { readJsonSync } from 'fs-extra'
+import {
+  getArtifactByName,
+  getBytecode,
+  getDeployedBytecode,
+  getSourceFile,
+} from '@celo/protocol/lib/compatibility/internal'
+import { verifyBytecodes } from '@celo/protocol/lib/compatibility/verify-bytecode-foundry'
+import { assertThrowsAsync } from '@celo/protocol/lib/test-utils'
+import { startNetwork } from '@celo/protocol/test-ts/util/anvil'
+import { getTestArtifacts } from '@celo/protocol/test-ts/util/compatibility'
+import { deployViemContract } from '@celo/protocol/test-ts/util/viem'
 
 const registryAbi = readJsonSync(`./out/Registry.sol/Registry.json`).abi
 const registryBytecode = readJsonSync(`./out/Registry.sol/Registry.json`).bytecode.object
