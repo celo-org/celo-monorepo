@@ -27,9 +27,33 @@ const registryBytecode = readJsonSync(`./out/Registry.sol/Registry.json`).byteco
 const proxyAbi = readJsonSync(`./out/Proxy.sol/Proxy.json`).abi
 const proxyBytecode = readJsonSync(`./out/Proxy.sol/Proxy.json`).bytecode.object
 
-const deployProxiedContract = async (abi: Abi, bytecode: string, client: any) => {
+const deployContractWithLinking = async (
+  contract: string,
+  artifacts: any,
+  client: any,
+  links: LibraryLinks
+) => {
+  const artifact = getArtifactByName(contract, artifacts)
+  const bytecode = getBytecode(artifact)
+  const linkedBytecode = linkLibraries(bytecode, links)
+  const address = await deployViemContract(artifact.abi, linkedBytecode, client)
+
+  links[contract] = {
+    address: address.slice(2),
+    placeholderHash: getPlaceholderHash(`${getSourceFile(artifact)}:${contract}`),
+  }
+
+  return address
+}
+
+const deployProxiedContract = async (
+  contract: string,
+  artifacts: any,
+  client: any,
+  links: LibraryLinks
+) => {
   const proxyAddress = await deployViemContract(proxyAbi, proxyBytecode, client)
-  const implementationAddress = await deployViemContract(abi, bytecode, client)
+  const implementationAddress = await deployContractWithLinking(contract, artifacts, client, links)
 
   await client.writeContract({
     address: proxyAddress,
@@ -53,7 +77,7 @@ describe('', () => {
 
   before(() => {
     const libraryNames = ['LinkedLibrary1', 'LinkedLibrary2', 'LinkedLibrary3']
-    libraryNames.map((library: string) => {
+    libraryNames.forEach((library: string) => {
       const artifact = getArtifactByName(library, testCases.buildArtifacts)
       const placeholderHash = getPlaceholderHash(`${getSourceFile(artifact)}:${library}`)
       placeholderHashes[library] = placeholderHash
@@ -143,48 +167,31 @@ describe('', () => {
         network.client,
         [true]
       )
-      const lib1Artifact = getArtifactByName('LinkedLibrary1', testCases.buildArtifacts)
-      const lib1Address = await deployViemContract(
-        lib1Artifact.abi,
-        getBytecode(lib1Artifact),
-        network.client
-      )
-      const lib3Artifact = getArtifactByName('LinkedLibrary3', testCases.buildArtifacts)
-      const lib3Address = await deployViemContract(
-        lib3Artifact.abi,
-        getBytecode(lib3Artifact),
-        network.client
-      )
-      links['LinkedLibrary1'] = {
-        address: lib1Address.slice(2),
-        placeholderHash: getPlaceholderHash(`${getSourceFile(lib1Artifact)}:LinkedLibrary1`),
-      }
-      links['LinkedLibrary3'] = {
-        address: lib3Address.slice(2),
-        placeholderHash: getPlaceholderHash(`${getSourceFile(lib3Artifact)}:LinkedLibrary3`),
-      }
 
-      const lib2Artifact = getArtifactByName('LinkedLibrary2', testCases.buildArtifacts)
-      const lib2Bytecode = getBytecode(lib2Artifact)
-      const lib2LinkedBytecode = linkLibraries(lib2Bytecode, links)
-      const lib2Address = await deployViemContract(
-        lib2Artifact.abi,
-        lib2LinkedBytecode,
-        network.client
+      await deployContractWithLinking(
+        'LinkedLibrary1',
+        testCases.buildArtifacts,
+        network.client,
+        links
+      )
+      await deployContractWithLinking(
+        'LinkedLibrary3',
+        testCases.buildArtifacts,
+        network.client,
+        links
+      )
+      await deployContractWithLinking(
+        'LinkedLibrary2',
+        testCases.buildArtifacts,
+        network.client,
+        links
       )
 
-      links['LinkedLibrary2'] = {
-        address: lib2Address.slice(2),
-        placeholderHash: getPlaceholderHash(`${getSourceFile(lib2Artifact)}:LinkedLibrary2`),
-      }
-
-      const testContractArtifact = getArtifactByName('TestContract', testCases.buildArtifacts)
-      const testContractBytecode = getBytecode(testContractArtifact)
-      const testContractLinkedBytecode = linkLibraries(testContractBytecode, links)
       const testContractAddress = await deployProxiedContract(
-        testContractArtifact.abi,
-        testContractLinkedBytecode,
-        network.client
+        'TestContract',
+        testCases.buildArtifacts,
+        network.client,
+        links
       )
 
       registryLookup = {
@@ -299,35 +306,19 @@ describe('', () => {
         let testContractAddress
 
         beforeEach(async () => {
-          const lib3Artifact = getArtifactByName(
+          await deployContractWithLinking(
             'LinkedLibrary3',
-            testCases.upgradedLibBuildArtifacts
+            testCases.upgradedLibBuildArtifacts,
+            network.client,
+            links
           )
-          const lib3Address = await deployViemContract(
-            lib3Artifact.abi,
-            getBytecode(lib3Artifact),
-            network.client
-          )
-          links['LinkedLibrary3'] = {
-            address: lib3Address.slice(2),
-            placeholderHash: getPlaceholderHash(`${getSourceFile(lib3Artifact)}:LinkedLibrary3`),
-          }
 
-          const lib2Artifact = getArtifactByName(
+          await deployContractWithLinking(
             'LinkedLibrary2',
-            testCases.upgradedLibBuildArtifacts
+            testCases.upgradedLibBuildArtifacts,
+            network.client,
+            links
           )
-          const lib2Bytecode = getBytecode(lib2Artifact)
-          const lib2LinkedBytecode = linkLibraries(lib2Bytecode, links)
-          const lib2Address = await deployViemContract(
-            lib2Artifact.abi,
-            lib2LinkedBytecode,
-            network.client
-          )
-          links['LinkedLibrary2'] = {
-            address: lib2Address.slice(2),
-            placeholderHash: getPlaceholderHash(`${getSourceFile(lib2Artifact)}:LinkedLibrary2`),
-          }
 
           // The new linking placeholders are source path dependent. This doesn't matter in a real
           // deployment where contract source paths remain consistent between releases, but our test
@@ -338,16 +329,11 @@ describe('', () => {
             )}:LinkedLibrary1`
           )
 
-          const testContractArtifact = getArtifactByName(
+          testContractAddress = await deployContractWithLinking(
             'TestContract',
-            testCases.upgradedLibBuildArtifacts
-          )
-          const testContractBytecode = getBytecode(testContractArtifact)
-          const testContractLinkedBytecode = linkLibraries(testContractBytecode, links)
-          testContractAddress = await deployViemContract(
-            testContractArtifact.abi,
-            testContractLinkedBytecode,
-            network.client
+            testCases.upgradedLibBuildArtifacts,
+            network.client,
+            links
           )
         })
 
@@ -434,16 +420,11 @@ describe('', () => {
             )}:LinkedLibrary2`
           )
 
-          const testContractArtifact = getArtifactByName(
+          testContractAddress = await deployContractWithLinking(
             'TestContract',
-            testCases.upgradedContractBuildArtifacts
-          )
-          const testContractBytecode = getBytecode(testContractArtifact)
-          const testContractLinkedBytecode = linkLibraries(testContractBytecode, links)
-          testContractAddress = await deployViemContract(
-            testContractArtifact.abi,
-            testContractLinkedBytecode,
-            network.client
+            testCases.upgradedContractBuildArtifacts,
+            network.client,
+            links
           )
         })
 
@@ -545,16 +526,11 @@ describe('', () => {
             )}:LinkedLibrary2`
           )
 
-          const testContractArtifact = getArtifactByName(
-            'TestContract',
-            testCases.upgradedContractBuildArtifacts
-          )
-          const testContractBytecode = getBytecode(testContractArtifact)
-          const testContractLinkedBytecode = linkLibraries(testContractBytecode, links)
           testContractProxyAddress = await deployProxiedContract(
-            testContractArtifact.abi,
-            testContractLinkedBytecode,
-            network.client
+            'TestContract',
+            testCases.upgradedContractBuildArtifacts,
+            network.client,
+            links
           )
         })
 
