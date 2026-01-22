@@ -224,14 +224,6 @@ describe('', () => {
         functionName: 'setAddressFor',
         args: ['TestContract', testContractAddress],
       })
-
-      // Set a dummy governance address as it's looked up in the verification logic
-      await network.client.writeContract({
-        address: registryAddress as `0x${string}`,
-        abi: registryAbi,
-        functionName: 'setAddressFor',
-        args: ['Governance', '0x0000000000000000000000000000000000000001'],
-      })
     })
 
     afterEach(() => {
