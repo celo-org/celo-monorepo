@@ -65,20 +65,18 @@ const deployProxiedContract = async (
   return proxyAddress
 }
 
-const testCases = {
-  buildArtifacts: getTestArtifacts('linked_libraries')[0],
-  upgradedLibBuildArtifacts: getTestArtifacts('linked_libraries_upgraded_lib')[0],
-  upgradedContractBuildArtifacts: getTestArtifacts('linked_libraries_upgraded_contract')[0],
-}
+const buildArtifacts = getTestArtifacts('linked_libraries')[0]
+const upgradedLibBuildArtifacts = getTestArtifacts('linked_libraries_upgraded_lib')[0]
+const upgradedContractBuildArtifacts = getTestArtifacts('linked_libraries_upgraded_contract')[0]
 
 describe('', () => {
-  const artifact = getArtifactByName('TestContract', testCases['buildArtifacts'])
+  const artifact = getArtifactByName('TestContract', buildArtifacts)
   const placeholderHashes = {}
 
   before(() => {
     const libraryNames = ['LinkedLibrary1', 'LinkedLibrary2', 'LinkedLibrary3']
     libraryNames.forEach((library: string) => {
-      const artifact = getArtifactByName(library, testCases.buildArtifacts)
+      const artifact = getArtifactByName(library, buildArtifacts)
       const placeholderHash = getPlaceholderHash(`${getSourceFile(artifact)}:${library}`)
       placeholderHashes[library] = placeholderHash
     })
@@ -168,28 +166,13 @@ describe('', () => {
         [true]
       )
 
-      await deployContractWithLinking(
-        'LinkedLibrary1',
-        testCases.buildArtifacts,
-        network.client,
-        links
-      )
-      await deployContractWithLinking(
-        'LinkedLibrary3',
-        testCases.buildArtifacts,
-        network.client,
-        links
-      )
-      await deployContractWithLinking(
-        'LinkedLibrary2',
-        testCases.buildArtifacts,
-        network.client,
-        links
-      )
+      await deployContractWithLinking('LinkedLibrary1', buildArtifacts, network.client, links)
+      await deployContractWithLinking('LinkedLibrary3', buildArtifacts, network.client, links)
+      await deployContractWithLinking('LinkedLibrary2', buildArtifacts, network.client, links)
 
       const testContractAddress = await deployProxiedContract(
         'TestContract',
-        testCases.buildArtifacts,
+        buildArtifacts,
         network.client,
         links
       )
@@ -259,7 +242,7 @@ describe('', () => {
       it(`doesn't throw on matching contracts`, async () => {
         await verifyBytecodes(
           ['TestContract'],
-          [testCases.buildArtifacts],
+          [buildArtifacts],
           registryLookup,
           [],
           proxyLookup,
@@ -274,7 +257,7 @@ describe('', () => {
         await assertThrowsAsync(
           verifyBytecodes(
             ['TestContract'],
-            [testCases.buildArtifacts],
+            [buildArtifacts],
             registryLookup,
             [],
             proxyLookup,
@@ -285,14 +268,14 @@ describe('', () => {
       })
 
       it(`throws when a library's bytecodes don't match`, async () => {
-        const libraryArtifact = getArtifactByName('LinkedLibrary1', testCases.buildArtifacts)
+        const libraryArtifact = getArtifactByName('LinkedLibrary1', buildArtifacts)
         const oldBytecode = (libraryArtifact as any).deployedBytecode.object
         ;(libraryArtifact as any).deployedBytecode.object =
           oldBytecode.slice(0, 44) + '00' + oldBytecode.slice(46, oldBytecode.length)
         await assertThrowsAsync(
           verifyBytecodes(
             ['TestContract'],
-            [testCases.buildArtifacts],
+            [buildArtifacts],
             registryLookup,
             [],
             proxyLookup,
@@ -308,14 +291,14 @@ describe('', () => {
         beforeEach(async () => {
           await deployContractWithLinking(
             'LinkedLibrary3',
-            testCases.upgradedLibBuildArtifacts,
+            upgradedLibBuildArtifacts,
             network.client,
             links
           )
 
           await deployContractWithLinking(
             'LinkedLibrary2',
-            testCases.upgradedLibBuildArtifacts,
+            upgradedLibBuildArtifacts,
             network.client,
             links
           )
@@ -325,13 +308,13 @@ describe('', () => {
           // cases are organized in separate directories, so this needs to be updated.
           links['LinkedLibrary1'].placeholderHash = getPlaceholderHash(
             `${getSourceFile(
-              getArtifactByName('LinkedLibrary1', testCases.upgradedLibBuildArtifacts)
+              getArtifactByName('LinkedLibrary1', upgradedLibBuildArtifacts)
             )}:LinkedLibrary1`
           )
 
           testContractAddress = await deployContractWithLinking(
             'TestContract',
-            testCases.upgradedLibBuildArtifacts,
+            upgradedLibBuildArtifacts,
             network.client,
             links
           )
@@ -349,7 +332,7 @@ describe('', () => {
 
           await verifyBytecodes(
             ['TestContract'],
-            [testCases.upgradedLibBuildArtifacts],
+            [upgradedLibBuildArtifacts],
             registryLookup,
             proposal,
             proxyLookup,
@@ -371,7 +354,7 @@ describe('', () => {
           await assertThrowsAsync(
             verifyBytecodes(
               ['TestContract'],
-              [testCases.buildArtifacts],
+              [buildArtifacts],
               registryLookup,
               proposal,
               proxyLookup,
@@ -393,7 +376,7 @@ describe('', () => {
           await assertThrowsAsync(
             verifyBytecodes(
               ['TestContract'],
-              [testCases.upgradedLibBuildArtifacts],
+              [upgradedLibBuildArtifacts],
               registryLookup,
               proposal,
               proxyLookup,
@@ -411,18 +394,18 @@ describe('', () => {
           // cases are organized in separate directories, so this needs to be updated.
           links['LinkedLibrary1'].placeholderHash = getPlaceholderHash(
             `${getSourceFile(
-              getArtifactByName('LinkedLibrary1', testCases.upgradedContractBuildArtifacts)
+              getArtifactByName('LinkedLibrary1', upgradedContractBuildArtifacts)
             )}:LinkedLibrary1`
           )
           links['LinkedLibrary2'].placeholderHash = getPlaceholderHash(
             `${getSourceFile(
-              getArtifactByName('LinkedLibrary2', testCases.upgradedContractBuildArtifacts)
+              getArtifactByName('LinkedLibrary2', upgradedContractBuildArtifacts)
             )}:LinkedLibrary2`
           )
 
           testContractAddress = await deployContractWithLinking(
             'TestContract',
-            testCases.upgradedContractBuildArtifacts,
+            upgradedContractBuildArtifacts,
             network.client,
             links
           )
@@ -440,7 +423,7 @@ describe('', () => {
 
           await verifyBytecodes(
             ['TestContract'],
-            [testCases.upgradedContractBuildArtifacts],
+            [upgradedContractBuildArtifacts],
             registryLookup,
             proposal,
             proxyLookup,
@@ -462,7 +445,7 @@ describe('', () => {
           await assertThrowsAsync(
             verifyBytecodes(
               ['TestContract'],
-              [testCases.buildArtifacts],
+              [buildArtifacts],
               registryLookup,
               proposal,
               proxyLookup,
@@ -484,7 +467,7 @@ describe('', () => {
           await assertThrowsAsync(
             verifyBytecodes(
               ['TestContract'],
-              [testCases.upgradedContractBuildArtifacts],
+              [upgradedContractBuildArtifacts],
               registryLookup,
               proposal,
               proxyLookup,
@@ -499,7 +482,7 @@ describe('', () => {
           await assertThrowsAsync(
             verifyBytecodes(
               ['TestContract'],
-              [testCases.upgradedContractBuildArtifacts],
+              [upgradedContractBuildArtifacts],
               registryLookup,
               proposal,
               proxyLookup,
@@ -517,18 +500,18 @@ describe('', () => {
           // cases are organized in separate directories, so this needs to be updated.
           links['LinkedLibrary1'].placeholderHash = getPlaceholderHash(
             `${getSourceFile(
-              getArtifactByName('LinkedLibrary1', testCases.upgradedContractBuildArtifacts)
+              getArtifactByName('LinkedLibrary1', upgradedContractBuildArtifacts)
             )}:LinkedLibrary1`
           )
           links['LinkedLibrary2'].placeholderHash = getPlaceholderHash(
             `${getSourceFile(
-              getArtifactByName('LinkedLibrary2', testCases.upgradedContractBuildArtifacts)
+              getArtifactByName('LinkedLibrary2', upgradedContractBuildArtifacts)
             )}:LinkedLibrary2`
           )
 
           testContractProxyAddress = await deployProxiedContract(
             'TestContract',
-            testCases.upgradedContractBuildArtifacts,
+            upgradedContractBuildArtifacts,
             network.client,
             links
           )
@@ -546,7 +529,7 @@ describe('', () => {
 
           await verifyBytecodes(
             ['TestContract'],
-            [testCases.upgradedContractBuildArtifacts],
+            [upgradedContractBuildArtifacts],
             registryLookup,
             proposal,
             proxyLookup,
@@ -568,7 +551,7 @@ describe('', () => {
           await assertThrowsAsync(
             verifyBytecodes(
               ['TestContract'],
-              [testCases.buildArtifacts],
+              [buildArtifacts],
               registryLookup,
               proposal,
               proxyLookup,
@@ -590,7 +573,7 @@ describe('', () => {
           await assertThrowsAsync(
             verifyBytecodes(
               ['TestContract'],
-              [testCases.upgradedContractBuildArtifacts],
+              [upgradedContractBuildArtifacts],
               registryLookup,
               proposal,
               proxyLookup,
