@@ -3,11 +3,13 @@ import { Abi, getContractAddress } from 'viem'
 export const deployViemContract = async (
   abi: Abi,
   bytecode: string,
-  client: any
+  client: any,
+  args = []
 ): Promise<string> => {
   const hash = await client.deployContract({
     abi,
     bytecode,
+    args,
   })
   const tx = await client.getTransaction({ hash })
   const address = getContractAddress({
