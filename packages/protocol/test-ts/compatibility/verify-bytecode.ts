@@ -157,7 +157,6 @@ describe('', () => {
 
     beforeEach(async () => {
       network = await startNetwork()
-      // Test contract deployment
 
       const registryAddress = await deployViemContract(
         registryAbi,
