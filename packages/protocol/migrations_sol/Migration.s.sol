@@ -80,8 +80,10 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 commissionUpdateDelay;
   }
 
+  string json; // configuration file content
   IProxyFactory internal proxyFactory;
   uint256 internal proxyNonce = 0;
+  address DEPLOYER_ACCOUNT;
   address SECP256K1Address;
 
   ConstitutionHelper.ConstitutionEntry[] internal constitutionEntries;
@@ -95,6 +97,10 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       }
     }
     return deployedAddress;
+  }
+
+  function deployContract(string memory contractName, bytes32 nonce) internal returns (address) {
+    return create2deploy(nonce, vm.getCode(getContractArtifactPath(contractName)));
   }
 
   function addToRegistry(string memory contractName, address proxyAddress) public {
@@ -160,17 +166,19 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     addToRegistry(contractName, address(proxy));
   }
 
+  function setUp() public {
+    console.log("Setting up migration...");
+    json = vm.readFile("./migrations_sol/migrationsConfig.json");
+    DEPLOYER_ACCOUNT = json.readAddress(".deployerAccount");
+  }
+
   /**
    * First part of the migration, deploys most contracts
    */
   function runMigration() external {
-    // TODO check that this matches DEPLOYER_ACCOUNT and the PK can be avoided with --unlock
     vm.startBroadcast(DEPLOYER_ACCOUNT);
 
-    proxyFactory = IProxyFactory(
-      create2deploy(0, vm.getCode("./out-truffle-compat/ProxyFactory.sol/ProxyFactory.json"))
-    );
-    string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
+    proxyFactory = IProxyFactory(deployContract("ProxyFactory", 0));
 
     migrateRegistry();
     setupUsingRegistry();
@@ -204,13 +212,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     vm.stopBroadcast();
 
     // fund the CeloUnreleasedTreasury
-    // TODO move to json
-    vm.startBroadcast(0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d);
+    vm.startBroadcast(json.readUint(".deployerPrivateKey"));
 
     // doing a native transfer is not allowed by the unreleased treasury
     IERC20(registry.getAddressForStringOrDie("GoldToken")).transfer(
       registry.getAddressForStringOrDie("CeloUnreleasedTreasury"),
-      390000000000000000000000000
+      390_000_000e18
     );
     vm.stopBroadcast();
   }
@@ -222,14 +229,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     setupUsingRegistry();
 
     vm.startBroadcast(DEPLOYER_ACCOUNT);
-    proxyFactory = IProxyFactory(
-      create2deploy(
-        bytes32(uint256(1)), // increase the salt to avoid address collision from previous run
-        vm.getCode("./out-truffle-compat/ProxyFactory.sol/ProxyFactory.json")
-      )
-    );
+    // increase the salt to avoid address collision from previous run
+    proxyFactory = IProxyFactory(deployContract("ProxyFactory", bytes32(uint256(1))));
 
-    string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
     checkUnreleasedTreasuryBalance();
     migrateEpochManager(json);
     migrateScoreManager();

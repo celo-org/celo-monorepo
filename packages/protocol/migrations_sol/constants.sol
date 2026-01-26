@@ -8,9 +8,6 @@ enum SolidityVersions {
 }
 
 contract MigrationsConstants is TestConstants {
-  // Addresses
-  address constant DEPLOYER_ACCOUNT = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
-
   // Contracts compiled with Solidity 0.8
   mapping(string => bool) internal is08Contract;
 
