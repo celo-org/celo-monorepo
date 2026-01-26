@@ -14,6 +14,8 @@ import { IMockValidators } from "@celo-contracts-8/governance/test/IMockValidato
 import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
 import "@celo-contracts-8/stability/test/MockStableToken.sol";
 
+import { Ownable } from "@openzeppelin/contracts8/access/Ownable.sol";
+
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
 contract EpochManagerTest is TestWithUtils08 {
@@ -129,20 +131,8 @@ contract EpochManagerTest is TestWithUtils08 {
   }
 
   function revertOwnershipEpochManager() internal {
-    // load slot 0
-    bytes32 slot0_ = vm.load(address(epochManagerContract), bytes32(uint256(0)));
-    // extract initialized from slot 0
-    uint8 initialized_ = uint8(uint256(slot0_));
-    // extract owner from slot 0
-    address owner_ = address(uint160(uint256(slot0_) >> 8));
-    // assert that owner is correctly extracted
-    assertEq(owner_, epochManager.owner());
-    // create new slot 0 with the original owner and initialized value
-    bytes32 newSlot0_ = bytes32(
-      abi.encodePacked(hex"0000000000000000000000", address(this), initialized_)
-    );
-    // store new slot 0
-    vm.store(address(epochManagerContract), bytes32(uint256(0)), newSlot0_);
+    vm.prank(Ownable(address(epochManagerContract)).owner());
+    epochManagerContract.transferOwnership(address(this));
   }
 
   function setupAndElectValidators() public {
