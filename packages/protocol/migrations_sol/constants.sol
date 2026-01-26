@@ -11,6 +11,15 @@ contract MigrationsConstants is TestConstants {
   // Contracts compiled with Solidity 0.8
   mapping(string => bool) internal is08Contract;
 
+  // List of contracts compiled with Solidity 0.8
+  string[] solidity08Contracts = [
+    "CeloUnreleasedTreasury",
+    "EpochManager",
+    "FeeCurrencyDirectory",
+    "ScoreManager",
+    "Validators"
+  ];
+
   // List of contracts that are expected to be in Registry.sol
   string[] contractsInRegistry = [
     "Accounts",
@@ -36,12 +45,14 @@ contract MigrationsConstants is TestConstants {
     "UniswapFeeHandlerSeller"
   ];
 
+  function _markAs08Contract(string memory contractName) internal {
+    is08Contract[contractName] = true;
+  }
+
   constructor() {
-    is08Contract["CeloUnreleasedTreasury"] = true;
-    is08Contract["EpochManager"] = true;
-    is08Contract["FeeCurrencyDirectory"] = true;
-    is08Contract["ScoreManager"] = true;
-    is08Contract["Validators"] = true;
+    for (uint256 i = 0; i < solidity08Contracts.length; i++) {
+      _markAs08Contract(solidity08Contracts[i]);
+    }
   }
 
   function getSolidityVersion(string memory contractName) public view returns (SolidityVersions) {

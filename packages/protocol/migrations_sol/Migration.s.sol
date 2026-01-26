@@ -1054,7 +1054,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     IValidators validators = getValidators();
 
-    // TODO: change name of variable amount of groups for amount in group
     for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
       address groupAddress = groups[groupIndex];
       console.log("Registering members for group: ", groupAddress);
