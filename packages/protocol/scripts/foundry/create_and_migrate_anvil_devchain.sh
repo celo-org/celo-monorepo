@@ -4,7 +4,7 @@ set -euo pipefail
 ### This scripts sets up a local Anvil instance, deploys libraries, precompiles, and runs migrations
 
 # this temp file is deleted at the end
-# truffle wont compile 0.5 dependencies without this file
+# foundry wont compile 0.5 dependencies without this file
 cp test-sol/devchain/Import05Dependencies.sol contracts
 
 # Read environment variables and constants

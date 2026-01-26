@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Read environment variables and constants
-# source $PWD/scripts/foundry/constants.sh
-
 # Function to copy libraries to temporary directory
 copy_libraries() {
     local -n lib_array=$1

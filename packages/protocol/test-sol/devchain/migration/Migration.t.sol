@@ -18,7 +18,6 @@ import { FeeCurrencyDirectory } from "@celo-contracts-8/common/FeeCurrencyDirect
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 import "@celo-contracts-8/common/interfaces/IScoreManager.sol";
 
-import { IERC20 } from "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import { Ownable } from "@openzeppelin/contracts8/access/Ownable.sol";
 
 import { console2 } from "forge-std-8/console2.sol";

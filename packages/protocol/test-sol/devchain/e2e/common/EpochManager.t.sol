@@ -6,7 +6,6 @@ import { Devchain } from "@test-sol/devchain/e2e/utils.sol";
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@test-sol/utils/ECDSAHelper08.sol";
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
-import { console2 } from "forge-std-8/console2.sol";
 
 contract E2E_EpochManager is ECDSAHelper08, Devchain {
   using EnumerableSet for EnumerableSet.AddressSet;
@@ -358,14 +357,7 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
       uint256 totalRewardsCarbonFund
     ) = epochManagerContract.getEpochProcessingState();
 
-    // uint256 targetVoterReward =     epochRewards.getTargetVoterRewards();
-    // console.log("targetVoterReward", targetVoterReward);
-    // uint256 targetGoldSupplyIncrease = epochRewards.getTargetGoldSupplyIncrease();
-    // console.log("targetGoldSupplyIncrease", targetGoldSupplyIncrease);
-    uint256 rewardsMultiplier = epochRewards.getRewardsMultiplier();
-    console2.log("rewardsMultiplier", rewardsMultiplier);
-
-    assertEq(status, 1, "it started"); // Started
+    assertEq(status, 1, "Epoch is started");
     assertGt(perValidatorReward, 0, "perValidatorReward");
     assertGt(totalRewardsVote, 0, "totalRewardsVote");
     assertGt(totalRewardsCommunity, 0, "totalRewardsCommunity");
