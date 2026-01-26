@@ -10,7 +10,6 @@ import { ICeloUnreleasedTreasury } from "@celo-contracts/common/interfaces/ICelo
 import { ICeloToken } from "@celo-contracts/common/interfaces/ICeloToken.sol";
 import { IElection } from "@celo-contracts/governance/interfaces/IElection.sol";
 import { IEpochRewards } from "@celo-contracts/governance/interfaces/IEpochRewards.sol";
-import { IEpochManagerEnabler } from "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
 import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.sol";
 import { IEscrow } from "@celo-contracts/identity/interfaces/IEscrow.sol";
 import { IFederatedAttestations } from "@celo-contracts/identity/interfaces/IFederatedAttestations.sol";
@@ -32,7 +31,6 @@ contract Devchain is TestWithUtils08 {
   ICeloToken celoTokenContract;
   IElection election;
   IEpochRewards epochRewards;
-  IEpochManagerEnabler epochManagerEnablerContract;
   IEpochManager epochManagerContract;
   IEscrow escrow;
   IFederatedAttestations federatedAttestations;
@@ -62,7 +60,6 @@ contract Devchain is TestWithUtils08 {
     celoTokenContract = ICeloToken(registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
     election = getElection();
     epochRewards = getEpochRewards();
-    epochManagerEnablerContract = getEpochManagerEnabler();
     epochManagerContract = getEpochManager();
     escrow = getEscrow();
     federatedAttestations = getFederatedAttestations();

@@ -10,7 +10,6 @@ import "@celo-contracts/common/interfaces/IProxy.sol";
 import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts/common/interfaces/IAccounts.sol";
 import "@celo-contracts/common/interfaces/IEpochManager.sol";
-import "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
 import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 import "@celo-contracts/governance/interfaces/IElection.sol";
 import "@celo-contracts/governance/interfaces/IValidators.sol";
@@ -147,7 +146,6 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   ICeloToken celoTokenContract;
   IValidators validatorsContract;
   IEpochManager epochManagerContract;
-  IEpochManagerEnabler epochManagerEnablerContract;
   IScoreManager scoreManager;
   IElection election;
   ICeloUnreleasedTreasury celoUnreleasedTreasuryContract;
@@ -185,12 +183,11 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     vm.deal(address(0), CELO_SUPPLY_CAP);
 
     epochManagerContract = IEpochManager(registry.getAddressForStringOrDie("EpochManager"));
-    epochManagerEnablerContract = IEpochManagerEnabler(
-      registry.getAddressForStringOrDie("EpochManagerEnabler")
-    );
   }
 
   function test_Reverts_WhenEndOfEpochHasNotBeenReached() public {
+    // Skip this test if epoch is already ready on the forked chain
+    vm.skip(epochManagerContract.isTimeForNextEpoch());
     vm.expectRevert("Epoch is not ready to start");
     epochManagerContract.startNextEpochProcess();
   }
