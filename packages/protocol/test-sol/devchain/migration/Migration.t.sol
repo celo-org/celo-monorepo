@@ -79,7 +79,7 @@ contract RegistryIntegrationTest is IntegrationTest, MigrationsConstants {
     bytes32 hashLockedCelo = keccak256(abi.encodePacked("LockedCelo"));
     bytes32 hashEpochManager = keccak256(abi.encodePacked("EpochManager"));
 
-    for (uint256 i = 0; i < contractsInRegistryPath.length; i++) {
+    for (uint256 i = 0; i < contractsInRegistry.length; i++) {
       // Read name from list of core contracts
       string memory contractName = contractsInRegistry[i];
       console2.log("Checking bytecode of:", contractName);
@@ -117,7 +117,7 @@ contract RegistryIntegrationTest is IntegrationTest, MigrationsConstants {
         // Get bytecode from build artifacts
         // this has to be built twice like we do when migrating
         bytes memory expectedBytecodeWithMetadataFromArtifacts = vm.getDeployedCode(
-          contractsInRegistryPath[i]
+          getContractArtifactPath(contractName)
         );
         bytes memory expectedBytecodeFromArtifacts = removeMetadataFromBytecode(
           expectedBytecodeWithMetadataFromArtifacts
