@@ -63,7 +63,7 @@ import { IFeeCurrencyDirectory } from "@celo-contracts-8/common/interfaces/IFeeC
 import { UsingRegistry } from "@celo-contracts-8/common/UsingRegistry.sol";
 
 // Test imports
-import { ISECP256K1 } from "@test-sol/utils/SECP256K1.sol";
+import { ISECP256K1, SECP256K1 } from "@test-sol/utils/SECP256K1.sol";
 import { ConstitutionHelper } from "@test-sol/utils/ConstitutionHelper.sol";
 
 contract ForceTx {
@@ -92,6 +92,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   IProxyFactory internal proxyFactory;
   uint256 internal proxyNonce = 0;
+  address SECP256K1Address;
 
   ConstitutionHelper.ConstitutionEntry[] internal constitutionEntries;
 
@@ -106,32 +107,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       }
     }
     return deployedAddress;
-  }
-
-  // TODO remove this duplicated block (it's in tests)
-  // can't remove because of the syntax of value
-  function deployCodeTo(
-    string memory what,
-    bytes memory args,
-    uint256 value,
-    address where
-  ) internal {
-    bytes memory creationCode = vm.getCode(what);
-    vm.etch(where, abi.encodePacked(creationCode, args));
-    (bool success, bytes memory runtimeBytecode) = where.call{ value: value }("");
-    require(
-      success,
-      "StdCheats deployCodeTo(string,bytes,uint256,address): Failed to create runtime bytecode."
-    );
-    vm.etch(where, runtimeBytecode);
-  }
-
-  function deployCodeTo(string memory what, address where) internal {
-    deployCodeTo(what, "", 0, where);
-  }
-
-  function deployCodeTo(string memory what, bytes memory args, address where) internal {
-    deployCodeTo(what, args, 0, where);
   }
 
   function addToRegistry(string memory contractName, address proxyAddress) public {
@@ -182,28 +157,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function deployProxiedContract(
     string memory contractName,
-    address toProxy,
-    bytes memory initializeCalldata,
-    SolidityVersions solidityVersion
-  ) public {
-    console.log("Deploying: ", contractName);
-    deployCodeTo("Proxy.sol", abi.encode(false), toProxy);
-    IProxy proxy = IProxy(toProxy);
-    console.log(" Proxy deployed to:", toProxy);
-
-    setImplementationOnProxy(proxy, contractName, initializeCalldata, solidityVersion);
-    addToRegistry(contractName, address(proxy));
-    console.log(" Done deploying:", contractName);
-    console.log("------------------------------");
-  }
-
-  function deployProxiedContract(
-    string memory contractName,
     bytes memory initializeCalldata,
     SolidityVersions solidityVersion
   ) public returns (address proxyAddress) {
-    console.log("Deploying: ", contractName);
-
     // Can't deploy with new Proxy() because Proxy is in 0.5
     // Proxy proxy = new Proxy();
     // In production this should use create2, in anvil can't do that
@@ -213,51 +169,30 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     proxyAddress = proxyFactory.deployProxy();
 
     IProxy proxy = IProxy(proxyAddress);
-    console.log(" Proxy deployed to:", address(proxy));
+    console.log(" New proxy deployed to:", address(proxy));
 
-    setImplementationOnProxy(proxy, contractName, initializeCalldata, solidityVersion);
-
-    addToRegistry(contractName, address(proxy));
+    setImplementationOnProxyAndAddToRegistry(
+      contractName,
+      proxy,
+      initializeCalldata,
+      solidityVersion
+    );
 
     console.log(" Done deploying:", contractName);
     console.log("------------------------------");
   }
 
-  function deployImplementationAndAddToRegistry(
+  function setImplementationOnProxyAndAddToRegistry(
     string memory contractName,
     IProxy proxy,
     bytes memory initializeCalldata,
     SolidityVersions solidityVersion
   ) public {
     address owner_ = proxy._getOwner();
-    console.log("Owner is:", owner_);
+    console.log("Owner of Proxy is:", owner_);
+    console.log("Deploying implementation of: ", contractName);
     setImplementationOnProxy(proxy, contractName, initializeCalldata, solidityVersion);
     addToRegistry(contractName, address(proxy));
-  }
-
-  function deployImplementationAndAddToRegistry(
-    string memory contractName,
-    bytes memory initializeCalldata,
-    SolidityVersions solidityVersion
-  ) public returns (address proxyAddress) {
-    console.log("Deploying: ", contractName);
-
-    // Can't deploy with new Proxy() because Proxy is in 0.5
-    // Proxy proxy = new Proxy();
-    // In production this should use create2, in anvil can't do that
-    // because forge re-routes the create2 via Create2Deployer contract to have predictable address
-    // then, a owner can be set
-
-    proxyAddress = proxyFactory.deployProxy();
-
-    IProxy proxy = IProxy(proxyAddress);
-    console.log(" Proxy deployed to:", address(proxy));
-
-    setImplementationOnProxy(proxy, contractName, initializeCalldata, solidityVersion);
-    addToRegistry(contractName, address(proxy));
-
-    console.log(" Done deploying:", contractName);
-    console.log("------------------------------");
   }
 
   /**
@@ -340,6 +275,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     vm.startBroadcast(DEPLOYER_ACCOUNT);
     migrateGovernance(json);
+
+    SECP256K1Address = address(new SECP256K1());
     vm.stopBroadcast();
 
     electValidators(json);
@@ -360,7 +297,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateRegistry() public {
-    deployImplementationAndAddToRegistry(
+    setImplementationOnProxyAndAddToRegistry(
       "Registry",
       IProxy(REGISTRY_ADDRESS),
       abi.encodeWithSelector(IRegistryInitializer.initialize.selector),
@@ -379,7 +316,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function migrateFeeCurrencyDirectory(string memory json) public {
     address feeCurrencyDirectoryProxyAddress = json.readAddress(".proxies.feeCurrencyDirectory");
-    deployImplementationAndAddToRegistry(
+    setImplementationOnProxyAndAddToRegistry(
       "FeeCurrencyDirectory",
       IProxy(feeCurrencyDirectoryProxyAddress),
       abi.encodeWithSelector(IFeeCurrencyDirectoryInitializer.initialize.selector),
@@ -392,7 +329,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // pre deployed celo token proxy address from L2Genesis.s.sol
     address celoProxyAddress = json.readAddress(".proxies.celoToken");
 
-    deployImplementationAndAddToRegistry(
+    setImplementationOnProxyAndAddToRegistry(
       "GoldToken",
       IProxy(celoProxyAddress),
       abi.encodeWithSelector(ICeloTokenInitializer.initialize.selector, REGISTRY_ADDRESS),
@@ -861,7 +798,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // pre deployed fee handler proxy address from L2Genesis.s.sol
     address feeHandlerProxyAddress = json.readAddress(".proxies.feeHandler");
 
-    deployImplementationAndAddToRegistry(
+    setImplementationOnProxyAndAddToRegistry(
       "FeeHandler",
       IProxy(feeHandlerProxyAddress),
       abi.encodeWithSelector(
@@ -895,7 +832,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // pre deployed celo unreleased treasury proxy address from L2Genesis.s.sol
     address celoUnreleasedTreasury = json.readAddress(".proxies.celoUnreleasedTreasury");
 
-    deployImplementationAndAddToRegistry(
+    setImplementationOnProxyAndAddToRegistry(
       "CeloUnreleasedTreasury",
       IProxy(celoUnreleasedTreasury),
       abi.encodeWithSelector(
@@ -1138,8 +1075,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     bytes32 _r,
     bytes32 _s
   ) public returns (bytes memory) {
-    address SECP256K1Address = actor("SECP256K1Address");
-    deployCodeTo("SECP256K1.sol:SECP256K1", SECP256K1Address);
     ISECP256K1 sECP256K1 = ISECP256K1(SECP256K1Address);
 
     string memory header = "\x19Ethereum Signed Message:\n32";
