@@ -96,8 +96,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   ConstitutionHelper.ConstitutionEntry[] internal constitutionEntries;
 
-  event Result(bytes);
-
   function create2deploy(bytes32 salt, bytes memory initCode) internal returns (address) {
     address deployedAddress;
     assembly {
@@ -709,24 +707,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     getLockedGold().addSlasher("GovernanceSlasher");
   }
 
-  function migrateDoubleSigningSlasher(string memory json) public {
-    uint256 penalty = json.readUint(".doubleSigningSlasher.penalty");
-    uint256 reward = json.readUint(".doubleSigningSlasher.reward");
-
-    deployProxiedContract(
-      "DoubleSigningSlasher",
-      abi.encodeWithSelector(
-        IDoubleSigningSlasherInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
-        penalty,
-        reward
-      ),
-      SolidityVersions.SOLIDITY_05
-    );
-
-    getLockedGold().addSlasher("DoubleSigningSlasher");
-  }
-
   function migrateGovernanceApproverMultiSig(string memory json) public {
     address[] memory owners = new address[](1);
     owners[0] = DEPLOYER_ACCOUNT;
@@ -1086,10 +1066,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       uint256(_s)
     );
     return abi.encodePacked(x, y);
-  }
-
-  function actor(string memory name) internal returns (address) {
-    return vm.addr(uint256(keccak256(abi.encodePacked(name))));
   }
 
   function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32) {
