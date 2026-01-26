@@ -9,7 +9,7 @@
     "anvil-devchain:e2e-tests": "./scripts/foundry/run_e2e_tests_in_anvil.sh",
     "anvil-devchain:e2e-tests:rpc-logs": "ANVIL_LOGGING=true ./scripts/foundry/run_e2e_tests_in_anvil.sh",
     "anvil-devchain:integration-tests": "./scripts/foundry/run_integration_tests_in_anvil.sh",
-    "anvil-devchain:start-L1": "./scripts/foundry/create_and_migrate_anvil_devchain.sh",
+    "anvil-devchain:start": "./scripts/foundry/create_and_migrate_anvil_devchain.sh",
     "anvil-devchain:status": "if nc -z localhost 8546; then echo 'Devchain is serving at http://localhost:8546'; else echo 'Devchain is not running.'; fi",
     "anvil-devchain:stop": "./scripts/foundry/stop_anvil.sh",
     "build:foundry": "forge build",
