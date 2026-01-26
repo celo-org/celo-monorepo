@@ -8,8 +8,6 @@ import "@test-sol/utils/ECDSAHelper08.sol";
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
 import { console2 } from "forge-std-8/console2.sol";
 
-import { EpochManagerEnabler } from "@celo-contracts-8/common/EpochManagerEnabler.sol";
-
 contract E2E_EpochManager is ECDSAHelper08, Devchain {
   using EnumerableSet for EnumerableSet.AddressSet;
 
@@ -24,7 +22,6 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
   }
 
   address epochManagerOwner;
-  address epochManagerEnablerAddress;
   address[] firstElected;
 
   uint256 epochDuration;
@@ -42,9 +39,6 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
 
   function setUp() public virtual override(TestWithUtils08, Devchain) {
     epochManagerOwner = Ownable(address(epochManagerContract)).owner();
-    epochManagerEnablerAddress = registryContract.getAddressForOrDie(
-      EPOCH_MANAGER_ENABLER_REGISTRY_ID
-    );
     firstElected = getValidators().getRegisteredValidators();
 
     epochDuration = epochManagerContract.epochDuration();
