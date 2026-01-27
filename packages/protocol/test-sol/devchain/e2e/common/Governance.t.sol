@@ -374,7 +374,6 @@ contract E2E_GovernanceSlashing is E2E_Governance {
 
   function _passProposal() public {
     _propose();
-    // _upvoteProposal(proposalId, 0, 0);
     _approveProposal();
     _vote();
 
