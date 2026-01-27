@@ -121,7 +121,7 @@ jobs:
         if: success() || failure()
         with:
           repository: 'celo-org/optimism'
-          ref: 'martinvol/completeMigrationsPython'
+          ref: 'celo/core-contracts-base'
           path: celo-optimism
           submodules: recursive
 
