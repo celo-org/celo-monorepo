@@ -386,7 +386,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function deployStable(
     string memory name,
     string memory symbol,
-    string memory sufix,
+    string memory suffix,
     uint8 decimals,
     uint256 inflationRate,
     uint256 inflationFactorUpdatePeriod,
@@ -395,9 +395,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     bool frozen,
     uint256 celoPrice
   ) public {
-    string memory exchangeIdentifier = string.concat("Exchange", sufix);
+    string memory exchangeIdentifier = string.concat("Exchange", suffix);
     address stableTokenProxyAddress = deployProxiedContract(
-      string.concat("StableToken", sufix),
+      string.concat("StableToken", suffix),
       abi.encodeWithSelector(
         IStableTokenInitialize.initialize.selector,
         name,
@@ -443,7 +443,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     string[] memory names = json.readStringArray(".stableTokens.names");
     string[] memory symbols = json.readStringArray(".stableTokens.symbols");
-    string[] memory contractSufixs = json.readStringArray(".stableTokens.contractSufixs");
+    string[] memory contractsuffixs = json.readStringArray(".stableTokens.contractsuffixs");
 
     require(names.length == symbols.length, "Ticker and stable names should match");
 
@@ -464,7 +464,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       deployStable(
         names[i],
         symbols[i],
-        contractSufixs[i],
+        contractsuffixs[i],
         decimals,
         inflationRate,
         inflationFactorUpdatePeriod,
