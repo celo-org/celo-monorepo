@@ -72,6 +72,12 @@ const deployProxiedContract = async (
   return proxyAddress
 }
 
+const setPlaceholderHash = (links: LibraryLinks, library: string, artifacts: BuildArtifacts) => {
+  links[library].placeholderHash = getPlaceholderHash(
+    `${getSourceFile(getArtifactByName(library, artifacts))}:${library}`
+  )
+}
+
 const buildArtifacts = getTestArtifacts('linked_libraries')[0]
 const upgradedLibBuildArtifacts = getTestArtifacts('linked_libraries_upgraded_lib')[0]
 const upgradedContractBuildArtifacts = getTestArtifacts('linked_libraries_upgraded_contract')[0]
@@ -307,11 +313,7 @@ describe('', () => {
           // The new linking placeholders are source path dependent. This doesn't matter in a real
           // deployment where contract source paths remain consistent between releases, but our test
           // cases are organized in separate directories, so this needs to be updated.
-          links.LinkedLibrary1.placeholderHash = getPlaceholderHash(
-            `${getSourceFile(
-              getArtifactByName('LinkedLibrary1', upgradedLibBuildArtifacts)
-            )}:LinkedLibrary1`
-          )
+          setPlaceholderHash(links, 'LinkedLibrary1', upgradedLibBuildArtifacts)
 
           testContractAddress = await deployContractWithLinking(
             'TestContract',
@@ -393,16 +395,8 @@ describe('', () => {
           // The new linking placeholders are source path dependent. This doesn't matter in a real
           // deployment where contract source paths remain consistent between releases, but our test
           // cases are organized in separate directories, so this needs to be updated.
-          links.LinkedLibrary1.placeholderHash = getPlaceholderHash(
-            `${getSourceFile(
-              getArtifactByName('LinkedLibrary1', upgradedContractBuildArtifacts)
-            )}:LinkedLibrary1`
-          )
-          links.LinkedLibrary2.placeholderHash = getPlaceholderHash(
-            `${getSourceFile(
-              getArtifactByName('LinkedLibrary2', upgradedContractBuildArtifacts)
-            )}:LinkedLibrary2`
-          )
+          setPlaceholderHash(links, 'LinkedLibrary1', upgradedContractBuildArtifacts)
+          setPlaceholderHash(links, 'LinkedLibrary2', upgradedContractBuildArtifacts)
 
           testContractAddress = await deployContractWithLinking(
             'TestContract',
@@ -496,19 +490,8 @@ describe('', () => {
       describe(`when a proposal changes a contract's proxy`, () => {
         let testContractProxyAddress
         beforeEach(async () => {
-          // The new linking placeholders are source path dependent. This doesn't matter in a real
-          // deployment where contract source paths remain consistent between releases, but our test
-          // cases are organized in separate directories, so this needs to be updated.
-          links.LinkedLibrary1.placeholderHash = getPlaceholderHash(
-            `${getSourceFile(
-              getArtifactByName('LinkedLibrary1', upgradedContractBuildArtifacts)
-            )}:LinkedLibrary1`
-          )
-          links.LinkedLibrary2.placeholderHash = getPlaceholderHash(
-            `${getSourceFile(
-              getArtifactByName('LinkedLibrary2', upgradedContractBuildArtifacts)
-            )}:LinkedLibrary2`
-          )
+          setPlaceholderHash(links, 'LinkedLibrary1', upgradedContractBuildArtifacts)
+          setPlaceholderHash(links, 'LinkedLibrary2', upgradedContractBuildArtifacts)
 
           testContractProxyAddress = await deployProxiedContract(
             'TestContract',
