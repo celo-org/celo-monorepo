@@ -98,8 +98,8 @@ describe('', () => {
   describe('ArtifactLibraryLinking()', () => {
     it('collects the right number of positions for each library', () => {
       const linking = new ArtifactLibraryLinking(artifact)
-      assert.equal(linking.links.LinkedLibrary1.positions.length, 2)
-      assert.equal(linking.links.LinkedLibrary2.positions.length, 2)
+      assert.equal(linking.links['LinkedLibrary1'].positions.length, 2)
+      assert.equal(linking.links['LinkedLibrary2'].positions.length, 2)
     })
   })
 
@@ -122,11 +122,11 @@ describe('', () => {
         linkingInfo.collect(linkedBytecode, linking)
 
         assert.equal(
-          linkingInfo.info.LinkedLibrary1.address,
+          linkingInfo.info['LinkedLibrary1'].address,
           '0000000000000000000000000000000000000001'
         )
         assert.equal(
-          linkingInfo.info.LinkedLibrary2.address,
+          linkingInfo.info['LinkedLibrary2'].address,
           '0000000000000000000000000000000000000002'
         )
       })
@@ -147,10 +147,10 @@ describe('', () => {
         }
         const linkedBytecode = linkLibraries(getDeployedBytecode(artifact), links)
         const incorrectBytecode =
-          linkedBytecode.slice(0, linking.links.LinkedLibrary1.positions[0] - 1) +
+          linkedBytecode.slice(0, linking.links['LinkedLibrary1'].positions[0] - 1) +
           '0000000000000000000000000000000000000003' +
           linkedBytecode.slice(
-            linking.links.LinkedLibrary1.positions[0] - 1 + 40,
+            linking.links['LinkedLibrary1'].positions[0] - 1 + 40,
             linkedBytecode.length
           )
 
