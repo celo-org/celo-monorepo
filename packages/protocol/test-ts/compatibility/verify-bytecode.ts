@@ -1,7 +1,9 @@
 import { assert } from 'chai'
-import { encodeFunctionData } from 'viem'
+import { BuildArtifacts } from '@openzeppelin/upgrades'
+import { Abi, encodeFunctionData, GetProofReturnType } from 'viem'
 import { readJsonSync } from 'fs-extra'
 
+import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import {
   ArtifactLibraryLinking,
   LibraryLinks,
@@ -15,22 +17,27 @@ import {
   getDeployedBytecode,
   getSourceFile,
 } from '@celo/protocol/lib/compatibility/internal'
-import { verifyBytecodes } from '@celo/protocol/lib/compatibility/verify-bytecode-foundry'
+import {
+  verifyBytecodes,
+  ChainLookup,
+  RegistryLookup,
+  ProxyLookup,
+} from '@celo/protocol/lib/compatibility/verify-bytecode-foundry'
 import { assertThrowsAsync } from '@celo/protocol/lib/test-utils'
 import { startNetwork } from '@celo/protocol/test-ts/util/anvil'
 import { getTestArtifacts } from '@celo/protocol/test-ts/util/compatibility'
 import { deployViemContract } from '@celo/protocol/test-ts/util/viem'
 
-const registryAbi = readJsonSync(`./out/Registry.sol/Registry.json`).abi
-const registryBytecode = readJsonSync(`./out/Registry.sol/Registry.json`).bytecode.object
+const registryAbi = readJsonSync(`./out/Registry.sol/Registry.json`).abi as Abi
+const registryBytecode = readJsonSync(`./out/Registry.sol/Registry.json`).bytecode.object as string
 
-const proxyAbi = readJsonSync(`./out/Proxy.sol/Proxy.json`).abi
-const proxyBytecode = readJsonSync(`./out/Proxy.sol/Proxy.json`).bytecode.object
+const proxyAbi = readJsonSync(`./out/Proxy.sol/Proxy.json`).abi as Abi
+const proxyBytecode = readJsonSync(`./out/Proxy.sol/Proxy.json`).bytecode.object as string
 
 const deployContractWithLinking = async (
   contract: string,
-  artifacts: any,
-  client: any,
+  artifacts: BuildArtifacts,
+  client,
   links: LibraryLinks
 ) => {
   const artifact = getArtifactByName(contract, artifacts)
@@ -48,8 +55,8 @@ const deployContractWithLinking = async (
 
 const deployProxiedContract = async (
   contract: string,
-  artifacts: any,
-  client: any,
+  artifacts: BuildArtifacts,
+  client,
   links: LibraryLinks
 ) => {
   const proxyAddress = await deployViemContract(proxyAbi, proxyBytecode, client)
@@ -71,13 +78,13 @@ const upgradedContractBuildArtifacts = getTestArtifacts('linked_libraries_upgrad
 
 describe('', () => {
   const artifact = getArtifactByName('TestContract', buildArtifacts)
-  const placeholderHashes = {}
+  const placeholderHashes: { [library: string]: string } = {}
 
   before(() => {
     const libraryNames = ['LinkedLibrary1', 'LinkedLibrary2', 'LinkedLibrary3']
     libraryNames.forEach((library: string) => {
-      const artifact = getArtifactByName(library, buildArtifacts)
-      const placeholderHash = getPlaceholderHash(`${getSourceFile(artifact)}:${library}`)
+      const libArtifact = getArtifactByName(library, buildArtifacts)
+      const placeholderHash = getPlaceholderHash(`${getSourceFile(libArtifact)}:${library}`)
       placeholderHashes[library] = placeholderHash
     })
   })
@@ -85,8 +92,8 @@ describe('', () => {
   describe('ArtifactLibraryLinking()', () => {
     it('collects the right number of positions for each library', () => {
       const linking = new ArtifactLibraryLinking(artifact)
-      assert.equal(linking.links['LinkedLibrary1'].positions.length, 2)
-      assert.equal(linking.links['LinkedLibrary2'].positions.length, 2)
+      assert.equal(linking.links.LinkedLibrary1.positions.length, 2)
+      assert.equal(linking.links.LinkedLibrary2.positions.length, 2)
     })
   })
 
@@ -109,11 +116,11 @@ describe('', () => {
         linkingInfo.collect(linkedBytecode, linking)
 
         assert.equal(
-          linkingInfo.info['LinkedLibrary1'].address,
+          linkingInfo.info.LinkedLibrary1.address,
           '0000000000000000000000000000000000000001'
         )
         assert.equal(
-          linkingInfo.info['LinkedLibrary2'].address,
+          linkingInfo.info.LinkedLibrary2.address,
           '0000000000000000000000000000000000000002'
         )
       })
@@ -134,10 +141,10 @@ describe('', () => {
         }
         const linkedBytecode = linkLibraries(getDeployedBytecode(artifact), links)
         const incorrectBytecode =
-          linkedBytecode.slice(0, linking.links['LinkedLibrary1'].positions[0] - 1) +
+          linkedBytecode.slice(0, linking.links.LinkedLibrary1.positions[0] - 1) +
           '0000000000000000000000000000000000000003' +
           linkedBytecode.slice(
-            linking.links['LinkedLibrary1'].positions[0] - 1 + 40,
+            linking.links.LinkedLibrary1.positions[0] - 1 + 40,
             linkedBytecode.length
           )
 
@@ -150,10 +157,10 @@ describe('', () => {
 
   describe('on a test contract deployment', () => {
     let network
-    let registryLookup
-    let proxyLookup
-    let chainLookup
-    let links: LibraryLinks = {}
+    let registryLookup: RegistryLookup
+    let proxyLookup: ProxyLookup
+    let chainLookup: ChainLookup
+    const links: LibraryLinks = {}
 
     beforeEach(async () => {
       network = await startNetwork()
@@ -178,29 +185,29 @@ describe('', () => {
 
       registryLookup = {
         getAddressForString: async (name: string) => {
-          return network.client.readContract({
+          return (await network.client.readContract({
             address: registryAddress as `0x${string}`,
             abi: registryAbi,
             functionName: 'getAddressForString',
             args: [name],
-          })
+          })) as string
         },
       }
 
       proxyLookup = {
-        getImplementation: async (address: string) => {
-          return network.client.readContract({
+        getImplementation: async (address: string): Promise<string> => {
+          return (await network.client.readContract({
             address,
             abi: proxyAbi,
             functionName: '_getImplementation',
             args: [],
-          })
+          })) as string
         },
       }
 
       chainLookup = {
-        getCode: (address: `0x${string}`) => {
-          return network.client.getCode({ address })
+        getCode: async (address: `0x${string}`): Promise<string> => {
+          return (await network.client.getCode({ address })) as string
         },
         encodeFunctionCall: (abi: any, args: any[]) => {
           return encodeFunctionData({
@@ -209,11 +216,14 @@ describe('', () => {
             args,
           })
         },
-        getProof: (address: `0x${string}`, slots: `0x${string}`[]) => {
-          return network.client.getProof({
+        getProof: async (
+          address: `0x${string}`,
+          slots: `0x${string}`[]
+        ): Promise<GetProofReturnType> => {
+          return (await network.client.getProof({
             address,
             storageKeys: slots,
-          })
+          })) as GetProofReturnType
         },
       }
 
@@ -297,7 +307,7 @@ describe('', () => {
           // The new linking placeholders are source path dependent. This doesn't matter in a real
           // deployment where contract source paths remain consistent between releases, but our test
           // cases are organized in separate directories, so this needs to be updated.
-          links['LinkedLibrary1'].placeholderHash = getPlaceholderHash(
+          links.LinkedLibrary1.placeholderHash = getPlaceholderHash(
             `${getSourceFile(
               getArtifactByName('LinkedLibrary1', upgradedLibBuildArtifacts)
             )}:LinkedLibrary1`
@@ -383,12 +393,12 @@ describe('', () => {
           // The new linking placeholders are source path dependent. This doesn't matter in a real
           // deployment where contract source paths remain consistent between releases, but our test
           // cases are organized in separate directories, so this needs to be updated.
-          links['LinkedLibrary1'].placeholderHash = getPlaceholderHash(
+          links.LinkedLibrary1.placeholderHash = getPlaceholderHash(
             `${getSourceFile(
               getArtifactByName('LinkedLibrary1', upgradedContractBuildArtifacts)
             )}:LinkedLibrary1`
           )
-          links['LinkedLibrary2'].placeholderHash = getPlaceholderHash(
+          links.LinkedLibrary2.placeholderHash = getPlaceholderHash(
             `${getSourceFile(
               getArtifactByName('LinkedLibrary2', upgradedContractBuildArtifacts)
             )}:LinkedLibrary2`
@@ -468,7 +478,7 @@ describe('', () => {
         })
 
         it(`throws when there is no proposal`, async () => {
-          const proposal = []
+          const proposal: ProposalTx[] = []
 
           await assertThrowsAsync(
             verifyBytecodes(
@@ -489,12 +499,12 @@ describe('', () => {
           // The new linking placeholders are source path dependent. This doesn't matter in a real
           // deployment where contract source paths remain consistent between releases, but our test
           // cases are organized in separate directories, so this needs to be updated.
-          links['LinkedLibrary1'].placeholderHash = getPlaceholderHash(
+          links.LinkedLibrary1.placeholderHash = getPlaceholderHash(
             `${getSourceFile(
               getArtifactByName('LinkedLibrary1', upgradedContractBuildArtifacts)
             )}:LinkedLibrary1`
           )
-          links['LinkedLibrary2'].placeholderHash = getPlaceholderHash(
+          links.LinkedLibrary2.placeholderHash = getPlaceholderHash(
             `${getSourceFile(
               getArtifactByName('LinkedLibrary2', upgradedContractBuildArtifacts)
             )}:LinkedLibrary2`

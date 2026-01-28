@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process'
+import { spawn, ChildProcess } from 'node:child_process'
 import { createTestClient, http, publicActions, walletActions } from 'viem'
 import { foundry } from 'viem/chains'
 import { privateKeyToAccount } from 'viem/accounts'
@@ -16,13 +16,13 @@ const defaultPrivateKeys = [
   '0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6',
 ]
 
-const containsListeningMessage = (output) => {
+const containsListeningMessage = (output: string) => {
   return /Listening on /.test(output)
 }
 
-const waitForListening = (proc) => {
+const waitForListening = (proc: ChildProcess) => {
   return new Promise((resolve) => {
-    const resolveIfListening = (output) => {
+    const resolveIfListening = (output: string) => {
       if (containsListeningMessage(output.toString())) {
         resolve(null)
         proc.stdout.off('data', resolveIfListening)

@@ -1,9 +1,9 @@
-import { Abi, getContractAddress } from 'viem'
+import { Abi, getContractAddress, Transaction } from 'viem'
 
 export const deployViemContract = async (
   abi: Abi,
   bytecode: string,
-  client: any,
+  client,
   args = []
 ): Promise<string> => {
   const hash = await client.deployContract({
@@ -11,7 +11,7 @@ export const deployViemContract = async (
     bytecode,
     args,
   })
-  const tx = await client.getTransaction({ hash })
+  const tx: Transaction = await client.getTransaction({ hash })
   const address = getContractAddress({
     from: tx.from,
     nonce: BigInt(tx.nonce),
