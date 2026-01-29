@@ -12,6 +12,8 @@ set -euo pipefail
 # -p: Path that the governance proposal should be written to.
 # -r: Path to the contract compatibility report.
 # -u: Custom RPC URL (optional, overrides network default).
+# -s: Skip contract verification (optional).
+# -a: Celoscan API key for verification (optional, can also use CELOSCAN_API_KEY env var).
 
 BRANCH=""
 PRIVATE_KEY=""
@@ -21,8 +23,10 @@ NETWORK=""
 PROPOSAL=""
 REPORT=""
 RPC_URL=""
+SKIP_VERIFICATION=""
+CELOSCAN_API_KEY_ARG=""
 
-while getopts 'b:k:i:l:n:p:r:u:' flag; do
+while getopts 'b:k:i:l:n:p:r:u:sa:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     k) PRIVATE_KEY="${OPTARG}" ;;
@@ -32,6 +36,8 @@ while getopts 'b:k:i:l:n:p:r:u:' flag; do
     p) PROPOSAL="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
     u) RPC_URL="${OPTARG}" ;;
+    s) SKIP_VERIFICATION="true" ;;
+    a) CELOSCAN_API_KEY_ARG="${OPTARG}" ;;
     *)
       echo "Unexpected option ${flag}" >&2
       exit 1
@@ -49,10 +55,16 @@ done
 
 BUILD_DIR="./out/"
 
-# Build the command with optional rpcUrl
-RPC_URL_FLAG=""
+# Build the command with optional flags
+OPTIONAL_FLAGS=""
 if [ -n "$RPC_URL" ]; then
-  RPC_URL_FLAG="--rpcUrl $RPC_URL"
+  OPTIONAL_FLAGS="$OPTIONAL_FLAGS --rpcUrl $RPC_URL"
+fi
+if [ -n "$SKIP_VERIFICATION" ]; then
+  OPTIONAL_FLAGS="$OPTIONAL_FLAGS --skipVerification"
+fi
+if [ -n "$CELOSCAN_API_KEY_ARG" ]; then
+  OPTIONAL_FLAGS="$OPTIONAL_FLAGS --celoscanApiKey $CELOSCAN_API_KEY_ARG"
 fi
 
 yarn ts-node ./scripts/foundry/make-release.ts \
@@ -64,4 +76,4 @@ yarn ts-node ./scripts/foundry/make-release.ts \
   --proposal "$PROPOSAL" \
   --report "$REPORT" \
   --buildDirectory "$BUILD_DIR" \
-  $RPC_URL_FLAG
+  $OPTIONAL_FLAGS

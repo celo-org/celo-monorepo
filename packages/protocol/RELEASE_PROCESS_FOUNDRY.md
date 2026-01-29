@@ -16,6 +16,12 @@ This document describes the release process for Celo Core Contracts using Foundr
 - [Communication & Community](#communication--community)
 - [Emergency Patches](#emergency-patches)
 - [Troubleshooting](#troubleshooting)
+- [Additional Resources](#additional-resources)
+- [Networks](#networks)
+- [Deployer Keys](#deployer-keys)
+- [Starting a Local Fork](#starting-a-local-fork)
+- [Contract Verification (Block Explorers)](#contract-verification-block-explorers)
+- [Environment Variables](#environment-variables)
 
 ## Overview
 
@@ -967,10 +973,105 @@ export RPC_URL=https://your-custom-rpc.com
 
 ## Networks
 
-| Network | Chain ID | RPC URL |
-|---------|----------|---------|
-| Celo Mainnet | 42220 | https://forno.celo.org |
-| Celo Sepolia | 11142220 | https://forno.celo-sepolia.celo-testnet.org |
+| Network | Chain ID | RPC URL | Use Case |
+|---------|----------|---------|----------|
+| Celo Mainnet | 42220 | https://forno.celo.org | Production releases |
+| Celo Sepolia | 11142220 | https://forno.celo-sepolia.celo-testnet.org | Testnet releases |
+| Local Fork | varies | http://127.0.0.1:8545 | Testing releases |
+
+## Deployer Keys
+
+Deployer keys are stored in encrypted mnemonic files in the repo root:
+
+| Network | Mnemonic File | Encrypted File |
+|---------|--------------|----------------|
+| Celo Sepolia | `.env.mnemonic.celosepolia` | N/A (manual) |
+| Mainnet | `.env.mnemonic.mainnet` | `.env.mnemonic.mainnet.enc` |
+
+### Decrypting Keys (cLabs employees)
+
+```bash
+# Decrypt all mnemonic files using GCP KMS
+yarn keys:decrypt
+```
+
+### Using Keys
+
+Each mnemonic file exports `DEPLOYER_PRIVATE_KEY`. Source it before running release commands:
+
+```bash
+# For Celo Sepolia
+source .env.mnemonic.celosepolia
+
+# For Mainnet
+source .env.mnemonic.mainnet
+```
+
+Then use `$DEPLOYER_PRIVATE_KEY` in release commands.
+
+## Starting a Local Fork
+
+Before testing on a local fork, start Anvil with the required parameters:
+
+```bash
+# Fork Celo Sepolia
+anvil --fork-url https://forno.celo-sepolia.celo-testnet.org \
+  --code-size-limit 500000 \
+  --gas-limit 100000000
+
+# Fork Mainnet
+anvil --fork-url https://forno.celo.org \
+  --code-size-limit 500000 \
+  --gas-limit 100000000
+```
+
+**Important**: The `--code-size-limit` and `--gas-limit` flags are required for Celo contract deployments due to large contract sizes.
+
+## Contract Verification (Block Explorers)
+
+The release script automatically verifies deployed contracts on:
+- **Blockscout** (https://celo-sepolia.blockscout.com or https://celo.blockscout.com) - No API key required
+- **Celoscan** via Etherscan V2 API (https://celoscan.io) - **API key required** for production networks
+
+### Verification Features
+
+The script handles verification automatically with:
+- **Linked libraries**: Contracts using libraries (e.g., Governance with Proposals library) are verified with the `--libraries` flag
+- **Foundry profiles**: Sets `FOUNDRY_PROFILE` environment variable (`truffle-compat` for 0.5.x, `truffle-compat8` for 0.8.x) to ensure bytecode matches
+- **Full compiler version**: Uses full version with commit hash (e.g., `0.5.14+commit.01f1aaa4`)
+- **Automatic retries**: Up to 6 retries with logarithmic delays (5s, 10s, 20s, 40s, 60s, 60s) for block explorer indexing
+
+### Celoscan API Key (Required for celo-sepolia and mainnet)
+
+The API key is **required by default** for production networks. Get your key from https://etherscan.io/myapikey
+
+**Setup options (in order of precedence):**
+
+1. **CLI flag**: `-a YOUR_API_KEY`
+2. **Environment variable**: `export CELOSCAN_API_KEY=YOUR_API_KEY`
+3. **Config file**: `packages/protocol/.env.json`
+   ```json
+   {
+     "celoScanApiKey": "YOUR_API_KEY"
+   }
+   ```
+
+**Note**: The Etherscan V2 API uses a unified endpoint (`api.etherscan.io`) that works with a single API key for all supported chains including Celo.
+
+### Skip Verification
+
+To skip verification (e.g., for testing or if you don't have an API key):
+```bash
+yarn release:make:foundry ... -s
+```
+
+Verification is automatically skipped when using a custom RPC URL (local forks).
+
+### Verification Troubleshooting
+
+- **"Address is not a smart-contract"**: Block explorer hasn't indexed the contract yet. The script waits 30s initially, then automatically retries up to 6 times with logarithmic delays (5s, 10s, 20s, 40s, 60s max).
+- **"Bytecode mismatch"**: Usually caused by wrong foundry profile. The script now automatically sets `FOUNDRY_PROFILE` based on contract source path.
+- **Linked library errors**: The script automatically detects and passes library addresses via `--libraries` flag for contracts that use linked libraries.
 
 ## Environment Variables
 
@@ -980,6 +1081,9 @@ For convenience, set these environment variables:
 # Deployer keys (keep secure!)
 export CELO_SEPOLIA_DEPLOYER_KEY="0x..."
 export MAINNET_DEPLOYER_KEY="0x..."
+
+# Celoscan API key (for contract verification)
+export CELOSCAN_API_KEY="YOUR_API_KEY"
 
 # Optional: Custom RPC URLs
 export RPC_URL="https://forno.celo.org"

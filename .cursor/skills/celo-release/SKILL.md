@@ -31,8 +31,6 @@ Deployer keys are stored in encrypted mnemonic files in the repo root:
 |---------|--------------|----------------|
 | Celo Sepolia | `.env.mnemonic.celosepolia` | N/A (manual) |
 | Mainnet | `.env.mnemonic.mainnet` | `.env.mnemonic.mainnet.enc` |
-| Alfajores | `.env.mnemonic.alfajores` | `.env.mnemonic.alfajores.enc` |
-| Baklava | `.env.mnemonic.baklava` | `.env.mnemonic.baklava.enc` |
 
 ### Decrypting Keys (cLabs employees)
 
@@ -56,6 +54,69 @@ source .env.mnemonic.mainnet
 Then use `$DEPLOYER_PRIVATE_KEY` in release commands.
 
 ## Release Workflow
+
+### Step 0: Confirm Release Parameters with User
+
+**IMPORTANT**: Before executing any release commands, you MUST:
+
+1. Query available tags and branches:
+   ```bash
+   git tag -l 'core-contracts.*' | sort -V | tail -15
+   git branch -a | grep 'release/core-contracts'
+   ```
+
+2. Determine the release source using this priority order:
+   
+   **Tag priority (check in order, use first match):**
+   1. Post-audit tag (if exists): `core-contracts.vN.post-audit` or `core-contracts.vN.post_audit`
+   2. Base tag: `core-contracts.vN`
+   3. Release branch: `release/core-contracts/N` (only if no tags exist)
+   
+   **Note**: Not all releases have post-audit tags. If one exists, use it; otherwise use the base tag.
+   
+   **For the NEW release**: Check for post-audit tag first, then base tag, then branch.
+   **For the PREVIOUS release**: Same logic - use post-audit tag if available, otherwise base tag.
+
+3. Present a confirmation to the user with:
+   - **Previous release tag** (for libraries.json): e.g., `core-contracts.v14` or `core-contracts.v14.post-audit`
+   - **New release source**: Following the priority above
+   - **Target network**: e.g., `celo-sepolia` or `celo`
+
+4. Use the AskQuestion tool to get explicit confirmation:
+   - Option to confirm the proposed tags/branches
+   - Option to specify different tag/branch
+
+5. Only proceed with the release after user confirmation.
+
+Example confirmation prompt (when post-audit tag exists):
+```
+I plan to release with the following parameters:
+- Previous release tag: core-contracts.v14.post-audit
+- New release tag: core-contracts.v15.post-audit
+- Target network: celo-sepolia
+
+Please confirm or specify different values.
+```
+
+Example confirmation prompt (when only base tag exists):
+```
+I plan to release with the following parameters:
+- Previous release tag: core-contracts.v14
+- New release tag: core-contracts.v15
+- Target network: celo-sepolia
+
+Please confirm or specify different values.
+```
+
+Example confirmation prompt (when only branch exists):
+```
+I plan to release with the following parameters:
+- Previous release tag: core-contracts.v14
+- New release branch: release/core-contracts/15 (no tag found)
+- Target network: celo-sepolia
+
+Please confirm or specify different values.
+```
 
 ### Step 1: Generate libraries.json
 
@@ -156,13 +217,26 @@ yarn release:make:foundry \
 
 ## Determining Release Numbers
 
-```bash
-# List existing tags
-git tag -l 'core-contracts.*' | sort -V | tail -5
+**Priority**: Always prefer git tags over branches. Post-audit tags are preferred over base tags.
 
-# List release branches
+```bash
+# List existing tags (check these FIRST)
+git tag -l 'core-contracts.*' | sort -V | tail -15
+
+# List release branches (fallback if no tag exists)
 git branch -a | grep 'release/core-contracts'
 ```
+
+**Tag priority (check in order, use first match):**
+1. `core-contracts.vN.post-audit` or `core-contracts.vN.post_audit` - Post-audit (if exists)
+2. `core-contracts.vN` - Base tag
+3. `release/core-contracts/N` - Branch (fallback only)
+
+**Note**: Not all releases have post-audit tags. Use it if available, otherwise use the base tag.
+
+**Selection logic:**
+1. For NEW release: Check for post-audit tag first, then base tag, then branch
+2. For PREVIOUS release: Same logic - use post-audit tag if available, otherwise base tag
 
 ## Starting a Local Fork
 
@@ -181,6 +255,51 @@ anvil --fork-url https://forno.celo.org \
 ```
 
 **Important**: The `--code-size-limit` and `--gas-limit` flags are required for Celo contract deployments due to large contract sizes.
+
+## Contract Verification
+
+The release script automatically verifies deployed contracts on:
+- **Blockscout** (https://celo-sepolia.blockscout.com or https://celo.blockscout.com) - No API key required
+- **Celoscan** via Etherscan V2 API (https://celoscan.io) - **API key required** for production networks
+
+### Verification Features
+
+The script handles verification automatically with:
+- **Linked libraries**: Contracts using libraries (e.g., Governance with Proposals library) are verified with the `--libraries` flag
+- **Foundry profiles**: Sets `FOUNDRY_PROFILE` environment variable (`truffle-compat` for 0.5.x, `truffle-compat8` for 0.8.x) to ensure bytecode matches
+- **Full compiler version**: Uses full version with commit hash (e.g., `0.5.14+commit.01f1aaa4`)
+
+### Celoscan API Key (Required for celo-sepolia and mainnet)
+
+The API key is **required by default** for production networks. Get your key from https://etherscan.io/myapikey
+
+**Setup options (in order of precedence):**
+
+1. **CLI flag**: `-a YOUR_API_KEY`
+2. **Environment variable**: `export CELOSCAN_API_KEY=YOUR_API_KEY`
+3. **Config file**: `packages/protocol/.env.json`
+   ```json
+   {
+     "celoScanApiKey": "YOUR_API_KEY"
+   }
+   ```
+
+**Note**: The Etherscan V2 API uses a unified endpoint (`api.etherscan.io`) that works with a single API key for all supported chains including Celo.
+
+### Skip Verification
+
+To skip verification (e.g., for testing or if you don't have an API key):
+```bash
+yarn release:make:foundry ... -s
+```
+
+Verification is automatically skipped when using a custom RPC URL (local forks).
+
+### Verification Troubleshooting
+
+- **"Address is not a smart-contract"**: Block explorer hasn't indexed the contract yet. The script waits 30s initially, then automatically retries up to 6 times with logarithmic delays (5s, 10s, 20s, 40s, 60s max).
+- **"Bytecode mismatch"**: Usually caused by wrong foundry profile. The script now automatically sets `FOUNDRY_PROFILE` based on contract source path.
+- **Linked library errors**: The script automatically detects and passes library addresses via `--libraries` flag for contracts that use linked libraries.
 
 ## Common Issues
 
