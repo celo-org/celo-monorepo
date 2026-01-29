@@ -17,6 +17,9 @@ import {
   Chain,
   Hex,
   Address as ViemAddress,
+  PublicClient,
+  Transport,
+  WalletClient,
   createPublicClient,
   createWalletClient,
   defineChain,
@@ -27,36 +30,17 @@ import {
   toHex,
 } from 'viem'
 
-// Define explicit interfaces for the viem client methods we actually use
-// This avoids viem's complex generic constraints while maintaining type safety
-interface PublicClientMethods {
-  call(args: { to: ViemAddress; data: Hex }): Promise<{ data?: Hex }>
-  waitForTransactionReceipt(args: { hash: Hex }): Promise<{
-    status: 'success' | 'reverted'
-    contractAddress?: ViemAddress
-  }>
-}
+// Use Pick to extract only the methods we need from viem's client types
+// This maintains compatibility with viem's complex generics
+type PublicClientMethods = Pick<
+  PublicClient<Transport, Chain>,
+  'call' | 'waitForTransactionReceipt'
+>
 
-interface WalletClientMethods {
-  account: Account | undefined
-  chain: Chain | undefined
-  deployContract(args: {
-    abi: Abi
-    bytecode: Hex
-    account: Account
-    chain: Chain
-    gas: bigint
-    args?: readonly unknown[]
-  }): Promise<Hex>
-  writeContract(args: {
-    address: ViemAddress
-    abi: Abi
-    functionName: string
-    args: readonly unknown[]
-    account: Account
-    chain: Chain
-  }): Promise<Hex>
-}
+type WalletClientMethods = Pick<
+  WalletClient<Transport, Chain, Account>,
+  'account' | 'chain' | 'deployContract' | 'writeContract'
+>
 
 // Registry ABI for getAddressForString - used for type-safe contract reads
 const registryGetAddressAbi = [
