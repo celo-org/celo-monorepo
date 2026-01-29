@@ -224,7 +224,7 @@ jobs:
               fi
           - name: Protocol Compatibility
             command: |
-              yarn --cwd packages/protocol test:truffle:compatibility
+              yarn --cwd packages/protocol test:ts
     steps:
       - uses: actions/checkout@v4
         with:
