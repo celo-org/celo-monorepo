@@ -44,7 +44,7 @@
     "tags:view": "git for-each-ref 'refs/tags/core-contracts.*' --sort=-committerdate --format='%(color:magenta)%(committerdate:short) %(color:blue)%(tree) %(color:green)github.com/celo-org/celo-monorepo/releases/tag/%(color:yellow)%(refname:short)'",
     "test": "forge test",
     "test:release-snapshots": "./scripts/bash/release-snapshots.sh",
-    "test:ts": "yarn build:foundry && yarn tsc && yarn mocha --recursive test-ts",
+    "test:ts": "yarn tsc && yarn mocha --recursive test-ts",
     "truffle:console": "./scripts/bash/console.sh",
     "truffle:verify": "yarn truffle run verify",
     "utils:prepare-contracts-and-abis-publishing": "yarn ts-node --preferTsExts ./scripts/prepare-contracts-and-abis-publishing.ts",
