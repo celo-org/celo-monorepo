@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
-import { Abi, encodeFunctionData, GetProofReturnType } from 'viem'
+import { AbiFunction, Abi, encodeFunctionData, GetProofReturnType } from 'viem'
 import { readJsonSync } from 'fs-extra'
 
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
@@ -215,7 +215,7 @@ describe('', () => {
         getCode: async (address: `0x${string}`): Promise<string> => {
           return (await network.client.getCode({ address })) as string
         },
-        encodeFunctionCall: (abi: any, args: any[]) => {
+        encodeFunctionCall: (abi: AbiFunction, args: any[]) => {
           return encodeFunctionData({
             abi: [abi],
             functionName: abi.name,
