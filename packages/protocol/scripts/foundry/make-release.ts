@@ -27,9 +27,36 @@ import {
   toHex,
 } from 'viem'
 
-// Use simplified types to avoid viem's complex generic constraints
-type SimplePublicClient = ReturnType<typeof createPublicClient> extends infer T ? T : never
-type SimpleWalletClient = ReturnType<typeof createWalletClient> extends infer T ? T : never
+// Define explicit interfaces for the viem client methods we actually use
+// This avoids viem's complex generic constraints while maintaining type safety
+interface PublicClientMethods {
+  call(args: { to: ViemAddress; data: Hex }): Promise<{ data?: Hex }>
+  waitForTransactionReceipt(args: { hash: Hex }): Promise<{
+    status: 'success' | 'reverted'
+    contractAddress?: ViemAddress
+  }>
+}
+
+interface WalletClientMethods {
+  account: Account | undefined
+  chain: Chain | undefined
+  deployContract(args: {
+    abi: Abi
+    bytecode: Hex
+    account: Account
+    chain: Chain
+    gas: bigint
+    args?: readonly unknown[]
+  }): Promise<Hex>
+  writeContract(args: {
+    address: ViemAddress
+    abi: Abi
+    functionName: string
+    args: readonly unknown[]
+    account: Account
+    chain: Chain
+  }): Promise<Hex>
+}
 
 // Registry ABI for getAddressForString - used for type-safe contract reads
 const registryGetAddressAbi = [
@@ -403,8 +430,8 @@ let ignoredContractsSet = new Set()
 class ContractAddresses {
   static async create(
     contracts: string[],
-    publicClient: SimplePublicClient,
-    registryAbi: Abi,
+    publicClient: PublicClientMethods,
+    _registryAbi: Abi, // Kept for API compatibility, uses registryGetAddressAbi internally
     registryAddress: ViemAddress,
     libraryAddresses: LibraryAddresses['addresses']
   ) {
@@ -588,8 +615,8 @@ function getDefaultValueForSolidityType(
 const deployImplementation = async (
   contractName: string,
   contractArtifact: ViemContract,
-  walletClient: SimpleWalletClient,
-  publicClient: SimplePublicClient,
+  walletClient: WalletClientMethods,
+  publicClient: PublicClientMethods,
   requireVersion = true,
   gas?: bigint,
   isLibrary = false,
@@ -670,8 +697,8 @@ const deployProxy = async (
   contractName: string,
   proxyArtifact: ViemContract,
   addresses: ContractAddresses,
-  walletClient: SimpleWalletClient,
-  publicClient: SimplePublicClient,
+  walletClient: WalletClientMethods,
+  publicClient: PublicClientMethods,
   gas?: bigint
 ): Promise<ViemContract> => {
   if (contractName === 'Governance') {
@@ -733,8 +760,8 @@ const deployCoreContract = async (
   addresses: ContractAddresses,
   report: ASTDetailedVersionedReport,
   initializationData: Record<string, unknown[]>,
-  walletClient: SimpleWalletClient,
-  publicClient: SimplePublicClient,
+  walletClient: WalletClientMethods,
+  publicClient: PublicClientMethods,
   contractArtifactPaths: Map<string, string>,
   linkedLibraries: LinkedLibrary[] = []
 ) => {
@@ -830,8 +857,8 @@ const deployLibrary = async (
   libraryName: string,
   libraryArtifact: ViemContract,
   addresses: ContractAddresses,
-  walletClient: SimpleWalletClient,
-  publicClient: SimplePublicClient
+  walletClient: WalletClientMethods,
+  publicClient: PublicClientMethods
 ): Promise<void> => {
   const deployedLibrary = await deployImplementation(
     libraryName,
@@ -1021,8 +1048,8 @@ const performRelease = async (
   addresses: ContractAddresses,
   proposal: ProposalTx[],
   initializationData: Record<string, unknown[]>,
-  walletClient: SimpleWalletClient,
-  publicClient: SimplePublicClient
+  walletClient: WalletClientMethods,
+  publicClient: PublicClientMethods
 ): Promise<void> => {
   if (released.has(contractName)) return
 
