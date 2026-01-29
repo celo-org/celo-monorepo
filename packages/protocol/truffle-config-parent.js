@@ -9,14 +9,12 @@ const argv = require('minimist')(process.argv.slice(2), {
   boolean: ['reset'],
 })
 
-const ALFAJORES_NETWORKID = 11142220
 const CELOSEPOLIA_NETWORKID = 11142220
 
 const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
 const INTEGRATION_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const INTEGRATION_TESTING_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
-const ALFAJORES_FROM = '0x59A60D2B488154dc5CB48c42347Df222e13C70Ba'
 const CELOSEPOLIA_FROM =
   process.env.CELOSEPOLIA_FROM || '0x0000000000000000000000000000000000000000'
 
@@ -52,7 +50,6 @@ function readMnemonic(networkName) {
 }
 
 const fornoUrls = {
-  alfajores: 'https://forno.celo-sepolia.celo-testnet.org',
   celosepolia: 'https://forno.celo-sepolia.celo-testnet.org',
   rc1: 'https://forno.celo.org',
   mainnet: 'https://forno.celo.org',
@@ -93,12 +90,6 @@ const networks = {
     from: INTEGRATION_TESTING_FROM,
     network_id: 1101,
     port: devPort,
-  },
-  alfajores: {
-    ...defaultConfig,
-    network_id: ALFAJORES_NETWORKID,
-    from: ALFAJORES_FROM,
-    privateKeyAvailable: true,
   },
   celosepolia: {
     ...defaultConfig,

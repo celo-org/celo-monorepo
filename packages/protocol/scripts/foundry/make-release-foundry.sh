@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Checks that the contract version numbers in a provided branch are as expected given
-# a released branch.
+# Deploys new contract implementations and generates governance proposal.
 #
 # Flags:
-# -b: Branch to build contracts from.
+# -b: Branch to build contracts from (must be core-contracts.vX or release/core-contracts/X format).
 # -k: Private key to sign transactions from.
 # -i: Path to the data needed to initialize contracts.
 # -l: Path to the canonical library mapping.

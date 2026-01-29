@@ -14,6 +14,7 @@ import {
   Chain,
   Hex,
   PublicClient,
+  Transport,
   Address as ViemAddress,
   WalletClient,
   createPublicClient,
@@ -61,7 +62,7 @@ let ignoredContractsSet = new Set()
 class ContractAddresses {
   static async create(
     contracts: string[],
-    publicClient: PublicClient,
+    publicClient: PublicClient<Transport, Chain>,
     registryAbi: Abi,
     registryAddress: ViemAddress,
     libraryAddresses: LibraryAddresses['addresses']
@@ -72,7 +73,7 @@ class ContractAddresses {
     await Promise.all(
       contracts.map(async (contract: string) => {
         try {
-          const registeredAddress = (await (publicClient.readContract as any)({
+          const registeredAddress = (await publicClient.readContract({
             address: registryAddress,
             abi,
             functionName,
@@ -233,7 +234,7 @@ const deployImplementation = async (
   contractName: string,
   contractArtifact: ViemContract,
   walletClient: WalletClient,
-  publicClient: PublicClient,
+  publicClient: PublicClient<Transport, Chain>,
   requireVersion = true,
   gas?: bigint
 ): Promise<ViemContract> => {
@@ -291,7 +292,7 @@ const deployProxy = async (
   proxyArtifact: ViemContract,
   addresses: ContractAddresses,
   walletClient: WalletClient,
-  publicClient: PublicClient,
+  publicClient: PublicClient<Transport, Chain>,
   gas?: bigint
 ): Promise<ViemContract> => {
   if (contractName === 'Governance') {
@@ -354,7 +355,7 @@ const deployCoreContract = async (
   report: ASTDetailedVersionedReport,
   initializationData: Record<string, unknown[]>,
   walletClient: WalletClient,
-  publicClient: PublicClient,
+  publicClient: PublicClient<Transport, Chain>,
   contractArtifactPaths: Map<string, string>
 ) => {
   const deployedImplementation = await deployImplementation(
@@ -448,7 +449,7 @@ const deployLibrary = async (
   libraryArtifact: ViemContract,
   addresses: ContractAddresses,
   walletClient: WalletClient,
-  publicClient: PublicClient
+  publicClient: PublicClient<Transport, Chain>
 ): Promise<void> => {
   const deployedLibrary = await deployImplementation(
     libraryName,
@@ -596,7 +597,7 @@ const performRelease = async (
   proposal: ProposalTx[],
   initializationData: Record<string, unknown[]>,
   walletClient: WalletClient,
-  publicClient: PublicClient
+  publicClient: PublicClient<Transport, Chain>
 ): Promise<void> => {
   if (released.has(contractName)) return
 
@@ -727,15 +728,11 @@ async function main() {
         `RPC URL for network ${networkName} could not be determined. Provide --rpcUrl parameter.`
       )
     }
-    const publicClientInternal = createPublicClient({
+    const publicClient = createPublicClient({
       chain: viemChain,
       transport: http(transportUrl),
     })
 
-    const publicClient = {
-      ...publicClientInternal,
-      account: undefined,
-    } as PublicClient
     let account: Account
 
     if (argv.privateKey) {

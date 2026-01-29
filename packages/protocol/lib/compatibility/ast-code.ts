@@ -5,7 +5,7 @@ import {
   MethodMutabilityChange, MethodRemovedChange, MethodReturnChange,
   MethodVisibilityChange, NewContractChange
 } from '@celo/protocol/lib/compatibility/change'
-import { getArtifactByName, getContractName, makeZContract } from '@celo/protocol/lib/compatibility/internal'
+import { Artifact, getArtifactByName, getContractName, makeZContract } from '@celo/protocol/lib/compatibility/internal'
 import {
   BuildArtifacts,
   Contract as ZContract
@@ -263,7 +263,7 @@ export function reportASTIncompatibilities(
 
   // Helper function to get compiler version from artifacts
   const getCompilerVersion = (artifacts: BuildArtifacts): string => {
-    const firstArtifact = artifacts.listArtifacts()[0] as any
+    const firstArtifact: Artifact | undefined = artifacts.listArtifacts()[0]
     // Truffle artifacts have .compiler.version at top level
     if (firstArtifact?.compiler?.version) {
       return firstArtifact.compiler.version
