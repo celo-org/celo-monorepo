@@ -67,7 +67,7 @@ if [ -n "$CELOSCAN_API_KEY_ARG" ]; then
   OPTIONAL_FLAGS="$OPTIONAL_FLAGS --celoscanApiKey $CELOSCAN_API_KEY_ARG"
 fi
 
-yarn ts-node ./scripts/foundry/make-release.ts \
+yarn ts-node --transpile-only ./scripts/foundry/make-release.ts \
   --branch "$BRANCH" \
   --privateKey "$PRIVATE_KEY" \
   --initializeData "$INITIALIZE_DATA" \

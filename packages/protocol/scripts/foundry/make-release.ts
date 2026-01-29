@@ -16,17 +16,31 @@ import {
   Account,
   Chain,
   Hex,
-  PublicClient,
-  Transport,
   Address as ViemAddress,
-  WalletClient,
   createPublicClient,
   createWalletClient,
+  defineChain,
+  decodeFunctionResult,
   encodeFunctionData,
   http,
   keccak256,
   toHex,
 } from 'viem'
+
+// Use simplified types to avoid viem's complex generic constraints
+type SimplePublicClient = ReturnType<typeof createPublicClient> extends infer T ? T : never
+type SimpleWalletClient = ReturnType<typeof createWalletClient> extends infer T ? T : never
+
+// Registry ABI for getAddressForString - used for type-safe contract reads
+const registryGetAddressAbi = [
+  {
+    type: 'function',
+    name: 'getAddressForString',
+    inputs: [{ name: 'identifier', type: 'string' }],
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+  },
+] as const
 import { mnemonicToAccount, privateKeyToAccount } from 'viem/accounts'
 import * as viemChains from 'viem/chains'
 import yargs from 'yargs'
@@ -389,23 +403,32 @@ let ignoredContractsSet = new Set()
 class ContractAddresses {
   static async create(
     contracts: string[],
-    publicClient: PublicClient<Transport, Chain>,
+    publicClient: SimplePublicClient,
     registryAbi: Abi,
     registryAddress: ViemAddress,
     libraryAddresses: LibraryAddresses['addresses']
   ) {
     const addresses = new Map<string, string>()
-    const functionName = 'getAddressForString'
-    const abi = registryAbi
     await Promise.all(
       contracts.map(async (contract: string) => {
         try {
-          const registeredAddress = (await publicClient.readContract({
-            address: registryAddress,
-            abi,
-            functionName,
+          // Use low-level call to avoid viem's strict readContract typing
+          const callData = encodeFunctionData({
+            abi: registryGetAddressAbi,
+            functionName: 'getAddressForString',
             args: [contract],
-          })) as string
+          })
+          const result = await publicClient.call({
+            to: registryAddress,
+            data: callData,
+          })
+          const registeredAddress = result.data
+            ? decodeFunctionResult({
+                abi: registryGetAddressAbi,
+                functionName: 'getAddressForString',
+                data: result.data,
+              })
+            : NULL_ADDRESS
           if (registeredAddress && !eqAddress(registeredAddress, NULL_ADDRESS)) {
             addresses.set(contract, registeredAddress)
           }
@@ -565,8 +588,8 @@ function getDefaultValueForSolidityType(
 const deployImplementation = async (
   contractName: string,
   contractArtifact: ViemContract,
-  walletClient: WalletClient,
-  publicClient: PublicClient<Transport, Chain>,
+  walletClient: SimpleWalletClient,
+  publicClient: SimplePublicClient,
   requireVersion = true,
   gas?: bigint,
   isLibrary = false,
@@ -647,8 +670,8 @@ const deployProxy = async (
   contractName: string,
   proxyArtifact: ViemContract,
   addresses: ContractAddresses,
-  walletClient: WalletClient,
-  publicClient: PublicClient<Transport, Chain>,
+  walletClient: SimpleWalletClient,
+  publicClient: SimplePublicClient,
   gas?: bigint
 ): Promise<ViemContract> => {
   if (contractName === 'Governance') {
@@ -710,8 +733,8 @@ const deployCoreContract = async (
   addresses: ContractAddresses,
   report: ASTDetailedVersionedReport,
   initializationData: Record<string, unknown[]>,
-  walletClient: WalletClient,
-  publicClient: PublicClient<Transport, Chain>,
+  walletClient: SimpleWalletClient,
+  publicClient: SimplePublicClient,
   contractArtifactPaths: Map<string, string>,
   linkedLibraries: LinkedLibrary[] = []
 ) => {
@@ -807,8 +830,8 @@ const deployLibrary = async (
   libraryName: string,
   libraryArtifact: ViemContract,
   addresses: ContractAddresses,
-  walletClient: WalletClient,
-  publicClient: PublicClient<Transport, Chain>
+  walletClient: SimpleWalletClient,
+  publicClient: SimplePublicClient
 ): Promise<void> => {
   const deployedLibrary = await deployImplementation(
     libraryName,
@@ -837,20 +860,18 @@ const getViemChain = (networkName: string): Chain => {
     case 'rc1':
       return viemChains.celo
     case 'celo-sepolia':
-      return {
+      return defineChain({
         id: 11142220,
         name: 'Celo Sepolia',
-        network: 'celo-sepolia',
         nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 },
         rpcUrls: {
           default: { http: ['https://forno.celo-sepolia.celo-testnet.org'] },
-          public: { http: ['https://forno.celo-sepolia.celo-testnet.org'] },
         },
         blockExplorers: {
           default: { name: 'CeloScan', url: 'https://celo-sepolia.blockscout.com' },
         },
         testnet: true,
-      } as unknown as Chain
+      })
     default:
       return { ...viemChains.hardhat, id: 31337 }
   }
@@ -1000,8 +1021,8 @@ const performRelease = async (
   addresses: ContractAddresses,
   proposal: ProposalTx[],
   initializationData: Record<string, unknown[]>,
-  walletClient: WalletClient,
-  publicClient: PublicClient<Transport, Chain>
+  walletClient: SimpleWalletClient,
+  publicClient: SimplePublicClient
 ): Promise<void> => {
   if (released.has(contractName)) return
 

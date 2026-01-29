@@ -9,7 +9,7 @@ import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 
 import { instantiateArtifactsFromForge } from '@celo/protocol/lib/compatibility/utils'
 import { existsSync, readJsonSync, writeJsonSync } from 'fs-extra'
-import { Chain, createPublicClient, encodeFunctionData, http } from 'viem'
+import { Chain, createPublicClient, defineChain, encodeFunctionData, http } from 'viem'
 import * as viemChains from 'viem/chains'
 
 /*
@@ -61,20 +61,18 @@ const getViemChain = (networkName: string): Chain => {
     case 'rc1':
       return viemChains.celo
     case 'celo-sepolia':
-      return {
+      return defineChain({
         id: 11142220,
         name: 'Celo Sepolia',
-        network: 'celo-sepolia',
         nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 },
         rpcUrls: {
           default: { http: ['https://forno.celo-sepolia.celo-testnet.org'] },
-          public: { http: ['https://forno.celo-sepolia.celo-testnet.org'] },
         },
         blockExplorers: {
           default: { name: 'CeloScan', url: 'https://celo-sepolia.blockscout.com' },
         },
         testnet: true,
-      } as unknown as Chain
+      })
     default:
       return { ...viemChains.hardhat, id: 31337 }
   }
