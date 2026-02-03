@@ -9954,10 +9954,10 @@ functions-have-names@^1.2.2, functions-have-names@^1.2.3:
   resolved "https://registry.yarnpkg.com/functions-have-names/-/functions-have-names-1.2.3.tgz#0404fe4ee2ba2f607f0e0ec3c80bae994133b834"
   integrity sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==
 
-ganache@7.8.0, "ganache@npm:@celo/ganache@7.8.0-unofficial.0":
-  version "7.8.0-unofficial.0"
-  resolved "https://registry.yarnpkg.com/@celo/ganache/-/ganache-7.8.0-unofficial.0.tgz#7930a68ea8df36c7862425a164b44e3e89cb3d0f"
-  integrity sha512-csobquRjvgG/0mzw6NRB4ga+idPq7yQKLISNbxn2JSS/nCkGCTKn4yvTJqhmZ1dzwL2U3qHmGer2qXlxFQgbdg==
+ganache@7.8.0:
+  version "7.8.0"
+  resolved "https://registry.yarnpkg.com/ganache/-/ganache-7.8.0.tgz#02154384f246b66e98974cbcbb18e8372df3c2e0"
+  integrity sha512-IrUYvsaE/m2/NaVIZ7D/gCnsmyU/buechnH6MhUipzG1qJcZIwIp/DoP/LZUcHyhy0Bv0NKZD2pGOjpRhn7l7A==
   dependencies:
     "@trufflesuite/bigint-buffer" "1.1.10"
     "@trufflesuite/uws-js-unofficial" "20.10.0-unofficial.2"
