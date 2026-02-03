@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Checks that the contract version numbers in a provided branch are as expected given
-# a released branch.
+# Deploys new contract implementations and generates governance proposal.
 #
 # Flags:
-# -b: Branch to build contracts from.
+# -b: Branch to build contracts from (must be core-contracts.vX or release/core-contracts/X format).
 # -k: Private key to sign transactions from.
 # -i: Path to the data needed to initialize contracts.
 # -l: Path to the canonical library mapping.
 # -n: The network to deploy to.
 # -p: Path that the governance proposal should be written to.
 # -r: Path to the contract compatibility report.
+# -u: Custom RPC URL (optional, overrides network default).
+# -s: Skip contract verification (optional).
+# -a: Celoscan API key for verification (optional, can also use CELOSCAN_API_KEY env var).
 
 BRANCH=""
 PRIVATE_KEY=""
@@ -20,8 +22,11 @@ LIBRARIES=""
 NETWORK=""
 PROPOSAL=""
 REPORT=""
+RPC_URL=""
+SKIP_VERIFICATION=""
+CELOSCAN_API_KEY_ARG=""
 
-while getopts 'b:k:i:l:n:p:r:' flag; do
+while getopts 'b:k:i:l:n:p:r:u:sa:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     k) PRIVATE_KEY="${OPTARG}" ;;
@@ -30,6 +35,9 @@ while getopts 'b:k:i:l:n:p:r:' flag; do
     n) NETWORK="${OPTARG}" ;;
     p) PROPOSAL="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
+    u) RPC_URL="${OPTARG}" ;;
+    s) SKIP_VERIFICATION="true" ;;
+    a) CELOSCAN_API_KEY_ARG="${OPTARG}" ;;
     *)
       echo "Unexpected option ${flag}" >&2
       exit 1
@@ -47,7 +55,19 @@ done
 
 BUILD_DIR="./out/"
 
-yarn ts-node ./scripts/foundry/make-release.ts \
+# Build the command with optional flags
+OPTIONAL_FLAGS=""
+if [ -n "$RPC_URL" ]; then
+  OPTIONAL_FLAGS="$OPTIONAL_FLAGS --rpcUrl $RPC_URL"
+fi
+if [ -n "$SKIP_VERIFICATION" ]; then
+  OPTIONAL_FLAGS="$OPTIONAL_FLAGS --skipVerification"
+fi
+if [ -n "$CELOSCAN_API_KEY_ARG" ]; then
+  OPTIONAL_FLAGS="$OPTIONAL_FLAGS --celoscanApiKey $CELOSCAN_API_KEY_ARG"
+fi
+
+yarn ts-node --transpile-only ./scripts/foundry/make-release.ts \
   --branch "$BRANCH" \
   --privateKey "$PRIVATE_KEY" \
   --initializeData "$INITIALIZE_DATA" \
@@ -55,4 +75,5 @@ yarn ts-node ./scripts/foundry/make-release.ts \
   --network "$NETWORK" \
   --proposal "$PROPOSAL" \
   --report "$REPORT" \
-  --buildDirectory "$BUILD_DIR"
+  --buildDirectory "$BUILD_DIR" \
+  $OPTIONAL_FLAGS
