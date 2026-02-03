@@ -172,7 +172,9 @@ export class ASTVersionedReport {
       contracts: {},
       libraries: {}
     }
-    Object.keys(changesByContract).forEach((contract: string) => {
+    // Sort contract names alphabetically to ensure consistent ordering
+    // regardless of whether Truffle or Foundry artifacts are used
+    Object.keys(changesByContract).sort().forEach((contract: string) => {
       if (isLibrary(contract, artifactsSet)) {
         reportIndex.libraries[contract] = changesByContract[contract]
       } else {
