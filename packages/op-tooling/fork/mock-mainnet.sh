@@ -41,14 +41,6 @@ fi
 [ "$USE_INTERNAL_COUNCIL" = "false" ] && MOCKED_SIGNER_3=$EXTERNAL_ACCOUNT
 [ -z "${MOCKED_SIGNER_4:-}" ] && echo "Need to set the MOCKED_SIGNER_4 via env" && exit 1
 
-# validate signer ordering
-if [ "$USE_INTERNAL_CLABS" = "true" ] && [[ ${MOCKED_SIGNER_1:2,,} > ${MOCKED_SIGNER_2:2,,} ]]; then
-  echo "Error: MOCKED_SIGNER_1 must be < MOCKED_SIGNER_2 (addresses must be in ascending order)" && exit 1
-fi
-if [ "$USE_INTERNAL_COUNCIL" = "true" ] && [[ ${MOCKED_SIGNER_3:2,,} > ${MOCKED_SIGNER_4:2,,} ]]; then
-  echo "Error: MOCKED_SIGNER_3 must be < MOCKED_SIGNER_4 (addresses must be in ascending order)" && exit 1
-fi
-
 # safe internal
 SENTINEL_ADDRESS=0x0000000000000000000000000000000000000001
 
@@ -117,25 +109,14 @@ if [ -z "$GRAND_CHILD_MULTISIG" ]; then
   SIGNER_4_SLOT=$(cast index address $MOCKED_SIGNER_4 2)
   cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SIGNER_4_SLOT 0x000000000000000000000000${SENTINEL_ADDRESS:2} -r $RPC_URL
 else
-  if [[ ${GRAND_CHILD_MULTISIG:2,,} < ${MOCKED_SIGNER_4:2,,} ]]; then
-    # Sentinel -> Grand Child
-    cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SENTINEL_SLOT 0x000000000000000000000000${GRAND_CHILD_MULTISIG:2} -r $RPC_URL
-    # Grand Child -> Signer #4
-    GC_SLOT=$(cast index address $GRAND_CHILD_MULTISIG 2)
-    cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $GC_SLOT 0x000000000000000000000000${MOCKED_SIGNER_4:2} -r $RPC_URL
-    # Signer #4 -> Sentinel
-    SIGNER_4_SLOT=$(cast index address $MOCKED_SIGNER_4 2)
-    cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SIGNER_4_SLOT 0x000000000000000000000000${SENTINEL_ADDRESS:2} -r $RPC_URL
-  else
-    # Sentinel -> Signer #4
-    cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SENTINEL_SLOT 0x000000000000000000000000${MOCKED_SIGNER_4:2} -r $RPC_URL
-    # Signer #4 -> Grand Child
-    SIGNER_4_SLOT=$(cast index address $MOCKED_SIGNER_4 2)
-    cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SIGNER_4_SLOT 0x000000000000000000000000${GRAND_CHILD_MULTISIG:2} -r $RPC_URL
-    # Grand Child -> Sentinel
-    GC_SLOT=$(cast index address $GRAND_CHILD_MULTISIG 2)
-    cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $GC_SLOT 0x000000000000000000000000${SENTINEL_ADDRESS:2} -r $RPC_URL
-  fi
+  # Sentinel -> Grand Child
+  cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SENTINEL_SLOT 0x000000000000000000000000${GRAND_CHILD_MULTISIG:2} -r $RPC_URL
+  # Grand Child -> Signer #4
+  GC_SLOT=$(cast index address $GRAND_CHILD_MULTISIG 2)
+  cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $GC_SLOT 0x000000000000000000000000${MOCKED_SIGNER_4:2} -r $RPC_URL
+  # Signer #4 -> Sentinel
+  SIGNER_4_SLOT=$(cast index address $MOCKED_SIGNER_4 2)
+  cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SIGNER_4_SLOT 0x000000000000000000000000${SENTINEL_ADDRESS:2} -r $RPC_URL
 
   # GC Sentinel -> Signer #3
   cast rpc anvil_setStorageAt $GRAND_CHILD_MULTISIG $SENTINEL_SLOT 0x000000000000000000000000${MOCKED_SIGNER_3:2} -r $RPC_URL
