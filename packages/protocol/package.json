@@ -70,7 +70,6 @@
     "chalk": "^2.4.2",
     "form-data": "^3.0.0",
     "fs-extra": "^5.0.0",
-    "ganache": "npm:@celo/ganache@7.8.0-unofficial.0",
     "glob-fs": "^0.1.7",
     "lodash": "^4.17.21",
     "minimist": "^1.2.0",
