@@ -9,26 +9,31 @@ import { exec } from 'child_process'
 import { existsSync, readJsonSync, readdirSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
 import { TextEncoder, promisify } from 'util'
-
-const execAsync = promisify(exec)
 import {
   Abi,
   Account,
   Chain,
   Hex,
-  Address as ViemAddress,
   PublicClient,
   Transport,
+  Address as ViemAddress,
   WalletClient,
   createPublicClient,
   createWalletClient,
-  defineChain,
   decodeFunctionResult,
+  defineChain,
   encodeFunctionData,
   http,
   keccak256,
   toHex,
 } from 'viem'
+import { mnemonicToAccount, privateKeyToAccount } from 'viem/accounts'
+import * as viemChains from 'viem/chains'
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+import { getReleaseVersion, ignoredContractsV9 } from '../../lib/compatibility/ignored-contracts-v9'
+
+const execAsync = promisify(exec)
 
 // Use Pick to extract only the methods we need from viem's client types
 // This maintains compatibility with viem's complex generics
@@ -52,11 +57,6 @@ const registryGetAddressAbi = [
     stateMutability: 'view',
   },
 ] as const
-import { mnemonicToAccount, privateKeyToAccount } from 'viem/accounts'
-import * as viemChains from 'viem/chains'
-import yargs from 'yargs'
-import { hideBin } from 'yargs/helpers'
-import { getReleaseVersion, ignoredContractsV9 } from '../../lib/compatibility/ignored-contracts-v9'
 // AbiParameter type is inferred from Abi entries
 type AbiParameter = {
   name?: string
@@ -1180,7 +1180,9 @@ async function main() {
             const envJson = readJsonSync(envJsonPath)
             celoscanApiKey = envJson.celoScanApiKey || envJson.celoscanApiKey
           } catch (e) {
-            // Ignore error, will check below
+            // Failed to parse .env.json - fall through to validation check below
+            // which will throw a descriptive error if API key is still missing
+            console.warn(`Warning: Could not read Celoscan API key from ${envJsonPath}: ${e}`)
           }
         }
       }
@@ -1318,7 +1320,9 @@ async function main() {
             const envJson = readJsonSync(envJsonPath)
             celoscanApiKey = envJson.celoScanApiKey || envJson.celoscanApiKey
           } catch (e) {
-            // Ignore - already validated for production networks
+            // Failed to parse .env.json - verifyAllContracts handles undefined
+            // gracefully by skipping Celoscan verification (Blockscout still works)
+            console.warn(`Warning: Could not read Celoscan API key from ${envJsonPath}: ${e}`)
           }
         }
       }
