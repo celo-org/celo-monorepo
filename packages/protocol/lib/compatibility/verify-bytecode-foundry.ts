@@ -13,15 +13,15 @@ import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9'
 import { getArtifactByName, getContractName, getDeployedBytecode } from '@celo/protocol/lib/compatibility/internal'
 
-interface RegistryLookup {
+export interface RegistryLookup {
   getAddressForString: (name: string) => Promise<string>
 }
 
-interface ProxyLookup {
+export interface ProxyLookup {
   getImplementation: (address: string) => Promise<string>
 }
 
-interface ChainLookup {
+export interface ChainLookup {
   getCode: (address: string) => Promise<string>
   encodeFunctionCall: (abi: any, args: any[]) => string
   getProof: (address: string, slots: string[]) => Promise<any>
@@ -146,6 +146,9 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   let implementationAddress: string
   if (isImplementationChanged(contract, context.proposal)) {
     implementationAddress = getProposedImplementationAddress(contract, context.proposal)
+  } else if (isProxyChanged(contract, context.proposal)) {
+    const proxyAddress = getProposedProxyAddress(contract, context.proposal)
+    implementationAddress = await context.proxyLookup.getImplementation(proxyAddress)
   } else if (isLibrary(contract, context)) {
     implementationAddress = ensureLeading0x(context.libraryLinkingInfo.info[contract].address)
   } else {
