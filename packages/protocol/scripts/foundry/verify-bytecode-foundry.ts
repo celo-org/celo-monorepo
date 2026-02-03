@@ -1,16 +1,16 @@
 import {
-  verifyBytecodes,
   InitializationData,
+  verifyBytecodes,
 } from '@celo/protocol/lib/compatibility/verify-bytecode-foundry'
 import { getReleaseVersion } from '../../lib/compatibility/ignored-contracts-v9'
 
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 
-import { existsSync, readJsonSync, writeJsonSync } from 'fs-extra'
-import { Chain, createPublicClient, encodeFunctionData, http } from 'viem'
-import * as viemChains from 'viem/chains'
 import { instantiateArtifactsFromForge } from '@celo/protocol/lib/compatibility/utils'
+import { existsSync, readJsonSync, writeJsonSync } from 'fs-extra'
+import { Chain, createPublicClient, defineChain, encodeFunctionData, http } from 'viem'
+import * as viemChains from 'viem/chains'
 
 /*
  * This script verifies that a given set of smart contract bytecodes corresponds
@@ -61,7 +61,7 @@ const getViemChain = (networkName: string): Chain => {
     case 'rc1':
       return viemChains.celo
     case 'celo-sepolia':
-      return {
+      return defineChain({
         id: 11142220,
         name: 'Celo Sepolia',
         nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 },
@@ -72,7 +72,7 @@ const getViemChain = (networkName: string): Chain => {
           default: { name: 'CeloScan', url: 'https://celo-sepolia.blockscout.com' },
         },
         testnet: true,
-      }
+      })
     default:
       return { ...viemChains.hardhat, id: 31337 }
   }
@@ -90,29 +90,31 @@ const registryAddress = '0x000000000000000000000000000000000000ce10'
 const registryAbi = readJsonSync(`${buildDir05}/Registry.sol/Registry.json`).abi
 const proxyAbi = readJsonSync(`${buildDir05}/Proxy.sol/Proxy.json`).abi
 
-const getAddressForString = (contract: string) => {
-  return publicClient.readContract({
+const getAddressForString = async (contract: string): Promise<string> => {
+  const result = await publicClient.readContract({
     address: registryAddress,
     abi: registryAbi,
     functionName: 'getAddressForString',
     args: [contract],
   })
+  return result as string
 }
 
-const getImplementation = (address: string) => {
-  return publicClient.readContract({
-    address,
+const getImplementation = async (address: string): Promise<string> => {
+  const result = await publicClient.readContract({
+    address: address as `0x${string}`,
     abi: proxyAbi,
     functionName: '_getImplementation',
     args: [],
   })
+  return result as string
 }
 
 const registryLookup = { getAddressForString }
 const proxyLookup = { getImplementation }
 const chainLookup = {
   getCode: (address: `0x${string}`) => {
-    return publicClient.getCode({ address })
+    return publicClient.getBytecode({ address })
   },
   encodeFunctionCall: (abi: any, args: any[]) => {
     return encodeFunctionData({
