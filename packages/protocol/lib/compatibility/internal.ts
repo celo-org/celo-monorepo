@@ -100,6 +100,7 @@ export interface Artifact {
   deployedSourceMap: string
   fileName: string
   legacyAST?: any
+  metadata?: { compiler?: { version?: string } } // Foundry artifact metadata
   networks: any
   schemaVersion: string
   source: string
