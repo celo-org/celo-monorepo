@@ -110,7 +110,7 @@ jobs:
         with:
           api-url: https://api.gateway.akeyless.celo-networks-dev.org
           access-id: p-kf9vjzruht6l
-          static-secrets: '{"/static-secrets/primitives-circle/npm-publish-token":"NPM_TOKEN"}'
+          static-secrets: '{"/static-secrets/primitives-circle/NPM/npm-publish-token":"NPM_TOKEN"}'
 
       - uses: actions/setup-node@v4
         with:
