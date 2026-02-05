@@ -117,6 +117,11 @@ jobs:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Verify NPM Token
+        run: npm whoami --registry https://registry.npmjs.org
+        env:
+          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
+
       - name: 'Setup yarn'
         shell: bash
         run: |
