@@ -104,23 +104,10 @@ jobs:
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
 
-      - name: Akeyless Get Secrets
-        id: get_auth_token
-        uses: docker://us-west1-docker.pkg.dev/devopsre/akeyless-public/akeyless-action:latest
-        with:
-          api-url: https://api.gateway.akeyless.celo-networks-dev.org
-          access-id: p-kf9vjzruht6l
-          static-secrets: '{"/static-secrets/primitives-circle/NPM/npm-publish-token":"NPM_TOKEN"}'
-
       - uses: actions/setup-node@v4
         with:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
-
-      - name: Verify NPM Token
-        run: npm whoami --registry https://registry.npmjs.org
-        env:
-          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
 
       - name: 'Setup yarn'
         shell: bash
@@ -178,10 +165,9 @@ jobs:
       - name: Publish @celo/devchain-anvil
         run: |
           cat package.json
-          npm publish $RELEASE_TYPE $DRY_RUN --access public
+          npm publish $RELEASE_TYPE $DRY_RUN --access public --provenance
         working-directory: packages/protocol/.tmp
         env:
           RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
           DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
