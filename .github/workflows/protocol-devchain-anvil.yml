@@ -107,7 +107,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-          registry-url: 'https://registry.npmjs.org'
 
       - name: 'Setup yarn'
         shell: bash
@@ -162,11 +161,13 @@ jobs:
           # https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy
           retention-days: 90
 
+      - name: Update npm for OIDC trusted publishing
+        run: npm install -g npm@latest
+
       - name: Publish @celo/devchain-anvil
         run: |
-          npm config delete //registry.npmjs.org/:_authToken || true
           cat package.json
-          npm publish $RELEASE_TYPE $DRY_RUN --access public --provenance
+          npm publish $RELEASE_TYPE $DRY_RUN --access public
         working-directory: packages/protocol/.tmp
         env:
           RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}
