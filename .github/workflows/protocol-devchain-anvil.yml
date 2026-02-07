@@ -36,7 +36,6 @@ jobs:
     permissions:
       contents: read
       pull-requests: read
-      id-token: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -152,6 +151,7 @@ jobs:
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4
         with:
@@ -161,6 +161,51 @@ jobs:
           # https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy
           retention-days: 90
 
+      - name: Upload devchain for publish job
+        uses: actions/upload-artifact@v4
+        with:
+          name: devchain-publish
+          path: packages/protocol/.tmp
+          retention-days: 1
+
+      - name: Save release env for publish job
+        run: |
+          echo "RELEASE_TYPE=${{ env.RELEASE_TYPE }}" >> release-env.txt
+          echo "RELEASE_VERSION=${{ env.RELEASE_VERSION }}" >> release-env.txt
+        working-directory: packages/protocol
+
+      - name: Upload release env
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-env
+          path: packages/protocol/release-env.txt
+
+  publish:
+    name: Publish to npm
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download release env
+        uses: actions/download-artifact@v4
+        with:
+          name: release-env
+
+      - name: Load release env
+        run: cat release-env.txt >> $GITHUB_ENV
+
+      - name: Download devchain artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: devchain-publish
+          path: package
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
       - name: Update npm for OIDC trusted publishing
         run: npm install -g npm@latest
 
@@ -168,7 +213,7 @@ jobs:
         run: |
           cat package.json
           npm publish $RELEASE_TYPE $DRY_RUN --access public
-        working-directory: packages/protocol/.tmp
+        working-directory: package
         env:
           RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
