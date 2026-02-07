@@ -164,6 +164,7 @@ jobs:
 
       - name: Publish @celo/devchain-anvil
         run: |
+          npm config delete //registry.npmjs.org/:_authToken || true
           cat package.json
           npm publish $RELEASE_TYPE $DRY_RUN --access public --provenance
         working-directory: packages/protocol/.tmp
