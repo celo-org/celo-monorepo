@@ -171,6 +171,7 @@ jobs:
         with:
           name: ${{ steps.artifact-name.outputs.name }}
           path: packages/protocol/.tmp
+          include-hidden-files: true
           # Max retention time is 90 days for public repos
           # https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy
           retention-days: 90
