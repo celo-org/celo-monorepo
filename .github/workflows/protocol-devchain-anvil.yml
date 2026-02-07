@@ -36,6 +36,10 @@ jobs:
     permissions:
       contents: read
       pull-requests: read
+    outputs:
+      release_type: ${{ steps.release-env.outputs.release_type }}
+      release_version: ${{ steps.release-env.outputs.release_version }}
+      artifact_name: ${{ steps.artifact-name.outputs.name }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -145,6 +149,12 @@ jobs:
           NPM_PACKAGE: '@celo/devchain-anvil'
           NPM_TAG: ${{ inputs.npm_tag }}
 
+      - name: Set release outputs
+        id: release-env
+        run: |
+          echo "release_type=${{ env.RELEASE_TYPE }}" >> $GITHUB_OUTPUT
+          echo "release_version=${{ env.RELEASE_VERSION }}" >> $GITHUB_OUTPUT
+
       - name: Prepare package for publishing
         run: yarn utils:prepare-devchain-anvil-publishing
         working-directory: packages/protocol
@@ -152,33 +162,18 @@ jobs:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
 
+      - name: Set artifact name
+        id: artifact-name
+        run: echo "name=devchain-${{ env.PR_NUMBER }}-${{ steps.date.outputs.date }}" >> $GITHUB_OUTPUT
+
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: devchain-${{ env.PR_NUMBER }}-${{ steps.date.outputs.date }}
+          name: ${{ steps.artifact-name.outputs.name }}
           path: packages/protocol/.tmp
           # Max retention time is 90 days for public repos
           # https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy
           retention-days: 90
-
-      - name: Upload devchain for publish job
-        uses: actions/upload-artifact@v4
-        with:
-          name: devchain-publish
-          path: packages/protocol/.tmp
-          retention-days: 1
-
-      - name: Save release env for publish job
-        run: |
-          echo "RELEASE_TYPE=${{ env.RELEASE_TYPE }}" >> release-env.txt
-          echo "RELEASE_VERSION=${{ env.RELEASE_VERSION }}" >> release-env.txt
-        working-directory: packages/protocol
-
-      - name: Upload release env
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-env
-          path: packages/protocol/release-env.txt
 
   publish:
     name: Publish to npm
@@ -188,18 +183,10 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - name: Download release env
-        uses: actions/download-artifact@v4
-        with:
-          name: release-env
-
-      - name: Load release env
-        run: cat release-env.txt >> $GITHUB_ENV
-
       - name: Download devchain artifact
         uses: actions/download-artifact@v4
         with:
-          name: devchain-publish
+          name: ${{ needs.build.outputs.artifact_name }}
           path: package
 
       - uses: actions/setup-node@v4
@@ -215,6 +202,6 @@ jobs:
           npm publish $RELEASE_TYPE $DRY_RUN --access public
         working-directory: package
         env:
-          RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}
-          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-          DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
+          RELEASE_TYPE: --tag ${{ needs.build.outputs.release_type != '' && needs.build.outputs.release_type || 'canary' }}
+          RELEASE_VERSION: ${{ needs.build.outputs.release_version }}
+          DRY_RUN: ${{ needs.build.outputs.release_version == '' && '--dry-run' || '' }}
