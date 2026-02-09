@@ -27,13 +27,13 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry, ICeloVersion
   function initialize(
     address _registryAddress,
     address[] calldata tokenAddresses,
-    uint256[] calldata newMinimumReports
+    uint256[] calldata newMininumReports
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
 
     for (uint256 i = 0; i < tokenAddresses.length; i++) {
-      _setMinimumReports(tokenAddresses[i], newMinimumReports[i]);
+      _setMinimumReports(tokenAddresses[i], newMininumReports[i]);
     }
   }
 
@@ -51,10 +51,10 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry, ICeloVersion
 
   /**
    * @notice Allows owner to set the minimum number of reports required.
-   * @param newMinimumReports The new update minimum number of reports required.
+   * @param newMininumReports The new update minimum number of reports required.
    */
-  function setMinimumReports(address tokenAddress, uint256 newMinimumReports) public onlyOwner {
-    _setMinimumReports(tokenAddress, newMinimumReports);
+  function setMinimumReports(address tokenAddress, uint256 newMininumReports) public onlyOwner {
+    _setMinimumReports(tokenAddress, newMininumReports);
   }
 
   /**
@@ -87,9 +87,9 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry, ICeloVersion
         .fromFixed();
   }
 
-  function _setMinimumReports(address tokenAddress, uint256 newMinimumReports) internal {
-    minimumReports[tokenAddress] = newMinimumReports;
-    emit MinimumReportsSet(tokenAddress, newMinimumReports);
+  function _setMinimumReports(address tokenAddress, uint256 newMininumReports) internal {
+    minimumReports[tokenAddress] = newMininumReports;
+    emit MinimumReportsSet(tokenAddress, newMininumReports);
   }
 
   function setOracleAddress(address _tokenAddress, address _oracleAddress) external onlyOwner {
