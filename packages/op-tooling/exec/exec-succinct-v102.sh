@@ -136,7 +136,7 @@ function performUpgrade() {
   echo "Grand child hash: $GC_TX_HASH"
 
   # gc sig
-  GC_SIG=0x${GC_D1C_SIGNER_C96__SIG:2}${GC_D1C_SIGNER_D80__SIG:2}
+  GC_SIG=0x${GC_D1C_SIGNER_C96_SIG:2}${GC_D1C_SIGNER_D80_SIG:2}
   echo "Grand child sig: $GC_SIG"
 
   echo "--- Grand child exec ---"
