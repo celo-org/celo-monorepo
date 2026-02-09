@@ -5,7 +5,7 @@ This directory contains scripts for executing OPCM upgrade transactions through 
 ## Prerequisites
 
 - Valid signatures from desired Multisig signatories for transaction execution
-- For `exec-v2v3.sh` and `exec-succinct.sh`: Decrypted signer files are required. Run from repo root:
+- For `exec-v2v3.sh`, `exec-succinct.sh`, and `exec-succinct-v102.sh`: Decrypted signer files are required. Run from repo root:
   ```bash
   ./scripts/key_placer.sh decrypt
   ```
@@ -13,6 +13,7 @@ This directory contains scripts for executing OPCM upgrade transactions through 
   - `secrets/.env.signers.v2`
   - `secrets/.env.signers.v3`
   - `secrets/.env.signers.succinct`
+  - `secrets/.env.signers.succinct102`
 
 ## Scripts
 
@@ -115,6 +116,39 @@ Script for executing Succinct prover upgrade. Contains hardcoded transaction dat
 PK="0x..." ./exec-succinct.sh
 ```
 
+### `exec-succinct-v102.sh`
+
+Script for executing Succinct prover v1.0.2 upgrade. Contains hardcoded transaction data and pre-configured signatures for the Succinct v1.0.2 upgrade, loaded from a separate encrypted signer file.
+
+**Features:**
+- Loads signatures from `secrets/.env.signers.succinct102` (decrypted via `key_placer.sh`)
+- Hardcoded transaction data for Succinct v1.0.2 upgrade via Multicall3
+- Pre-configured signatures from all multisig members:
+  - 6 cLabs signers (09C, 0BD, 21E, 4D8, 8B4, E00)
+  - 5 Council signers (148, 2BE, 6FD, B96, D0C)
+  - 2 Grand Child (0xD1C) signers (C96, D80)
+- Executes through complete approval chain: Grand Child → Council → cLabs → Parent
+- Uses `aggregate3` calldata format for batched operations
+
+**Required Environment Variables:**
+- `PK` - Private key for transaction execution
+
+**Optional Environment Variables:**
+- `RPC_URL` - RPC endpoint (defaults to `http://127.0.0.1:8545`)
+
+**Configuration:**
+- **Parent Nonce**: 25
+- **cLabs Nonce**: 22
+- **Council Nonce**: 24
+- **Grand Child Nonce**: 6
+- **Target**: `0xcA11bde05977b3631167028862bE2a173976CA11` (Multicall3)
+- **Refund Receiver**: `0x95ffac468e37ddeef407ffef18f0cc9e86d8f13b`
+
+**Example Execution:**
+```bash
+PK="0x..." ./exec-succinct-v102.sh
+```
+
 ### `exec-mocked.sh`
 
 Simplified and mocked simulation of network upgrade with support for providing an arbitrary account with signature. Designed for testing and development.
@@ -183,7 +217,7 @@ VERSION="v3" PK="0x..." SENDER="0x..." SIG="0x..." ACCOUNT="0x..." TEAM="council
 
 ## Execution Flow
 
-### Standard Flow (exec.sh, exec-v2v3.sh, exec-succinct.sh)
+### Standard Flow (exec.sh, exec-v2v3.sh, exec-succinct.sh, exec-succinct-v102.sh)
 1. **Grand Child Approval**: Approve Council transaction
 2. **Council Approval**: Approve Parent transaction
 3. **cLabs Approval**: Approve Parent transaction
