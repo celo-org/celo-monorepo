@@ -546,7 +546,7 @@ contract Accounts is
   }
 
   /**
-   * @notice Removes a validator's payment delegation by setting benficiary and
+   * @notice Removes a validator's payment delegation by setting beneficiary and
    * fraction to 0.
    */
   function deletePaymentDelegation() public {

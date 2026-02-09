@@ -20,7 +20,7 @@ interface IFeeHandler {
   // calls exchange(tokenAddress), and distribute(tokenAddress)
   function handle(address tokenAddress) external;
 
-  // main entrypoint for a burn, iterates over token and calles handle
+  // main entrypoint for a burn, iterates over token and calls handle
   function handleAll() external;
 
   // Sends the balance of token at tokenAddress to feesBeneficiary,
