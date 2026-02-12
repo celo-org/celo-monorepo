@@ -45,7 +45,17 @@ yarn release:check-versions:foundry -a $BRANCH -b HEAD -r report.json
 # From make-release.sh
 echo "- Deploy release of current branch"
 INITIALIZATION_FILE=`ls releaseData/initializationData/release*.json | sort -V | tail -n 1 | xargs realpath`
-yarn truffle exec --network anvil ./scripts/truffle/make-release.js --build_directory build/ --branch $BRANCH --report report.json --proposal proposal.json --librariesFile libraries.json --initialize_data $INITIALIZATION_FILE
+
+ANVIL_DEVNET_PRIVATE_KEY='0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+yarn release:make:foundry \
+  -b "$BRANCH" \
+  -k "$ANVIL_DEVNET_PRIVATE_KEY" \
+  -i "$INITIALIZATION_FILE" \
+  -l libraries.json \
+  -n anvil \
+  -p proposal.json \
+  -r report.json \
+  -u "http://localhost:$ANVIL_PORT"
 
 # From verify-release.sh
 echo "- Verify release"
