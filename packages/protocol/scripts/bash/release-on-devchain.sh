@@ -39,22 +39,8 @@ echo "- Verify bytecode of the network"
 # this commands compiles the output
 yarn --cwd packages/protocol release:verify-deployed:foundry -n anvil -b $BRANCH
 
-
 echo "- Check versions of current branch"
-
-# From check-versions.sh
-
-BASE_COMMIT=$(git rev-parse HEAD)
-echo " - Base commit $BASE_COMMIT"
-echo " - Checkout migrationsConfig.js at $BRANCH"
-git checkout $BRANCH -- migrationsConfig.js
-
-source scripts/bash/contract-exclusion-regex.sh
-yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/contracts --new_contracts build/contracts --exclude $CONTRACT_EXCLUSION_REGEX --new_branch $BRANCH --output_file report.json
-
-echo "- Clean git modified file"
-git restore --source $BASE_COMMIT --staged --worktree migrationsConfig.js
-
+yarn release:check-versions:foundry -a $BRANCH -b HEAD -r report.json
 
 # From make-release.sh
 echo "- Deploy release of current branch"
