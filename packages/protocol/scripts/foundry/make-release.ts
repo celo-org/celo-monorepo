@@ -870,7 +870,7 @@ const getViemChain = (networkName: string): Chain => {
     case 'mainnet':
     case 'rc1':
       return viemChains.celo
-    case 'celo-sepolia':
+    case 'celosepolia':
       return defineChain({
         id: 11142220,
         name: 'Celo Sepolia',
@@ -884,6 +884,7 @@ const getViemChain = (networkName: string): Chain => {
         testnet: true,
       })
     default:
+      console.warn(`Unknown network ${networkName}, defaulting to Hardhat chain config`)
       return { ...viemChains.hardhat, id: 31337 }
   }
 }

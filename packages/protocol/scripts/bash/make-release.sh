@@ -47,6 +47,9 @@ done
 [ -z "$REPORT" ] && echo "Need to set the compatibility report input via the -r flag" && exit 1;
 [ -z "$LIBRARIES" ] && echo "Need to set the library mapping input via the -l flag" && exit 1;
 
+source scripts/bash/validate-libraries-filename.sh
+validate_libraries_filename "$LIBRARIES" "$NETWORK" "$BRANCH"
+
 source scripts/bash/release-lib.sh
 build_tag $BRANCH "/dev/stdout"
 

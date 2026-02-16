@@ -53,6 +53,9 @@ done
 [ -z "$PROPOSAL" ] && echo "Need to set the proposal outfile via the -p flag" && exit 1;
 [ -z "$REPORT" ] && echo "Need to set the compatibility report input via the -r flag" && exit 1;
 
+source scripts/bash/validate-libraries-filename.sh
+validate_libraries_filename "$LIBRARIES" "$NETWORK" "$BRANCH"
+
 BUILD_DIR="./out/"
 
 # Build the command with optional flags
