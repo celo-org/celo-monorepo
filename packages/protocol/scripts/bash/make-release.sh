@@ -50,6 +50,9 @@ done
 source scripts/bash/validate-libraries-filename.sh
 validate_libraries_filename "$LIBRARIES" "$NETWORK" "$BRANCH"
 
+source scripts/bash/validate-libraries-bytecode.sh
+validate_libraries_bytecode "$LIBRARIES" "$(get_forno_url "$NETWORK")"
+
 source scripts/bash/release-lib.sh
 build_tag $BRANCH "/dev/stdout"
 

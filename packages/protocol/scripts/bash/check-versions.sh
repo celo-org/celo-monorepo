@@ -7,7 +7,7 @@ set -euo pipefail
 # Flags:
 # -a: Old branch containing smart contracts, which has likely been released.
 # -b: New branch containing smart contracts, on which version numbers may be updated.
-# -r: Path that the contract compatibility report should be written to.
+# -r: (Optional) Generate a compatibility report. Path is auto-generated as report-$OLD_BRANCH-$NEW_BRANCH.json.
 # -l: Path to a file to which logs should be appended
 
 BRANCH=""
@@ -28,13 +28,17 @@ done
 [ -z "$BRANCH" ] && echo "Need to set the old branch via the -a flag" && exit 1;
 [ -z "$NEW_BRANCH" ] && echo "Need to set the new branch via the -b flag" && exit 1;
 
+if [ -n "$REPORT" ]; then
+  echo "Error: -r no longer accepts a path. Report name is now generated automatically from release names." >&2
+  echo "See: https://github.com/celo-org/celo-monorepo/pull/11651" >&2
+  exit 1
+fi
+REPORT="report-$BRANCH-$NEW_BRANCH.json"
+
 # CONTRACT_EXCLUSION_REGEX imported from here
 source scripts/bash/contract-exclusion-regex.sh
 
-REPORT_FLAG=""
-if [ ! -z "$REPORT" ]; then
-  REPORT_FLAG="--output_file "$REPORT
-fi
+REPORT_FLAG="--output_file $REPORT"
 
 source scripts/bash/release-lib.sh
 
