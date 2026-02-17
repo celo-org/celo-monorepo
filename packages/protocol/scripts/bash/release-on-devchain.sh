@@ -59,8 +59,10 @@ yarn release:make:foundry \
 
 # From verify-release.sh
 echo "- Verify release"
-yarn truffle exec --network anvil ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json --branch $BRANCH --initialize_data $INITIALIZATION_FILE
-
+yarn --cwd packages/protocol release:verify-deployed:foundry \
+    -n anvil \
+    -b $BRANCH \
+    -p proposal.json
 
 if [[ -n $ANVIL_PID ]]; then
     kill $ANVIL_PID
