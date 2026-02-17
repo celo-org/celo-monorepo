@@ -870,7 +870,7 @@ const getViemChain = (networkName: string): Chain => {
     case 'mainnet':
     case 'rc1':
       return viemChains.celo
-    case 'celosepolia':
+    case 'celo-sepolia':
       return defineChain({
         id: 11142220,
         name: 'Celo Sepolia',
@@ -1195,7 +1195,7 @@ async function main() {
             `  - CLI flag: -a YOUR_API_KEY\n` +
             `  - Environment variable: CELOSCAN_API_KEY\n` +
             `  - Config file: packages/protocol/.env.json (celoScanApiKey)\n` +
-            `Or use --skipVerification (-s) to skip verification.`
+            `Or use -s to skip verification.`
         )
       }
     }

@@ -40,4 +40,4 @@ build_tag_foundry $BRANCH $LOG_FILE truffle-compat8 foundry.toml.bak
 
 mv foundry.toml.bak foundry.toml
 
-yarn ts-node ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "$NETWORK-$BRANCH-libraries.json" $FORNO
+TS_NODE_CACHE=false yarn ts-node --preferTsExts ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "$NETWORK-$BRANCH-libraries.json" $FORNO
