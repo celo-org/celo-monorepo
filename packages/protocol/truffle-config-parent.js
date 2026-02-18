@@ -34,7 +34,7 @@ const defaultConfig = {
 
 function readMnemonic(networkName) {
   dotenv = require('dotenv').config({
-    path: require('path').resolve(__dirname, `../../.env.mnemonic.${networkName}`),
+    path: require('path').resolve(__dirname, `../../.env.mnemonic.${networkName.replace('-', '')}`),
   })
 
   const privateKey = process.env.DEPLOYER_PRIVATE_KEY
@@ -90,7 +90,7 @@ const networks = {
     network_id: 1101,
     port: devPort,
   },
-  celosepolia: {
+  'celo-sepolia': {
     ...defaultConfig,
     network_id: CELOSEPOLIA_NETWORKID,
     from: CELOSEPOLIA_FROM,

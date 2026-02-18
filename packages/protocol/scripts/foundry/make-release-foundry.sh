@@ -66,7 +66,7 @@ source scripts/bash/validate-libraries-bytecode.sh
 VALIDATION_RPC_URL="${RPC_URL:-$(get_forno_url "$NETWORK")}"
 validate_libraries_bytecode "$LIBRARIES" "$VALIDATION_RPC_URL"
 
-BUILD_DIR="./out/"
+BUILD_DIR="./out-${BRANCH}"
 
 # Build the command with optional flags
 OPTIONAL_FLAGS=""
