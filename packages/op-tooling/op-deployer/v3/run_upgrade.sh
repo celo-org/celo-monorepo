@@ -47,6 +47,6 @@ if [[ -z "${DEPLOYER_PK:-}" ]]; then
 fi
 
 # Run all scripts synchronously
-./op-deployer/bootstrap.sh
-./op-deployer/bootstrap-validator.sh
-./op-deployer/upgrade.sh
+./bootstrap.sh
+./bootstrap-validator.sh
+./upgrade.sh
