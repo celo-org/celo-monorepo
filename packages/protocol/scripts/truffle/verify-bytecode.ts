@@ -62,7 +62,7 @@ module.exports = async (callback: (error?: any) => number) => {
     }
     const libraryAddresses = await verifyBytecodes(
       Object.keys(CeloContractName),
-      artifactsMap,
+      Object.values(artifactsMap),
       registry,
       proposal,
       Proxy,
