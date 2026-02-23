@@ -7,12 +7,18 @@ import {
   stripMetadata,
   verifyAndStripLibraryPrefix,
 } from '@celo/protocol/lib/bytecode'
+import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { verifyProxyStorageProof } from '@celo/protocol/lib/proxy-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { ProxyInstance, RegistryInstance } from 'types'
 import Web3 from 'web3'
 import { ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9'
+
+const contracts08Set = new Set(SOLIDITY_08_PACKAGE.contracts)
+const mentoContractsSet = new Set(MENTO_PACKAGE.contracts)
+
+type ArtifactsMap = Record<string, BuildArtifacts>
 
 let ignoredContracts = [
   // This contract is not proxied
@@ -29,7 +35,7 @@ let ignoredContracts = [
 ]
 
 interface VerificationContext {
-  artifacts: BuildArtifacts[]
+  artifactsMap: ArtifactsMap
   libraryAddresses: LibraryAddresses
   registry: RegistryInstance
   governanceAddress: string
@@ -82,11 +88,14 @@ export const getProposedProxyAddress = (contract: string, proposal: ProposalTx[]
   return relevantTx.args[1]
 }
 
-const getSourceBytecodeFromArtifacts = (contract: string, artifacts: BuildArtifacts[]): string =>
-  stripMetadata(artifacts.map(a => a.getArtifactByName(contract)).find(a => a).deployedBytecode)
+const getArtifactsForContract = (contract: string, artifactsMap: ArtifactsMap): BuildArtifacts => {
+  if (contracts08Set.has(contract)) return artifactsMap[SOLIDITY_08_PACKAGE.name]
+  if (mentoContractsSet.has(contract)) return artifactsMap[MENTO_PACKAGE.name]
+  return artifactsMap['']
+}
 
 const getSourceBytecode = (contract: string, context: VerificationContext): string =>
-  getSourceBytecodeFromArtifacts(contract, context.artifacts)
+  stripMetadata(getArtifactsForContract(contract, context.artifactsMap).getArtifactByName(contract).deployedBytecode)
 
 const getOnchainBytecode = async (address: string, context: VerificationContext) =>
   stripMetadata(await context.web3.eth.getCode(address))
@@ -235,7 +244,7 @@ const assertValidInitializationData = (
  */
 export const verifyBytecodes = async (
   contracts: string[],
-  artifacts: BuildArtifacts[],
+  artifactsMap: ArtifactsMap,
   registry: RegistryInstance,
   proposal: ProposalTx[],
   Proxy: Truffle.Contract<ProxyInstance>,
@@ -244,10 +253,11 @@ export const verifyBytecodes = async (
   version?: number,
   network = 'development'
 ) => {
+  const allArtifacts = Object.values(artifactsMap)
   assertValidProposalTransactions(proposal)
-  assertValidInitializationData(artifacts, proposal, _web3, initializationData)
+  assertValidInitializationData(allArtifacts, proposal, _web3, initializationData)
 
-  const compiledContracts = Array.prototype.concat.apply([], artifacts.map(a => a.listArtifacts())).map((a) => a.contractName)
+  const compiledContracts = Array.prototype.concat.apply([], allArtifacts.map(a => a.listArtifacts())).map((a) => a.contractName)
 
   if (version > 9) {
     ignoredContracts = [...ignoredContracts, ...ignoredContractsV9]
@@ -268,7 +278,7 @@ export const verifyBytecodes = async (
 
   const governanceAddress = await registry.getAddressForString('Governance')
   const context: VerificationContext = {
-    artifacts,
+    artifactsMap,
     libraryAddresses: new LibraryAddresses(),
     registry,
     governanceAddress,
