@@ -95,6 +95,9 @@ const networks = {
     network_id: CELOSEPOLIA_NETWORKID,
     from: CELOSEPOLIA_FROM,
     privateKeyAvailable: true,
+    proposer: '0x95a40aA01d2d72b4122C19c86160710D01224ada',
+    approver: '0x95a40aA01d2d72b4122C19c86160710D01224ada',
+    voter: '0x95a40aA01d2d72b4122C19c86160710D01224ada',
   },
 }
 

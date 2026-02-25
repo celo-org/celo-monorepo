@@ -7,11 +7,15 @@ source $PWD/scripts/foundry/constants.sh
 # Parse command line options:
 #   -p: Custom port number for Anvil to listen on (overrides default ANVIL_PORT)
 #   -l: Path to load existing Anvil state from (instead of creating new state)
+#   -f: Fork URL to fork from a live network
+#   -a: Enable auto-impersonate mode
 
-while getopts 'p:l:' flag; do
+while getopts 'p:l:f:a' flag; do
   case "${flag}" in
     p) CUSTOM_PORT="${OPTARG}" ;;
     l) LOAD_STATE="${OPTARG}" ;;
+    f) FORK_URL="${OPTARG}" ;;
+    a) AUTO_IMPERSONATE=true ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -47,8 +51,21 @@ else
   STATE_FLAGS="--dump-state $ANVIL_FOLDER --state-interval $STATE_INTERVAL"
 fi
 
+FORK_FLAGS=""
+if [ -n "${FORK_URL:-}" ]; then
+  echo "Forking from $FORK_URL"
+  FORK_FLAGS="--fork-url $FORK_URL"
+fi
+
+IMPERSONATE_FLAGS=""
+if [ "${AUTO_IMPERSONATE:-}" = true ]; then
+  IMPERSONATE_FLAGS="--auto-impersonate"
+fi
+
 anvil \
 $STATE_FLAGS \
+$FORK_FLAGS \
+$IMPERSONATE_FLAGS \
 --port $ANVIL_PORT \
 --gas-limit $GAS_LIMIT \
 --code-size-limit $CODE_SIZE_LIMIT \
@@ -69,13 +86,8 @@ while ! nc -z localhost $ANVIL_PORT; do
   sleep 0.1 # wait for 1/10 of the second before check again
 done
 
-# enabled logging
-cast rpc anvil_setLoggingEnabled $ANVIL_LOGGING_ENABLED --rpc-url "$ANVIL_RPC_URL"
-
 echo "Anvil launched"
+
 sleep 1
 # enabled logging
 cast rpc anvil_setLoggingEnabled $ANVIL_LOGGING_ENABLED --rpc-url $ANVIL_RPC_URL
-
-echo "Anvil launched"
-sleep 1

@@ -6,27 +6,11 @@
 # Extracts the forno URL for a network from truffle-config-parent.js
 get_forno_url() {
   local NETWORK="$1"
-  local CONFIG_FILE="truffle-config-parent.js"
-
-  if [ ! -f "$CONFIG_FILE" ]; then
-    echo "Error: $CONFIG_FILE not found." >&2
-    exit 1
-  fi
-
   local URL
-  URL=$(node -e "
-    const fs = require('fs');
-    const src = fs.readFileSync('$CONFIG_FILE', 'utf8');
-    const match = src.match(/const fornoUrls\s*=\s*(\{[^}]+\})/s);
-    if (!match) { process.exit(1); }
-    const urls = eval('(' + match[1] + ')');
-    const url = urls['$NETWORK'];
-    if (!url) { process.stderr.write('No forno URL for network $NETWORK\n'); process.exit(1); }
-    process.stdout.write(url);
-  ")
+  URL=$(yarn --silent ts-node scripts/bash/network-info.ts "$NETWORK" | jq -r '.rpcUrl')
 
   if [ $? -ne 0 ] || [ -z "$URL" ]; then
-    echo "Error: Could not resolve forno URL for network '$NETWORK' from $CONFIG_FILE" >&2
+    echo "Error: Could not resolve forno URL for network '$NETWORK'" >&2
     exit 1
   fi
 
