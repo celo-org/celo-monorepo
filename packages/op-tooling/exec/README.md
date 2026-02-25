@@ -79,6 +79,46 @@ Final script used for migration from `1.8.0` to `2.0.0` & from `2.0.0` to `3.0.0
 PK="0x..." ./exec-v2v3.sh
 ```
 
+### `exec-succinct.sh`
+
+Script used to execute the OP Succinct upgrade transaction through the nested Safe multisig chain. Contains hardcoded transaction data and signatures loaded from a decoded signers file.
+
+**Features:**
+- Loads signer addresses and signatures from `secrets/.env.signers.succinct`
+- Hardcoded nonces and calldata for the Succinct upgrade
+- Executes the full approval chain: Grand Child → Council → cLabs → Parent
+- Uses Multicall3 as the target with delegatecall
+- Pre-configured cLabs (6 signers), Council (5 signers), and Grand Child (2 signers)
+
+**Required Environment Variables:**
+- `PK` - Private key for transaction execution
+
+**Optional Environment Variables:**
+- `RPC_URL` - RPC endpoint (defaults to `http://127.0.0.1:8545`)
+
+**Required Files:**
+- `secrets/.env.signers.succinct` - Decoded signers file containing signer addresses and signatures (must be decrypted before running)
+
+**Upgrade Configuration:**
+- **Target Address**: `0xcA11bde05977b3631167028862bE2a173976CA11` (Multicall3)
+- **Parent Nonce**: 24
+- **cLabs Nonce**: 21
+- **Council Nonce**: 23
+- **Grand Child Nonce**: 5
+
+**Signers:**
+
+| Safe | Count | Address suffixes |
+|------|-------|-----------------|
+| cLabs | 6 | 09C, 21E, 481, 4D8, 8B4, E00 |
+| Council | 5 | 148, 5F7, 6FD, B96, D0C |
+| Grand Child | 2 | C96, D80 |
+
+**Example Execution:**
+```bash
+PK="0x..." ./exec-succinct.sh
+```
+
 ### `exec-mocked.sh`
 
 Simplified and mocked simulation of network upgrade with support for providing an arbitrary account with signature. Designed for testing and development.
@@ -152,6 +192,12 @@ VERSION="v3" PK="0x..." SENDER="0x..." SIG="0x..." ACCOUNT="0x..." TEAM="council
 1. **cLabs Approval**: Approve Parent transaction
 2. **Council Approval**: Approve Parent transaction (with optional Grand Child)
 3. **Parent Execution**: Execute OPCM upgrade
+
+### Succinct Flow (exec-succinct.sh)
+1. **Grand Child Execution**: Execute approval of Council transaction
+2. **Council Execution**: Execute approval of Parent transaction
+3. **cLabs Execution**: Execute approval of Parent transaction
+4. **Parent Execution**: Execute Succinct upgrade via Multicall3
 
 ## Transaction Parameters
 

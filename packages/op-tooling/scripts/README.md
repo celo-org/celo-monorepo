@@ -203,6 +203,78 @@ event AnchorGameReset(
 - Testing anchor state behavior in non-production environments
 - Fixing anchor state after disputed game resolution issues
 
+### `MigrateOwnershipToSafe.s.sol`
+
+Foundry script that migrates OP Stack L1 contract ownership from an EOA to a Gnosis Safe. Performs four operations in a single broadcast: transfers ProxyAdmin ownership, transfers SystemConfig ownership, transfers DisputeGameFactory ownership, and migrates the SuperchainConfig proxy admin from a separate ProxyAdmin to the main one.
+
+**Features:**
+- Transfers ProxyAdmin ownership (controls all proxy upgrades and AddressManager)
+- Transfers SystemConfig ownership (controls L2 system configuration parameters)
+- Transfers DisputeGameFactory ownership (controls game type registration and implementations)
+- Migrates SuperchainConfig from a separate ProxyAdmin to the main one via changeProxyAdmin()
+- Pre-flight checks verify current ownership and validate EIP-1967 admin slots before execution
+- Skips already-migrated contracts to avoid redundant transactions
+- Post-migration verification confirms all ownerships transferred correctly and all EIP-1967 admin slots are consistent
+- Emits `OwnershipMigratedToSafe` event on completion
+
+**Required Environment Variables:**
+- `NEW_SAFE` - Address of the target Gnosis Safe
+- `NETWORK` - Network identifier (currently only `chaos` is supported)
+
+**Example Execution:**
+```bash
+NEW_SAFE="0x..." NETWORK=chaos forge script MigrateOwnershipToSafe.s.sol --root $PATH_TO_OP_REPO/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
+```
+
+**Process Flow:**
+1. Load network config (proxy addresses, contract references)
+2. Run pre-flight checks: verify current ownership, validate EIP-1967 admin slots
+3. Execute migration in a single broadcast: ProxyAdmin, SystemConfig, DisputeGameFactory, SuperchainConfig
+4. Run post-migration verification: confirm all ownerships and admin slots
+5. Emit `OwnershipMigratedToSafe` event
+
+**Event:**
+```solidity
+event OwnershipMigratedToSafe(
+  address indexed proxyAdmin,
+  address indexed previousOwner,
+  address indexed newSafe
+)
+```
+
+**Safety Considerations:**
+- Irreversible once broadcast - verify `NEW_SAFE` is the correct Safe address before running
+- Pre-flight aborts if SuperchainConfig has an unexpected admin (neither the known old ProxyAdmin nor the main one)
+- AddressManager ownership is not transferred directly; it remains owned by ProxyAdmin, which is transferred to the Safe
+
+### `migrate-ownership-to-safe.sh`
+
+Shell wrapper that simplifies execution of `MigrateOwnershipToSafe.s.sol` by validating environment variables and constructing the forge command.
+
+**Features:**
+- Validates all required environment variables before execution
+- Automatically constructs `--root` path from `OP_DIR`
+- Provides clear error messages for missing configuration
+- Uses proper error handling with `set -euo pipefail`
+- Executes forge script with `--broadcast` enabled
+
+**Required Environment Variables:**
+- `L1_RPC_URL` - RPC URL for the L1 network
+- `OP_DIR` - Path to the Optimism repository root
+- `PK` - Private key of the current owner EOA
+- `NETWORK` - Network identifier (passed to forge script)
+- `NEW_SAFE` - Address of the target Gnosis Safe (passed to forge script)
+
+**Example Execution:**
+```bash
+export L1_RPC_URL="https://..."
+export OP_DIR="/path/to/optimism"
+export PK="0x..."
+export NETWORK=chaos
+export NEW_SAFE="0x..."
+./migrate-ownership-to-safe.sh
+```
+
 ## Notes
 
 - **Critical**: All Foundry scripts must be executed from the Optimism contracts-bedrock directory using `--root` flag

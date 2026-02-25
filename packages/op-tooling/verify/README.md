@@ -133,6 +133,52 @@ Verifies validator contracts used in upgrade processes.
 VERSION="v3" VALIDATOR="0x..." CHAIN_ID="17000" ETHERSCAN_API_KEY="your-key" ./verify-upgrade-validator.sh
 ```
 
+### `verify-versions.sh`
+
+A diagnostic tool for inspecting the current state of all OP Stack contracts on a given network. Shows proxy/implementation addresses, version strings, ownership, and a summary upgrade status matrix with color-coded version tags.
+
+**Features:**
+
+- Supports `sepolia`, `chaos`, and `mainnet` networks
+- Network-aware: hardcoded proxy addresses for all OP Stack contracts per network
+- Reads EIP-1967 implementation and admin slots for each proxy
+- Color-coded output: Yellow = v3/Isthmus, Green = v4.1.0/pre-Jovian, Magenta = v5.0.0/Jovian
+- Classifies addresses as EOA, Safe (with threshold and owners), or Contract
+- Shows dispute game implementations (type 1 = PermissionedGame, type 42 = OPSuccinctGame)
+- Shows singletons: PreimageOracle, MIPS
+- Ends with an Upgrade Status Matrix summarizing all contracts and their current versions
+- Uses `cast` (Foundry) for all on-chain queries
+
+**Output Sections:**
+
+1. Admin & Ownership
+2. Superchain Topology
+3. Core Bridge Contracts
+4. Dispute/Fault Proof
+5. Dispute Games
+6. Protocol
+7. Singletons
+8. Upgrade Status Matrix
+
+**Required Environment Variables:**
+
+- `NETWORK` - Target network (`sepolia`, `chaos`, or `mainnet`)
+
+**Optional Environment Variables:**
+
+- `RPC_URL` - RPC endpoint to query (defaults to `http://127.0.0.1:8545`)
+
+**Example Execution:**
+
+```bash
+NETWORK="sepolia" RPC_URL="https://forno.celo-sepolia.celo-testnet.org" ./verify-versions.sh
+```
+
+```bash
+# Against a local fork
+NETWORK="mainnet" ./verify-versions.sh
+```
+
 ## Contract Categories
 
 ### L1 Contracts

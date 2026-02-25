@@ -108,6 +108,46 @@ ACCOUNT="0x..." TEAM="clabs" MOCKED_SIGNER_2="0x..." MOCKED_SIGNER_3="0x..." MOC
 ACCOUNT="0x..." TEAM="council" GC_MULTISIG="0x..." MOCKED_SIGNER_1="0x..." MOCKED_SIGNER_2="0x..." MOCKED_SIGNER_4="0x..." ./mock-mainnet.sh
 ```
 
+### `mock-sepolia.sh`
+
+Sets up a mocked testnet environment for Sepolia or Chaos networks. Fixes the SuperchainConfig proxy admin and converts the ProxyAdminOwner EOA into a Gnosis Safe so the superchain-ops simulation framework can operate against it. Requires a running Anvil instance (typically started by `fork_l1.sh`).
+
+**Required Environment Variables:**
+
+- `NETWORK` - Network to mock (`sepolia` or `chaos`)
+
+**Optional Environment Variables:**
+
+- `MOCK_OWNER` - EOA address to set as the Safe owner (defaults to `0x2529fcD95f714af9031d70ff02B196704B65FD27`). Must be a pure EOA with no deployed code.
+
+**Features:**
+
+- Fixes SuperchainConfig proxy admin by writing the ProxyAdmin address into the EIP-1967 admin slot
+- Converts the ProxyAdminOwner EOA into a Gnosis Safe (plants GnosisSafeProxy bytecode, sets singleton, ownerCount=1, threshold=1, owners linked list with MOCK_OWNER)
+- Funds the mock owner with 10 ETH
+- Validation output: prints SuperchainConfig admin, ProxyAdminOwner Safe configuration, and mock owner balance
+
+**Network-Specific Addresses:**
+
+| | sepolia | chaos |
+|---|---|---|
+| **Label** | Celo Sepolia | Celo Chaos |
+| **SuperchainConfig Proxy** | `0x31bEef32135c90AE8E56Fb071B3587de289Aaf77` | `0x852A5763dA3Fdf51a8b816E02b91A054904Bd8B0` |
+| **ProxyAdmin** | `0xF7d7A3d3bb8aBb6829249B3D3aD3d525D052027e` | `0x6151d1cc7724ee7594f414c152320757c9c5844e` |
+| **ProxyAdminOwner** | `0x5e60d897Cd62588291656b54655e98ee73f0aabF` | `0xa3A3a43E2de78070129C697A5CdCa0618B1f574d` |
+
+**Safe Singleton:** `0xfb1bffc9d739b8d520daf37df666da4c687191ea`
+
+**Example Execution:**
+
+```bash
+# Mock Celo Sepolia (default mock owner)
+NETWORK="sepolia" ./mock-sepolia.sh
+
+# Mock Celo Chaos with a custom owner
+NETWORK="chaos" MOCK_OWNER="0x..." ./mock-sepolia.sh
+```
+
 ## Usage Workflow
 
 1. **Start L1 fork:**
@@ -134,8 +174,11 @@ ACCOUNT="0x..." TEAM="council" GC_MULTISIG="0x..." MOCKED_SIGNER_1="0x..." MOCKE
 
 3. **In another terminal, set up mocked environment:**
    ```bash
-   # Use the same addresses that correspond to your private keys in exec-mocked.sh
+   # For mainnet fork: use the same addresses that correspond to your private keys in exec-mocked.sh
    MOCKED_SIGNER_1="0x..." MOCKED_SIGNER_2="0x..." MOCKED_SIGNER_3="0x..." MOCKED_SIGNER_4="0x..." ./mock-mainnet.sh
+
+   # For Sepolia/Chaos fork: set NETWORK to sepolia or chaos
+   NETWORK="sepolia" ./mock-sepolia.sh
    ```
 
 ## Ports Used
