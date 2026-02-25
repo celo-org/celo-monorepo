@@ -40,6 +40,12 @@ source scripts/foundry/constants.sh
 scripts/foundry/start_anvil.sh -f "$RPC_URL" -a
 ANVIL_RPC_URL=$(get_anvil_rpc_url)
 
+# Impersonate governance accounts so celocli can send transactions from them
+# this walks-around a cli trying to simulate a tx with the node tx
+cast rpc anvil_impersonateAccount "$PROPOSER" --rpc-url "$ANVIL_RPC_URL"
+cast rpc anvil_impersonateAccount "$APPROVER" --rpc-url "$ANVIL_RPC_URL"
+cast rpc anvil_impersonateAccount "$VOTER" --rpc-url "$ANVIL_RPC_URL"
+
 echo "Anvil forked $NETWORK at $ANVIL_RPC_URL"
 
 # Verify the forked network is healthy
@@ -55,9 +61,29 @@ fi
 echo "Verifying network contracts..."
 NO_SYNCCHECK=true celocli network:contracts --node="$ANVIL_RPC_URL"
 
-# Placeholder: simulate proposal via celocli
+# Propose
 echo "Simulating proposal $PROPOSAL on $ANVIL_RPC_URL..."
-NO_SYNCCHECK=true celocli governance:propose --jsonTransactions="$PROPOSAL" --from="$PROPOSER" --deposit=100e18 --descriptionURL="https://github.com/celo-org/governance/blob/main/CGPs/TEST" --node="$ANVIL_RPC_URL"
+PROPOSE_OUTPUT=$(NO_SYNCCHECK=true celocli governance:propose --jsonTransactions="$PROPOSAL" --from="$PROPOSER" --deposit=100e18 --descriptionURL="https://github.com/celo-org/governance/blob/main/CGPs/TEST" --node="$ANVIL_RPC_URL")
+echo "$PROPOSE_OUTPUT"
+PROPOSAL_ID=$(echo "$PROPOSE_OUTPUT" | grep "proposalId:" | awk '{print $2}')
+echo "Proposal ID: $PROPOSAL_ID"
+
+# Approve
+NO_SYNCCHECK=true celocli governance:approve --proposalID="$PROPOSAL_ID" --from="$APPROVER" --node="$ANVIL_RPC_URL" && \
+echo "Proposal approved"
+
+# Vote
+echo "Voting yes on proposal $PROPOSAL_ID..."
+NO_SYNCCHECK=true celocli governance:vote --value=Yes --from="$VOTER" --proposalID="$PROPOSAL_ID" --node="$ANVIL_RPC_URL"
+echo "Proposal voted"
+
+# Fast-forward past the referendum period
+cast rpc evm_increaseTime 301 --rpc-url "$ANVIL_RPC_URL"
+cast rpc evm_mine --rpc-url "$ANVIL_RPC_URL"
+
+# Execute
+NO_SYNCCHECK=true celocli governance:execute --from="$VOTER" --proposalID="$PROPOSAL_ID" --node="$ANVIL_RPC_URL"
+echo "Proposal executed"
 
 # Cleanup
 kill $(lsof -t -i:$ANVIL_PORT) 2>/dev/null || true

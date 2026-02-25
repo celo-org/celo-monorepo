@@ -59,7 +59,7 @@ fi
 
 IMPERSONATE_FLAGS=""
 if [ "${AUTO_IMPERSONATE:-}" = true ]; then
-  IMPERSONATE_FLAGS="--auto-impersonate"
+  IMPERSONATE_FLAGS="--auto-impersonate --accounts 0"
 fi
 
 anvil \
