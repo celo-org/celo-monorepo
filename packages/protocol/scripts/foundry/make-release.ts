@@ -534,6 +534,7 @@ const isProxiedContract = (
   buildDir05: string,
   buildDir08: string
 ): boolean => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return (
     proxiedCoreContracts.has(contractName) ||
     existsSync(getContractArtifactPath(`${contractName}Proxy`, buildDir05, buildDir08))

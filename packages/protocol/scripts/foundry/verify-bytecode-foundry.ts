@@ -151,6 +151,7 @@ verifyBytecodes(
       verifiedMapping[library] = allMapping[library]
     }
 
+    /* eslint-disable no-console */
     if (errors.length > 0) {
       console.log(`\n❌ Verification completed with ${errors.length} error(s):`)
       errors.forEach((err, i) => console.log(`  ${i + 1}. ${err}`))

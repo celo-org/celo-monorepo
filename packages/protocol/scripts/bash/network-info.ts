@@ -1,4 +1,3 @@
-import * as fs from 'fs'
 import * as path from 'path'
 
 const network = process.argv[2]
@@ -8,18 +7,7 @@ if (!network) {
 }
 
 const configPath = path.resolve(__dirname, '../../truffle-config-parent.js')
-
-// Extract fornoUrls via regex (not exported by the module)
-const src = fs.readFileSync(configPath, 'utf8')
-const match = src.match(/const fornoUrls\s*=\s*(\{[^}]+\})/s)
-if (!match) {
-  process.stderr.write('Could not find fornoUrls in truffle-config-parent.js\n')
-  process.exit(1)
-}
-const fornoUrls: Record<string, string> = eval('(' + match[1] + ')')
-
-// Load network config from the module export
-const { networks } = require(configPath)
+const { networks, fornoUrls } = require(configPath)
 const networkConfig = networks[network]
 if (!networkConfig) {
   process.stderr.write(`No network config for '${network}'\n`)
@@ -33,8 +21,8 @@ if (!rpcUrl) {
 }
 
 // Output all serializable metadata as JSON
-const output: Record<string, any> = { rpcUrl }
-for (const [key, value] of Object.entries(networkConfig)) {
+const output: Record<string, unknown> = { rpcUrl }
+for (const [key, value] of Object.entries(networkConfig as Record<string, unknown>)) {
   if (typeof value !== 'function') {
     output[key] = value
   }

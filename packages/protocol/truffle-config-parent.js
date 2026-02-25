@@ -140,4 +140,4 @@ if (process.argv.includes('--forno')) {
   }
 }
 
-module.exports = { networks: networks }
+module.exports = { networks: networks, fornoUrls: fornoUrls }
