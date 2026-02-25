@@ -7,11 +7,11 @@ set -euo pipefail
 
 # Check network
 case $NETWORK in
-  "sepolia"|"mainnet")
+  "chaos"|"sepolia"|"mainnet")
     echo "Detected supported network: $NETWORK"
     ;;
   *)
-    echo "Unsupported network! Choose from 'sepolia' or 'mainnet'" && exit 1
+    echo "Unsupported network! Choose from 'chaos', 'sepolia' or 'mainnet'" && exit 1
     ;;
 esac
 
