@@ -59,7 +59,11 @@ if [ "$REGISTRY_IMPL" = "0x0000000000000000000000000000000000000000" ]; then
 fi
 
 echo "Verifying network contracts..."
-NO_SYNCCHECK=true celocli network:contracts --node="$ANVIL_RPC_URL"
+CONTRACTS_OUTPUT=$(NO_SYNCCHECK=true celocli network:contracts --node="$ANVIL_RPC_URL")
+echo "$CONTRACTS_OUTPUT"
+
+GOVERNANCE_ADDRESS=$(echo "$CONTRACTS_OUTPUT" | awk '/^Governance /{print $2}')
+echo "Governance contract: $GOVERNANCE_ADDRESS"
 
 # Propose
 echo "Simulating proposal $PROPOSAL on $ANVIL_RPC_URL..."
@@ -78,7 +82,9 @@ NO_SYNCCHECK=true celocli governance:vote --value=Yes --from="$VOTER" --proposal
 echo "Proposal voted"
 
 # Fast-forward past the referendum period
-cast rpc evm_increaseTime 301 --rpc-url "$ANVIL_RPC_URL"
+REFERENDUM_DURATION=$(cast call "$GOVERNANCE_ADDRESS" "getReferendumStageDuration()(uint256)" --rpc-url "$ANVIL_RPC_URL")
+echo "Referendum stage duration: $REFERENDUM_DURATION seconds"
+cast rpc evm_increaseTime $((REFERENDUM_DURATION + 1)) --rpc-url "$ANVIL_RPC_URL"
 cast rpc evm_mine --rpc-url "$ANVIL_RPC_URL"
 
 # Execute
