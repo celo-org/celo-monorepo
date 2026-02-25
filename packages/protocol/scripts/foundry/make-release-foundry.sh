@@ -9,7 +9,7 @@ set -euo pipefail
 # -i: Path to the data needed to initialize contracts.
 # -l: Path to the canonical library mapping.
 # -n: The network to deploy to.
-# -p: (Optional) Deprecated. Proposal path is auto-generated as proposal-$NETWORK-$BRANCH.json.
+# -p: (Deprecated) No longer accepts a path. Proposal is always generated as proposal-$NETWORK-$BRANCH.json.
 # -r: Path to the contract compatibility report.
 # -u: Custom RPC URL (optional, overrides network default).
 # -s: Skip contract verification (optional).

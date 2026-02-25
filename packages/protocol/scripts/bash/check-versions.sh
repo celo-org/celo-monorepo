@@ -7,7 +7,7 @@ set -euo pipefail
 # Flags:
 # -a: Old branch containing smart contracts, which has likely been released.
 # -b: New branch containing smart contracts, on which version numbers may be updated.
-# -r: (Optional) Generate a compatibility report. Path is auto-generated as report-$OLD_BRANCH-$NEW_BRANCH.json.
+# -r: (Deprecated) No longer accepts a path. Report is always generated as report-$OLD_BRANCH-$NEW_BRANCH.json.
 # -l: Path to a file to which logs should be appended
 
 BRANCH=""
