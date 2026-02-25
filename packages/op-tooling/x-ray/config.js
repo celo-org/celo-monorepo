@@ -369,84 +369,141 @@ export function setCachedData(networkId, data) {
   }
 }
 
-// ── Cross-Reference Definitions ──────────────────────────
-// Getters to call on each proxy to validate cross-contract wiring.
-// 'expect' = address key in NETWORKS[n].addresses that the result should match.
-// 'type' overrides the default 'address' return type.
-// 'args' = optional call arguments (e.g. gameImpls(1)).
+// ── Contract Properties ───────────────────────────────────
+// Unified property definitions for each contract.
+// fn: getter function name (for ABI lookup)
+// label: display label (e.g., 'systemConfig()')
+// expect?: address key for cross-reference validation
+// args?: call arguments (e.g., [1] for gameImpls)
+// type?: return type: 'bool', 'uint256', 'uint32', 'uint64', 'seconds', 'string', 'bytes32', 'duration'
+// Default type is 'address' if expect is set, otherwise infer from value.
 // All calls use try/catch — v3 contracts missing v5 getters gracefully return null.
-export const CONTRACT_REFS = {
+export const CONTRACT_PROPS = {
   SystemConfig: [
-    { fn: 'optimismPortal', label: 'OptimismPortal', expect: 'OPTIMISM_PORTAL_PROXY' },
+    { fn: 'minimumGasLimit', label: 'minimumGasLimit()', type: 'uint64' },
+    { fn: 'maximumGasLimit', label: 'maximumGasLimit()', type: 'uint64' },
+    { fn: 'unsafeBlockSigner', label: 'unsafeBlockSigner()', type: 'address' },
     {
       fn: 'l1CrossDomainMessenger',
-      label: 'L1CrossDomainMessenger',
+      label: 'l1CrossDomainMessenger()',
       expect: 'L1_CROSS_DOMAIN_MESSENGER_PROXY',
     },
-    { fn: 'l1StandardBridge', label: 'L1StandardBridge', expect: 'L1_STANDARD_BRIDGE_PROXY' },
-    { fn: 'l1ERC721Bridge', label: 'L1ERC721Bridge', expect: 'L1_ERC721_BRIDGE_PROXY' },
+    { fn: 'l1ERC721Bridge', label: 'l1ERC721Bridge()', expect: 'L1_ERC721_BRIDGE_PROXY' },
+    { fn: 'l1StandardBridge', label: 'l1StandardBridge()', expect: 'L1_STANDARD_BRIDGE_PROXY' },
+    {
+      fn: 'disputeGameFactory',
+      label: 'disputeGameFactory()',
+      expect: 'DISPUTE_GAME_FACTORY_PROXY',
+    },
+    { fn: 'optimismPortal', label: 'optimismPortal()', expect: 'OPTIMISM_PORTAL_PROXY' },
     {
       fn: 'optimismMintableERC20Factory',
-      label: 'MintableERC20Factory',
+      label: 'optimismMintableERC20Factory()',
       expect: 'OPTIMISM_MINTABLE_ERC20_FACTORY_PROXY',
     },
-    { fn: 'disputeGameFactory', label: 'DisputeGameFactory', expect: 'DISPUTE_GAME_FACTORY_PROXY' },
-    { fn: 'superchainConfig', label: 'SuperchainConfig', expect: 'SUPERCHAIN_CONFIG_PROXY' },
+    { fn: 'batchInbox', label: 'batchInbox()', type: 'address' },
+    { fn: 'startBlock', label: 'startBlock()', type: 'uint256' },
+    { fn: 'gasPayingToken', label: 'gasPayingToken()', type: 'address' },
+    { fn: 'isCustomGasToken', label: 'isCustomGasToken()', type: 'bool' },
+    { fn: 'gasPayingTokenName', label: 'gasPayingTokenName()', type: 'string' },
+    { fn: 'gasPayingTokenSymbol', label: 'gasPayingTokenSymbol()', type: 'string' },
+    { fn: 'superchainConfig', label: 'superchainConfig()', expect: 'SUPERCHAIN_CONFIG_PROXY' },
+    { fn: 'guardian', label: 'guardian()', type: 'address' },
+    { fn: 'paused', label: 'paused()', type: 'bool' },
+  ],
+  CeloSuperchainConfig: [
+    { fn: 'superchainConfig', label: 'superchainConfig()', expect: 'SUPERCHAIN_CONFIG_PROXY' },
+    { fn: 'guardian', label: 'guardian()', type: 'address' },
+    { fn: 'paused', label: 'paused()', type: 'bool' },
+  ],
+  SuperchainConfig: [
+    { fn: 'paused', label: 'paused()', type: 'bool' },
+    { fn: 'guardian', label: 'guardian()', type: 'address' },
   ],
   OptimismPortal: [
-    { fn: 'systemConfig', label: 'SystemConfig', expect: 'SYSTEM_CONFIG_PROXY' },
-    { fn: 'respectedGameType', label: 'Respected Game Type', type: 'uint32' },
-  ],
-  L1CrossDomainMessenger: [
-    { fn: 'portal', label: 'OptimismPortal', expect: 'OPTIMISM_PORTAL_PROXY' },
-    { fn: 'systemConfig', label: 'SystemConfig', expect: 'SYSTEM_CONFIG_PROXY' },
+    { fn: 'systemConfig', label: 'systemConfig()', expect: 'SYSTEM_CONFIG_PROXY' },
+    { fn: 'superchainConfig', label: 'superchainConfig()', expect: 'SUPERCHAIN_CONFIG_PROXY' },
+    {
+      fn: 'disputeGameFactory',
+      label: 'disputeGameFactory()',
+      expect: 'DISPUTE_GAME_FACTORY_PROXY',
+    },
+    {
+      fn: 'anchorStateRegistry',
+      label: 'anchorStateRegistry()',
+      expect: 'ANCHOR_STATE_REGISTRY_PROXY',
+    },
+    { fn: 'guardian', label: 'guardian()', type: 'address' },
+    { fn: 'balance', label: 'balance()', type: 'uint256' },
+    { fn: 'paused', label: 'paused()', type: 'bool' },
+    { fn: 'respectedGameType', label: 'respectedGameType()', type: 'uint32' },
+    { fn: 'proofMaturityDelaySeconds', label: 'proofMaturityDelaySeconds()', type: 'seconds' },
+    {
+      fn: 'disputeGameFinalityDelaySeconds',
+      label: 'disputeGameFinalityDelaySeconds()',
+      type: 'seconds',
+    },
+    { fn: 'ethLockbox', label: 'ethLockbox()', type: 'address' },
   ],
   L1StandardBridge: [
-    { fn: 'MESSENGER', label: 'L1CrossDomainMessenger', expect: 'L1_CROSS_DOMAIN_MESSENGER_PROXY' },
-    { fn: 'systemConfig', label: 'SystemConfig', expect: 'SYSTEM_CONFIG_PROXY' },
+    { fn: 'systemConfig', label: 'systemConfig()', expect: 'SYSTEM_CONFIG_PROXY' },
+    { fn: 'superchainConfig', label: 'superchainConfig()', expect: 'SUPERCHAIN_CONFIG_PROXY' },
+    { fn: 'paused', label: 'paused()', type: 'bool' },
+    { fn: 'l2TokenBridge', label: 'l2TokenBridge()', type: 'address' },
+  ],
+  L1CrossDomainMessenger: [
+    { fn: 'portal', label: 'portal()', expect: 'OPTIMISM_PORTAL_PROXY' },
+    { fn: 'systemConfig', label: 'systemConfig()', expect: 'SYSTEM_CONFIG_PROXY' },
+    { fn: 'superchainConfig', label: 'superchainConfig()', expect: 'SUPERCHAIN_CONFIG_PROXY' },
+    { fn: 'paused', label: 'paused()', type: 'bool' },
   ],
   L1ERC721Bridge: [
-    { fn: 'MESSENGER', label: 'L1CrossDomainMessenger', expect: 'L1_CROSS_DOMAIN_MESSENGER_PROXY' },
-    { fn: 'systemConfig', label: 'SystemConfig', expect: 'SYSTEM_CONFIG_PROXY' },
+    { fn: 'systemConfig', label: 'systemConfig()', expect: 'SYSTEM_CONFIG_PROXY' },
+    { fn: 'superchainConfig', label: 'superchainConfig()', expect: 'SUPERCHAIN_CONFIG_PROXY' },
+    { fn: 'paused', label: 'paused()', type: 'bool' },
   ],
   OptimismMintableERC20Factory: [
-    { fn: 'bridge', label: 'L1StandardBridge', expect: 'L1_STANDARD_BRIDGE_PROXY' },
+    { fn: 'bridge', label: 'bridge()', expect: 'L1_STANDARD_BRIDGE_PROXY' },
   ],
-  AnchorStateRegistry: [
-    { fn: 'systemConfig', label: 'SystemConfig', expect: 'SYSTEM_CONFIG_PROXY' },
-    { fn: 'disputeGameFactory', label: 'DisputeGameFactory', expect: 'DISPUTE_GAME_FACTORY_PROXY' },
-  ],
-  DelayedWETH: [{ fn: 'systemConfig', label: 'SystemConfig', expect: 'SYSTEM_CONFIG_PROXY' }],
   DisputeGameFactory: [
-    { fn: 'gameImpls', label: 'gameImpls(1) — PermissionedGame', args: [1], type: 'address' },
-    { fn: 'gameImpls', label: 'gameImpls(42) — OPSuccinctGame', args: [42], type: 'address' },
-  ],
-  SuperchainConfig: [{ fn: 'guardian', label: 'Guardian', type: 'address' }],
-  CeloSuperchainConfig: [{ fn: 'guardian', label: 'Guardian', type: 'address' }],
-}
-
-// ── Pausable Contracts ───────────────────────────────────
-export const PAUSABLE_CONTRACTS = ['SystemConfig', 'SuperchainConfig', 'CeloSuperchainConfig']
-
-// ── Immutable Variables ──────────────────────────────────
-// Read from impl address (not proxy) since immutables are baked into bytecode.
-// For singletons (PreimageOracle), read from the singleton address directly.
-// All calls use try/catch — missing getters on older versions return null.
-export const IMMUTABLE_VARS = {
-  OptimismPortal: [
-    { fn: 'proofMaturityDelaySeconds', label: 'Proof Maturity Delay', type: 'seconds' },
-    { fn: 'disputeGameFinalityDelaySeconds', label: 'DG Finality Delay', type: 'seconds' },
+    { fn: 'gameImpls', label: 'gameImpls(1)', args: [1], type: 'address' },
+    { fn: 'gameImpls', label: 'gameImpls(42)', args: [42], type: 'address' },
+    { fn: 'initBonds', label: 'initBonds(1)', args: [1], type: 'uint256' },
+    { fn: 'initBonds', label: 'initBonds(42)', args: [42], type: 'uint256' },
   ],
   AnchorStateRegistry: [
-    { fn: 'disputeGameFinalityDelaySeconds', label: 'DG Finality Delay', type: 'seconds' },
+    { fn: 'systemConfig', label: 'systemConfig()', expect: 'SYSTEM_CONFIG_PROXY' },
+    {
+      fn: 'disputeGameFactory',
+      label: 'disputeGameFactory()',
+      expect: 'DISPUTE_GAME_FACTORY_PROXY',
+    },
+    { fn: 'superchainConfig', label: 'superchainConfig()', expect: 'SUPERCHAIN_CONFIG_PROXY' },
+    { fn: 'anchorGame', label: 'anchorGame()', type: 'address' },
+    { fn: 'respectedGameType', label: 'respectedGameType()', type: 'uint32' },
+    { fn: 'paused', label: 'paused()', type: 'bool' },
+    {
+      fn: 'disputeGameFinalityDelaySeconds',
+      label: 'disputeGameFinalityDelaySeconds()',
+      type: 'seconds',
+    },
+    { fn: 'retirementTimestamp', label: 'retirementTimestamp()', type: 'uint256' },
   ],
-  DelayedWETH: [{ fn: 'delay', label: 'WETH Delay', type: 'seconds' }],
+  DelayedWETH: [
+    { fn: 'systemConfig', label: 'systemConfig()', expect: 'SYSTEM_CONFIG_PROXY' },
+    { fn: 'delay', label: 'delay()', type: 'seconds' },
+    { fn: 'config', label: 'config()', type: 'address' },
+  ],
+  ProtocolVersions: [
+    { fn: 'required', label: 'required()', type: 'uint256' },
+    { fn: 'recommended', label: 'recommended()', type: 'uint256' },
+  ],
+  MIPS: [{ fn: 'oracle', label: 'oracle()', type: 'address' }],
   PreimageOracle: [
-    { fn: 'challengePeriod', label: 'Challenge Period', type: 'seconds' },
-    { fn: 'minProposalSize', label: 'Min Proposal Size', type: 'uint256' },
+    { fn: 'challengePeriod', label: 'challengePeriod()', type: 'seconds' },
+    { fn: 'minProposalSize', label: 'minProposalSize()', type: 'uint256' },
   ],
 }
-
 // ── Game Template Immutables ─────────────────────────────
 // Read from gameImpls() addresses (game template contracts).
 export const GAME_IMMUTABLE_VARS = {

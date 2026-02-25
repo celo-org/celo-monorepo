@@ -10,9 +10,7 @@ import {
   implLookup,
   gameVersionTag,
   resolveSingletons,
-  CONTRACT_REFS,
-  PAUSABLE_CONTRACTS,
-  IMMUTABLE_VARS,
+  CONTRACT_PROPS,
   GAME_IMMUTABLE_VARS,
 } from './config.js'
 
@@ -23,7 +21,7 @@ const ABI = {
   getThreshold: parseAbi(['function getThreshold() view returns (uint256)']),
   getOwners: parseAbi(['function getOwners() view returns (address[])']),
   getAddress: parseAbi(['function getAddress(string) view returns (address)']),
-  // Cross-reference getters
+  // Contract property getters
   superchainConfig: parseAbi(['function superchainConfig() view returns (address)']),
   guardian: parseAbi(['function guardian() view returns (address)']),
   gameImpls: parseAbi(['function gameImpls(uint32) view returns (address)']),
@@ -40,8 +38,27 @@ const ABI = {
   MESSENGER: parseAbi(['function MESSENGER() view returns (address)']),
   bridge: parseAbi(['function bridge() view returns (address)']),
   respectedGameType: parseAbi(['function respectedGameType() view returns (uint32)']),
-  // Paused
   paused: parseAbi(['function paused() view returns (bool)']),
+  // New getters
+  minimumGasLimit: parseAbi(['function minimumGasLimit() view returns (uint64)']),
+  maximumGasLimit: parseAbi(['function maximumGasLimit() view returns (uint64)']),
+  unsafeBlockSigner: parseAbi(['function unsafeBlockSigner() view returns (address)']),
+  batchInbox: parseAbi(['function batchInbox() view returns (address)']),
+  startBlock: parseAbi(['function startBlock() view returns (uint256)']),
+  gasPayingToken: parseAbi(['function gasPayingToken() view returns (address, uint8)']),
+  isCustomGasToken: parseAbi(['function isCustomGasToken() view returns (bool)']),
+  gasPayingTokenName: parseAbi(['function gasPayingTokenName() view returns (string)']),
+  gasPayingTokenSymbol: parseAbi(['function gasPayingTokenSymbol() view returns (string)']),
+  ethLockbox: parseAbi(['function ethLockbox() view returns (address)']),
+  balance: parseAbi(['function balance() view returns (uint256)']),
+  l2TokenBridge: parseAbi(['function l2TokenBridge() view returns (address)']),
+  initBonds: parseAbi(['function initBonds(uint32) view returns (uint256)']),
+  anchorGame: parseAbi(['function anchorGame() view returns (address)']),
+  config: parseAbi(['function config() view returns (address)']),
+  retirementTimestamp: parseAbi(['function retirementTimestamp() view returns (uint256)']),
+  required: parseAbi(['function required() view returns (uint256)']),
+  recommended: parseAbi(['function recommended() view returns (uint256)']),
+  oracle: parseAbi(['function oracle() view returns (address)']),
   // Immutables – proxied contract impls
   proofMaturityDelaySeconds: parseAbi([
     'function proofMaturityDelaySeconds() view returns (uint256)',
@@ -127,26 +144,6 @@ async function readOwner(client, addr) {
   }
 }
 
-async function readSuperchainConfig(client, addr) {
-  try {
-    return await client.readContract({
-      address: addr,
-      abi: ABI.superchainConfig,
-      functionName: 'superchainConfig',
-    })
-  } catch {
-    return null
-  }
-}
-
-async function readGuardian(client, addr) {
-  try {
-    return await client.readContract({ address: addr, abi: ABI.guardian, functionName: 'guardian' })
-  } catch {
-    return null
-  }
-}
-
 async function readGameImpl(client, dgfAddr, gameType) {
   try {
     const addr = await client.readContract({
@@ -188,14 +185,6 @@ async function safeRead(client, addr, fnName, args) {
       functionName: fnName,
       args: args || undefined,
     })
-  } catch {
-    return null
-  }
-}
-
-async function readPaused(client, addr) {
-  try {
-    return await client.readContract({ address: addr, abi: ABI.paused, functionName: 'paused' })
   } catch {
     return null
   }
@@ -247,36 +236,33 @@ export async function classifyAddress(client, addr) {
   return { type: 'Contract', details: null }
 }
 
-// ── Cross-Reference Fetching ───────────────────────────────
+// ── Contract Property Fetching ─────────────────────────────
 
 /**
- * Fetch cross-reference getters for a contract.
+ * Fetch unified contract properties from CONTRACT_PROPS.
  * Returns array of { label, value, type, expected, valid }.
  */
-async function fetchContractRefs(client, proxyAddr, contractKey, networkAddrs) {
-  const defs = CONTRACT_REFS[contractKey]
-  if (!defs || defs.length === 0) return []
+async function fetchContractProps(client, addr, contractKey, networkAddrs) {
+  const defs = CONTRACT_PROPS[contractKey]
+  if (!defs || defs.length === 0 || !addr) return []
 
   const results = await Promise.all(
     defs.map(async (def) => {
-      const value = await safeRead(client, proxyAddr, def.fn, def.args)
+      let value = await safeRead(client, addr, def.fn, def.args)
       if (value === null || value === undefined) return null
+
+      // Handle tuple returns (e.g., gasPayingToken returns [address, uint8])
+      if (Array.isArray(value)) value = value[0]
 
       const type = def.type || 'address'
       const expected = def.expect ? networkAddrs[def.expect] : null
       let valid = null
-      if (type === 'address' && expected && value) {
+      if (expected && value) {
         const valStr = typeof value === 'string' ? value : String(value)
         valid = valStr.toLowerCase() === expected.toLowerCase()
       }
 
-      return {
-        label: def.label,
-        value,
-        type,
-        expected,
-        valid,
-      }
+      return { label: def.label, value, type, expected, valid }
     })
   )
 
@@ -336,17 +322,8 @@ async function fetchProxiedContract(client, networkId, contractKey) {
 
   const tag = implLookup(contractKey, impl, networkId)
 
-  // Fetch cross-references
-  const refs = await fetchContractRefs(client, proxy, contractKey, cfg.addresses)
-
-  // Fetch immutables from impl address (bytecode-embedded values)
-  const immutableDefs = IMMUTABLE_VARS[contractKey]
-  const immutables = immutableDefs ? await fetchImmutables(client, impl, immutableDefs) : []
-
-  // Fetch paused state for pausable contracts
-  const paused = PAUSABLE_CONTRACTS.includes(contractKey)
-    ? await readPaused(client, proxy)
-    : undefined
+  // Fetch unified properties
+  const props = await fetchContractProps(client, proxy, contractKey, cfg.addresses)
 
   return {
     key: contractKey,
@@ -356,9 +333,7 @@ async function fetchProxiedContract(client, networkId, contractKey) {
     version,
     owner,
     tag,
-    refs,
-    immutables,
-    paused,
+    props,
   }
 }
 
@@ -377,17 +352,8 @@ async function fetchResolvedContract(client, networkId, contractKey, resolveName
 
   const tag = implLookup(contractKey, impl, networkId)
 
-  // Fetch cross-references
-  const refs = await fetchContractRefs(client, proxy, contractKey, cfg.addresses)
-
-  // Fetch immutables from impl address
-  const immutableDefs = IMMUTABLE_VARS[contractKey]
-  const immutables = immutableDefs ? await fetchImmutables(client, impl, immutableDefs) : []
-
-  // Fetch paused state
-  const paused = PAUSABLE_CONTRACTS.includes(contractKey)
-    ? await readPaused(client, proxy)
-    : undefined
+  // Fetch unified properties
+  const props = await fetchContractProps(client, proxy, contractKey, cfg.addresses)
 
   return {
     key: contractKey,
@@ -400,9 +366,7 @@ async function fetchResolvedContract(client, networkId, contractKey, resolveName
     resolvedVia: 'AddressManager',
     addressManager: am,
     resolveName,
-    refs,
-    immutables,
-    paused,
+    props,
   }
 }
 
@@ -430,8 +394,6 @@ export async function fetchNetworkData(networkId, onProgress) {
     blockNumber: null,
     admin: {},
     contracts: {},
-    superchain: {},
-    guardian: null,
     games: {},
     singletons: {},
   }
@@ -484,23 +446,8 @@ export async function fetchNetworkData(networkId, onProgress) {
     if (c) data.contracts[c.key] = c
   }
 
-  // ── Phase 3: Superchain pointers ───────────────────────
-  const [sysScAddr, celoScAddr] = await Promise.all([
-    readSuperchainConfig(client, addrs.SYSTEM_CONFIG_PROXY),
-    readSuperchainConfig(client, addrs.CELO_SUPERCHAIN_CONFIG_PROXY),
-  ])
-  data.superchain = {
-    systemConfigTarget: sysScAddr,
-    celoSuperchainConfigTarget: celoScAddr,
-  }
+  // (superchain pointers and guardian now fetched as props inside contracts)
   tick('superchain')
-
-  // ── Phase 4: Guardian ──────────────────────────────────
-  const guardianAddr = await readGuardian(client, addrs.OPTIMISM_PORTAL_PROXY)
-  if (guardianAddr && guardianAddr !== ZERO_ADDR) {
-    const guardianClassify = await classifyAddress(client, guardianAddr)
-    data.guardian = { address: guardianAddr, classify: guardianClassify }
-  }
   tick('bridge')
 
   // ── Phase 5: Dispute games ─────────────────────────────
@@ -538,13 +485,14 @@ export async function fetchNetworkData(networkId, onProgress) {
   const singletonAddrs = resolveSingletons(dgfTag, networkId)
 
   if (singletonAddrs) {
-    const [mipsVer, preimageVer, mipsClassify, preimageClassify, preimageImmutables] =
+    const [mipsVer, preimageVer, mipsClassify, preimageClassify, mipsProps, preimageProps] =
       await Promise.all([
         readVersion(client, singletonAddrs.MIPS),
         readVersion(client, singletonAddrs.PreimageOracle),
         classifyAddress(client, singletonAddrs.MIPS),
         classifyAddress(client, singletonAddrs.PreimageOracle),
-        fetchImmutables(client, singletonAddrs.PreimageOracle, IMMUTABLE_VARS.PreimageOracle || []),
+        fetchContractProps(client, singletonAddrs.MIPS, 'MIPS', addrs),
+        fetchContractProps(client, singletonAddrs.PreimageOracle, 'PreimageOracle', addrs),
       ])
 
     data.singletons.MIPS = {
@@ -552,13 +500,14 @@ export async function fetchNetworkData(networkId, onProgress) {
       version: mipsVer,
       tag: implLookup('MIPS', singletonAddrs.MIPS, networkId),
       classify: mipsClassify,
+      props: mipsProps,
     }
     data.singletons.PreimageOracle = {
       address: singletonAddrs.PreimageOracle,
       version: preimageVer,
       tag: implLookup('PreimageOracle', singletonAddrs.PreimageOracle, networkId),
       classify: preimageClassify,
-      immutables: preimageImmutables,
+      props: preimageProps,
     }
   }
   tick('singletons')
@@ -619,7 +568,6 @@ export function compareNetworks(mainnetData, testnetDataArray) {
   if (!mainnetData) return alerts
 
   const mainAdminOwnerType = mainnetData.admin?.proxyAdminOwner?.classify?.type
-  const mainGuardianType = mainnetData.guardian?.classify?.type
 
   for (const td of testnetDataArray) {
     if (!td) continue
@@ -637,19 +585,7 @@ export function compareNetworks(mainnetData, testnetDataArray) {
       })
     }
 
-    // 2. Guardian type
-    const testGuardianType = td.guardian?.classify?.type
-    if (mainGuardianType && testGuardianType && mainGuardianType !== testGuardianType) {
-      alerts.push({
-        severity: 'critical',
-        category: 'guardian',
-        network: net,
-        contract: 'OptimismPortal Guardian',
-        message: `${net} guardian is ${testGuardianType} (mainnet is ${mainGuardianType})`,
-      })
-    }
-
-    // 3. Contract ownership patterns
+    // 2. Contract ownership patterns
     for (const [key, mainContract] of Object.entries(mainnetData.contracts)) {
       const testContract = td.contracts[key]
       if (!testContract) continue
@@ -671,24 +607,26 @@ export function compareNetworks(mainnetData, testnetDataArray) {
         }
       }
 
-      // 4. Cross-reference validation failures
-      if (testContract.refs) {
-        for (const ref of testContract.refs) {
-          if (ref.valid === false) {
+      // 3. Cross-reference validation failures (from props)
+      if (testContract.props) {
+        for (const prop of testContract.props) {
+          if (prop.valid === false) {
             alerts.push({
               severity: 'warning',
               category: 'cross-ref',
               network: net,
               contract: key,
-              message: `${key}.${ref.label} on ${net} points to unexpected address`,
+              message: `${key}.${prop.label} on ${net} points to unexpected address`,
             })
           }
         }
       }
 
-      // 5. Paused state discrepancy
-      const mainPaused = mainContract.paused
-      const testPaused = testContract.paused
+      // 4. Paused state discrepancy (from props)
+      const mainPausedProp = mainContract.props?.find((p) => p.label === 'paused()')
+      const testPausedProp = testContract.props?.find((p) => p.label === 'paused()')
+      const mainPaused = mainPausedProp?.value
+      const testPaused = testPausedProp?.value
       if (mainPaused !== undefined && testPaused !== undefined && mainPaused !== testPaused) {
         alerts.push({
           severity: testPaused ? 'critical' : 'warning',

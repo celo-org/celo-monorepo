@@ -83,7 +83,7 @@ function AddressTag({ label }) {
 }
 
 /**
- * Format immutable/ref values for display.
+ * Format property values for display.
  */
 function formatValue(value, type) {
   if (value === null || value === undefined) return '—'
@@ -177,84 +177,77 @@ function Skeleton({ width }) {
   return html`<div class=${cls}></div>`
 }
 
-function PausedBadge({ paused }) {
-  if (paused === null || paused === undefined) return null
-  return html`<span class="paused-badge ${paused ? 'active' : 'ok'}"
-    >${paused ? '⏸ PAUSED' : '▶ Active'}</span
-  >`
-}
+// ── Prop Row Component ──────────────────────────────────────
 
-// ── Ref Row Component ──────────────────────────────────────
+function PropRow({ prop, networkId, knownAddrs }) {
+  if (!prop) return null
 
-function RefRow({ ref, networkId, knownAddrs }) {
-  if (!ref) return null
+  const isAddr = prop.type === 'address' || (prop.expect && !prop.type)
+  const isBool = prop.type === 'bool'
+  const invalid = prop.valid === false
 
-  if (
-    ref.type === 'address' ||
-    (!ref.type &&
-      typeof ref.value === 'string' &&
-      ref.value.startsWith('0x') &&
-      ref.value.length === 42)
-  ) {
-    const addrVal = ref.value === ZERO_ADDR ? null : ref.value
-    const label = addrVal ? addressLabel(addrVal, knownAddrs) : null
+  if (isAddr) {
+    const addrVal = prop.value === ZERO_ADDR ? null : prop.value
+    const addrStr = addrVal ? String(addrVal) : null
+    const label = addrStr ? addressLabel(addrStr, knownAddrs) : null
     return html`
-      <div class="ref-row">
-        <span class="ref-label">${ref.label}</span>
+      <div class="chain-pointer ${invalid ? 'invalid' : ''}">
+        <span class="chain-arrow">↳</span>
+        <span class="prop-name">${prop.label}</span>
+        <span class="prop-sep">→</span>
         <${AddressPill} addr=${addrVal || ZERO_ADDR} networkId=${networkId} />
-        ${ref.valid === true && html`<span class="ref-valid">✓</span>`}
-        ${ref.valid === false && html`<span class="ref-invalid">✗</span>`}
+        ${prop.valid === true && html`<span class="ref-valid">✓</span>`}
+        ${prop.valid === false && html`<span class="ref-invalid">✗</span>`}
         <${AddressTag} label=${label} />
       </div>
     `
   }
 
-  // Non-address value (uint32, uint256, etc.)
-  return html`
-    <div class="ref-row">
-      <span class="ref-label">${ref.label}</span>
-      <span class="ref-value">${formatValue(ref.value, ref.type)}</span>
-    </div>
-  `
-}
-
-// ── Immutable Row Component ────────────────────────────────
-
-function ImmutableRow({ item, networkId, knownAddrs }) {
-  if (!item) return null
-
-  if (item.type === 'address') {
-    const addrVal = item.value === ZERO_ADDR ? null : item.value
-    const label = addrVal ? addressLabel(String(addrVal), knownAddrs) : null
-    let valid = null
-    if (item.expect && addrVal && knownAddrs) {
-      const expectedAddr = Object.entries(NETWORKS).length > 0 ? null : null // validated in rpc.js
-      // Simple: if the address has a known label, it's likely valid
-    }
+  if (isBool) {
+    const boolVal = prop.value === true || prop.value === 'true'
     return html`
-      <div class="immutable-row">
-        <span class="immutable-label">${item.label}</span>
-        <${AddressPill} addr=${addrVal || ZERO_ADDR} networkId=${networkId} />
-        <${AddressTag} label=${label} />
+      <div class="chain-pointer">
+        <span class="chain-arrow">↳</span>
+        <span class="prop-name">${prop.label}</span>
+        <span class="prop-sep">→</span>
+        <span class="prop-bool ${boolVal ? 'is-true' : 'is-false'}">${String(boolVal)}</span>
       </div>
     `
   }
 
+  if (prop.type === 'string') {
+    return html`
+      <div class="chain-pointer">
+        <span class="chain-arrow">↳</span>
+        <span class="prop-name">${prop.label}</span>
+        <span class="prop-sep">→</span>
+        <span class="prop-str">${String(prop.value)}</span>
+      </div>
+    `
+  }
+
+  // Numbers, seconds, durations, bytes32, etc.
   return html`
-    <div class="immutable-row">
-      <span class="immutable-label">${item.label}</span>
-      <span class="immutable-value">${formatValue(item.value, item.type)}</span>
+    <div class="chain-pointer">
+      <span class="chain-arrow">↳</span>
+      <span class="prop-name">${prop.label}</span>
+      <span class="prop-sep">→</span>
+      <span class="prop-val">${formatValue(prop.value, prop.type)}</span>
     </div>
   `
+}
+
+function Props({ props, networkId, knownAddrs }) {
+  if (!props?.length) return null
+  return html`${props.map(
+    (p) => html`<${PropRow} prop=${p} networkId=${networkId} knownAddrs=${knownAddrs} />`
+  )}`
 }
 
 // ── Contract Card ──────────────────────────────────────────
 
 function ContractCard({ contract, networkId, subtitle, knownAddrs }) {
   if (!contract) return html`<div class="card"><div class="skeleton card-skeleton"></div></div>`
-
-  const hasRefs = contract.refs && contract.refs.length > 0
-  const hasImmutables = contract.immutables && contract.immutables.length > 0
 
   return html`
     <div class="card">
@@ -264,7 +257,6 @@ function ContractCard({ contract, networkId, subtitle, knownAddrs }) {
           ${subtitle && html`<span class="card-subtitle"> ${subtitle}</span>`}
         </div>
         <div style="display: flex; align-items: center; gap: 6px;">
-          <${PausedBadge} paused=${contract.paused} />
           <${VersionBadge} tag=${contract.tag} />
         </div>
       </div>
@@ -316,21 +308,6 @@ function ContractCard({ contract, networkId, subtitle, knownAddrs }) {
           </span>
         </div>
       `}
-      ${hasRefs &&
-      html`
-        <div class="ref-section-label">References</div>
-        ${contract.refs.map(
-          (r) => html`<${RefRow} ref=${r} networkId=${networkId} knownAddrs=${knownAddrs} />`
-        )}
-      `}
-      ${hasImmutables &&
-      html`
-        <div class="ref-section-label">Immutables (impl)</div>
-        ${contract.immutables.map(
-          (item) =>
-            html`<${ImmutableRow} item=${item} networkId=${networkId} knownAddrs=${knownAddrs} />`
-        )}
-      `}
     </div>
   `
 }
@@ -379,8 +356,6 @@ function AdminCard({ label, info, networkId }) {
 function GameCard({ game, networkId, knownAddrs }) {
   if (!game) return null
 
-  const hasImmutables = game.immutables && game.immutables.length > 0
-
   return html`
     <div class="card">
       <div class="card-header">
@@ -404,14 +379,6 @@ function GameCard({ game, networkId, knownAddrs }) {
         <span class="card-label">Type</span>
         <${TypeBadge} classify=${game.classify} />
       </div>
-      ${hasImmutables &&
-      html`
-        <div class="ref-section-label">Immutables</div>
-        ${game.immutables.map(
-          (item) =>
-            html`<${ImmutableRow} item=${item} networkId=${networkId} knownAddrs=${knownAddrs} />`
-        )}
-      `}
     </div>
   `
 }
@@ -420,8 +387,6 @@ function GameCard({ game, networkId, knownAddrs }) {
 
 function SingletonCard({ name, info, networkId, knownAddrs }) {
   if (!info) return null
-
-  const hasImmutables = info.immutables && info.immutables.length > 0
 
   return html`
     <div class="card">
@@ -442,14 +407,6 @@ function SingletonCard({ name, info, networkId, knownAddrs }) {
           ${cleanVersion(info.version) || '—'}
         </span>
       </div>
-      ${hasImmutables &&
-      html`
-        <div class="ref-section-label">Immutables</div>
-        ${info.immutables.map(
-          (item) =>
-            html`<${ImmutableRow} item=${item} networkId=${networkId} knownAddrs=${knownAddrs} />`
-        )}
-      `}
     </div>
   `
 }
@@ -621,41 +578,33 @@ function NetworkView({ data, networkId, status }) {
     <!-- Superchain Topology -->
     <div class="section">
       <${SectionHeader} icon="🔗" title="SUPERCHAIN TOPOLOGY" />
-      <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px; padding: 0 4px;">
-        SystemConfig → CeloSuperchainConfig → SuperchainConfig
-      </div>
       <${ContractCard}
         contract=${data.contracts?.SystemConfig}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
       />
-      ${data.superchain?.systemConfigTarget &&
-      html`
-        <div class="chain-pointer">
-          <span class="chain-arrow">↳</span>
-          superchainConfig() →
-          <span class="addr" style="font-size: 0.75rem"
-            >${truncAddr(data.superchain.systemConfigTarget)}</span
-          >
-        </div>
-      `}
+      <${Props}
+        props=${data.contracts?.SystemConfig?.props}
+        networkId=${networkId}
+        knownAddrs=${knownAddrs}
+      />
       <${ContractCard}
         contract=${data.contracts?.CeloSuperchainConfig}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
       />
-      ${data.superchain?.celoSuperchainConfigTarget &&
-      html`
-        <div class="chain-pointer">
-          <span class="chain-arrow">↳</span>
-          superchainConfig() →
-          <span class="addr" style="font-size: 0.75rem"
-            >${truncAddr(data.superchain.celoSuperchainConfigTarget)}</span
-          >
-        </div>
-      `}
+      <${Props}
+        props=${data.contracts?.CeloSuperchainConfig?.props}
+        networkId=${networkId}
+        knownAddrs=${knownAddrs}
+      />
       <${ContractCard}
         contract=${data.contracts?.SuperchainConfig}
+        networkId=${networkId}
+        knownAddrs=${knownAddrs}
+      />
+      <${Props}
+        props=${data.contracts?.SuperchainConfig?.props}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
       />
@@ -669,17 +618,18 @@ function NetworkView({ data, networkId, status }) {
         networkId=${networkId}
         knownAddrs=${knownAddrs}
       />
-      ${data.guardian &&
-      html`
-        <div class="chain-pointer">
-          <span class="chain-arrow">↳</span>
-          guardian() →
-          <span class="addr" style="font-size: 0.75rem">${truncAddr(data.guardian.address)}</span>
-          <span style="margin-left: 4px"><${TypeBadge} classify=${data.guardian.classify} /></span>
-        </div>
-      `}
+      <${Props}
+        props=${data.contracts?.OptimismPortal?.props}
+        networkId=${networkId}
+        knownAddrs=${knownAddrs}
+      />
       <${ContractCard}
         contract=${data.contracts?.L1StandardBridge}
+        networkId=${networkId}
+        knownAddrs=${knownAddrs}
+      />
+      <${Props}
+        props=${data.contracts?.L1StandardBridge?.props}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
       />
@@ -689,13 +639,28 @@ function NetworkView({ data, networkId, status }) {
         subtitle="(ResolvedDelegateProxy)"
         knownAddrs=${knownAddrs}
       />
+      <${Props}
+        props=${data.contracts?.L1CrossDomainMessenger?.props}
+        networkId=${networkId}
+        knownAddrs=${knownAddrs}
+      />
       <${ContractCard}
         contract=${data.contracts?.L1ERC721Bridge}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
       />
+      <${Props}
+        props=${data.contracts?.L1ERC721Bridge?.props}
+        networkId=${networkId}
+        knownAddrs=${knownAddrs}
+      />
       <${ContractCard}
         contract=${data.contracts?.OptimismMintableERC20Factory}
+        networkId=${networkId}
+        knownAddrs=${knownAddrs}
+      />
+      <${Props}
+        props=${data.contracts?.OptimismMintableERC20Factory?.props}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
       />
@@ -709,13 +674,28 @@ function NetworkView({ data, networkId, status }) {
         networkId=${networkId}
         knownAddrs=${knownAddrs}
       />
+      <${Props}
+        props=${data.contracts?.DisputeGameFactory?.props}
+        networkId=${networkId}
+        knownAddrs=${knownAddrs}
+      />
       <${ContractCard}
         contract=${data.contracts?.AnchorStateRegistry}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
       />
+      <${Props}
+        props=${data.contracts?.AnchorStateRegistry?.props}
+        networkId=${networkId}
+        knownAddrs=${knownAddrs}
+      />
       <${ContractCard}
         contract=${data.contracts?.DelayedWETH}
+        networkId=${networkId}
+        knownAddrs=${knownAddrs}
+      />
+      <${Props}
+        props=${data.contracts?.DelayedWETH?.props}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
       />
@@ -725,11 +705,17 @@ function NetworkView({ data, networkId, status }) {
     <div class="section">
       <${SectionHeader} icon="🎲" title="DISPUTE GAMES" />
       ${data.games?.[1]
-        ? html`<${GameCard}
-            game=${data.games[1]}
-            networkId=${networkId}
-            knownAddrs=${knownAddrs}
-          />`
+        ? html`<${GameCard} game=${data.games[1]} networkId=${networkId} knownAddrs=${knownAddrs} />
+            <${Props}
+              props=${data.games[1].immutables?.map((i) => ({
+                label: i.label,
+                value: i.value,
+                type: i.type,
+                expect: i.expect,
+              }))}
+              networkId=${networkId}
+              knownAddrs=${knownAddrs}
+            />`
         : html`<div
             class="card"
             style="color: var(--text-dim); font-size: 0.82rem; text-align: center; padding: 16px;"
@@ -738,10 +724,20 @@ function NetworkView({ data, networkId, status }) {
           </div>`}
       ${data.games?.[42]
         ? html`<${GameCard}
-            game=${data.games[42]}
-            networkId=${networkId}
-            knownAddrs=${knownAddrs}
-          />`
+              game=${data.games[42]}
+              networkId=${networkId}
+              knownAddrs=${knownAddrs}
+            />
+            <${Props}
+              props=${data.games[42].immutables?.map((i) => ({
+                label: i.label,
+                value: i.value,
+                type: i.type,
+                expect: i.expect,
+              }))}
+              networkId=${networkId}
+              knownAddrs=${knownAddrs}
+            />`
         : html`<div
             class="card"
             style="color: var(--text-dim); font-size: 0.82rem; text-align: center; padding: 16px;"
@@ -758,6 +754,11 @@ function NetworkView({ data, networkId, status }) {
         networkId=${networkId}
         knownAddrs=${knownAddrs}
       />
+      <${Props}
+        props=${data.contracts?.ProtocolVersions?.props}
+        networkId=${networkId}
+        knownAddrs=${knownAddrs}
+      />
     </div>
 
     <!-- Singletons -->
@@ -769,9 +770,19 @@ function NetworkView({ data, networkId, status }) {
         networkId=${networkId}
         knownAddrs=${knownAddrs}
       />
+      <${Props}
+        props=${data.singletons?.PreimageOracle?.props}
+        networkId=${networkId}
+        knownAddrs=${knownAddrs}
+      />
       <${SingletonCard}
         name="MIPS"
         info=${data.singletons?.MIPS}
+        networkId=${networkId}
+        knownAddrs=${knownAddrs}
+      />
+      <${Props}
+        props=${data.singletons?.MIPS?.props}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
       />

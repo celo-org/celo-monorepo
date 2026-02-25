@@ -520,7 +520,7 @@
         }
       }
 
-      /* ── Chain Pointer ─────────────────────────────────── */
+      /* ── Chain Pointer ─────────────────────────────────────── */
       .chain-pointer {
         display: flex;
         align-items: center;
@@ -530,8 +530,42 @@
         font-size: 0.75rem;
         color: var(--text-dim);
       }
+      .chain-pointer.invalid {
+        background: rgba(239, 68, 68, 0.08);
+        border-radius: 4px;
+      }
       .chain-arrow {
         color: var(--text-dim);
+      }
+      .prop-name {
+        color: var(--text-dim);
+        font-size: 0.75rem;
+        min-width: 220px;
+        flex-shrink: 0;
+      }
+      .prop-sep {
+        color: var(--text-dim);
+        margin: 0 4px;
+      }
+      .prop-val {
+        color: var(--text-secondary);
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+      }
+      .prop-str {
+        color: var(--color-purple);
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+      }
+      .prop-bool.is-true {
+        color: var(--color-green);
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+      }
+      .prop-bool.is-false {
+        color: var(--color-amber);
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
       }
 
       /* ── Cached Banner ─────────────────────────────────── */
@@ -583,30 +617,7 @@
         color: var(--text-dim);
       }
 
-      /* ── Cross-Reference Row ─────────────────────────── */
-      .ref-section-label {
-        font-size: 0.68rem;
-        color: var(--text-dim);
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        margin-top: 8px;
-        margin-bottom: 2px;
-        padding-left: 10px;
-      }
-      .ref-row {
-        display: flex;
-        align-items: baseline;
-        padding: 2px 0 2px 16px;
-        font-size: 0.78rem;
-        border-left: 2px solid var(--border-subtle);
-        margin-left: 8px;
-      }
-      .ref-label {
-        color: var(--text-dim);
-        width: 180px;
-        flex-shrink: 0;
-        font-size: 0.72rem;
-      }
+      /* ── Cross-Reference Validation ─────────────────────── */
       .ref-valid {
         color: var(--color-green);
         margin-left: 6px;
@@ -617,49 +628,6 @@
         margin-left: 6px;
         font-size: 0.72rem;
         font-weight: 600;
-      }
-      .ref-value {
-        color: var(--text-secondary);
-        font-family: var(--font-mono);
-        font-size: 0.78rem;
-      }
-
-      /* ── Paused Badge ──────────────────────────────────── */
-      .paused-badge {
-        display: inline-flex;
-        padding: 1px 6px;
-        border-radius: 4px;
-        font-size: 0.7rem;
-        font-weight: 600;
-      }
-      .paused-badge.active {
-        background: rgba(239, 68, 68, 0.15);
-        color: var(--color-red);
-      }
-      .paused-badge.ok {
-        background: rgba(34, 197, 94, 0.1);
-        color: var(--color-green);
-      }
-
-      /* ── Immutable Row ────────────────────────────────── */
-      .immutable-row {
-        display: flex;
-        align-items: baseline;
-        padding: 2px 0 2px 16px;
-        font-size: 0.78rem;
-        border-left: 2px solid rgba(168, 85, 247, 0.3);
-        margin-left: 8px;
-      }
-      .immutable-label {
-        color: var(--text-dim);
-        width: 180px;
-        flex-shrink: 0;
-        font-size: 0.72rem;
-      }
-      .immutable-value {
-        color: var(--color-purple);
-        font-family: var(--font-mono);
-        font-size: 0.78rem;
       }
     </style>
   </head>
