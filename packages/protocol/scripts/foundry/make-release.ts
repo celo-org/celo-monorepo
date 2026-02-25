@@ -534,7 +534,10 @@ const isProxiedContract = (
   buildDir05: string,
   buildDir08: string
 ): boolean => {
-  return proxiedCoreContracts.has(contractName) || existsSync(getContractArtifactPath(`${contractName}Proxy`, buildDir05, buildDir08))
+  return (
+    proxiedCoreContracts.has(contractName) ||
+    existsSync(getContractArtifactPath(`${contractName}Proxy`, buildDir05, buildDir08))
+  )
 }
 
 const isCoreContract = (contractName: string) =>
@@ -947,14 +950,22 @@ const loadContractArtifact = (contractName: string, artifactPath: string): ViemC
 
 const contracts08Set = new Set(SOLIDITY_08_PACKAGE.contracts)
 
-const getContractBuildDir = (contractName: string, buildDir05: string, buildDir08: string): string => {
+const getContractBuildDir = (
+  contractName: string,
+  buildDir05: string,
+  buildDir08: string
+): string => {
   if (contracts08Set.has(contractName)) {
     return buildDir08
   }
   return buildDir05
 }
 
-const getContractArtifactPath = (contractName: string, buildDir05: string, buildDir08: string): string => {
+const getContractArtifactPath = (
+  contractName: string,
+  buildDir05: string,
+  buildDir08: string
+): string => {
   const buildDir = getContractBuildDir(contractName, buildDir05, buildDir08)
   return join(buildDir, `${contractName}.sol`, `${contractName}.json`)
 }
@@ -1042,7 +1053,9 @@ const linkLibraries = (
     const missingLibs = contractDependencies.filter((dep) => !addresses.addresses.has(dep))
     throw new Error(
       `Bytecode for ${contractViemArtifact.contractName} still contains unlinked library placeholders. ` +
-      `Missing library addresses: ${missingLibs.length > 0 ? missingLibs.join(', ') : '(unknown - check libraries file)'}`
+        `Missing library addresses: ${
+          missingLibs.length > 0 ? missingLibs.join(', ') : '(unknown - check libraries file)'
+        }`
     )
   }
 
@@ -1107,14 +1120,20 @@ const performRelease = async (
     const missingLibraries = contractDependencies.filter((dep) => !addresses.addresses.has(dep))
     if (missingLibraries.length > 0) {
       console.warn(
-        `\nWARNING: ${contractName} requires libraries not found in the libraries file: ${missingLibraries.join(', ')}`
+        `\nWARNING: ${contractName} requires libraries not found in the libraries file: ${missingLibraries.join(
+          ', '
+        )}`
       )
       console.warn(
         `Missing libraries is often due an error in the libraries file. Deploying the wrong version can lead to errors.`
       )
-      const confirmed = await promptUserConfirmation(`Deploy missing libraries (${missingLibraries.join(', ')})?`)
+      const confirmed = await promptUserConfirmation(
+        `Deploy missing libraries (${missingLibraries.join(', ')})?`
+      )
       if (!confirmed) {
-        throw new Error(`Aborting: missing libraries for ${contractName}: ${missingLibraries.join(', ')}`)
+        throw new Error(
+          `Aborting: missing libraries for ${contractName}: ${missingLibraries.join(', ')}`
+        )
       }
       for (const lib of missingLibraries) {
         const libArtifactPath = getContractArtifactPath(lib, buildDir05, buildDir08)
