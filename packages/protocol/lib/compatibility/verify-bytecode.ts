@@ -164,11 +164,33 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   }
 
   if (onchainBytecode !== linkedSourceBytecode) {
-    console.log("onchainBytecode", onchainBytecode)
-    console.log("linkedSourceBytecode", linkedSourceBytecode)
-    const logMessage = `${contract}'s onchain and compiled bytecodes do not match`
-    throw new Error(logMessage)
-    // console.log(logMessage)
+    // AddressLinkedList exists in both Mento (0.5) and 0.8 packages because Validators (0.8)
+    // links it, but it was deployed with the 0.5 compiler. Try the Mento artifacts as fallback.
+    // See https://github.com/celo-org/celo-monorepo/issues/11684
+    if (contract === 'AddressLinkedList' && isLibrary(contract, context)) {
+      const mentoArtifacts = context.artifactsMap[MENTO_PACKAGE.name]
+      if (mentoArtifacts) {
+        let mentoBytecode = stripMetadata(mentoArtifacts.getArtifactByName(contract).deployedBytecode)
+        mentoBytecode = linkLibraries(mentoBytecode, context.libraryAddresses.addresses)
+        try {
+          mentoBytecode = verifyAndStripLibraryPrefix(mentoBytecode)
+        } catch { /* ignore */ }
+
+        if (onchainBytecode === mentoBytecode) {
+          console.warn(`\n⚠️  WARNING: ${contract} was deployed with Solidity 0.5 instead of 0.8!`)
+          console.warn(`⚠️  This is a known issue caused by Validators linking AddressLinkedList.`)
+          console.warn(`⚠️  See https://github.com/celo-org/celo-monorepo/issues/11684\n`)
+        } else {
+          console.log("onchainBytecode", onchainBytecode)
+          console.log("linkedSourceBytecode", linkedSourceBytecode)
+          throw new Error(`${contract}'s onchain and compiled bytecodes do not match (tried both 0.5 and 0.8)`)
+        }
+      }
+    } else {
+      console.log("onchainBytecode", onchainBytecode)
+      console.log("linkedSourceBytecode", linkedSourceBytecode)
+      throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
+    }
   } else {
     console.log(
       `${isLibrary(contract, context) ? 'Library' : 'Contract'
