@@ -128,14 +128,14 @@ const dfsStep = async (queue: QueueEntry[], visited: Set<string>, context: Verif
   const { contract, requiredBy } = queue.pop()
   const artifact = getArtifact(contract, context)
   const isLib = isLibrary(contract, context)
-  const label = isLib ? 'Library' : 'Contract'
+  const kind = isLib ? 'Library' : 'Contract'
   // mark current DFS node as visited
   visited.add(contract)
 
   if (requiredBy) {
-    console.log(`\nVerifying ${label} ${contract} (required by ${requiredBy})`)
+    console.log(`\nVerifying ${kind} ${contract} (required by ${requiredBy})`)
   } else {
-    console.log(`\nVerifying ${label} ${contract}`)
+    console.log(`\nVerifying ${kind} ${contract}`)
   }
 
   try {
@@ -202,11 +202,11 @@ const dfsStep = async (queue: QueueEntry[], visited: Set<string>, context: Verif
     }
 
     if (onchainBytecode !== linkedSourceBytecode) {
-      const msg = `${label} ${contract} (at ${implementationAddress}): onchain and compiled bytecodes do not match`
+      const msg = `${kind} ${contract} (at ${implementationAddress}): onchain and compiled bytecodes do not match`
       console.log(`  ❌ ${msg}`)
       errors.push(msg)
     } else {
-      console.log(`  ✅ ${label} ${contract} matches (at ${implementationAddress})`)
+      console.log(`  ✅ ${kind} ${contract} matches (at ${implementationAddress})`)
       if (isLib) {
         verifiedLibraries.add(contract)
       }
@@ -216,7 +216,7 @@ const dfsStep = async (queue: QueueEntry[], visited: Set<string>, context: Verif
     const unvisitedLibraries = Object.keys(sourceArtifactLinking.links).filter((library) => !visited.has(library))
     queue.push(...unvisitedLibraries.map((library) => ({ contract: library, requiredBy: contract })))
   } catch (err) {
-    const msg = `${label} ${contract}: ${err.message}`
+    const msg = `${kind} ${contract}: ${err.message}`
     console.log(`  ❌ ${msg}`)
     errors.push(msg)
   }

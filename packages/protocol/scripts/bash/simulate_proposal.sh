@@ -23,7 +23,7 @@ done
 [ ! -f "$PROPOSAL" ] && echo "Proposal file '$PROPOSAL' not found" && exit 1;
 
 # Fetch all network metadata as JSON
-NETWORK_INFO=$(yarn --silent ts-node scripts/bash/network-info.ts "$NETWORK")
+NETWORK_INFO=$(yarn --silent ts-node scripts/ts/network-info.ts "$NETWORK")
 RPC_URL=$(echo "$NETWORK_INFO" | jq -r '.rpcUrl')
 PROPOSER=$(echo "$NETWORK_INFO" | jq -r '.proposer')
 APPROVER=$(echo "$NETWORK_INFO" | jq -r '.approver')

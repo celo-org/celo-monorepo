@@ -54,7 +54,7 @@ done
 
 if [ -n "$PROPOSAL" ]; then
   echo "Error: -p no longer accepts a path. Proposal name is now generated automatically as proposal-\$NETWORK-\$BRANCH.json." >&2
-  echo "See: https://github.com/celo-org/celo-monorepo/pull/11651" >&2
+  echo "See: https://github.com/celo-org/celo-monorepo/pull/11662" >&2
   exit 1
 fi
 PROPOSAL="proposal-$NETWORK-$BRANCH.json"

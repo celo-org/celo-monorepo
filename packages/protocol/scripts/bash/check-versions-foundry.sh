@@ -30,7 +30,7 @@ done
 
 if [ -n "$REPORT" ]; then
   echo "Error: -r no longer accepts a path. Report name is now generated automatically from release names." >&2
-  echo "See: https://github.com/celo-org/celo-monorepo/pull/11651" >&2
+  echo "See: https://github.com/celo-org/celo-monorepo/pull/11662" >&2
   exit 1
 fi
 REPORT="report-$BRANCH-$NEW_BRANCH.json"

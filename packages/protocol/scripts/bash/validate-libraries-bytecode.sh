@@ -7,7 +7,7 @@
 get_forno_url() {
   local NETWORK="$1"
   local URL
-  URL=$(yarn --silent ts-node scripts/bash/network-info.ts "$NETWORK" | jq -r '.rpcUrl')
+  URL=$(yarn --silent ts-node scripts/ts/network-info.ts "$NETWORK" | jq -r '.rpcUrl')
 
   if [ $? -ne 0 ] || [ -z "$URL" ]; then
     echo "Error: Could not resolve forno URL for network '$NETWORK'" >&2
