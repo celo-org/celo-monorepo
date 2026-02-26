@@ -336,5 +336,5 @@ export const verifyBytecodes = async (
     throw new Error(errors.join('\n'))
   }
 
-  return { libraryLinkingInfo: context.libraryLinkingInfo, errors, verifiedLibraries }
+  return { libraryLinkingInfo: context.libraryLinkingInfo, verifiedLibraries }
 }

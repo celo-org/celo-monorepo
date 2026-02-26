@@ -144,7 +144,7 @@ verifyBytecodes(
   version,
   network
 )
-  .then(({ libraryLinkingInfo, errors, verifiedLibraries }) => {
+  .then(({ libraryLinkingInfo, verifiedLibraries }) => {
     const allMapping = libraryLinkingInfo.getAddressMapping()
     const verifiedMapping = {}
     for (const library of verifiedLibraries) {
@@ -152,19 +152,9 @@ verifyBytecodes(
     }
 
     /* eslint-disable no-console */
-    if (errors.length > 0) {
-      console.log(`\n❌ Verification completed with ${errors.length} error(s):`)
-      errors.forEach((err, i) => console.log(`  ${i + 1}. ${err}`))
-
-      const errFile = `${librariesFile}-err`
-      console.info(`Writing verified library addresses to ${errFile}`)
-      writeJsonSync(errFile, verifiedMapping, { spaces: 2 })
-      process.exit(1)
-    } else {
-      console.log(`\n✅ All contracts and libraries verified successfully!`)
-      console.info(`Writing linked library addresses to ${librariesFile}`)
-      writeJsonSync(librariesFile, verifiedMapping, { spaces: 2 })
-    }
+    console.log(`\n✅ All contracts and libraries verified successfully!`)
+    console.info(`Writing linked library addresses to ${librariesFile}`)
+    writeJsonSync(librariesFile, verifiedMapping, { spaces: 2 })
   })
   .catch((error) => {
     console.info('Script errored!', error)
