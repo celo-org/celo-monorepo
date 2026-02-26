@@ -34,7 +34,7 @@ export const MENTO_PACKAGE = {
     'StableToken',
     'StableTokenEUR',
     'StableTokenBRL',
-    // 'AddressLinkedList', // Celo Sepolia has AddressLinkedList in 0.5, so does mento
+    'AddressLinkedList', // Celo Sepolia has AddressLinkedList in 0.5, so does mento
   ],
   proxyContracts: [
     'ExchangeBRLProxy',
@@ -66,7 +66,7 @@ export const SOLIDITY_08_PACKAGE = {
     'EpochManager',
     'EpochManagerEnabler',
     'ScoreManager',
-    'AddressLinkedList', // Celo Sepolia has AddressLinkedList in 0.5, so does mento
+    // 'AddressLinkedList', // Celo Sepolia has AddressLinkedList in 0.5, so does mento
   ],
   proxyContracts: [
     'GasPriceMinimumProxy',

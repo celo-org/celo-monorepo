@@ -85,7 +85,7 @@ echo "Proposal approved"
 
 # Vote
 echo "Voting yes on proposal $PROPOSAL_ID..."
-celocli governance:vote --value=Yes --from="$VOTER" --proposalID="$PROPOSAL_ID" -n "$ANVIL_RPC_URL"
+celocli governance:vote --value=Yes --from="$VOTER" --proposalID="$PROPOSAL_ID" -n "$ANVIL_RPC_URL" 2>&1 | tee /dev/stderr
 echo "Proposal voted"
 
 # Fast-forward past the referendum period
@@ -101,7 +101,7 @@ echo "Proposal executed"
 # Sanity-check the Governance contract
 celocli governance:withdraw --from="$PROPOSER" -n "$ANVIL_RPC_URL"
 # propose just as a test
-celocli governance:propose --jsonTransactions="$PROPOSAL" --from="$PROPOSER" --deposit=100e18 --descriptionURL="https://github.com/celo-org/governance/blob/main/CGPs/TEST" -n "$ANVIL_RPC_URL"
+celocli governance:propose --jsonTransactions="$PROPOSAL" --from="$PROPOSER" --deposit="$MIN_DEPOSIT" --descriptionURL="https://github.com/celo-org/governance/blob/main/CGPs/TEST" -n "$ANVIL_RPC_URL"
 
 # Cleanup
 kill $(lsof -t -i:$ANVIL_PORT) 2>/dev/null || true
