@@ -7,7 +7,7 @@ import {
   stripMetadata,
   verifyAndStripLibraryPrefix,
 } from '@celo/protocol/lib/bytecode'
-import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
+import { MENTO_PACKAGE, SOLIDITY_05_PACKAGE, SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { verifyProxyStorageProof } from '@celo/protocol/lib/proxy-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
@@ -91,7 +91,7 @@ export const getProposedProxyAddress = (contract: string, proposal: ProposalTx[]
 const getArtifactsForContract = (contract: string, artifactsMap: ArtifactsMap): BuildArtifacts => {
   if (contracts08Set.has(contract)) return artifactsMap[SOLIDITY_08_PACKAGE.name]
   if (mentoContractsSet.has(contract)) return artifactsMap[MENTO_PACKAGE.name]
-  return artifactsMap['']
+  return artifactsMap[SOLIDITY_05_PACKAGE.name]
 }
 
 const getSourceBytecode = (contract: string, context: VerificationContext): string =>

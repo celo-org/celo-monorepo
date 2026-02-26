@@ -10,6 +10,15 @@ export interface ContractPackage {
   proxiesPath?: string
 }
 
+export const SOLIDITY_05_PACKAGE = {
+  path: 'contracts',
+  contractsFolder: '',
+  folderPath: '',
+  name: '0.5',
+  contracts: [] as string[], // catch-all
+  truffleConfig: 'truffle-config.js',
+} satisfies ContractPackage
+
 export const MENTO_PACKAGE = {
   path: 'mento-core',
   contractsFolder: 'contracts',
@@ -57,6 +66,7 @@ export const SOLIDITY_08_PACKAGE = {
     'EpochManager',
     'EpochManagerEnabler',
     'ScoreManager',
+    'AddressLinkedList', // Celo Sepolia has AddressLinkedList in 0.5, so does mento
   ],
   proxyContracts: [
     'GasPriceMinimumProxy',

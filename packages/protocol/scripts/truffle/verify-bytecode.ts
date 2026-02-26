@@ -1,4 +1,8 @@
-import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
+import {
+  MENTO_PACKAGE,
+  SOLIDITY_05_PACKAGE,
+  SOLIDITY_08_PACKAGE,
+} from '@celo/protocol/contractPackages'
 import { verifyBytecodes } from '@celo/protocol/lib/compatibility/verify-bytecode'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { getBuildArtifacts } from '@openzeppelin/upgrades'
@@ -55,8 +59,7 @@ module.exports = async (callback: (error?: any) => number) => {
 
     const registry = await Registry.at(celoRegistryAddress)
     const artifactsMap: Record<string, ReturnType<typeof getBuildArtifacts>> = {
-      // Empty string is the default package for 0.5 contracts
-      '': getBuildArtifacts(artifactsDirectory),
+      [SOLIDITY_05_PACKAGE.name]: getBuildArtifacts(artifactsDirectory),
       [SOLIDITY_08_PACKAGE.name]: getBuildArtifacts(artifacts08Directory),
       [MENTO_PACKAGE.name]: getBuildArtifacts(mentoArtifactsDirectory),
     }
