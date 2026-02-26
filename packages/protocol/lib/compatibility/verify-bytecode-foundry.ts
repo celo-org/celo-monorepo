@@ -332,5 +332,9 @@ export const verifyBytecodes = async (
     await dfsStep(queue, visited, context, errors, verifiedLibraries)
   }
 
+  if (errors.length > 0) {
+    throw new Error(errors.join('\n'))
+  }
+
   return { libraryLinkingInfo: context.libraryLinkingInfo, errors, verifiedLibraries }
 }
