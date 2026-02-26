@@ -1126,7 +1126,7 @@ const performRelease = async (
         )}`
       )
       console.warn(
-        `Missing libraries is often due an error in the libraries file. Deploying the wrong version can lead to errors.`
+        `Missing libraries is often due to an error in the libraries file. Deploying the wrong version can lead to errors.`
       )
       const confirmed = await promptUserConfirmation(
         `Deploy missing libraries (${missingLibraries.join(', ')})?`
