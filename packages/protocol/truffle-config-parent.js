@@ -70,6 +70,9 @@ const networks = {
     gas: gasLimit,
     gasPrice: 100000000000,
     privateKeyAvailable: false,
+    proposer: '0xc11F5aC70B86517Dcc10f20d8B0D5e77EBb956Ce',
+    approver: '0x41822d8A191fcfB1cfcA5F7048818aCd8eE933d3',
+    voter: '0xb7Eb6BBDFA555a1065374b4a1aa2Bc446A05F442',
   },
   testnet_prod: defaultConfig,
   anvil: {

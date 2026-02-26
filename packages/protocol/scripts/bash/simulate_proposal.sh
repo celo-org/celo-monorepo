@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Disable sync check for celocli commands (anvil fork won't pass sync checks)
+export NO_SYNCCHECK=true
+
 # Simulates a governance proposal on a forked anvil instance.
 #
 # Flags:
@@ -59,37 +62,46 @@ if [ "$REGISTRY_IMPL" = "0x0000000000000000000000000000000000000000" ]; then
 fi
 
 echo "Verifying network contracts..."
-CONTRACTS_OUTPUT=$(NO_SYNCCHECK=true celocli network:contracts --node="$ANVIL_RPC_URL")
+CONTRACTS_OUTPUT=$(celocli network:contracts -n "$ANVIL_RPC_URL")
 echo "$CONTRACTS_OUTPUT"
 
-GOVERNANCE_ADDRESS=$(echo "$CONTRACTS_OUTPUT" | awk '/^Governance /{print $2}')
+GOVERNANCE_ADDRESS=$(echo "$CONTRACTS_OUTPUT" | awk '/Governance [^S]/{print $2}')
 echo "Governance contract: $GOVERNANCE_ADDRESS"
+
+MIN_DEPOSIT=$(cast call "$GOVERNANCE_ADDRESS" "minDeposit()(uint256)" --rpc-url "$ANVIL_RPC_URL" --json | jq -r '.[0]')
+echo "Min deposit: $MIN_DEPOSIT"
+
+celocli governance:withdraw --from="$PROPOSER" -n "$ANVIL_RPC_URL" || echo "no existing deposit to withdraw"
 
 # Propose
 echo "Simulating proposal $PROPOSAL on $ANVIL_RPC_URL..."
-PROPOSE_OUTPUT=$(NO_SYNCCHECK=true celocli governance:propose --jsonTransactions="$PROPOSAL" --from="$PROPOSER" --deposit=100e18 --descriptionURL="https://github.com/celo-org/governance/blob/main/CGPs/TEST" --node="$ANVIL_RPC_URL")
-echo "$PROPOSE_OUTPUT"
+PROPOSE_OUTPUT=$(celocli governance:propose --jsonTransactions="$PROPOSAL" --from="$PROPOSER" --deposit="$MIN_DEPOSIT" --descriptionURL="https://github.com/celo-org/governance/blob/main/CGPs/TEST" -n "$ANVIL_RPC_URL" 2>&1 | tee /dev/stderr)
 PROPOSAL_ID=$(echo "$PROPOSE_OUTPUT" | grep "proposalId:" | awk '{print $2}')
 echo "Proposal ID: $PROPOSAL_ID"
 
 # Approve
-NO_SYNCCHECK=true celocli governance:approve --proposalID="$PROPOSAL_ID" --from="$APPROVER" --node="$ANVIL_RPC_URL" && \
+celocli governance:approve --proposalID="$PROPOSAL_ID" --from="$APPROVER" -n "$ANVIL_RPC_URL" && \
 echo "Proposal approved"
 
 # Vote
 echo "Voting yes on proposal $PROPOSAL_ID..."
-NO_SYNCCHECK=true celocli governance:vote --value=Yes --from="$VOTER" --proposalID="$PROPOSAL_ID" --node="$ANVIL_RPC_URL"
+celocli governance:vote --value=Yes --from="$VOTER" --proposalID="$PROPOSAL_ID" -n "$ANVIL_RPC_URL"
 echo "Proposal voted"
 
 # Fast-forward past the referendum period
-REFERENDUM_DURATION=$(cast call "$GOVERNANCE_ADDRESS" "getReferendumStageDuration()(uint256)" --rpc-url "$ANVIL_RPC_URL")
+REFERENDUM_DURATION=$(cast call "$GOVERNANCE_ADDRESS" "getReferendumStageDuration()(uint256)" --rpc-url "$ANVIL_RPC_URL" --json | jq -r '.[0]')
 echo "Referendum stage duration: $REFERENDUM_DURATION seconds"
 cast rpc evm_increaseTime $((REFERENDUM_DURATION + 1)) --rpc-url "$ANVIL_RPC_URL"
 cast rpc evm_mine --rpc-url "$ANVIL_RPC_URL"
 
 # Execute
-NO_SYNCCHECK=true celocli governance:execute --from="$VOTER" --proposalID="$PROPOSAL_ID" --node="$ANVIL_RPC_URL"
+celocli governance:execute --from="$VOTER" --proposalID="$PROPOSAL_ID" -n "$ANVIL_RPC_URL"
 echo "Proposal executed"
+
+# Sanity-check the Governance contract
+celocli governance:withdraw --from="$PROPOSER" -n "$ANVIL_RPC_URL"
+# propose just as a test
+celocli governance:propose --jsonTransactions="$PROPOSAL" --from="$PROPOSER" --deposit=100e18 --descriptionURL="https://github.com/celo-org/governance/blob/main/CGPs/TEST" -n "$ANVIL_RPC_URL"
 
 # Cleanup
 kill $(lsof -t -i:$ANVIL_PORT) 2>/dev/null || true
