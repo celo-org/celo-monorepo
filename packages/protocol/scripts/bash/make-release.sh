@@ -7,7 +7,7 @@ set -euo pipefail
 # Flags:
 # -n: The network to deploy to.
 # -b: Branch to build contracts from.
-# -p: (Optional) Deprecated. Proposal path is auto-generated as proposal-$NETWORK-$BRANCH.json.
+# -p: Deprecated. Proposal path is auto-generated as proposal-$NETWORK-$BRANCH.json.
 # -i: Path to the data needed to initialize contracts.
 # -r: Path to the contract compatibility report.
 # -d: Whether to dry-run this deploy
