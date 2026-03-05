@@ -179,6 +179,6 @@
     "baselineUpdateFactor": 200000000000000000000000,
     "baselineQuorumFactor": 1000000000000000000000000,
     "skipSetConstitution": false,
-    "skipTransferOwnership": false
+    "skipTransferOwnership": true
   }
 }

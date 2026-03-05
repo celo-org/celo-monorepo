@@ -9,8 +9,9 @@ source $PWD/scripts/foundry/constants.sh
 # MIGRATION_PK=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 ANVIL_PORT=9545
 ANVIL_RPC_URL="http://127.0.0.1:9545"
-DEPLOYER_PRIVATE_KEY="0xc2e0b480b7d39aa35be9cb0761cb11b5f27d8deefad7a4a194b09274937804df"
-FROM_ADDRESS="$(cast wallet address --private-key $DEPLOYER_PRIVATE_KEY)" # 0x95a40aA01d2d72b4122C19c86160710D01224ada
+# DEPLOYER_PRIVATE_KEY="0xc2e0b480b7d39aa35be9cb0761cb11b5f27d8deefad7a4a194b09274937804df"
+DEPLOYER_PRIVATE_KEY="0xd3fd5b3d4c9ea5e73829b2dff39bf7f7230cfb193b80ca376dbe96944ffafaa8"
+FROM_ADDRESS="$(cast wallet address --private-key $DEPLOYER_PRIVATE_KEY)"
 
 CACHED_LIBRARIES_FLAG=$(cat $TMP_FOLDER/library_flags.txt || echo "")
 echo "Library flags are: $CACHED_LIBRARIES_FLAG"

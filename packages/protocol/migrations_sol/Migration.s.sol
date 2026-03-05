@@ -244,6 +244,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateFeeHandler(json);
     migrateOdisPayments();
     migrateCeloUnreleasedTreasury();
+    // fundValidators(json);
     vm.stopBroadcast();
 
     // needs to broadcast from a pre-funded account
@@ -323,7 +324,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateFeeCurrencyDirectory() public {
-    address feeCurrencyDirectoryProxyAddress = 0x9212Fb72ae65367A7c887eC4Ad9bE310BAC611BF;
+    address feeCurrencyDirectoryProxyAddress = 0x15F344b9E6c3Cb6F0376A36A64928b13F62C6276;
     deployImplementationAndAddToRegistry(
       "FeeCurrencyDirectory",
       IProxy(feeCurrencyDirectoryProxyAddress),
@@ -1116,7 +1117,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 commission,
     string memory json
   ) public returns (address accountAddress) {
-    // fundAccount(vm.addr(validator0Key), amountToLock + 1000 ether);
+    // fundAccount(vm.addr(validator0Key), amountToLock + 10005 ether);
+    // fundAccount(vm.addr(validator0Key), (amountToLock * 5) + 5 ether);
     string memory groupName = json.readString(".validators.groupName");
     console.log("Registering validator group", groupName, "with address: ", vm.addr(validator0Key));
     console.log("Locking gold: ", amountToLock);
@@ -1131,13 +1133,32 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function fundAccount(address account, uint256 amount) public {
     console.log("Funding account: ", account, " with amount: ", amount);
-    vm.startBroadcast(DEPLOYER_ACCOUNT);
-    vm.deal(account, amount);
-    vm.stopBroadcast();
-
-    // Also give native balance for lock() calls that use {value: }
-    vm.deal(account, amount);
+    (bool success, ) = payable(account).call{ value: amount }("");
+    require(success, "Transfer failed");
   }
+
+  // function fundValidators(string memory json) public {
+  //   // uint256[] memory valKeys = json.readUintArray(".validators.valKeys");
+  //   // for (uint256 i = 0; i < valKeys.length; i++) {
+  //   //   fundAccount(vm.addr(valKeys[i]), 30000 ether);
+  //   // }
+
+  //   console.log("Funding validators");
+  //   address[] memory validators = [
+  //     0x06F6b03020692bC2c62362568FC251fA392834F6,
+  //     0x31F737b55d50C31C3993fA3BECEa8561B20D25A9,
+  //     0x73b3307111b6fA70933A636a8dD939293FdFDF27,
+  //     0x822aEF6Ee28185117386Cc96Bff5523C8C57c1E7,
+  //     0x941B3d1c9778DF9Ec5E72cD38038BF11890E4542,
+  //     0xA223b73Bfc642e1C08154FC150B8Ea975c656252,
+  //     0xB347EE81Af3e66405b71b4E23B2C8354980253D4,
+  //     0xCFc6b063227A1cBA667F017044eA1C476f0869cB,
+  //     0xeDeDE206fD98A100b8d4F96716A344534a89d506
+  //     ];
+  //   for (uint256 i = 0; i < validators.length; i++) {
+  //     fundAccount(validators[i], 30000 ether);
+  //   }
+  // }
 
   function _generateEcdsaPubKeyWithSigner(
     address _validator,
