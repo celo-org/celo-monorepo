@@ -37,34 +37,32 @@ echo "- Verify bytecode of the network"
 
 
 # this commands compiles the output
-yarn --cwd packages/protocol release:verify-deployed -n anvil -b $BRANCH
-
+yarn --cwd packages/protocol release:verify-deployed:foundry -n anvil -b $BRANCH
 
 echo "- Check versions of current branch"
-
-# From check-versions.sh
-
-BASE_COMMIT=$(git rev-parse HEAD)
-echo " - Base commit $BASE_COMMIT"
-echo " - Checkout migrationsConfig.js at $BRANCH"
-git checkout $BRANCH -- migrationsConfig.js
-
-source scripts/bash/contract-exclusion-regex.sh
-yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/contracts --new_contracts build/contracts --exclude $CONTRACT_EXCLUSION_REGEX --new_branch $BRANCH --output_file report.json
-
-echo "- Clean git modified file"
-git restore migrationsConfig.js
-
+yarn release:check-versions:foundry -a $BRANCH -b HEAD -r report.json
 
 # From make-release.sh
 echo "- Deploy release of current branch"
 INITIALIZATION_FILE=`ls releaseData/initializationData/release*.json | sort -V | tail -n 1 | xargs realpath`
-yarn truffle exec --network anvil ./scripts/truffle/make-release.js --build_directory build/ --branch $BRANCH --report report.json --proposal proposal.json --librariesFile libraries.json --initialize_data $INITIALIZATION_FILE
+
+ANVIL_DEVNET_PRIVATE_KEY='0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+yarn release:make:foundry \
+  -b "$BRANCH" \
+  -k "$ANVIL_DEVNET_PRIVATE_KEY" \
+  -i "$INITIALIZATION_FILE" \
+  -l libraries.json \
+  -n anvil \
+  -p proposal.json \
+  -r report.json \
+  -u "http://localhost:$ANVIL_PORT"
 
 # From verify-release.sh
 echo "- Verify release"
-yarn truffle exec --network anvil ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json --branch $BRANCH --initialize_data $INITIALIZATION_FILE
-
+yarn --cwd packages/protocol release:verify-deployed:foundry \
+    -n anvil \
+    -b $BRANCH \
+    -p proposal.json
 
 if [[ -n $ANVIL_PID ]]; then
     kill $ANVIL_PID

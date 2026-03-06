@@ -53,7 +53,17 @@ done
 [ -z "$PROPOSAL" ] && echo "Need to set the proposal outfile via the -p flag" && exit 1;
 [ -z "$REPORT" ] && echo "Need to set the compatibility report input via the -r flag" && exit 1;
 
-BUILD_DIR="./out/"
+source scripts/bash/release-lib.sh
+
+cp foundry.toml foundry.toml.bak
+
+build_tag_foundry "$BRANCH" /dev/stdout truffle-compat foundry.toml.bak
+BUILD_DIR_05=$BUILD_DIR
+
+build_tag_foundry "$BRANCH" /dev/stdout truffle-compat8 foundry.toml.bak
+BUILD_DIR_08=$BUILD_DIR
+
+mv foundry.toml.bak foundry.toml
 
 # Build the command with optional flags
 OPTIONAL_FLAGS=""
@@ -75,5 +85,6 @@ yarn ts-node --transpile-only ./scripts/foundry/make-release.ts \
   --network "$NETWORK" \
   --proposal "$PROPOSAL" \
   --report "$REPORT" \
-  --buildDirectory "$BUILD_DIR" \
+  --buildDirectory05 "$BUILD_DIR_05" \
+  --buildDirectory08 "$BUILD_DIR_08" \
   $OPTIONAL_FLAGS
