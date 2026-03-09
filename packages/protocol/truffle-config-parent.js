@@ -15,7 +15,7 @@ const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
 const INTEGRATION_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const INTEGRATION_TESTING_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
-const CELOSEPOLIA_FROM = process.env.CELOSEPOLIA_FROM
+const CELOSEPOLIA_FROM = '0x33c35343B08ff91a9d7a07daa34eDce5248bE318'
 
 const gasLimit = 20000000
 const hostAddress = process.env.CELO_NODE_ADDRESS || '127.0.0.1'
@@ -34,7 +34,7 @@ const defaultConfig = {
 
 function readMnemonic(networkName) {
   dotenv = require('dotenv').config({
-    path: require('path').resolve(__dirname, `../../.env.mnemonic.${networkName}`),
+    path: require('path').resolve(__dirname, `../../.env.mnemonic.${networkName.replace('-', '')}`),
   })
 
   const privateKey = process.env.DEPLOYER_PRIVATE_KEY
@@ -49,7 +49,7 @@ function readMnemonic(networkName) {
 }
 
 const fornoUrls = {
-  celosepolia: 'https://forno.celo-sepolia.celo-testnet.org',
+  'celo-sepolia': 'https://forno.celo-sepolia.celo-testnet.org',
   rc1: 'https://forno.celo.org',
   mainnet: 'https://forno.celo.org',
 }
@@ -70,6 +70,9 @@ const networks = {
     gas: gasLimit,
     gasPrice: 100000000000,
     privateKeyAvailable: false,
+    proposer: '0xc11F5aC70B86517Dcc10f20d8B0D5e77EBb956Ce',
+    approver: '0x41822d8A191fcfB1cfcA5F7048818aCd8eE933d3',
+    voter: '0xb073014a4c60c9824B597375C5e2d49e765cf811',
   },
   testnet_prod: defaultConfig,
   anvil: {
@@ -90,22 +93,19 @@ const networks = {
     network_id: 1101,
     port: devPort,
   },
-  celosepolia: {
+  'celo-sepolia': {
     ...defaultConfig,
     network_id: CELOSEPOLIA_NETWORKID,
     from: CELOSEPOLIA_FROM,
     privateKeyAvailable: true,
+    proposer: '0x95a40aA01d2d72b4122C19c86160710D01224ada',
+    approver: '0x95a40aA01d2d72b4122C19c86160710D01224ada',
+    voter: '0x95a40aA01d2d72b4122C19c86160710D01224ada',
   },
 }
 
 // Equivalent
 networks.mainnet = networks.rc1
-
-// Validate CELOSEPOLIA_FROM is set when using celosepolia network
-if (argv.network === 'celosepolia' && !CELOSEPOLIA_FROM) {
-  console.error('Error: CELOSEPOLIA_FROM environment variable is required for celosepolia network')
-  process.exit(1)
-}
 
 // If an override was provided, apply it.
 // If the network is missing from networks, start with the default config.
@@ -143,4 +143,4 @@ if (process.argv.includes('--forno')) {
   }
 }
 
-module.exports = { networks: networks }
+module.exports = { networks: networks, fornoUrls: fornoUrls }

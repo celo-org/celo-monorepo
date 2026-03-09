@@ -154,9 +154,9 @@ describe('', () => {
             linkedBytecode.length
           )
 
-        assert.throws(() => {
-          new LibraryLinkingInfo().collect(incorrectBytecode, linking)
-        }, /Mismatched addresses for LinkedLibrary1/)
+        const errors = new LibraryLinkingInfo().collect(incorrectBytecode, linking)
+        assert.isAbove(errors.length, 0)
+        assert.match(errors[0], /Mismatched addresses for LinkedLibrary1/)
       })
     })
   })
