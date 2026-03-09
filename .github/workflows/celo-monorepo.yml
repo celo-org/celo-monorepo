@@ -29,7 +29,7 @@ env:
   TERM: dumb
   GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
   # Git Tag for contract release to use
-  RELEASE_TAG: core-contracts.v14.anvil
+  RELEASE_TAG: core-contracts.v15
 
 # EXAMPLE on debug ssh step
 #  - name: Setup tmate session
