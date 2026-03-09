@@ -24,9 +24,22 @@ import { IDisputeGameFactory } from "interfaces/dispute/IDisputeGameFactory.sol"
 ///           - DisputeGameFactory game implementations
 ///           - SuperchainConfig upgrades (now under main ProxyAdmin)
 ///
-///         Env vars:
-///           NEW_SAFE (required)  - address of the target Gnosis Safe
-///           NETWORK  (required)  - network identifier (chaos)
+///         Env vars (all required):
+///           NEW_SAFE              - address of the target Gnosis Safe
+///           PROXY_ADMIN           - ProxyAdmin contract address
+///           ADDRESS_MANAGER       - AddressManager contract address
+///           SC_OLD_PROXY_ADMIN    - SuperchainConfig's separate ProxyAdmin (for migration)
+///           SYSTEM_CONFIG         - SystemConfig proxy address
+///           OPTIMISM_PORTAL       - OptimismPortal proxy address
+///           L1_STANDARD_BRIDGE    - L1StandardBridge proxy address
+///           L1_ERC721_BRIDGE      - L1ERC721Bridge proxy address
+///           OPTIMISM_MINTABLE_ERC20_FACTORY - OptimismMintableERC20Factory proxy address
+///           DISPUTE_GAME_FACTORY  - DisputeGameFactory proxy address
+///           ANCHOR_STATE_REGISTRY - AnchorStateRegistry proxy address
+///           DELAYED_WETH          - DelayedWETH (permissioned) proxy address
+///           PROTOCOL_VERSIONS     - ProtocolVersions proxy address
+///           CELO_SUPERCHAIN_CONFIG - CeloSuperchainConfig proxy address
+///           SUPERCHAIN_CONFIG     - SuperchainConfig proxy address
 ///
 ///         Usage:
 ///           forge script MigrateOwnershipToSafe.s.sol \
@@ -66,9 +79,8 @@ contract MigrateOwnershipToSafe is Script {
 
   function run() external {
     address newSafe_ = vm.envAddress("NEW_SAFE");
-    string memory network_ = vm.envString("NETWORK");
 
-    Config memory cfg_ = _loadConfig(network_, newSafe_);
+    Config memory cfg_ = _loadConfig(newSafe_);
 
     _logHeader(cfg_);
     _preflight(cfg_, newSafe_);
@@ -78,49 +90,42 @@ contract MigrateOwnershipToSafe is Script {
     emit OwnershipMigratedToSafe(cfg_.proxyAdminAddr, currentOwner_, newSafe_);
   }
 
-  // ── Network Config ───────────────────────────────────────────────
+  // ── Config Loading ──────────────────────────────────────────────
 
-  function _loadConfig(
-    string memory _network,
-    address _newSafe
-  ) internal pure returns (Config memory cfg_) {
+  function _loadConfig(address _newSafe) internal returns (Config memory cfg_) {
     cfg_.newSafe = _newSafe;
 
-    if (_strEq(_network, "chaos")) {
-      cfg_.proxyAdminAddr = 0x6151d1cc7724Ee7594F414C152320757c9C5844e;
-      cfg_.proxyAdmin = IProxyAdmin(cfg_.proxyAdminAddr);
-      cfg_.addrManager = IAddressManager(0xfc7950601Fd0B3d07FCB8899a6dFAF578eAc8Fec);
-      cfg_.scOldProxyAdmin = 0xB31a514deb33248C0165E4273680121722bfbF3e;
+    cfg_.proxyAdminAddr = vm.envAddress("PROXY_ADMIN");
+    cfg_.proxyAdmin = IProxyAdmin(cfg_.proxyAdminAddr);
+    cfg_.addrManager = IAddressManager(vm.envAddress("ADDRESS_MANAGER"));
+    cfg_.scOldProxyAdmin = vm.envAddress("SC_OLD_PROXY_ADMIN");
 
-      cfg_.names[0] = "SystemConfig";
-      cfg_.names[1] = "OptimismPortal";
-      cfg_.names[2] = "L1StandardBridge";
-      cfg_.names[3] = "L1ERC721Bridge";
-      cfg_.names[4] = "OptimismMintableERC20Factory";
-      cfg_.names[5] = "DisputeGameFactory";
-      cfg_.names[6] = "AnchorStateRegistry";
-      cfg_.names[7] = "DelayedWETH";
-      cfg_.names[8] = "ProtocolVersions";
-      cfg_.names[9] = "CeloSuperchainConfig";
-      cfg_.names[10] = "SuperchainConfig";
+    cfg_.names[0] = "SystemConfig";
+    cfg_.names[1] = "OptimismPortal";
+    cfg_.names[2] = "L1StandardBridge";
+    cfg_.names[3] = "L1ERC721Bridge";
+    cfg_.names[4] = "OptimismMintableERC20Factory";
+    cfg_.names[5] = "DisputeGameFactory";
+    cfg_.names[6] = "AnchorStateRegistry";
+    cfg_.names[7] = "DelayedWETH";
+    cfg_.names[8] = "ProtocolVersions";
+    cfg_.names[9] = "CeloSuperchainConfig";
+    cfg_.names[10] = "SuperchainConfig";
 
-      cfg_.proxies[0] = 0x624ce254d4d0E84E4179897c9E9B97784f37f6fD; // SystemConfig
-      cfg_.proxies[1] = 0x37e3521CC2C2e3FC12ad4Adc36Aa8F6B6B686473; // OptimismPortal
-      cfg_.proxies[2] = 0xb2F2468D0ab462Da6caB2EF547feFd3511E33D14; // L1StandardBridge
-      cfg_.proxies[3] = 0xe9b3351F4632DF6609aB6434c17667ecb97A5F6D; // L1ERC721Bridge
-      cfg_.proxies[4] = 0x80a8C6C150BdBD0f0C6AC7Fc71c42fD6523F8284; // OptimismMintableERC20Factory
-      cfg_.proxies[5] = 0xC0215f0202418568C06b899F5E11245Dbf717802; // DisputeGameFactory
-      cfg_.proxies[6] = 0x06EC7FFC5ec88b750152Bc26e4a456345A57c286; // AnchorStateRegistry
-      cfg_.proxies[7] = 0x6089EC4cf7C5d571901F32b2cb51ae01f14d65c5; // DelayedWETH
-      cfg_.proxies[8] = 0x433a83893DDA68B941D4aefA908DED9c599522ad; // ProtocolVersions
-      cfg_.proxies[9] = 0xD1Ed48c497abc6276804b16e72045F0Dd5878e2A; // CeloSuperchainConfig
-      cfg_.proxies[10] = 0x852A5763dA3Fdf51a8b816E02b91A054904Bd8B0; // SuperchainConfig
+    cfg_.proxies[0] = vm.envAddress("SYSTEM_CONFIG");
+    cfg_.proxies[1] = vm.envAddress("OPTIMISM_PORTAL");
+    cfg_.proxies[2] = vm.envAddress("L1_STANDARD_BRIDGE");
+    cfg_.proxies[3] = vm.envAddress("L1_ERC721_BRIDGE");
+    cfg_.proxies[4] = vm.envAddress("OPTIMISM_MINTABLE_ERC20_FACTORY");
+    cfg_.proxies[5] = vm.envAddress("DISPUTE_GAME_FACTORY");
+    cfg_.proxies[6] = vm.envAddress("ANCHOR_STATE_REGISTRY");
+    cfg_.proxies[7] = vm.envAddress("DELAYED_WETH");
+    cfg_.proxies[8] = vm.envAddress("PROTOCOL_VERSIONS");
+    cfg_.proxies[9] = vm.envAddress("CELO_SUPERCHAIN_CONFIG");
+    cfg_.proxies[10] = vm.envAddress("SUPERCHAIN_CONFIG");
 
-      cfg_.systemConfig = ISystemConfig(cfg_.proxies[0]);
-      cfg_.dgFactory = IDisputeGameFactory(cfg_.proxies[5]);
-    } else {
-      revert(string.concat("Unsupported network: ", _network));
-    }
+    cfg_.systemConfig = ISystemConfig(cfg_.proxies[0]);
+    cfg_.dgFactory = IDisputeGameFactory(cfg_.proxies[5]);
   }
 
   // ── Logging ──────────────────────────────────────────────────────
@@ -348,10 +353,5 @@ contract MigrateOwnershipToSafe is Script {
         issues_++;
       }
     }
-  }
-
-  /// @notice String equality check via keccak256.
-  function _strEq(string memory _a, string memory _b) internal pure returns (bool) {
-    return keccak256(bytes(_a)) == keccak256(bytes(_b));
   }
 }

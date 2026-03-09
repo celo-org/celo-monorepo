@@ -203,6 +203,44 @@ event AnchorGameReset(
 - Testing anchor state behavior in non-production environments
 - Fixing anchor state after disputed game resolution issues
 
+### `SafeResetAnchorGame.s.sol`
+
+Safe multisig version of `ResetAnchorGame.s.sol`. Overrides the `anchorGame` storage slot (slot 3) on the AnchorStateRegistry via a Gnosis Safe transaction. Uses the same StorageSetter + upgradeAndCall pattern as `SafeRetireASR.s.sol`.
+
+**Features:**
+- Deterministic CREATE2 deployment of StorageSetter (salt: `SafeResetAnchorGame`)
+- Temporarily upgrades AnchorStateRegistry to StorageSetter via `upgradeAndCall`
+- Sets storage slot 3 (`anchorGame`) to the new game address using `setAddress`
+- Restores original ASR implementation in the same multicall
+- `getTransactionHash()` for offline signing, `execTransaction()` for execution
+- Post-execution verification reads `anchorGame()` and asserts match
+
+**Required Environment Variables:**
+- `ASR` - Address of the AnchorStateRegistry proxy
+- `PROXY_ADMIN` - Address of the ProxyAdmin contract
+- `SAFE` - Address of the Gnosis Safe to execute the transaction
+- `SENDER` - Address of the sender in the Gnosis Safe
+- `ANCHOR_GAME` - Address of the new anchor game to set
+- `SIG` (optional) - Pre-collected signatures for the Safe transaction
+
+**Example Execution:**
+```bash
+# Step 1: Get transaction hash for signing
+ASR="0x..." PROXY_ADMIN="0x..." SAFE="0x..." SENDER="0x..." ANCHOR_GAME="0x..." \
+  forge script SafeResetAnchorGame.s.sol:SafeResetAnchorGame \
+  --sig "getTransactionHash()" \
+  --root $OP_DIR/packages/contracts-bedrock --rpc-url $RPC
+
+# Step 2: Execute with collected signatures
+ASR="0x..." PROXY_ADMIN="0x..." SAFE="0x..." SENDER="0x..." ANCHOR_GAME="0x..." SIG="0x..." \
+  forge script SafeResetAnchorGame.s.sol:SafeResetAnchorGame \
+  --sig "execTransaction()" \
+  --root $OP_DIR/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
+```
+
+**Storage Slot Modified:**
+- **Slot 3**: `anchorGame` (IFaultDisputeGame) - The game whose claim is currently being used as the anchor state
+
 ### `MigrateOwnershipToSafe.s.sol`
 
 Foundry script that migrates OP Stack L1 contract ownership from an EOA to a Gnosis Safe. Performs four operations in a single broadcast: transfers ProxyAdmin ownership, transfers SystemConfig ownership, transfers DisputeGameFactory ownership, and migrates the SuperchainConfig proxy admin from a separate ProxyAdmin to the main one.
