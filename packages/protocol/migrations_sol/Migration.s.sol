@@ -774,7 +774,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         );
 
         vm.startBroadcast(valKeys[validatorKeyIndex]);
-        address accountAddress = msg.sender;
+        address accountAddress = vm.addr(valKeys[validatorKeyIndex]);
         // TODO: On mainnet potentially singer & account should be different
         // 1 -> list of accounts
         // 2 -> list of signers
@@ -915,7 +915,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   ) public returns (address) {
     vm.startBroadcast(validatorKey);
     lockGold(amountToLock);
-    address accountAddress = msg.sender;
+    address accountAddress = vm.addr(validatorKey);
 
     (bytes memory ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(accountAddress, validatorKey);
     getValidators().registerValidatorNoBls(ecdsaPubKey);
@@ -947,7 +947,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     getAccounts().setName(groupName);
     getValidators().registerValidatorGroup(commission);
 
-    accountAddress = msg.sender;
+    accountAddress = vm.addr(validator0Key);
     vm.stopBroadcast();
   }
 
