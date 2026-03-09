@@ -160,6 +160,8 @@ jobs:
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: 'v1.0.0'
+      - name: Restore script permissions
+        run: chmod +x scripts/foundry/*.sh
       - name: Generate migrations and run devchain
         run: ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
       - name: Run migration tests against local anvil devchain
