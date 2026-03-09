@@ -61,17 +61,6 @@ import { UsingRegistry } from "@celo-contracts-8/common/UsingRegistry.sol";
 import { ISECP256K1, SECP256K1 } from "@test-sol/utils/SECP256K1.sol";
 import { ConstitutionHelper } from "@test-sol/utils/ConstitutionHelper.sol";
 
-contract ForceTx {
-  // event to trigger so a tx can be processed
-  event VanillaEvent(string);
-
-  // helper used to know the account broadcasting a tx
-  function identity() public returns (address) {
-    emit VanillaEvent("nop");
-    return msg.sender;
-  }
-}
-
 contract Migration is Script, UsingRegistry, MigrationsConstants {
   using stdJson for string;
 
@@ -425,14 +414,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     IReserve(registry.getAddressForStringOrDie("Reserve")).addToken(stableTokenProxyAddress);
 
-    /*
-    Arbitrary intrinsic gas number take from existing `FeeCurrencyDirectory.t.sol` tests
-    Source: https://github.com/celo-org/celo-monorepo/blob/2cec07d43328cf4216c62491a35eacc4960fffb6/packages/protocol/test-sol/common/FeeCurrencyDirectory.t.sol#L27 
-    */
-    uint256 mockIntrinsicGas = 50_000;
-
     IFeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory"))
-      .setCurrencyConfig(stableTokenProxyAddress, address(getSortedOracles()), mockIntrinsicGas);
+      .setCurrencyConfig(stableTokenProxyAddress, address(getSortedOracles()), MOCK_INTRINSIC_GAS);
   }
 
   function migrateStableToken(string memory json) public {
@@ -791,8 +774,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         );
 
         vm.startBroadcast(valKeys[validatorKeyIndex]);
-        // TODO: ForceTx only exists to retrieve Address from PrivateKey -> explore alternatives
-        address accountAddress = (new ForceTx()).identity();
+        address accountAddress = msg.sender;
         // TODO: On mainnet potentially singer & account should be different
         // 1 -> list of accounts
         // 2 -> list of signers
@@ -933,7 +915,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   ) public returns (address) {
     vm.startBroadcast(validatorKey);
     lockGold(amountToLock);
-    address accountAddress = (new ForceTx()).identity();
+    address accountAddress = msg.sender;
 
     (bytes memory ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(accountAddress, validatorKey);
     getValidators().registerValidatorNoBls(ecdsaPubKey);
@@ -965,7 +947,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     getAccounts().setName(groupName);
     getValidators().registerValidatorGroup(commission);
 
-    accountAddress = (new ForceTx()).identity();
+    accountAddress = msg.sender;
     vm.stopBroadcast();
   }
 
