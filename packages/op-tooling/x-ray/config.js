@@ -29,6 +29,7 @@ export const NETWORKS = {
       PERMISSIONED_DELAYED_WETH_PROXY: '0x9c314E8057025F2982aa4B3923Abd741A8e8DE91',
       PROXY_ADMIN: '0x783A434532Ee94667979213af1711505E8bFE374',
       ADDRESS_MANAGER: '0x55093104b76FAA602F9d6c35A5FFF576bE78d753',
+      ACCESS_MANAGER: '0xF59a19c5578291cB7fd22618D16281aDf76f2816',
     },
   },
   sepolia: {
@@ -52,6 +53,7 @@ export const NETWORKS = {
       PERMISSIONED_DELAYED_WETH_PROXY: '0x082F5f58B664CD1d51F9845fEE322aBA2cED9CbA',
       PROXY_ADMIN: '0xF7d7A3d3bb8aBb6829249B3D3aD3d525D052027e',
       ADDRESS_MANAGER: '0x8f0c6FC85A53551d87899aC2a5Af2B48C793eB63',
+      ACCESS_MANAGER: '0x188A7797B65e715b1dC9c85B908B9151dFe6C483',
     },
   },
   chaos: {
@@ -61,21 +63,30 @@ export const NETWORKS = {
     rpcUrl: 'https://ethereum-sepolia-rpc.publicnode.com',
     explorerUrl: 'https://sepolia.etherscan.io',
     addresses: {
-      SYSTEM_CONFIG_PROXY: '0x624ce254d4d0e84e4179897c9e9b97784f37f6fd',
-      OPTIMISM_PORTAL_PROXY: '0x37e3521cc2c2e3fc12ad4adc36aa8f6b6b686473',
-      L1_STANDARD_BRIDGE_PROXY: '0xb2f2468d0ab462da6cab2ef547fefd3511e33d14',
-      L1_CROSS_DOMAIN_MESSENGER_PROXY: '0x88bc63f650a49a5b3d10035cd5bdab036da0e3d8',
-      L1_ERC721_BRIDGE_PROXY: '0xe9b3351f4632df6609ab6434c17667ecb97a5f6d',
-      OPTIMISM_MINTABLE_ERC20_FACTORY_PROXY: '0x80a8c6c150bdbd0f0c6ac7fc71c42fd6523f8284',
-      DISPUTE_GAME_FACTORY_PROXY: '0xc0215f0202418568c06b899f5e11245dbf717802',
-      ANCHOR_STATE_REGISTRY_PROXY: '0x06ec7ffc5ec88b750152bc26e4a456345a57c286',
-      SUPERCHAIN_CONFIG_PROXY: '0x852A5763dA3Fdf51a8b816E02b91A054904Bd8B0',
-      CELO_SUPERCHAIN_CONFIG_PROXY: '0xd1ed48c497abc6276804b16e72045f0dd5878e2a',
+      SYSTEM_CONFIG_PROXY: '0x6baf5959cc06a39793c338e6586f49473c731b4c',
+      OPTIMISM_PORTAL_PROXY: '0x101f7d8038beb55d92919e9f944feb0faf211a9b',
+      L1_STANDARD_BRIDGE_PROXY: '0x95f39a9dd86e4c777fd6dc4404d94fd32c23ea30',
+      L1_CROSS_DOMAIN_MESSENGER_PROXY: '0x8627c42d20358d7064f3776c0a543195db8d5b22',
+      L1_ERC721_BRIDGE_PROXY: '0x493ec8a8956d1239d01450a6adb6f7f091d2a81f',
+      OPTIMISM_MINTABLE_ERC20_FACTORY_PROXY: '0x92fa5b9a26580b7ecc495ffab4cbc0d995be5b5a',
+      DISPUTE_GAME_FACTORY_PROXY: '0x338ac809e6a045cfc8aeb16ff8a4329147b61afb',
+      ANCHOR_STATE_REGISTRY_PROXY: '0x7a7d0d1b0114e8a5a489f488b9ccab0611333687',
+      SUPERCHAIN_CONFIG_PROXY: '0x7801D0a005d13CB66f8113BC28cb2640D8f44A6F',
+      CELO_SUPERCHAIN_CONFIG_PROXY: '0xc731e02cb012e8d6e6f36cffb05d300e262d34bf',
       PROTOCOL_VERSIONS_PROXY: '0x433a83893DDA68B941D4aefA908DED9c599522ad',
-      PERMISSIONED_DELAYED_WETH_PROXY: '0x6089ec4cf7c5d571901f32b2cb51ae01f14d65c5',
-      PROXY_ADMIN: '0x6151d1cc7724ee7594f414c152320757c9c5844e',
-      ADDRESS_MANAGER: '0xfc7950601fd0b3d07fcb8899a6dfaf578eac8fec',
+      PERMISSIONED_DELAYED_WETH_PROXY: '0x9a95f7f7cdbb5195674a32d1579504e8fd302cc9',
+      PROXY_ADMIN: '0xb2a0c2b49cdc2d3f0a0a291be0a6c20559ec053e',
+      ADDRESS_MANAGER: '0xe79a9c96f2ea3340add851f83dbfdc2ff4ceb838',
+      ACCESS_MANAGER: '0x47634F0B37f5A4d19C52045565934db761eF56cD',
     },
+  },
+  localhost: {
+    id: 'localhost',
+    label: 'Localhost Fork',
+    shortLabel: 'Localhost',
+    rpcUrl: 'http://localhost:8545',
+    explorerUrl: null,
+    addresses: {},
   },
 }
 
@@ -124,8 +135,8 @@ export function proxyKey(contractKey) {
 // ── Version Tags ───────────────────────────────────────────
 export const VERSION_TAGS = {
   initial: { label: 'v3 (Isthmus)', color: 'amber' },
-  'v4.1.0': { label: 'v4.1.0 (pre-Jovian)', color: 'green' },
-  'v5.0.0': { label: 'v5.0.0 (Jovian)', color: 'purple' },
+  'v4.1.0': { label: 'v4.1 (pre-Jovian)', color: 'green' },
+  'v5.0.0': { label: 'v5 (Jovian)', color: 'purple' },
 }
 
 // ── Implementation Address Lookup Tables ───────────────────
@@ -141,12 +152,11 @@ const IMPL_TABLE = {
   },
   OptimismPortal: {
     '0x229ac4d29814249ba4830eb0e5b133df664ce4d7': 'initial', // Sepolia
-    '0x8f3af3a2abf706a6b1a334d15833f72de6efad93': 'initial', // Chaos
+    '0x4f306d5be1c85531d804b708981de90a37ac4fdd': 'initial', // Chaos
     '0x215a5ff85308a72a772f09b520da71d3520e9ac7': 'initial', // Mainnet
     '0x661dfa933f77148dc8d84b06646a2868d7ae5deb': 'v4.1.0', // Sepolia
-    '0x4fd87a100bd869080789a178c53fdeac5e23ae4c': 'v4.1.0', // Chaos
     '0x2c431080fc733e259654f3b91e39468d9a85ac9b': 'v5.0.0', // Sepolia
-    '0x5b0faa24146d607bd72b9b472d2d0f2c7ccd19ae': 'v5.0.0', // Chaos
+    '0x3e36032b97b87231be90aab35f8a02113b984888': 'v5.0.0', // Chaos
   },
   L1StandardBridge: {
     '0x4063c3824d993784a169470e05dacc1b8501d972': 'initial', // Sepolia
@@ -188,8 +198,7 @@ const IMPL_TABLE = {
     '0x68bc45e9774889efc5a317e9361bba655d33973c': 'initial', // Chaos
     '0x7b465370bb7a333f99edd19599eb7fb1c2d3f8d2': 'initial', // Mainnet
     '0xeb69cc681e8d4a557b30dffbad85affd47a2cf2e': 'v4.1.0', // Sepolia
-    '0xb38a2b523c6c2effa7473cf54adac0ba1ade99b2': 'v4.1.0', // Chaos
-    // v5.0.0 uses same impl as v4.1.0
+    '0xcc9a707187585a5a4d15b0211310b86bec224fcc': 'v5.0.0', // Chaos
   },
   SuperchainConfig: {
     '0x1b8ca63db2e3e37c1def34f24e4c88ed422bd7c1': 'initial', // Sepolia
@@ -200,75 +209,99 @@ const IMPL_TABLE = {
   },
   CeloSuperchainConfig: {
     '0x00cdf709c093702c8019889e7df32d1735b80355': 'initial', // Sepolia
-    '0x37c91ad60e49cf606bfefe96122629c2488d982d': 'initial', // Chaos
+    '0x4a7ac982962ce927288df6f3eb8bc34bea15ea67': 'initial', // Chaos
     '0x693cfd911523ccae1a14ade2501ae4a0a463b446': 'initial', // Mainnet
   },
   DelayedWETH: {
     '0xe8249b2cffc3f71e433918c5267c71bf1e1fdc1e': 'initial', // Sepolia
-    '0x158ec618e7b6e14ab039a9fade14f15cfdb8e2e7': 'initial', // Chaos
+    '0x008bed3ac2ba61a6c17c52e012b7b6d647954fe0': 'initial', // Chaos
     '0x1e121e21e1a11ae47c0efe8a7e13ae3eb4923796': 'initial', // Mainnet
     '0xb86a464cc743440fddaa43900e05318ef4818b29': 'v4.1.0', // Sepolia
-    '0x6803e87a24c8019f42e89dc06a4c8749373e99ad': 'v4.1.0', // Chaos
-    // v5.0.0 uses same impl as v4.1.0
+    '0x596ca58673d9909d1578d314f2dd4e71fc3cdcfb': 'v5.0.0', // Chaos
   },
   PreimageOracle: {
     '0x855828ea44a0ce2596fdf49bea5b2859c0453704': 'initial',
-    '0xf6516bcb58cd4b2d2a4325cc329b97627053cf83': 'v4.1.0', // Chaos
-    // v5.0.0 uses same impl as v4.1.0
+    '0x58fd9886ea355a7082041a6073dac61a5740594c': 'initial', // Chaos
+    '0xd59bb1d50dfeadc2cc3a7bed43c3bc4065b0ed4b': 'v5.0.0', // Chaos (New)
   },
   MIPS: {
     '0x0a691eed7be53f27f3c3b796061cdb8565da0b2a': 'initial',
+    '0xf3ae9abc9bb2b4dc269f11eed2a9e5b26177773a': 'initial', // Chaos
     '0xaa59a0777648bc75cd10364083e878c1ccd6112a': 'initial', // Mainnet
     '0x07babe08ee4d07dba236530183b24055535a7011': 'v4.1.0', // Sepolia
-    '0x0c908f56eb51e01ed055d2dff5b5842a5f0f28b2': 'v4.1.0', // Chaos
     '0x6463dee3828677f6270d83d45408044fc5edb908': 'v5.0.0', // Sepolia
-    '0x96dc36d70491000d9f16e1b25afa1876ecfc994e': 'v5.0.0', // Chaos
+    '0x9dd9fd5a9ed48d12a2adb7525972069c078fe0ec': 'v5.0.0', // Chaos
   },
 }
 
 // Network-specific override addresses (same binary different tag per network)
 const NETWORK_OVERRIDES = {
   ProtocolVersions: {
-    '0x37e15e4d6dffa9e5e320ee1ec036922e563cb76c': { mainnet: 'initial', _default: 'v4.1.0' },
+    '0x37e15e4d6dffa9e5e320ee1ec036922e563cb76c': { _default: 'initial' }, // Mainnet
+    '0x9a7ca01b64ce656b927248af08692ed2714c68e0': { _default: 'initial' }, // Sepolia
+    '0xb0eb0b64b765851e34ca0bc473206e6c7415b1a5': { _default: 'initial' }, // Chaos
   },
   PreimageOracle: {
     '0x1fb8cdfc6831fc866ed9c51af8817da5c287add3': { mainnet: 'initial', _default: 'v4.1.0' },
   },
 }
 
+// ── Version String → Release Tag Fallback ────────────────
+// Maps contract version strings to release tags when impl address
+// is not found in IMPL_TABLE (e.g. local Anvil forks with fresh deploys).
+const VERSION_STRING_MAP = {
+  CeloSuperchainConfig: {
+    '1.0.0-celo': 'v4.1.0',
+  },
+  OptimismPortal: {
+    '5.0.0': 'v4.1.0',
+  },
+}
+
 /**
  * Look up implementation address → version tag.
+ * Falls back to contract version string when address is unknown.
  * Returns 'initial' | 'v4.1.0' | 'v5.0.0' | null
  */
-export function implLookup(contractName, addr, network) {
+export function implLookup(contractName, addr, network, version) {
   if (!addr) return null
   const lower = addr.toLowerCase()
+  const resolvedNet =
+    network === 'localhost' ? NETWORKS.localhost.sourceNetwork || network : network
 
   // Check network-specific overrides first
   const overrides = NETWORK_OVERRIDES[contractName]
   if (overrides && overrides[lower]) {
     const entry = overrides[lower]
-    return entry[network] || entry._default || null
+    return entry[resolvedNet] || entry._default || null
   }
 
   // Check standard table
   const table = IMPL_TABLE[contractName]
-  if (!table) return null
-  return table[lower] || null
+  const fromAddr = table ? table[lower] || null : null
+  if (fromAddr) return fromAddr
+
+  // Fallback: map contract version string → release tag
+  if (version) {
+    const vsm = VERSION_STRING_MAP[contractName]
+    if (vsm && vsm[version]) return vsm[version]
+  }
+
+  return null
 }
 
 // ── Game Version Tags ──────────────────────────────────────
 const GAME_VERSIONS = {
   1: {
     // PermissionedGame
-    '1.4.1': { tag: 'Isthmus', color: 'amber' },
-    '1.7.0': { tag: 'pre-Jovian', color: 'green' },
-    '1.8.0': { tag: 'Jovian', color: 'purple' },
+    '1.4.1': { tag: 'v3 (Isthmus)', color: 'amber' },
+    '1.7.0': { tag: 'v4.1 (pre-Jovian)', color: 'green' },
+    '1.8.0': { tag: 'v5 (Jovian)', color: 'purple' },
   },
   42: {
     // OPSuccinctGame
-    '1.0.0': { tag: 'Isthmus', color: 'amber' },
-    '2.0.0': { tag: 'Jovian', color: 'purple' },
+    '1.0.0': { tag: 'v3 (Isthmus)', color: 'amber' },
+    '2.0.0': { tag: 'v5 (Jovian)', color: 'purple' },
   },
 }
 
@@ -292,13 +325,13 @@ export const SINGLETON_ADDRS = {
       MIPS: '0x6463dee3828677f6270d83d45408044fc5edb908',
       PreimageOracle: '0x1fb8cdfc6831fc866ed9c51af8817da5c287add3',
     },
-    chaos: {
-      MIPS: '0x96dc36d70491000d9f16e1b25afa1876ecfc994e',
-      PreimageOracle: '0x1fb8cdfc6831fc866ed9c51af8817da5c287add3',
-    },
     mainnet: {
       MIPS: '0xaa59a0777648bc75cd10364083e878c1ccd6112a',
       PreimageOracle: '0x1fb8cdfc6831fc866ed9c51af8817da5c287add3',
+    },
+    chaos: {
+      MIPS: '0xF3ae9abc9bb2b4dc269F11eED2A9e5b26177773A',
+      PreimageOracle: '0x58fD9886ea355a7082041a6073DAC61a5740594c',
     },
   },
   v4: {
@@ -306,13 +339,13 @@ export const SINGLETON_ADDRS = {
       MIPS: '0x07babe08ee4d07dba236530183b24055535a7011',
       PreimageOracle: '0x1fb8cdfc6831fc866ed9c51af8817da5c287add3',
     },
-    chaos: {
-      MIPS: '0x0c908f56eb51e01ed055d2dff5b5842a5f0f28b2',
-      PreimageOracle: '0x1fb8cdfc6831fc866ed9c51af8817da5c287add3',
-    },
     mainnet: {
       MIPS: '0xaa59a0777648bc75cd10364083e878c1ccd6112a',
       PreimageOracle: '0x1fb8cdfc6831fc866ed9c51af8817da5c287add3',
+    },
+    chaos: {
+      MIPS: '0xF3ae9abc9bb2b4dc269F11eED2A9e5b26177773A',
+      PreimageOracle: '0x58fD9886ea355a7082041a6073DAC61a5740594c',
     },
   },
   initial: {
@@ -321,8 +354,8 @@ export const SINGLETON_ADDRS = {
       PreimageOracle: '0x855828eA44a0CE2596FDf49bEA5b2859c0453704',
     },
     chaos: {
-      MIPS: '0x0a691eEd7bE53F27f3C3b796061Cdb8565dA0b2a',
-      PreimageOracle: '0x855828eA44a0CE2596FDf49bEA5b2859c0453704',
+      MIPS: '0xF3ae9abc9bb2b4dc269F11eED2A9e5b26177773A',
+      PreimageOracle: '0x58fD9886ea355a7082041a6073DAC61a5740594c',
     },
     mainnet: {
       MIPS: '0xaa59a0777648bc75cd10364083e878c1ccd6112a',
@@ -335,9 +368,11 @@ export const SINGLETON_ADDRS = {
  * Resolve singleton addresses based on DGF impl tag.
  */
 export function resolveSingletons(dgfTag, network) {
-  if (dgfTag === 'v5.0.0') return SINGLETON_ADDRS.v5[network]
-  if (dgfTag === 'v4.1.0') return SINGLETON_ADDRS.v4[network]
-  return SINGLETON_ADDRS.initial[network]
+  const resolvedNet =
+    network === 'localhost' ? NETWORKS.localhost.sourceNetwork || network : network
+  if (dgfTag === 'v5.0.0') return SINGLETON_ADDRS.v5[resolvedNet]
+  if (dgfTag === 'v4.1.0') return SINGLETON_ADDRS.v4[resolvedNet]
+  return SINGLETON_ADDRS.initial[resolvedNet]
 }
 
 // ── localStorage Cache ─────────────────────────────────────
@@ -369,6 +404,20 @@ export function setCachedData(networkId, data) {
   }
 }
 
+// ── Re-deployment Discovery Map ──────────────────────────
+// Maps address key → contract key for automatic re-deployment detection.
+// When a cross-reference property (expect) returns a different address than expected,
+// the contract at that unexpected address is auto-discovered and displayed alongside
+// the original as (Old) / (New).
+// Only contracts that CAN be re-deployed during upgrades should be listed here.
+export const DISCOVERY_MAP = {
+  ANCHOR_STATE_REGISTRY_PROXY: 'AnchorStateRegistry',
+  DISPUTE_GAME_FACTORY_PROXY: 'DisputeGameFactory',
+  PERMISSIONED_DELAYED_WETH_PROXY: 'DelayedWETH',
+  MIPS_SINGLETON: 'MIPS',
+  PREIMAGE_ORACLE_SINGLETON: 'PreimageOracle',
+}
+
 // ── Contract Properties ───────────────────────────────────
 // Unified property definitions for each contract.
 // fn: getter function name (for ABI lookup)
@@ -382,6 +431,7 @@ export const CONTRACT_PROPS = {
   SystemConfig: [
     { fn: 'minimumGasLimit', label: 'minimumGasLimit()', type: 'uint64' },
     { fn: 'maximumGasLimit', label: 'maximumGasLimit()', type: 'uint64' },
+    { fn: 'minBaseFee', label: 'minBaseFee()', type: 'uint64' },
     { fn: 'unsafeBlockSigner', label: 'unsafeBlockSigner()', type: 'address' },
     {
       fn: 'l1CrossDomainMessenger',
@@ -407,7 +457,11 @@ export const CONTRACT_PROPS = {
     { fn: 'isCustomGasToken', label: 'isCustomGasToken()', type: 'bool' },
     { fn: 'gasPayingTokenName', label: 'gasPayingTokenName()', type: 'string' },
     { fn: 'gasPayingTokenSymbol', label: 'gasPayingTokenSymbol()', type: 'string' },
-    { fn: 'superchainConfig', label: 'superchainConfig()', expect: 'SUPERCHAIN_CONFIG_PROXY' },
+    {
+      fn: 'superchainConfig',
+      label: 'superchainConfig()',
+      expect: ['SUPERCHAIN_CONFIG_PROXY', 'CELO_SUPERCHAIN_CONFIG_PROXY'],
+    },
     { fn: 'guardian', label: 'guardian()', type: 'address' },
     { fn: 'paused', label: 'paused()', type: 'bool' },
   ],
@@ -422,7 +476,11 @@ export const CONTRACT_PROPS = {
   ],
   OptimismPortal: [
     { fn: 'systemConfig', label: 'systemConfig()', expect: 'SYSTEM_CONFIG_PROXY' },
-    { fn: 'superchainConfig', label: 'superchainConfig()', expect: 'SUPERCHAIN_CONFIG_PROXY' },
+    {
+      fn: 'superchainConfig',
+      label: 'superchainConfig()',
+      expect: ['SUPERCHAIN_CONFIG_PROXY', 'CELO_SUPERCHAIN_CONFIG_PROXY'],
+    },
     {
       fn: 'disputeGameFactory',
       label: 'disputeGameFactory()',
@@ -447,19 +505,31 @@ export const CONTRACT_PROPS = {
   ],
   L1StandardBridge: [
     { fn: 'systemConfig', label: 'systemConfig()', expect: 'SYSTEM_CONFIG_PROXY' },
-    { fn: 'superchainConfig', label: 'superchainConfig()', expect: 'SUPERCHAIN_CONFIG_PROXY' },
+    {
+      fn: 'superchainConfig',
+      label: 'superchainConfig()',
+      expect: ['SUPERCHAIN_CONFIG_PROXY', 'CELO_SUPERCHAIN_CONFIG_PROXY'],
+    },
     { fn: 'paused', label: 'paused()', type: 'bool' },
     { fn: 'l2TokenBridge', label: 'l2TokenBridge()', type: 'address' },
   ],
   L1CrossDomainMessenger: [
     { fn: 'portal', label: 'portal()', expect: 'OPTIMISM_PORTAL_PROXY' },
     { fn: 'systemConfig', label: 'systemConfig()', expect: 'SYSTEM_CONFIG_PROXY' },
-    { fn: 'superchainConfig', label: 'superchainConfig()', expect: 'SUPERCHAIN_CONFIG_PROXY' },
+    {
+      fn: 'superchainConfig',
+      label: 'superchainConfig()',
+      expect: ['SUPERCHAIN_CONFIG_PROXY', 'CELO_SUPERCHAIN_CONFIG_PROXY'],
+    },
     { fn: 'paused', label: 'paused()', type: 'bool' },
   ],
   L1ERC721Bridge: [
     { fn: 'systemConfig', label: 'systemConfig()', expect: 'SYSTEM_CONFIG_PROXY' },
-    { fn: 'superchainConfig', label: 'superchainConfig()', expect: 'SUPERCHAIN_CONFIG_PROXY' },
+    {
+      fn: 'superchainConfig',
+      label: 'superchainConfig()',
+      expect: ['SUPERCHAIN_CONFIG_PROXY', 'CELO_SUPERCHAIN_CONFIG_PROXY'],
+    },
     { fn: 'paused', label: 'paused()', type: 'bool' },
   ],
   OptimismMintableERC20Factory: [
@@ -478,7 +548,11 @@ export const CONTRACT_PROPS = {
       label: 'disputeGameFactory()',
       expect: 'DISPUTE_GAME_FACTORY_PROXY',
     },
-    { fn: 'superchainConfig', label: 'superchainConfig()', expect: 'SUPERCHAIN_CONFIG_PROXY' },
+    {
+      fn: 'superchainConfig',
+      label: 'superchainConfig()',
+      expect: ['SUPERCHAIN_CONFIG_PROXY', 'CELO_SUPERCHAIN_CONFIG_PROXY'],
+    },
     { fn: 'anchorGame', label: 'anchorGame()', type: 'address' },
     { fn: 'respectedGameType', label: 'respectedGameType()', type: 'uint32' },
     { fn: 'paused', label: 'paused()', type: 'bool' },
@@ -492,13 +566,17 @@ export const CONTRACT_PROPS = {
   DelayedWETH: [
     { fn: 'systemConfig', label: 'systemConfig()', expect: 'SYSTEM_CONFIG_PROXY' },
     { fn: 'delay', label: 'delay()', type: 'seconds' },
-    { fn: 'config', label: 'config()', type: 'address' },
+    {
+      fn: 'config',
+      label: 'config()',
+      expect: ['SUPERCHAIN_CONFIG_PROXY', 'CELO_SUPERCHAIN_CONFIG_PROXY'],
+    },
   ],
   ProtocolVersions: [
     { fn: 'required', label: 'required()', type: 'uint256' },
     { fn: 'recommended', label: 'recommended()', type: 'uint256' },
   ],
-  MIPS: [{ fn: 'oracle', label: 'oracle()', type: 'address' }],
+  MIPS: [{ fn: 'oracle', label: 'oracle()', type: 'address', expect: 'PREIMAGE_ORACLE_SINGLETON' }],
   PreimageOracle: [
     { fn: 'challengePeriod', label: 'challengePeriod()', type: 'seconds' },
     { fn: 'minProposalSize', label: 'minProposalSize()', type: 'uint256' },
@@ -516,7 +594,7 @@ export const GAME_IMMUTABLE_VARS = {
     { fn: 'splitDepth', label: 'Split Depth', type: 'uint256' },
     { fn: 'maxClockDuration', label: 'Max Clock Duration', type: 'duration' },
     { fn: 'clockExtension', label: 'Clock Extension', type: 'duration' },
-    { fn: 'vm', label: 'VM (BigStepper)', type: 'address' },
+    { fn: 'vm', label: 'VM (BigStepper)', type: 'address', expect: 'MIPS_SINGLETON' },
     {
       fn: 'weth',
       label: 'DelayedWETH',
@@ -552,6 +630,6 @@ export const GAME_IMMUTABLE_VARS = {
       type: 'address',
       expect: 'ANCHOR_STATE_REGISTRY_PROXY',
     },
-    { fn: 'accessManager', label: 'Access Manager', type: 'address' },
+    { fn: 'accessManager', label: 'Access Manager', type: 'address', expect: 'ACCESS_MANAGER' },
   ],
 }

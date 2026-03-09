@@ -11,7 +11,7 @@ import {
   getCachedData,
   setCachedData,
 } from './config.js'
-import { fetchNetworkData, compareNetworks } from './rpc.js'
+import { fetchNetworkData, compareNetworks, resetClient } from './rpc.js'
 
 // ── Utility ────────────────────────────────────────────────
 
@@ -68,6 +68,50 @@ function buildKnownAddrs(networkId, data) {
   if (data?.admin?.proxyAdminOwner?.address) {
     known[data.admin.proxyAdminOwner.address.toLowerCase()] = 'ProxyAdminOwner'
   }
+
+  // Add singleton addresses (with New/Old context labels)
+  for (const [name, info] of Object.entries(data?.singletons || {})) {
+    if (!info?.address) continue
+    const isOld = name.endsWith('Old')
+    const baseName = isOld ? name.replace(/Old$/, '') : name
+    const suffix = isOld ? ' (Old)' : info.discovered ? ' (New)' : ''
+    known[info.address.toLowerCase()] = baseName + suffix
+  }
+
+  // Add game template addresses (from DGF gameImpls)
+  if (data?.games?.[1]?.address) {
+    known[data.games[1].address.toLowerCase()] = 'PermissionedGame'
+  }
+  if (data?.games?.[42]?.address) {
+    known[data.games[42].address.toLowerCase()] = 'OPSuccinctGame'
+  }
+
+  // Add discovered contract proxy addresses (New/Old context labels)
+  for (const [key, contract] of Object.entries(data?.contracts || {})) {
+    if (!contract?.proxy) continue
+    const isOld = key.endsWith('Old')
+    const baseName = isOld ? key.replace(/Old$/, '') : key
+    const suffix = isOld ? ' (Old)' : contract.discovered ? ' (New)' : ''
+    // Only add discovered/old contract proxies — originals are already in NETWORKS.addresses
+    if (contract.discovered || isOld) {
+      known[contract.proxy.toLowerCase()] = baseName + suffix
+    }
+  }
+
+  // SP1 Verifier labels (known verifier contract addresses)
+  const SP1_VERIFIERS = {
+    '0x397a5f7f3dbd538f23de225b51f532c34448da9b': 'SP1VerifierGroth16',
+    '0x3b6041173b80e77f038f3f2c0f9744f04837185e': 'SP1VerifierPlonk',
+  }
+  for (const [addr, label] of Object.entries(SP1_VERIFIERS)) {
+    known[addr] = label
+  }
+
+  // AccessManager labels (from network config)
+  if (addrs.ACCESS_MANAGER) {
+    known[addrs.ACCESS_MANAGER.toLowerCase()] = 'AccessManager'
+  }
+
   return known
 }
 
@@ -244,13 +288,48 @@ function Props({ props, networkId, knownAddrs }) {
   )}`
 }
 
+/**
+ * Render a contract with automatic Old/New discovery.
+ * If a contract has `discovered: true`, it was auto-discovered as the New version.
+ * The original contract is stored as contractKey + 'Old' in data.contracts.
+ */
+function ContractWithDiscovery({ contractKey, data, networkId, knownAddrs, issues }) {
+  const contract = data?.contracts?.[contractKey]
+  const oldKey = contractKey + 'Old'
+  const oldContract = data?.contracts?.[oldKey]
+  const isDiscovered = contract?.discovered === true
+
+  return html`
+    <${ContractCard}
+      contract=${contract}
+      networkId=${networkId}
+      subtitle=${isDiscovered ? '(New)' : null}
+      knownAddrs=${knownAddrs}
+      issues=${issues?.[contractKey]}
+      discovered=${isDiscovered}
+    />
+    <${Props} props=${contract?.props} networkId=${networkId} knownAddrs=${knownAddrs} />
+    ${oldContract &&
+    html`
+      <${ContractCard}
+        contract=${{ ...oldContract, key: contractKey }}
+        networkId=${networkId}
+        subtitle="(Old)"
+        knownAddrs=${knownAddrs}
+        issues=${issues?.[oldKey]}
+      />
+      <${Props} props=${oldContract.props} networkId=${networkId} knownAddrs=${knownAddrs} />
+    `}
+  `
+}
+
 // ── Contract Card ──────────────────────────────────────────
 
-function ContractCard({ contract, networkId, subtitle, knownAddrs }) {
+function ContractCard({ contract, networkId, subtitle, knownAddrs, issues, discovered }) {
   if (!contract) return html`<div class="card"><div class="skeleton card-skeleton"></div></div>`
 
   return html`
-    <div class="card">
+    <div class="card ${discovered ? 'card-discovered' : ''}" data-contract=${contract.key}>
       <div class="card-header">
         <div>
           <span class="card-title">${contract.key}</span>
@@ -277,7 +356,10 @@ function ContractCard({ contract, networkId, subtitle, knownAddrs }) {
       ${contract.admin &&
       contract.admin !== ZERO_ADDR &&
       html`
-        <div class="card-row">
+        <div
+          class="card-row ${issues?.includes('admin') ? 'issue-row issue-' + networkId : ''}"
+          data-field="admin"
+        >
           <span class="card-label">Admin</span>
           <${AddressPill} addr=${contract.admin} networkId=${networkId} />
           <${AddressTag} label=${addressLabel(contract.admin, knownAddrs)} />
@@ -289,7 +371,10 @@ function ContractCard({ contract, networkId, subtitle, knownAddrs }) {
       `}
       ${contract.owner &&
       html`
-        <div class="card-row">
+        <div
+          class="card-row ${issues?.includes('owner') ? 'issue-row issue-' + networkId : ''}"
+          data-field="owner"
+        >
           <span class="card-label">Owner</span>
           <${AddressPill} addr=${contract.owner} networkId=${networkId} />
           <${AddressTag} label=${addressLabel(contract.owner, knownAddrs)} />
@@ -314,25 +399,31 @@ function ContractCard({ contract, networkId, subtitle, knownAddrs }) {
 
 // ── Admin Card ─────────────────────────────────────────────
 
-function AdminCard({ label, info, networkId }) {
+function AdminCard({ label, info, networkId, issues }) {
   if (!info)
     return html`<div class="card">
       <div class="skeleton card-skeleton" style="height:80px"></div>
     </div>`
 
   return html`
-    <div class="card">
+    <div class="card" data-contract=${label.split(' ')[0]}>
       <div class="card-header">
         <span class="card-title">${label}</span>
         <${TypeBadge} classify=${info.classify} />
       </div>
-      <div class="card-row">
+      <div
+        class="card-row ${issues?.includes('address') ? 'issue-row issue-' + networkId : ''}"
+        data-field="address"
+      >
         <span class="card-label">Address</span>
         <${AddressPill} addr=${info.address} networkId=${networkId} />
       </div>
       ${info.owner &&
       html`
-        <div class="card-row">
+        <div
+          class="card-row ${issues?.includes('owner') ? 'issue-row issue-' + networkId : ''}"
+          data-field="owner"
+        >
           <span class="card-label">Owner</span>
           <${AddressPill} addr=${info.owner} networkId=${networkId} />
         </div>
@@ -357,7 +448,7 @@ function GameCard({ game, networkId, knownAddrs }) {
   if (!game) return null
 
   return html`
-    <div class="card">
+    <div class="card" data-contract=${game.label}>
       <div class="card-header">
         <div>
           <span class="card-title">${game.label}</span>
@@ -385,15 +476,17 @@ function GameCard({ game, networkId, knownAddrs }) {
 
 // ── Singleton Card ─────────────────────────────────────────
 
-function SingletonCard({ name, info, networkId, knownAddrs }) {
+function SingletonCard({ name, info, networkId, knownAddrs, subtitle }) {
   if (!info) return null
 
   return html`
-    <div class="card">
+    <div class="card ${info.discovered ? 'card-discovered' : ''}" data-contract=${name}>
       <div class="card-header">
         <div>
           <span class="card-title">${name}</span>
-          <span class="card-subtitle"> (singleton)</span>
+          ${subtitle
+            ? html`<span class="card-subtitle"> ${subtitle}</span>`
+            : html`<span class="card-subtitle"> (singleton)</span>`}
         </div>
         <${VersionBadge} tag=${info.tag} />
       </div>
@@ -408,6 +501,35 @@ function SingletonCard({ name, info, networkId, knownAddrs }) {
         </span>
       </div>
     </div>
+  `
+}
+
+function SingletonWithDiscovery({ name, data, networkId, knownAddrs }) {
+  const info = data?.singletons?.[name]
+  const oldKey = name + 'Old'
+  const oldInfo = data?.singletons?.[oldKey]
+  const isDiscovered = info?.discovered === true
+
+  return html`
+    <${SingletonCard}
+      name=${name}
+      info=${info}
+      networkId=${networkId}
+      knownAddrs=${knownAddrs}
+      subtitle=${isDiscovered ? '(New)' : null}
+    />
+    <${Props} props=${info?.props} networkId=${networkId} knownAddrs=${knownAddrs} />
+    ${oldInfo &&
+    html`
+      <${SingletonCard}
+        name=${name}
+        info=${oldInfo}
+        networkId=${networkId}
+        knownAddrs=${knownAddrs}
+        subtitle="(Old)"
+      />
+      <${Props} props=${oldInfo?.props} networkId=${networkId} knownAddrs=${knownAddrs} />
+    `}
   `
 }
 
@@ -436,9 +558,18 @@ function UpgradeMatrix({ data, networkId }) {
     .map((key) => {
       const c = data.contracts[key]
       if (!c) return null
-      return { key, version: cleanVersion(c.version), tag: c.tag }
+      const suffix = c.discovered ? ' (New)' : ''
+      return { key: key + suffix, version: cleanVersion(c.version), tag: c.tag }
     })
     .filter(Boolean)
+
+  // Add dynamically discovered Old contracts
+  for (const [key, c] of Object.entries(data.contracts)) {
+    if (key.endsWith('Old') && !allContracts.includes(key)) {
+      const baseName = key.replace(/Old$/, '')
+      rows.push({ key: baseName + ' (Old)', version: cleanVersion(c.version), tag: c.tag })
+    }
+  }
 
   // Add games
   for (const [gt, game] of Object.entries(data.games || {})) {
@@ -450,16 +581,29 @@ function UpgradeMatrix({ data, networkId }) {
     })
   }
 
-  // Add singletons
+  // Add singletons (with Old/New discovery support)
   for (const [name, info] of Object.entries(data.singletons || {})) {
-    rows.push({
-      key: name + ' (singleton)',
-      version: cleanVersion(info.version),
-      tag: info.tag,
-    })
+    if (name.endsWith('Old')) {
+      const baseName = name.replace(/Old$/, '')
+      rows.push({
+        key: baseName + ' (Old)',
+        version: cleanVersion(info.version),
+        tag: info.tag,
+      })
+    } else {
+      const suffix = info.discovered ? ' (New)' : ' (singleton)'
+      rows.push({
+        key: name + suffix,
+        version: cleanVersion(info.version),
+        tag: info.tag,
+      })
+    }
   }
 
-  return html`
+  // Sort alphabetically by contract name
+  rows.sort((a, b) => a.key.localeCompare(b.key))
+
+  return html`<div class="matrix-wrap">
     <table class="matrix">
       <thead>
         <tr>
@@ -483,45 +627,142 @@ function UpgradeMatrix({ data, networkId }) {
         )}
       </tbody>
     </table>
-  `
+  </div>`
 }
 
 // ── Comparison Panel ───────────────────────────────────────
 
-function ComparisonPanel({ alerts }) {
+function ComparisonPanel({ alerts, onAlertClick }) {
   if (!alerts || alerts.length === 0) {
     return html`
-      <div class="alert-panel">
-        <${SectionHeader} icon="✓" title="CROSS-NETWORK HEALTH" />
+      <div class="alert-panel" id="health-alerts">
+        <${SectionHeader} icon="✓" title="NETWORK HEALTH" />
         <div class="card" style="text-align: center; padding: 24px; color: var(--color-green)">
-          All networks consistent — no discrepancies found.
+          All networks healthy — no anomalies detected.
         </div>
       </div>
     `
   }
 
   return html`
-    <div class="alert-panel">
-      <${SectionHeader} icon="⚠" title="CROSS-NETWORK DISCREPANCIES" />
-      ${alerts.map(
-        (a) => html`
-          <div class="alert ${a.severity}">
-            <span class="alert-icon">${a.severity === 'critical' ? '🔴' : '🟡'}</span>
+    <div class="alert-panel" id="health-alerts">
+      <${SectionHeader} icon="⚠" title="NETWORK HEALTH ALERTS" />
+      ${alerts.map((a) => {
+        const netCls = `net-${a.network}`
+        const icon =
+          a.network === 'mainnet'
+            ? '🔴'
+            : a.network === 'sepolia'
+            ? '🟡'
+            : a.network === 'localhost'
+            ? '🔵'
+            : '⚪'
+        return html`
+          <div
+            class="alert ${netCls}"
+            onClick=${() => onAlertClick && onAlertClick(a)}
+            style="cursor: pointer; transition: transform 0.1s, box-shadow 0.2s;"
+            onMouseEnter=${(e) => {
+              e.currentTarget.style.transform = 'translateX(4px)'
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)'
+            }}
+            onMouseLeave=${(e) => {
+              e.currentTarget.style.transform = ''
+              e.currentTarget.style.boxShadow = ''
+            }}
+            role="button"
+            tabindex="0"
+            onKeyDown=${(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                onAlertClick && onAlertClick(a)
+              }
+            }}
+          >
+            <span class="alert-icon">${icon}</span>
             <div class="alert-content">
-              <div class="alert-title ${a.severity}">${a.contract}</div>
+              <div class="alert-title ${netCls}">${a.contract}</div>
               <div class="alert-detail">${a.message}</div>
-              <div class="alert-network">${a.network}</div>
+              <div class="alert-network">
+                ${a.network} · <span style="opacity: 0.6">click to navigate</span>
+              </div>
             </div>
           </div>
         `
-      )}
+      })}
+    </div>
+  `
+}
+
+// ── Alert Banner ───────────────────────────────────────────────────
+
+function AlertBanner({ alerts }) {
+  if (!alerts || alerts.length === 0) return null
+
+  const mainnetCount = alerts.filter((a) => a.network === 'mainnet').length
+  const sepoliaCount = alerts.filter((a) => a.network === 'sepolia').length
+  const chaosCount = alerts.filter((a) => a.network === 'chaos').length
+  const localhostCount = alerts.filter((a) => a.network === 'localhost').length
+
+  const scrollToAlerts = () => {
+    const el = document.getElementById('health-alerts')
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  return html`
+    <div
+      class="alert-banner"
+      onClick=${scrollToAlerts}
+      role="button"
+      tabindex="0"
+      onKeyDown=${(e) => {
+        if (e.key === 'Enter' || e.key === ' ') scrollToAlerts()
+      }}
+    >
+      <span class="alert-banner-icon">⚠️</span>
+      <div class="alert-banner-body">
+        <div class="alert-banner-counts">
+          ${mainnetCount > 0 &&
+          html`
+            <span class="alert-banner-chip mainnet">
+              <span class="alert-banner-chip-dot"></span>
+              Mainnet · ${mainnetCount}
+            </span>
+          `}
+          ${sepoliaCount > 0 &&
+          html`
+            <span class="alert-banner-chip sepolia">
+              <span class="alert-banner-chip-dot"></span>
+              Sepolia · ${sepoliaCount}
+            </span>
+          `}
+          ${chaosCount > 0 &&
+          html`
+            <span class="alert-banner-chip chaos">
+              <span class="alert-banner-chip-dot"></span>
+              Chaos · ${chaosCount}
+            </span>
+          `}
+          ${localhostCount > 0 &&
+          html`
+            <span class="alert-banner-chip localhost">
+              <span class="alert-banner-chip-dot"></span>
+              Localhost · ${localhostCount}
+            </span>
+          `}
+        </div>
+        <span class="alert-banner-cta">
+          Scroll down to see details
+          <span class="alert-banner-cta-arrow">↓</span>
+        </span>
+      </div>
     </div>
   `
 }
 
 // ── Network View ───────────────────────────────────────────
 
-function NetworkView({ data, networkId, status }) {
+function NetworkView({ data, networkId, status, issues }) {
   if (status === 'idle') {
     return html`
       <div style="text-align: center; padding: 48px 0; color: var(--text-dim)">
@@ -544,7 +785,7 @@ function NetworkView({ data, networkId, status }) {
         <div class="skeleton card-skeleton"></div>
       </div>
       <div class="section">
-        <${SectionHeader} icon="🌉" title="CORE BRIDGE CONTRACTS" />
+        <${SectionHeader} icon="⛓️" title="CORE BRIDGE CONTRACTS" />
         ${[1, 2, 3, 4, 5].map(() => html`<div class="skeleton card-skeleton"></div>`)}
       </div>
     `
@@ -555,23 +796,40 @@ function NetworkView({ data, networkId, status }) {
   const knownAddrs = buildKnownAddrs(networkId, data)
 
   return html`
-    ${data.blockNumber &&
+    ${data.blockNumber != null &&
     html`
-      <div style="font-size: 0.78rem; color: var(--text-dim); margin-bottom: 16px;">
-        Block:
-        <span style="font-family: var(--font-mono)">${data.blockNumber.toLocaleString()}</span> ·
-        RPC: <span style="font-family: var(--font-mono)">${NETWORKS[networkId].rpcUrl}</span>
+      <div class="block-info">
+        <span class="block-info-item"
+          ><span class="block-info-label">Block</span>
+          <span class="block-info-val">${data.blockNumber.toLocaleString()}</span></span
+        >
+        <span class="block-info-sep">·</span>
+        <span class="block-info-item"
+          ><span class="block-info-label">Chain</span>
+          <span class="block-info-val">${data.chainId || '—'}</span></span
+        >
+        <span class="block-info-sep">·</span>
+        <span class="block-info-item"
+          ><span class="block-info-label">RPC</span>
+          <span class="block-info-val">${NETWORKS[networkId].rpcUrl}</span></span
+        >
       </div>
     `}
 
     <!-- Admin & Ownership -->
     <div class="section">
       <${SectionHeader} icon="🔑" title="ADMIN & OWNERSHIP" />
-      <${AdminCard} label="ProxyAdmin" info=${data.admin?.proxyAdmin} networkId=${networkId} />
+      <${AdminCard}
+        label="ProxyAdmin"
+        info=${data.admin?.proxyAdmin}
+        networkId=${networkId}
+        issues=${issues?.['ProxyAdmin']}
+      />
       <${AdminCard}
         label="ProxyAdminOwner (SystemOwnerSafe)"
         info=${data.admin?.proxyAdminOwner}
         networkId=${networkId}
+        issues=${issues?.['ProxyAdminOwner']}
       />
     </div>
 
@@ -582,6 +840,7 @@ function NetworkView({ data, networkId, status }) {
         contract=${data.contracts?.SystemConfig}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
+        issues=${issues?.['SystemConfig']}
       />
       <${Props}
         props=${data.contracts?.SystemConfig?.props}
@@ -592,6 +851,7 @@ function NetworkView({ data, networkId, status }) {
         contract=${data.contracts?.CeloSuperchainConfig}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
+        issues=${issues?.['CeloSuperchainConfig']}
       />
       <${Props}
         props=${data.contracts?.CeloSuperchainConfig?.props}
@@ -602,6 +862,7 @@ function NetworkView({ data, networkId, status }) {
         contract=${data.contracts?.SuperchainConfig}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
+        issues=${issues?.['SuperchainConfig']}
       />
       <${Props}
         props=${data.contracts?.SuperchainConfig?.props}
@@ -612,11 +873,12 @@ function NetworkView({ data, networkId, status }) {
 
     <!-- Core Bridge Contracts -->
     <div class="section">
-      <${SectionHeader} icon="🌉" title="CORE BRIDGE CONTRACTS" />
+      <${SectionHeader} icon="⛓️" title="CORE BRIDGE CONTRACTS" />
       <${ContractCard}
         contract=${data.contracts?.OptimismPortal}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
+        issues=${issues?.['OptimismPortal']}
       />
       <${Props}
         props=${data.contracts?.OptimismPortal?.props}
@@ -627,6 +889,7 @@ function NetworkView({ data, networkId, status }) {
         contract=${data.contracts?.L1StandardBridge}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
+        issues=${issues?.['L1StandardBridge']}
       />
       <${Props}
         props=${data.contracts?.L1StandardBridge?.props}
@@ -638,6 +901,7 @@ function NetworkView({ data, networkId, status }) {
         networkId=${networkId}
         subtitle="(ResolvedDelegateProxy)"
         knownAddrs=${knownAddrs}
+        issues=${issues?.['L1CrossDomainMessenger']}
       />
       <${Props}
         props=${data.contracts?.L1CrossDomainMessenger?.props}
@@ -648,6 +912,7 @@ function NetworkView({ data, networkId, status }) {
         contract=${data.contracts?.L1ERC721Bridge}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
+        issues=${issues?.['L1ERC721Bridge']}
       />
       <${Props}
         props=${data.contracts?.L1ERC721Bridge?.props}
@@ -658,6 +923,7 @@ function NetworkView({ data, networkId, status }) {
         contract=${data.contracts?.OptimismMintableERC20Factory}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
+        issues=${issues?.['OptimismMintableERC20Factory']}
       />
       <${Props}
         props=${data.contracts?.OptimismMintableERC20Factory?.props}
@@ -668,36 +934,27 @@ function NetworkView({ data, networkId, status }) {
 
     <!-- Dispute / Fault Proof -->
     <div class="section">
-      <${SectionHeader} icon="⚔" title="DISPUTE / FAULT PROOF" />
-      <${ContractCard}
-        contract=${data.contracts?.DisputeGameFactory}
+      <${SectionHeader} icon="⚖️" title="DISPUTE / FAULT PROOF" />
+      <${ContractWithDiscovery}
+        contractKey="DisputeGameFactory"
+        data=${data}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
+        issues=${issues}
       />
-      <${Props}
-        props=${data.contracts?.DisputeGameFactory?.props}
+      <${ContractWithDiscovery}
+        contractKey="AnchorStateRegistry"
+        data=${data}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
+        issues=${issues}
       />
-      <${ContractCard}
-        contract=${data.contracts?.AnchorStateRegistry}
+      <${ContractWithDiscovery}
+        contractKey="DelayedWETH"
+        data=${data}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
-      />
-      <${Props}
-        props=${data.contracts?.AnchorStateRegistry?.props}
-        networkId=${networkId}
-        knownAddrs=${knownAddrs}
-      />
-      <${ContractCard}
-        contract=${data.contracts?.DelayedWETH}
-        networkId=${networkId}
-        knownAddrs=${knownAddrs}
-      />
-      <${Props}
-        props=${data.contracts?.DelayedWETH?.props}
-        networkId=${networkId}
-        knownAddrs=${knownAddrs}
+        issues=${issues}
       />
     </div>
 
@@ -712,6 +969,7 @@ function NetworkView({ data, networkId, status }) {
                 value: i.value,
                 type: i.type,
                 expect: i.expect,
+                valid: i.valid,
               }))}
               networkId=${networkId}
               knownAddrs=${knownAddrs}
@@ -734,6 +992,7 @@ function NetworkView({ data, networkId, status }) {
                 value: i.value,
                 type: i.type,
                 expect: i.expect,
+                valid: i.valid,
               }))}
               networkId=${networkId}
               knownAddrs=${knownAddrs}
@@ -753,6 +1012,7 @@ function NetworkView({ data, networkId, status }) {
         contract=${data.contracts?.ProtocolVersions}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
+        issues=${issues?.['ProtocolVersions']}
       />
       <${Props}
         props=${data.contracts?.ProtocolVersions?.props}
@@ -764,25 +1024,15 @@ function NetworkView({ data, networkId, status }) {
     <!-- Singletons -->
     <div class="section">
       <${SectionHeader} icon="🧩" title="SINGLETONS (non-upgradeable)" />
-      <${SingletonCard}
+      <${SingletonWithDiscovery}
         name="PreimageOracle"
-        info=${data.singletons?.PreimageOracle}
+        data=${data}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
       />
-      <${Props}
-        props=${data.singletons?.PreimageOracle?.props}
-        networkId=${networkId}
-        knownAddrs=${knownAddrs}
-      />
-      <${SingletonCard}
+      <${SingletonWithDiscovery}
         name="MIPS"
-        info=${data.singletons?.MIPS}
-        networkId=${networkId}
-        knownAddrs=${knownAddrs}
-      />
-      <${Props}
-        props=${data.singletons?.MIPS?.props}
+        data=${data}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
       />
@@ -790,8 +1040,59 @@ function NetworkView({ data, networkId, status }) {
 
     <!-- Upgrade Matrix -->
     <div class="section">
-      <${SectionHeader} icon="📊" title="UPGRADE STATUS MATRIX" />
+      <${SectionHeader} icon="🧬" title="UPGRADE STATUS MATRIX" />
       <${UpgradeMatrix} data=${data} networkId=${networkId} />
+    </div>
+  `
+}
+
+// ── Localhost Setup ────────────────────────────────────────
+
+function LocalhostSetup({ onLoad }) {
+  const [source, setSource] = useState('mainnet')
+  const [rpc, setRpc] = useState('http://localhost:8545')
+  const [loading, setLoading] = useState(false)
+
+  const handleLoad = useCallback(async () => {
+    setLoading(true)
+    try {
+      await onLoad(source, rpc)
+    } finally {
+      setLoading(false)
+    }
+  }, [onLoad, source, rpc])
+
+  return html`
+    <div class="localhost-setup">
+      <div class="localhost-setup-header">
+        <div class="localhost-setup-icon">🔗</div>
+        <h3 class="localhost-setup-title">Connect to Local Fork</h3>
+        <p class="localhost-setup-desc">
+          Point to a running Anvil fork to inspect contract state against live networks.
+        </p>
+      </div>
+      <div class="localhost-form">
+        <div class="localhost-field">
+          <label>Fork Source</label>
+          <select value=${source} onChange=${(e) => setSource(e.target.value)}>
+            <option value="mainnet">Celo Mainnet</option>
+            <option value="sepolia">Celo Sepolia</option>
+            <option value="chaos">Chaos (L2)</option>
+          </select>
+        </div>
+        <div class="localhost-field">
+          <label>RPC Endpoint</label>
+          <input
+            type="text"
+            value=${rpc}
+            onChange=${(e) => setRpc(e.target.value)}
+            placeholder="http://localhost:8545"
+          />
+        </div>
+        <button class="localhost-load-btn" onClick=${handleLoad} disabled=${loading}>
+          ${loading ? 'Connecting…' : 'Load Fork Data'}
+        </button>
+      </div>
     </div>
   `
 }
@@ -799,11 +1100,14 @@ function NetworkView({ data, networkId, status }) {
 // ── Progress Bar ───────────────────────────────────────────
 
 function ProgressBar({ phase, networks }) {
+  const lh = networks.localhost
+  const showLocalhost = lh && lh.status !== 'idle'
+
   const phases = [
-    { id: 1, label: 'Mainnet', network: 'mainnet' },
-    { id: 2, label: 'Testnets', networks: ['sepolia', 'chaos'] },
-    { id: 3, label: 'Comparison' },
+    { id: 1, label: 'Mainnet' },
+    { id: 2, label: 'Testnets' },
   ]
+  if (showLocalhost) phases.push({ id: 'lh', label: 'Localhost' })
 
   // Calculate overall progress
   let pct = 0
@@ -811,23 +1115,35 @@ function ProgressBar({ phase, networks }) {
   const s = networks.sepolia
   const c = networks.chaos
 
-  // Phase 1: 0-40%
-  if (m.status === 'done') pct += 40
-  else if (m.status === 'loading') pct += (m.progress / 100) * 40
+  if (showLocalhost) {
+    // 3 phases: Mainnet 0-40%, Testnets 40-80%, Localhost 80-100%
+    if (m.status === 'done') pct += 40
+    else if (m.status === 'loading') pct += (m.progress / 100) * 40
 
-  // Phase 2: 40-80%
-  if (s.status === 'done' && c.status === 'done') pct += 40
-  else {
-    const sp = s.status === 'done' ? 100 : s.status === 'loading' ? s.progress : 0
-    const cp = c.status === 'done' ? 100 : c.status === 'loading' ? c.progress : 0
-    pct += ((sp + cp) / 200) * 40
+    if (s.status === 'done' && c.status === 'done') pct += 40
+    else {
+      const sp = s.status === 'done' ? 100 : s.status === 'loading' ? s.progress : 0
+      const cp = c.status === 'done' ? 100 : c.status === 'loading' ? c.progress : 0
+      pct += ((sp + cp) / 200) * 40
+    }
+
+    if (lh.status === 'done') pct += 20
+    else if (lh.status === 'loading') pct += (lh.progress / 100) * 20
+  } else {
+    // 2 phases: Mainnet 0-50%, Testnets 50-100%
+    if (m.status === 'done') pct += 50
+    else if (m.status === 'loading') pct += (m.progress / 100) * 50
+
+    if (s.status === 'done' && c.status === 'done') pct += 50
+    else {
+      const sp = s.status === 'done' ? 100 : s.status === 'loading' ? s.progress : 0
+      const cp = c.status === 'done' ? 100 : c.status === 'loading' ? c.progress : 0
+      pct += ((sp + cp) / 200) * 50
+    }
   }
 
-  // Phase 3: 80-100%
-  if (phase === 3) pct += 10 // comparison in progress
-  if (phase >= 4) pct = 100
-
-  const isDone = phase >= 4
+  const isDone = phase >= 3 && (!showLocalhost || lh.status === 'done')
+  if (isDone) pct = 100
 
   return html`
     <div class="progress-container">
@@ -835,7 +1151,15 @@ function ProgressBar({ phase, networks }) {
         ${phases.map((p) => {
           let cls = 'progress-phase'
           let icon = ''
-          if (p.id < phase) {
+          if (p.id === 'lh') {
+            if (lh.status === 'done') {
+              cls += ' done'
+              icon = '✓ '
+            } else if (lh.status === 'loading') {
+              cls += ' active'
+              icon = '● '
+            }
+          } else if (p.id < phase) {
             cls += ' done'
             icon = '✓ '
           } else if (p.id === phase) {
@@ -855,6 +1179,99 @@ function ProgressBar({ phase, networks }) {
   `
 }
 
+// ── Side Navigation ────────────────────────────────────────
+
+const NAV_ITEMS = [
+  { key: 'ProxyAdmin', short: 'PA', section: 'admin' },
+  { key: 'ProxyAdminOwner', short: 'PAO', section: 'admin' },
+  { key: 'SystemConfig', short: 'SC', section: 'superchain' },
+  { key: 'CeloSuperchainConfig', short: 'CSC', section: 'superchain' },
+  { key: 'SuperchainConfig', short: 'SuC', section: 'superchain' },
+  { key: 'OptimismPortal', short: 'OP', section: 'bridge' },
+  { key: 'L1StandardBridge', short: 'SB', section: 'bridge' },
+  { key: 'L1CrossDomainMessenger', short: 'CDM', section: 'bridge' },
+  { key: 'L1ERC721Bridge', short: 'EB', section: 'bridge' },
+  { key: 'OptimismMintableERC20Factory', short: 'MEF', section: 'bridge' },
+  { key: 'DisputeGameFactory', short: 'DGF', section: 'dispute' },
+  { key: 'AnchorStateRegistry', short: 'ASR', section: 'dispute' },
+  { key: 'DelayedWETH', short: 'DW', section: 'dispute' },
+  { key: 'PermissionedGame', short: 'PG', section: 'games' },
+  { key: 'OPSuccinctGame', short: 'OSG', section: 'games' },
+  { key: 'ProtocolVersions', short: 'PV', section: 'protocol' },
+  { key: 'PreimageOracle', short: 'PO', section: 'singletons' },
+  { key: 'MIPS', short: 'M', section: 'singletons' },
+]
+
+function SideNav({ visible, activeTab }) {
+  const [activeKey, setActiveKey] = useState(null)
+
+  useEffect(() => {
+    if (!visible) return
+
+    let observer = null
+
+    // Small delay so new tab content DOM is rendered before we query it
+    const timerId = setTimeout(() => {
+      observer = new IntersectionObserver(
+        (entries) => {
+          let topEntry = null
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              if (!topEntry || entry.boundingClientRect.top < topEntry.boundingClientRect.top) {
+                topEntry = entry
+              }
+            }
+          }
+          if (topEntry) {
+            const key = topEntry.target.getAttribute('data-contract')
+            if (key) setActiveKey(key)
+          }
+        },
+        { rootMargin: '-10% 0px -60% 0px', threshold: 0 }
+      )
+
+      const cards = document.querySelectorAll('[data-contract]')
+      cards.forEach((card) => observer.observe(card))
+    }, 50)
+
+    return () => {
+      clearTimeout(timerId)
+      if (observer) observer.disconnect()
+    }
+  }, [visible, activeTab])
+
+  const handleClick = useCallback((key) => {
+    const card = document.querySelector(`[data-contract="${key}"]`)
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [])
+
+  if (!visible) return null
+
+  return html`
+    <nav class="side-nav" aria-label="Contract navigation">
+      <div class="side-nav-track">
+        ${NAV_ITEMS.map(
+          (item, i) => html`
+            ${i > 0 && item.section !== NAV_ITEMS[i - 1].section
+              ? html`<div class="side-nav-divider"></div>`
+              : null}
+            <button
+              class="side-nav-item ${activeKey === item.key ? 'active' : ''}"
+              onClick=${() => handleClick(item.key)}
+              data-tooltip=${item.key}
+              aria-label=${item.key}
+            >
+              ${item.short}
+            </button>
+          `
+        )}
+      </div>
+    </nav>
+  `
+}
+
 // ── Main App ───────────────────────────────────────────────
 
 function App() {
@@ -865,9 +1282,16 @@ function App() {
     mainnet: { status: 'idle', progress: 0, data: null, cached: false, timestamp: null },
     sepolia: { status: 'idle', progress: 0, data: null, cached: false, timestamp: null },
     chaos: { status: 'idle', progress: 0, data: null, cached: false, timestamp: null },
+    localhost: { status: 'idle', progress: 0, data: null, cached: false, timestamp: null },
+  })
+  const [localhostFork, setLocalhostFork] = useState({
+    sourceNetwork: 'mainnet',
+    rpcUrl: 'http://localhost:8545',
+    loaded: false,
   })
 
   const dataRef = useRef({})
+  const preserveScrollRef = useRef(false)
 
   // Load cached data on mount
   useEffect(() => {
@@ -906,7 +1330,7 @@ function App() {
         })
 
         dataRef.current[netId] = data
-        setCachedData(netId, data)
+        if (netId !== 'localhost') setCachedData(netId, data)
         updateNetwork(netId, {
           status: 'done',
           progress: 100,
@@ -933,18 +1357,127 @@ function App() {
     setPhase(2)
     await Promise.all([loadNetwork('sepolia'), loadNetwork('chaos')])
 
-    // Phase 3: Comparison
-    setPhase(3)
+    // Run comparison (instant, no separate phase)
     const mainData = dataRef.current.mainnet
-    const testData = [dataRef.current.sepolia, dataRef.current.chaos].filter(Boolean)
+    const testData = [
+      dataRef.current.sepolia,
+      dataRef.current.chaos,
+      dataRef.current.localhost,
+    ].filter(Boolean)
     const compAlerts = compareNetworks(mainData, testData)
     setAlerts(compAlerts)
-    setPhase(4) // Mark comparison as done
+    setPhase(3) // Done
   }, [loadNetwork])
+
+  const loadLocalhost = useCallback(
+    async (sourceNet, rpcUrl) => {
+      // Configure localhost to use source network's addresses
+      NETWORKS.localhost.sourceNetwork = sourceNet
+      NETWORKS.localhost.addresses = { ...NETWORKS[sourceNet].addresses }
+      NETWORKS.localhost.rpcUrl = rpcUrl
+      NETWORKS.localhost.explorerUrl = NETWORKS[sourceNet].explorerUrl
+      resetClient('localhost')
+
+      setLocalhostFork({ sourceNetwork: sourceNet, rpcUrl, loaded: true })
+      await loadNetwork('localhost')
+
+      // Re-run comparison including localhost
+      const mainData = dataRef.current.mainnet
+      const testData = [
+        dataRef.current.sepolia,
+        dataRef.current.chaos,
+        dataRef.current.localhost,
+      ].filter(Boolean)
+      if (mainData) {
+        const compAlerts = compareNetworks(mainData, testData)
+        setAlerts(compAlerts)
+      }
+    },
+    [loadNetwork]
+  )
+
+  const resetLocalhost = useCallback(() => {
+    setLocalhostFork({ sourceNetwork: 'mainnet', rpcUrl: 'http://localhost:8545', loaded: false })
+    updateNetwork('localhost', {
+      status: 'idle',
+      progress: 0,
+      data: null,
+      cached: false,
+      timestamp: null,
+    })
+    dataRef.current.localhost = null
+    resetClient('localhost')
+    // Re-run comparison without localhost
+    const mainData = dataRef.current.mainnet
+    const testData = [dataRef.current.sepolia, dataRef.current.chaos].filter(Boolean)
+    if (mainData) {
+      const compAlerts = compareNetworks(mainData, testData)
+      setAlerts(compAlerts)
+    }
+  }, [updateNetwork])
+
+  const handleAlertClick = useCallback((alert) => {
+    // 1. Switch to the correct network tab
+    setActiveTab(alert.network)
+
+    // 2. After render, scroll to the contract card and highlight the field
+    setTimeout(() => {
+      // Remove any existing highlights first
+      document.querySelectorAll('.hl-card, .hl-row').forEach((el) => {
+        el.classList.remove(
+          'hl-card',
+          'hl-row',
+          'hl-mainnet',
+          'hl-sepolia',
+          'hl-chaos',
+          'hl-localhost'
+        )
+      })
+
+      const card = document.querySelector(`[data-contract="${alert.contract}"]`)
+      if (!card) return
+
+      // Scroll card into view
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
+      // Highlight the card
+      const netHl = `hl-${alert.network}`
+      card.classList.add('hl-card', netHl)
+
+      // Highlight the specific field row within the card
+      const fieldRow = card.querySelector(`[data-field="${alert.field}"]`)
+      if (fieldRow) {
+        fieldRow.classList.add('hl-row', netHl)
+      }
+
+      // Auto-remove highlights after animation completes
+      setTimeout(() => {
+        card.classList.remove('hl-card', netHl)
+        if (fieldRow) fieldRow.classList.remove('hl-row', netHl)
+      }, 3000)
+    }, 150) // wait for tab switch re-render
+  }, [])
 
   const activeData = networks[activeTab]
 
+  // Build issues map for the active network tab: { contractName: ['field1', 'field2'] }
+  const activeIssues = alerts
+    ? alerts.reduce((map, a) => {
+        if (a.network === activeTab) {
+          if (!map[a.contract]) map[a.contract] = []
+          if (!map[a.contract].includes(a.field)) map[a.contract].push(a.field)
+        }
+        return map
+      }, {})
+    : null
+
+  const sideNavVisible =
+    activeTab === 'localhost'
+      ? localhostFork.loaded && activeData.data != null
+      : activeData.data != null
+
   return html`
+    <${SideNav} visible=${sideNavVisible} activeTab=${activeTab} />
     <div class="container">
       <!-- Header -->
       <div class="header">
@@ -954,32 +1487,58 @@ function App() {
         </div>
         <div class="header-legend">
           <span class="legend-item"><span class="legend-dot amber"></span> v3 (Isthmus)</span>
-          <span class="legend-item"
-            ><span class="legend-dot green"></span> v4.1.0 (pre-Jovian)</span
-          >
-          <span class="legend-item"><span class="legend-dot purple"></span> v5.0.0 (Jovian)</span>
+          <span class="legend-item"><span class="legend-dot green"></span> v4.1 (pre-Jovian)</span>
+          <span class="legend-item"><span class="legend-dot purple"></span> v5 (Jovian)</span>
         </div>
       </div>
 
       <!-- Progress -->
       <${ProgressBar} phase=${phase} networks=${networks} />
 
+      <!-- Alert Summary Banner -->
+      ${phase >= 3 && alerts && alerts.length > 0 && html`<${AlertBanner} alerts=${alerts} />`}
+
       <!-- Tabs -->
-      <div class="tabs">
-        ${LOAD_ORDER.map((netId) => {
-          const net = networks[netId]
-          let statusCls = net.status
-          if (net.cached && net.status !== 'loading') statusCls = 'cached'
-          return html`
-            <button
-              class="tab ${activeTab === netId ? 'active' : ''}"
-              onClick=${() => setActiveTab(netId)}
-            >
-              <span class="tab-status ${statusCls}"></span>
-              ${NETWORKS[netId].shortLabel}
-            </button>
-          `
-        })}
+      <div class="tabs-sticky-wrapper">
+        <div class="tabs">
+          ${LOAD_ORDER.map((netId) => {
+            const net = networks[netId]
+            let statusCls = net.status
+            if (net.cached && net.status !== 'loading') statusCls = 'cached'
+            return html`
+              <button
+                class="tab ${activeTab === netId ? 'active' : ''}"
+                onClick=${() => {
+                  const scrollY = window.scrollY
+                  preserveScrollRef.current = true
+                  setActiveTab(netId)
+                  requestAnimationFrame(() => {
+                    window.scrollTo(0, scrollY)
+                    preserveScrollRef.current = false
+                  })
+                }}
+              >
+                <span class="tab-status ${statusCls}"></span>
+                ${NETWORKS[netId].shortLabel}
+              </button>
+            `
+          })}
+          <button
+            class="tab ${activeTab === 'localhost' ? 'active' : ''}"
+            onClick=${() => {
+              const scrollY = window.scrollY
+              preserveScrollRef.current = true
+              setActiveTab('localhost')
+              requestAnimationFrame(() => {
+                window.scrollTo(0, scrollY)
+                preserveScrollRef.current = false
+              })
+            }}
+          >
+            <span class="tab-status ${networks.localhost.status}"></span>
+            Localhost
+          </button>
+        </div>
       </div>
 
       <!-- Cached Banner -->
@@ -992,15 +1551,43 @@ function App() {
       `}
 
       <!-- Network View -->
-      <${NetworkView} data=${activeData.data} networkId=${activeTab} status=${activeData.status} />
+      ${activeTab === 'localhost'
+        ? html`
+            ${!localhostFork.loaded
+              ? html` <${LocalhostSetup} onLoad=${loadLocalhost} /> `
+              : html`
+                  <div class="localhost-banner">
+                    <span
+                      >🔗 Fork of${' '}<strong
+                        >${NETWORKS[localhostFork.sourceNetwork].shortLabel}</strong
+                      ></span
+                    >
+                    <span class="localhost-rpc">${localhostFork.rpcUrl}</span>
+                    <button class="localhost-reset-btn" onClick=${resetLocalhost}>Reset</button>
+                  </div>
+                  <${NetworkView}
+                    data=${activeData.data}
+                    networkId=${'localhost'}
+                    status=${activeData.status}
+                    issues=${activeIssues}
+                  />
+                `}
+          `
+        : html`
+            <${NetworkView}
+              data=${activeData.data}
+              networkId=${activeTab}
+              status=${activeData.status}
+              issues=${activeIssues}
+            />
+          `}
 
       <!-- Cross-Network Comparison -->
-      ${phase >= 3 && html`<${ComparisonPanel} alerts=${alerts} />`}
+      ${phase >= 3 &&
+      html`<${ComparisonPanel} alerts=${alerts} onAlertClick=${handleAlertClick} />`}
 
       <!-- Footer -->
-      <div class="footer">
-        Celo OP Stack X-Ray · Data fetched live from L1 RPCs · No server required
-      </div>
+      <div class="footer">celo op stack x-ray · live from l1 rpcs · no server</div>
     </div>
   `
 }

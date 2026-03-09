@@ -12,6 +12,7 @@ import {
   resolveSingletons,
   CONTRACT_PROPS,
   GAME_IMMUTABLE_VARS,
+  DISCOVERY_MAP,
 } from './config.js'
 
 // ── ABI Fragments ──────────────────────────────────────────
@@ -45,6 +46,7 @@ const ABI = {
   unsafeBlockSigner: parseAbi(['function unsafeBlockSigner() view returns (address)']),
   batchInbox: parseAbi(['function batchInbox() view returns (address)']),
   startBlock: parseAbi(['function startBlock() view returns (uint256)']),
+  minBaseFee: parseAbi(['function minBaseFee() view returns (uint64)']),
   gasPayingToken: parseAbi(['function gasPayingToken() view returns (address, uint8)']),
   isCustomGasToken: parseAbi(['function isCustomGasToken() view returns (bool)']),
   gasPayingTokenName: parseAbi(['function gasPayingTokenName() view returns (string)']),
@@ -99,7 +101,16 @@ const clients = {}
 function getClient(networkId) {
   if (clients[networkId]) return clients[networkId]
   const cfg = NETWORKS[networkId]
-  const chain = networkId === 'mainnet' ? mainnet : sepolia
+  let chain
+  if (networkId === 'mainnet') chain = mainnet
+  else if (networkId === 'localhost') {
+    chain = {
+      id: 31337,
+      name: 'Localhost',
+      nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+      rpcUrls: { default: { http: [cfg.rpcUrl] } },
+    }
+  } else chain = sepolia
   clients[networkId] = createPublicClient({
     chain,
     transport: http(cfg.rpcUrl, {
@@ -109,6 +120,10 @@ function getClient(networkId) {
     }),
   })
   return clients[networkId]
+}
+
+export function resetClient(networkId) {
+  delete clients[networkId]
 }
 
 // ── Low-Level Helpers ──────────────────────────────────────
@@ -255,14 +270,15 @@ async function fetchContractProps(client, addr, contractKey, networkAddrs) {
       if (Array.isArray(value)) value = value[0]
 
       const type = def.type || 'address'
-      const expected = def.expect ? networkAddrs[def.expect] : null
+      const expects = Array.isArray(def.expect) ? def.expect : def.expect ? [def.expect] : []
+      const expectedAddrs = expects.map((k) => networkAddrs[k]).filter(Boolean)
       let valid = null
-      if (expected && value) {
-        const valStr = typeof value === 'string' ? value : String(value)
-        valid = valStr.toLowerCase() === expected.toLowerCase()
+      if (expectedAddrs.length > 0 && value) {
+        const valStr = (typeof value === 'string' ? value : String(value)).toLowerCase()
+        valid = expectedAddrs.some((e) => valStr === e.toLowerCase())
       }
 
-      return { label: def.label, value, type, expected, valid }
+      return { label: def.label, value, type, expected: expectedAddrs[0] || null, valid }
     })
   )
 
@@ -275,7 +291,7 @@ async function fetchContractProps(client, addr, contractKey, networkAddrs) {
  * Fetch immutable variables from an implementation or singleton address.
  * Returns array of { label, value, type }.
  */
-async function fetchImmutables(client, targetAddr, defs) {
+async function fetchImmutables(client, targetAddr, defs, networkAddrs) {
   if (!defs || defs.length === 0 || !targetAddr || targetAddr === ZERO_ADDR) return []
 
   const results = await Promise.all(
@@ -283,12 +299,22 @@ async function fetchImmutables(client, targetAddr, defs) {
       const value = await safeRead(client, targetAddr, def.fn)
       if (value === null || value === undefined) return null
 
+      const type = def.type || 'uint256'
+      const expects = Array.isArray(def.expect) ? def.expect : def.expect ? [def.expect] : []
+      const expectedAddrs = networkAddrs ? expects.map((k) => networkAddrs[k]).filter(Boolean) : []
+      let valid = null
+      if (expectedAddrs.length > 0 && value) {
+        const valStr = (typeof value === 'string' ? value : String(value)).toLowerCase()
+        valid = expectedAddrs.some((e) => valStr === e.toLowerCase())
+      }
+
       return {
         label: def.label,
         fn: def.fn,
         value,
-        type: def.type || 'uint256',
+        type,
         expect: def.expect || null,
+        valid,
       }
     })
   )
@@ -299,10 +325,10 @@ async function fetchImmutables(client, targetAddr, defs) {
 /**
  * Fetch immutable variables from a game template address.
  */
-async function fetchGameImmutables(client, gameAddr, gameType) {
+async function fetchGameImmutables(client, gameAddr, gameType, networkAddrs) {
   const defs = GAME_IMMUTABLE_VARS[gameType]
   if (!defs || !gameAddr) return []
-  return fetchImmutables(client, gameAddr, defs)
+  return fetchImmutables(client, gameAddr, defs, networkAddrs)
 }
 
 // ── Contract Data Fetching ─────────────────────────────────
@@ -320,7 +346,7 @@ async function fetchProxiedContract(client, networkId, contractKey) {
     readOwner(client, proxy),
   ])
 
-  const tag = implLookup(contractKey, impl, networkId)
+  const tag = implLookup(contractKey, impl, networkId, version)
 
   // Fetch unified properties
   const props = await fetchContractProps(client, proxy, contractKey, cfg.addresses)
@@ -350,7 +376,7 @@ async function fetchResolvedContract(client, networkId, contractKey, resolveName
     readOwner(client, proxy),
   ])
 
-  const tag = implLookup(contractKey, impl, networkId)
+  const tag = implLookup(contractKey, impl, networkId, version)
 
   // Fetch unified properties
   const props = await fetchContractProps(client, proxy, contractKey, cfg.addresses)
@@ -367,6 +393,255 @@ async function fetchResolvedContract(client, networkId, contractKey, resolveName
     addressManager: am,
     resolveName,
     props,
+  }
+}
+
+// ── Automatic Re-deployment Discovery ─────────────────────
+
+/**
+ * Scan fetched contracts for cross-reference mismatches that indicate a re-deployment.
+ * When a property’s `expect` address doesn’t match the on-chain value, the on-chain
+ * address is the “new” contract. We fetch its full data and store it as a discovered
+ * contract, while the original (at the expected proxy address) becomes the “old”.
+ *
+ * Returns Map<contractKey, { discoveredAddr, sourceContract, sourceField }>
+ */
+async function discoverRedeployedContracts(client, networkId, data) {
+  const cfg = NETWORKS[networkId]
+  const addrs = cfg.addresses
+  const discoveries = new Map()
+
+  // Scan all fetched contracts for cross-ref mismatches
+  for (const [key, contract] of Object.entries(data.contracts)) {
+    if (!contract.props) continue
+    for (const prop of contract.props) {
+      if (prop.valid !== false) continue // only mismatches
+      if (!prop.expected) continue // no expected address to compare against
+
+      // Find which address key this property was expecting
+      const defs = CONTRACT_PROPS[key]
+      if (!defs) continue
+      const def = defs.find((d) => d.label === prop.label)
+      if (!def?.expect) continue
+
+      // Resolve which address keys were expected
+      const expectKeys = Array.isArray(def.expect) ? def.expect : [def.expect]
+
+      // Check each expected key against DISCOVERY_MAP
+      for (const expectKey of expectKeys) {
+        const targetContractKey = DISCOVERY_MAP[expectKey]
+        if (!targetContractKey) continue // not a discoverable contract
+
+        // The on-chain value is the NEW address (different from expected)
+        const discoveredAddr = typeof prop.value === 'string' ? prop.value : String(prop.value)
+        if (!discoveredAddr || discoveredAddr === ZERO_ADDR) continue
+
+        // Only discover if we don’t already have it and it’s truly different
+        if (discoveries.has(targetContractKey)) continue
+        const expectedAddr = addrs[expectKey]
+        if (discoveredAddr.toLowerCase() === expectedAddr?.toLowerCase()) continue
+
+        discoveries.set(targetContractKey, {
+          discoveredAddr: getAddress(discoveredAddr),
+          sourceContract: key,
+          sourceField: prop.label,
+        })
+      }
+    }
+  }
+
+  // Also scan game immutables for cross-ref mismatches
+  for (const [, game] of Object.entries(data.games || {})) {
+    if (!game?.immutables) continue
+    for (const imm of game.immutables) {
+      if (imm.valid !== false) continue
+      if (!imm.expect) continue
+
+      const expectKeys = Array.isArray(imm.expect) ? imm.expect : [imm.expect]
+      for (const expectKey of expectKeys) {
+        const targetContractKey = DISCOVERY_MAP[expectKey]
+        if (!targetContractKey) continue
+
+        const discoveredAddr = typeof imm.value === 'string' ? imm.value : String(imm.value)
+        if (!discoveredAddr || discoveredAddr === ZERO_ADDR) continue
+        if (discoveries.has(targetContractKey)) continue
+
+        const expectedAddr = addrs[expectKey]
+        if (discoveredAddr.toLowerCase() === expectedAddr?.toLowerCase()) continue
+
+        discoveries.set(targetContractKey, {
+          discoveredAddr: getAddress(discoveredAddr),
+          sourceContract: game.label || 'Game',
+          sourceField: imm.label,
+        })
+      }
+    }
+  }
+
+  for (const [name, singleton] of Object.entries(data.singletons || {})) {
+    if (name.endsWith('Old')) continue
+    if (!singleton?.props) continue
+    for (const prop of singleton.props) {
+      if (prop.valid !== false) continue
+      if (!prop.expected) continue
+
+      const defs = CONTRACT_PROPS[name]
+      if (!defs) continue
+      const def = defs.find((d) => d.label === prop.label)
+      if (!def?.expect) continue
+
+      const expectKeys = Array.isArray(def.expect) ? def.expect : [def.expect]
+      for (const expectKey of expectKeys) {
+        const targetContractKey = DISCOVERY_MAP[expectKey]
+        if (!targetContractKey) continue
+
+        const discoveredAddr = typeof prop.value === 'string' ? prop.value : String(prop.value)
+        if (!discoveredAddr || discoveredAddr === ZERO_ADDR) continue
+        if (discoveries.has(targetContractKey)) continue
+
+        const expectedAddr = addrs[expectKey]
+        if (discoveredAddr.toLowerCase() === expectedAddr?.toLowerCase()) continue
+
+        discoveries.set(targetContractKey, {
+          discoveredAddr: getAddress(discoveredAddr),
+          sourceContract: name,
+          sourceField: prop.label,
+        })
+      }
+    }
+  }
+
+  if (discoveries.size === 0) return
+
+  const SINGLETON_KEYS = new Set(['MIPS', 'PreimageOracle'])
+
+  const fetchPromises = []
+  for (const [contractKey, info] of discoveries) {
+    fetchPromises.push(
+      (async () => {
+        const addr = info.discoveredAddr
+        const isSingleton = SINGLETON_KEYS.has(contractKey)
+
+        if (isSingleton) {
+          const [version, classify, props] = await Promise.all([
+            readVersion(client, addr),
+            classifyAddress(client, addr),
+            fetchContractProps(client, addr, contractKey, addrs),
+          ])
+          const tag = implLookup(contractKey, addr, networkId, version)
+
+          const oldKey = contractKey + 'Old'
+          const oldSingleton = data.singletons[contractKey]
+          if (oldSingleton) {
+            data.singletons[oldKey] = { ...oldSingleton }
+          }
+
+          data.singletons[contractKey] = {
+            address: addr,
+            version,
+            tag,
+            classify,
+            props,
+            discovered: true,
+            discoveredFrom: info.sourceContract,
+            discoveredField: info.sourceField,
+          }
+        } else {
+          const [impl, admin, version, owner] = await Promise.all([
+            readStorage(client, addr, EIP1967.IMPL_SLOT),
+            readStorage(client, addr, EIP1967.ADMIN_SLOT),
+            readVersion(client, addr),
+            readOwner(client, addr),
+          ])
+
+          const tag = implLookup(contractKey, impl, networkId, version)
+          const props = await fetchContractProps(client, addr, contractKey, addrs)
+
+          const newContract = {
+            key: contractKey,
+            proxy: addr,
+            impl,
+            admin,
+            version,
+            owner,
+            tag,
+            props,
+            discovered: true,
+            discoveredFrom: info.sourceContract,
+            discoveredField: info.sourceField,
+          }
+
+          const oldKey = contractKey + 'Old'
+          const oldContract = data.contracts[contractKey]
+          if (oldContract) {
+            data.contracts[oldKey] = { ...oldContract, key: oldKey }
+          }
+
+          data.contracts[contractKey] = newContract
+        }
+      })()
+    )
+  }
+
+  await Promise.all(fetchPromises)
+
+  const cascadeDiscoveries = new Map()
+  for (const [name, singleton] of Object.entries(data.singletons)) {
+    if (!singleton.discovered || name.endsWith('Old') || !singleton.props) continue
+    for (const prop of singleton.props) {
+      if (prop.valid !== false || !prop.expected) continue
+      const defs = CONTRACT_PROPS[name]
+      if (!defs) continue
+      const def = defs.find((d) => d.label === prop.label)
+      if (!def?.expect) continue
+      const expectKeys = Array.isArray(def.expect) ? def.expect : [def.expect]
+      for (const expectKey of expectKeys) {
+        const targetKey = DISCOVERY_MAP[expectKey]
+        if (!targetKey || discoveries.has(targetKey) || cascadeDiscoveries.has(targetKey)) continue
+        const dAddr = typeof prop.value === 'string' ? prop.value : String(prop.value)
+        if (!dAddr || dAddr === ZERO_ADDR) continue
+        const expectedAddr = addrs[expectKey]
+        if (dAddr.toLowerCase() === expectedAddr?.toLowerCase()) continue
+        cascadeDiscoveries.set(targetKey, {
+          discoveredAddr: getAddress(dAddr),
+          sourceContract: name,
+          sourceField: prop.label,
+        })
+      }
+    }
+  }
+
+  if (cascadeDiscoveries.size > 0) {
+    const cascadePromises = []
+    for (const [contractKey, info] of cascadeDiscoveries) {
+      cascadePromises.push(
+        (async () => {
+          const addr = info.discoveredAddr
+          const isSingleton = SINGLETON_KEYS.has(contractKey)
+          if (isSingleton) {
+            const [version, classify, props] = await Promise.all([
+              readVersion(client, addr),
+              classifyAddress(client, addr),
+              fetchContractProps(client, addr, contractKey, addrs),
+            ])
+            const oldKey = contractKey + 'Old'
+            const oldSingleton = data.singletons[contractKey]
+            if (oldSingleton) data.singletons[oldKey] = { ...oldSingleton }
+            data.singletons[contractKey] = {
+              address: addr,
+              version,
+              tag: implLookup(contractKey, addr, networkId, version),
+              classify,
+              props,
+              discovered: true,
+              discoveredFrom: info.sourceContract,
+              discoveredField: info.sourceField,
+            }
+          }
+        })()
+      )
+    }
+    await Promise.all(cascadePromises)
   }
 }
 
@@ -392,6 +667,7 @@ export async function fetchNetworkData(networkId, onProgress) {
   const data = {
     networkId,
     blockNumber: null,
+    chainId: null,
     admin: {},
     contracts: {},
     games: {},
@@ -403,6 +679,11 @@ export async function fetchNetworkData(networkId, onProgress) {
     data.blockNumber = Number(await client.getBlockNumber())
   } catch {
     data.blockNumber = null
+  }
+  try {
+    data.chainId = Number(await client.getChainId())
+  } catch {
+    data.chainId = null
   }
   tick('admin')
 
@@ -450,7 +731,45 @@ export async function fetchNetworkData(networkId, onProgress) {
   tick('superchain')
   tick('bridge')
 
-  // ── Phase 5: Dispute games ─────────────────────────────
+  // ── Phase 5: Singletons (MIPS + PreimageOracle) ────────
+  // Resolved before games so MIPS_SINGLETON is available for game immutable expect validation.
+  const dgf = data.contracts.DisputeGameFactory
+  const dgfTag = dgf?.tag
+  const singletonAddrs = resolveSingletons(dgfTag, networkId)
+
+  if (singletonAddrs) {
+    addrs.MIPS_SINGLETON = singletonAddrs.MIPS
+    addrs.PREIMAGE_ORACLE_SINGLETON = singletonAddrs.PreimageOracle
+
+    const [mipsVer, preimageVer, mipsClassify, preimageClassify, mipsProps, preimageProps] =
+      await Promise.all([
+        readVersion(client, singletonAddrs.MIPS),
+        readVersion(client, singletonAddrs.PreimageOracle),
+        classifyAddress(client, singletonAddrs.MIPS),
+        classifyAddress(client, singletonAddrs.PreimageOracle),
+        fetchContractProps(client, singletonAddrs.MIPS, 'MIPS', addrs),
+        fetchContractProps(client, singletonAddrs.PreimageOracle, 'PreimageOracle', addrs),
+      ])
+
+    data.singletons.MIPS = {
+      address: singletonAddrs.MIPS,
+      version: mipsVer,
+      tag: implLookup('MIPS', singletonAddrs.MIPS, networkId, mipsVer),
+      classify: mipsClassify,
+      props: mipsProps,
+    }
+    data.singletons.PreimageOracle = {
+      address: singletonAddrs.PreimageOracle,
+      version: preimageVer,
+      tag: implLookup('PreimageOracle', singletonAddrs.PreimageOracle, networkId, preimageVer),
+      classify: preimageClassify,
+      props: preimageProps,
+    }
+  }
+  tick('singletons')
+  tick('singletons')
+
+  // ── Phase 6: Dispute games ─────────────────────────────
   const [game1Addr, game42Addr] = await Promise.all([
     readGameImpl(client, addrs.DISPUTE_GAME_FACTORY_PROXY, 1),
     readGameImpl(client, addrs.DISPUTE_GAME_FACTORY_PROXY, 42),
@@ -465,7 +784,7 @@ export async function fetchNetworkData(networkId, onProgress) {
       const [ver, classify, immutables] = await Promise.all([
         readVersion(client, addr),
         classifyAddress(client, addr),
-        fetchGameImmutables(client, addr, gameType),
+        fetchGameImmutables(client, addr, gameType, addrs),
       ])
       data.games[gameType] = {
         address: addr,
@@ -479,39 +798,9 @@ export async function fetchNetworkData(networkId, onProgress) {
     }
   }
 
-  // ── Phase 6: Singletons (MIPS + PreimageOracle) ────────
-  const dgf = data.contracts.DisputeGameFactory
-  const dgfTag = dgf?.tag
-  const singletonAddrs = resolveSingletons(dgfTag, networkId)
-
-  if (singletonAddrs) {
-    const [mipsVer, preimageVer, mipsClassify, preimageClassify, mipsProps, preimageProps] =
-      await Promise.all([
-        readVersion(client, singletonAddrs.MIPS),
-        readVersion(client, singletonAddrs.PreimageOracle),
-        classifyAddress(client, singletonAddrs.MIPS),
-        classifyAddress(client, singletonAddrs.PreimageOracle),
-        fetchContractProps(client, singletonAddrs.MIPS, 'MIPS', addrs),
-        fetchContractProps(client, singletonAddrs.PreimageOracle, 'PreimageOracle', addrs),
-      ])
-
-    data.singletons.MIPS = {
-      address: singletonAddrs.MIPS,
-      version: mipsVer,
-      tag: implLookup('MIPS', singletonAddrs.MIPS, networkId),
-      classify: mipsClassify,
-      props: mipsProps,
-    }
-    data.singletons.PreimageOracle = {
-      address: singletonAddrs.PreimageOracle,
-      version: preimageVer,
-      tag: implLookup('PreimageOracle', singletonAddrs.PreimageOracle, networkId),
-      classify: preimageClassify,
-      props: preimageProps,
-    }
-  }
-  tick('singletons')
-  tick('singletons')
+  // ── Phase 6b: Auto-discover re-deployed contracts ──────
+  await discoverRedeployedContracts(client, networkId, data)
+  tick('discovery')
 
   // ── Phase 7: Classify admins (batch) ───────────────────
   const adminsToClassify = []
@@ -561,85 +850,203 @@ export async function fetchNetworkData(networkId, onProgress) {
   return data
 }
 
-// ── Cross-Network Comparison ───────────────────────────────
+// ── Network Health Analysis ─────────────────────────────────
 
-export function compareNetworks(mainnetData, testnetDataArray) {
+// Acknowledged exceptions — known patterns on specific networks that should not alert.
+// SuperchainConfig on mainnet uses a separate admin because Optimism Foundation maintains it directly.
+const ACKNOWLEDGED_ADMIN = { mainnet: ['SuperchainConfig'] }
+
+/**
+ * Analyze a single network for internal consistency anomalies.
+ * Detects admin outliers, owner outliers, and EOA ProxyAdminOwner.
+ */
+function analyzeNetwork(data) {
+  if (!data) return []
+  const net = data.networkId
   const alerts = []
-  if (!mainnetData) return alerts
+  const proxyAdminAddr = data.admin?.proxyAdmin?.address
 
-  const mainAdminOwnerType = mainnetData.admin?.proxyAdminOwner?.classify?.type
+  // 1. ProxyAdminOwner should be a Safe multisig, never an EOA
+  const paOwnerType = data.admin?.proxyAdminOwner?.classify?.type
+  if (paOwnerType === 'EOA') {
+    alerts.push({
+      severity: 'critical',
+      category: 'ownership',
+      network: net,
+      contract: 'ProxyAdminOwner',
+      field: 'address',
+      message: `ProxyAdminOwner on ${net} is an EOA (expected Safe multisig)`,
+    })
+  }
 
-  for (const td of testnetDataArray) {
-    if (!td) continue
-    const net = td.networkId
-
-    // 1. ProxyAdmin owner type
-    const testAdminOwnerType = td.admin?.proxyAdminOwner?.classify?.type
-    if (mainAdminOwnerType && testAdminOwnerType && mainAdminOwnerType !== testAdminOwnerType) {
+  // 2. Admin consistency — every proxied contract should use the network's ProxyAdmin
+  if (proxyAdminAddr) {
+    const ack = ACKNOWLEDGED_ADMIN[net] || []
+    for (const [key, contract] of Object.entries(data.contracts)) {
+      if (!contract.admin || contract.admin === ZERO_ADDR) continue
+      if (key.endsWith('Old')) continue // Old contracts are expected pre-upgrade artifacts
+      if (contract.admin.toLowerCase() === proxyAdminAddr.toLowerCase()) continue
+      if (ack.includes(key)) continue
       alerts.push({
         severity: 'critical',
-        category: 'ownership',
+        category: 'admin',
         network: net,
-        contract: 'ProxyAdmin Owner',
-        message: `${net} uses ${testAdminOwnerType} (mainnet uses ${mainAdminOwnerType})`,
+        contract: key,
+        field: 'admin',
+        message: `${key} on ${net} uses a different admin than ProxyAdmin`,
       })
     }
+  }
 
-    // 2. Contract ownership patterns
-    for (const [key, mainContract] of Object.entries(mainnetData.contracts)) {
-      const testContract = td.contracts[key]
-      if (!testContract) continue
-
-      // Admin consistency: check if testnet uses same ProxyAdmin for all contracts
-      if (mainContract.admin && testContract.admin) {
-        const mainUsesPA =
-          mainContract.admin.toLowerCase() === mainnetData.admin.proxyAdmin.address.toLowerCase()
-        const testUsesPA =
-          testContract.admin.toLowerCase() === td.admin.proxyAdmin.address.toLowerCase()
-        if (mainUsesPA && !testUsesPA) {
-          alerts.push({
-            severity: 'warning',
-            category: 'admin',
-            network: net,
-            contract: key,
-            message: `${key} on ${net} uses different ProxyAdmin than expected`,
-          })
-        }
-      }
-
-      // 3. Cross-reference validation failures (from props)
-      if (testContract.props) {
-        for (const prop of testContract.props) {
-          if (prop.valid === false) {
-            alerts.push({
-              severity: 'warning',
-              category: 'cross-ref',
-              network: net,
-              contract: key,
-              message: `${key}.${prop.label} on ${net} points to unexpected address`,
-            })
-          }
-        }
-      }
-
-      // 4. Paused state discrepancy (from props)
-      const mainPausedProp = mainContract.props?.find((p) => p.label === 'paused()')
-      const testPausedProp = testContract.props?.find((p) => p.label === 'paused()')
-      const mainPaused = mainPausedProp?.value
-      const testPaused = testPausedProp?.value
-      if (mainPaused !== undefined && testPaused !== undefined && mainPaused !== testPaused) {
+  // 3. Owner consistency — detect outliers against the dominant owner
+  const contractsWithOwner = Object.entries(data.contracts).filter(
+    ([k, c]) => c.owner && !k.endsWith('Old')
+  )
+  if (contractsWithOwner.length >= 2) {
+    const counts = {}
+    for (const [, c] of contractsWithOwner) {
+      const o = c.owner.toLowerCase()
+      counts[o] = (counts[o] || 0) + 1
+    }
+    const dominantOwner = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0]
+    for (const [key, contract] of contractsWithOwner) {
+      if (contract.owner.toLowerCase() !== dominantOwner) {
         alerts.push({
-          severity: testPaused ? 'critical' : 'warning',
-          category: 'paused',
+          severity: 'critical',
+          category: 'ownership',
           network: net,
           contract: key,
-          message: `${key} on ${net} is ${testPaused ? 'PAUSED' : 'active'} (mainnet is ${
-            mainPaused ? 'PAUSED' : 'active'
-          })`,
+          field: 'owner',
+          message: `${key} on ${net} has a different owner than other contracts`,
         })
       }
     }
   }
 
+  // 4. Cross-reference validation failures
+  const discoveredKeys = new Set(
+    Object.entries(data.contracts)
+      .filter(([, c]) => c.discovered)
+      .map(([k]) => k)
+  )
+  const discoveredSingletonKeys = new Set(
+    Object.entries(data.singletons || {})
+      .filter(([, s]) => s.discovered)
+      .map(([n]) => n)
+  )
+  for (const [key, contract] of Object.entries(data.contracts)) {
+    if (key.endsWith('Old')) continue
+    if (!contract.props) continue
+    for (const prop of contract.props) {
+      if (prop.valid !== false) continue
+      const def = CONTRACT_PROPS[key]?.find((d) => d.label === prop.label)
+      const expectKeys = def?.expect ? (Array.isArray(def.expect) ? def.expect : [def.expect]) : []
+      const triggeredDiscovery = expectKeys.some((ek) => {
+        const target = DISCOVERY_MAP[ek]
+        return target && (discoveredKeys.has(target) || discoveredSingletonKeys.has(target))
+      })
+      if (triggeredDiscovery) continue
+      alerts.push({
+        severity: 'critical',
+        category: 'cross-ref',
+        network: net,
+        contract: key,
+        field: prop.label,
+        message: `${key}.${prop.label} on ${net} points to unexpected address`,
+      })
+    }
+  }
+  for (const [, game] of Object.entries(data.games || {})) {
+    if (!game?.immutables) continue
+    for (const imm of game.immutables) {
+      if (imm.valid !== false) continue
+      const expectKeys = imm.expect ? (Array.isArray(imm.expect) ? imm.expect : [imm.expect]) : []
+      const triggeredDiscovery = expectKeys.some((ek) => {
+        const target = DISCOVERY_MAP[ek]
+        return target && (discoveredKeys.has(target) || discoveredSingletonKeys.has(target))
+      })
+      if (triggeredDiscovery) continue
+      alerts.push({
+        severity: 'critical',
+        category: 'cross-ref',
+        network: net,
+        contract: game.label || 'Game',
+        field: imm.label,
+        message: `${game.label || 'Game'}.${imm.label} on ${net} points to unexpected address`,
+      })
+    }
+  }
+
+  // 5. Re-deployment discoveries (proxied contracts)
+  for (const [key, contract] of Object.entries(data.contracts)) {
+    if (!contract.discovered) continue
+    alerts.push({
+      severity: 'warning',
+      category: 'discovery',
+      network: net,
+      contract: key,
+      field: 'proxy',
+      message: `${key} on ${net} was re-deployed — new contract auto-discovered from ${contract.discoveredFrom}.${contract.discoveredField}`,
+    })
+  }
+
+  // 6. Re-deployment discoveries (singletons)
+  for (const [name, info] of Object.entries(data.singletons || {})) {
+    if (!info.discovered) continue
+    alerts.push({
+      severity: 'warning',
+      category: 'discovery',
+      network: net,
+      contract: name,
+      field: 'address',
+      message: `${name} on ${net} was re-deployed — new singleton auto-discovered from ${info.discoveredFrom}.${info.discoveredField}`,
+    })
+  }
+
+  return alerts
+}
+
+// ── Cross-Network Comparison ───────────────────────────────
+
+export function compareNetworks(mainnetData, testnetDataArray) {
+  const alerts = []
+
+  // Per-network anomaly detection (including mainnet)
+  const allNetworks = [mainnetData, ...testnetDataArray].filter(Boolean)
+  for (const data of allNetworks) {
+    alerts.push(...analyzeNetwork(data))
+  }
+
+  // Cross-network: paused state discrepancy (mainnet = source of truth)
+  if (mainnetData) {
+    for (const td of testnetDataArray) {
+      if (!td) continue
+      for (const [key, mainContract] of Object.entries(mainnetData.contracts)) {
+        const testContract = td.contracts[key]
+        if (!testContract) continue
+        const mainPaused = mainContract.props?.find((p) => p.label === 'paused()')?.value
+        const testPaused = testContract.props?.find((p) => p.label === 'paused()')?.value
+        if (mainPaused !== undefined && testPaused !== undefined && mainPaused !== testPaused) {
+          alerts.push({
+            severity: 'critical',
+            category: 'paused',
+            network: td.networkId,
+            contract: key,
+            field: 'paused',
+            message: `${key} on ${td.networkId} is ${
+              testPaused ? 'PAUSED' : 'active'
+            } (mainnet is ${mainPaused ? 'PAUSED' : 'active'})`,
+          })
+        }
+      }
+    }
+  }
+
+  const netOrder = { mainnet: 0, sepolia: 1, chaos: 2, localhost: 3 }
+  alerts.sort(
+    (a, b) =>
+      (netOrder[a.network] ?? 9) - (netOrder[b.network] ?? 9) ||
+      a.contract.localeCompare(b.contract)
+  )
   return alerts
 }
