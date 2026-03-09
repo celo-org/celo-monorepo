@@ -45,13 +45,13 @@ jobs:
         id: foundry-cache
         uses: actions/cache@v4
         with:
-          path: ./cache
+          path: packages/protocol/cache
           key: ${{ runner.os }}-foundry-cache-${{ env.FOUNDRY_CACHE_KEY }}
       - name: Foundry out
         id: foundry-out
         uses: actions/cache@v4
         with:
-          path: ./out
+          path: packages/protocol/out
           key: ${{ runner.os }}-foundry-out-${{ env.FOUNDRY_CACHE_KEY }}
 
       - name: Install Foundry
