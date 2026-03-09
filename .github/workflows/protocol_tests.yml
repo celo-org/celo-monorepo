@@ -10,8 +10,6 @@ on:
       - 'release/**'
 
 env:
-  # Increment these to force cache rebuilding
-  FOUNDRY_CACHE_KEY: 2
   # Supported Foundry version defined at celo-org (GitHub organisation) level, for consistency across workflows. Please contact DevOps to update value.
   SUPPORTED_FOUNDRY_VERSION: ${{ vars.SUPPORTED_FOUNDRY_VERSION }}
 
@@ -65,11 +63,13 @@ jobs:
         run: forge install
       - name: Compile Contracts
         run: forge --version && forge compile
-      - name: Upload compiled artifacts
+      # Upload the full workspace (source + compiled artifacts) so child jobs
+      # skip both git clone and recompilation.
+      - name: Upload workspace
         uses: actions/upload-artifact@v4
         with:
-          name: foundry-out
-          path: packages/protocol/out
+          name: protocol-workspace
+          path: packages/protocol
           retention-days: 1
 
   unit-tests:
@@ -102,25 +102,15 @@ jobs:
           - name: all (catch-all)
             path: "test-sol/unit/*"
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Download compiled artifacts
+      - name: Download workspace
         uses: actions/download-artifact@v4
         with:
-          name: foundry-out
-          path: packages/protocol/out
-      # Touch all artifacts so forge sees them as newer than source files
-      # and skips recompilation. This works because the compile job already
-      # verified the build succeeds.
-      - name: Mark artifacts as up-to-date
-        run: find out -type f -exec touch {} +
+          name: protocol-workspace
+          path: packages/protocol
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: 'v1.0.0'
-      - name: Install forge dependencies
-        run: forge install
       - name: Run tests
         run: |
           forge test -vvv \
@@ -135,22 +125,15 @@ jobs:
     name: Integration tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Download compiled artifacts
+      - name: Download workspace
         uses: actions/download-artifact@v4
         with:
-          name: foundry-out
-          path: packages/protocol/out
-      - name: Mark artifacts as up-to-date
-        run: find out -type f -exec touch {} +
+          name: protocol-workspace
+          path: packages/protocol
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: 'v1.0.0'
-      - name: Install forge dependencies
-        run: forge install
       - name: Run integration tests
         run: |
           forge test -vvv \
@@ -168,22 +151,15 @@ jobs:
         uses: pierotofy/set-swap-space@0404882bc4666c0ff2f6fd8b3d32af69a730183c
         with:
           swap-size-gb: 32
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Download compiled artifacts
+      - name: Download workspace
         uses: actions/download-artifact@v4
         with:
-          name: foundry-out
-          path: packages/protocol/out
-      - name: Mark artifacts as up-to-date
-        run: find out -type f -exec touch {} +
+          name: protocol-workspace
+          path: packages/protocol
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: 'v1.0.0'
-      - name: Install forge dependencies
-        run: forge install
       - name: Generate migrations and run devchain
         run: ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
       - name: Run migration tests against local anvil devchain
