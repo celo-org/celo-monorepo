@@ -7,7 +7,7 @@ set -euo pipefail
 # Flags:
 # -n: The network to deploy to.
 # -b: Branch to build contracts from.
-# -p: Path that the governance proposal should be written to.
+# -p: Deprecated. Proposal path is auto-generated as proposal-$NETWORK-$BRANCH.json.
 # -i: Path to the data needed to initialize contracts.
 # -r: Path to the contract compatibility report.
 # -d: Whether to dry-run this deploy
@@ -42,10 +42,22 @@ done
 
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
 [ -z "$BRANCH" ] && echo "Need to set the build branch via the -b flag" && exit 1;
-[ -z "$PROPOSAL" ] && echo "Need to set the proposal outfile via the -p flag" && exit 1;
 [ -z "$INITIALIZE_DATA" ] && echo "Need to set the initialization data via the -i flag" && exit 1;
 [ -z "$REPORT" ] && echo "Need to set the compatibility report input via the -r flag" && exit 1;
 [ -z "$LIBRARIES" ] && echo "Need to set the library mapping input via the -l flag" && exit 1;
+
+if [ -n "$PROPOSAL" ]; then
+  echo "Error: -p no longer accepts a path. Proposal name is now generated automatically as proposal-\$NETWORK-\$BRANCH.json." >&2
+  echo "See: https://github.com/celo-org/celo-monorepo/pull/11662" >&2
+  exit 1
+fi
+PROPOSAL="proposal-$NETWORK-$BRANCH.json"
+
+source scripts/bash/validate-libraries-filename.sh
+validate_libraries_filename "$LIBRARIES" "$NETWORK" "$BRANCH"
+
+source scripts/bash/validate-libraries-bytecode.sh
+validate_libraries_bytecode "$LIBRARIES" "$(get_forno_url "$NETWORK")"
 
 source scripts/bash/release-lib.sh
 build_tag $BRANCH "/dev/stdout"
