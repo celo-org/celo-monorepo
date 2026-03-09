@@ -70,7 +70,8 @@ interface MakeReleaseArgv {
   proposal: string
   librariesFile: string
   initializeData: string
-  buildDirectory: string
+  buildDirectory05: string
+  buildDirectory08: string
   branch: string
   network: string
   privateKey?: string
@@ -1118,10 +1119,17 @@ async function main() {
         demandOption: true,
         description: 'Path to the JSON file with initialization data for contracts.',
       })
-      .option('buildDirectory', {
+      .option('buildDirectory05', {
         type: 'string',
         demandOption: true,
-        description: 'Path to the Foundry build output directory (e.g., out/).',
+        description:
+          'Path to the Foundry build output directory for Solidity 0.5 contracts (e.g., out-branch-truffle-compat).',
+      })
+      .option('buildDirectory08', {
+        type: 'string',
+        demandOption: true,
+        description:
+          'Path to the Foundry build output directory for Solidity 0.8 contracts (e.g., out-branch-truffle-compat8).',
       })
       .option('branch', {
         type: 'string',
@@ -1157,9 +1165,19 @@ async function main() {
       }).argv
 
     const networkName = argv.network!
-    const buildDir = argv.buildDirectory
-    if (!existsSync(buildDir)) {
-      throw new Error(`${buildDir} directory not found. Make sure to run foundry build first`)
+    const buildDir05 = argv.buildDirectory05
+    const buildDir08 = argv.buildDirectory08
+
+    if (!existsSync(buildDir05)) {
+      throw new Error(
+        `${buildDir05} directory not found. Make sure to run foundry build with truffle-compat profile first`
+      )
+    }
+
+    if (!existsSync(buildDir08)) {
+      throw new Error(
+        `${buildDir08} directory not found. Make sure to run foundry build with truffle-compat8 profile first`
+      )
     }
 
     // Check for Celoscan API key early (before deployment) for production networks
@@ -1248,21 +1266,20 @@ async function main() {
 
     const contractArtifactPaths = new Map<string, string>()
 
-    findContractArtifacts(buildDir, contractArtifactPaths)
+    findContractArtifacts(buildDir05, contractArtifactPaths)
+    findContractArtifacts(buildDir08, contractArtifactPaths)
 
     if (contractArtifactPaths.size === 0) {
       console.warn(
-        `No contract artifacts found in ${buildDir}. Ensure the directory is correct and contains Foundry outputs.`
+        `No contract artifacts found in ${buildDir05} or ${buildDir08}. Ensure the directories contain Foundry outputs.`
       )
     }
 
     const registryArtifactPath = contractArtifactPaths.get('Registry')
     if (!registryArtifactPath) {
       throw new Error(
-        `Registry.json artifact not found in ${buildDir} or its subdirectories. ` +
-          `Please ensure it is compiled and present in the Foundry output format (e.g., ${String(
-            buildDir
-          )}/Registry.sol/Registry.json).`
+        `Registry.json artifact not found in ${buildDir05} or ${buildDir08}. ` +
+          `Please ensure it is compiled and present in the Foundry output format (e.g., ${buildDir05}/Registry.sol/Registry.json).`
       )
     }
     const registryArtifact = loadContractArtifact('Registry', registryArtifactPath)
