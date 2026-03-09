@@ -41,7 +41,7 @@ export const assertThrowsAsync = async (promise: any, errorMessage: string = '')
     failed = true
   }
 
-  assert.strictEqual(true, failed, errorMessage)
+  chai.assert.strictEqual(true, failed, errorMessage)
 }
 
 function delay(time) {

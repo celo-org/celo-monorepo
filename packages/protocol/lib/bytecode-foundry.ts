@@ -55,7 +55,7 @@ export interface LibraryLinks {
  * i.e. `sourcePath:libraryName`.
  * See https://docs.soliditylang.org/en/v0.8.13/using-the-compiler.html#library-linking
  */
-const getPlaceholderHash = (name: string): string => {
+export const getPlaceholderHash = (name: string): string => {
   const hash = keccak256(toHex(name))
   return hash.slice(2, 2 + 34)
 }

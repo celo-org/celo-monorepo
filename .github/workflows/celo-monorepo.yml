@@ -24,7 +24,7 @@ defaults:
 
 env:
   # Increment these to force cache rebuilding
-  NODE_MODULE_CACHE_VERSION: 9
+  NODE_MODULE_CACHE_VERSION: 10
   NODE_OPTIONS: '--max-old-space-size=4096'
   TERM: dumb
   GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
@@ -224,7 +224,7 @@ jobs:
               fi
           - name: Protocol Compatibility
             command: |
-              yarn --cwd packages/protocol test:truffle:compatibility
+              yarn --cwd packages/protocol test:ts
     steps:
       - uses: actions/checkout@v4
         with:
@@ -234,6 +234,13 @@ jobs:
         with:
           rebuild-package: 'true'
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
+        with:
+          version: 'v1.0.0'
+      - name: Install forge dependencies
+        working-directory: packages/protocol
+        run: forge install
       - name: Execute matrix command for test
         uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
         with:

@@ -54,6 +54,9 @@ evm_version = 'istanbul'
 metadata_literal = true
 via_ir = false
 
+[profile.truffle-compat.lint]
+lint_on_build = false
+
 # Profile to match Truffle configuration for 0.8.19 contracts
 [profile.truffle-compat8]
 skip=[

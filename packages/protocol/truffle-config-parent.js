@@ -9,13 +9,13 @@ const argv = require('minimist')(process.argv.slice(2), {
   boolean: ['reset'],
 })
 
-const ALFAJORES_NETWORKID = 11142220
+const CELOSEPOLIA_NETWORKID = 11142220
 
 const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
 const INTEGRATION_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const INTEGRATION_TESTING_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
-const ALFAJORES_FROM = '0x59A60D2B488154dc5CB48c42347Df222e13C70Ba'
+const CELOSEPOLIA_FROM = process.env.CELOSEPOLIA_FROM
 
 const gasLimit = 20000000
 const hostAddress = process.env.CELO_NODE_ADDRESS || '127.0.0.1'
@@ -49,7 +49,7 @@ function readMnemonic(networkName) {
 }
 
 const fornoUrls = {
-  alfajores: 'https://forno.celo-sepolia.celo-testnet.org',
+  celosepolia: 'https://forno.celo-sepolia.celo-testnet.org',
   rc1: 'https://forno.celo.org',
   mainnet: 'https://forno.celo.org',
 }
@@ -74,9 +74,9 @@ const networks = {
   testnet_prod: defaultConfig,
   anvil: {
     ...defaultConfig,
-    network_id: 31337,
+    network_id: '*', // Accept any chain ID for anvil fork testing
     from: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
-    port: devPort,
+    port: devPort, // Use port 8546 for anvil (matches ANVIL_PORT in constants.sh)
   },
   // New testnets
   integration: {
@@ -90,16 +90,22 @@ const networks = {
     network_id: 1101,
     port: devPort,
   },
-  alfajores: {
+  celosepolia: {
     ...defaultConfig,
-    network_id: ALFAJORES_NETWORKID,
-    from: ALFAJORES_FROM,
+    network_id: CELOSEPOLIA_NETWORKID,
+    from: CELOSEPOLIA_FROM,
     privateKeyAvailable: true,
   },
 }
 
 // Equivalent
 networks.mainnet = networks.rc1
+
+// Validate CELOSEPOLIA_FROM is set when using celosepolia network
+if (argv.network === 'celosepolia' && !CELOSEPOLIA_FROM) {
+  console.error('Error: CELOSEPOLIA_FROM environment variable is required for celosepolia network')
+  process.exit(1)
+}
 
 // If an override was provided, apply it.
 // If the network is missing from networks, start with the default config.

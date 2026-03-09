@@ -14,6 +14,16 @@ export interface ForgeArtifact {
     compiler?: {
       version?: string
     }
+    settings?: {
+      optimizer?: {
+        enabled?: boolean
+        runs?: number
+      }
+      evmVersion?: string
+      compilationTarget?: {
+        [path: string]: string
+      }
+    }
   }
   contractName?: string
   deployedBytecode?: {

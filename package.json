@@ -5,7 +5,6 @@
   "license": "SEE LICENSE IN SUB-PACKAGES",
   "private": true,
   "scripts": {
-    "preinstall": "git config --global url.\"https://\".insteadOf ssh://",
     "lint": "yarn lerna run lint && yarn run --silent lint:do-not-merge",
     "lint:do-not-merge": "! git grep -E 'DO[ _]*NOT[ _]*MERGE'",
     "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|js|sol)'",
@@ -59,7 +58,6 @@
     "typescript": "^5.3.3"
   },
   "resolutions": {
-    "ganache": "npm:@celo/ganache@7.8.0-unofficial.0",
     "bip39": "https://github.com/bitcoinjs/bip39#a7ecbfe2e60d0214ce17163d610cad9f7b23140c",
     "@types/bn.js": "4.11.6",
     "bignumber.js": "9.0.0"
