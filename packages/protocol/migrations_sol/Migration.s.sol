@@ -426,7 +426,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     string[] memory names = json.readStringArray(".stableTokens.names");
     string[] memory symbols = json.readStringArray(".stableTokens.symbols");
-    string[] memory contractsuffixs = json.readStringArray(".stableTokens.contractsuffixs");
+    string[] memory contractSuffixes = json.readStringArray(".stableTokens.contractSuffixes");
 
     require(names.length == symbols.length, "Ticker and stable names should match");
 
@@ -447,7 +447,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       deployStable(
         names[i],
         symbols[i],
-        contractsuffixs[i],
+        contractSuffixes[i],
         decimals,
         inflationRate,
         inflationFactorUpdatePeriod,

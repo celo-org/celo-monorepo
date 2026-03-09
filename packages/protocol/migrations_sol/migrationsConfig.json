@@ -45,7 +45,7 @@
   "stableTokens": {
     "names": ["Celo Dollar", "Celo Euro", "Celo Brazilian Real"],
     "symbols": ["cUSD", "cEUR", "cREAL"],
-    "contractSufixs": ["", "EUR", "BRL"],
+    "contractSuffixes": ["", "EUR", "BRL"],
     "decimals": 18,
     "celoPrice": 1,
     "inflationRate": 1,
