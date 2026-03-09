@@ -1,3 +1,8 @@
+import {
+  MENTO_PACKAGE,
+  SOLIDITY_05_PACKAGE,
+  SOLIDITY_08_PACKAGE,
+} from '@celo/protocol/contractPackages'
 import { verifyBytecodes } from '@celo/protocol/lib/compatibility/verify-bytecode'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { getBuildArtifacts } from '@openzeppelin/upgrades'
@@ -37,8 +42,11 @@ const argv = require('minimist')(process.argv.slice(2), {
 
 const artifactsDirectory = argv.build_artifacts ? argv.build_artifacts : './build/contracts'
 const artifacts08Directory = argv.build_artifacts
-  ? `${argv.build_artifacts}-0.8`
-  : './build/contracts-0.8'
+  ? `${argv.build_artifacts}-${SOLIDITY_08_PACKAGE.name}`
+  : `./build/contracts-${SOLIDITY_08_PACKAGE.name}`
+const mentoArtifactsDirectory = argv.build_artifacts
+  ? `${argv.build_artifacts}-${MENTO_PACKAGE.name}`
+  : `./build/contracts-${MENTO_PACKAGE.name}`
 const branch = (argv.branch ? argv.branch : '') as string
 const network = argv.network ?? 'development'
 const proposal = argv.proposal ? readJsonSync(argv.proposal) : []
@@ -50,11 +58,14 @@ module.exports = async (callback: (error?: any) => number) => {
     const version = getReleaseVersion(branch)
 
     const registry = await Registry.at(celoRegistryAddress)
-    const buildArtifacts = getBuildArtifacts(artifactsDirectory)
-    const artifacts08 = getBuildArtifacts(artifacts08Directory)
+    const artifactsMap: Record<string, ReturnType<typeof getBuildArtifacts>> = {
+      [SOLIDITY_05_PACKAGE.name]: getBuildArtifacts(artifactsDirectory),
+      [SOLIDITY_08_PACKAGE.name]: getBuildArtifacts(artifacts08Directory),
+      [MENTO_PACKAGE.name]: getBuildArtifacts(mentoArtifactsDirectory),
+    }
     const libraryAddresses = await verifyBytecodes(
       Object.keys(CeloContractName),
-      [buildArtifacts, artifacts08],
+      artifactsMap,
       registry,
       proposal,
       Proxy,
@@ -70,6 +81,7 @@ module.exports = async (callback: (error?: any) => number) => {
     // eslint-disable-next-line: no-console
     console.info(`Writing linked library addresses to ${librariesFile}`)
     writeJsonSync(librariesFile, libraryAddresses.addresses, { spaces: 2 })
+    callback()
   } catch (error) {
     callback(error)
   }

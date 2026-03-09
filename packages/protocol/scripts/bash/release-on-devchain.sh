@@ -50,7 +50,11 @@ echo " - Checkout migrationsConfig.js at $BRANCH"
 git checkout $BRANCH -- migrationsConfig.js
 
 source scripts/bash/contract-exclusion-regex.sh
-yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/contracts --new_contracts build/contracts --exclude $CONTRACT_EXCLUSION_REGEX --new_branch $BRANCH --output_file report.json
+
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+REPORT="report-$BRANCH-$CURRENT_BRANCH.json"
+
+yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/contracts --new_contracts build/contracts --exclude $CONTRACT_EXCLUSION_REGEX --new_branch $BRANCH --output_file $REPORT
 
 echo "- Clean git modified file"
 git restore migrationsConfig.js
@@ -59,11 +63,13 @@ git restore migrationsConfig.js
 # From make-release.sh
 echo "- Deploy release of current branch"
 INITIALIZATION_FILE=`ls releaseData/initializationData/release*.json | sort -V | tail -n 1 | xargs realpath`
-yarn truffle exec --network anvil ./scripts/truffle/make-release.js --build_directory build/ --branch $BRANCH --report report.json --proposal proposal.json --librariesFile libraries.json --initialize_data $INITIALIZATION_FILE
+LIBRARIES_FILE="anvil-$BRANCH-libraries.json"
+PROPOSAL="proposal-anvil-$BRANCH.json"
+yarn truffle exec --network anvil ./scripts/truffle/make-release.js --build_directory build/ --branch $BRANCH --report $REPORT --proposal $PROPOSAL --librariesFile $LIBRARIES_FILE --initialize_data $INITIALIZATION_FILE
 
 # From verify-release.sh
 echo "- Verify release"
-yarn truffle exec --network anvil ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json --branch $BRANCH --initialize_data $INITIALIZATION_FILE
+yarn truffle exec --network anvil ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../$PROPOSAL --branch $BRANCH --initialize_data $INITIALIZATION_FILE
 
 
 if [[ -n $ANVIL_PID ]]; then
