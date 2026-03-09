@@ -33,6 +33,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+          # Fetch enough history for git-restore-mtime to set accurate timestamps.
+          # Files modified beyond this depth keep the checkout timestamp and will be
+          # recompiled, but that's a small subset so still a net win over full recompile.
+          fetch-depth: 100
+      - name: Restore file timestamps for Foundry cache
+        run: |
+          sudo apt-get install -qq -y git-restore-mtime
+          git restore-mtime
+          git submodule foreach --recursive git restore-mtime
+        working-directory: .
       - name: Fail if there are test with wrong extension
         if: success() || failure()
         run: |
