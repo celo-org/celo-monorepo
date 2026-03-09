@@ -159,7 +159,7 @@ jobs:
   protocol-test-release:
     name: Protocol Test Release
     runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
-    timeout-minutes: 500
+    timeout-minutes: 90
     needs: install-dependencies
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'release') || contains(github.base_ref, 'production') ||
