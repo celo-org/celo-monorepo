@@ -18,13 +18,15 @@ NETWORK=""
 FORNO=""
 LOG_FILE="/dev/stdout"
 PROPOSAL=""
+INITIALIZE_DATA=""
 
-while getopts 'b:n:fl:p:' flag; do
+while getopts 'b:n:fl:i:p:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
     f) FORNO="--forno" ;;
     l) LOG_FILE="${OPTARG}" ;;
+    i) INITIALIZE_DATA="--initialize_data $(realpath $OPTARG)" ;;
     p) PROPOSAL="--proposal ${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
@@ -42,4 +44,4 @@ build_tag_foundry $BRANCH $LOG_FILE truffle-compat8 foundry.toml.bak
 
 mv foundry.toml.bak foundry.toml
 
-yarn ts-node ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "libraries.json" $FORNO $PROPOSAL
+yarn ts-node ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "libraries.json" $FORNO $PROPOSAL $INITIALIZE_DATA
