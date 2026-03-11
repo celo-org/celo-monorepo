@@ -221,6 +221,67 @@ function Skeleton({ width }) {
   return html`<div class=${cls}></div>`
 }
 
+// ── Theme Toggle ───────────────────────────────────────────
+
+const THEME_KEY = 'xray-theme'
+
+function getInitialTheme() {
+  const stored = localStorage.getItem(THEME_KEY)
+  if (stored === 'light' || stored === 'dark') return stored
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme)
+  const favicon = document.querySelector('link[rel="icon"]')
+  if (favicon) {
+    const bg = theme === 'light' ? '%23edeef4' : '%230a0a0f'
+    favicon.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2322d3ee'/%3E%3Cstop offset='100%25' stop-color='%233b82f6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='6' fill='${bg}'/%3E%3Cpath d='M7 7L16 16.5L7 26' stroke='url(%23g)' stroke-width='5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M25 7L16 16.5L25 26' stroke='url(%23g)' stroke-width='5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E`
+  }
+}
+
+function ThemeToggle() {
+  const [theme, setTheme] = useState(getInitialTheme)
+
+  // Apply on mount + sync system preference when no user override
+  useEffect(() => {
+    applyTheme(theme)
+
+    const mql = window.matchMedia('(prefers-color-scheme: dark)')
+    const handler = (e) => {
+      if (!localStorage.getItem(THEME_KEY)) {
+        const next = e.matches ? 'dark' : 'light'
+        setTheme(next)
+        applyTheme(next)
+      }
+    }
+    mql.addEventListener('change', handler)
+    return () => mql.removeEventListener('change', handler)
+  }, [])
+
+  // Apply whenever theme state changes
+  useEffect(() => {
+    applyTheme(theme)
+  }, [theme])
+
+  const toggle = useCallback(() => {
+    const next = theme === 'dark' ? 'light' : 'dark'
+    setTheme(next)
+    localStorage.setItem(THEME_KEY, next)
+  }, [theme])
+
+  return html`
+    <button
+      class="theme-toggle"
+      onClick=${toggle}
+      aria-label=${theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+      title=${theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+    >
+      ${theme === 'dark' ? '\u263C' : '\u263E'}
+    </button>
+  `
+}
+
 // ── Prop Row Component ──────────────────────────────────────
 
 function PropRow({ prop, networkId, knownAddrs }) {
@@ -1483,7 +1544,7 @@ function App() {
       <div class="header">
         <div class="header-top">
           <h1><span>⬡</span> Celo OP Stack <span>X-Ray</span></h1>
-          <span class="header-meta"> Live contract state inspection </span>
+          <${ThemeToggle} />
         </div>
         <div class="header-legend">
           <span class="legend-item"><span class="legend-dot amber"></span> v3 (Isthmus)</span>
