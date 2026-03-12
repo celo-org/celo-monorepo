@@ -8,6 +8,11 @@
     "url": "https://github.com/celo-org/celo-monorepo.git",
     "directory": "packages/protocol/contracts"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
+  },
   "scripts": {},
   "dependencies": {}
 }
