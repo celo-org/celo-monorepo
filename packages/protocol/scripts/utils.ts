@@ -121,17 +121,19 @@ export function getReleaseTypeFromSemVer(version: SemVer): string | number {
 
 export function replacePackageVersionAndMakePublic(
   packageJsonPath: string,
+  version?: string,
   onDone?: (json: JSON) => void
 ) {
   const json: JSON = JSON.parse(fs.readFileSync(packageJsonPath).toString())
 
-  if (process.env.RELEASE_VERSION) {
-    console.info(`Replacing ${json.name as string} version with provided RELEASE_VERSION`)
+  const effectiveVersion = version ?? process.env.RELEASE_VERSION
+  if (effectiveVersion) {
+    console.info(`Replacing ${json.name as string} version with ${effectiveVersion}`)
 
-    json.version = process.env.RELEASE_VERSION
+    json.version = effectiveVersion
     json.private = false
   } else {
-    console.info('No RELEASE_VERSION provided')
+    console.info('No version provided')
   }
 
   if (onDone !== undefined) {
