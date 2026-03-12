@@ -105,7 +105,7 @@ jobs:
             echo "Dry run mode, exiting successfully."
             exit 0
           fi
-          # npm dist-tag add @celo/contracts@$RELEASE_VERSION $COMMIT_HASH              
+          # npm dist-tag add @celo/contracts@$RELEASE_VERSION $COMMIT_HASH
         working-directory: packages/protocol/contracts
         env:
           RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}

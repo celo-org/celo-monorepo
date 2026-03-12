@@ -264,7 +264,8 @@ const DRY_RUN_VERSION = '0.0.0-dry-run'
 
 function prepareAbisPackageJson(exports: Exports) {
   log('Preparing @celo/abis package.json')
-  const packageJsonPath = path.join(ABIS_PACKAGE_SRC_DIR, 'package.json')
+  // Use process.cwd() so paths are correct when run with working-directory: packages/protocol (e.g. in CI)
+  const packageJsonPath = path.resolve(process.cwd(), 'abis', 'package.json')
 
   const version = process.env.RELEASE_VERSION || DRY_RUN_VERSION
   if (process.env.RELEASE_VERSION) {
@@ -291,7 +292,8 @@ function prepareContractsPackage() {
     log(`Using placeholder version ${DRY_RUN_VERSION} for dry run`)
   }
 
-  const packageJsonPath = path.join(CONTRACTS_PACKAGE_SRC_DIR, 'package.json')
+  // Use process.cwd() so paths are correct when run with working-directory: packages/protocol (e.g. in CI)
+  const packageJsonPath = path.resolve(process.cwd(), 'contracts', 'package.json')
   replacePackageVersionAndMakePublic(packageJsonPath, version)
 }
 
