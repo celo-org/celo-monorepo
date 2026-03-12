@@ -96,6 +96,24 @@ jobs:
       - name: Update npm for OIDC trusted publishing (v11.5.1)
         run: npm install -g npm@11.5.1
 
+      # Fallback: ensure package.json has version (prepare script may not persist in CI)
+      - name: Ensure package.json has version
+        run: |
+          for pkg in packages/protocol/contracts packages/protocol/abis; do
+            node -e "
+              const fs = require('fs');
+              const pkgPath = process.argv[1] + '/package.json';
+              const pkg = JSON.parse(fs.readFileSync(pkgPath));
+              if (!pkg.version) {
+                pkg.version = process.env.RELEASE_VERSION || '0.0.0-dry-run';
+                pkg.private = false;
+                fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
+              }
+            " "$pkg"
+          done
+        env:
+          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+
       - name: Publish @celo/contracts
         run: |
           cat package.json
