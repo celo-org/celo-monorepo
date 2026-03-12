@@ -13,7 +13,7 @@ import {
   BuildTarget,
   CONTRACTS_08_PACKAGE_DESTINATION_DIR,
   CONTRACTS_08_SOURCE_DIR,
-  CONTRACTS_PACKAGE_SRC_DIR,
+  // CONTRACTS_PACKAGE_SRC_DIR - unused: we use process.cwd() for correct path resolution in CI
   PublishContracts,
   TSCONFIG_PATH,
 } from './consts'
