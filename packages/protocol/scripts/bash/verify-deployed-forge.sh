@@ -28,7 +28,7 @@ while getopts 'b:n:fl:i:p:' flag; do
     f) FORNO="--forno" ;;
     l) LOG_FILE="${OPTARG}" ;;
     i) INITIALIZE_DATA="--initialize_data $(realpath $OPTARG)" ;;
-    p) PROPOSAL="--proposal ${OPTARG}" ;;
+    p) PROPOSAL="--proposal $(realpath OPTARG)" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
