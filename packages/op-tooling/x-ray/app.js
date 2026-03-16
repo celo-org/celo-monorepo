@@ -908,16 +908,12 @@ function NetworkView({ data, networkId, status, issues }) {
         networkId=${networkId}
         knownAddrs=${knownAddrs}
       />
-      <${ContractCard}
-        contract=${data.contracts?.CeloSuperchainConfig}
+      <${ContractWithDiscovery}
+        contractKey="CeloSuperchainConfig"
+        data=${data}
         networkId=${networkId}
         knownAddrs=${knownAddrs}
-        issues=${issues?.['CeloSuperchainConfig']}
-      />
-      <${Props}
-        props=${data.contracts?.CeloSuperchainConfig?.props}
-        networkId=${networkId}
-        knownAddrs=${knownAddrs}
+        issues=${issues}
       />
       <${ContractCard}
         contract=${data.contracts?.SuperchainConfig}

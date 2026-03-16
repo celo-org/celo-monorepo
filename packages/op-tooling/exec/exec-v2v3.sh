@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# parse version argument
+VERSION=${1:?Usage: $0 <v2|v3>}
+case $VERSION in
+  "v2"|"v3") ;;
+  *) echo "Usage: $0 <v2|v3>" && exit 1 ;;
+esac
+
 # get repo root
 REPO_ROOT=$(git rev-parse --show-toplevel)
 
@@ -260,8 +267,6 @@ function performUpgrade() {
   echo "--- Parent done ---"
 }
 
-echo "--------- V2 ---------"
-performUpgrade "v2"
-echo "--------- V3 ---------"
-performUpgrade "v3"
+echo "--------- $(echo $VERSION | tr '[:lower:]' '[:upper:]') ---------"
+performUpgrade "$VERSION"
 echo "--------- EOF ---------"

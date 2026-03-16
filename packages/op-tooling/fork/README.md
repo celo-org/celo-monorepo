@@ -110,42 +110,36 @@ ACCOUNT="0x..." TEAM="council" GC_MULTISIG="0x..." MOCKED_SIGNER_1="0x..." MOCKE
 
 ### `mock-sepolia.sh`
 
-Sets up a mocked testnet environment for Sepolia or Chaos networks. Fixes the SuperchainConfig proxy admin and converts the ProxyAdminOwner EOA into a Gnosis Safe so the superchain-ops simulation framework can operate against it. Requires a running Anvil instance (typically started by `fork_l1.sh`).
+Prepares a forked testnet environment for Sepolia or Chaos networks. Fixes the SuperchainConfig proxy admin and transfers ownership of key OP Stack contracts to the deployed Gnosis Safe. Requires a running Anvil instance (typically started by `fork_l1.sh`).
 
 **Required Environment Variables:**
 
 - `NETWORK` - Network to mock (`sepolia` or `chaos`)
 
-**Optional Environment Variables:**
-
-- `MOCK_OWNER` - EOA address to set as the Safe owner (defaults to `0x2529fcD95f714af9031d70ff02B196704B65FD27`). Must be a pure EOA with no deployed code.
-
 **Features:**
 
 - Fixes SuperchainConfig proxy admin by writing the ProxyAdmin address into the EIP-1967 admin slot
-- Converts the ProxyAdminOwner EOA into a Gnosis Safe (plants GnosisSafeProxy bytecode, sets singleton, ownerCount=1, threshold=1, owners linked list with MOCK_OWNER)
-- Funds the mock owner with 10 ETH
-- Validation output: prints SuperchainConfig admin, ProxyAdminOwner Safe configuration, and mock owner balance
+- Transfers ownership of ProxyAdmin, SystemConfig, DisputeGameFactory, DelayedWETH, and ProtocolVersions to the network's deployed Safe (via impersonation + `transferOwnership()`)
+- Skips contracts already owned by the target Safe
+- Validation output: prints SuperchainConfig admin and ownership of all transferred contracts
 
 **Network-Specific Addresses:**
 
-| | sepolia | chaos |
-|---|---|---|
-| **Label** | Celo Sepolia | Celo Chaos |
-| **SuperchainConfig Proxy** | `0x31bEef32135c90AE8E56Fb071B3587de289Aaf77` | `0x852A5763dA3Fdf51a8b816E02b91A054904Bd8B0` |
-| **ProxyAdmin** | `0xF7d7A3d3bb8aBb6829249B3D3aD3d525D052027e` | `0x6151d1cc7724ee7594f414c152320757c9c5844e` |
-| **ProxyAdminOwner** | `0x5e60d897Cd62588291656b54655e98ee73f0aabF` | `0xa3A3a43E2de78070129C697A5CdCa0618B1f574d` |
-
-**Safe Singleton:** `0xfb1bffc9d739b8d520daf37df666da4c687191ea`
+|                            | sepolia                                      | chaos                                        |
+| -------------------------- | -------------------------------------------- | -------------------------------------------- |
+| **Safe**                   | `0x009A6Ac23EeBe98488ED28A52af69Bf46F1C18cb` | `0x6F8DB5374003c9ffa7084d8b65c57655963766a9` |
+| **SuperchainConfig Proxy** | `0x31bEef32135c90AE8E56Fb071B3587de289Aaf77` | `0x7801D0a005d13CB66f8113BC28cb2640D8f44A6F` |
+| **ProxyAdmin**             | `0xF7d7A3d3bb8aBb6829249B3D3aD3d525D052027e` | `0xb2a0c2b49cdc2d3f0a0a291be0a6c20559ec053e` |
+| **SystemConfig**           | `0x760a5F022C9940f4A074e0030be682F560d29818` | `0x6baf5959cc06a39793c338e6586f49473c731b4c` |
+| **DisputeGameFactory**     | `0x57C45d82D1a995F1e135B8D7EDc0a6BB5211cfAA` | `0x338ac809e6a045cfc8aeb16ff8a4329147b61afb` |
+| **DelayedWETH**            | `0x082F5f58B664CD1d51F9845fEE322aBA2cED9CbA` | `0x9a95f7f7cdbb5195674a32d1579504e8fd302cc9` |
+| **ProtocolVersions**       | `0x0e2d45F3393C3A02ebf285F998c5bF990A1541cd` | `0x433a83893DDA68B941D4aefA908DED9c599522ad` |
 
 **Example Execution:**
 
 ```bash
-# Mock Celo Sepolia (default mock owner)
 NETWORK="sepolia" ./mock-sepolia.sh
-
-# Mock Celo Chaos with a custom owner
-NETWORK="chaos" MOCK_OWNER="0x..." ./mock-sepolia.sh
+NETWORK="chaos" ./mock-sepolia.sh
 ```
 
 ## Usage Workflow
@@ -173,6 +167,7 @@ NETWORK="chaos" MOCK_OWNER="0x..." ./mock-sepolia.sh
    ```
 
 3. **In another terminal, set up mocked environment:**
+
    ```bash
    # For mainnet fork: use the same addresses that correspond to your private keys in exec-mocked.sh
    MOCKED_SIGNER_1="0x..." MOCKED_SIGNER_2="0x..." MOCKED_SIGNER_3="0x..." MOCKED_SIGNER_4="0x..." ./mock-mainnet.sh

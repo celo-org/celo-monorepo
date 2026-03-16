@@ -412,6 +412,7 @@ export function setCachedData(networkId, data) {
 // Only contracts that CAN be re-deployed during upgrades should be listed here.
 export const DISCOVERY_MAP = {
   ANCHOR_STATE_REGISTRY_PROXY: 'AnchorStateRegistry',
+  CELO_SUPERCHAIN_CONFIG_PROXY: 'CeloSuperchainConfig',
   DISPUTE_GAME_FACTORY_PROXY: 'DisputeGameFactory',
   PERMISSIONED_DELAYED_WETH_PROXY: 'DelayedWETH',
   MIPS_SINGLETON: 'MIPS',

@@ -5,6 +5,7 @@ This directory contains Foundry scripts and shell utilities for managing Optimis
 ## Important Usage Note
 
 **All Foundry scripts in this directory must be executed with root pointing to the Optimism repository contracts folder:**
+
 ```bash
 forge script --root $PATH_TO_OP_REPO/packages/contracts-bedrock
 ```
@@ -16,6 +17,7 @@ forge script --root $PATH_TO_OP_REPO/packages/contracts-bedrock
 Closes the most recent eligible fault dispute game, which updates the anchor state in the registry. The script searches through recent games to find one that is resolved, finalized, and ready to be closed.
 
 **Features:**
+
 - Iterates through recent games in reverse chronological order (newest first)
 - Validates game status (not in progress, resolved, finalized)
 - Checks if game is already closed before attempting to close
@@ -24,13 +26,16 @@ Closes the most recent eligible fault dispute game, which updates the anchor sta
 - Proper use of broadcast for state-changing operations
 
 **Required Environment Variables:**
+
 - `FACTORY` - Address of the DisputeGameFactory
 - `REGISTRY` - Address of the AnchorStateRegistry
 
 **Optional Environment Variables:**
+
 - `MAX` - Maximum number of recent games to check (default: 50)
 
 **Example Execution:**
+
 ```bash
 FACTORY="0x..." REGISTRY="0x..." forge script CloseRecentGame.s.sol --root $PATH_TO_OP_REPO/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
 
@@ -39,12 +44,14 @@ FACTORY="0x..." REGISTRY="0x..." MAX=100 forge script CloseRecentGame.s.sol --ro
 ```
 
 **Events Emitted:**
+
 - `AnchorStateUpdated(address game, uint256 index, GameStatus status, Timestamp created)` - Game successfully closed
 - `AnchorStateUpToDate()` - Most recent eligible game already closed
 - `NoGamesFound()` - Factory has no games
 - `NoEligibleGamesFound()` - No games in the checked range are eligible for closing
 
 **Validation Checks:**
+
 1. Game status is not IN_PROGRESS
 2. Game has been resolved (resolvedAt != 0)
 3. Game has been finalized by the registry
@@ -55,6 +62,7 @@ FACTORY="0x..." REGISTRY="0x..." MAX=100 forge script CloseRecentGame.s.sol --ro
 Shell wrapper script that simplifies execution of CloseRecentGame.s.sol by handling environment variable validation and forge command construction.
 
 **Features:**
+
 - Validates required environment variables before execution
 - Automatically constructs --root path from OP_DIR
 - Provides clear error messages for missing configuration
@@ -62,6 +70,7 @@ Shell wrapper script that simplifies execution of CloseRecentGame.s.sol by handl
 - Executes forge script with broadcast enabled
 
 **Required Environment Variables:**
+
 - `L1_RPC_URL` - RPC URL for L1 network
 - `OP_DIR` - Path to Optimism repository contracts directory
 - `PK` - Private key for transaction signing
@@ -69,6 +78,7 @@ Shell wrapper script that simplifies execution of CloseRecentGame.s.sol by handl
 - `REGISTRY` - Address of the AnchorStateRegistry (passed to forge script)
 
 **Example Execution:**
+
 ```bash
 export L1_RPC_URL="https://..."
 export OP_DIR="/path/to/optimism"
@@ -83,6 +93,7 @@ export REGISTRY="0x..."
 Maintenance script that removes games from the DisputeGameFactory storage to reduce storage costs and optimize factory performance. This is a critical operation that temporarily upgrades the factory to a pruning contract, removes games from the end of the array (higher indices), then restores the original implementation.
 
 **Features:**
+
 - Temporarily upgrades DisputeGameFactory to DisputeGameFactoryPrunner
 - Prunes games from the end of the storage array (higher indices)
 - Automatically restores original factory implementation
@@ -90,17 +101,20 @@ Maintenance script that removes games from the DisputeGameFactory storage to red
 - Emits events for each pruned game via GamePruned event
 
 **Required Environment Variables:**
+
 - `FACTORY` - Address of the DisputeGameFactory proxy
 - `PROXY_ADMIN` - Address of the ProxyAdmin contract
 - `RETENTION_INDEX` - Index up to which games are retained (all games with index ≤ RETENTION_INDEX are kept, games with higher indices are removed)
 
 **Example Execution:**
+
 ```bash
 # Keep games 0-100, remove games 101+
 FACTORY="0x..." PROXY_ADMIN="0x..." RETENTION_INDEX=100 forge script PruneGamesFromStorage.s.sol --root $PATH_TO_OP_REPO/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
 ```
 
 **Process Flow:**
+
 1. Store original factory implementation address
 2. Deploy and upgrade to DisputeGameFactoryPrunner
 3. Call pruneGames() to remove games from storage (from end of array)
@@ -108,6 +122,7 @@ FACTORY="0x..." PROXY_ADMIN="0x..." RETENTION_INDEX=100 forge script PruneGamesF
 5. Verify final game count and oldest retained game
 
 **Safety Considerations:**
+
 - This operation modifies critical factory storage - use with caution
 - Requires ProxyAdmin privileges to upgrade factory
 - Games are permanently removed from factory storage (though on-chain game contracts remain)
@@ -119,23 +134,28 @@ FACTORY="0x..." PROXY_ADMIN="0x..." RETENTION_INDEX=100 forge script PruneGamesF
 Helper contract used by `PruneGamesFromStorage.s.sol` to remove games from DisputeGameFactory storage. This contract replicates the factory's storage layout to safely manipulate the internal game arrays and mappings.
 
 **Features:**
+
 - Matches DisputeGameFactory storage layout exactly (slots 103-104)
 - Provides pruneGames() function to remove games from end of array
 - Emits GamePruned event for each removed game
 - Computes game UUIDs to properly clean up mapping storage
 
 **Storage Layout:**
+
 - `uint256[103] __gap` - Reserved slots 0-102 (matches factory layout)
 - `mapping(Hash => GameId) _disputeGames` - Slot 103 (game UUID to ID mapping)
 - `GameId[] _disputeGameList` - Slot 104 (array of all game IDs)
 
 **Key Function:**
+
 ```solidity
 function pruneGames(uint256 _desiredLength) external
 ```
+
 Removes games from storage until `_disputeGameList.length == _desiredLength`.
 
 **Event:**
+
 ```solidity
 event GamePruned(
   uint256 indexed index,
@@ -153,6 +173,7 @@ event GamePruned(
 Maintenance script that directly sets the anchor game in the AnchorStateRegistry by manipulating storage slot 3. This is a critical operation that temporarily upgrades the registry to StorageSetter, updates the anchorGame storage slot, then restores the original implementation.
 
 **Features:**
+
 - Temporarily upgrades AnchorStateRegistry to StorageSetter
 - Directly sets storage slot 3 (anchorGame) to a new game address
 - Automatically restores original registry implementation
@@ -160,16 +181,19 @@ Maintenance script that directly sets the anchor game in the AnchorStateRegistry
 - Emits AnchorGameReset event for tracking
 
 **Required Environment Variables:**
+
 - `REGISTRY` - Address of the AnchorStateRegistry proxy
 - `PROXY_ADMIN` - Address of the ProxyAdmin contract
 - `ANCHOR_GAME` - Address of the new anchor game to set
 
 **Example Execution:**
+
 ```bash
 REGISTRY="0x..." PROXY_ADMIN="0x..." ANCHOR_GAME="0x..." forge script ResetAnchorGame.s.sol --root $PATH_TO_OP_REPO/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
 ```
 
 **Process Flow:**
+
 1. Store original registry implementation address
 2. Read current anchor game from slot 3
 3. Deploy and upgrade to StorageSetter
@@ -179,9 +203,11 @@ REGISTRY="0x..." PROXY_ADMIN="0x..." ANCHOR_GAME="0x..." forge script ResetAncho
 7. Emit AnchorGameReset event
 
 **Storage Slot Modified:**
+
 - **Slot 3**: `anchorGame` (IFaultDisputeGame) - The game whose claim is currently being used as the anchor state
 
 **Event:**
+
 ```solidity
 event AnchorGameReset(
   address indexed previousGame,
@@ -190,6 +216,7 @@ event AnchorGameReset(
 ```
 
 **Safety Considerations:**
+
 - This operation modifies critical registry storage - use with extreme caution
 - Requires ProxyAdmin privileges to upgrade registry
 - The anchor game address is used for proving withdrawals and disputes
@@ -199,6 +226,7 @@ event AnchorGameReset(
 - Consider impact on in-flight withdrawals
 
 **Use Cases:**
+
 - Emergency recovery when anchor state needs manual correction
 - Testing anchor state behavior in non-production environments
 - Fixing anchor state after disputed game resolution issues
@@ -208,6 +236,7 @@ event AnchorGameReset(
 Safe multisig version of `ResetAnchorGame.s.sol`. Overrides the `anchorGame` storage slot (slot 3) on the AnchorStateRegistry via a Gnosis Safe transaction. Uses the same StorageSetter + upgradeAndCall pattern as `SafeRetireASR.s.sol`.
 
 **Features:**
+
 - Deterministic CREATE2 deployment of StorageSetter (salt: `SafeResetAnchorGame`)
 - Temporarily upgrades AnchorStateRegistry to StorageSetter via `upgradeAndCall`
 - Sets storage slot 3 (`anchorGame`) to the new game address using `setAddress`
@@ -216,6 +245,7 @@ Safe multisig version of `ResetAnchorGame.s.sol`. Overrides the `anchorGame` sto
 - Post-execution verification reads `anchorGame()` and asserts match
 
 **Required Environment Variables:**
+
 - `ASR` - Address of the AnchorStateRegistry proxy
 - `PROXY_ADMIN` - Address of the ProxyAdmin contract
 - `SAFE` - Address of the Gnosis Safe to execute the transaction
@@ -224,6 +254,7 @@ Safe multisig version of `ResetAnchorGame.s.sol`. Overrides the `anchorGame` sto
 - `SIG` (optional) - Pre-collected signatures for the Safe transaction
 
 **Example Execution:**
+
 ```bash
 # Step 1: Get transaction hash for signing
 ASR="0x..." PROXY_ADMIN="0x..." SAFE="0x..." SENDER="0x..." ANCHOR_GAME="0x..." \
@@ -239,6 +270,7 @@ ASR="0x..." PROXY_ADMIN="0x..." SAFE="0x..." SENDER="0x..." ANCHOR_GAME="0x..." 
 ```
 
 **Storage Slot Modified:**
+
 - **Slot 3**: `anchorGame` (IFaultDisputeGame) - The game whose claim is currently being used as the anchor state
 
 ### `MigrateOwnershipToSafe.s.sol`
@@ -246,6 +278,7 @@ ASR="0x..." PROXY_ADMIN="0x..." SAFE="0x..." SENDER="0x..." ANCHOR_GAME="0x..." 
 Foundry script that migrates OP Stack L1 contract ownership from an EOA to a Gnosis Safe. Performs four operations in a single broadcast: transfers ProxyAdmin ownership, transfers SystemConfig ownership, transfers DisputeGameFactory ownership, and migrates the SuperchainConfig proxy admin from a separate ProxyAdmin to the main one.
 
 **Features:**
+
 - Transfers ProxyAdmin ownership (controls all proxy upgrades and AddressManager)
 - Transfers SystemConfig ownership (controls L2 system configuration parameters)
 - Transfers DisputeGameFactory ownership (controls game type registration and implementations)
@@ -256,15 +289,18 @@ Foundry script that migrates OP Stack L1 contract ownership from an EOA to a Gno
 - Emits `OwnershipMigratedToSafe` event on completion
 
 **Required Environment Variables:**
+
 - `NEW_SAFE` - Address of the target Gnosis Safe
 - `NETWORK` - Network identifier (currently only `chaos` is supported)
 
 **Example Execution:**
+
 ```bash
 NEW_SAFE="0x..." NETWORK=chaos forge script MigrateOwnershipToSafe.s.sol --root $PATH_TO_OP_REPO/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
 ```
 
 **Process Flow:**
+
 1. Load network config (proxy addresses, contract references)
 2. Run pre-flight checks: verify current ownership, validate EIP-1967 admin slots
 3. Execute migration in a single broadcast: ProxyAdmin, SystemConfig, DisputeGameFactory, SuperchainConfig
@@ -272,6 +308,7 @@ NEW_SAFE="0x..." NETWORK=chaos forge script MigrateOwnershipToSafe.s.sol --root 
 5. Emit `OwnershipMigratedToSafe` event
 
 **Event:**
+
 ```solidity
 event OwnershipMigratedToSafe(
   address indexed proxyAdmin,
@@ -281,6 +318,7 @@ event OwnershipMigratedToSafe(
 ```
 
 **Safety Considerations:**
+
 - Irreversible once broadcast - verify `NEW_SAFE` is the correct Safe address before running
 - Pre-flight aborts if SuperchainConfig has an unexpected admin (neither the known old ProxyAdmin nor the main one)
 - AddressManager ownership is not transferred directly; it remains owned by ProxyAdmin, which is transferred to the Safe
@@ -290,6 +328,7 @@ event OwnershipMigratedToSafe(
 Shell wrapper that simplifies execution of `MigrateOwnershipToSafe.s.sol` by validating environment variables and constructing the forge command.
 
 **Features:**
+
 - Validates all required environment variables before execution
 - Automatically constructs `--root` path from `OP_DIR`
 - Provides clear error messages for missing configuration
@@ -297,6 +336,7 @@ Shell wrapper that simplifies execution of `MigrateOwnershipToSafe.s.sol` by val
 - Executes forge script with `--broadcast` enabled
 
 **Required Environment Variables:**
+
 - `L1_RPC_URL` - RPC URL for the L1 network
 - `OP_DIR` - Path to the Optimism repository root
 - `PK` - Private key of the current owner EOA
@@ -304,6 +344,7 @@ Shell wrapper that simplifies execution of `MigrateOwnershipToSafe.s.sol` by val
 - `NEW_SAFE` - Address of the target Gnosis Safe (passed to forge script)
 
 **Example Execution:**
+
 ```bash
 export L1_RPC_URL="https://..."
 export OP_DIR="/path/to/optimism"
@@ -311,6 +352,138 @@ export PK="0x..."
 export NETWORK=chaos
 export NEW_SAFE="0x..."
 ./migrate-ownership-to-safe.sh
+```
+
+### `SafePruneGamesFromStorage.s.sol`
+
+Safe multisig version of `PruneGamesFromStorage.s.sol`. Prunes games from DisputeGameFactory storage via a Gnosis Safe transaction. Uses the same temporary upgrade pattern as the non-Safe version: deploys DisputeGameFactoryPrunner via deterministic CREATE2, upgrades the factory via `upgradeAndCall`, prunes, then restores the original implementation. Includes a MAX_PRUNE=500 limit per execution.
+
+**Features:**
+
+- Deterministic CREATE2 deployment of DisputeGameFactoryPrunner
+- Temporarily upgrades DisputeGameFactory to DisputeGameFactoryPrunner via `upgradeAndCall`
+- Prunes games from the end of the storage array (higher indices)
+- Restores original factory implementation in the same multicall
+- MAX_PRUNE=500 limit per execution
+- `getTransactionHash()` for offline signing, `execTransaction()` for execution
+- Post-execution verification confirms game count matches `retentionIndex + 1` and logs the retained game at the retention index
+
+**Required Environment Variables:**
+
+- `FACTORY` - Address of the DisputeGameFactory proxy
+- `PROXY_ADMIN` - Address of the ProxyAdmin contract
+- `SAFE` - Address of the Gnosis Safe to execute the transaction
+- `SENDER` - Address of the sender in the Gnosis Safe
+- `RETENTION_INDEX` - Index up to which games are retained
+
+**Optional Environment Variables:**
+
+- `SIG` - Pre-collected signatures for the Safe transaction
+
+**Example Execution:**
+
+```bash
+# Step 1: Get transaction hash
+FACTORY="0x..." PROXY_ADMIN="0x..." SAFE="0x..." SENDER="0x..." RETENTION_INDEX=100 \
+  forge script SafePruneGamesFromStorage.s.sol:SafePruneGamesFromStorage \
+  --sig "getTransactionHash()" \
+  --root $OP_DIR/packages/contracts-bedrock --rpc-url $RPC
+
+# Step 2: Execute
+FACTORY="0x..." PROXY_ADMIN="0x..." SAFE="0x..." SENDER="0x..." RETENTION_INDEX=100 SIG="0x..." \
+  forge script SafePruneGamesFromStorage.s.sol:SafePruneGamesFromStorage \
+  --sig "execTransaction()" \
+  --root $OP_DIR/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
+```
+
+### `SafeRetireASR.s.sol`
+
+Retires the AnchorStateRegistry via a Gnosis Safe transaction by setting a `retirementTimestamp` in storage slot 6. Uses StorageSetter deployed via deterministic CREATE2 (salt: `SafeRetireASR`). Slot 6 is packed: `respectedGameType` (uint32, offset 0) and `retirementTimestamp` (uint64, offset 4). The script preserves the existing `respectedGameType` while writing the new timestamp.
+
+**Features:**
+
+- Deterministic CREATE2 deployment of StorageSetter (salt: `SafeRetireASR`)
+- Temporarily upgrades AnchorStateRegistry to StorageSetter via `upgradeAndCall`
+- Writes packed slot 6 preserving `respectedGameType` while setting `retirementTimestamp`
+- Restores original ASR implementation in the same multicall
+- `getTransactionHash()` for offline signing, `execTransaction()` for execution
+- Post-execution verification confirms `retirementTimestamp` and `respectedGameType` are correct
+
+**Required Environment Variables:**
+
+- `ASR` - Address of the AnchorStateRegistry proxy
+- `PROXY_ADMIN` - Address of the ProxyAdmin contract
+- `SAFE` - Address of the Gnosis Safe to execute the transaction
+- `SENDER` - Address of the sender in the Gnosis Safe
+
+**Optional Environment Variables:**
+
+- `SIG` - Pre-collected signatures for the Safe transaction
+- `RETIREMENT_TIMESTAMP` - Timestamp to set as the retirement time (defaults to `block.timestamp - 30 days`)
+
+**Storage Slot Modified:**
+
+- **Slot 6**: packed (`respectedGameType` uint32 at offset 0, `retirementTimestamp` uint64 at offset 4)
+
+**Example Execution:**
+
+```bash
+# Step 1: Get transaction hash
+ASR="0x..." PROXY_ADMIN="0x..." SAFE="0x..." SENDER="0x..." \
+  forge script SafeRetireASR.s.sol:SafeRetireASR \
+  --sig "getTransactionHash()" \
+  --root $OP_DIR/packages/contracts-bedrock --rpc-url $RPC
+
+# Step 2: Execute
+ASR="0x..." PROXY_ADMIN="0x..." SAFE="0x..." SENDER="0x..." SIG="0x..." \
+  forge script SafeRetireASR.s.sol:SafeRetireASR \
+  --sig "execTransaction()" \
+  --root $OP_DIR/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
+
+# With explicit retirement timestamp
+ASR="0x..." PROXY_ADMIN="0x..." SAFE="0x..." SENDER="0x..." RETIREMENT_TIMESTAMP=1700000000 SIG="0x..." \
+  forge script SafeRetireASR.s.sol:SafeRetireASR \
+  --sig "execTransaction()" \
+  --root $OP_DIR/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
+```
+
+### `SafeSystemConfigOwner.s.sol`
+
+Transfers SystemConfig ownership via a Gnosis Safe transaction. Calls `transferOwnership()` on the SystemConfig contract through the Safe using a standard `Operation.Call` (not multicall or delegatecall).
+
+**Features:**
+
+- Calls `transferOwnership()` on SystemConfig through the Safe
+- Uses `Operation.Call` (single call, not multicall)
+- `getTransactionHash()` for offline signing, `execTransaction()` for execution
+- Pre-execution check verifies the Safe is the current SystemConfig owner
+- Post-execution verification confirms the new owner matches `NEW_OWNER`
+
+**Required Environment Variables:**
+
+- `SYSTEM_CONFIG` - Address of the SystemConfig proxy
+- `SAFE` - Address of the Gnosis Safe to execute the transaction
+- `SENDER` - Address of the sender in the Gnosis Safe
+- `NEW_OWNER` - Address of the new SystemConfig owner
+
+**Optional Environment Variables:**
+
+- `SIG` - Pre-collected signatures for the Safe transaction
+
+**Example Execution:**
+
+```bash
+# Step 1: Get transaction hash
+SYSTEM_CONFIG="0x..." SAFE="0x..." SENDER="0x..." NEW_OWNER="0x..." \
+  forge script SafeSystemConfigOwner.s.sol:SafeSystemConfigOwner \
+  --sig "getTransactionHash()" \
+  --root $OP_DIR/packages/contracts-bedrock --rpc-url $RPC
+
+# Step 2: Execute
+SYSTEM_CONFIG="0x..." SAFE="0x..." SENDER="0x..." NEW_OWNER="0x..." SIG="0x..." \
+  forge script SafeSystemConfigOwner.s.sol:SafeSystemConfigOwner \
+  --sig "execTransaction()" \
+  --root $OP_DIR/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
 ```
 
 ## Notes
