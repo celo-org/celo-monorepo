@@ -10,8 +10,9 @@ set -euo pipefail
 # -f: Boolean flag to indicate if the Forno service should be used to connect to
 #     the network
 # -l: Path to a file to which logs should be appended
+# -i: Path to the data needed to initialize contracts (if verifying a smart contracts release).
 # -p: Path to an optional proposal file, to verify the bytecodes of the core contracts after a
-# proposed release.
+#     proposed release.
 
 BRANCH=""
 NETWORK=""
