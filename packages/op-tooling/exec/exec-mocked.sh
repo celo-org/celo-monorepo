@@ -56,10 +56,10 @@ MOCKED_SIGNER_2=$(cast wallet address --private-key $SIGNER_2_PK)
 MOCKED_SIGNER_4=$(cast wallet address --private-key $SIGNER_4_PK)
 
 # validate signer ordering
-if [ "$USE_INTERNAL_CLABS" = "true" ] && [[ ${MOCKED_SIGNER_1:2,,} > ${MOCKED_SIGNER_2:2,,} ]]; then
+if [ "$USE_INTERNAL_CLABS" = "true" ] && [[ ${MOCKED_SIGNER_1,,} > ${MOCKED_SIGNER_2,,} ]]; then
   echo "Error: MOCKED_SIGNER_1 must be < MOCKED_SIGNER_2 (addresses must be in ascending order)" && exit 1
 fi
-if [ "$USE_INTERNAL_COUNCIL" = "true" ] && [[ ${MOCKED_SIGNER_3:2,,} > ${MOCKED_SIGNER_4:2,,} ]]; then
+if [ "$USE_INTERNAL_COUNCIL" = "true" ] && [[ ${MOCKED_SIGNER_3,,} > ${MOCKED_SIGNER_4,,} ]]; then
   echo "Error: MOCKED_SIGNER_3 must be < MOCKED_SIGNER_4 (addresses must be in ascending order)" && exit 1
 fi
 
@@ -151,7 +151,7 @@ echo "cLabs hash signed"
 # concat cLabs sigs
 if [ "$USE_INTERNAL_CLABS" = "true" ]; then
   CLABS_SIG=0x${CLABS_SIG_1:2}${CLABS_SIG_2:2}
-elif [[ ${EXTERNAL_ACCOUNT:2,,} < ${MOCKED_SIGNER_2:2,,} ]]; then
+elif [[ ${EXTERNAL_ACCOUNT,,} < ${MOCKED_SIGNER_2,,} ]]; then
   CLABS_SIG=0x${EXTERNAL_SIG:2}${CLABS_SIG_2:2}
 else
   CLABS_SIG=0x${CLABS_SIG_2:2}${EXTERNAL_SIG:2}
@@ -218,13 +218,13 @@ echo "Council hash signed"
 if [ -z "$GRAND_CHILD_MULTISIG" ]; then
   if [ "$USE_INTERNAL_COUNCIL" = "true" ]; then
     COUNCIL_SIG=0x${COUNCIL_SIG_1:2}${COUNCIL_SIG_2:2}
-  elif [[ ${EXTERNAL_ACCOUNT:2,,} < ${MOCKED_SIGNER_4:2,,} ]]; then
+  elif [[ ${EXTERNAL_ACCOUNT,,} < ${MOCKED_SIGNER_4,,} ]]; then
     COUNCIL_SIG=0x${EXTERNAL_SIG:2}${COUNCIL_SIG_2:2}
   else
     COUNCIL_SIG=0x${COUNCIL_SIG_2:2}${EXTERNAL_SIG:2}
   fi
 else
-  if [[ ${GRAND_CHILD_MULTISIG:2,,} < ${MOCKED_SIGNER_4:2,,} ]]; then
+  if [[ ${GRAND_CHILD_MULTISIG,,} < ${MOCKED_SIGNER_4,,} ]]; then
     COUNCIL_SIG=0x000000000000000000000000${GRAND_CHILD_MULTISIG:2}000000000000000000000000000000000000000000000000000000000000000001${COUNCIL_SIG_2:2}
   else
     COUNCIL_SIG=0x${COUNCIL_SIG_2:2}000000000000000000000000${GRAND_CHILD_MULTISIG:2}000000000000000000000000000000000000000000000000000000000000000001
