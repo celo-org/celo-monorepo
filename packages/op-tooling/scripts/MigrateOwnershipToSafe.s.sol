@@ -8,20 +8,26 @@ import { IProxyAdmin } from "interfaces/universal/IProxyAdmin.sol";
 import { IAddressManager } from "interfaces/legacy/IAddressManager.sol";
 import { ISystemConfig } from "interfaces/L1/ISystemConfig.sol";
 import { IDisputeGameFactory } from "interfaces/dispute/IDisputeGameFactory.sol";
+import { IProtocolVersions } from "interfaces/L1/IProtocolVersions.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 /// @title MigrateOwnershipToSafe
 /// @notice Migrates OP Stack L1 contract ownership from an EOA to a Gnosis Safe.
-///         Performs 4 operations in a single broadcast:
+///         Performs 6 operations in a single broadcast:
 ///           1. ProxyAdmin.transferOwnership()        - controls all proxy upgrades + AddressManager
 ///           2. SystemConfig.transferOwnership()       - owns L2 system configuration parameters
 ///           3. DisputeGameFactory.transferOwnership() - owns game type registration + implementations
-///           4. SuperchainConfig changeProxyAdmin()    - migrates from separate ProxyAdmin to main one
+///           4. DelayedWETH.transferOwnership()        - owns WETH delay configuration
+///           5. ProtocolVersions.transferOwnership()   - owns protocol version management
+///           6. SuperchainConfig changeProxyAdmin()    - migrates from separate ProxyAdmin to main one
 ///
 ///         After execution, the Safe controls:
 ///           - All ERC1967 proxy upgrades (via ProxyAdmin)
 ///           - L1CrossDomainMessenger (via AddressManager, owned by ProxyAdmin)
 ///           - SystemConfig parameters
 ///           - DisputeGameFactory game implementations
+///           - DelayedWETH configuration
+///           - ProtocolVersions management
 ///           - SuperchainConfig upgrades (now under main ProxyAdmin)
 ///
 ///         Env vars (all required):
@@ -63,6 +69,8 @@ contract MigrateOwnershipToSafe is Script {
     IAddressManager addrManager;
     ISystemConfig systemConfig;
     IDisputeGameFactory dgFactory;
+    Ownable delayedWeth;
+    IProtocolVersions protocolVersions;
     address[11] proxies;
     string[11] names;
   }
@@ -126,6 +134,8 @@ contract MigrateOwnershipToSafe is Script {
 
     cfg_.systemConfig = ISystemConfig(cfg_.proxies[0]);
     cfg_.dgFactory = IDisputeGameFactory(cfg_.proxies[5]);
+    cfg_.delayedWeth = Ownable(cfg_.proxies[7]);
+    cfg_.protocolVersions = IProtocolVersions(cfg_.proxies[8]);
   }
 
   // ── Logging ──────────────────────────────────────────────────────
@@ -182,7 +192,25 @@ contract MigrateOwnershipToSafe is Script {
       console.log("  [OK] Will transfer from", dgfOwner_);
     }
 
-    // 5. SuperchainConfig proxy admin
+    // 5. DelayedWETH ownership
+    address dwOwner_ = _cfg.delayedWeth.owner();
+    console.log("DelayedWETH owner:", dwOwner_);
+    if (dwOwner_ == _newSafe) {
+      console.log("  [SKIP] Already owned by target Safe");
+    } else {
+      console.log("  [OK] Will transfer from", dwOwner_);
+    }
+
+    // 6. ProtocolVersions ownership
+    address pvOwner_ = _cfg.protocolVersions.owner();
+    console.log("ProtocolVersions owner:", pvOwner_);
+    if (pvOwner_ == _newSafe) {
+      console.log("  [SKIP] Already owned by target Safe");
+    } else {
+      console.log("  [OK] Will transfer from", pvOwner_);
+    }
+
+    // 7. SuperchainConfig proxy admin
     address scAdmin_ = _adminOf(_cfg.proxies[10]);
     console.log("SuperchainConfig admin:", scAdmin_);
     if (scAdmin_ == _cfg.proxyAdminAddr) {
@@ -214,11 +242,15 @@ contract MigrateOwnershipToSafe is Script {
     currentOwner_ = _cfg.proxyAdmin.owner();
     address scOwner_ = _cfg.systemConfig.owner();
     address dgfOwner_ = _cfg.dgFactory.owner();
+    address dwOwner_ = _cfg.delayedWeth.owner();
+    address pvOwner_ = _cfg.protocolVersions.owner();
     address scAdmin_ = _adminOf(_cfg.proxies[10]);
 
     uint256 steps_;
     if (scOwner_ != _newSafe) steps_++;
     if (dgfOwner_ != _newSafe) steps_++;
+    if (dwOwner_ != _newSafe) steps_++;
+    if (pvOwner_ != _newSafe) steps_++;
     if (scAdmin_ != _cfg.proxyAdminAddr) steps_++;
     steps_++; // ProxyAdmin always transfers
     uint256 step_;
@@ -253,7 +285,23 @@ contract MigrateOwnershipToSafe is Script {
       _cfg.dgFactory.transferOwnership(_newSafe);
     }
 
-    // Step 4: SuperchainConfig proxy admin migration
+    // Step 4: DelayedWETH ownership
+    if (dwOwner_ != _newSafe) {
+      step_++;
+      console.log("  [%d/%d] DelayedWETH.transferOwnership()", step_, steps_);
+      console.log("         From:", dwOwner_);
+      _cfg.delayedWeth.transferOwnership(_newSafe);
+    }
+
+    // Step 5: ProtocolVersions ownership
+    if (pvOwner_ != _newSafe) {
+      step_++;
+      console.log("  [%d/%d] ProtocolVersions.transferOwnership()", step_, steps_);
+      console.log("         From:", pvOwner_);
+      _cfg.protocolVersions.transferOwnership(_newSafe);
+    }
+
+    // Step 6: SuperchainConfig proxy admin migration
     if (scAdmin_ != _cfg.proxyAdminAddr) {
       step_++;
       console.log("  [%d/%d] SuperchainConfig.changeProxyAdmin()", step_, steps_);
@@ -296,6 +344,24 @@ contract MigrateOwnershipToSafe is Script {
       console.log("  [OK] DisputeGameFactory.owner() == Safe");
     } else {
       console.log("  [!!] Unexpected:", dgfOwner_);
+    }
+
+    // DelayedWETH
+    address dwOwner_ = _cfg.delayedWeth.owner();
+    console.log("DelayedWETH owner:", dwOwner_);
+    if (dwOwner_ == _cfg.newSafe) {
+      console.log("  [OK] DelayedWETH.owner() == Safe");
+    } else {
+      console.log("  [!!] Unexpected:", dwOwner_);
+    }
+
+    // ProtocolVersions
+    address pvOwner_ = _cfg.protocolVersions.owner();
+    console.log("ProtocolVersions owner:", pvOwner_);
+    if (pvOwner_ == _cfg.newSafe) {
+      console.log("  [OK] ProtocolVersions.owner() == Safe");
+    } else {
+      console.log("  [!!] Unexpected:", pvOwner_);
     }
 
     // AddressManager (should still be owned by ProxyAdmin)
