@@ -56,10 +56,10 @@ MOCKED_SIGNER_2=$(cast wallet address --private-key $SIGNER_2_PK)
 MOCKED_SIGNER_4=$(cast wallet address --private-key $SIGNER_4_PK)
 
 # validate signer ordering
-if [ "$USE_INTERNAL_CLABS" = "true" ] && [[ ${MOCKED_SIGNER_1,,} > ${MOCKED_SIGNER_2,,} ]]; then
+if [ "$USE_INTERNAL_CLABS" = "true" ] && [[ $(echo "$MOCKED_SIGNER_1" | tr '[:upper:]' '[:lower:]') > $(echo "$MOCKED_SIGNER_2" | tr '[:upper:]' '[:lower:]') ]]; then
   echo "Error: MOCKED_SIGNER_1 must be < MOCKED_SIGNER_2 (addresses must be in ascending order)" && exit 1
 fi
-if [ "$USE_INTERNAL_COUNCIL" = "true" ] && [[ ${MOCKED_SIGNER_3,,} > ${MOCKED_SIGNER_4,,} ]]; then
+if [ "$USE_INTERNAL_COUNCIL" = "true" ] && [[ $(echo "$MOCKED_SIGNER_3" | tr '[:upper:]' '[:lower:]') > $(echo "$MOCKED_SIGNER_4" | tr '[:upper:]' '[:lower:]') ]]; then
   echo "Error: MOCKED_SIGNER_3 must be < MOCKED_SIGNER_4 (addresses must be in ascending order)" && exit 1
 fi
 
@@ -151,7 +151,7 @@ echo "cLabs hash signed"
 # concat cLabs sigs
 if [ "$USE_INTERNAL_CLABS" = "true" ]; then
   CLABS_SIG=0x${CLABS_SIG_1:2}${CLABS_SIG_2:2}
-elif [[ ${EXTERNAL_ACCOUNT,,} < ${MOCKED_SIGNER_2,,} ]]; then
+elif [[ $(echo "$EXTERNAL_ACCOUNT" | tr '[:upper:]' '[:lower:]') < $(echo "$MOCKED_SIGNER_2" | tr '[:upper:]' '[:lower:]') ]]; then
   CLABS_SIG=0x${EXTERNAL_SIG:2}${CLABS_SIG_2:2}
 else
   CLABS_SIG=0x${CLABS_SIG_2:2}${EXTERNAL_SIG:2}
@@ -218,13 +218,13 @@ echo "Council hash signed"
 if [ -z "$GRAND_CHILD_MULTISIG" ]; then
   if [ "$USE_INTERNAL_COUNCIL" = "true" ]; then
     COUNCIL_SIG=0x${COUNCIL_SIG_1:2}${COUNCIL_SIG_2:2}
-  elif [[ ${EXTERNAL_ACCOUNT,,} < ${MOCKED_SIGNER_4,,} ]]; then
+  elif [[ $(echo "$EXTERNAL_ACCOUNT" | tr '[:upper:]' '[:lower:]') < $(echo "$MOCKED_SIGNER_4" | tr '[:upper:]' '[:lower:]') ]]; then
     COUNCIL_SIG=0x${EXTERNAL_SIG:2}${COUNCIL_SIG_2:2}
   else
     COUNCIL_SIG=0x${COUNCIL_SIG_2:2}${EXTERNAL_SIG:2}
   fi
 else
-  if [[ ${GRAND_CHILD_MULTISIG,,} < ${MOCKED_SIGNER_4,,} ]]; then
+  if [[ $(echo "$GRAND_CHILD_MULTISIG" | tr '[:upper:]' '[:lower:]') < $(echo "$MOCKED_SIGNER_4" | tr '[:upper:]' '[:lower:]') ]]; then
     COUNCIL_SIG=0x000000000000000000000000${GRAND_CHILD_MULTISIG:2}000000000000000000000000000000000000000000000000000000000000000001${COUNCIL_SIG_2:2}
   else
     COUNCIL_SIG=0x${COUNCIL_SIG_2:2}000000000000000000000000${GRAND_CHILD_MULTISIG:2}000000000000000000000000000000000000000000000000000000000000000001
