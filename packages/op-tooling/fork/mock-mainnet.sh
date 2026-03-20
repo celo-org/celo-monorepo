@@ -42,11 +42,19 @@ fi
 [ -z "${MOCKED_SIGNER_4:-}" ] && echo "Need to set the MOCKED_SIGNER_4 via env" && exit 1
 
 # validate signer ordering
-if [ "$USE_INTERNAL_CLABS" = "true" ] && [[ ${MOCKED_SIGNER_1:2,,} > ${MOCKED_SIGNER_2:2,,} ]]; then
-  echo "Error: MOCKED_SIGNER_1 must be < MOCKED_SIGNER_2 (addresses must be in ascending order)" && exit 1
+if [ "$USE_INTERNAL_CLABS" = "true" ]; then
+  SIGNER_1_CLEAN=$(echo "${MOCKED_SIGNER_1#0x}" | tr '[:upper:]' '[:lower:]')
+  SIGNER_2_CLEAN=$(echo "${MOCKED_SIGNER_2#0x}" | tr '[:upper:]' '[:lower:]')
+  if [[ "$SIGNER_1_CLEAN" > "$SIGNER_2_CLEAN" ]]; then
+    echo "Error: MOCKED_SIGNER_1 must be < MOCKED_SIGNER_2 (addresses must be in ascending order)" && exit 1
+  fi
 fi
-if [ "$USE_INTERNAL_COUNCIL" = "true" ] && [[ ${MOCKED_SIGNER_3:2,,} > ${MOCKED_SIGNER_4:2,,} ]]; then
-  echo "Error: MOCKED_SIGNER_3 must be < MOCKED_SIGNER_4 (addresses must be in ascending order)" && exit 1
+if [ "$USE_INTERNAL_COUNCIL" = "true" ]; then
+  SIGNER_3_CLEAN=$(echo "${MOCKED_SIGNER_3#0x}" | tr '[:upper:]' '[:lower:]')
+  SIGNER_4_CLEAN=$(echo "${MOCKED_SIGNER_4#0x}" | tr '[:upper:]' '[:lower:]')
+  if [[ "$SIGNER_3_CLEAN" > "$SIGNER_4_CLEAN" ]]; then
+    echo "Error: MOCKED_SIGNER_3 must be < MOCKED_SIGNER_4 (addresses must be in ascending order)" && exit 1
+  fi
 fi
 
 # safe internal
@@ -117,7 +125,9 @@ if [ -z "$GRAND_CHILD_MULTISIG" ]; then
   SIGNER_4_SLOT=$(cast index address $MOCKED_SIGNER_4 2)
   cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SIGNER_4_SLOT 0x000000000000000000000000${SENTINEL_ADDRESS:2} -r $RPC_URL
 else
-  if [[ ${GRAND_CHILD_MULTISIG:2,,} < ${MOCKED_SIGNER_4:2,,} ]]; then
+  GC_CLEAN=$(echo "${GRAND_CHILD_MULTISIG#0x}" | tr '[:upper:]' '[:lower:]')
+  SIGNER_4_CLEAN=$(echo "${MOCKED_SIGNER_4#0x}" | tr '[:upper:]' '[:lower:]')
+  if [[ "$GC_CLEAN" < "$SIGNER_4_CLEAN" ]]; then
     # Sentinel -> Grand Child
     cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SENTINEL_SLOT 0x000000000000000000000000${GRAND_CHILD_MULTISIG:2} -r $RPC_URL
     # Grand Child -> Signer #4
