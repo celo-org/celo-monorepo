@@ -604,7 +604,7 @@ contract EpochManager is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 3);
+    return (1, 1, 1, 0);
   }
 
   /**
@@ -761,6 +761,10 @@ contract EpochManager is
     _setElectedSigners(_newlyElected);
 
     ICeloUnreleasedTreasury celoUnreleasedTreasury = getCeloUnreleasedTreasury();
+    celoUnreleasedTreasury.release(
+      registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID),
+      _epochProcessing.totalRewardsVoter
+    );
     celoUnreleasedTreasury.release(
       registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID),
       _epochProcessing.totalRewardsCommunity

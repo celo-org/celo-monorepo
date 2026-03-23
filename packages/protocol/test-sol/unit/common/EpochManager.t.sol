@@ -28,6 +28,7 @@ contract EpochManagerTest is TestWithUtils08 {
   address carbonOffsettingPartner;
   address communityRewardFund;
   address reserveAddress;
+  address lockedGoldAddress;
   address scoreManagerAddress;
 
   uint256 firstEpochNumber = 3;
@@ -90,6 +91,7 @@ contract EpochManagerTest is TestWithUtils08 {
     scoreManagerAddress = actor("scoreManagerAddress");
 
     reserveAddress = actor("reserve");
+    lockedGoldAddress = actor("lockedGold");
 
     carbonOffsettingPartner = actor("carbonOffsettingPartner");
     communityRewardFund = actor("communityRewardFund");
@@ -108,6 +110,7 @@ contract EpochManagerTest is TestWithUtils08 {
     registry.setAddressFor(ScoreManagerContract, address(scoreManager));
     registry.setAddressFor(StableTokenContract, address(stableToken));
     registry.setAddressFor(ReserveContract, reserveAddress);
+    registry.setAddressFor(LockedGoldContract, lockedGoldAddress);
     registry.setAddressFor(ElectionContract, address(election));
 
     celoUnreleasedTreasury.setRegistry(REGISTRY_ADDRESS);
@@ -578,6 +581,53 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
     assertEq(celoToken.balanceOf(carbonOffsettingPartner), epochRewards.totalRewardsCarbonFund());
   }
 
+  function test_TransfersVoterRewardsToLockedGold() public {
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
+
+    uint256 lockedGoldBalanceBefore = celoToken.balanceOf(lockedGoldAddress);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+
+    uint256 lockedGoldBalanceAfter = celoToken.balanceOf(lockedGoldAddress);
+    assertEq(
+      lockedGoldBalanceAfter - lockedGoldBalanceBefore,
+      epochRewards.totalRewardsVoter(),
+      "LockedGold should receive totalRewardsVoter CELO"
+    );
+  }
+
+  function test_TransfersAllEpochRewards() public {
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+
+    assertEq(
+      celoToken.balanceOf(lockedGoldAddress),
+      epochRewards.totalRewardsVoter(),
+      "LockedGold should receive voter rewards"
+    );
+    assertEq(
+      celoToken.balanceOf(communityRewardFund),
+      epochRewards.totalRewardsCommunity(),
+      "Governance should receive community rewards"
+    );
+    assertEq(
+      celoToken.balanceOf(carbonOffsettingPartner),
+      epochRewards.totalRewardsCarbonFund(),
+      "Carbon fund should receive carbon rewards"
+    );
+  }
+
   function test_TransfersToValidatorGroup() public {
     (
       address[] memory groups,
@@ -741,6 +791,21 @@ contract EpochManagerTest_processGroup is EpochManagerTest {
 
     assertEq(celoToken.balanceOf(communityRewardFund), epochRewards.totalRewardsCommunity());
     assertEq(celoToken.balanceOf(carbonOffsettingPartner), epochRewards.totalRewardsCarbonFund());
+  }
+
+  function test_TransfersVoterRewardsToLockedGold() public {
+    uint256 lockedGoldBalanceBefore = celoToken.balanceOf(lockedGoldAddress);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+    epochManagerContract.processGroup(group, address(0), address(0));
+
+    uint256 lockedGoldBalanceAfter = celoToken.balanceOf(lockedGoldAddress);
+    assertEq(
+      lockedGoldBalanceAfter - lockedGoldBalanceBefore,
+      epochRewards.totalRewardsVoter(),
+      "LockedGold should receive totalRewardsVoter CELO via processGroup path"
+    );
   }
 
   function test_TransfersToValidatorGroup() public {
