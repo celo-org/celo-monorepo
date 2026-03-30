@@ -140,6 +140,56 @@ PK="0x..." ./exec-jovian-sepolia.sh v4
 PK="0x..." ./exec-jovian-sepolia.sh v5
 ```
 
+### `exec-jovian.sh`
+
+Executes the Jovian upgrade (v4 + v5 + succ-v2) on Celo Mainnet through the nested Safe multisig chain. Accepts a version argument to run one of the three transactions. Signatures loaded from version-specific encrypted signer files.
+
+**Features:**
+
+- Loads signer addresses and signatures from `secrets/.env.signers.<version>`
+- Supports three versions: v4 (OPCM upgrade), v5 (OPCM upgrade), succ-v2 (Multicall3)
+- Executes through 6-of-8 multisig approvals: Council → cLabs → Parent
+- Optional Grand Child support via `USE_GC=true` (retained for future upgrades)
+- Pre-configured cLabs (6 signers) and Council (6 signers)
+
+**Required Environment Variables:**
+
+- `PK` - Private key for transaction execution
+
+**Optional Environment Variables:**
+
+- `RPC_URL` - RPC endpoint (defaults to `http://127.0.0.1:8545`)
+- `USE_GC` - Enable Grand Child multisig flow (defaults to `false`)
+
+**Required Files:**
+
+- `secrets/.env.signers.v4` - Decoded signers file for v4 (must be decrypted before running)
+- `secrets/.env.signers.v5` - Decoded signers file for v5
+- `secrets/.env.signers.succ-v2` - Decoded signers file for succ-v2
+
+**Upgrade Configuration:**
+
+| Version | Parent Nonce | cLabs Nonce | Council Nonce | Target                   | Description                                                           |
+| ------- | ------------ | ----------- | ------------- | ------------------------ | --------------------------------------------------------------------- |
+| v4      | 26           | 24          | 26            | `0x5fe4...` (OPCM)       | Proxy implementation upgrade                                          |
+| v5      | 27           | 25          | 27            | `0x503c...` (OPCM)       | Proxy implementation upgrade                                          |
+| succ-v2 | 28           | 26          | 28            | `0xcA11...` (Multicall3) | Register OPSuccinctFaultDisputeGame + transfer SystemConfig ownership |
+
+**Signers:**
+
+| Safe    | Count | Threshold | Address suffixes             |
+| ------- | ----- | --------- | ---------------------------- |
+| cLabs   | 6     | 6-of-8    | 0Bd, 21e, 4D8, 74b, 812, 8b4 |
+| Council | 6     | 6-of-8    | 148, 2BE, 5f7, 6FD, B96, C91 |
+
+**Example Execution:**
+
+```bash
+PK="0x..." ./exec-jovian.sh v4
+PK="0x..." ./exec-jovian.sh v5
+PK="0x..." ./exec-jovian.sh succ-v2
+```
+
 ### `exec-succinct.sh`
 
 Script used to execute the OP Succinct upgrade transaction through the nested Safe multisig chain. Contains hardcoded transaction data and signatures loaded from a decoded signers file.
