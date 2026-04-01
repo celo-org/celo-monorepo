@@ -179,6 +179,15 @@ contract FeeCurrencyAdapter_DebitGasFees is FeeCurrencyAdapterTest {
     feeCurrencyAdapter.debitGasFees(address(this), 0);
   }
 
+  function test_ShouldDebitOneNativeUnit_WhenValueLessThanDigitDifference() public {
+    // Debit uses ceiling division: any non-zero value below digitDifference debits 1 native unit.
+    uint256 subUnitValue = 1e12 - 1;
+    vm.prank(address(0));
+    feeCurrencyAdapter.debitGasFees(address(this), subUnitValue);
+    assertEq(feeCurrencyAdapter.debited(), 1);
+    assertEq(feeCurrency.balanceOf(address(this)), initialSupply - 1);
+  }
+
   function test_ShouldDebitCorrectAmount_WhenExpectedDigitsOnlyOneBigger() public {
     debitFuzzyHelper(7, 1e1);
   }
