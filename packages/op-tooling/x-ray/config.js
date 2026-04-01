@@ -221,9 +221,10 @@ const IMPL_TABLE = {
     '0x596ca58673d9909d1578d314f2dd4e71fc3cdcfb': 'v5.0.0', // Chaos
   },
   PreimageOracle: {
-    '0x855828ea44a0ce2596fdf49bea5b2859c0453704': 'initial',
-    '0x58fd9886ea355a7082041a6073dac61a5740594c': 'initial', // Chaos
-    '0xd59bb1d50dfeadc2cc3a7bed43c3bc4065b0ed4b': 'v5.0.0', // Chaos (New)
+    '0x855828ea44a0ce2596fdf49bea5b2859c0453704': 'initial', // Sepolia (old)
+    '0x58fd9886ea355a7082041a6073dac61a5740594c': 'initial', // Chaos (old)
+    '0x1fb8cdfc6831fc866ed9c51af8817da5c287add3': 'v5.0.0', // Mainnet & Sepolia
+    '0xd59bb1d50dfeadc2cc3a7bed43c3bc4065b0ed4b': 'v5.0.0', // Chaos
   },
   MIPS: {
     '0x0a691eed7be53f27f3c3b796061cdb8565da0b2a': 'initial',
@@ -241,9 +242,6 @@ const NETWORK_OVERRIDES = {
     '0x37e15e4d6dffa9e5e320ee1ec036922e563cb76c': { _default: 'initial' }, // Mainnet
     '0x9a7ca01b64ce656b927248af08692ed2714c68e0': { _default: 'initial' }, // Sepolia
     '0xb0eb0b64b765851e34ca0bc473206e6c7415b1a5': { _default: 'initial' }, // Chaos
-  },
-  PreimageOracle: {
-    '0x1fb8cdfc6831fc866ed9c51af8817da5c287add3': { mainnet: 'initial', _default: 'v4.1.0' },
   },
 }
 
