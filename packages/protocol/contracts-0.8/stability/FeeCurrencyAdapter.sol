@@ -65,8 +65,7 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm, IFeeCurrencyAdapter {
    * @param value Debited value in the adapted digits.
    */
   function debitGasFees(address from, uint256 value) external onlyVm {
-    // Ceiling division: ensures any non-zero fee always debits at least 1 native unit.
-    uint256 valueScaled = (value + digitDifference - 1) / digitDifference;
+    uint256 valueScaled = downscaleCeil(value);
     require(valueScaled > 0, "Scaled debit value must be > 0.");
     debited = valueScaled;
     adaptedToken.debitGasFees(from, valueScaled);
@@ -98,9 +97,9 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm, IFeeCurrencyAdapter {
       return;
     }
 
-    uint256 refundScaled = downscale(refundAmount);
-    uint256 tipTxFeeScaled = downscale(tipAmount);
-    uint256 baseTxFeeScaled = downscale(baseFeeAmount);
+    uint256 refundScaled = downscaleFloor(refundAmount);
+    uint256 tipTxFeeScaled = downscaleFloor(tipAmount);
+    uint256 baseTxFeeScaled = downscaleFloor(baseFeeAmount);
 
     require(
       refundScaled + tipTxFeeScaled + baseTxFeeScaled <= debited,
@@ -168,16 +167,24 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm, IFeeCurrencyAdapter {
   }
 
   /**
+   * @notice Downscales value to the adapted token's native digits using ceiling division.
+   * @dev Used for debiting: ensures any non-zero fee always collects at least 1 native
+   * unit, protecting the protocol from sub-unit fees being rounded to zero.
+   * @param value The value to downscale.
+   */
+  function downscaleCeil(uint256 value) internal view returns (uint256) {
+    return (value + digitDifference - 1) / digitDifference;
+  }
+
+  /**
    * @notice Downscales value to the adapted token's native digits using floor division.
-   * @dev Used only for credit-side components. Floor division guarantees
+   * @dev Used for crediting: floor division guarantees
    * floor(a/d) + floor(b/d) + floor(c/d) <= floor((a+b+c)/d), so the sum of credited
    * components never exceeds debited. Any undershoot is absorbed by the roundingError
    * correction in creditGasFees.
-   * Debit uses ceiling division (inlined in debitGasFees) to ensure any non-zero fee
-   * always collects at least 1 native unit.
    * @param value The value to downscale.
    */
-  function downscale(uint256 value) internal view returns (uint256) {
+  function downscaleFloor(uint256 value) internal view returns (uint256) {
     return value / digitDifference;
   }
 }

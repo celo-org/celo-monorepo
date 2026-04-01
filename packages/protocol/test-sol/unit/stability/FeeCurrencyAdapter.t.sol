@@ -72,8 +72,12 @@ contract CeloFeeCurrencyAdapterTestContract is CeloFeeCurrencyAdapterOwnable {
     return upscale(value);
   }
 
-  function downscaleVisible(uint256 value) external view returns (uint256) {
-    return downscale(value);
+  function downscaleCeilVisible(uint256 value) external view returns (uint256) {
+    return downscaleCeil(value);
+  }
+
+  function downscaleFloorVisible(uint256 value) external view returns (uint256) {
+    return downscaleFloor(value);
   }
 }
 
@@ -410,17 +414,29 @@ contract FeeCurrencyAdapter_UpscaleAndDownScaleTests is FeeCurrencyAdapterTest {
     feeCurrencyAdapter.upscaleVisible(boundaryValue);
   }
 
-  function test_shouldDownscale() public {
-    assertEq(feeCurrencyAdapter.downscaleVisible(1e12), 1);
-    assertEq(feeCurrencyAdapter.downscaleVisible(1e18), 1e6);
-    assertEq(feeCurrencyAdapter.downscaleVisible(1e24), 1e12);
+  function test_shouldDownscaleFloor() public {
+    assertEq(feeCurrencyAdapter.downscaleFloorVisible(1e12), 1);
+    assertEq(feeCurrencyAdapter.downscaleFloorVisible(1e18), 1e6);
+    assertEq(feeCurrencyAdapter.downscaleFloorVisible(1e24), 1e12);
   }
 
-  function test_ShouldReturnZero_WhenValueLessThanDigitDifference() public {
-    assertEq(feeCurrencyAdapter.downscaleVisible(0), 0);
-    assertEq(feeCurrencyAdapter.downscaleVisible(1), 0);
-    assertEq(feeCurrencyAdapter.downscaleVisible(1e6 - 1), 0);
-    assertEq(feeCurrencyAdapter.downscaleVisible(1e12 - 1), 0);
+  function test_shouldDownscaleCeil() public {
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1e12), 1);
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1e18), 1e6);
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1e24), 1e12);
+  }
+
+  function test_downscaleFloor_ShouldReturnZero_WhenValueLessThanDigitDifference() public {
+    assertEq(feeCurrencyAdapter.downscaleFloorVisible(0), 0);
+    assertEq(feeCurrencyAdapter.downscaleFloorVisible(1), 0);
+    assertEq(feeCurrencyAdapter.downscaleFloorVisible(1e6 - 1), 0);
+    assertEq(feeCurrencyAdapter.downscaleFloorVisible(1e12 - 1), 0);
+  }
+
+  function test_downscaleCeil_ShouldReturnOne_WhenValueLessThanDigitDifference() public {
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1), 1);
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1e6 - 1), 1);
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1e12 - 1), 1);
   }
 }
 
