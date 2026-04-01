@@ -231,6 +231,49 @@ contract FeeCurrencyAdapter_CreditGasFees is FeeCurrencyAdapterTest {
     assertEq(feeCurrencyAdapter.balanceOf(address(this)), initialSupply * 1e12);
   }
 
+  /**
+   * @notice Regression test: ceiling division caused refundScaled + tipScaled + baseFeeScaled
+   * to exceed debited whenever two or more components had non-zero remainders mod digitDifference.
+   * With floor division the sum is always <= debited and the rounding error is absorbed by baseFee.
+   *
+   * Example: debit 2e12 (debited=2), split as refund=5e11, tip=5e11, baseFee=1e12.
+   *   ceil: 1+1+1=3 > 2 → would revert
+   *   floor: 0+0+1=1 <= 2 → roundingError=1 added to baseFee → baseFee credited as 2 ✓
+   */
+  function test_shouldCreditGasFees_WhenComponentsHaveNonZeroRemainders() public {
+    // debit 2 native units (2e12 in 18-dec)
+    uint256 debitAmount = 2 * 1e12;
+    vm.prank(address(0));
+    feeCurrencyAdapter.debitGasFees(address(this), debitAmount);
+    assertEq(feeCurrencyAdapter.debited(), 2);
+
+    address tipRecipient = actor("tipRecipient");
+    address baseFeeRecipient = actor("baseFeeRecipient");
+
+    // split: refund=5e11, tip=5e11, baseFee=1e12 (sums to 2e12 = debitAmount)
+    // floor: 0 + 0 + 1 = 1; roundingError = 1 → baseFee credited as 2
+    vm.prank(address(0));
+    feeCurrencyAdapter.creditGasFees(
+      address(this),
+      tipRecipient,
+      address(0),
+      baseFeeRecipient,
+      5e11, // refund — floors to 0
+      5e11, // tip   — floors to 0
+      0,
+      1e12 // baseFee — floors to 1, roundingError adds 1 → credited as 2
+    );
+
+    // refund recipient gets 0 native units (sub-unit refund lost to rounding)
+    assertEq(feeCurrency.balanceOf(address(this)), initialSupply - 2);
+    // tip recipient gets 0
+    assertEq(feeCurrency.balanceOf(tipRecipient), 0);
+    // baseFee recipient gets all 2 native units (1 direct + 1 roundingError)
+    assertEq(feeCurrency.balanceOf(baseFeeRecipient), 2);
+    // debited cleared
+    assertEq(feeCurrencyAdapter.debited(), 0);
+  }
+
   function test_shouldRevert_WhenTryingToCreditMoreThanBurned() public {
     uint256 amount = 1 * 1e12;
     vm.prank(address(0));
@@ -364,10 +407,11 @@ contract FeeCurrencyAdapter_UpscaleAndDownScaleTests is FeeCurrencyAdapterTest {
     assertEq(feeCurrencyAdapter.downscaleVisible(1e24), 1e12);
   }
 
-  function test_ShouldReturn1_WhenSmallEnoughAndRoundingUp() public {
-    assertEq(feeCurrencyAdapter.downscaleVisible(1), 1);
-    assertEq(feeCurrencyAdapter.downscaleVisible(1e6 - 1), 1);
-    assertEq(feeCurrencyAdapter.downscaleVisible(1e12 - 1), 1);
+  function test_ShouldReturnZero_WhenValueLessThanDigitDifference() public {
+    assertEq(feeCurrencyAdapter.downscaleVisible(0), 0);
+    assertEq(feeCurrencyAdapter.downscaleVisible(1), 0);
+    assertEq(feeCurrencyAdapter.downscaleVisible(1e6 - 1), 0);
+    assertEq(feeCurrencyAdapter.downscaleVisible(1e12 - 1), 0);
   }
 }
 
