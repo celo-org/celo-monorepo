@@ -190,6 +190,53 @@ PK="0x..." ./exec-jovian.sh v5
 PK="0x..." ./exec-jovian.sh succ-v2
 ```
 
+### `exec-basefee.sh`
+
+Executes the base fee update proposal directly through the cLabs Safe (no Parent/Council chain). Sets minimum base fee and DA footprint gas scalar on SystemConfig via MultiSend delegatecall. Must run after Jovian upgrade (v4 + v5 + succ-v2) completes, which transfers SystemConfig ownership to cLabs.
+
+**Features:**
+
+- Direct cLabs Safe execution (6-of-8 ECDSA signatures)
+- Loads signatures from `secrets/.env.signers.basefee`
+- Builds MultiSend calldata dynamically (same as CeloSuperchainOps sign-basefee.sh)
+- Delegatecalls MultiSend to batch `setMinBaseFee` + `setDAFootprintGasScalar`
+
+**Required Environment Variables:**
+
+- `PK` - Private key for transaction execution
+
+**Optional Environment Variables:**
+
+- `RPC_URL` - RPC endpoint (defaults to `http://127.0.0.1:8545`)
+
+**Required Files:**
+
+- `secrets/.env.signers.basefee` - Decoded signers file (must be decrypted before running)
+
+**Configuration:**
+
+| Parameter    | Value                                                    |
+| ------------ | -------------------------------------------------------- |
+| Safe         | `0x9Eb44Da23433b5cAA1c87e35594D15FcEb08D34d` (cLabs)     |
+| Target       | `0x9641d764fc13c8B624c04430C7356C1C7C8102e2` (MultiSend) |
+| SystemConfig | `0x89E31965D844a309231B1f17759Ccaf1b7c09861`             |
+| cLabs Nonce  | 27 (after v4=24, v5=25, succ-v2=26)                      |
+| Min Base Fee | 25000000000 wei (25 gwei)                                |
+| DA Scalar    | 1                                                        |
+
+**Signers:**
+
+| Safe  | Count | Threshold | Address suffixes             |
+| ----- | ----- | --------- | ---------------------------- |
+| cLabs | 6     | 6-of-8    | 21e, 4D8, 74b, 812, 8b4, E00 |
+
+**Example Execution:**
+
+```bash
+# After Jovian completes (v4 → v5 → succ-v2):
+PK="0x..." ./exec-basefee.sh
+```
+
 ### `exec-succinct.sh`
 
 Script used to execute the OP Succinct upgrade transaction through the nested Safe multisig chain. Contains hardcoded transaction data and signatures loaded from a decoded signers file.

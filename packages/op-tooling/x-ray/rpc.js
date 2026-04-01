@@ -706,6 +706,17 @@ export async function fetchNetworkData(networkId, onProgress) {
       address: proxyAdminOwner,
       classify: ownerClassify,
     }
+    // Classify each PAO sub-owner (detect nested Safes for threshold display)
+    if (ownerClassify.type === 'Safe' && ownerClassify.details?.owners?.length > 0) {
+      const subResults = await Promise.all(
+        ownerClassify.details.owners.map((o) => classifyAddress(client, o))
+      )
+      const ownerDetails = {}
+      ownerClassify.details.owners.forEach((o, i) => {
+        ownerDetails[o.toLowerCase()] = subResults[i]
+      })
+      data.admin.proxyAdminOwner.ownerDetails = ownerDetails
+    }
   }
   tick('admin')
 
@@ -856,6 +867,13 @@ export async function fetchNetworkData(networkId, onProgress) {
 // SuperchainConfig on mainnet uses a separate admin because Optimism Foundation maintains it directly.
 const ACKNOWLEDGED_ADMIN = { mainnet: ['SuperchainConfig'] }
 
+// SystemConfig.owner() is set to cLabs Safe (not ProxyAdminOwner) — this is intentional.
+const ACKNOWLEDGED_OWNER = {
+  mainnet: ['SystemConfig'],
+  sepolia: ['SystemConfig'],
+  chaos: ['SystemConfig'],
+}
+
 /**
  * Analyze a single network for internal consistency anomalies.
  * Detects admin outliers, owner outliers, and EOA ProxyAdminOwner.
@@ -909,8 +927,10 @@ function analyzeNetwork(data) {
       counts[o] = (counts[o] || 0) + 1
     }
     const dominantOwner = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0]
+    const ackOwner = ACKNOWLEDGED_OWNER[net] || []
     for (const [key, contract] of contractsWithOwner) {
       if (contract.owner.toLowerCase() !== dominantOwner) {
+        if (ackOwner.includes(key)) continue
         alerts.push({
           severity: 'critical',
           category: 'ownership',

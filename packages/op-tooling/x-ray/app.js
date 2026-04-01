@@ -8,6 +8,7 @@ import {
   ZERO_ADDR,
   PROXIED_CONTRACTS,
   RESOLVED_CONTRACTS,
+  KNOWN_LABELS,
   getCachedData,
   setCachedData,
 } from './config.js'
@@ -110,6 +111,16 @@ function buildKnownAddrs(networkId, data) {
   // AccessManager labels (from network config)
   if (addrs.ACCESS_MANAGER) {
     known[addrs.ACCESS_MANAGER.toLowerCase()] = 'AccessManager'
+  }
+
+  // Well-known Safe labels (cLabs, Council, etc.)
+  const resolvedNet =
+    networkId === 'localhost' ? NETWORKS.localhost.sourceNetwork || networkId : networkId
+  const labels = KNOWN_LABELS[resolvedNet]
+  if (labels) {
+    for (const [addr, label] of Object.entries(labels)) {
+      known[addr.toLowerCase()] = label
+    }
   }
 
   return known
@@ -460,7 +471,7 @@ function ContractCard({ contract, networkId, subtitle, knownAddrs, issues, disco
 
 // ── Admin Card ─────────────────────────────────────────────
 
-function AdminCard({ label, info, networkId, issues }) {
+function AdminCard({ label, info, networkId, knownAddrs, issues, ownerClassify }) {
   if (!info)
     return html`<div class="card">
       <div class="skeleton card-skeleton" style="height:80px"></div>
@@ -487,16 +498,28 @@ function AdminCard({ label, info, networkId, issues }) {
         >
           <span class="card-label">Owner</span>
           <${AddressPill} addr=${info.owner} networkId=${networkId} />
+          <${AddressTag} label=${addressLabel(info.owner, knownAddrs)} />
+          ${ownerClassify &&
+          html`<span style="margin-left: 2px"><${TypeBadge} classify=${ownerClassify} /></span>`}
         </div>
       `}
       ${info.classify?.type === 'Safe' &&
       info.classify.details?.owners &&
       html`
-        <div class="card-row">
+        <div class="card-row" style="flex-direction: column; align-items: flex-start; gap: 2px;">
           <span class="card-label">Owners</span>
-          <span class="card-value" style="font-size: 0.75rem; color: var(--text-dim)">
-            ${info.classify.details.owners.map((o) => truncAddr(o)).join(', ')}
-          </span>
+          ${info.classify.details.owners.map((o) => {
+            const ownerCls = info.ownerDetails?.[o.toLowerCase()]
+            return html`
+              <div
+                style="display: flex; align-items: center; gap: 6px; padding-left: 8px; margin-top: 2px;"
+              >
+                <${AddressPill} addr=${o} networkId=${networkId} />
+                <${AddressTag} label=${addressLabel(o, knownAddrs)} />
+                ${ownerCls && html`<${TypeBadge} classify=${ownerCls} />`}
+              </div>
+            `
+          })}
         </div>
       `}
     </div>
@@ -884,12 +907,15 @@ function NetworkView({ data, networkId, status, issues }) {
         label="ProxyAdmin"
         info=${data.admin?.proxyAdmin}
         networkId=${networkId}
+        knownAddrs=${knownAddrs}
         issues=${issues?.['ProxyAdmin']}
+        ownerClassify=${data.admin?.proxyAdminOwner?.classify}
       />
       <${AdminCard}
         label="ProxyAdminOwner (SystemOwnerSafe)"
         info=${data.admin?.proxyAdminOwner}
         networkId=${networkId}
+        knownAddrs=${knownAddrs}
         issues=${issues?.['ProxyAdminOwner']}
       />
     </div>
