@@ -10,18 +10,25 @@ set -euo pipefail
 # -f: Boolean flag to indicate if the Forno service should be used to connect to
 #     the network
 # -l: Path to a file to which logs should be appended
+# -i: Path to the data needed to initialize contracts (if verifying a smart contracts release).
+# -p: Path to an optional proposal file, to verify the bytecodes of the core contracts after a
+#     proposed release.
 
 BRANCH=""
 NETWORK=""
 FORNO=""
 LOG_FILE="/dev/stdout"
+PROPOSAL=""
+INITIALIZE_DATA=""
 
-while getopts 'b:n:fl:' flag; do
+while getopts 'b:n:fl:i:p:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
     f) FORNO="--forno" ;;
     l) LOG_FILE="${OPTARG}" ;;
+    i) INITIALIZE_DATA="--initialize_data $(realpath $OPTARG)" ;;
+    p) PROPOSAL="--proposal $(realpath $OPTARG)" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -38,4 +45,4 @@ build_tag_foundry $BRANCH $LOG_FILE truffle-compat8 foundry.toml.bak
 
 mv foundry.toml.bak foundry.toml
 
-yarn ts-node ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "libraries.json" $FORNO
+yarn ts-node ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "libraries.json" $FORNO $PROPOSAL $INITIALIZE_DATA

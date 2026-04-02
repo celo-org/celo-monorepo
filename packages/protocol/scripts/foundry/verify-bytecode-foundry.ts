@@ -73,6 +73,16 @@ const getViemChain = (networkName: string): Chain => {
         },
         testnet: true,
       })
+    case 'anvil':
+      return {
+        ...viemChains.hardhat,
+        id: 31337,
+        rpcUrls: {
+          default: {
+            http: ['http://localhost:8546'],
+          },
+        },
+      }
     default:
       return { ...viemChains.hardhat, id: 31337 }
   }
