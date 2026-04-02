@@ -92,7 +92,7 @@ VERIFIER_API_KEY="${VERIFIER_API_KEY:-}"
 
 echo "Performing bootstrap implementations for $NETWORK!"
 BOOTSTRAP_OUTPUT=`mktemp`
-if [ -z $VERIFIER_API_KEY ]; then
+if [ -z "$VERIFIER_API_KEY" ]; then
   $OP_DEPLOYER_CMD bootstrap implementations \
     --l1-rpc-url="$L1_RPC_URL" \
     --artifacts-locator="$ARTIFACTS_LOCATOR" \
@@ -121,7 +121,7 @@ else
     --challenger=$CHALLENGER \
     --private-key=$DEPLOYER_PK \
     --verify \
-    --verifier-api-key $VERIFIER_API_KEY | tee $BOOTSTRAP_OUTPUT
+    --verifier-api-key "$VERIFIER_API_KEY" | tee $BOOTSTRAP_OUTPUT
 fi
 
 # Set OPCM address from bootstrap output
