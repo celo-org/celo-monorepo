@@ -83,7 +83,7 @@ contract SafePruneGamesFromStorage is Script {
         vm.envAddress("SAFE"),
         vm.envAddress("SENDER"),
         vm.envUint("RETENTION_INDEX"),
-        vm.envOr("SIG", bytes(hex"00"))
+        vm.envOr("SIG", bytes(""))
       );
   }
 

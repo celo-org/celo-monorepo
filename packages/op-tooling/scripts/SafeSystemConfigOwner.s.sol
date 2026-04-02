@@ -34,7 +34,7 @@ contract SafeSystemConfigOwner is Script {
         vm.envAddress("SAFE"),
         vm.envAddress("SENDER"),
         vm.envAddress("NEW_OWNER"),
-        vm.envOr("SIG", bytes(hex"00"))
+        vm.envOr("SIG", bytes(""))
       );
   }
 

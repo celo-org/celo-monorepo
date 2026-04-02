@@ -48,7 +48,7 @@ contract SafeRetireASR is Script {
         vm.envAddress("SAFE"),
         vm.envAddress("SENDER"),
         uint64(vm.envOr("RETIREMENT_TIMESTAMP", uint256(0))),
-        vm.envOr("SIG", bytes(hex"00"))
+        vm.envOr("SIG", bytes(""))
       );
   }
 

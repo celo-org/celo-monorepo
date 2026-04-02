@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
 # Migrates OP Stack L1 contract ownership from an EOA to a Gnosis Safe.
 # Performs: ProxyAdmin, SystemConfig, DisputeGameFactory, DelayedWETH,

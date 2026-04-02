@@ -48,7 +48,7 @@ contract SafeResetAnchorGame is Script {
         vm.envAddress("SAFE"),
         vm.envAddress("SENDER"),
         vm.envAddress("ANCHOR_GAME"),
-        vm.envOr("SIG", bytes(hex"00"))
+        vm.envOr("SIG", bytes(""))
       );
   }
 
