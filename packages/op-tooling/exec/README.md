@@ -5,7 +5,7 @@ This directory contains scripts for executing OPCM upgrade transactions through 
 ## Prerequisites
 
 - Valid signatures from desired Multisig signatories for transaction execution
-- For `exec-v2v3.sh`, `exec-succinct.sh`, and `exec-succinct-v102.sh`: Decrypted signer files are required. Run from repo root:
+- For scripts that load signatures from file (`exec-v2v3.sh`, `exec-succinct.sh`, `exec-succinct-v102.sh`, `exec-jovian.sh`, `exec-basefee.sh`): Decrypted signer files are required. Run from repo root:
   ```bash
   ./scripts/key_placer.sh decrypt
   ```
@@ -14,6 +14,10 @@ This directory contains scripts for executing OPCM upgrade transactions through 
   - `secrets/.env.signers.v3`
   - `secrets/.env.signers.succinct`
   - `secrets/.env.signers.succinct102`
+  - `secrets/.env.signers.v4`
+  - `secrets/.env.signers.v5`
+  - `secrets/.env.signers.succ-v2`
+  - `secrets/.env.signers.basefee`
 
 ## Scripts
 
@@ -102,13 +106,13 @@ PK="0x..." ./exec-v2v3.sh v3
 
 ### `exec-jovian-sepolia.sh`
 
-Executes OPCM upgrade transactions on Celo Sepolia through the Jovian-era Safe multisig chain (2-of-2: cLabs + Council, no Grand Child). Accepts a version argument to run either the v4 or v5 upgrade.
+Executes OPCM upgrade transactions on Celo Sepolia through the Jovian-era Safe multisig chain (2-of-2: cLabs + Council, no Grand Child). Accepts a version argument to run one of three upgrades.
 
 **Features:**
 
-- Hardcoded transaction data for v4 and v5 Sepolia upgrades
+- Hardcoded transaction data for v4, v5, and succinct-v2 Sepolia upgrades
 - Pre-configured single signatures from cLabs and Council
-- Accepts version argument (`v4` or `v5`)
+- Accepts version argument (`v4`, `v5`, or `succinct-v2`)
 - Simplified multisig chain: Council → cLabs → Parent (no Grand Child)
 - Uses Sepolia-specific Safe addresses and refund receiver
 
@@ -292,39 +296,6 @@ Script used to execute the OP Succinct upgrade transaction through the nested Sa
 PK="0x..." ./exec-succinct.sh
 ```
 
-### `exec-succinct.sh`
-
-Script for executing Succinct prover upgrade. Contains hardcoded transaction data and pre-configured signatures for the Succinct v1.0.2 upgrade.
-
-**Features:**
-
-- Hardcoded transaction data for Succinct upgrade via Multicall3
-- Pre-configured signatures from all multisig members
-- Executes through complete approval chain: Grand Child → Council → cLabs → Parent
-- Uses `aggregate3` calldata format for batched operations
-
-**Required Environment Variables:**
-
-- `PK` - Private key for transaction execution
-
-**Optional Environment Variables:**
-
-- `RPC_URL` - RPC endpoint (defaults to `http://127.0.0.1:8545`)
-
-**Configuration:**
-
-- **Parent Nonce**: 24
-- **cLabs Nonce**: 21
-- **Council Nonce**: 23
-- **Grand Child Nonce**: 5
-- **Target**: `0xcA11bde05977b3631167028862bE2a173976CA11` (Multicall3)
-
-**Example Execution:**
-
-```bash
-PK="0x..." ./exec-succinct.sh
-```
-
 ### `exec-succinct-v102.sh`
 
 Script for executing Succinct prover v1.0.2 upgrade. Contains hardcoded transaction data and pre-configured signatures for the Succinct v1.0.2 upgrade, loaded from a separate encrypted signer file.
@@ -378,7 +349,7 @@ Simplified and mocked simulation of network upgrade with support for providing a
 
 **Required Environment Variables:**
 
-- `VERSION` - Target version (`v2`, `v3`, `succinct`, or `succinct102`)
+- `VERSION` - Target version (`v2`, `v3`, `v4`, `v5`, `succ`, `succ-v102`, or `succ-v2`)
 - `PK` - Private key for transaction execution
 - `SENDER` - Expected sender address (must match the address derived from `PK`)
 - `SIGNER_1_PK` - Private key for first signer (unless external account used)
@@ -402,11 +373,6 @@ Simplified and mocked simulation of network upgrade with support for providing a
 - `TEAM` - Team identifier (`clabs` or `council`)
 - `GC_MULTISIG` - Grand Child multisig address (`council` team only)
 
-**Behavior Modes:**
-
-- **`approve`**: Uses `approveHash` calls for multisig approvals
-- **`sign`**: Uses signature-based execution (default)
-
 **Example Executions:**
 
 #### Basic Mocked Execution (v3)
@@ -418,7 +384,7 @@ VERSION="v3" PK="0x..." SENDER="0x..." SIGNER_1_PK="0x..." SIGNER_2_PK="0x..." S
 #### Basic Mocked Execution (Succinct v1.0.2)
 
 ```bash
-VERSION="succinct102" PK="0x..." SENDER="0x..." SIGNER_1_PK="0x..." SIGNER_2_PK="0x..." SIGNER_3_PK="0x..." SIGNER_4_PK="0x..." ./exec-mocked.sh
+VERSION="succ-v102" PK="0x..." SENDER="0x..." SIGNER_1_PK="0x..." SIGNER_2_PK="0x..." SIGNER_3_PK="0x..." SIGNER_4_PK="0x..." ./exec-mocked.sh
 ```
 
 #### With External cLabs Account
@@ -441,25 +407,30 @@ VERSION="v3" PK="0x..." SENDER="0x..." SIG="0x..." ACCOUNT="0x..." TEAM="council
 
 ## Execution Flow
 
-### Standard Flow (exec.sh, exec-v2v3.sh, exec-succinct.sh, exec-succinct-v102.sh)
+### Full Nested Flow (exec.sh, exec-v2v3.sh, exec-succinct.sh, exec-succinct-v102.sh)
 
 1. **Grand Child Approval**: Approve Council transaction
 2. **Council Approval**: Approve Parent transaction
 3. **cLabs Approval**: Approve Parent transaction
 4. **Parent Execution**: Execute upgrade via delegatecall
 
+### Jovian Flow (exec-jovian.sh, exec-jovian-sepolia.sh)
+
+1. **Council Approval**: Approve Parent transaction
+2. **cLabs Approval**: Approve Parent transaction
+3. **Parent Execution**: Execute upgrade via delegatecall
+
+No Grand Child by default. Optional via `USE_GC=true` on mainnet.
+
+### Direct cLabs Flow (exec-basefee.sh)
+
+1. **cLabs Execution**: Execute transaction directly (6-of-8 ECDSA signatures, no Parent/Council chain)
+
 ### Mocked Flow (exec-mocked.sh)
 
 1. **cLabs Approval**: Approve Parent transaction
 2. **Council Approval**: Approve Parent transaction (with optional Grand Child)
 3. **Parent Execution**: Execute OPCM upgrade
-
-### Succinct Flow (exec-succinct.sh)
-
-1. **Grand Child Execution**: Execute approval of Council transaction
-2. **Council Execution**: Execute approval of Parent transaction
-3. **cLabs Execution**: Execute approval of Parent transaction
-4. **Parent Execution**: Execute Succinct upgrade via Multicall3
 
 ## Transaction Parameters
 
