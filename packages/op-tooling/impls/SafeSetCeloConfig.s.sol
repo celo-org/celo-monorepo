@@ -38,7 +38,7 @@ contract SafeSetCeloConfig is Script {
         vm.envAddress("PROXY_ADMIN"),
         vm.envAddress("SAFE"),
         vm.envAddress("SENDER"),
-        vm.envOr("SIG", bytes(hex"00"))
+        vm.envOr("SIG", bytes(""))
       );
   }
 
