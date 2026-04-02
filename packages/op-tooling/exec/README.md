@@ -16,7 +16,7 @@ This directory contains scripts for executing OPCM upgrade transactions through 
   - `secrets/.env.signers.succinct102`
   - `secrets/.env.signers.v4`
   - `secrets/.env.signers.v5`
-  - `secrets/.env.signers.succ-v2`
+  - `secrets/.env.signers.succinct200`
   - `secrets/.env.signers.basefee`
 
 ## Scripts
