@@ -61,11 +61,13 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm, IFeeCurrencyAdapter {
 
   /**
    * Downscales value to the adapted token's native digits and debits it.
+   * @dev Uses ceiling division so the user is charged at least 1 native unit
+   * even when the 18-decimal fee is smaller than one native token unit.
    * @param from from address
    * @param value Debited value in the adapted digits.
    */
   function debitGasFees(address from, uint256 value) external onlyVm {
-    uint256 valueScaled = downscale(value);
+    uint256 valueScaled = downscaleCeil(value);
     require(valueScaled > 0, "Scaled debit value must be > 0.");
     debited = valueScaled;
     adaptedToken.debitGasFees(from, valueScaled);
@@ -167,16 +169,25 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm, IFeeCurrencyAdapter {
   }
 
   /**
-   * @notice Downscales value to the adapted token's native digits.
-   * @dev Downscale is rounding up in favour of protocol. User possibly can pay a bit more than expected (up to 1 unit of a token).
-   * Example:
-   * USDC has 6 decimals and in such case user can pay up to 0.000001 USDC more than expected.
-   * WBTC (currently not supported by Celo chain as fee currency) has 8 decimals and in such case user can pay up to 0.00000001 WBTC more than expected.
-   * Considering the current price of WBTC, it's less than 0.0005 USD. Even when WBTC price would be 1 mil USD, it's still would be only 0.01 USD.
-   * In general it is a very small amount and it is acceptable to round up in favor of the protocol.
+   * @notice Downscales value to the adapted token's native digits using floor division.
+   * @dev Rounding down guarantees that the sum of individually downscaled
+   * credit amounts never exceeds the downscaled debit amount, i.e.
+   * floor(a/n) + floor(b/n) + floor(c/n) <= floor((a+b+c)/n).
+   * Any remainder from rounding is absorbed into the base fee via the
+   * roundingError adjustment in creditGasFees.
    * @param value The value to downscale.
    */
   function downscale(uint256 value) internal view returns (uint256) {
+    return value / digitDifference;
+  }
+
+  /**
+   * @notice Downscales value using ceiling division (rounds up).
+   * @dev Used by debitGasFees so the user is charged at least 1 native unit
+   * even when the 18-decimal fee is smaller than one native token unit.
+   * @param value The value to downscale.
+   */
+  function downscaleCeil(uint256 value) internal view returns (uint256) {
     return (value + digitDifference - 1) / digitDifference;
   }
 }

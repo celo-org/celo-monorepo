@@ -75,6 +75,10 @@ contract CeloFeeCurrencyAdapterTestContract is CeloFeeCurrencyAdapterOwnable {
   function downscaleVisible(uint256 value) external view returns (uint256) {
     return downscale(value);
   }
+
+  function downscaleCeilVisible(uint256 value) external view returns (uint256) {
+    return downscaleCeil(value);
+  }
 }
 
 contract FeeCurrencyAdapterTest is Test {
@@ -281,6 +285,33 @@ contract FeeCurrencyAdapter_CreditGasFees is FeeCurrencyAdapterTest {
     assertEq(balanceBefore, balanceAfter);
   }
 
+  function test_shouldCreditGasFees_WithNonAlignedAmounts() public {
+    // Verifies that non-aligned amounts (not exact multiples of digitDifference)
+    // can be credited without reverting. Floor division guarantees
+    // floor(a/n) + floor(b/n) + floor(c/n) <= floor((a+b+c)/n).
+    uint256 debitAmount = 1000 * 1e12 + 7; // non-aligned amount
+    vm.prank(address(0));
+    feeCurrencyAdapter.debitGasFees(address(this), debitAmount);
+
+    // Split into three non-aligned parts that sum to debitAmount
+    uint256 refund = 333 * 1e12 + 3;
+    uint256 tip = 333 * 1e12 + 2;
+    uint256 baseFee = 334 * 1e12 + 2;
+    assertEq(refund + tip + baseFee, debitAmount);
+
+    vm.prank(address(0));
+    feeCurrencyAdapter.creditGasFees(
+      address(this),
+      address(this),
+      address(0),
+      address(this),
+      refund,
+      tip,
+      0,
+      baseFee
+    );
+  }
+
   function test_shouldCreditGasFees_WhenOnlyOneBigger() public {
     creditFuzzHelper(7, 1e1);
   }
@@ -364,10 +395,22 @@ contract FeeCurrencyAdapter_UpscaleAndDownScaleTests is FeeCurrencyAdapterTest {
     assertEq(feeCurrencyAdapter.downscaleVisible(1e24), 1e12);
   }
 
-  function test_ShouldReturn1_WhenSmallEnoughAndRoundingUp() public {
-    assertEq(feeCurrencyAdapter.downscaleVisible(1), 1);
-    assertEq(feeCurrencyAdapter.downscaleVisible(1e6 - 1), 1);
-    assertEq(feeCurrencyAdapter.downscaleVisible(1e12 - 1), 1);
+  function test_ShouldReturn0_WhenValueSmallerThanDigitDifference() public {
+    assertEq(feeCurrencyAdapter.downscaleVisible(1), 0);
+    assertEq(feeCurrencyAdapter.downscaleVisible(1e6 - 1), 0);
+    assertEq(feeCurrencyAdapter.downscaleVisible(1e12 - 1), 0);
+  }
+
+  function test_shouldDownscaleCeil() public {
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1e12), 1);
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1e18), 1e6);
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1e24), 1e12);
+  }
+
+  function test_ShouldReturn1_WhenSubUnitValueAndCeil() public {
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1), 1);
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1e6 - 1), 1);
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1e12 - 1), 1);
   }
 }
 
