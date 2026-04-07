@@ -1,10 +1,13 @@
 pragma solidity ^0.5.13;
 /* solhint-disable no-inline-assembly, avoid-low-level-calls, func-name-mixedcase, func-order */
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+// OpenZeppelin imports
+import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-import "./ExternalCall.sol";
-import "./Initializable.sol";
+// Local imports
+import { ExternalCall } from "./ExternalCall.sol";
+import { Initializable } from "./Initializable.sol";
+import { IMultiSig } from "./interfaces/IMultiSig.sol";
 
 /**
  * @title Multisignature wallet - Allows multiple parties to agree on transactions before
@@ -19,14 +22,14 @@ import "./Initializable.sol";
  * owned by a single owner. Safely increasing the owner set and requirement at
  * the same time is not trivial. One way to work around this situation is to
  * first add a second address controlled by the original owner, increase the
- * requirement, and then replace the auxillary address with the intended second
+ * requirement, and then replace the auxiliary address with the intended second
  * owner.
  * Again, this is just one example, in general make sure to verify this contract
  * will support your intended usage. The goal of this contract is to offer a
  * simple, minimal multi-signature API that's easy to understand even for novice
  * Solidity users.
  */
-contract MultiSig is Initializable {
+contract MultiSig is Initializable, IMultiSig {
   using SafeMath for uint256;
 
   struct Transaction {

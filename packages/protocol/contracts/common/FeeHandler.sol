@@ -431,7 +431,7 @@ contract FeeHandler is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 0);
+    return (1, 2, 0, 1);
   }
 
   /**
@@ -517,7 +517,7 @@ contract FeeHandler is
 
   function _setCarbonFraction(uint256 _newFraction) internal {
     FixidityLib.Fraction memory newFraction = FixidityLib.wrap(_newFraction);
-    require(newFraction.lte(FixidityLib.fixed1()), "New cargon fraction can't be greather than 1");
+    require(newFraction.lte(FixidityLib.fixed1()), "New carbon fraction can't be greater than 1");
     ignoreRenaming_inverseCarbonFraction = FixidityLib.fixed1().subtract(newFraction);
     checkTotalBeneficiary();
     emit CarbonFractionSet(_newFraction);
