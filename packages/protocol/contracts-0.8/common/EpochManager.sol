@@ -46,9 +46,13 @@ contract EpochManager is
   struct EpochProcessState {
     EpochProcessStatus status;
     uint256 perValidatorReward; // The per validator epoch reward.
-    uint256 totalRewardsVoter; // The total rewards to voters.
+    uint256 totalRewardsVoter; // The total rewards to voters (target bucket).
     uint256 totalRewardsCommunity; // The total community reward.
     uint256 totalRewardsCarbonFund; // The total carbon offsetting partner reward.
+    // The sum of voter rewards actually distributed to elected groups during this
+    // epoch. May be less than `totalRewardsVoter` due to per-group score, slashing
+    // multipliers, and integer rounding in `Election.getGroupEpochRewardsBasedOnScore`.
+    uint256 totalDistributedVoterRewards;
   }
 
   bool public isSystemInitialized;
@@ -316,6 +320,7 @@ contract EpochManager is
 
     if (epochRewards != type(uint256).max) {
       election.distributeEpochRewards(group, epochRewards, lesser, greater);
+      _epochProcessing.totalDistributedVoterRewards += epochRewards;
     }
 
     delete processedGroups[group];
@@ -377,6 +382,7 @@ contract EpochManager is
       require(epochRewards > 0, "group not from current elected set");
       if (epochRewards != type(uint256).max) {
         election.distributeEpochRewards(groups[i], epochRewards, lessers[i], greaters[i]);
+        _epochProcessing.totalDistributedVoterRewards += epochRewards;
       }
 
       delete processedGroups[groups[i]];
@@ -761,9 +767,12 @@ contract EpochManager is
     _setElectedSigners(_newlyElected);
 
     ICeloUnreleasedTreasury celoUnreleasedTreasury = getCeloUnreleasedTreasury();
+    // Release only the voter rewards that were actually distributed to groups
+    // (post score, slashing multiplier, and rounding) to avoid stranding excess
+    // CELO in LockedGold without matching vote units.
     celoUnreleasedTreasury.release(
       registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID),
-      _epochProcessing.totalRewardsVoter
+      _epochProcessing.totalDistributedVoterRewards
     );
     celoUnreleasedTreasury.release(
       registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID),
@@ -779,6 +788,7 @@ contract EpochManager is
     _epochProcessing.totalRewardsVoter = 0;
     _epochProcessing.totalRewardsCommunity = 0;
     _epochProcessing.totalRewardsCarbonFund = 0;
+    _epochProcessing.totalDistributedVoterRewards = 0;
 
     emit EpochProcessingEnded(currentEpochNumber - 1);
   }
