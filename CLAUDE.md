@@ -54,7 +54,7 @@ Quick reference: Increment `NODE_MODULE_CACHE_VERSION` in `.github/workflows/cel
 ```bash
 # From packages/protocol/
 yarn release:verify-deployed:foundry -b <TAG> -n <NETWORK>
-yarn release:check-versions:foundry -a <OLD_TAG> -b <NEW_BRANCH> -r <REPORT_PATH>
+yarn release:check-versions:foundry -a <OLD_TAG> -b <NEW_BRANCH>
 yarn release:make:foundry -b <BRANCH> -k <KEY> -n <NETWORK> ...
 
 # Decrypt deployer keys (cLabs employees)
