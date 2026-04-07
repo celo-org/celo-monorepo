@@ -1,15 +1,15 @@
 /* eslint-disable no-console */
+import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
-import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { ForgeArtifact } from '@celo/protocol/scripts/foundry/ForgeArtifact'
 import { NULL_ADDRESS, eqAddress } from '@celo/utils/lib/address'
 import { exec } from 'child_process'
-import { createInterface } from 'readline'
 import { existsSync, readJsonSync, readdirSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
+import { createInterface } from 'readline'
 import { TextEncoder, promisify } from 'util'
 import {
   Abi,
@@ -1251,7 +1251,6 @@ async function main() {
       throw new Error(
         `${buildDir08} directory not found. Make sure to run foundry build with truffle-compat8 profile first`
       )
-
     }
 
     // Check for Celoscan API key early (before deployment) for production networks
@@ -1342,28 +1341,11 @@ async function main() {
     const names08 = listContractNames(buildDir08)
     const allContractNamesFromDirs = [...new Set([...names05, ...names08])].sort()
 
-<<<<<<< HEAD
-    findContractArtifacts(buildDir05, contractArtifactPaths)
-    findContractArtifacts(buildDir08, contractArtifactPaths)
-
-    if (contractArtifactPaths.size === 0) {
-      console.warn(
-        `No contract artifacts found in ${buildDir05} or ${buildDir08}. Ensure the directories contain Foundry outputs.`
-      )
-    }
-
-    const registryArtifactPath = contractArtifactPaths.get('Registry')
-    if (!registryArtifactPath) {
-      throw new Error(
-        `Registry.json artifact not found in ${buildDir05} or ${buildDir08}. ` +
-          `Please ensure it is compiled and present in the Foundry output format (e.g., ${buildDir05}/Registry.sol/Registry.json).`
-=======
     const registryArtifactPath = getContractArtifactPath('Registry', buildDir05, buildDir08)
     if (!existsSync(registryArtifactPath)) {
       throw new Error(
         `Registry.json artifact not found at ${registryArtifactPath}. ` +
           `Please ensure it is compiled and present in the Foundry output format.`
->>>>>>> a46299c9d (Adding security checks for release scripts (#11662))
       )
     }
     const registryArtifact = loadContractArtifact('Registry', registryArtifactPath)
