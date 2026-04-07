@@ -239,7 +239,7 @@ contract FeeHandlerTest_SetCarbonFraction is FeeHandlerTest {
   }
 
   function test_Reverts_WhenFractionsGreaterThanOne() public {
-    vm.expectRevert("New cargon fraction can't be greather than 1");
+    vm.expectRevert("New carbon fraction can't be greater than 1");
     feeHandler.setCarbonFraction(FixidityLib.newFixedFraction(3, 2).unwrap());
   }
 

@@ -313,6 +313,18 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
 
     assertEq(reserveBalanceAfter, CELOequivalent);
   }
+
+  function test_Emits_ValidatorEpochRewardAllocatedEvent() public {
+    setupAndElectValidators();
+
+    // Expect events for both validators with their respective rewards and correct group
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorEpochRewardAllocated(validator1, validator1Reward, group, firstEpochNumber);
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorEpochRewardAllocated(validator2, validator2Reward, group, firstEpochNumber);
+
+    epochManagerContract.startNextEpochProcess();
+  }
 }
 
 contract EpochManagerTest_setEpochDuration is EpochManagerTest {
@@ -702,7 +714,7 @@ contract EpochManagerTest_processGroup is EpochManagerTest {
   }
 
   function test_Reverts_WhenNotStarted() public {
-    vm.expectRevert("Indivudual epoch process is not started");
+    vm.expectRevert("Individual epoch process is not started");
     epochManagerContract.processGroup(group, address(0), address(0));
   }
 
