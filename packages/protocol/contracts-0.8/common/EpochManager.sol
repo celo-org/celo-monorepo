@@ -46,13 +46,9 @@ contract EpochManager is
   struct EpochProcessState {
     EpochProcessStatus status;
     uint256 perValidatorReward; // The per validator epoch reward.
-    uint256 totalRewardsVoter; // The total rewards to voters (target bucket).
+    uint256 totalRewardsVoter; // The total rewards to voters.
     uint256 totalRewardsCommunity; // The total community reward.
     uint256 totalRewardsCarbonFund; // The total carbon offsetting partner reward.
-    // The sum of voter rewards actually distributed to elected groups during this
-    // epoch. May be less than `totalRewardsVoter` due to per-group score, slashing
-    // multipliers, and integer rounding in `Election.getGroupEpochRewardsBasedOnScore`.
-    uint256 totalDistributedVoterRewards;
   }
 
   bool public isSystemInitialized;
@@ -74,6 +70,14 @@ contract EpochManager is
   address[] public electedSigners;
 
   uint256 public toProcessGroups = 0;
+
+  // Sum of voter rewards actually distributed to elected groups during the
+  // current epoch. May be less than `epochProcessing.totalRewardsVoter` due to
+  // per-group score, slashing multipliers, and integer rounding in
+  // `Election.getGroupEpochRewardsBasedOnScore`.
+  // NOTE: declared after all pre-existing state variables to preserve the
+  // proxy storage layout on in-place upgrades.
+  uint256 public totalDistributedVoterRewards;
 
   /**
    * @notice Event emitted when epochProcessing has begun.
@@ -320,7 +324,7 @@ contract EpochManager is
 
     if (epochRewards != type(uint256).max) {
       election.distributeEpochRewards(group, epochRewards, lesser, greater);
-      _epochProcessing.totalDistributedVoterRewards += epochRewards;
+      totalDistributedVoterRewards += epochRewards;
     }
 
     delete processedGroups[group];
@@ -382,7 +386,7 @@ contract EpochManager is
       require(epochRewards > 0, "group not from current elected set");
       if (epochRewards != type(uint256).max) {
         election.distributeEpochRewards(groups[i], epochRewards, lessers[i], greaters[i]);
-        _epochProcessing.totalDistributedVoterRewards += epochRewards;
+        totalDistributedVoterRewards += epochRewards;
       }
 
       delete processedGroups[groups[i]];
@@ -610,7 +614,7 @@ contract EpochManager is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 3);
+    return (1, 1, 0, 4);
   }
 
   /**
@@ -772,7 +776,7 @@ contract EpochManager is
     // CELO in LockedGold without matching vote units.
     celoUnreleasedTreasury.release(
       registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID),
-      _epochProcessing.totalDistributedVoterRewards
+      totalDistributedVoterRewards
     );
     celoUnreleasedTreasury.release(
       registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID),
@@ -788,7 +792,7 @@ contract EpochManager is
     _epochProcessing.totalRewardsVoter = 0;
     _epochProcessing.totalRewardsCommunity = 0;
     _epochProcessing.totalRewardsCarbonFund = 0;
-    _epochProcessing.totalDistributedVoterRewards = 0;
+    totalDistributedVoterRewards = 0;
 
     emit EpochProcessingEnded(currentEpochNumber - 1);
   }
