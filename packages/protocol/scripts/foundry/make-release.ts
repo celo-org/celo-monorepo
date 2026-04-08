@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
@@ -10,6 +11,7 @@ import { exec } from 'child_process'
 import { createInterface } from 'readline'
 import { existsSync, readJsonSync, readdirSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
+import { createInterface } from 'readline'
 import { TextEncoder, promisify } from 'util'
 import {
   Abi,

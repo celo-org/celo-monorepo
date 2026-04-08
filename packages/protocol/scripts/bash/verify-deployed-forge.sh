@@ -10,18 +10,25 @@ set -euo pipefail
 # -f: Boolean flag to indicate if the Forno service should be used to connect to
 #     the network
 # -l: Path to a file to which logs should be appended
+# -i: Path to the data needed to initialize contracts (if verifying a smart contracts release).
+# -p: Path to an optional proposal file, to verify the bytecodes of the core contracts after a
+#     proposed release.
 
 BRANCH=""
 NETWORK=""
 FORNO=""
 LOG_FILE="/dev/stdout"
+PROPOSAL=""
+INITIALIZE_DATA=""
 
-while getopts 'b:n:fl:' flag; do
+while getopts 'b:n:fl:i:p:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
     f) FORNO="--forno" ;;
     l) LOG_FILE="${OPTARG}" ;;
+    i) INITIALIZE_DATA="--initialize_data $(realpath $OPTARG)" ;;
+    p) PROPOSAL="--proposal $(realpath $OPTARG)" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -31,7 +38,9 @@ done
 
 source scripts/bash/release-lib.sh
 source scripts/bash/warn-if-libraries-exist.sh
-warn_if_libraries_exist "$NETWORK-$BRANCH-libraries.json"
+source scripts/bash/validate-libraries-filename.sh
+LIBRARIES_FILE=$(get_libraries_filename "$NETWORK" "$BRANCH")
+warn_if_libraries_exist "$LIBRARIES_FILE"
 
 cp foundry.toml foundry.toml.bak
 
@@ -40,4 +49,4 @@ build_tag_foundry $BRANCH $LOG_FILE truffle-compat8 foundry.toml.bak
 
 mv foundry.toml.bak foundry.toml
 
-TS_NODE_CACHE=false yarn ts-node --preferTsExts ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "$NETWORK-$BRANCH-libraries.json" $FORNO
+yarn ts-node ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "$LIBRARIES_FILE" $FORNO $PROPOSAL $INITIALIZE_DATA

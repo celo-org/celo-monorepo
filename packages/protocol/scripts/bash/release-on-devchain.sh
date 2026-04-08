@@ -3,6 +3,7 @@ set -euo pipefail
 
 source ./scripts/bash/utils.sh
 source ./scripts/foundry/constants.sh
+source ./scripts/bash/validate-libraries-filename.sh
 
 # Simulates a release of the current contracts against a target git ref on a local network
 #
@@ -39,6 +40,11 @@ echo "- Verify bytecode of the network"
 # this commands compiles the output
 yarn --cwd packages/protocol release:verify-deployed:foundry -n anvil -b $BRANCH
 
+# Rename to the expected format for make-release
+LIBRARIES_FILE=$(get_previous_libraries_filename "anvil" "$BRANCH")
+VERIFY_LIBRARIES_FILE=$(get_libraries_filename "anvil" "$BRANCH")
+mv "$VERIFY_LIBRARIES_FILE" "$LIBRARIES_FILE"
+
 echo "- Check versions of current branch"
 yarn release:check-versions:foundry -a $BRANCH -b HEAD
 
@@ -48,6 +54,7 @@ INITIALIZATION_FILE=`ls releaseData/initializationData/release*.json | sort -V |
 REPORT="report-$BRANCH-HEAD.json"
 LIBRARIES_FILE="anvil-$BRANCH-libraries.json"
 
+
 ANVIL_DEVNET_PRIVATE_KEY='0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 yarn release:make:foundry \
   -b "$BRANCH" \
@@ -55,14 +62,15 @@ yarn release:make:foundry \
   -i "$INITIALIZATION_FILE" \
   -l "$LIBRARIES_FILE" \
   -n anvil \
-  -r "$REPORT" \
+  -r "report-$BRANCH-HEAD.json" \
   -u "http://localhost:$ANVIL_PORT"
 
 # From verify-release.sh
 echo "- Verify release"
 yarn --cwd packages/protocol release:verify-deployed:foundry \
     -n anvil \
-    -b $BRANCH
+    -b $BRANCH \
+    -p "proposal-anvil-$BRANCH.json"
 
 if [[ -n $ANVIL_PID ]]; then
     kill $ANVIL_PID

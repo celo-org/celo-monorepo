@@ -15,7 +15,7 @@ const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
 const INTEGRATION_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const INTEGRATION_TESTING_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
-const CELOSEPOLIA_FROM = process.env.CELOSEPOLIA_FROM
+const CELOSEPOLIA_FROM = '0x33c35343B08ff91a9d7a07daa34eDce5248bE318'
 
 const gasLimit = 20000000
 const hostAddress = process.env.CELO_NODE_ADDRESS || '127.0.0.1'
@@ -106,12 +106,6 @@ const networks = {
 
 // Equivalent
 networks.mainnet = networks.rc1
-
-// Validate CELOSEPOLIA_FROM is set when using celosepolia network
-if (argv.network === 'celo-sepolia' && !CELOSEPOLIA_FROM) {
-  console.error('Error: CELOSEPOLIA_FROM environment variable is required for celo-sepolia network')
-  process.exit(1)
-}
 
 // If an override was provided, apply it.
 // If the network is missing from networks, start with the default config.

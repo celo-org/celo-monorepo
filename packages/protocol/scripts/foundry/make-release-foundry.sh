@@ -52,6 +52,7 @@ done
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
 [ -z "$REPORT" ] && echo "Need to set the compatibility report input via the -r flag" && exit 1;
 
+
 if [ -n "$PROPOSAL" ]; then
   echo "Error: -p no longer accepts a path. Proposal name is now generated automatically as proposal-\$NETWORK-\$BRANCH.json." >&2
   echo "See: https://github.com/celo-org/celo-monorepo/pull/11662" >&2
@@ -66,7 +67,23 @@ source scripts/bash/validate-libraries-bytecode.sh
 VALIDATION_RPC_URL="${RPC_URL:-$(get_forno_url "$NETWORK")}"
 validate_libraries_bytecode "$LIBRARIES" "$VALIDATION_RPC_URL"
 
-BUILD_DIR="./out-${BRANCH}"
+source scripts/bash/release-lib.sh
+
+# Build contract artifacts for both Solidity 0.5 and 0.8 using Foundry profiles.
+# foundry.toml is backed up because build_tag_foundry may overwrite it when
+# restoring the config from the target branch.
+cp foundry.toml foundry.toml.bak
+
+# Solidity 0.5 contracts (truffle-compat profile produces artifacts compatible with the release tooling)
+build_tag_foundry "$BRANCH" /dev/stdout truffle-compat foundry.toml.bak
+BUILD_DIR_05=$BUILD_DIR
+
+# Solidity 0.8 contracts
+build_tag_foundry "$BRANCH" /dev/stdout truffle-compat8 foundry.toml.bak
+BUILD_DIR_08=$BUILD_DIR
+
+mv foundry.toml.bak foundry.toml
+
 
 # Build the command with optional flags
 OPTIONAL_FLAGS=""
@@ -88,5 +105,6 @@ yarn ts-node --transpile-only ./scripts/foundry/make-release.ts \
   --network "$NETWORK" \
   --proposal "$PROPOSAL" \
   --report "$REPORT" \
-  --buildDirectory "$BUILD_DIR" \
+  --buildDirectory05 "$BUILD_DIR_05" \
+  --buildDirectory08 "$BUILD_DIR_08" \
   $OPTIONAL_FLAGS
