@@ -9,7 +9,7 @@ set -euo pipefail
 # -i: Path to the data needed to initialize contracts.
 # -l: Path to the canonical library mapping.
 # -n: The network to deploy to.
-# -p: Path that the governance proposal should be written to.
+# -p: (Deprecated) No longer accepts a path. Proposal is always generated as proposal-$NETWORK-$BRANCH.json.
 # -r: Path to the contract compatibility report.
 # -u: Custom RPC URL (optional, overrides network default).
 # -s: Skip contract verification (optional).
@@ -50,20 +50,23 @@ done
 [ -z "$INITIALIZE_DATA" ] && echo "Need to set the initialization data via the -i flag" && exit 1;
 [ -z "$LIBRARIES" ] && echo "Need to set the library mapping input via the -l flag" && exit 1;
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
-[ -z "$PROPOSAL" ] && echo "Need to set the proposal outfile via the -p flag" && exit 1;
 [ -z "$REPORT" ] && echo "Need to set the compatibility report input via the -r flag" && exit 1;
 
-source scripts/bash/release-lib.sh
+if [ -n "$PROPOSAL" ]; then
+  echo "Error: -p no longer accepts a path. Proposal name is now generated automatically as proposal-\$NETWORK-\$BRANCH.json." >&2
+  echo "See: https://github.com/celo-org/celo-monorepo/pull/11662" >&2
+  exit 1
+fi
+PROPOSAL="proposal-$NETWORK-$BRANCH.json"
 
-cp foundry.toml foundry.toml.bak
+source scripts/bash/validate-libraries-filename.sh
+validate_libraries_filename "$LIBRARIES" "$NETWORK" "$BRANCH"
 
-build_tag_foundry "$BRANCH" /dev/stdout truffle-compat foundry.toml.bak
-BUILD_DIR_05=$BUILD_DIR
+source scripts/bash/validate-libraries-bytecode.sh
+VALIDATION_RPC_URL="${RPC_URL:-$(get_forno_url "$NETWORK")}"
+validate_libraries_bytecode "$LIBRARIES" "$VALIDATION_RPC_URL"
 
-build_tag_foundry "$BRANCH" /dev/stdout truffle-compat8 foundry.toml.bak
-BUILD_DIR_08=$BUILD_DIR
-
-mv foundry.toml.bak foundry.toml
+BUILD_DIR="./out-${BRANCH}"
 
 # Build the command with optional flags
 OPTIONAL_FLAGS=""
@@ -85,6 +88,5 @@ yarn ts-node --transpile-only ./scripts/foundry/make-release.ts \
   --network "$NETWORK" \
   --proposal "$PROPOSAL" \
   --report "$REPORT" \
-  --buildDirectory05 "$BUILD_DIR_05" \
-  --buildDirectory08 "$BUILD_DIR_08" \
+  --buildDirectory "$BUILD_DIR" \
   $OPTIONAL_FLAGS

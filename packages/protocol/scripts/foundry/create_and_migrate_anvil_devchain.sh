@@ -23,6 +23,9 @@ $PWD/scripts/foundry/start_anvil.sh --celo
 # build standard forge artifacts, needed to deploy precompiles
 FOUNDRY_PROFILE=truffle-compat forge build
 
+# build standard forge artifacts, needed to deploy precompiles
+forge build
+
 # Deploy libraries to the anvil instance
 source $PWD/scripts/foundry/deploy_libraries.sh
 echo "Library flags 0.5 are: $LIBRARY_FLAGS"
@@ -37,8 +40,7 @@ source $PWD/scripts/foundry/build_constitution_selectors_map.sh
 echo "Compiling 0.5 with libraries..."
 time FOUNDRY_PROFILE=truffle-compat forge build $LIBRARY_FLAGS 
 echo "Compiling 0.8 with libraries..."
-
-time FOUNDRY_PROFILE=truffle-compat8 forge build $LIBRARY_FLAGS_08 
+time FOUNDRY_PROFILE=truffle-compat8 forge build $LIBRARY_FLAGS_08
 
 echo "Setting Registry Proxy"
 PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode.object' ./out-truffle-compat/Proxy.sol/Proxy.json)

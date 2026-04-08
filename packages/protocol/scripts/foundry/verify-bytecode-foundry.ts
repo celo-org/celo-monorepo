@@ -154,12 +154,19 @@ verifyBytecodes(
   version,
   network
 )
-  .then((libraryLinkingInfo) => {
-    console.info('Success, no bytecode mismatches found!')
+  .then(({ libraryLinkingInfo, verifiedLibraries }) => {
+    const allMapping = libraryLinkingInfo.getAddressMapping()
+    const verifiedMapping = {}
+    for (const library of verifiedLibraries) {
+      verifiedMapping[library] = allMapping[library]
+    }
 
+    /* eslint-disable no-console */
+    console.log(`\n✅ All contracts and libraries verified successfully!`)
     console.info(`Writing linked library addresses to ${librariesFile}`)
-    writeJsonSync(librariesFile, libraryLinkingInfo.getAddressMapping(), { spaces: 2 })
+    writeJsonSync(librariesFile, verifiedMapping, { spaces: 2 })
   })
   .catch((error) => {
     console.info('Script errored!', error)
+    process.exit(1)
   })

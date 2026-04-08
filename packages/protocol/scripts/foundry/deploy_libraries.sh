@@ -34,6 +34,39 @@ deploy_libraries() {
     done
 }
 
+# Function to copy libraries to temporary directory
+copy_libraries() {
+    local -n lib_array=$1
+    for LIB_PATH in "${lib_array[@]}"; do
+        IFS=":" read -r SOURCE DEST <<< "$LIB_PATH"
+        echo "SOURCE: $SOURCE"
+        echo "DEST: $DEST"
+        DEST_FILE="$TEMP_DIR/$SOURCE"
+        DEST_DIR=$(dirname "$DEST_FILE")
+        mkdir -p "$DEST_DIR"
+        echo "Copying file $SOURCE to $DEST_FILE"
+        cp "$SOURCE" "$DEST_FILE"
+    done
+}
+
+# Function to deploy libraries
+deploy_libraries() {
+    local -n lib_array=$1
+    local profile=$2
+    local flags_var=$3
+    local version=$4
+    
+    echo "Deploying libraries $version..."
+    for LIB_PATH in "${lib_array[@]}"; do
+        LIB_NAME="${LIB_PATH#*:}" 
+        echo "Deploying library: $LIB_NAME"
+        create_library_out=`FOUNDRY_PROFILE=$profile forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url $ANVIL_RPC_URL --unlocked --broadcast --json`
+        LIB_ADDRESS=`echo $create_library_out | jq -r '.deployedTo'`
+        # Constructing library flag so the remaining contracts can be built and linkeded to these libraries
+        eval "$flags_var=\"\$$flags_var --libraries $LIB_PATH:$LIB_ADDRESS\""
+    done
+}
+
 # Create a temporary directory or remove it first it if exists
 if [ -d "$TEMP_DIR" ]; then
     echo "Removing existing temporary folder..."

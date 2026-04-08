@@ -40,29 +40,29 @@ echo "- Verify bytecode of the network"
 yarn --cwd packages/protocol release:verify-deployed:foundry -n anvil -b $BRANCH
 
 echo "- Check versions of current branch"
-yarn release:check-versions:foundry -a $BRANCH -b HEAD -r report.json
+yarn release:check-versions:foundry -a $BRANCH -b HEAD
 
 # From make-release.sh
 echo "- Deploy release of current branch"
 INITIALIZATION_FILE=`ls releaseData/initializationData/release*.json | sort -V | tail -n 1 | xargs realpath`
+REPORT="report-$BRANCH-HEAD.json"
+LIBRARIES_FILE="anvil-$BRANCH-libraries.json"
 
 ANVIL_DEVNET_PRIVATE_KEY='0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 yarn release:make:foundry \
   -b "$BRANCH" \
   -k "$ANVIL_DEVNET_PRIVATE_KEY" \
   -i "$INITIALIZATION_FILE" \
-  -l libraries.json \
+  -l "$LIBRARIES_FILE" \
   -n anvil \
-  -p proposal.json \
-  -r report.json \
+  -r "$REPORT" \
   -u "http://localhost:$ANVIL_PORT"
 
 # From verify-release.sh
 echo "- Verify release"
 yarn --cwd packages/protocol release:verify-deployed:foundry \
     -n anvil \
-    -b $BRANCH \
-    -p proposal.json
+    -b $BRANCH
 
 if [[ -n $ANVIL_PID ]]; then
     kill $ANVIL_PID

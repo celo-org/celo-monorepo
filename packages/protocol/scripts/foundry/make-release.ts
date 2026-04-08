@@ -3,9 +3,11 @@ import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
+import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { ForgeArtifact } from '@celo/protocol/scripts/foundry/ForgeArtifact'
 import { NULL_ADDRESS, eqAddress } from '@celo/utils/lib/address'
 import { exec } from 'child_process'
+import { createInterface } from 'readline'
 import { existsSync, readJsonSync, readdirSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
 import { TextEncoder, promisify } from 'util'
@@ -70,8 +72,7 @@ interface MakeReleaseArgv {
   proposal: string
   librariesFile: string
   initializeData: string
-  buildDirectory05: string
-  buildDirectory08: string
+  buildDirectory: string
   branch: string
   network: string
   privateKey?: string
@@ -302,6 +303,16 @@ const verifyContractOnCeloscan = async (
 // Helper to sleep for a given number of milliseconds
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
 
+const promptUserConfirmation = (message: string): Promise<boolean> => {
+  const rl = createInterface({ input: process.stdin, output: process.stdout })
+  return new Promise((resolve) => {
+    rl.question(`${message} (y/N): `, (answer) => {
+      rl.close()
+      resolve(answer.toLowerCase() === 'y')
+    })
+  })
+}
+
 // Retry configuration for verification
 const VERIFICATION_MAX_RETRIES = 6
 const VERIFICATION_INITIAL_DELAY_MS = 5000 // 5 seconds
@@ -520,9 +531,14 @@ const proxiedCoreContracts = new Set<string>([
 
 const isProxiedContract = (
   contractName: string,
-  contractArtifactPaths: Map<string, string>
+  buildDir05: string,
+  buildDir08: string
 ): boolean => {
-  return proxiedCoreContracts.has(contractName) || contractArtifactPaths.has(`${contractName}Proxy`)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return (
+    proxiedCoreContracts.has(contractName) ||
+    existsSync(getContractArtifactPath(`${contractName}Proxy`, buildDir05, buildDir08))
+  )
 }
 
 const isCoreContract = (contractName: string) =>
@@ -747,7 +763,8 @@ const deployCoreContract = async (
   initializationData: Record<string, unknown[]>,
   walletClient: WalletClientMethods,
   publicClient: PublicClientMethods,
-  contractArtifactPaths: Map<string, string>,
+  buildDir05: string,
+  buildDir08: string,
   linkedLibraries: LinkedLibrary[] = []
 ) => {
   const deployedImplementation = await deployImplementation(
@@ -772,9 +789,9 @@ const deployCoreContract = async (
     proposal.push(setImplementationTx)
   } else {
     const proxyArtifactName = `${contractName}Proxy`
-    const proxyArtifactPath = contractArtifactPaths.get(proxyArtifactName)
-    if (!proxyArtifactPath) {
-      throw new Error(`Proxy artifact ${proxyArtifactName} not found in artifact map.`)
+    const proxyArtifactPath = getContractArtifactPath(proxyArtifactName, buildDir05, buildDir08)
+    if (!existsSync(proxyArtifactPath)) {
+      throw new Error(`Proxy artifact ${proxyArtifactName} not found at ${proxyArtifactPath}.`)
     }
     let proxyArtifact: ViemContract
     try {
@@ -885,6 +902,7 @@ const getViemChain = (networkName: string): Chain => {
         testnet: true,
       })
     default:
+      console.warn(`Unknown network ${networkName}, defaulting to Hardhat chain config`)
       return { ...viemChains.hardhat, id: 31337 }
   }
 }
@@ -931,7 +949,30 @@ const loadContractArtifact = (contractName: string, artifactPath: string): ViemC
   }
 }
 
-const findContractArtifacts = (baseDir: string, contractArtifactPathsMap: Map<string, string>) => {
+const contracts08Set = new Set(SOLIDITY_08_PACKAGE.contracts)
+
+const getContractBuildDir = (
+  contractName: string,
+  buildDir05: string,
+  buildDir08: string
+): string => {
+  if (contracts08Set.has(contractName)) {
+    return buildDir08
+  }
+  return buildDir05
+}
+
+const getContractArtifactPath = (
+  contractName: string,
+  buildDir05: string,
+  buildDir08: string
+): string => {
+  const buildDir = getContractBuildDir(contractName, buildDir05, buildDir08)
+  return join(buildDir, `${contractName}.sol`, `${contractName}.json`)
+}
+
+const listContractNames = (baseDir: string): string[] => {
+  const names: string[] = []
   const entries = readdirSync(baseDir, { withFileTypes: true })
   for (const entry of entries) {
     if (!entry.isDirectory() || !entry.name.endsWith('.sol')) {
@@ -944,22 +985,10 @@ const findContractArtifacts = (baseDir: string, contractArtifactPathsMap: Map<st
       if (!fileEntry.isFile() || !fileEntry.name.endsWith('.json')) {
         continue
       }
-
-      const contractName = basename(fileEntry.name as string, '.json')
-      const artifactFilePath = join(contractSolDirPath, fileEntry.name as string)
-
-      try {
-        const content = readJsonSync(artifactFilePath)
-        if (content.abi && content.bytecode) {
-          contractArtifactPathsMap.set(contractName, artifactFilePath)
-        } else {
-          console.warn(`Skipping non-ABI/bytecode file: ${artifactFilePath}`)
-        }
-      } catch (e) {
-        console.warn(`Skipping non-JSON or unreadable file: ${artifactFilePath}`)
-      }
+      names.push(basename(fileEntry.name as string, '.json'))
     }
   }
+  return names
 }
 
 const linkLibraries = (
@@ -1021,6 +1050,16 @@ const linkLibraries = (
     }
   }
 
+  if (contractViemArtifact.bytecode.includes('__')) {
+    const missingLibs = contractDependencies.filter((dep) => !addresses.addresses.has(dep))
+    throw new Error(
+      `Bytecode for ${contractViemArtifact.contractName} still contains unlinked library placeholders. ` +
+        `Missing library addresses: ${
+          missingLibs.length > 0 ? missingLibs.join(', ') : '(unknown - check libraries file)'
+        }`
+    )
+  }
+
   return linkedLibraries
 }
 
@@ -1028,7 +1067,8 @@ const performRelease = async (
   contractName: string,
   report: ASTDetailedVersionedReport,
   released: Set<string>,
-  contractArtifactPaths: Map<string, string>,
+  buildDir05: string,
+  buildDir08: string,
   dependencies: { get(key: string): string[] | undefined },
   addresses: ContractAddresses,
   proposal: ProposalTx[],
@@ -1043,9 +1083,9 @@ const performRelease = async (
 
   if (!shouldDeployContract && !shouldDeployLibrary) return
 
-  const artifactPath = contractArtifactPaths.get(contractName)
-  if (!artifactPath) {
-    throw new Error(`Artifact path for ${contractName} not found in map.`)
+  const artifactPath = getContractArtifactPath(contractName, buildDir05, buildDir08)
+  if (!existsSync(artifactPath)) {
+    throw new Error(`Artifact for ${contractName} not found at ${artifactPath}.`)
   }
 
   let contractViemArtifact: ViemContract
@@ -1065,7 +1105,8 @@ const performRelease = async (
           dependency,
           report,
           released,
-          contractArtifactPaths,
+          buildDir05,
+          buildDir08,
           dependencies,
           addresses,
           proposal,
@@ -1073,6 +1114,36 @@ const performRelease = async (
           walletClient,
           publicClient
         )
+      }
+    }
+
+    // Check for missing library addresses (not in libraries file and not yet deployed)
+    const missingLibraries = contractDependencies.filter((dep) => !addresses.addresses.has(dep))
+    if (missingLibraries.length > 0) {
+      console.warn(
+        `\nWARNING: ${contractName} requires libraries not found in the libraries file: ${missingLibraries.join(
+          ', '
+        )}`
+      )
+      console.warn(
+        `Missing libraries is often due to an error in the libraries file. Deploying the wrong version can lead to errors.`
+      )
+      const confirmed = await promptUserConfirmation(
+        `Deploy missing libraries (${missingLibraries.join(', ')})?`
+      )
+      if (!confirmed) {
+        throw new Error(
+          `Aborting: missing libraries for ${contractName}: ${missingLibraries.join(', ')}`
+        )
+      }
+      for (const lib of missingLibraries) {
+        const libArtifactPath = getContractArtifactPath(lib, buildDir05, buildDir08)
+        if (!existsSync(libArtifactPath)) {
+          throw new Error(`Artifact for library ${lib} not found at ${libArtifactPath}.`)
+        }
+        const libArtifact = loadContractArtifact(lib, libArtifactPath)
+        await deployLibrary(lib, libArtifact, addresses, walletClient, publicClient)
+        released.add(lib)
       }
     }
 
@@ -1087,7 +1158,8 @@ const performRelease = async (
       initializationData,
       walletClient,
       publicClient,
-      contractArtifactPaths,
+      buildDir05,
+      buildDir08,
       linkedLibraries
     )
   } else if (shouldDeployLibrary) {
@@ -1119,17 +1191,10 @@ async function main() {
         demandOption: true,
         description: 'Path to the JSON file with initialization data for contracts.',
       })
-      .option('buildDirectory05', {
+      .option('buildDirectory', {
         type: 'string',
         demandOption: true,
-        description:
-          'Path to the Foundry build output directory for Solidity 0.5 contracts (e.g., out-branch-truffle-compat).',
-      })
-      .option('buildDirectory08', {
-        type: 'string',
-        demandOption: true,
-        description:
-          'Path to the Foundry build output directory for Solidity 0.8 contracts (e.g., out-branch-truffle-compat8).',
+        description: 'Path to the Foundry build output directory (e.g., out/).',
       })
       .option('branch', {
         type: 'string',
@@ -1165,19 +1230,14 @@ async function main() {
       }).argv
 
     const networkName = argv.network!
-    const buildDir05 = argv.buildDirectory05
-    const buildDir08 = argv.buildDirectory08
-
+    const buildDirBase = argv.buildDirectory
+    const buildDir05 = `${buildDirBase}-truffle-compat`
+    const buildDir08 = `${buildDirBase}-truffle-compat8`
     if (!existsSync(buildDir05)) {
-      throw new Error(
-        `${buildDir05} directory not found. Make sure to run foundry build with truffle-compat profile first`
-      )
+      throw new Error(`${buildDir05} directory not found. Make sure to run foundry build first`)
     }
-
     if (!existsSync(buildDir08)) {
-      throw new Error(
-        `${buildDir08} directory not found. Make sure to run foundry build with truffle-compat8 profile first`
-      )
+      throw new Error(`${buildDir08} directory not found. Make sure to run foundry build first`)
     }
 
     // Check for Celoscan API key early (before deployment) for production networks
@@ -1212,7 +1272,7 @@ async function main() {
             `  - CLI flag: -a YOUR_API_KEY\n` +
             `  - Environment variable: CELOSCAN_API_KEY\n` +
             `  - Config file: packages/protocol/.env.json (celoScanApiKey)\n` +
-            `Or use --skipVerification (-s) to skip verification.`
+            `Or use -s to skip verification.`
         )
       }
     }
@@ -1264,27 +1324,20 @@ async function main() {
       ignoredContractsSet = new Set(ignoredContractsV9)
     }
 
-    const contractArtifactPaths = new Map<string, string>()
+    const names05 = listContractNames(buildDir05)
+    const names08 = listContractNames(buildDir08)
+    const allContractNamesFromDirs = [...new Set([...names05, ...names08])].sort()
 
-    findContractArtifacts(buildDir05, contractArtifactPaths)
-    findContractArtifacts(buildDir08, contractArtifactPaths)
-
-    if (contractArtifactPaths.size === 0) {
-      console.warn(
-        `No contract artifacts found in ${buildDir05} or ${buildDir08}. Ensure the directories contain Foundry outputs.`
-      )
-    }
-
-    const registryArtifactPath = contractArtifactPaths.get('Registry')
-    if (!registryArtifactPath) {
+    const registryArtifactPath = getContractArtifactPath('Registry', buildDir05, buildDir08)
+    if (!existsSync(registryArtifactPath)) {
       throw new Error(
-        `Registry.json artifact not found in ${buildDir05} or ${buildDir08}. ` +
-          `Please ensure it is compiled and present in the Foundry output format (e.g., ${buildDir05}/Registry.sol/Registry.json).`
+        `Registry.json artifact not found at ${registryArtifactPath}. ` +
+          `Please ensure it is compiled and present in the Foundry output format.`
       )
     }
     const registryArtifact = loadContractArtifact('Registry', registryArtifactPath)
 
-    const allContractNames = Array.from(contractArtifactPaths.keys()).filter(
+    const allContractNames = allContractNamesFromDirs.filter(
       (contractName) =>
         !ignoredContractsSet.has(contractName) &&
         !ignoredContractsSet.has(contractName.replace('Proxy', ''))
@@ -1302,12 +1355,13 @@ async function main() {
     const proposal: ProposalTx[] = []
 
     for (const contractName of allContractNames) {
-      if (isCoreContract(contractName) && isProxiedContract(contractName, contractArtifactPaths)) {
+      if (isCoreContract(contractName) && isProxiedContract(contractName, buildDir05, buildDir08)) {
         await performRelease(
           contractName,
           report,
           released,
-          contractArtifactPaths,
+          buildDir05,
+          buildDir08,
           dependencies,
           addresses,
           proposal,

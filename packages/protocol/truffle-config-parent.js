@@ -34,7 +34,7 @@ const defaultConfig = {
 
 function readMnemonic(networkName) {
   dotenv = require('dotenv').config({
-    path: require('path').resolve(__dirname, `../../.env.mnemonic.${networkName}`),
+    path: require('path').resolve(__dirname, `../../.env.mnemonic.${networkName.replace('-', '')}`),
   })
 
   const privateKey = process.env.DEPLOYER_PRIVATE_KEY
@@ -49,7 +49,7 @@ function readMnemonic(networkName) {
 }
 
 const fornoUrls = {
-  celosepolia: 'https://forno.celo-sepolia.celo-testnet.org',
+  'celo-sepolia': 'https://forno.celo-sepolia.celo-testnet.org',
   rc1: 'https://forno.celo.org',
   mainnet: 'https://forno.celo.org',
 }
@@ -70,6 +70,9 @@ const networks = {
     gas: gasLimit,
     gasPrice: 100000000000,
     privateKeyAvailable: false,
+    proposer: '0xc11F5aC70B86517Dcc10f20d8B0D5e77EBb956Ce',
+    approver: '0x41822d8A191fcfB1cfcA5F7048818aCd8eE933d3',
+    voter: '0xb073014a4c60c9824B597375C5e2d49e765cf811',
   },
   testnet_prod: defaultConfig,
   anvil: {
@@ -90,11 +93,14 @@ const networks = {
     network_id: 1101,
     port: devPort,
   },
-  celosepolia: {
+  'celo-sepolia': {
     ...defaultConfig,
     network_id: CELOSEPOLIA_NETWORKID,
     from: CELOSEPOLIA_FROM,
     privateKeyAvailable: true,
+    proposer: '0x95a40aA01d2d72b4122C19c86160710D01224ada',
+    approver: '0x95a40aA01d2d72b4122C19c86160710D01224ada',
+    voter: '0x95a40aA01d2d72b4122C19c86160710D01224ada',
   },
 }
 
@@ -102,8 +108,8 @@ const networks = {
 networks.mainnet = networks.rc1
 
 // Validate CELOSEPOLIA_FROM is set when using celosepolia network
-if (argv.network === 'celosepolia' && !CELOSEPOLIA_FROM) {
-  console.error('Error: CELOSEPOLIA_FROM environment variable is required for celosepolia network')
+if (argv.network === 'celo-sepolia' && !CELOSEPOLIA_FROM) {
+  console.error('Error: CELOSEPOLIA_FROM environment variable is required for celo-sepolia network')
   process.exit(1)
 }
 
@@ -143,4 +149,4 @@ if (process.argv.includes('--forno')) {
   }
 }
 
-module.exports = { networks: networks }
+module.exports = { networks: networks, fornoUrls: fornoUrls }
