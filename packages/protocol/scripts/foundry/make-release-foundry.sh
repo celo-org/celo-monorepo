@@ -9,7 +9,7 @@ set -euo pipefail
 # -i: Path to the data needed to initialize contracts.
 # -l: Path to the canonical library mapping.
 # -n: The network to deploy to.
-# -p: Path that the governance proposal should be written to.
+# -p: (Deprecated) No longer accepts a path. Proposal is always generated as proposal-$NETWORK-$BRANCH.json.
 # -r: Path to the contract compatibility report.
 # -u: Custom RPC URL (optional, overrides network default).
 # -s: Skip contract verification (optional).
@@ -50,20 +50,40 @@ done
 [ -z "$INITIALIZE_DATA" ] && echo "Need to set the initialization data via the -i flag" && exit 1;
 [ -z "$LIBRARIES" ] && echo "Need to set the library mapping input via the -l flag" && exit 1;
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
-[ -z "$PROPOSAL" ] && echo "Need to set the proposal outfile via the -p flag" && exit 1;
 [ -z "$REPORT" ] && echo "Need to set the compatibility report input via the -r flag" && exit 1;
+
+
+if [ -n "$PROPOSAL" ]; then
+  echo "Error: -p no longer accepts a path. Proposal name is now generated automatically as proposal-\$NETWORK-\$BRANCH.json." >&2
+  echo "See: https://github.com/celo-org/celo-monorepo/pull/11662" >&2
+  exit 1
+fi
+PROPOSAL="proposal-$NETWORK-$BRANCH.json"
+
+source scripts/bash/validate-libraries-filename.sh
+validate_libraries_filename "$LIBRARIES" "$NETWORK" "$BRANCH"
+
+source scripts/bash/validate-libraries-bytecode.sh
+VALIDATION_RPC_URL="${RPC_URL:-$(get_forno_url "$NETWORK")}"
+validate_libraries_bytecode "$LIBRARIES" "$VALIDATION_RPC_URL"
 
 source scripts/bash/release-lib.sh
 
+# Build contract artifacts for both Solidity 0.5 and 0.8 using Foundry profiles.
+# foundry.toml is backed up because build_tag_foundry may overwrite it when
+# restoring the config from the target branch.
 cp foundry.toml foundry.toml.bak
 
+# Solidity 0.5 contracts (truffle-compat profile produces artifacts compatible with the release tooling)
 build_tag_foundry "$BRANCH" /dev/stdout truffle-compat foundry.toml.bak
 BUILD_DIR_05=$BUILD_DIR
 
+# Solidity 0.8 contracts
 build_tag_foundry "$BRANCH" /dev/stdout truffle-compat8 foundry.toml.bak
 BUILD_DIR_08=$BUILD_DIR
 
 mv foundry.toml.bak foundry.toml
+
 
 # Build the command with optional flags
 OPTIONAL_FLAGS=""

@@ -2,9 +2,16 @@
 
 # Function to print usage
 usage() {
-  echo "Usage: $0 <tag/branch1> <tag/branch2>"
+  echo "Usage: $0 [--expanded] <tag/branch1> <tag/branch2>"
   exit 1
 }
+
+# Parse optional flags
+EXPANDED=false
+if [ "$1" = "--expanded" ]; then
+  EXPANDED=true
+  shift
+fi
 
 # Check if the correct number of arguments are provided
 if [ "$#" -ne 2 ]; then
@@ -26,8 +33,8 @@ CHANGED_FILES=$(git diff --name-only "$BRANCH1" "$BRANCH2" | grep -E '(.*/contra
 # Print the changed Solidity files
 echo "Changed Solidity files between $BRANCH1 and $BRANCH2 (excluding *.t.sol and files containing 'test'/'Test' and including only contracts or contracts-0.8 folders):"
 
-CHANGED_FILES=$(echo "$CHANGED_FILES" | sed 's|^packages/protocol/||')
-echo "$CHANGED_FILES"
+CHANGED_FILES_DISPLAY=$(echo "$CHANGED_FILES" | sed 's|^packages/protocol/||')
+echo "$CHANGED_FILES_DISPLAY"
 
 # Initialize an empty string for storing commits
 COMMITS=""
@@ -37,6 +44,13 @@ for file in $CHANGED_FILES; do
   FILE_COMMITS=$(git log --pretty=format:"%h %s" "$BRANCH1..$BRANCH2" -- "$file")
   COMMITS+=$FILE_COMMITS
   COMMITS+="\n"
+
+  if [ "$EXPANDED" = true ]; then
+    echo ""
+    echo "********************************************"
+    echo "Diff for $file"
+    git diff "$BRANCH1" "$BRANCH2" -- "$file"
+  fi
 done
 
 # Extract unique commits from the collected commit messages

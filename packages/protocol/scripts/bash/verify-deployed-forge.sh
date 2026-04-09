@@ -37,6 +37,10 @@ done
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
 
 source scripts/bash/release-lib.sh
+source scripts/bash/warn-if-libraries-exist.sh
+source scripts/bash/validate-libraries-filename.sh
+LIBRARIES_FILE=$(get_libraries_filename "$NETWORK" "$BRANCH")
+warn_if_libraries_exist "$LIBRARIES_FILE"
 
 cp foundry.toml foundry.toml.bak
 
@@ -45,4 +49,4 @@ build_tag_foundry $BRANCH $LOG_FILE truffle-compat8 foundry.toml.bak
 
 mv foundry.toml.bak foundry.toml
 
-yarn ts-node ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "libraries.json" $FORNO $PROPOSAL $INITIALIZE_DATA
+yarn ts-node ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "$LIBRARIES_FILE" $FORNO $PROPOSAL $INITIALIZE_DATA
