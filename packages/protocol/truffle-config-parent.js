@@ -80,6 +80,7 @@ const networks = {
     network_id: '*', // Accept any chain ID for anvil fork testing
     from: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
     port: devPort, // Use port 8546 for anvil (matches ANVIL_PORT in constants.sh)
+    mnemonic: 'test test test test test test test test test test test junk',
   },
   // New testnets
   integration: {

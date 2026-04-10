@@ -759,10 +759,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     console.log("Initialize EpochManager...");
     uint256[] memory valKeys = json.readUintArray(".validators.valKeys");
     uint256 maxGroupSize = json.readUint(".validators.maxGroupSize");
-    uint256 groupCount = 3;
-    address[] memory signers = new address[](maxGroupSize * groupCount);
-    // TODO check no signer is left with 0x0
-    uint256 signerIndexCount = 0;
+    uint256 groupCount = json.readUint(".validators.groupCount");
+    uint256 totalValidators = maxGroupSize * groupCount;
+    address[] memory signers = new address[](totalValidators);
+    IAccounts accounts = getAccounts();
+    uint256 count = 0;
 
     for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
       for (uint256 validatorIndex = 0; validatorIndex < maxGroupSize; validatorIndex++) {
@@ -772,22 +773,14 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
           validatorIndex,
           maxGroupSize
         );
-
-        vm.startBroadcast(valKeys[validatorKeyIndex]);
-        address accountAddress = vm.addr(valKeys[validatorKeyIndex]);
-        // TODO: On mainnet potentially singer & account should be different
-        // 1 -> list of accounts
-        // 2 -> list of signers
-        address signer = accountAddress;
-        signers[signerIndexCount] = signer;
-        signerIndexCount++;
-        vm.stopBroadcast();
+        address account = vm.addr(valKeys[validatorKeyIndex]);
+        signers[count] = accounts.getValidatorSigner(account);
+        count++;
       }
     }
 
-    // Bypass epoch manager enabler?
     vm.startBroadcast(DEPLOYER_ACCOUNT);
-    IEpochManager(getEpochManager()).initializeSystem(1, block.number, signers); // TODO fix signers (nice to have)
+    IEpochManager(getEpochManager()).initializeSystem(1, block.number, signers);
     vm.stopBroadcast();
   }
 
@@ -908,19 +901,26 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function registerValidator(
-    uint256 validatorIndex,
     uint256 validatorKey,
+    uint256 signerKey,
     uint256 amountToLock,
     address groupToAffiliate
   ) public returns (address) {
     vm.startBroadcast(validatorKey);
     lockGold(amountToLock);
     address accountAddress = vm.addr(validatorKey);
+    address signerAddress = vm.addr(signerKey);
 
-    (bytes memory ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(accountAddress, validatorKey);
+    // Authorize validator signer (without public key — can't use WithPublicKey variant
+    // because updateEcdsaPublicKey requires isValidator, and we haven't registered yet)
+    (uint8 sv, bytes32 sr, bytes32 ss) = getParsedSignatureOfAddress(accountAddress, signerKey);
+    getAccounts().authorizeValidatorSigner(signerAddress, sv, sr, ss);
+
+    // Register with the signer's ECDSA public key
+    (bytes memory ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(accountAddress, signerKey);
     getValidators().registerValidatorNoBls(ecdsaPubKey);
     getValidators().affiliate(groupToAffiliate);
-    console.log("Done registering validators");
+    console.log("Done registering validator, signer: ", signerAddress);
 
     vm.stopBroadcast();
     return accountAddress;
@@ -1002,12 +1002,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 commission = json.readUint(".validators.commission");
     uint256 minElectableValidators = json.readUint(".election.minElectableValidators");
     uint256[] memory valKeys = json.readUintArray(".validators.valKeys");
+    string memory signersMnemonic = json.readString(".validators.signersMnemonic");
     uint256 maxGroupSize = json.readUint(".validators.maxGroupSize");
     uint256 validatorLockedGoldRequirements = json.readUint(
       ".validators.validatorLockedGoldRequirements.value"
     );
     uint256 groupCount = json.readUint(".validators.groupCount");
-    // TODO: attestationKeys not migrated
 
     if (valKeys.length == 0) {
       console.log("  No validators to register");
@@ -1032,9 +1032,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     }
 
     console.log("  * Registering validators... Count: ", valKeys.length - groupCount);
-    // TODO: Split the validator keys into groups that will fit within the max group size.
 
     IValidators validators = getValidators();
+    uint256 signerIndex = 0;
 
     for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
       address groupAddress = groups[groupIndex];
@@ -1047,10 +1047,13 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
           maxGroupSize
         );
 
+        uint256 signerKey = vm.deriveKey(signersMnemonic, uint32(signerIndex));
+        signerIndex++;
+
         console.log("Registering validator #: ", validatorIndex);
         address validator = registerValidator(
-          validatorIndex,
           valKeys[validatorKeyIndex],
+          signerKey,
           validatorLockedGoldRequirements,
           groupAddress
         );
