@@ -7,7 +7,6 @@ import { Script } from "forge-std-8/Script.sol";
 
 // Foundry imports
 import { console } from "forge-std/console.sol";
-import { console2 } from "forge-std/console2.sol";
 import { stdJson } from "forge-std/StdJson.sol";
 
 // OpenZeppelin
@@ -204,9 +203,10 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     vm.startBroadcast(json.readUint(".deployerPrivateKey"));
 
     // doing a native transfer is not allowed by the unreleased treasury
+    uint256 treasuryBalance = json.readUint(".celoUnreleasedTreasury.initialBalance");
     IERC20(registry.getAddressForStringOrDie("GoldToken")).transfer(
       registry.getAddressForStringOrDie("CeloUnreleasedTreasury"),
-      390_000_000e18
+      treasuryBalance
     );
     vm.stopBroadcast();
   }
@@ -240,7 +240,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function checkUnreleasedTreasuryBalance() internal {
     address celoUnreleasedTreasury = address(getCeloUnreleasedTreasury());
     uint256 balance = getCeloToken().balanceOf(celoUnreleasedTreasury);
-    console2.log("Unreleased Treasury balance: ", balance, "CELO");
+    console.log("Unreleased Treasury balance: ", balance, "CELO");
   }
 
   /**
