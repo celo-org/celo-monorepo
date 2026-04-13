@@ -184,7 +184,7 @@ contract EpochManager is
   /**
    * @notice Initializes the EpochManager system, allowing it to start processing epoch
    * and distributing the epoch rewards.
-   * @dev Can only be called by the EpochManagerEnabler contract.
+   * @dev Can only be called by Owner. This function is only meant to be called during deployment of a new network.
    */
   function initializeSystem(
     uint256 firstEpochNumber,

@@ -12,6 +12,7 @@ import "./interfaces/IEpochManagerEnablerInitializer.sol";
 
 /**
  * @title Contract Used to initialize the EpochManager system after L2 transition.
+ * @dev this contract is now deprecated.
  */
 contract EpochManagerEnabler is
   Initializable,

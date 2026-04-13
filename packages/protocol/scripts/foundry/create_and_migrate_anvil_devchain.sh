@@ -57,12 +57,15 @@ $REGISTRY_ADDRESS $REGISTRY_STORAGE_LOCATION "0x000000000000000000000000$REGISTR
 # Run migrations
 # Not using the --slow flag causes the migrations to randomly hang
 echo "Running migration script..."
+
+# In the past, --slow used to fix flaky migrations runs
+# as of forge v1.5 this issue seems to be resolved, but we keep it may be worth trying if experiencing issues
 $FORGE script \
   $MIGRATION_SCRIPT_PATH \
   --target-contract $MIGRATION_TARGET_CONTRACT \
   --sender $FROM_ACCOUNT \
-  --legacy \
   --slow \
+  --legacy \
   --sig "runMigration()" \
   --private-key $FROM_PK \
   $VERBOSITY_LEVEL \

@@ -97,8 +97,6 @@ for validator in $registered_validators; do
     continue
   fi
 
-  
-
   echo "### activating validator group: $validator_group with pending votes: $pending_votes"
   cast send $ELECTION_ADDRESS "activate(address)" $validator_group --private-key ${FIRST_THREE_KEYS[$key_index]} --rpc-url $ANVIL_RPC_URL
   key_index=$((key_index + 1))

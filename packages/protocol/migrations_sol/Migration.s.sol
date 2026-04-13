@@ -68,7 +68,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 commissionUpdateDelay;
   }
 
-  string json; // configuration file content
+  string configulationFileRawJSON;
   IProxyFactory internal proxyFactory;
   uint256 internal proxyNonce = 0;
   address DEPLOYER_ACCOUNT;
@@ -156,8 +156,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function setUp() public {
     console.log("Setting up migration...");
-    json = vm.readFile("./migrations_sol/migrationsConfig.json");
-    DEPLOYER_ACCOUNT = json.readAddress(".deployerAccount");
+    configulationFileRawJSON = vm.readFile("./migrations_sol/migrationsConfig.json");
+    DEPLOYER_ACCOUNT = configulationFileRawJSON.readAddress(".deployerAccount");
   }
 
   /**
@@ -171,39 +171,41 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateRegistry();
     setupUsingRegistry();
     migrateFreezer();
-    migrateFeeCurrencyDirectory(json);
-    migrateCeloToken(json);
-    migrateSortedOracles(json);
-    migrateReserveSpenderMultiSig(json);
-    migrateReserve(json);
-    migrateStableToken(json);
+    migrateFeeCurrencyDirectory(configulationFileRawJSON);
+    migrateCeloToken(configulationFileRawJSON);
+    migrateSortedOracles(configulationFileRawJSON);
+    migrateReserveSpenderMultiSig(configulationFileRawJSON);
+    migrateReserve(configulationFileRawJSON);
+    migrateStableToken(configulationFileRawJSON);
 
-    migrateExchange(json);
+    migrateExchange(configulationFileRawJSON);
 
     migrateAccount();
 
-    migrateLockedCelo(json);
-    migrateValidators(json);
-    migrateElection(json);
-    migrateEpochRewards(json);
+    migrateLockedCelo(configulationFileRawJSON);
+    migrateValidators(configulationFileRawJSON);
+    migrateElection(configulationFileRawJSON);
+    migrateEpochRewards(configulationFileRawJSON);
     migrateEscrow();
 
     migrateGovernanceSlasher();
-    migrateGovernanceApproverMultiSig(json);
+    migrateGovernanceApproverMultiSig(configulationFileRawJSON);
     migrateFederatedAttestations();
     migrateMentoFeeHandlerSeller();
     migrateUniswapFeeHandlerSeller();
-    migrateFeeHandler(json);
+    migrateFeeHandler(configulationFileRawJSON);
     migrateOdisPayments();
-    migrateCeloUnreleasedTreasury(json);
+    migrateCeloUnreleasedTreasury(configulationFileRawJSON);
 
     vm.stopBroadcast();
 
     // fund the CeloUnreleasedTreasury
-    vm.startBroadcast(json.readUint(".deployerPrivateKey"));
+    vm.startBroadcast(configulationFileRawJSON.readUint(".deployerPrivateKey"));
 
     // doing a native transfer is not allowed by the unreleased treasury
-    uint256 treasuryBalance = json.readUint(".celoUnreleasedTreasury.initialBalance");
+    uint256 treasuryBalance = configulationFileRawJSON.readUint(
+      ".celoUnreleasedTreasury.initialBalance"
+    );
     IERC20(registry.getAddressForStringOrDie("GoldToken")).transfer(
       registry.getAddressForStringOrDie("CeloUnreleasedTreasury"),
       treasuryBalance
@@ -222,19 +224,19 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     proxyFactory = IProxyFactory(deployContract("ProxyFactory", bytes32(uint256(1))));
 
     checkUnreleasedTreasuryBalance();
-    migrateEpochManager(json);
+    migrateEpochManager(configulationFileRawJSON);
     migrateScoreManager();
     vm.stopBroadcast();
 
-    initializeEpochManager(json);
+    initializeEpochManager(configulationFileRawJSON);
 
     vm.startBroadcast(DEPLOYER_ACCOUNT);
-    migrateGovernance(json);
+    migrateGovernance(configulationFileRawJSON);
 
     SECP256K1Address = address(new SECP256K1());
     vm.stopBroadcast();
 
-    electValidators(json);
+    electValidators(configulationFileRawJSON);
   }
 
   function checkUnreleasedTreasuryBalance() internal {
@@ -268,7 +270,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateFeeCurrencyDirectory(string memory json) public {
-    address feeCurrencyDirectoryProxyAddress = json.readAddress(".proxies.feeCurrencyDirectory");
+    address feeCurrencyDirectoryProxyAddress = configulationFileRawJSON.readAddress(
+      ".proxies.feeCurrencyDirectory"
+    );
     setImplementationOnProxyAndAddToRegistry(
       "FeeCurrencyDirectory",
       IProxy(feeCurrencyDirectoryProxyAddress),
@@ -279,7 +283,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function migrateCeloToken(string memory json) public {
     // TODO: change pre-funded addresses to make it match circulation supply
     // pre deployed celo token proxy address from L2Genesis.s.sol
-    address celoProxyAddress = json.readAddress(".proxies.celoToken");
+    address celoProxyAddress = configulationFileRawJSON.readAddress(".proxies.celoToken");
 
     setImplementationOnProxyAndAddToRegistry(
       "GoldToken",
@@ -289,14 +293,16 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     addToRegistry("CeloToken", celoProxyAddress);
 
-    bool frozen = json.readBool(".goldToken.frozen");
+    bool frozen = configulationFileRawJSON.readBool(".goldToken.frozen");
     if (frozen) {
       getFreezer().freeze(celoProxyAddress);
     }
   }
 
   function migrateSortedOracles(string memory json) public {
-    uint256 reportExpirySeconds = json.readUint(".sortedOracles.reportExpirySeconds");
+    uint256 reportExpirySeconds = configulationFileRawJSON.readUint(
+      ".sortedOracles.reportExpirySeconds"
+    );
     deployProxiedContract(
       "SortedOracles",
       abi.encodeWithSelector(ISortedOraclesInitializer.initialize.selector, reportExpirySeconds)
@@ -307,8 +313,10 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     address[] memory owners = new address[](1);
     owners[0] = DEPLOYER_ACCOUNT;
 
-    uint256 required = json.readUint(".reserveSpenderMultiSig.required");
-    uint256 internalRequired = json.readUint(".reserveSpenderMultiSig.internalRequired");
+    uint256 required = configulationFileRawJSON.readUint(".reserveSpenderMultiSig.required");
+    uint256 internalRequired = configulationFileRawJSON.readUint(
+      ".reserveSpenderMultiSig.internalRequired"
+    );
 
     // Deploys and adds the ReserveSpenderMultiSig to the Registry for ease of reference.
     // The ReserveSpenderMultiSig is not in the Registry on Mainnet, but it's useful to keep a
@@ -330,18 +338,24 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "We only have it because the StableTokens need it for compatibility."
     );
 
-    uint256 tobinTaxStalenessThreshold = json.readUint(".reserve.tobinTaxStalenessThreshold");
-    uint256 spendingRatio = json.readUint(".reserve.spendingRatio");
-    uint256 frozenGold = json.readUint(".reserve.frozenGold");
-    uint256 frozenDays = json.readUint(".reserve.frozenDays");
-    bytes32[] memory assetAllocationSymbols = json.readBytes32Array(
+    uint256 tobinTaxStalenessThreshold = configulationFileRawJSON.readUint(
+      ".reserve.tobinTaxStalenessThreshold"
+    );
+    uint256 spendingRatio = configulationFileRawJSON.readUint(".reserve.spendingRatio");
+    uint256 frozenGold = configulationFileRawJSON.readUint(".reserve.frozenGold");
+    uint256 frozenDays = configulationFileRawJSON.readUint(".reserve.frozenDays");
+    bytes32[] memory assetAllocationSymbols = configulationFileRawJSON.readBytes32Array(
       ".reserve.assetAllocationSymbols"
     );
 
-    uint256[] memory assetAllocationWeights = json.readUintArray(".reserve.assetAllocationWeights");
-    uint256 tobinTax = json.readUint(".reserve.tobinTax");
-    uint256 tobinTaxReserveRatio = json.readUint(".reserve.tobinTaxReserveRatio");
-    uint256 initialBalance = json.readUint(".reserve.initialBalance");
+    uint256[] memory assetAllocationWeights = configulationFileRawJSON.readUintArray(
+      ".reserve.assetAllocationWeights"
+    );
+    uint256 tobinTax = configulationFileRawJSON.readUint(".reserve.tobinTax");
+    uint256 tobinTaxReserveRatio = configulationFileRawJSON.readUint(
+      ".reserve.tobinTaxReserveRatio"
+    );
+    uint256 initialBalance = configulationFileRawJSON.readUint(".reserve.initialBalance");
 
     address reserveProxyAddress = deployProxiedContract(
       "Reserve",
@@ -363,7 +377,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     vm.deal(reserveProxyAddress, initialBalance);
 
     // Adds ReserveSpenderMultiSig to Reserve
-    bool useSpender = json.readBool(".reserveSpenderMultiSig.required");
+    bool useSpender = configulationFileRawJSON.readBool(".reserveSpenderMultiSig.required");
     address spender = useSpender
       ? registry.getAddressForString("ReserveSpenderMultiSig")
       : DEPLOYER_ACCOUNT;
@@ -424,18 +438,25 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "At this point, it mostly serves as an example of an ERC20 token with support for fee abstraction."
     );
 
-    string[] memory names = json.readStringArray(".stableTokens.names");
-    string[] memory symbols = json.readStringArray(".stableTokens.symbols");
-    string[] memory contractSuffixes = json.readStringArray(".stableTokens.contractSuffixes");
+    string[] memory names = configulationFileRawJSON.readStringArray(".stableTokens.names");
+    string[] memory symbols = configulationFileRawJSON.readStringArray(".stableTokens.symbols");
+    string[] memory contractSuffixes = configulationFileRawJSON.readStringArray(
+      ".stableTokens.contractSuffixes"
+    );
 
     require(names.length == symbols.length, "Ticker and stable names should match");
 
-    uint8 decimals = abi.decode(json.parseRaw(".stableTokens.decimals"), (uint8));
-    uint256 inflationRate = json.readUint(".stableTokens.inflationRate");
-    uint256 inflationFactorUpdatePeriod = json.readUint(".stableTokens.inflationPeriod");
-    uint256 initialBalanceValue = json.readUint(".stableTokens.initialBalance");
-    bool frozen = json.readBool(".stableTokens.frozen");
-    uint256 celoPrice = json.readUint(".stableTokens.celoPrice");
+    uint8 decimals = abi.decode(
+      configulationFileRawJSON.parseRaw(".stableTokens.decimals"),
+      (uint8)
+    );
+    uint256 inflationRate = configulationFileRawJSON.readUint(".stableTokens.inflationRate");
+    uint256 inflationFactorUpdatePeriod = configulationFileRawJSON.readUint(
+      ".stableTokens.inflationPeriod"
+    );
+    uint256 initialBalanceValue = configulationFileRawJSON.readUint(".stableTokens.initialBalance");
+    bool frozen = configulationFileRawJSON.readBool(".stableTokens.frozen");
+    uint256 celoPrice = configulationFileRawJSON.readUint(".stableTokens.celoPrice");
 
     address[] memory initialBalanceAddresses = new address[](1);
     initialBalanceAddresses[0] = DEPLOYER_ACCOUNT;
@@ -463,10 +484,10 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // TODO make this for all stables (using a loop like in stable)
 
     string memory stableTokenIdentifier = "StableToken";
-    uint256 spread = json.readUint(".exchange.spread");
-    uint256 reserveFraction = json.readUint(".exchange.reserveFraction");
-    uint256 updateFrequency = json.readUint(".exchange.updateFrequency");
-    uint256 minimumReports = json.readUint(".exchange.minimumReports");
+    uint256 spread = configulationFileRawJSON.readUint(".exchange.spread");
+    uint256 reserveFraction = configulationFileRawJSON.readUint(".exchange.reserveFraction");
+    uint256 updateFrequency = configulationFileRawJSON.readUint(".exchange.updateFrequency");
+    uint256 minimumReports = configulationFileRawJSON.readUint(".exchange.minimumReports");
 
     address exchangeProxyAddress = deployProxiedContract(
       "Exchange",
@@ -481,7 +502,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       )
     );
 
-    bool frozen = json.readBool(".exchange.frozen");
+    bool frozen = configulationFileRawJSON.readBool(".exchange.frozen");
     if (frozen) {
       getFreezer().freeze(exchangeProxyAddress);
     }
@@ -499,7 +520,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateLockedCelo(string memory json) public {
-    uint256 unlockingPeriod = json.readUint(".lockedGold.unlockingPeriod");
+    uint256 unlockingPeriod = configulationFileRawJSON.readUint(".lockedGold.unlockingPeriod");
 
     address LockedCeloProxyAddress = deployProxiedContract(
       "LockedGold",
@@ -514,22 +535,28 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateValidators(string memory json) public {
-    uint256 groupRequirementValue = json.readUint(".validators.groupLockedGoldRequirements.value");
-    uint256 groupRequirementDuration = json.readUint(
+    uint256 groupRequirementValue = configulationFileRawJSON.readUint(
+      ".validators.groupLockedGoldRequirements.value"
+    );
+    uint256 groupRequirementDuration = configulationFileRawJSON.readUint(
       ".validators.groupLockedGoldRequirements.duration"
     );
-    uint256 validatorRequirementValue = json.readUint(
+    uint256 validatorRequirementValue = configulationFileRawJSON.readUint(
       ".validators.validatorLockedGoldRequirements.value"
     );
-    uint256 validatorRequirementDuration = json.readUint(
+    uint256 validatorRequirementDuration = configulationFileRawJSON.readUint(
       ".validators.validatorLockedGoldRequirements.duration"
     );
-    uint256 membershipHistoryLength = json.readUint(".validators.membershipHistoryLength");
-    uint256 slashingMultiplierResetPeriod = json.readUint(
+    uint256 membershipHistoryLength = configulationFileRawJSON.readUint(
+      ".validators.membershipHistoryLength"
+    );
+    uint256 slashingMultiplierResetPeriod = configulationFileRawJSON.readUint(
       ".validators.slashingMultiplierResetPeriod"
     );
-    uint256 maxGroupSize = json.readUint(".validators.maxGroupSize");
-    uint256 commissionUpdateDelay = json.readUint(".validators.commissionUpdateDelay");
+    uint256 maxGroupSize = configulationFileRawJSON.readUint(".validators.maxGroupSize");
+    uint256 commissionUpdateDelay = configulationFileRawJSON.readUint(
+      ".validators.commissionUpdateDelay"
+    );
 
     InitParamsTunnel memory initParamsTunnel = InitParamsTunnel({
       commissionUpdateDelay: commissionUpdateDelay
@@ -553,10 +580,18 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateElection(string memory json) public {
-    uint256 minElectableValidators = json.readUint(".election.minElectableValidators");
-    uint256 maxElectableValidators = json.readUint(".election.maxElectableValidators");
-    uint256 maxNumGroupsVotedFor = json.readUint(".election.maxNumGroupsVotedFor");
-    uint256 electabilityThreshold = json.readUint(".election.electabilityThreshold");
+    uint256 minElectableValidators = configulationFileRawJSON.readUint(
+      ".election.minElectableValidators"
+    );
+    uint256 maxElectableValidators = configulationFileRawJSON.readUint(
+      ".election.maxElectableValidators"
+    );
+    uint256 maxNumGroupsVotedFor = configulationFileRawJSON.readUint(
+      ".election.maxNumGroupsVotedFor"
+    );
+    uint256 electabilityThreshold = configulationFileRawJSON.readUint(
+      ".election.electabilityThreshold"
+    );
 
     address proxyAddress = proxyFactory.deployProxy();
 
@@ -580,25 +615,39 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateEpochRewards(string memory json) public {
-    uint256 targetVotingYieldInitial = json.readUint(
+    uint256 targetVotingYieldInitial = configulationFileRawJSON.readUint(
       ".epochRewards.targetVotingYieldParameters.initial"
     );
-    uint256 targetVotingYieldMax = json.readUint(".epochRewards.targetVotingYieldParameters.max");
-    uint256 targetVotingYieldAdjustmentFactor = json.readUint(
+    uint256 targetVotingYieldMax = configulationFileRawJSON.readUint(
+      ".epochRewards.targetVotingYieldParameters.max"
+    );
+    uint256 targetVotingYieldAdjustmentFactor = configulationFileRawJSON.readUint(
       ".epochRewards.targetVotingYieldParameters.adjustmentFactor"
     );
-    uint256 rewardsMultiplierMax = json.readUint(".epochRewards.rewardsMultiplierParameters.max");
-    uint256 rewardsMultiplierUnderspendAdjustmentFactor = json.readUint(
+    uint256 rewardsMultiplierMax = configulationFileRawJSON.readUint(
+      ".epochRewards.rewardsMultiplierParameters.max"
+    );
+    uint256 rewardsMultiplierUnderspendAdjustmentFactor = configulationFileRawJSON.readUint(
       ".epochRewards.rewardsMultiplierParameters.adjustmentFactors.underspend"
     );
-    uint256 rewardsMultiplierOverspendAdjustmentFactor = json.readUint(
+    uint256 rewardsMultiplierOverspendAdjustmentFactor = configulationFileRawJSON.readUint(
       ".epochRewards.rewardsMultiplierParameters.adjustmentFactors.overspend"
     );
-    uint256 targetVotingGoldFraction = json.readUint(".epochRewards.targetVotingGoldFraction");
-    uint256 targetValidatorEpochPayment = json.readUint(".epochRewards.maxValidatorEpochPayment");
-    uint256 communityRewardFraction = json.readUint(".epochRewards.communityRewardFraction");
-    address carbonOffsettingPartner = json.readAddress(".epochRewards.carbonOffsettingPartner");
-    uint256 carbonOffsettingFraction = json.readUint(".epochRewards.carbonOffsettingFraction");
+    uint256 targetVotingGoldFraction = configulationFileRawJSON.readUint(
+      ".epochRewards.targetVotingGoldFraction"
+    );
+    uint256 targetValidatorEpochPayment = configulationFileRawJSON.readUint(
+      ".epochRewards.maxValidatorEpochPayment"
+    );
+    uint256 communityRewardFraction = configulationFileRawJSON.readUint(
+      ".epochRewards.communityRewardFraction"
+    );
+    address carbonOffsettingPartner = configulationFileRawJSON.readAddress(
+      ".epochRewards.carbonOffsettingPartner"
+    );
+    uint256 carbonOffsettingFraction = configulationFileRawJSON.readUint(
+      ".epochRewards.carbonOffsettingFraction"
+    );
 
     address epochRewardsProxy = deployProxiedContract(
       "EpochRewards",
@@ -619,7 +668,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       )
     );
 
-    bool frozen = json.readBool(".epochRewards.frozen");
+    bool frozen = configulationFileRawJSON.readBool(".epochRewards.frozen");
 
     if (frozen) {
       getFreezer().freeze(epochRewardsProxy);
@@ -643,8 +692,10 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     address[] memory owners = new address[](1);
     owners[0] = DEPLOYER_ACCOUNT;
 
-    uint256 required = json.readUint(".governanceApproverMultiSig.required");
-    uint256 internalRequired = json.readUint(".governanceApproverMultiSig.internalRequired");
+    uint256 required = configulationFileRawJSON.readUint(".governanceApproverMultiSig.required");
+    uint256 internalRequired = configulationFileRawJSON.readUint(
+      ".governanceApproverMultiSig.internalRequired"
+    );
     // This adds the multisig to the registry, which is not a case in mainnet but it's useful to keep a reference
     // of the deployed contract
     deployProxiedContract(
@@ -696,15 +747,15 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateFeeHandler(string memory json) public {
-    address newFeeBeneficiary = json.readAddress(".feeHandler.beneficiary");
-    uint256 newBurnFraction = json.readUint(".feeHandler.burnFraction");
+    address newFeeBeneficiary = configulationFileRawJSON.readAddress(".feeHandler.beneficiary");
+    uint256 newBurnFraction = configulationFileRawJSON.readUint(".feeHandler.burnFraction");
     address[] memory tokens;
     address[] memory handlers;
     uint256[] memory newLimits;
     uint256[] memory newMaxSlippages;
 
     // pre deployed fee handler proxy address from L2Genesis.s.sol
-    address feeHandlerProxyAddress = json.readAddress(".proxies.feeHandler");
+    address feeHandlerProxyAddress = configulationFileRawJSON.readAddress(".proxies.feeHandler");
 
     setImplementationOnProxyAndAddToRegistry(
       "FeeHandler",
@@ -736,7 +787,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function migrateCeloUnreleasedTreasury(string memory json) public {
     // pre deployed celo unreleased treasury proxy address from L2Genesis.s.sol
-    address celoUnreleasedTreasury = json.readAddress(".proxies.celoUnreleasedTreasury");
+    address celoUnreleasedTreasury = configulationFileRawJSON.readAddress(
+      ".proxies.celoUnreleasedTreasury"
+    );
 
     setImplementationOnProxyAndAddToRegistry(
       "CeloUnreleasedTreasury",
@@ -757,9 +810,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function initializeEpochManager(string memory json) public {
     console.log("Initialize EpochManager...");
-    uint256[] memory valKeys = json.readUintArray(".validators.valKeys");
-    uint256 maxGroupSize = json.readUint(".validators.maxGroupSize");
-    uint256 groupCount = json.readUint(".validators.groupCount");
+    uint256[] memory valKeys = configulationFileRawJSON.readUintArray(".validators.valKeys");
+    uint256 maxGroupSize = configulationFileRawJSON.readUint(".validators.maxGroupSize");
+    uint256 groupCount = configulationFileRawJSON.readUint(".validators.groupCount");
     uint256 totalValidators = maxGroupSize * groupCount;
     address[] memory signers = new address[](totalValidators);
     IAccounts accounts = getAccounts();
@@ -785,7 +838,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateEpochManager(string memory json) public {
-    address newEpochDuration = json.readAddress(".epochManager.newEpochDuration");
+    uint256 newEpochDuration = configulationFileRawJSON.readUint(".epochManager.newEpochDuration");
 
     deployProxiedContract(
       "EpochManager",
@@ -799,21 +852,35 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateGovernance(string memory json) public {
-    bool useApprover = json.readBool(".governanceApproverMultiSig.required");
+    bool useApprover = configulationFileRawJSON.readBool(".governanceApproverMultiSig.required");
 
     address approver = useApprover
       ? registry.getAddressForString("GovernanceApproverMultiSig")
       : DEPLOYER_ACCOUNT;
-    uint256 concurrentProposals = json.readUint(".governance.concurrentProposals");
-    uint256 minDeposit = json.readUint(".governance.minDeposit");
-    uint256 queueExpiry = json.readUint(".governance.queueExpiry");
-    uint256 dequeueFrequency = json.readUint(".governance.dequeueFrequency");
-    uint256 referendumStageDuration = json.readUint(".governance.referendumStageDuration");
-    uint256 executionStageDuration = json.readUint(".governance.executionStageDuration");
-    uint256 participationBaseline = json.readUint(".governance.participationBaseline");
-    uint256 participationFloor = json.readUint(".governance.participationFloor");
-    uint256 baselineUpdateFactor = json.readUint(".governance.baselineUpdateFactor");
-    uint256 baselineQuorumFactor = json.readUint(".governance.baselineQuorumFactor");
+    uint256 concurrentProposals = configulationFileRawJSON.readUint(
+      ".governance.concurrentProposals"
+    );
+    uint256 minDeposit = configulationFileRawJSON.readUint(".governance.minDeposit");
+    uint256 queueExpiry = configulationFileRawJSON.readUint(".governance.queueExpiry");
+    uint256 dequeueFrequency = configulationFileRawJSON.readUint(".governance.dequeueFrequency");
+    uint256 referendumStageDuration = configulationFileRawJSON.readUint(
+      ".governance.referendumStageDuration"
+    );
+    uint256 executionStageDuration = configulationFileRawJSON.readUint(
+      ".governance.executionStageDuration"
+    );
+    uint256 participationBaseline = configulationFileRawJSON.readUint(
+      ".governance.participationBaseline"
+    );
+    uint256 participationFloor = configulationFileRawJSON.readUint(
+      ".governance.participationFloor"
+    );
+    uint256 baselineUpdateFactor = configulationFileRawJSON.readUint(
+      ".governance.baselineUpdateFactor"
+    );
+    uint256 baselineQuorumFactor = configulationFileRawJSON.readUint(
+      ".governance.baselineQuorumFactor"
+    );
 
     address governanceProxyAddress = deployProxiedContract(
       "Governance",
@@ -839,7 +906,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function _transferOwnerShipCoreContract(address governanceAddress, string memory json) public {
-    bool skipTransferOwnership = json.readBool(".governance.skipTransferOwnership");
+    bool skipTransferOwnership = configulationFileRawJSON.readBool(
+      ".governance.skipTransferOwnership"
+    );
     if (!skipTransferOwnership) {
       // BlockchainParameters ownership transitioned to governance in a follow-up script.?
       for (uint256 i = 0; i < contractsInRegistry.length; i++) {
@@ -861,8 +930,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     }
   }
 
-  function _setConstitution(address _governanceAddress, string memory _json) public {
-    bool skipSetConstitution_ = _json.readBool(".governance.skipSetConstitution");
+  function _setConstitution(address _governanceAddress, string memory _configulationJSON) public {
+    bool skipSetConstitution_ = _configulationJSON.readBool(".governance.skipSetConstitution");
     IGovernance governance_ = IGovernance(_governanceAddress);
     registry = IRegistry(REGISTRY_ADDRESS);
 
@@ -941,7 +1010,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 commission,
     string memory json
   ) public returns (address accountAddress) {
-    string memory groupName = json.readString(".validators.groupName");
+    string memory groupName = configulationFileRawJSON.readString(".validators.groupName");
     vm.startBroadcast(validator0Key);
     lockGold(amountToLock);
     getAccounts().setName(groupName);
@@ -999,15 +1068,19 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function electValidators(string memory json) public {
     console.log("Electing validators: ");
 
-    uint256 commission = json.readUint(".validators.commission");
-    uint256 minElectableValidators = json.readUint(".election.minElectableValidators");
-    uint256[] memory valKeys = json.readUintArray(".validators.valKeys");
-    string memory signersMnemonic = json.readString(".validators.signersMnemonic");
-    uint256 maxGroupSize = json.readUint(".validators.maxGroupSize");
-    uint256 validatorLockedGoldRequirements = json.readUint(
+    uint256 commission = configulationFileRawJSON.readUint(".validators.commission");
+    uint256 minElectableValidators = configulationFileRawJSON.readUint(
+      ".election.minElectableValidators"
+    );
+    uint256[] memory valKeys = configulationFileRawJSON.readUintArray(".validators.valKeys");
+    string memory signersMnemonic = configulationFileRawJSON.readString(
+      ".validators.signersMnemonic"
+    );
+    uint256 maxGroupSize = configulationFileRawJSON.readUint(".validators.maxGroupSize");
+    uint256 validatorLockedGoldRequirements = configulationFileRawJSON.readUint(
       ".validators.validatorLockedGoldRequirements.value"
     );
-    uint256 groupCount = json.readUint(".validators.groupCount");
+    uint256 groupCount = configulationFileRawJSON.readUint(".validators.groupCount");
 
     if (valKeys.length == 0) {
       console.log("  No validators to register");
