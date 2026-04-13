@@ -3,7 +3,11 @@ set -euo pipefail
 
 CONFIG_FILE=$PWD/migrations_sol/migrationsConfig.json
 
-ELECTIONS_ADDRESS=$(
+current_block() {
+  cast block-number --rpc-url $ANVIL_RPC_URL
+}
+
+ELECTION_ADDRESS=$(
   cast call \
     $REGISTRY_ADDRESS \
     "getAddressForStringOrDie(string calldata identifier)(address)" \
@@ -18,7 +22,7 @@ VALIDATORS_ADDRESS=$(
     "Validators" \
     --rpc-url $ANVIL_RPC_URL
 )
-# Activate votes:
+
 # Activate Validators
 echo "Activating Validators..."
 registered_validators=$(cast call \
@@ -29,15 +33,15 @@ registered_validators=$(cast call \
 echo "### registered_validators: $registered_validators"
 
 # Increase the block number using anvil cast rpc
-echo `cast block --rpc-url $ANVIL_RPC_URL`
+echo "Current block now $(current_block)"
 BLOCKS_TO_ADVANCE=$(($(jq '.epochManager.newEpochDuration' "$CONFIG_FILE") + 1))
 MS_TO_ADVANCE=$((BLOCKS_TO_ADVANCE * 1000))
 
+# Mock the new time on anvil
 cast rpc evm_increaseTime $MS_TO_ADVANCE --rpc-url $ANVIL_RPC_URL --rpc-timeout 30000
 cast rpc anvil_mine $BLOCKS_TO_ADVANCE --rpc-url $ANVIL_RPC_URL --rpc-timeout 30000
 
-# advance 101 seconds
-echo `cast block --rpc-url $ANVIL_RPC_URL`
+echo "Current block now $(current_block)"
 
 celocli epochs:switch --from $FROM_ACCOUNT -n $ANVIL_RPC_URL
 
@@ -80,7 +84,7 @@ for validator in $registered_validators; do
   echo "### validator group: $validator_group"
 
   pending_votes=$(cast call \
-    $ELECTIONS_ADDRESS \
+    $ELECTION_ADDRESS \
     "getPendingVotesForGroup(address)(uint256)" \
     $validator_group \
     --rpc-url $ANVIL_RPC_URL)
@@ -96,7 +100,7 @@ for validator in $registered_validators; do
   
 
   echo "### activating validator group: $validator_group with pending votes: $pending_votes"
-  cast send $ELECTIONS_ADDRESS "activate(address)" $validator_group --private-key ${FIRST_THREE_KEYS[$key_index]} --rpc-url $ANVIL_RPC_URL
+  cast send $ELECTION_ADDRESS "activate(address)" $validator_group --private-key ${FIRST_THREE_KEYS[$key_index]} --rpc-url $ANVIL_RPC_URL
   key_index=$((key_index + 1))
 
   echo "### activated validator group: $validator_group with pending votes: $pending_votes"
@@ -104,7 +108,7 @@ for validator in $registered_validators; do
 done
 
 active_votes=$(cast call \
-  $ELECTIONS_ADDRESS \
+  $ELECTION_ADDRESS \
   "getActiveVotes()(uint256)" \
   --rpc-url $ANVIL_RPC_URL)
 echo "### active votes: $active_votes"
