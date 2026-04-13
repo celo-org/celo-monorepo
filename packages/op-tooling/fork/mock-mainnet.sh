@@ -58,7 +58,7 @@ fi
 SENTINEL_ADDRESS=0x0000000000000000000000000000000000000001
 
 # rpc
-RPC_URL=http://127.0.0.1:8545
+RPC_URL="${RPC_URL:-http://127.0.0.1:8545}"
 
 # set 10_000 ETH on mocked owner
 echo "Mock accounts balance"

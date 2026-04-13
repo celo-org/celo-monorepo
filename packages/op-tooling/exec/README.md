@@ -178,7 +178,7 @@ Executes the Jovian upgrade (v4 + v5 + succ-v2) on Celo Mainnet through the nest
 
 - `secrets/.env.signers.v4` - Decoded signers file for v4 (must be decrypted before running)
 - `secrets/.env.signers.v5` - Decoded signers file for v5
-- `secrets/.env.signers.succ-v2` - Decoded signers file for succ-v2
+- `secrets/.env.signers.succinct200` - Decoded signers file for succ-v2
 
 **Upgrade Configuration:**
 

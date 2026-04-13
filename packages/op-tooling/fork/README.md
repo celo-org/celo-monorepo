@@ -12,11 +12,12 @@ Forks an L1 network (Ethereum mainnet or Sepolia testnet) using Anvil.
 
 - `NETWORK` - Network to fork (`mainnet` or `sepolia`)
 - `BLOCK_NUMBER` - Block number to fork from
-- `RPC_URL` - RPC endpoint to fork from. If not set, falls back to Alchemy (`ALCHEMY_API_KEY` required)
+- `RPC_URL` - Upstream RPC endpoint to fork from. **Must be archive-capable** (Tenderly, archive-tier Alchemy/Infura, or a private archive node). Public RPCs (llamarpc, publicnode, cloudflare, flashbots) will break historical-state queries at pre-Jovian blocks like `24699169`. If not set, falls back to Alchemy (`ALCHEMY_API_KEY` required).
 
 **Optional Environment Variables:**
 
 - `ALCHEMY_API_KEY` - Your Alchemy API key (only required when `RPC_URL` is not set)
+- `PORT` - Local Anvil listen port (default: `8545`). Use this to run multiple forks on different ports simultaneously.
 
 **Supported Networks:**
 
@@ -26,14 +27,17 @@ Forks an L1 network (Ethereum mainnet or Sepolia testnet) using Anvil.
 **Example Execution:**
 
 ```bash
-# Using a custom RPC URL
+# Using a custom RPC URL (default port 8545)
 RPC_URL="https://..." NETWORK="mainnet" BLOCK_NUMBER="..." ./fork_l1.sh
+
+# On a non-default port (e.g. parallel test runs)
+PORT=8549 RPC_URL="https://..." NETWORK="mainnet" BLOCK_NUMBER="..." ./fork_l1.sh
 
 # Using Alchemy (RPC_URL built automatically)
 ALCHEMY_API_KEY="..." NETWORK="mainnet" BLOCK_NUMBER="..." ./fork_l1.sh
 ```
 
-The script will start an Anvil instance on port 8545 with the specified network forked.
+The script starts an Anvil instance on the specified port (default `8545`) with the specified network forked.
 
 ### `fork_l2.sh`
 
