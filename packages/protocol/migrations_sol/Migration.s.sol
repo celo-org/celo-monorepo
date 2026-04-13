@@ -429,7 +429,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     IReserve(registry.getAddressForStringOrDie("Reserve")).addToken(stableTokenProxyAddress);
 
     IFeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory"))
-      .setCurrencyConfig(stableTokenProxyAddress, address(getSortedOracles()), MOCK_INTRINSIC_GAS);
+      .setCurrencyConfig(
+        stableTokenProxyAddress,
+        address(getSortedOracles()),
+        json.readUint(".feeCurrencyDirectory.intrinsicGas")
+      );
   }
 
   function migrateStableToken(string memory json) public {

@@ -5,6 +5,9 @@
   "celoUnreleasedTreasury": {
     "initialBalance": "390000000000000000000000000"
   },
+  "feeCurrencyDirectory": {
+    "intrinsicGas": 75000
+  },
   "sortedOracles": {
     "reportExpirySeconds": 300
   },

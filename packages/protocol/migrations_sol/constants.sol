@@ -8,7 +8,6 @@ enum SolidityVersions {
 }
 
 contract MigrationsConstants is TestConstants {
-  uint256 constant MOCK_INTRINSIC_GAS = 50_000;
   // Contracts compiled with Solidity 0.8
   mapping(string => bool) internal is08Contract;
 
