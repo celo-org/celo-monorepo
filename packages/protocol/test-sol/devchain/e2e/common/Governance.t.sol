@@ -186,33 +186,6 @@ contract E2E_GovernanceBase is Devchain {
   }
 }
 contract E2E_Governance is E2E_GovernanceBase {
-  // not responding un Foundry 1.5
-  // function beforeTestSetup(
-  //   bytes4 _testSelector
-  // ) public pure virtual returns (bytes[] memory beforeCalldata_) {
-  //   // ensure tests inherit state
-  //   if (_testSelector == this.test_shouldUpvoteProposal.selector) {
-  //   revert("before Test setup called");
-  //     beforeCalldata_ = new bytes[](1);
-  //     beforeCalldata_[0] = abi.encodePacked(this.test_shouldIncrementProposalCount.selector);
-  //   } else if (_testSelector == this.test_shouldApproveProposal.selector) {
-  //     beforeCalldata_ = new bytes[](2);
-  //     beforeCalldata_[0] = abi.encodePacked(this.test_shouldIncrementProposalCount.selector);
-  //     beforeCalldata_[1] = abi.encodePacked(this.test_shouldUpvoteProposal.selector);
-  //   } else if (_testSelector == this.test_shouldIncrementVoteTotals.selector) {
-  //     beforeCalldata_ = new bytes[](3);
-  //     beforeCalldata_[0] = abi.encodePacked(this.test_shouldIncrementProposalCount.selector);
-  //     beforeCalldata_[1] = abi.encodePacked(this.test_shouldUpvoteProposal.selector);
-  //     beforeCalldata_[2] = abi.encodePacked(this.test_shouldApproveProposal.selector);
-  //   } else if (_testSelector == this.test_shouldExecuteProposal.selector) {
-  //     beforeCalldata_ = new bytes[](4);
-  //     beforeCalldata_[0] = abi.encodePacked(this.test_shouldIncrementProposalCount.selector);
-  //     beforeCalldata_[1] = abi.encodePacked(this.test_shouldUpvoteProposal.selector);
-  //     beforeCalldata_[2] = abi.encodePacked(this.test_shouldApproveProposal.selector);
-  //     beforeCalldata_[3] = abi.encodePacked(this.test_shouldIncrementVoteTotals.selector);
-  //   }
-  // }
-
   function test_shouldIncrementProposalCount() public virtual {
     // setup values
 
