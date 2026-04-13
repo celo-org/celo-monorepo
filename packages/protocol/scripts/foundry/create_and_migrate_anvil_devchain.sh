@@ -60,11 +60,12 @@ echo "Running migration script..."
 
 # In the past, --slow used to fix flaky migrations runs
 # as of forge v1.5 this issue seems to be resolved, but we keep it may be worth trying if experiencing issues
+# However --slow is not showing to be significantly slower in the current version, based on manual testing.
+
 $FORGE script \
   $MIGRATION_SCRIPT_PATH \
   --target-contract $MIGRATION_TARGET_CONTRACT \
   --sender $FROM_ACCOUNT \
-  --slow \
   --legacy \
   --sig "runMigration()" \
   --private-key $FROM_PK \
