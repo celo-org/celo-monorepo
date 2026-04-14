@@ -46,7 +46,7 @@ DEPLOY_CONFIG_PATH=deploy-config/celo-devnet.json forge script \
   scripts/L2Genesis.s.sol:L2Genesis
 
 # Kill anvil
-lsof -i :"$ANVIL_PORT" | awk 'NR!=1 {print $2}' | xargs kill -9
+kill $ANVIL_PID
 
 # Convert state to anvil format
 python3 convert_to_anvil_state.py state-dump-11142220-granite.json anvil-state.json

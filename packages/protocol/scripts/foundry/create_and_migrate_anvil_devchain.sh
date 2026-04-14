@@ -66,7 +66,6 @@ $FORGE script \
   $MIGRATION_SCRIPT_PATH \
   --target-contract $MIGRATION_TARGET_CONTRACT \
   --sender $FROM_ACCOUNT \
-  --legacy \
   --sig "runMigration()" \
   --private-key $FROM_PK \
   $VERBOSITY_LEVEL \
