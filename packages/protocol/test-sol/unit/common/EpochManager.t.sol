@@ -28,6 +28,7 @@ contract EpochManagerTest is TestWithUtils08 {
   address carbonOffsettingPartner;
   address communityRewardFund;
   address reserveAddress;
+  address lockedGoldAddress;
   address scoreManagerAddress;
 
   uint256 firstEpochNumber = 3;
@@ -90,6 +91,7 @@ contract EpochManagerTest is TestWithUtils08 {
     scoreManagerAddress = actor("scoreManagerAddress");
 
     reserveAddress = actor("reserve");
+    lockedGoldAddress = actor("lockedGold");
 
     carbonOffsettingPartner = actor("carbonOffsettingPartner");
     communityRewardFund = actor("communityRewardFund");
@@ -108,6 +110,7 @@ contract EpochManagerTest is TestWithUtils08 {
     registry.setAddressFor(ScoreManagerContract, address(scoreManager));
     registry.setAddressFor(StableTokenContract, address(stableToken));
     registry.setAddressFor(ReserveContract, reserveAddress);
+    registry.setAddressFor(LockedGoldContract, lockedGoldAddress);
     registry.setAddressFor(ElectionContract, address(election));
 
     celoUnreleasedTreasury.setRegistry(REGISTRY_ADDRESS);
@@ -564,6 +567,56 @@ contract EpochManagerTest_finishNextEpochProcess is EpochManagerTest {
 
     assertEq(celoToken.balanceOf(communityRewardFund), epochRewards.totalRewardsCommunity());
     assertEq(celoToken.balanceOf(carbonOffsettingPartner), epochRewards.totalRewardsCarbonFund());
+    // LockedGold receives the sum of voter rewards actually distributed to groups,
+    // which for this fixture is `groupEpochRewards` (a single elected group).
+    assertEq(
+      celoToken.balanceOf(lockedGoldAddress),
+      groupEpochRewards,
+      "LockedGold should receive distributed voter rewards"
+    );
+  }
+
+  function test_ReleasesOnlyDistributedVoterRewards_WhenSlashed() public {
+    // Simulate a slashed/score-reduced group where Election distributes less than
+    // the target voter bucket. Release must match the distributed amount (not the
+    // target), otherwise excess CELO would be stranded in LockedGold.
+    uint256 reducedRewards = groupEpochRewards / 4;
+    election.setGroupEpochRewardsBasedOnScore(group, reducedRewards);
+
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+
+    assertEq(
+      celoToken.balanceOf(lockedGoldAddress),
+      reducedRewards,
+      "LockedGold should receive only the distributed (reduced) voter rewards"
+    );
+  }
+
+  function test_ReleasesNothingToLockedGold_WhenAllGroupsIneligible() public {
+    // Group is ineligible / fully slashed -> distributed amount is 0.
+    election.setGroupEpochRewardsBasedOnScore(group, 0);
+
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+
+    assertEq(
+      celoToken.balanceOf(lockedGoldAddress),
+      0,
+      "LockedGold should receive nothing when no voter rewards were distributed"
+    );
   }
 
   function test_TransfersToValidatorGroup() public {
@@ -729,6 +782,29 @@ contract EpochManagerTest_processGroup is EpochManagerTest {
 
     assertEq(celoToken.balanceOf(communityRewardFund), epochRewards.totalRewardsCommunity());
     assertEq(celoToken.balanceOf(carbonOffsettingPartner), epochRewards.totalRewardsCarbonFund());
+    assertEq(
+      celoToken.balanceOf(lockedGoldAddress),
+      groupEpochRewards,
+      "LockedGold should receive distributed voter rewards via processGroup path"
+    );
+  }
+
+  function test_ReleasesOnlyDistributedVoterRewards_WhenSlashed() public {
+    // Regression: per-group score / slashing multiplier reduces the distributed
+    // amount below the target voter bucket. Release must match what was actually
+    // distributed via the processGroup path.
+    uint256 reducedRewards = groupEpochRewards / 4;
+    election.setGroupEpochRewardsBasedOnScore(group, reducedRewards);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+    epochManagerContract.processGroup(group, address(0), address(0));
+
+    assertEq(
+      celoToken.balanceOf(lockedGoldAddress),
+      reducedRewards,
+      "LockedGold should receive only the distributed (reduced) voter rewards"
+    );
   }
 
   function test_TransfersToValidatorGroup() public {
