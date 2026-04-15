@@ -1,17 +1,17 @@
 /* eslint-disable no-console: 0 */
 import { ensureLeading0x } from '@celo/base/lib/address'
 import {
-  LibraryLinkingInfo,
   ArtifactLibraryLinking,
+  LibraryLinkingInfo,
   linkLibraries,
   stripMetadata,
   verifyAndStripLibraryPrefix,
 } from '@celo/protocol/lib/bytecode-foundry'
+import { getArtifactByName, getContractName, getDeployedBytecode } from '@celo/protocol/lib/compatibility/internal'
 import { verifyProxyStorageProofFoundry } from '@celo/protocol/lib/proxy-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9'
-import { getArtifactByName, getContractName, getDeployedBytecode } from '@celo/protocol/lib/compatibility/internal'
 
 export interface RegistryLookup {
   getAddressForString: (name: string) => Promise<string>
@@ -106,84 +106,120 @@ const getSourceBytecodeFromArtifacts = (contract: string, artifacts: BuildArtifa
 const getSourceBytecode = (contract: string, context: VerificationContext): string =>
   getSourceBytecodeFromArtifacts(contract, context.artifacts)
 
-const getOnchainBytecode = async (address: string, context: VerificationContext) =>
-  stripMetadata(await context.chainLookup.getCode(address))
+const getOnchainBytecode = async (address: string, context: VerificationContext) => {
+  const code = await context.chainLookup.getCode(address)
+  if (!code || code === '0x') {
+    throw new Error(`No bytecode found at address ${address}`)
+  }
+  return stripMetadata(code)
+}
 
 const isLibrary = (contract: string, context: VerificationContext) => {
   const answer = Object.keys(context.libraryLinkingInfo.info).includes(contract)
   return answer
 }
 
-const dfsStep = async (queue: string[], visited: Set<string>, context: VerificationContext) => {
-  const contract = queue.pop()
+interface QueueEntry {
+  contract: string
+  requiredBy?: string
+}
+
+const dfsStep = async (queue: QueueEntry[], visited: Set<string>, context: VerificationContext, errors: string[], verifiedLibraries: Set<string>) => {
+  const { contract, requiredBy } = queue.pop()
   const artifact = getArtifact(contract, context)
+  const isLib = isLibrary(contract, context)
+  const kind = isLib ? 'Library' : 'Contract'
   // mark current DFS node as visited
   visited.add(contract)
 
-  // check proxy deployment
-  if (isProxyChanged(contract, context.proposal)) {
-    const proxyAddress = getProposedProxyAddress(contract, context.proposal)
-    // ganache does not support eth_getProof
-    if (
-      context.network !== 'development' &&
-      !(await verifyProxyStorageProofFoundry(context.chainLookup, proxyAddress, context.governanceAddress))
-    ) {
-      throw new Error(`Proposed ${contract}Proxy has impure storage`)
-    }
-
-    const onchainProxyBytecode = await getOnchainBytecode(proxyAddress, context)
-    const sourceProxyBytecode = getSourceBytecode(`${contract}Proxy`, context)
-    if (onchainProxyBytecode !== sourceProxyBytecode) {
-      throw new Error(`Proposed ${contract}Proxy does not match compiled proxy bytecode`)
-    }
-
-  }
-
-  // check implementation deployment
-  const sourceBytecode = getSourceBytecode(contract, context)
-  const sourceArtifactLinking = new ArtifactLibraryLinking(artifact)
-
-  let implementationAddress: string
-  if (isImplementationChanged(contract, context.proposal)) {
-    implementationAddress = getProposedImplementationAddress(contract, context.proposal)
-  } else if (isProxyChanged(contract, context.proposal)) {
-    const proxyAddress = getProposedProxyAddress(contract, context.proposal)
-    implementationAddress = await context.proxyLookup.getImplementation(proxyAddress)
-  } else if (isLibrary(contract, context)) {
-    implementationAddress = ensureLeading0x(context.libraryLinkingInfo.info[contract].address)
+  if (requiredBy) {
+    console.log(`\nVerifying ${kind} ${contract} (required by ${requiredBy})`)
   } else {
-    const proxyAddress = await context.registry.getAddressForString(contract)
-    if (proxyAddress === ZERO_ADDRESS) {
-      console.log(`Contract ${contract} is not in registry - skipping bytecode verification`)
-      return;
+    console.log(`\nVerifying ${kind} ${contract}`)
+  }
+
+  try {
+    // check proxy deployment
+    if (isProxyChanged(contract, context.proposal)) {
+      const proxyAddress = getProposedProxyAddress(contract, context.proposal)
+      // ganache does not support eth_getProof
+      if (
+        context.network !== 'development' &&
+        !(await verifyProxyStorageProofFoundry(context.chainLookup, proxyAddress, context.governanceAddress))
+      ) {
+        const msg = `Proposed ${contract}Proxy has impure storage`
+        console.log(`  ❌ ${msg}`)
+        errors.push(msg)
+        return
+      }
+
+      const onchainProxyBytecode = await getOnchainBytecode(proxyAddress, context)
+      const sourceProxyBytecode = getSourceBytecode(`${contract}Proxy`, context)
+      if (onchainProxyBytecode !== sourceProxyBytecode) {
+        const msg = `Proposed ${contract}Proxy does not match compiled proxy bytecode`
+        console.log(`  ❌ ${msg}`)
+        errors.push(msg)
+        return
+      }
     }
-    implementationAddress = await context.proxyLookup.getImplementation(proxyAddress)
+
+    // check implementation deployment
+    const sourceBytecode = getSourceBytecode(contract, context)
+    const sourceArtifactLinking = new ArtifactLibraryLinking(artifact)
+
+    let implementationAddress: string
+    if (isImplementationChanged(contract, context.proposal)) {
+      implementationAddress = getProposedImplementationAddress(contract, context.proposal)
+    } else if (isProxyChanged(contract, context.proposal)) {
+      const proxyAddress = getProposedProxyAddress(contract, context.proposal)
+      implementationAddress = await context.proxyLookup.getImplementation(proxyAddress)
+    } else if (isLib) {
+      implementationAddress = ensureLeading0x(context.libraryLinkingInfo.info[contract].address)
+    } else {
+      const proxyAddress = await context.registry.getAddressForString(contract)
+      if (proxyAddress === ZERO_ADDRESS) {
+        console.log(`  ⏭️  ${contract} is not in registry - skipping`)
+        return
+      }
+      implementationAddress = await context.proxyLookup.getImplementation(proxyAddress)
+    }
+
+    let onchainBytecode = await getOnchainBytecode(implementationAddress, context)
+    const collectErrors = context.libraryLinkingInfo.collect(onchainBytecode, sourceArtifactLinking, contract)
+    if (collectErrors.length > 0) {
+      for (const err of collectErrors) {
+        console.log(`  ❌ ${err}`)
+        errors.push(err)
+      }
+    }
+
+    let linkedSourceBytecode = linkLibraries(sourceBytecode, context.libraryLinkingInfo.info)
+
+    // normalize library bytecodes
+    if (isLib) {
+      linkedSourceBytecode = verifyAndStripLibraryPrefix(linkedSourceBytecode)
+      onchainBytecode = verifyAndStripLibraryPrefix(onchainBytecode, implementationAddress)
+    }
+
+    if (onchainBytecode !== linkedSourceBytecode) {
+      const msg = `${kind} ${contract} (at ${implementationAddress}): onchain and compiled bytecodes do not match`
+      console.log(`  ❌ ${msg}`)
+      errors.push(msg)
+    } else {
+      console.log(`  ✅ ${kind} ${contract} matches (at ${implementationAddress})`)
+      if (isLib) {
+        verifiedLibraries.add(contract)
+      }
+    }
+
+    // push unvisited libraries to DFS queue
+    const unvisitedLibraries = Object.keys(sourceArtifactLinking.links).filter((library) => !visited.has(library))
+    queue.push(...unvisitedLibraries.map((library) => ({ contract: library, requiredBy: contract })))
+  } catch (err) {
+    const msg = `${kind} ${contract}: ${err.message}`
+    console.log(`  ❌ ${msg}`)
+    errors.push(msg)
   }
-
-  let onchainBytecode = await getOnchainBytecode(implementationAddress, context)
-  context.libraryLinkingInfo.collect(onchainBytecode, sourceArtifactLinking)
-
-  let linkedSourceBytecode = linkLibraries(sourceBytecode, context.libraryLinkingInfo.info)
-
-  // normalize library bytecodes
-  if (isLibrary(contract, context)) {
-    linkedSourceBytecode = verifyAndStripLibraryPrefix(linkedSourceBytecode)
-    onchainBytecode = verifyAndStripLibraryPrefix(onchainBytecode, implementationAddress)
-  }
-
-  if (onchainBytecode !== linkedSourceBytecode) {
-    throw new Error(`${contract}'s onchain (deployed at ${implementationAddress}) and compiled bytecodes do not match`)
-  } else {
-    console.log(
-      `${isLibrary(contract, context) ? 'Library' : 'Contract'
-      } deployed at ${implementationAddress} matches ${contract}`
-    )
-  }
-
-  // push unvisited libraries to DFS queue
-  queue.push(
-    ...Object.keys(sourceArtifactLinking.links).filter((library) => !visited.has(library))
-  )
 }
 
 const assertValidProposalTransactions = (proposal: ProposalTx[]) => {
@@ -268,13 +304,14 @@ export const verifyBytecodes = async (
     ignoredContracts = [...ignoredContracts, ...ignoredContractsV9, ...ignoredContractsV9Only]
   }
 
-  const queue = contracts.filter(
+  const filteredContracts = contracts.filter(
     (contract) => !ignoredContracts.includes(contract)
   ).filter(
     (contract) => compiledContracts.includes(contract)
   )
 
-  const visited: Set<string> = new Set(queue)
+  const queue: QueueEntry[] = filteredContracts.map((contract) => ({ contract }))
+  const visited: Set<string> = new Set(filteredContracts)
 
   const governanceAddress = await registry.getAddressForString('Governance')
   const context: VerificationContext = {
@@ -288,9 +325,16 @@ export const verifyBytecodes = async (
     network,
   }
 
+  const errors: string[] = []
+  const verifiedLibraries: Set<string> = new Set()
+
   while (queue.length > 0) {
-    await dfsStep(queue, visited, context)
+    await dfsStep(queue, visited, context, errors, verifiedLibraries)
   }
 
-  return context.libraryLinkingInfo
+  if (errors.length > 0) {
+    throw new Error(errors.join('\n'))
+  }
+
+  return { libraryLinkingInfo: context.libraryLinkingInfo, verifiedLibraries }
 }

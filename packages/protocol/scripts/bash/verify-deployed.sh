@@ -30,6 +30,11 @@ done
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
 
 source scripts/bash/release-lib.sh
+source scripts/bash/warn-if-libraries-exist.sh
+source scripts/bash/validate-libraries-filename.sh
+LIBRARIES_FILE=$(get_libraries_filename "$NETWORK" "$BRANCH")
+warn_if_libraries_exist "$LIBRARIES_FILE"
+
 build_tag $BRANCH $LOG_FILE
 
 if [ "$BRANCH" = "core-contracts.v10" ]; then
@@ -59,4 +64,4 @@ if [ "$BRANCH" = "core-contracts.v10" ]; then
   cd ../../../
 fi
 
-yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts  --branch $BRANCH --librariesFile "libraries.json" $FORNO
+yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts  --branch $BRANCH --librariesFile "$LIBRARIES_FILE" $FORNO

@@ -1,0 +1,39 @@
+{
+  "oldArtifactsFolder": [
+    "out-core-contracts.v14"
+  ],
+  "newArtifactsFolder": [
+    "out-core-contracts.v15"
+  ],
+  "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles|CeloFeeCurrencyAdapterOwnable|FeeCurrencyAdapter|FeeCurrencyAdapterOwnable|IsL2Check|Blockable|PrecompilesOverride|CompileExchange|PrecompilesOverrideV2|UsingRegistryV2NoMento|^UsingRegistry|^Ownable|Initializable|BLS12_377Passthrough|BLS12_381Passthrough]UniswapV2ERC20|ReentrancyGuard|MockElection|\\bFeeHandlerSeller\\b/",
+  "report": {
+    "contracts": {
+      "Governance": {
+        "changes": {
+          "storage": [],
+          "major": [],
+          "minor": [
+            {
+              "contract": "Governance",
+              "signature": "proposalCount()",
+              "type": "MethodAdded"
+            }
+          ],
+          "patch": [
+            {
+              "contract": "Governance",
+              "type": "DeployedBytecode"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "=",
+          "minor": "+1",
+          "patch": "0"
+        }
+      }
+    },
+    "libraries": {}
+  }
+}
