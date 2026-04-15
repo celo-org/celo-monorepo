@@ -312,8 +312,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     address[] memory owners = new address[](1);
     owners[0] = DEPLOYER_ACCOUNT;
 
-    uint256 required = configurationFileRawJSON.readUint(".reserveSpenderMultiSig.required");
-    uint256 internalRequired = configurationFileRawJSON.readUint(
+    bool required = configurationFileRawJSON.readBool(".reserveSpenderMultiSig.required");
+    bool internalRequired = configurationFileRawJSON.readBool(
       ".reserveSpenderMultiSig.internalRequired"
     );
 
@@ -325,8 +325,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       abi.encodeWithSelector(
         IReserveSpenderMultiSig.initialize.selector,
         owners,
-        required,
-        internalRequired
+        required ? 1 : 0,
+        internalRequired ? 1 : 0
       )
     );
   }
@@ -703,8 +703,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     address[] memory owners = new address[](1);
     owners[0] = DEPLOYER_ACCOUNT;
 
-    uint256 required = configurationFileRawJSON.readUint(".governanceApproverMultiSig.required");
-    uint256 internalRequired = configurationFileRawJSON.readUint(
+    bool required = configurationFileRawJSON.readBool(".governanceApproverMultiSig.required");
+    bool internalRequired = configurationFileRawJSON.readBool(
       ".governanceApproverMultiSig.internalRequired"
     );
     // This adds the multisig to the registry, which is not a case in mainnet but it's useful to keep a reference
@@ -714,8 +714,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       abi.encodeWithSelector(
         IGovernanceApproverMultiSigInitializer.initialize.selector,
         owners,
-        required,
-        internalRequired
+        required ? 1 : 0,
+        internalRequired ? 1 : 0
       )
     );
   }

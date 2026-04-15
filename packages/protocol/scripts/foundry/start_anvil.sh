@@ -59,11 +59,12 @@ echo "{\"name\": \"@celo/devchain-anvil\",\"version\": \"0.0.0-placeholder\",\"r
 
 cp $PWD/migrations_sol/README.md $TMP_FOLDER/README.md
 
-if nc -z localhost $ANVIL_PORT; then
+ANVIL_PID=$(lsof -t -i:$ANVIL_PORT 2>/dev/null || true)
+if [ -n "$ANVIL_PID" ]; then
   echo "Port already used"
-  kill $(lsof -t -i:$ANVIL_PORT)
+  kill $ANVIL_PID
   sleep 5
-  echo "Killed previous Anvil"
+  echo "Killed previous Anvil (PID: $ANVIL_PID)"
 fi
 
 # Start anvil
