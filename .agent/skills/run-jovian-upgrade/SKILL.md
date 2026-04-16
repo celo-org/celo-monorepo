@@ -144,7 +144,7 @@ Required for both modes:
 | # | Detail             | Example                                         |
 | - | ------------------ | ----------------------------------------------- |
 | 1 | Execution mode     | `A` (mocked) or `B` (real sigs)                 |
-| 2 | `CELO_ROOT`        | `/Users/mc01/Documents/Celo`                    |
+| 2 | `CELO_ROOT`        | e.g. `/path/to/Celo` (your local checkout)      |
 | 3 | Network            | `mainnet`, `sepolia`, `chaos`                   |
 | 4 | Fork block         | numeric or alias (see §APPENDIX B)              |
 | 5 | Upstream RPC URL   | Tenderly / archive Alchemy / archive Infura     |
@@ -155,7 +155,7 @@ Required in Mode A only:
 
 | # | Detail                         | Notes                                         |
 | - | ------------------------------ | --------------------------------------------- |
-| 8a| Succinct config filename       | `opsuccinctfdgconfig.<name>.json` (verify present; Phase 2.3 doesn't consume it but repo must be set up) |
+| 8a| Succinct config filename       | `opsuccinctfdgconfig.<network>.json` under `$SUCCINCT_REPO/contracts/` — OR generate via `just fetch-fdg-config`. See §3.4 for repo resolution and §F.1 for per-network config references. |
 | 9a| `include_basefee`              | MUST be `no` — Mode A rejects `yes`           |
 
 Required in Mode B only:
@@ -166,7 +166,8 @@ Required in Mode B only:
 
 Optional with defaults:
 
-- Sibling repo paths → default `/Users/mc01/Documents/{Optimism,Optimism2,SuperchainOps,CeloSuperchainOps,Succinct}`
+- Sibling repo paths → default: sibling directories of `$CELO_ROOT` (e.g. `$CELO_ROOT/../Optimism`, `$CELO_ROOT/../Optimism2`, `$CELO_ROOT/../SuperchainOps`, `$CELO_ROOT/../CeloSuperchainOps`, `$CELO_ROOT/../Succinct`, `$CELO_ROOT/../Succinct2`)
+- `SUCCINCT_ROOT_MAINNET` → default `$CELO_ROOT/../Succinct2` (see §3.4)
 - Mocked signer addresses/PKs → defaults in §APPENDIX B
 
 ### §2.2 Missing-detail quit block (autonomous mode)
@@ -200,11 +201,11 @@ written** by a prior TODO. Never let a subagent "guess" a value.
 
 ```
 CELO_ROOT=<path>
-OP_ROOT_V4=<path>                 # default /Users/mc01/Documents/Optimism (overridable)
-OP_ROOT_V5=<path>                 # default /Users/mc01/Documents/Optimism2
-SUPERCHAIN_OPS=<path>             # default /Users/mc01/Documents/SuperchainOps
-CELO_SUPERCHAIN_OPS=<path>        # default /Users/mc01/Documents/CeloSuperchainOps
-SUCCINCT_ROOT=<path>              # default /Users/mc01/Documents/Succinct
+OP_ROOT_V4=<path>                 # default $CELO_ROOT/../Optimism (overridable)
+OP_ROOT_V5=<path>                 # default $CELO_ROOT/../Optimism2
+SUPERCHAIN_OPS=<path>             # default $CELO_ROOT/../SuperchainOps
+CELO_SUPERCHAIN_OPS=<path>        # default $CELO_ROOT/../CeloSuperchainOps
+SUCCINCT_ROOT=<path>              # default $CELO_ROOT/../Succinct
 NETWORK=<mainnet|sepolia|chaos>
 MODE=<A|B>
 INCLUDE_BASEFEE=<yes|no>          # Mode B only; Mode A forces 'no'
@@ -226,7 +227,10 @@ OLD_ASR=<§APPENDIX B.4 or B.4b>
 OLD_CSC=<§APPENDIX B.4 or B.4b>
 SUCCINCT_IMPL_ADDR=<§APPENDIX B.4 or B.4b>
 EXPECTED_NEW_ASR=<§APPENDIX B.4 or B.4b>   # deterministic post-v4 ASR
-SUCCINCT_CONFIG_FILE=<Mode A only; filename under $SUCCINCT_ROOT/contracts/>
+SUCCINCT_CONFIG_FILE=<Mode A only; filename under $SUCCINCT_REPO/contracts/>
+SUCCINCT_REPO=<resolved Succinct repo; see §3.4>
+SUCCINCT_PROPOSAL_ADDR=<expected impl addr from CeloSuperchainOps proposal; §F.2>
+SUCCINCT_DEPLOY_STRATEGY=<pending|deploy|setcode; see §3.2 & §5.10>
 OPCM_V4=<see §3.2 dynamic slots>
 OPCM_V5=<see §3.2 dynamic slots>
 NEW_CSC=<see §3.2 dynamic slots>
@@ -258,7 +262,10 @@ MUST update the CONTEXT_BLOCK between TODOs when each slot is filled:
 | `NEW_CSC`    | T20                  | `cast call $SYSTEM_CONFIG "superchainConfig()(address)"`                           |
 | `NEW_ASR`    | T20                  | `cast call <PERM_GAME_V4> "anchorStateRegistry()(address)"`                        |
 | `OLD_CSC`    | **Mode A mainnet**: §B.4 literal at T01. **Other networks**: T11 dynamic capture from `SystemConfig.superchainConfig()` on the pre-v4 fork state | see §B.4b sepolia note |
-| `SUCCINCT_IMPL_ADDR` | **Mainnet**: §B.4 literal at T01. **Sepolia**: T01 grep from `exec-jovian-sepolia.sh SUCCINCT_IMPL=` line. **Chaos**: T01 grep from same script's chaos branch. | §B.4 / §B.4b |
+| `SUCCINCT_IMPL_ADDR` | **Mainnet**: §B.4 literal at T01 (initial). **Sepolia**: T01 grep from `exec-jovian-sepolia.sh SUCCINCT_IMPL=` line. **Chaos**: T01 grep from same script's chaos branch. T10 may override if Strategy A (deploy) succeeds — see §5.10. | §B.4 / §B.4b / §F.2 |
+| `SUCCINCT_PROPOSAL_ADDR` | T01 from §F.2 per NETWORK. | §F.2 literal |
+| `SUCCINCT_DEPLOY_STRATEGY` | T10 — set to `deploy` if Strategy A succeeds, `setcode` if fallback used. | §5.10 |
+| `SUCCINCT_REPO` | T01 — resolved per §3.4: mainnet → `$SUCCINCT_ROOT_MAINNET`, sepolia/chaos → `$SUCCINCT_ROOT`. | §3.4 |
 
 Rule: after a TODO whose evidence contains one of these slots, the orchestrator's
 very next action is to append the new value to its in-memory CONTEXT_BLOCK. All
@@ -268,10 +275,42 @@ T27, T31, T32) therefore see `NEW_CSC` and `NEW_ASR` as concrete addresses, not
 
 ### §3.3 Sibling repo path portability
 
-The `OP_ROOT_V4`/`OP_ROOT_V5`/`SUPERCHAIN_OPS`/`CELO_SUPERCHAIN_OPS`/`SUCCINCT_ROOT`
-defaults assume a single operator's laptop layout. On a different machine, the
-orchestrator MUST override these in T01 (interactive: ask; autonomous: orchestrator
-prompt must pass them).
+The `OP_ROOT_V4`/`OP_ROOT_V5`/`SUPERCHAIN_OPS`/`CELO_SUPERCHAIN_OPS`/`SUCCINCT_ROOT`/
+`SUCCINCT_ROOT_MAINNET` defaults assume a single operator's laptop layout. On a
+different machine, the orchestrator MUST override these in T01 (interactive: ask;
+autonomous: orchestrator prompt must pass them).
+
+### §3.4 Succinct repo resolution (NETWORK-dependent)
+
+Succinct has a **per-network repo problem**: different networks were deployed with
+different repo versions, branches, and commits — each producing different vkeys and
+therefore different contract addresses. This is a temporary state; eventually all
+versions should converge into tagged releases in the public Succinct repo.
+
+**Current state (Jovian era)**:
+
+| Network  | Repo variable          | Default path                       | Why                                                                                           |
+| -------- | ---------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------- |
+| mainnet  | `SUCCINCT_ROOT_MAINNET`| `$CELO_ROOT/../Succinct2`          | Requires a specific repo, branch, or commit to produce vkeys matching the mainnet deployment. Operator determines the correct source.                    |
+| sepolia  | `SUCCINCT_ROOT`        | `$CELO_ROOT/../Succinct`           | Public repo at specific commit produces vkeys matching sepolia deployment.                     |
+| chaos    | `SUCCINCT_ROOT`        | `$CELO_ROOT/../Succinct`           | Public repo at specific commit produces vkeys matching chaos deployment.                      |
+
+At T01, set `SUCCINCT_REPO` to the resolved path:
+- `NETWORK=mainnet` → `SUCCINCT_REPO=$SUCCINCT_ROOT_MAINNET`
+- `NETWORK=sepolia|chaos` → `SUCCINCT_REPO=$SUCCINCT_ROOT`
+
+The FDG config file at `$SUCCINCT_REPO/contracts/opsuccinctfdgconfig.$NETWORK.json`
+(or the generic `opsuccinctfdgconfig.json` generated by `just fetch-fdg-config`)
+contains `aggregationVkey` and `rangeVkeyCommitment` — these are constructor
+parameters to `OPSuccinctFaultDisputeGame` and directly affect the deployed
+contract address via CREATE (deployer + nonce + initcode w/ constructor args).
+
+**Vkey → address chain**: `repo commit` → `SP1 ELF binaries` → `aggregationVkey +
+rangeVkeyCommitment` → `constructor args` → `initcode hash` → with deployer nonce →
+`CREATE address`. Wrong commit = wrong vkeys = wrong address = proposal mismatch.
+
+See §APPENDIX F for per-network commit references, config URLs, and expected
+proposal addresses.
 
 ---
 
@@ -297,7 +336,7 @@ with skipped phases marked as explicit SKIP TODOs). Use these exact subjects ver
 | T07 | Start x-ray dashboard on :$XRAY_PORT                                 | §5.7    |
 | T08 | Bootstrap v4 OPCM via op-deployer/v4/bootstrap.sh                    | §5.8    |
 | T09 | Bootstrap v5 OPCM via op-deployer/v5/bootstrap.sh                    | §5.9    |
-| T10 | Plant Succinct v2 impl via anvil_setCode (real mainnet bytecode)     | §5.10   |
+| T10 | Plant Succinct v2 impl (Strategy A: deploy from repo; Strategy B: setCodeAtAddress fallback) | §5.10 |
 | T11 | CP0.1 — run post-deploy baseline validation queries                  | §5.11   |
 | T12 | CP0.2 — render PASS/FAIL table                                       | §5.12   |
 | T13 | CP0.3 — x-ray offer (interactive mcp_question OR headless ack)       | §5.13   |
@@ -345,7 +384,7 @@ with skipped phases marked as explicit SKIP TODOs). Use these exact subjects ver
 | T07 | Start x-ray dashboard on :$XRAY_PORT                                 | §5.7    |
 | T08 | SKIP bootstrap v4 — real OPCM v4 already on-chain                    | §5.8    |
 | T09 | SKIP bootstrap v5 — real OPCM v5 already on-chain                    | §5.9    |
-| T10 | SKIP Succinct plant — real 0xE7bd... impl already on-chain           | §5.10   |
+| T10 | SKIP Succinct plant — real impl already on-chain at fork block       | §5.10   |
 | T11 | CP0.1 — post-deploy baseline queries                                 | §5.11   |
 | T12 | CP0.2 — render PASS/FAIL table                                       | §5.12   |
 | T13 | CP0.3 — x-ray offer                                                  | §5.13   |
@@ -496,8 +535,28 @@ task directories. SCOps task directories:
   line `scops_chaos=N/A`; T18/T24 will SKIP for the same reason.
 If artifacts missing → run `forge build` (may take 5-10 min). This is the ONE
 exception to "no extra steps" (§7 dispatch rules): artifact bootstrap is explicitly
-allowed in T02. Validate Succinct FDG config filename exists at
-`$SUCCINCT_CONFIG_FILE` (path is `$SUCCINCT_ROOT/contracts/$SUCCINCT_CONFIG_FILE`).
+allowed in T02.
+
+**Succinct build & FDG config validation (Mode A)**:
+1. Resolve `$SUCCINCT_REPO` per §3.4 (mainnet → `$SUCCINCT_ROOT_MAINNET`, else →
+   `$SUCCINCT_ROOT`). Verify the directory exists and is a git repo.
+2. Report `git -C $SUCCINCT_REPO log --oneline -1` and `git -C $SUCCINCT_REPO
+   branch --show-current` as evidence (`succinct_commit=<hash>; succinct_branch=<br>`).
+3. Check for pre-existing per-network config:
+   `$SUCCINCT_REPO/contracts/opsuccinctfdgconfig.$NETWORK.json`. If present, use it
+   as `SUCCINCT_CONFIG_FILE`. If absent, check for the generic
+   `$SUCCINCT_REPO/contracts/opsuccinctfdgconfig.json`.
+4. If neither config exists AND the operator has a `.env.$NETWORK` in the Succinct
+   repo: attempt `cd $SUCCINCT_REPO && just fetch-fdg-config .env.$NETWORK` to
+   generate it. This may fail if RPC access is not configured — on failure, record
+   `fdg_config_generated=false` as evidence and continue (T10 Strategy B
+   `setCodeAtAddress` fallback will be used).
+5. If a config file is found/generated: extract and report `aggregationVkey` and
+   `rangeVkeyCommitment` from it as evidence. Store the config path as
+   `SUCCINCT_CONFIG_FILE` in the CONTEXT_BLOCK.
+6. Build Succinct contracts: `cd $SUCCINCT_REPO/contracts && forge build`. If build
+   fails, record `succinct_build=failed` — T10 will use Strategy B fallback.
+7. Report `succinct_build=ok|failed; fdg_config=$SUCCINCT_CONFIG_FILE|missing`.
 
 **Task (Mode B)**: only check `$CELO_ROOT/packages/op-tooling/exec/exec-jovian.sh`
 (mainnet) or `exec-jovian-sepolia.sh` (sepolia/chaos) exists AND
@@ -634,18 +693,111 @@ Tier: `sonnet`.
 **PRECONDITION**: T09 STATUS=PASS (OPCM_V5 deployed — not strictly needed for
 this call but the orchestrator enforces Phase 2 monotonicity).
 
-**Task (Mode A)**:
-```
-CODE=$(cast code $SUCCINCT_IMPL_ADDR -r $UPSTREAM_RPC_URL)
-[ -z "$CODE" ] || [ "$CODE" = "0x" ] && exit 1
-cast rpc anvil_setCode $SUCCINCT_IMPL_ADDR "$CODE" -r $RPC_URL
-cast codesize $SUCCINCT_IMPL_ADDR -r $RPC_URL
-cast call $SUCCINCT_IMPL_ADDR "version()(string)" -r $RPC_URL
-cast call $SUCCINCT_IMPL_ADDR "gameType()(uint32)" -r $RPC_URL
-cast call $SUCCINCT_IMPL_ADDR "anchorStateRegistry()(address)" -r $RPC_URL
-```
+**Task (Mode B)**: `STATUS: SKIP` with evidence
+`SKIP: Mode B — Succinct impl $SUCCINCT_IMPL_ADDR already on-chain at fork block`.
 
-**Network-conditional ASR assertion**:
+**Task (Mode A)**: Two strategies, tried in order. The subagent MUST attempt
+Strategy A first; only fall through to Strategy B on failure.
+
+#### Strategy A — Deploy from Succinct repo (preferred)
+
+**Preconditions for Strategy A** (all must be true; if ANY is false → skip to B):
+- `SUCCINCT_CONFIG_FILE` is set (T02 found or generated an FDG config).
+- `succinct_build=ok` (T02 evidence).
+- `$SUCCINCT_REPO/contracts/` contains forge artifacts (`out/` non-empty).
+
+**Steps**:
+1. Read the FDG config and extract key fields:
+   ```
+   AGG_VKEY=$(jq -r '.aggregationVkey' $SUCCINCT_CONFIG_FILE)
+   RANGE_VKEY=$(jq -r '.rangeVkeyCommitment' $SUCCINCT_CONFIG_FILE)
+   ROLLUP_HASH=$(jq -r '.rollupConfigHash' $SUCCINCT_CONFIG_FILE)
+   VERIFIER=$(jq -r '.verifierAddress' $SUCCINCT_CONFIG_FILE)
+   ```
+   Report these as evidence: `agg_vkey=<val>; range_vkey=<val>`.
+
+2. Deploy via forge script on the local fork:
+   ```
+   cd $SUCCINCT_REPO/contracts
+   forge script script/fp/DeployOPSuccinctFDG.s.sol \
+     --fork-url $RPC_URL \
+     --private-key $DEPLOYER_PK \
+     --broadcast \
+     --json
+   ```
+   Capture the deployed `OPSuccinctFaultDisputeGame` address from forge output.
+   Record as `deployed_addr=<addr>`.
+
+3. **Address comparison**: compare `deployed_addr` against `$SUCCINCT_PROPOSAL_ADDR`
+   (from §F.2 via CONTEXT_BLOCK).
+   - **Match** → Strategy A SUCCESS. Set `SUCCINCT_IMPL_ADDR=$deployed_addr` and
+     `SUCCINCT_DEPLOY_STRATEGY=deploy`. Proceed to validation (step 4).
+   - **Mismatch** → log a WARNING:
+     ```
+     WARN: Strategy A deployed at <deployed_addr> but proposal expects
+     <SUCCINCT_PROPOSAL_ADDR>. Likely cause: deployer nonce mismatch or
+     vkey divergence (see §F.3 nonce quirks). Falling through to Strategy B.
+     ```
+     Proceed to Strategy B.
+
+   **Mainnet nonce quirk**: on mainnet, the Succinct game impl was deployed
+   TWICE during the original deployment (the first attempt consumed a nonce).
+   This means the effective deployer nonce is +1 from what a clean fork would
+   produce. If the address is off by exactly one nonce increment, this is the
+   likely cause. See §F.3.
+
+4. **Validation** (only on Strategy A match):
+   ```
+   cast codesize $SUCCINCT_IMPL_ADDR -r $RPC_URL
+   cast call $SUCCINCT_IMPL_ADDR "version()(string)" -r $RPC_URL
+   cast call $SUCCINCT_IMPL_ADDR "gameType()(uint32)" -r $RPC_URL
+   cast call $SUCCINCT_IMPL_ADDR "anchorStateRegistry()(address)" -r $RPC_URL
+   ```
+   Apply network-conditional ASR assertion (see below).
+
+#### Strategy B — setCodeAtAddress fallback
+
+Used when Strategy A is not possible (missing config, build failure, address
+mismatch) OR when `NETWORK=chaos` (no proposal exists for chaos).
+
+**Steps**:
+1. **Warn the user** that the alternative route is being taken:
+   ```
+   WARN: Using setCodeAtAddress fallback for Succinct impl.
+   Reason: <inherited from Strategy A failure or precondition miss>.
+   The bytecode will be copied from upstream RPC, not built locally.
+   ```
+
+2. Determine source address:
+   - If `$SUCCINCT_PROPOSAL_ADDR` is set (sepolia/mainnet): use it as both
+     source and target — copy bytecode from upstream to the proposal address.
+   - If `$SUCCINCT_PROPOSAL_ADDR` is empty (chaos): use `$SUCCINCT_IMPL_ADDR`
+     from CONTEXT_BLOCK (T01 grep from exec script).
+
+3. Copy bytecode:
+   ```
+   SOURCE_ADDR=<resolved per step 2>
+   CODE=$(cast code $SOURCE_ADDR -r $UPSTREAM_RPC_URL)
+   [ -z "$CODE" ] || [ "$CODE" = "0x" ] && exit 1
+   cast rpc anvil_setCode $SOURCE_ADDR "$CODE" -r $RPC_URL
+   ```
+
+4. If `$SUCCINCT_PROPOSAL_ADDR` differs from `$SUCCINCT_IMPL_ADDR`: update
+   `SUCCINCT_IMPL_ADDR=$SUCCINCT_PROPOSAL_ADDR` in evidence so the
+   orchestrator can mutate CONTEXT_BLOCK.
+
+5. Set `SUCCINCT_DEPLOY_STRATEGY=setcode`.
+
+6. **Validation** (same as Strategy A step 4):
+   ```
+   cast codesize $SUCCINCT_IMPL_ADDR -r $RPC_URL
+   cast call $SUCCINCT_IMPL_ADDR "version()(string)" -r $RPC_URL
+   cast call $SUCCINCT_IMPL_ADDR "gameType()(uint32)" -r $RPC_URL
+   cast call $SUCCINCT_IMPL_ADDR "anchorStateRegistry()(address)" -r $RPC_URL
+   ```
+
+#### Network-conditional ASR assertion (both strategies)
+
 - `NETWORK=mainnet`: FAIL if ASR ≠ `0x8fE58d2168b5412Cf1Bd212cE6137f8b7300222d`
   (this is the deterministic CREATE2 post-v4 ASR on mainnet, and
   `EXPECTED_NEW_ASR` in the CONTEXT_BLOCK).
@@ -654,17 +806,27 @@ cast call $SUCCINCT_IMPL_ADDR "anchorStateRegistry()(address)" -r $RPC_URL
   against the dynamically-discovered post-v4 ASR there. `EXPECTED_NEW_ASR` is
   empty on non-mainnet runs.
 
-**Codesize**: expect `9033` on mainnet (real mainnet Succinct impl). On sepolia/
-chaos the value will differ — report `codesize=<actual>` as evidence, do NOT
-assert a fixed number.
+#### Codesize expectations
 
-**Task (Mode B)**: `STATUS: SKIP` with evidence
-`SKIP: Mode B — Succinct impl $SUCCINCT_IMPL_ADDR already on-chain at fork block`.
+- `NETWORK=mainnet`: expect `9033` (real mainnet Succinct impl). On Strategy A
+  the forge-deployed contract may have slightly different codesize if the repo
+  version diverges — record actual and do NOT hard-fail on mismatch; flag as
+  WARNING.
+- `NETWORK=sepolia|chaos`: report `codesize=<actual>`, do NOT assert a fixed
+  number.
 
 Tier: `sonnet`.
 
-**Evidence (Mode A mainnet)**: `codesize=9033; version="2.0.0"; gameType=42; asr=0x8fE58d2168b5412Cf1Bd212cE6137f8b7300222d`.
-**Evidence (Mode A sepolia/chaos)**: `codesize=<N>; version="2.0.0"; gameType=42; succinct_baked_asr=<addr>`.
+**Evidence (Mode A, Strategy A success)**:
+`strategy=deploy; agg_vkey=<val>; range_vkey=<val>; deployed_addr=<addr>;
+proposal_match=true; SUCCINCT_IMPL_ADDR=<addr>; codesize=<N>;
+version="2.0.0"; gameType=42; asr=<addr>; SUCCINCT_DEPLOY_STRATEGY=deploy`.
+
+**Evidence (Mode A, Strategy B fallback)**:
+`strategy=setcode; fallback_reason=<reason>; SUCCINCT_IMPL_ADDR=<addr>;
+codesize=<N>; version="2.0.0"; gameType=42; succinct_baked_asr=<addr>;
+SUCCINCT_DEPLOY_STRATEGY=setcode`.
+
 **Evidence (Mode B)**: `SKIP: Mode B — Succinct impl already on-chain`.
 
 ### §5.11 — T11 CP0.1 post-deploy baseline queries
@@ -688,7 +850,8 @@ Rows (network-conditional — pick the row for the current NETWORK/MODE):
 - OPCM v4 codesize > 0
 - OPCM v5 codesize > 0
 - Succinct impl codesize:
-  - `NETWORK=mainnet, MODE=A`: == 9033
+  - `NETWORK=mainnet, MODE=A, SUCCINCT_DEPLOY_STRATEGY=setcode`: == 9033
+  - `NETWORK=mainnet, MODE=A, SUCCINCT_DEPLOY_STRATEGY=deploy`: > 0 (may differ from 9033; record actual)
   - `NETWORK=mainnet, MODE=B`: > 0
   - `NETWORK=sepolia|chaos`: > 0 (record actual)
 - Succinct baked ASR:
@@ -1403,7 +1566,7 @@ cast call <PERM_GAME> "anchorStateRegistry()(address)" -r $RPC_URL              
 cast call $DGF "gameImpls(uint32)(address)" 42 -r $RPC_URL                          # → pre-succ game or 0
 cast codesize $OPCM_V4 -r $RPC_URL                                                  # > 0 (both modes)
 cast codesize $OPCM_V5 -r $RPC_URL                                                  # > 0 (both modes)
-cast codesize $SUCCINCT_IMPL_ADDR -r $RPC_URL                                       # Mode A: 9033; Mode B: > 0
+cast codesize $SUCCINCT_IMPL_ADDR -r $RPC_URL                                       # > 0 (both modes; Strategy A may differ from 9033)
 cast call $SUCCINCT_IMPL_ADDR "anchorStateRegistry()(address)" -r $RPC_URL          # → 0x8fE58d... (mainnet)
 ```
 
@@ -1478,6 +1641,11 @@ cast call $COUNCIL_SAFE "nonce()(uint256)" -r $RPC_URL                          
 | SCOps `LOCAL_RPC_URL not found`                        | not exported                                                       | `export LOCAL_RPC_URL=$RPC_URL`        |
 | `setMinBaseFee` missing on SystemConfig                | v5 not yet applied                                                 | verify CP2 PASS before T36             |
 | Phase 8 cLabs Safe `execTransaction` revert            | Mode A, or SC ownership not transferred                            | Mode B only; verify CP3 SC_owner=cLabs |
+| T10 Strategy A address mismatch                        | Deployer nonce differs from original deployment (esp. mainnet double-deploy §F.3) | Expected; fall through to Strategy B (setCodeAtAddress) |
+| T10 Strategy A `forge script` fails                    | Succinct repo not built, wrong branch, missing artifacts           | Check T02 `succinct_build` evidence; fall through to Strategy B |
+| T10 Strategy A vkey mismatch                           | Wrong Succinct repo commit checked out (wrong ELFs → wrong vkeys) | Verify commit matches §F.5; checkout correct commit and rebuild |
+| T10 `fetch-fdg-config` fails                           | Missing `.env.$NETWORK`, RPC access denied, or repo access issue   | Fall through to Strategy B; operator resolves access separately |
+| T10 Strategy B empty bytecode from upstream             | Non-archive RPC or contract not yet deployed on target network     | Switch to Tenderly / archive Alchemy RPC |
 
 ---
 
@@ -1493,3 +1661,115 @@ cast call $COUNCIL_SAFE "nonce()(uint256)" -r $RPC_URL                          
   skipping impossible.
 - Subagents never call `mcp_question`. Only the orchestrator does. This preserves
   the turn boundary contract.
+
+---
+
+## §APPENDIX F — Succinct versioning reference (Jovian era)
+
+> **Temporary state disclaimer**: The per-network repo/commit divergence documented
+> here is a transitional artifact of the Jovian deployment timeline. Different
+> networks were deployed at different times with different Succinct repo versions,
+> each producing unique vkeys and therefore unique contract addresses. In the future,
+> all versions should converge into tagged releases in the public `op-succinct` repo
+> (`$SUCCINCT_ROOT`). When that happens, this appendix can be simplified to a single
+> tag reference per version. Until then, the per-network mapping below is
+> authoritative.
+
+### F.1 Per-network config references
+
+The FDG config files contain `aggregationVkey`, `rangeVkeyCommitment`, and other
+constructor parameters that determine the deployed `OPSuccinctFaultDisputeGame`
+address. Each network was deployed with a config generated from a specific repo
+state.
+
+**Canonical config files** (at commit `ca8ea9fc7750213c3d0ca775a522b1e23e21ff64`
+in `celo-org/op-succinct`):
+
+| Network  | Config file                            | Source URL                                                                                                     |
+| -------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| mainnet  | `opsuccinctfdgconfig.mainnet.json`     | `https://github.com/celo-org/op-succinct/blob/ca8ea9fc7750213c3d0ca775a522b1e23e21ff64/contracts/opsuccinctfdgconfig.mainnet.json` |
+| sepolia  | `opsuccinctfdgconfig.sepolia.json`     | `https://github.com/celo-org/op-succinct/blob/ca8ea9fc7750213c3d0ca775a522b1e23e21ff64/contracts/opsuccinctfdgconfig.sepolia.json` |
+| chaos    | `opsuccinctfdgconfig.chaos.json`       | `https://github.com/celo-org/op-succinct/blob/ca8ea9fc7750213c3d0ca775a522b1e23e21ff64/contracts/opsuccinctfdgconfig.chaos.json`   |
+
+**Local file resolution** at T02 / T10:
+- Look for `$SUCCINCT_REPO/contracts/opsuccinctfdgconfig.$NETWORK.json` first.
+- If absent, look for generic `$SUCCINCT_REPO/contracts/opsuccinctfdgconfig.json`.
+- If neither exists, attempt `just fetch-fdg-config .env.$NETWORK` to generate.
+- If generation fails (RPC access issues, missing `.env`), fall to T10 Strategy B.
+
+**Config generation** (`just fetch-fdg-config`):
+Runs `scripts/utils/bin/fetch_fault_dispute_game_config.rs` which:
+1. Reads `.env` file for secrets, addresses, and behavior flags.
+2. Connects to L1/L2 RPCs to fetch `rollupConfigHash`, `startingRoot`, etc.
+3. Retrieves `aggregationVkey` and `rangeVkeyCommitment` from compiled SP1 programs.
+4. Writes `contracts/opsuccinctfdgconfig.json`.
+
+### F.2 Expected proposal addresses (CeloSuperchainOps)
+
+These are the `OPSuccinctFaultDisputeGame` implementation addresses embedded in the
+CeloSuperchainOps upgrade proposals. T10 Strategy A attempts to reproduce these
+via local deployment; Strategy B copies their bytecode from upstream.
+
+| Network  | Proposal file                              | OPSuccinctFaultDisputeGame address             |
+| -------- | ------------------------------------------ | ---------------------------------------------- |
+| mainnet  | `upgrades/mainnet/07-succ-v2.json`         | `0xE7bd695d6A17970A2D9dB55cfeF7F2024d630aE1`  |
+| sepolia  | `upgrades/sepolia/03-succ-v2.json`         | `0x67cd626E1C2534cD5A129ba9208de69B305Ffbd3`  |
+| chaos    | n/a (no proposal)                          | capture from `exec-jovian-sepolia.sh` `SUCCINCT_IMPL=` line |
+
+At T01, populate `SUCCINCT_PROPOSAL_ADDR` from this table. On chaos, leave empty.
+
+### F.3 Nonce quirks and address determinism
+
+`OPSuccinctFaultDisputeGame` is deployed via `new` (Solidity CREATE opcode).
+The deployed address is `keccak256(rlp([deployer, nonce]))[12:]`. This means:
+
+- **Same deployer + same nonce + same constructor args = same address.**
+- **Different nonce = different address**, even with identical bytecode.
+
+**Mainnet double-deploy**: during the original mainnet deployment, the Succinct
+game implementation was deployed **twice** — the first attempt consumed a deployer
+nonce before the second (successful) attempt produced the address
+`0xE7bd695d6A17970A2D9dB55cfeF7F2024d630aE1`. On a clean anvil fork, the deployer
+starts with the nonce from the fork block, so the first `forge script` deploy will
+land at a **different** address (one nonce earlier). To reproduce the exact mainnet
+address, you would need to burn one nonce first (e.g., send a zero-value tx from
+the deployer). T10 Strategy A compares the deployed address and falls back to
+Strategy B if it doesn't match — this is the expected path for mainnet unless the
+nonce is manually adjusted.
+
+**Sepolia**: deployed once, so the nonce is straightforward. Strategy A has a
+higher chance of matching if the correct Succinct repo commit is checked out.
+
+**Chaos**: no CeloSuperchainOps proposal exists. T10 always uses Strategy B
+(setCodeAtAddress from `$SUCCINCT_IMPL_ADDR` captured at T01).
+
+### F.4 Repo → vkey → address chain (why commits matter)
+
+```
+Succinct repo commit
+  → compiles SP1 programs (programs/aggregation/, programs/range/)
+  → produces ELF binaries (elf/)
+  → derives aggregationVkey + rangeVkeyCommitment
+  → these are constructor args to OPSuccinctFaultDisputeGame
+  → constructor args affect initcode hash
+  → initcode hash + deployer + nonce → CREATE address
+```
+
+**Wrong commit = wrong ELFs = wrong vkeys = wrong initcode = wrong address.**
+
+This is why §3.4 maps each network to a specific repo path, and why T02 reports
+the git commit hash as evidence — so the operator can verify the exact source that
+produced the vkeys.
+
+### F.5 Repo assignments (current Jovian era)
+
+| Network  | Repo path (default)                    | Branch        | Notes                                                                                   |
+| -------- | -------------------------------------- | ------------- | --------------------------------------------------------------------------------------- |
+| mainnet  | `$SUCCINCT_ROOT_MAINNET` (default `$CELO_ROOT/../Succinct2`) | `develop`     | May require a specific repo, branch, or commit to match deployed vkeys. Operator determines correct source. |
+| sepolia  | `$SUCCINCT_ROOT` (default `$CELO_ROOT/../Succinct`)          | `develop`     | Public `celo-org/op-succinct` repo. Config at commit `ca8ea9fc...` matches deployment.  |
+| chaos    | `$SUCCINCT_ROOT` (default `$CELO_ROOT/../Succinct`)          | `develop`     | Same public repo. Config at commit `ca8ea9fc...` matches deployment.                    |
+
+**Future state**: when all networks use the same repo source (e.g., tagged releases
+in the public `op-succinct` repo), `SUCCINCT_ROOT_MAINNET` can be removed and all
+networks can use `SUCCINCT_ROOT` with a version tag. Update this appendix and §3.4
+when that happens.
