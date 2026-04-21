@@ -133,6 +133,14 @@ NETWORK or MODE. If any of these is not true at any point, the pipeline is FAILE
 
 **Announce the mode** in your first message: `Detected mode: Interactive|Autonomous`.
 
+**Mid-run mode switch**: if the user explicitly requests fewer gates during an
+Interactive run (e.g. "just keep going", "don't ask me again"), switch to
+**Autonomous mode** for subsequent checkpoint gates. Record the switch:
+`Mode switched to Autonomous at T<NN> per user request`. All subsequent gates
+(T23, T29, T34, T40, T42) use autonomous proceed logic. Checkpoint TODOs (.1
+queries, .2 table, .3 x-ray offer) are still dispatched as subagents — only the
+.4 gate interaction changes.
+
 ### §2.1 Autonomous mode — required details
 
 In autonomous mode you MUST validate every required detail BEFORE any TodoWrite,
@@ -169,6 +177,47 @@ Optional with defaults:
 - Sibling repo paths → default: sibling directories of `$CELO_ROOT` (e.g. `$CELO_ROOT/../Optimism`, `$CELO_ROOT/../Optimism2`, `$CELO_ROOT/../SuperchainOps`, `$CELO_ROOT/../CeloSuperchainOps`, `$CELO_ROOT/../Succinct`, `$CELO_ROOT/../Succinct2`)
 - `SUCCINCT_ROOT_MAINNET` → default `$CELO_ROOT/../Succinct2` (see §3.4)
 - Mocked signer addresses/PKs → defaults in §APPENDIX B
+
+### §2.4 Sibling repo path discovery
+
+Default paths use capitalized directory names (`Optimism`, `SuperchainOps`, etc.) but
+real machines often have lowercase or hyphenated variants (`optimism`, `superchain-ops`,
+`celo-superchain-ops`, `op-succinct`). At T01, the subagent MUST resolve each path
+by checking both the default AND common alternatives:
+
+| Variable               | Default                          | Common alternatives                                |
+| ---------------------- | -------------------------------- | -------------------------------------------------- |
+| `OP_ROOT_V4`           | `$CELO_ROOT/../Optimism`         | `../optimism`                                      |
+| `OP_ROOT_V5`           | `$CELO_ROOT/../Optimism2`        | `../optimism2`, or same as `OP_ROOT_V4` (see §2.5) |
+| `SUPERCHAIN_OPS`       | `$CELO_ROOT/../SuperchainOps`    | `../superchain-ops`                                |
+| `CELO_SUPERCHAIN_OPS`  | `$CELO_ROOT/../CeloSuperchainOps`| `../celo-superchain-ops`                           |
+| `SUCCINCT_ROOT`        | `$CELO_ROOT/../Succinct`         | `../op-succinct`                                   |
+| `SUCCINCT_ROOT_MAINNET`| `$CELO_ROOT/../Succinct2`        | `../op-succinct-mainnet`                           |
+
+Use `ls -d <path> 2>/dev/null` for each candidate. First match wins. If no match,
+FAIL with `repo not found: <variable>=<tried paths>`.
+
+### §2.5 Single optimism repo (OP_ROOT_V4 == OP_ROOT_V5)
+
+The v4 and v5 bootstraps require **different `op-deployer` binaries**: v4 uses the
+`celo10` / `op-deployer/v4.1.0` branch, v5 uses the `op-deployer/v5.0.0` branch.
+These binaries produce different OPCM versions (v4 → `3.2.0`, v5 → `4.2.0`).
+
+If only ONE optimism repo exists (no `Optimism2` clone):
+
+1. At T01, set `OP_ROOT_V4 = OP_ROOT_V5 = <single repo path>` and record
+   `single_optimism_repo=true` in evidence.
+2. At T02, record the current branch of the single repo. If it is the v4 branch
+   (`celo10` or similar), the v4 binary is available.
+3. **Before T09** (v5 bootstrap), the orchestrator MUST instruct the T09 subagent to:
+   a. Create a git worktree: `git -C $OP_ROOT_V4 worktree add /tmp/optimism-v5 origin/op-deployer/v5.0.0`
+   b. Build the v5 op-deployer: `cd /tmp/optimism-v5/op-deployer && just build` (or `go build -o bin/op-deployer ./cmd/`)
+   c. If the build needs forge artifacts: `cd /tmp/optimism-v5/packages/contracts-bedrock && forge build`
+   d. Run `v5/bootstrap.sh` with `OP_ROOT=/tmp/optimism-v5`
+   e. After T09 completes, clean up: `git -C $OP_ROOT_V4 worktree remove /tmp/optimism-v5 --force`
+4. **Version guard at T09**: after bootstrap, verify `OPCM_V5 != OPCM_V4`. If they
+   are equal, FAIL with `v5 bootstrap produced same OPCM as v4 — wrong binary used`.
+   This is a hard guard against the v4/v5 binary confusion.
 
 ### §2.2 Missing-detail quit block (autonomous mode)
 
@@ -475,6 +524,7 @@ point the orchestrator marks T00 `completed`.
 
 Files the subagent registers for cleanup: `/tmp/anvil-$RPC_PORT.pid`,
 `/tmp/anvil-$RPC_PORT.log`, `/tmp/xray-$RPC_PORT.pid`, `/tmp/xray-$RPC_PORT.log`.
+Directories: `/tmp/optimism-v5` (git worktree, created by §2.5 if single repo).
 Ports to verify free at T41: `$RPC_PORT`, `$XRAY_PORT`.
 
 Tier: `haiku`.
@@ -528,9 +578,9 @@ binary presence (`op-deployer/bin/op-deployer` for v4/v5), forge artifact count,
 task directories. SCOps task directories:
 - `NETWORK=mainnet`: `$SUPERCHAIN_OPS/src/tasks/eth/048-opcm-upgrade-v410-celo/`
   and `.../eth/049-opcm-upgrade-v500-celo/`
-- `NETWORK=sepolia`: `$SUPERCHAIN_OPS/src/tasks/sep/048-opcm-upgrade-v410-celo/`
-  and `.../sep/049-opcm-upgrade-v500-celo/` (path is `sep/` at the TOP level of
-  `src/tasks/`, NOT under `eth/sep/`)
+- `NETWORK=sepolia`: `$SUPERCHAIN_OPS/src/tasks/sep/074-opcm-upgrade-v410-celo-sepolia/`
+  and `.../sep/075-opcm-upgrade-v500-celo-sepolia/` (path is `sep/` at the TOP level of
+  `src/tasks/`, NOT under `eth/sep/`; note the task numbers are 074/075, not 048/049)
 - `NETWORK=chaos`: no SCOps tasks exist; T02 MUST return a chaos-specific evidence
   line `scops_chaos=N/A`; T18/T24 will SKIP for the same reason.
 If artifacts missing → run `forge build` (may take 5-10 min). This is the ONE
@@ -595,7 +645,7 @@ Tier: `haiku`.
 - `NETWORK=sepolia`: `NETWORK=sepolia ./mock-sepolia.sh`
 - `NETWORK=chaos`:   `NETWORK=chaos ./mock-sepolia.sh`   (same script, different env)
 
-**Task (Mode A)**:
+**Task (Mode A, NETWORK=mainnet)**:
 ```
 cd $CELO_ROOT/packages/op-tooling/fork
 RPC_URL=$RPC_URL \
@@ -604,18 +654,32 @@ MOCKED_SIGNER_1=0x865d05C8bB46E7AF16D6Dc99ddfb2e64BBec1345 \
 MOCKED_SIGNER_2=0x899a864C6bE2c573a98d8493961F4D4c0F7Dd0CC \
 MOCKED_SIGNER_3=0x480C5f2340f9E7A46ee25BAa815105B415a7c2e2 \
 MOCKED_SIGNER_4=0x8Af6f11c501c082bD880B3ceC83e6bB249Fa32c9 \
-./<script-from-above>
+./mock-mainnet.sh
 ```
+
+**Task (Mode A, NETWORK=sepolia|chaos)**:
+`mock-sepolia.sh` does NOT inject mocked signers — it only transfers contract
+ownership (ProxyAdmin, SystemConfig, DGF, etc.) to the Safe and fixes the
+SuperchainConfig proxy admin slot. The MOCKED_SIGNER_* env vars are NOT used.
+```
+cd $CELO_ROOT/packages/op-tooling/fork
+RPC_URL=$RPC_URL \
+NETWORK=$NETWORK \
+./mock-sepolia.sh
+```
+`exec-jovian-sepolia.sh` uses pre-signed signatures (hardcoded per version) instead
+of mocked signer PKs, so injecting mocked owners is not needed on sepolia/chaos.
 
 **Task (Mode B)**: `STATUS: SKIP` with evidence `SKIP: Mode B keeps real Safes`.
 Tier: `haiku`.
 
-**Evidence (Mode A)**: `mock_script=<name>; exit_code=0`
+**Evidence (Mode A mainnet)**: `mock_script=mock-mainnet.sh; exit_code=0`
+**Evidence (Mode A sepolia/chaos)**: `mock_script=mock-sepolia.sh; exit_code=0`
 **Evidence (Mode B)**: `SKIP: Mode B keeps real Safes`
 
 ### §5.6 — T06 Validate mock state (Mode A only; SKIP in Mode B)
 
-**Task (Mode A, NETWORK ∈ {mainnet, sepolia})**:
+**Task (Mode A, NETWORK=mainnet)**:
 ```
 cast call $PARENT_SAFE  "getThreshold()(uint256)" -r $RPC_URL
 cast call $CLABS_SAFE   "getThreshold()(uint256)" -r $RPC_URL
@@ -627,13 +691,25 @@ cast call $PARENT_SAFE  "nonce()(uint256)"        -r $RPC_URL
 cast call $CLABS_SAFE   "nonce()(uint256)"        -r $RPC_URL
 cast call $COUNCIL_SAFE "nonce()(uint256)"        -r $RPC_URL
 ```
+
+**Task (Mode A, NETWORK=sepolia)**:
+Same queries as mainnet, but expected values differ. `mock-sepolia.sh` does NOT
+inject mocked signers, so the Safe owners/thresholds are the real sepolia values:
+- Parent Safe: threshold=2, owners=[cLabs_Safe, Council_Safe] (nested Safe structure)
+- cLabs Safe: threshold=1
+- Council Safe: threshold=1
+Nonces match §B.8 row for sepolia (all 0 at pre-impls block).
+
 **Task (Mode A, NETWORK=chaos)**: flat Safe — query `getThreshold()`, `getOwners()`,
 `nonce()` on the single chaos Safe `0x6F8DB5...66a9` only.
 **Task (Mode B)**: `STATUS: SKIP` with evidence `SKIP: Mode B keeps real Safes`.
 Tier: `haiku`.
 
-**Evidence (mainnet+sepolia Mode A)**: three thresholds (all `2`), three owner
+**Evidence (mainnet Mode A)**: three thresholds (all `2`), three owner
 arrays (match §B.7 mocked defaults), three nonces (match §B.8 row for NETWORK+MODE).
+**Evidence (sepolia Mode A)**: Parent_threshold=2, cLabs_threshold=1,
+Council_threshold=1; three owner arrays (real sepolia owners, NOT mocked);
+three nonces (match §B.8 row for sepolia).
 **Evidence (chaos Mode A)**: `threshold=1; owner=<EOA>; nonce=<baseline>`.
 **Evidence (Mode B)**: `SKIP: Mode B keeps real Safes`.
 
@@ -683,7 +759,18 @@ Tier: `sonnet`.
 Mirror of §5.8 for the v5 path (`.../op-deployer/v5/bootstrap.sh` and
 `.../op-deployer/v5/config-upgrade.json`).
 
-**Evidence (Mode A)**: `OPCM_V5=0x<addr>; codesize>0`
+**CRITICAL — v5 binary requirement**: v5 bootstrap MUST use the `op-deployer/v5.0.0`
+branch binary, NOT the v4 binary. If `OP_ROOT_V4 == OP_ROOT_V5` (single repo), the
+subagent MUST use a git worktree per §2.5. The v5 OPCM version should be `4.2.0`
+(not `3.2.0` which is v4).
+
+**Version guard**: after bootstrap, the subagent MUST verify:
+1. `OPCM_V5 != OPCM_V4` — if equal, FAIL with `v5 bootstrap produced same OPCM as
+   v4 — wrong binary used`. This catches the single-repo-wrong-branch bug.
+2. `cast call $OPCM_V5 "version()(string)"` — must return `"4.2.0"` (not `"3.2.0"`).
+   If it returns `"3.2.0"`, FAIL with `v5 OPCM has v4 version — wrong binary`.
+
+**Evidence (Mode A)**: `OPCM_V5=0x<addr>; codesize>0; opcm_version=4.2.0; v5_differs_from_v4=true`
 **Evidence (Mode B)**: `SKIP: Mode B — OPCM_V5=<§B.5 mainnet value> already on-chain`
 
 Tier: `sonnet`.
@@ -833,6 +920,13 @@ SUCCINCT_DEPLOY_STRATEGY=setcode`.
 
 **Task**: run every query in §APPENDIX C — CP0 ROW SET. Pre-v4 state on production
 contracts (Isthmus versions) + verify OPCM_V4/OPCM_V5/SUCCINCT_IMPL have code.
+
+**Sepolia OLD_CSC note**: on sepolia at the pre-impls fork block, the SystemConfig
+may be version 2.5.0 which does NOT expose `superchainConfig()`. In this case,
+record `OLD_CSC=N/A (SystemConfig version lacks superchainConfig() accessor)` as
+evidence. The v4 upgrade introduces the accessor, so NEW_CSC will be discovered
+at T20. The CP0.2 table should record this as a baseline observation, not a FAIL.
+
 Tier: `sonnet`.
 
 **Evidence**: labelled snapshot block with each query and its raw output.
@@ -860,7 +954,7 @@ Rows (network-conditional — pick the row for the current NETWORK/MODE):
 - SystemConfig.owner == ProxyAdminOwner (§APPENDIX B)
 - PermissionedGame(1).version == "1.4.1"
 - SystemConfig.superchainConfig: **mainnet** assert == `0xa440975E5A6BB19Bc3Bee901d909BB24b0f43D33` (literal OLD_CSC). **sepolia/chaos**: record the value as OLD_CSC baseline (evidence only — the assertion happens at CP1 via `NEW_CSC ≠ OLD_CSC`).
-- Safe thresholds (Mode A only): all == 2 (mainnet/sepolia) OR 1 (chaos)
+- Safe thresholds (Mode A only): mainnet all == 2; sepolia Parent == 2, cLabs == 1, Council == 1 (mock-sepolia.sh does NOT inject mocked signers); chaos == 1
 
 Any FAIL → `STATUS: FAIL`; orchestrator STOPs the pipeline and jumps to T41 cleanup.
 Tier: `haiku`.
@@ -907,11 +1001,17 @@ Tier: n/a.
 ```
 cd $CELO_SUPERCHAIN_OPS
 export LOCAL_RPC_URL=$RPC_URL
-NETWORK=$NETWORK TEST_PK=0x57e639820c9154e011f46153bda6d502e1f8ebd376f87fadc1e317d3beeb10d8 just sign <ver> clabs
-NETWORK=$NETWORK TEST_PK=0x5fb4edc777e9ad5889935f6cc0368a275be7f467b4b7eadf94cab92d667de592 just sign <ver> clabs
-NETWORK=$NETWORK TEST_PK=0x82b0a6c773da129fc3604c6b85e68fa2c9cce0b21c3b63dd70b691e538269996 just sign <ver> council
-NETWORK=$NETWORK TEST_PK=0x04cdae0aa51355d0bad6ec4e200138c71ca6686de3924382a048c9cbf38ddef9 just sign <ver> council
+export ${NETWORK^^}_RPC_URL=$RPC_URL   # e.g. SEPOLIA_RPC_URL — some sign scripts read this
+SKIP_SIGNER_CHECK=1 NETWORK=$NETWORK TEST_PK=0x57e639820c9154e011f46153bda6d502e1f8ebd376f87fadc1e317d3beeb10d8 just sign <ver> clabs
+SKIP_SIGNER_CHECK=1 NETWORK=$NETWORK TEST_PK=0x5fb4edc777e9ad5889935f6cc0368a275be7f467b4b7eadf94cab92d667de592 just sign <ver> clabs
+SKIP_SIGNER_CHECK=1 NETWORK=$NETWORK TEST_PK=0x82b0a6c773da129fc3604c6b85e68fa2c9cce0b21c3b63dd70b691e538269996 just sign <ver> council
+SKIP_SIGNER_CHECK=1 NETWORK=$NETWORK TEST_PK=0x04cdae0aa51355d0bad6ec4e200138c71ca6686de3924382a048c9cbf38ddef9 just sign <ver> council
 ```
+Note: `SKIP_SIGNER_CHECK=1` is required on sepolia because the mocked TEST_PK
+addresses are not registered as Safe owners on the local fork (sepolia uses
+pre-signed signatures in `exec-jovian-sepolia.sh`, so the CeloSuperchainOps signing
+step produces artifacts but the exec script ignores them in favor of hardcoded sigs).
+On mainnet, `SKIP_SIGNER_CHECK=1` may also be needed depending on the CSCOps version.
 `<ver>` = `v4` (T15), `v5` (T16), `succ-v2` (T17) — this is the CSCOps `just`
 recipe name and is uniform across networks. Note the downstream exec version
 string differs: on **mainnet** `exec-mocked.sh` / `exec-jovian.sh` take
@@ -942,8 +1042,8 @@ T17 was SKIP (Mode B / chaos).
 1. Pre-flight: SCOps repo exists; `mise` installed; task directory resolves per
    network:
    - `NETWORK=mainnet`: `$SUPERCHAIN_OPS/src/tasks/eth/048-opcm-upgrade-v410-celo/`
-   - `NETWORK=sepolia`: `$SUPERCHAIN_OPS/src/tasks/sep/048-opcm-upgrade-v410-celo/`
-     (top-level `sep/`, NOT `eth/sep/`)
+   - `NETWORK=sepolia`: `$SUPERCHAIN_OPS/src/tasks/sep/074-opcm-upgrade-v410-celo-sepolia/`
+     (top-level `sep/`, NOT `eth/sep/`; task number is 074, not 048)
    - `NETWORK=chaos`: no SCOps task exists → `STATUS: SKIP` with reason
      `SKIP: chaos has no SuperchainOps task directories`.
 2. `export LOCAL_RPC_URL=$RPC_URL`
@@ -953,6 +1053,12 @@ T17 was SKIP (Mode B / chaos).
 **Skip only if**: pre-flight fails for a documented reason (chaos network, SCOps
 not cloned, mise missing, task dir missing). Then `STATUS: SKIP` with the reason.
 Do NOT skip for convenience.
+
+**Runtime failure vs pre-flight**: if the simulation RUNS but reverts (e.g. OPCM not
+at expected address, contract call failure), that is `STATUS: FAIL`, NOT `SKIP`.
+The orchestrator should fix the root cause (e.g. clone OPCM to expected address)
+and re-dispatch T18. Only pre-flight issues (directory missing, tool missing) are
+valid SKIP reasons.
 Tier: `sonnet`.
 
 **Evidence (PASS)**: `simulate: PASS; tenderly_link=<url>`
@@ -967,6 +1073,20 @@ Tier: `sonnet`.
 - `NETWORK=mainnet, MODE=B`: `./exec-jovian.sh v4`
 - `NETWORK=sepolia|chaos`, both modes: `./exec-jovian-sepolia.sh v4` (uses
   hardcoded sigs; mock-sepolia.sh pre-setup is compatible)
+
+**Sepolia Mode A — OPCM address cloning prerequisite**:
+`exec-jovian-sepolia.sh` hardcodes TARGET_ADDRESS per version (these are the real
+sepolia OPCM addresses). In Mode A with a pre-impls fork, the bootstrapped OPCMs
+are at different addresses. Before T19 dispatch, the T19 subagent MUST:
+1. Read the hardcoded `TARGET_ADDRESS` from exec-jovian-sepolia.sh for the version.
+2. Check if code exists at that address: `cast codesize $TARGET_ADDRESS -r $RPC_URL`.
+3. If codesize == 0: clone the bootstrapped OPCM bytecode to the target address:
+   `CODE=$(cast code $OPCM_V4 -r $RPC_URL) && cast rpc anvil_setCode $TARGET_ADDRESS "$CODE" -r $RPC_URL`
+   (The OPContractsManager uses Solidity immutables baked into bytecode, not storage
+   slots, so bytecode-only copy is sufficient.)
+4. Verify: `cast codesize $TARGET_ADDRESS -r $RPC_URL` must be > 0.
+Same applies to T25 (v5) with `$OPCM_V5`, and the pre-signed signatures in the
+exec script are tied to these hardcoded addresses so they CANNOT be changed.
 
 **Task (Mode A mainnet)**:
 ```
@@ -1030,8 +1150,9 @@ Same shape as T13 / T14 with CP1 wording.
 post-v4 chain state (v5's OPCM calls `SystemConfig.l2ChainId()` which only exists
 post-v4) — running it before T19 reverts.
 
-Same shape as T18 but the task dir is `049-opcm-upgrade-v500-celo` under the
-network-appropriate `eth/` (mainnet) or `sep/` (sepolia) parent. Chaos → SKIP.
+Same shape as T18 but the task dir is `049-opcm-upgrade-v500-celo` (mainnet) or
+`075-opcm-upgrade-v500-celo-sepolia` (sepolia) under the network-appropriate
+`eth/` (mainnet) or `sep/` (sepolia) parent. Chaos → SKIP.
 Tier: `sonnet`.
 
 **Evidence (PASS)**: `simulate: PASS; tenderly_link=<url>`
@@ -1067,8 +1188,9 @@ Same shape as CP1.
 
 **Version string by network**:
 - `NETWORK=mainnet`: `VERSION=succ-v2` / `./exec-jovian.sh succ-v2`
-- `NETWORK=sepolia|chaos`: `./exec-jovian-sepolia.sh succinct-v2` (the `-v2` spelling
-  differs — `succinct-v2` NOT `succ-v2`)
+- `NETWORK=sepolia|chaos`: `./exec-jovian-sepolia.sh succ-v2` (the script's `case`
+  statement accepts `succ-v2`, NOT `succinct-v2` — verify by checking line ~6 of
+  `exec-jovian-sepolia.sh` before dispatch)
 
 Same exec-script shape as T19 with the correct version string. Tier: `sonnet`.
 
@@ -1223,6 +1345,10 @@ if [ -f /tmp/xray-$RPC_PORT.pid ]; then
   rm -f /tmp/xray-$RPC_PORT.pid
 fi
 pkill -f "python3 -m http.server $XRAY_PORT" 2>/dev/null || true
+# Git worktree cleanup (from §2.5 single-repo v5 build)
+if [ -d /tmp/optimism-v5 ]; then
+  git -C $OP_ROOT_V4 worktree remove /tmp/optimism-v5 --force 2>/dev/null || true
+fi
 # Port checks
 lsof -ti:$RPC_PORT  >/dev/null 2>&1 && echo "WARN: anvil port busy"  || echo "anvil port free"
 lsof -ti:$XRAY_PORT >/dev/null 2>&1 && echo "WARN: xray port busy"   || echo "xray port free"
@@ -1232,7 +1358,7 @@ After T41 completes successfully, the orchestrator marks T00 `completed` (T00 ha
 been `pending` since run start per §1.1 rule 6).
 Tier: `haiku`.
 
-**Evidence**: `anvil_killed=true; xray_killed=true; rpc_port_free=true; xray_port_free=true; logs_preserved=/tmp/anvil-$RPC_PORT.log,/tmp/xray-$RPC_PORT.log`.
+**Evidence**: `anvil_killed=true; xray_killed=true; rpc_port_free=true; xray_port_free=true; worktree_cleaned=true|N/A; logs_preserved=/tmp/anvil-$RPC_PORT.log,/tmp/xray-$RPC_PORT.log`.
 
 ### §5.42 — T42 Cleanup gate (ORCHESTRATOR-ONLY)
 
@@ -1453,7 +1579,8 @@ Sourced from `packages/op-tooling/exec/exec-jovian-sepolia.sh` and
 | DisputeGameFactory  | `0x338ac809e6a045cfc8aeb16ff8a4329147b61afb` |
 
 **Sepolia naming**: the succinct version string in `exec-jovian-sepolia.sh` is
-`succinct-v2` (NOT `succ-v2`). T30 must pass `VERSION=succinct-v2` when `NETWORK=sepolia`.
+`succ-v2` (the script's case statement on line ~6 accepts `v4|v5|succ-v2`).
+T30 must pass the argument as `succ-v2` when `NETWORK=sepolia`.
 
 **Chaos flow divergence**: on chaos the Parent/cLabs/Council nested Safe chain
 does not exist. `exec-jovian-sepolia.sh` with `NETWORK=chaos` talks to the flat
@@ -1646,6 +1773,11 @@ cast call $COUNCIL_SAFE "nonce()(uint256)" -r $RPC_URL                          
 | T10 Strategy A vkey mismatch                           | Wrong Succinct repo commit checked out (wrong ELFs → wrong vkeys) | Verify commit matches §F.5; checkout correct commit and rebuild |
 | T10 `fetch-fdg-config` fails                           | Missing `.env.$NETWORK`, RPC access denied, or repo access issue   | Fall through to Strategy B; operator resolves access separately |
 | T10 Strategy B empty bytecode from upstream             | Non-archive RPC or contract not yet deployed on target network     | Switch to Tenderly / archive Alchemy RPC |
+| T09 OPCM_V5 == OPCM_V4 (same address)                  | v5 bootstrap used v4 binary (single repo, wrong branch)           | Use git worktree per §2.5; verify version guard |
+| T19/T25 revert on sepolia (exec-jovian-sepolia.sh)     | OPCM not at hardcoded TARGET_ADDRESS on pre-impls fork            | Clone bootstrapped OPCM bytecode to target per §5.19 |
+| T15-T17 `just sign` signer check fails                 | Mocked PKs not registered as Safe owners on sepolia fork          | Set `SKIP_SIGNER_CHECK=1` per §5.15 |
+| T11 `superchainConfig()` reverts on sepolia            | SystemConfig v2.5.0 lacks accessor (pre-v4)                       | Record OLD_CSC=N/A per §5.11; normal for sepolia pre-impls |
+| T25 GS013 revert                                       | Inner delegatecall failed (often wrong OPCM version / CREATE2 collision) | Check OPCM version; v5 needs 4.2.0 not 3.2.0 |
 
 ---
 
