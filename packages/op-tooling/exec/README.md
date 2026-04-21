@@ -106,15 +106,20 @@ PK="0x..." ./exec-v2v3.sh v3
 
 ### `exec-jovian-sepolia.sh`
 
-Executes OPCM upgrade transactions on Celo Sepolia through the Jovian-era Safe multisig chain (2-of-2: cLabs + Council, no Grand Child). Accepts a version argument to run one of three upgrades.
+Executes OPCM upgrade transactions on Celo Sepolia and Chaos through the Jovian-era Safe multisig. Supports two networks with different execution models:
+
+- **Sepolia**: Nested 2-of-2 Safes (cLabs + Council → Parent) with pre-signed signatures and hardcoded calldata
+- **Chaos**: Flat Safe (single owner, threshold 1) with dynamically generated calldata and on-chain nonce
+
+Accepts a version argument (`v4`, `v5`, or `succ-v2`).
 
 **Features:**
 
-- Hardcoded transaction data for v4, v5, and succinct-v2 Sepolia upgrades
-- Pre-configured single signatures from cLabs and Council
-- Accepts version argument (`v4`, `v5`, or `succinct-v2`)
-- Simplified multisig chain: Council → cLabs → Parent (no Grand Child)
-- Uses Sepolia-specific Safe addresses and refund receiver
+- Hardcoded transaction data for v4 and v5 Sepolia upgrades
+- Pre-configured single signatures from cLabs and Council (Sepolia)
+- Dynamic calldata generation for Chaos (v4/v5 via OPCM, succ-v2 via Multicall3)
+- Strict `NETWORK` validation (`sepolia` or `chaos`)
+- Helper functions (`safe_tx_hash`, `safe_exec`) for DRY Safe interactions
 
 **Required Environment Variables:**
 
@@ -123,6 +128,13 @@ Executes OPCM upgrade transactions on Celo Sepolia through the Jovian-era Safe m
 **Optional Environment Variables:**
 
 - `RPC_URL` - RPC endpoint (defaults to `http://127.0.0.1:8545`)
+- `NETWORK` - Target network: `sepolia` (default) or `chaos`
+
+**Chaos-only Environment Variables:**
+
+- `OPCM_ADDRESS` - OPCM contract address (required for chaos v4/v5)
+- `SUCCINCT_IMPL` - Succinct implementation address (required for chaos succ-v2)
+- `SC_OWNER_TARGET` - SystemConfig ownership transfer target (optional, defaults to Safe address)
 
 **Sepolia Multisig Addresses:**
 
@@ -130,7 +142,11 @@ Executes OPCM upgrade transactions on Celo Sepolia through the Jovian-era Safe m
 - **cLabs Safe**: `0x769b480A8036873a2a5EB01FE39278e5Ab78Bb27`
 - **Council Safe**: `0x3b00043E8C82006fbE5f56b47F9889a04c20c5d6`
 
-**Version-Specific Data:**
+**Chaos Safe Address:**
+
+- **Safe**: `0x6F8DB5374003c9ffa7084d8b65c57655963766a9` (threshold 1, single owner)
+
+**Version-Specific Data (Sepolia):**
 
 #### V4 Configuration (from `upgrades/sepolia/01-v4.json`)
 
@@ -146,11 +162,25 @@ Executes OPCM upgrade transactions on Celo Sepolia through the Jovian-era Safe m
 - **cLabs Nonce**: 1
 - **Council Nonce**: 1
 
+#### Succ-v2 Configuration
+
+- **Target Address**: `0xcA11bde05977b3631167028862bE2a173976CA11` (Multicall3)
+- **Parent Nonce**: 2
+- **cLabs Nonce**: 2
+- **Council Nonce**: 2
+- **Operations**: Register OPSuccinctFaultDisputeGame via `setImplementation` + transfer SystemConfig ownership
+
 **Example Execution:**
 
 ```bash
+# Sepolia (default)
 PK="0x..." ./exec-jovian-sepolia.sh v4
 PK="0x..." ./exec-jovian-sepolia.sh v5
+PK="0x..." ./exec-jovian-sepolia.sh succ-v2
+
+# Chaos
+PK="0x..." NETWORK=chaos OPCM_ADDRESS="0x..." ./exec-jovian-sepolia.sh v4
+PK="0x..." NETWORK=chaos SUCCINCT_IMPL="0x..." ./exec-jovian-sepolia.sh succ-v2
 ```
 
 ### `exec-jovian.sh`
@@ -178,7 +208,7 @@ Executes the Jovian upgrade (v4 + v5 + succ-v2) on Celo Mainnet through the nest
 
 - `secrets/.env.signers.v4` - Decoded signers file for v4 (must be decrypted before running)
 - `secrets/.env.signers.v5` - Decoded signers file for v5
-- `secrets/.env.signers.succ-v2` - Decoded signers file for succ-v2
+- `secrets/.env.signers.succinct200` - Decoded signers file for succ-v2
 
 **Upgrade Configuration:**
 
