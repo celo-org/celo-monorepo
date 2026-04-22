@@ -48,11 +48,10 @@ mv "$VERIFY_LIBRARIES_FILE" "$LIBRARIES_FILE"
 echo "- Check versions of current branch"
 yarn release:check-versions:foundry -a $BRANCH -b HEAD
 
-
 # From make-release.sh
 echo "- Deploy release of current branch"
 INITIALIZATION_FILE=`ls releaseData/initializationData/release*.json | sort -V | tail -n 1 | xargs realpath`
-
+REPORT="report-$BRANCH-HEAD.json"
 
 ANVIL_DEVNET_PRIVATE_KEY='0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 yarn release:make:foundry \
@@ -70,7 +69,6 @@ yarn --cwd packages/protocol release:verify-deployed:foundry \
     -n anvil \
     -b $BRANCH \
     -p "proposal-anvil-$BRANCH.json"
-
 
 if [[ -n $ANVIL_PID ]]; then
     kill $ANVIL_PID

@@ -14,7 +14,7 @@ For example:
     case this command is out-of-date):
 
         ```sh
-        $ yarn anvil-devchain:start-L1
+        $ yarn anvil-devchain:start
 
         Waiting Anvil to launch on 8546...
 

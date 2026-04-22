@@ -69,21 +69,14 @@ validate_libraries_bytecode "$LIBRARIES" "$VALIDATION_RPC_URL"
 
 source scripts/bash/release-lib.sh
 
-# Build contract artifacts for both Solidity 0.5 and 0.8 using Foundry profiles.
-# foundry.toml is backed up because build_tag_foundry may overwrite it when
-# restoring the config from the target branch.
 cp foundry.toml foundry.toml.bak
 
-# Solidity 0.5 contracts (truffle-compat profile produces artifacts compatible with the release tooling)
 build_tag_foundry "$BRANCH" /dev/stdout truffle-compat foundry.toml.bak
-BUILD_DIR_05=$BUILD_DIR
-
-# Solidity 0.8 contracts
 build_tag_foundry "$BRANCH" /dev/stdout truffle-compat8 foundry.toml.bak
-BUILD_DIR_08=$BUILD_DIR
 
 mv foundry.toml.bak foundry.toml
 
+BUILD_DIR="./out-${BRANCH}"
 
 # Build the command with optional flags
 OPTIONAL_FLAGS=""
@@ -105,6 +98,5 @@ yarn ts-node --transpile-only ./scripts/foundry/make-release.ts \
   --network "$NETWORK" \
   --proposal "$PROPOSAL" \
   --report "$REPORT" \
-  --buildDirectory05 "$BUILD_DIR_05" \
-  --buildDirectory08 "$BUILD_DIR_08" \
+  --buildDirectory "$BUILD_DIR" \
   $OPTIONAL_FLAGS

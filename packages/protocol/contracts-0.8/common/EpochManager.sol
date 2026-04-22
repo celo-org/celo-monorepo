@@ -168,24 +168,29 @@ contract EpochManager is
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
    * @param newEpochDuration The duration of an epoch in seconds.
+   * @param sortedOraclesAddress The address of the sorted oracles core smart contract.
    */
-  function initialize(address registryAddress, uint256 newEpochDuration) external initializer {
+  function initialize(
+    address registryAddress,
+    uint256 newEpochDuration,
+    address sortedOraclesAddress
+  ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setEpochDuration(newEpochDuration);
-    setOracleAddress(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
+    setOracleAddress(sortedOraclesAddress);
   }
 
   /**
    * @notice Initializes the EpochManager system, allowing it to start processing epoch
    * and distributing the epoch rewards.
-   * @dev Can only be called by the EpochManagerEnabler contract.
+   * @dev Can only be called by Owner. This function is only meant to be called during deployment of a new network.
    */
   function initializeSystem(
     uint256 firstEpochNumber,
     uint256 firstEpochBlock,
     address[] memory firstElected
-  ) external onlyEpochManagerEnabler {
+  ) external onlyOwner {
     require(
       getCeloToken().balanceOf(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURY_REGISTRY_ID)) >
         0,
@@ -604,7 +609,7 @@ contract EpochManager is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 3);
+    return (1, 2, 0, 0);
   }
 
   /**

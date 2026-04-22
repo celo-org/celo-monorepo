@@ -3,24 +3,25 @@ set -euo pipefail
 
 ### This scripts sets up a local Anvil instance, deploys libraries, precompiles, and runs migrations
 
+# this temp file is deleted at the end
+# foundry wont compile 0.5 dependencies without this file
+cp test-sol/devchain/Import05Dependencies.sol contracts
+
 # Read environment variables and constants
 source $PWD/scripts/foundry/constants.sh
 
+CACHED_LIBRARIES_FLAG=`cat $TMP_FOLDER/library_flags.txt || echo ""`
+echo "Cached library flags are: $CACHED_LIBRARIES_FLAG"
+
 # Keeping track of start time to measure how long it takes to run the script entirely
 START_TIME=$SECONDS
-
-echo "Forge version: $(forge --version)"
-
-# Create temporary directory
-if [ -d "$TMP_FOLDER" ]; then
-    # Remove temporary directory first it if exists
-    echo "Removing existing temporary folder..."
-    rm -rf $TMP_FOLDER
-fi
-mkdir -p $TMP_FOLDER
+echo "Forge version: $($FORGE --version)"
 
 # Start a local anvil instance
-source $PWD/scripts/foundry/start_anvil.sh
+$PWD/scripts/foundry/start_anvil.sh --celo
+
+# build standard forge artifacts, needed to deploy precompiles
+FOUNDRY_PROFILE=truffle-compat forge build
 
 # build standard forge artifacts, needed to deploy precompiles
 forge build
@@ -39,11 +40,7 @@ source $PWD/scripts/foundry/build_constitution_selectors_map.sh
 echo "Compiling 0.5 with libraries..."
 time FOUNDRY_PROFILE=truffle-compat forge build $LIBRARY_FLAGS 
 echo "Compiling 0.8 with libraries..."
-
-time FOUNDRY_PROFILE=truffle-compat8 forge build $LIBRARY_FLAGS_08 
-
-# Deploy precompile contracts
-source $PWD/scripts/foundry/deploy_precompiles.sh
+time FOUNDRY_PROFILE=truffle-compat8 forge build $LIBRARY_FLAGS_08
 
 echo "Setting Registry Proxy"
 PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode.object' ./out-truffle-compat/Proxy.sol/Proxy.json)
@@ -56,13 +53,22 @@ anvil_setStorageAt \
 $REGISTRY_ADDRESS $REGISTRY_STORAGE_LOCATION "0x000000000000000000000000$REGISTRY_OWNER_ADDRESS" \
 --rpc-url $ANVIL_RPC_URL
 
+
 # Run migrations
-echo "Running migration script... "
-forge script \
+# Not using the --slow flag causes the migrations to randomly hang
+echo "Running migration script..."
+
+# In the past, --slow used to fix flaky migrations runs
+# as of forge v1.5 this issue seems to be resolved, but we keep it may be worth trying if experiencing issues
+# However --slow is not showing to be significantly slower in the current version, based on manual testing.
+
+$FORGE script \
   $MIGRATION_SCRIPT_PATH \
   --target-contract $MIGRATION_TARGET_CONTRACT \
   --sender $FROM_ACCOUNT \
-  --unlocked \
+  --sig "runMigration()" \
+  --private-key $FROM_PK \
+  $VERBOSITY_LEVEL \
   $BROADCAST \
   $SKIP_SIMULATION \
   $NON_INTERACTIVE \
@@ -70,33 +76,29 @@ forge script \
   $LIBRARY_FLAGS_08 \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
 
-CELO_EPOCH_REWARDS_ADDRESS=$(
-  cast call \
-    $REGISTRY_ADDRESS \
-    "getAddressForStringOrDie(string calldata identifier)(address)" \
-    "EpochRewards" \
-    --rpc-url $ANVIL_RPC_URL
-)
 
-echo "Setting storage of EpochRewards start time to same value as on mainnet"
-# Storage slot of start time is 2 and the value is 1587587214 which is identical to mainnet
-cast rpc \
-anvil_setStorageAt \
-$CELO_EPOCH_REWARDS_ADDRESS 2 "0x000000000000000000000000000000000000000000000000000000005ea0a88e" \
---rpc-url $ANVIL_RPC_URL
+# if the script is not split into two, then the funding of the UnreleasedTreasury is not recognized
+# this is likely due a bug in how anvil simulates the Celo transfer precompile
+
+echo "Running second part of migration script..."
+$FORGE script \
+  $MIGRATION_SCRIPT_PATH \
+  --target-contract $MIGRATION_TARGET_CONTRACT \
+  --sender $FROM_ACCOUNT \
+  --private-key $FROM_PK \
+  --sig "runAfterMigration()" \
+  $VERBOSITY_LEVEL \
+  $BROADCAST \
+  $SKIP_SIMULATION \
+  $NON_INTERACTIVE \
+  $LIBRARY_FLAGS \
+  --rpc-url $ANVIL_RPC_URL || { echo "Migration script (part 2) failed"; exit 1; }
+
+
+$PWD/scripts/foundry/activate_votes.sh
+
 
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
 echo "Migration script total elapsed time: $ELAPSED_TIME seconds"
-
-# this helps to make sure that devchain state is actually being saved
-sleep $SLEEP_DURATION
-
-if [[ "${KEEP_DEVCHAIN_FOLDER:-}" == "true" ]]; then
-    cp $ANVIL_FOLDER/state.json $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME
-    echo "Keeping devchain folder as per flag."
-else
-    # Rename devchain artifact and remove unused directory
-    mv $ANVIL_FOLDER/state.json $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME
-    rm -rf $ANVIL_FOLDER
-fi
+rm contracts/Import05Dependencies.sol

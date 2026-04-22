@@ -183,8 +183,10 @@ jobs:
           name: devchain-${{ env.RELEASE_TAG }}
           path: packages/protocol/.tmp/devchain
       - name: Install Foundry
+        # foundry-toolchain v1.7.0 https://github.com/foundry-rs/foundry-toolchain/releases/tag/v1.7.0
         uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
         with:
+          # TODO: Standardize Foundry version across workflows https://github.com/celo-org/celo-monorepo/issues/11714
           version: 'v1.0.0'
 
       - name: Install forge dependencies
@@ -235,8 +237,10 @@ jobs:
           rebuild-package: 'true'
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
       - name: Install Foundry
+        # foundry-toolchain v1.7.0 https://github.com/foundry-rs/foundry-toolchain/releases/tag/v1.7.0
         uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
         with:
+          # TODO: Standardize Foundry version across workflows https://github.com/celo-org/celo-monorepo/issues/11714
           version: 'v1.0.0'
       - name: Install forge dependencies
         working-directory: packages/protocol
@@ -252,9 +256,7 @@ jobs:
   # NOTE: This has not been fully tested as we don't have a license for certora
   certora-test:
     name: Certora test ${{ matrix.name }}
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:34b1c5e90f9613964160cdf6bc292b410362ec6d
+    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
     timeout-minutes: 30
     needs: install-dependencies
     # Disable as certora license is not active

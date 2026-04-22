@@ -6,9 +6,6 @@ import { Devchain } from "@test-sol/devchain/e2e/utils.sol";
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@test-sol/utils/ECDSAHelper08.sol";
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
-import { console } from "forge-std-8/console.sol";
-
-import { EpochManagerEnabler } from "@celo-contracts-8/common/EpochManagerEnabler.sol";
 
 contract E2E_EpochManager is ECDSAHelper08, Devchain {
   using EnumerableSet for EnumerableSet.AddressSet;
@@ -24,7 +21,6 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
   }
 
   address epochManagerOwner;
-  address epochManagerEnablerAddress;
   address[] firstElected;
 
   uint256 epochDuration;
@@ -42,9 +38,6 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
 
   function setUp() public virtual override(TestWithUtils08, Devchain) {
     epochManagerOwner = Ownable(address(epochManagerContract)).owner();
-    epochManagerEnablerAddress = registryContract.getAddressForOrDie(
-      EPOCH_MANAGER_ENABLER_REGISTRY_ID
-    );
     firstElected = getValidators().getRegisteredValidators();
 
     epochDuration = epochManagerContract.epochDuration();
@@ -281,11 +274,12 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
 
 contract E2E_EpochManager_InitializeSystem is E2E_EpochManager {
   function test_shouldRevert_WhenCalledByNonEnabler() public {
-    vm.expectRevert("msg.sender is not Enabler");
+    vm.prank(actor("notOwner"));
+    vm.expectRevert("Ownable: caller is not the owner");
     epochManagerContract.initializeSystem(1, 1, firstElected);
   }
   function test_shouldRevert_WhenAlreadyInitialized() public {
-    vm.prank(epochManagerEnablerAddress);
+    vm.prank(epochManagerOwner);
     vm.expectRevert("Epoch system already initialized");
     epochManagerContract.initializeSystem(1, 1, firstElected);
   }
@@ -293,8 +287,8 @@ contract E2E_EpochManager_InitializeSystem is E2E_EpochManager {
 
 contract E2E_EpochManager_GetCurrentEpoch is E2E_EpochManager {
   function test_ReturnExpectedValues() public {
-    assertEq(epochManagerContract.firstKnownEpoch(), 5);
-    assertEq(epochManagerContract.getCurrentEpochNumber(), 5);
+    assertEq(epochManagerContract.firstKnownEpoch(), 1, "firstKnownEpoch");
+    assertEq(epochManagerContract.getCurrentEpochNumber(), 2, "getCurrentEpochNumber");
 
     (
       uint256 firstBlock,
@@ -302,9 +296,9 @@ contract E2E_EpochManager_GetCurrentEpoch is E2E_EpochManager {
       uint256 startTimestamp,
       uint256 rewardsBlock
     ) = epochManagerContract.getCurrentEpoch();
-    assertEq(firstBlock, 400);
+    assertLt(firstBlock, block.number);
     assertEq(lastBlock, 0);
-    assertEq(startTimestamp, block.timestamp);
+    assertLt(startTimestamp, block.timestamp);
     assertEq(rewardsBlock, 0);
   }
 }
@@ -317,7 +311,6 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
     groups = getValidators().getRegisteredValidatorGroups();
 
     address scoreManagerOwner = scoreManager.owner();
-
     vm.startPrank(scoreManagerOwner);
     scoreManager.setGroupScore(groups[0], groupScore[0]);
     scoreManager.setGroupScore(groups[1], groupScore[1]);
@@ -329,13 +322,12 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
     scoreManager.setValidatorScore(validatorsArray[3], validatorScore[3]);
     scoreManager.setValidatorScore(validatorsArray[4], validatorScore[4]);
     scoreManager.setValidatorScore(validatorsArray[5], validatorScore[5]);
-
     vm.stopPrank();
   }
 
   function test_shouldHaveInitialValues() public {
-    assertEq(epochManagerContract.firstKnownEpoch(), 5);
-    assertEq(epochManagerContract.getCurrentEpochNumber(), 5);
+    assertEq(epochManagerContract.firstKnownEpoch(), 1, "firstKnownEpoch");
+    assertEq(epochManagerContract.getCurrentEpochNumber(), 2, "getCurrentEpochNumber");
 
     // get getEpochProcessingState
     (
@@ -346,10 +338,10 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
       uint256 totalRewardsCarbonFund
     ) = epochManagerContract.getEpochProcessingState();
     assertEq(status, 0); // Not started
-    assertEq(perValidatorReward, 0);
-    assertEq(totalRewardsVote, 0);
-    assertEq(totalRewardsCommunity, 0);
-    assertEq(totalRewardsCarbonFund, 0);
+    assertEq(perValidatorReward, 0, "perValidatorReward");
+    assertEq(totalRewardsVote, 0, "totalRewardsVote");
+    assertEq(totalRewardsCommunity, 0, "totalRewardsCommunity");
+    assertEq(totalRewardsCarbonFund, 0, "totalRewardsCarbonFund");
   }
 
   function test_shouldStartNextEpochProcessing() public {
@@ -364,7 +356,8 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
       uint256 totalRewardsCommunity,
       uint256 totalRewardsCarbonFund
     ) = epochManagerContract.getEpochProcessingState();
-    assertEq(status, 1); // Started
+
+    assertEq(status, 1, "Epoch is started");
     assertGt(perValidatorReward, 0, "perValidatorReward");
     assertGt(totalRewardsVote, 0, "totalRewardsVote");
     assertGt(totalRewardsCommunity, 0, "totalRewardsCommunity");

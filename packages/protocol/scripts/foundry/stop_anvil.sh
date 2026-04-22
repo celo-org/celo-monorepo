@@ -29,9 +29,10 @@ fi
 # Read environment variables and constants
 source $PWD/scripts/foundry/constants.sh
 
-if nc -z localhost $ANVIL_PORT; then
-  kill $(lsof -t -i:$ANVIL_PORT)
-  echo "Killed Anvil"
+ANVIL_PID=$(lsof -t -i:$ANVIL_PORT 2>/dev/null || true)
+if [ -n "$ANVIL_PID" ]; then
+  kill $ANVIL_PID
+  echo "Killed Anvil (PID: $ANVIL_PID)"
 fi
 
 # Conditionally remove anvil tmp state

@@ -9,6 +9,9 @@ import { Script } from "forge-std-8/Script.sol";
 import { console } from "forge-std/console.sol";
 import { stdJson } from "forge-std/StdJson.sol";
 
+// OpenZeppelin
+import { Ownable } from "@openzeppelin/contracts8/access/Ownable.sol";
+
 // Helper contract imports
 import { IReserveInitializer, IReserve, IStableTokenInitialize, IExchangeInitializer, IExchange, IReserveSpenderMultiSig } from "@migrations-sol/HelperInterFaces.sol";
 import { MigrationsConstants } from "@migrations-sol/constants.sol";
@@ -25,22 +28,19 @@ import { IAccountsInitializer } from "@celo-contracts/common/interfaces/IAccount
 import { IFeeHandlerSellerInitializer } from "@celo-contracts/common/interfaces/IFeeHandlerSellerInitializer.sol";
 import { IFeeHandler } from "@celo-contracts/common/interfaces/IFeeHandler.sol";
 import { IFeeHandlerInitializer } from "@celo-contracts/common/interfaces/IFeeHandlerInitializer.sol";
-import { IFeeCurrencyWhitelist } from "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
-import { IEpochManagerEnabler } from "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
+import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.sol";
 import { ILockedGoldInitializer } from "@celo-contracts/governance/interfaces/ILockedGoldInitializer.sol";
+import { IValidators } from "@celo-contracts/governance/interfaces/IValidators.sol";
 import { IValidatorsInitializer } from "@celo-contracts-8/governance/interfaces/IValidatorsInitializer.sol";
 import { IElectionInitializer } from "@celo-contracts/governance/interfaces/IElectionInitializer.sol";
 import { IEpochRewardsInitializer } from "@celo-contracts/governance/interfaces/IEpochRewardsInitializer.sol";
-import { IBlockchainParametersInitializer } from "@celo-contracts/governance/interfaces/IBlockchainParametersInitializer.sol";
 import { IGovernanceSlasherInitializer } from "@celo-contracts/governance/interfaces/IGovernanceSlasherInitializer.sol";
-import { IDoubleSigningSlasherInitializer } from "@celo-contracts/governance/interfaces/IDoubleSigningSlasherInitializer.sol";
-import { IDowntimeSlasherInitializer } from "@celo-contracts/governance/interfaces/IDowntimeSlasherInitializer.sol";
 import { IGovernanceApproverMultiSigInitializer } from "@celo-contracts/governance/interfaces/IGovernanceApproverMultiSigInitializer.sol";
 import { IGovernanceInitializer } from "@celo-contracts/governance/interfaces/IGovernanceInitializer.sol";
 import { ILockedGold } from "@celo-contracts/governance/interfaces/ILockedGold.sol";
+import { IERC20 } from "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import { IGovernance } from "@celo-contracts/governance/interfaces/IGovernance.sol";
-import { IRandomInitializer } from "@celo-contracts/identity/interfaces/IRandomInitializer.sol";
 import { IEscrowInitializer } from "@celo-contracts/identity/interfaces/IEscrowInitializer.sol";
 import { IOdisPaymentsInitializer } from "@celo-contracts/identity/interfaces/IOdisPaymentsInitializer.sol";
 import { IFederatedAttestationsInitializer } from "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
@@ -49,28 +49,15 @@ import { ISortedOracles } from "@celo-contracts/stability/interfaces/ISortedOrac
 
 // Core contract imports on Solidity 0.8
 import { IFeeCurrencyDirectoryInitializer } from "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectoryInitializer.sol";
-import { IGasPriceMinimumInitializer } from "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
 import { ICeloUnreleasedTreasuryInitializer } from "@celo-contracts-8/common/interfaces/ICeloUnreleasedTreasuryInitializer.sol";
-import { IEpochManagerEnablerInitializer } from "@celo-contracts-8/common/interfaces/IEpochManagerEnablerInitializer.sol";
 import { IEpochManagerInitializer } from "@celo-contracts-8/common/interfaces/IEpochManagerInitializer.sol";
 import { IScoreManagerInitializer } from "@celo-contracts-8/common/interfaces/IScoreManagerInitializer.sol";
 import { IFeeCurrencyDirectory } from "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
 import { UsingRegistry } from "@celo-contracts-8/common/UsingRegistry.sol";
 
 // Test imports
-import { ISECP256K1 } from "@test-sol/utils/SECP256K1.sol";
+import { ISECP256K1, SECP256K1 } from "@test-sol/utils/SECP256K1.sol";
 import { ConstitutionHelper } from "@test-sol/utils/ConstitutionHelper.sol";
-
-contract ForceTx {
-  // event to trigger so a tx can be processed
-  event VanillaEvent(string);
-
-  // helper used to know the account broadcasting a tx
-  function identity() public returns (address) {
-    emit VanillaEvent("nop");
-    return msg.sender;
-  }
-}
 
 contract Migration is Script, UsingRegistry, MigrationsConstants {
   using stdJson for string;
@@ -80,18 +67,13 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 commissionUpdateDelay;
   }
 
-  enum SolidityVersions {
-    SOLIDITY_05,
-    SOLIDITY_08
-  }
-
-  IProxyFactory proxyFactory;
-
-  uint256 proxyNonce = 0;
+  string configurationFileRawJSON;
+  IProxyFactory internal proxyFactory;
+  uint256 internal proxyNonce = 0;
+  address DEPLOYER_ACCOUNT;
+  address SECP256K1Address;
 
   ConstitutionHelper.ConstitutionEntry[] internal constitutionEntries;
-
-  event Result(bytes);
 
   function create2deploy(bytes32 salt, bytes memory initCode) internal returns (address) {
     address deployedAddress;
@@ -104,30 +86,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     return deployedAddress;
   }
 
-  // TODO remove this duplicated block (it's in tests)
-  // can't remove because of the syntax of value
-  function deployCodeTo(
-    string memory what,
-    bytes memory args,
-    uint256 value,
-    address where
-  ) internal {
-    bytes memory creationCode = vm.getCode(what);
-    vm.etch(where, abi.encodePacked(creationCode, args));
-    (bool success, bytes memory runtimeBytecode) = where.call{ value: value }("");
-    require(
-      success,
-      "StdCheats deployCodeTo(string,bytes,uint256,address): Failed to create runtime bytecode."
-    );
-    vm.etch(where, runtimeBytecode);
-  }
-
-  function deployCodeTo(string memory what, address where) internal {
-    deployCodeTo(what, "", 0, where);
-  }
-
-  function deployCodeTo(string memory what, bytes memory args, address where) internal {
-    deployCodeTo(what, args, 0, where);
+  function deployContract(string memory contractName, bytes32 nonce) internal returns (address) {
+    return create2deploy(nonce, vm.getCode(getContractArtifactPath(contractName)));
   }
 
   function addToRegistry(string memory contractName, address proxyAddress) public {
@@ -141,28 +101,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     registry.setAddressFor(contractName, proxyAddress);
   }
 
-  function getSolidityVersionPath(
-    SolidityVersions version
-  ) public pure returns (string memory versionPath) {
-    if (version == SolidityVersions.SOLIDITY_05) {
-      return "out-truffle-compat/";
-    } else {
-      return "out-truffle-compat-0.8/";
-    }
-    revert("Solidity version not supported");
-  }
-
   function setImplementationOnProxy(
     IProxy proxy,
     string memory contractName,
-    bytes memory initializeCalldata,
-    SolidityVersions solidityVersion
+    bytes memory initializeCalldata
   ) public {
-    string memory versionString = getSolidityVersionPath(solidityVersion);
-
-    bytes memory implementationBytecode = vm.getCode(
-      string.concat(versionString, contractName, ".sol/", contractName, ".json")
-    );
+    bytes memory implementationBytecode = vm.getCode(getContractArtifactPath(contractName));
     bool testingDeployment = false;
     bytes memory initialCode = abi.encodePacked(
       implementationBytecode,
@@ -178,28 +122,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function deployProxiedContract(
     string memory contractName,
-    address toProxy,
-    bytes memory initializeCalldata,
-    SolidityVersions solidityVersion
-  ) public {
-    console.log("Deploying: ", contractName);
-    deployCodeTo("Proxy.sol", abi.encode(false), toProxy);
-    IProxy proxy = IProxy(toProxy);
-    console.log(" Proxy deployed to:", toProxy);
-
-    setImplementationOnProxy(proxy, contractName, initializeCalldata, solidityVersion);
-    addToRegistry(contractName, address(proxy));
-    console.log(" Done deploying:", contractName);
-    console.log("------------------------------");
-  }
-
-  function deployProxiedContract(
-    string memory contractName,
-    bytes memory initializeCalldata,
-    SolidityVersions solidityVersion
+    bytes memory initializeCalldata
   ) public returns (address proxyAddress) {
-    console.log("Deploying: ", contractName);
-
     // Can't deploy with new Proxy() because Proxy is in 0.5
     // Proxy proxy = new Proxy();
     // In production this should use create2, in anvil can't do that
@@ -209,78 +133,115 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     proxyAddress = proxyFactory.deployProxy();
 
     IProxy proxy = IProxy(proxyAddress);
-    console.log(" Proxy deployed to:", address(proxy));
+    console.log(" New proxy deployed to:", address(proxy));
 
-    setImplementationOnProxy(proxy, contractName, initializeCalldata, solidityVersion);
-    addToRegistry(contractName, address(proxy));
+    setImplementationOnProxyAndAddToRegistry(contractName, proxy, initializeCalldata);
 
     console.log(" Done deploying:", contractName);
     console.log("------------------------------");
   }
 
+  function setImplementationOnProxyAndAddToRegistry(
+    string memory contractName,
+    IProxy proxy,
+    bytes memory initializeCalldata
+  ) public {
+    address owner_ = proxy._getOwner();
+    console.log("Owner of Proxy is:", owner_);
+    console.log("Deploying implementation of: ", contractName);
+    setImplementationOnProxy(proxy, contractName, initializeCalldata);
+    addToRegistry(contractName, address(proxy));
+  }
+
+  function setUp() public {
+    console.log("Setting up migration...");
+    configurationFileRawJSON = vm.readFile("./migrations_sol/migrationsConfig.json");
+    DEPLOYER_ACCOUNT = configurationFileRawJSON.readAddress(".deployerAccount");
+  }
+
   /**
-   * Entry point of the script
+   * First part of the migration, deploys most contracts
    */
-  function run() external {
-    // TODO check that this matches DEPLOYER_ACCOUNT and the pK can be avoided with --unlock
+  function runMigration() external {
     vm.startBroadcast(DEPLOYER_ACCOUNT);
 
-    string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
+    proxyFactory = IProxyFactory(deployContract("ProxyFactory", 0));
 
-    proxyFactory = IProxyFactory(
-      create2deploy(0, vm.getCode("./out-truffle-compat/ProxyFactory.sol/ProxyFactory.json"))
-    );
-
-    // Proxy for Registry is already set, just deploy implementation
     migrateRegistry();
     setupUsingRegistry();
-
     migrateFreezer();
-    migrateFeeCurrencyWhitelist();
-    migrateFeeCurrencyDirectory();
-    migrateCeloToken(json);
-    migrateSortedOracles(json);
-    migrateGasPriceMinimum(json);
-    migrateReserveSpenderMultiSig(json);
-    migrateReserve(json);
-    migrateStableToken(json);
-    migrateExchange(json);
+    migrateFeeCurrencyDirectory(configurationFileRawJSON);
+    migrateCeloToken(configurationFileRawJSON);
+    migrateSortedOracles(configurationFileRawJSON);
+    migrateReserveSpenderMultiSig(configurationFileRawJSON);
+    migrateReserve(configurationFileRawJSON);
+    migrateStableToken(configurationFileRawJSON);
+
+    migrateExchange(configurationFileRawJSON);
+
     migrateAccount();
-    migrateLockedCelo(json);
-    migrateValidators(json); // this triggers a revert, the deploy after the json reads
-    migrateElection(json);
-    migrateEpochRewards(json);
-    migrateRandom(json);
+
+    migrateLockedCelo(configurationFileRawJSON);
+    migrateValidators(configurationFileRawJSON);
+    migrateElection(configurationFileRawJSON);
+    migrateEpochRewards(configurationFileRawJSON);
     migrateEscrow();
-    // attestation not migrated
-    migrateBlockchainParameters(json);
+
     migrateGovernanceSlasher();
-    migrateDoubleSigningSlasher(json);
-    migrateDowntimeSlasher(json);
-    migrateGovernanceApproverMultiSig(json);
-    // GrandaMento not migrated
+    migrateGovernanceApproverMultiSig(configurationFileRawJSON);
     migrateFederatedAttestations();
     migrateMentoFeeHandlerSeller();
     migrateUniswapFeeHandlerSeller();
-    migrateFeeHandler(json);
+    migrateFeeHandler(configurationFileRawJSON);
     migrateOdisPayments();
-    migrateCeloUnreleasedTreasury();
-    migrateEpochManagerEnabler();
-    migrateEpochManager(json);
-    migrateScoreManager();
-    migrateGovernance(json);
+    migrateCeloUnreleasedTreasury(configurationFileRawJSON);
 
     vm.stopBroadcast();
 
-    // Functions with broadcast with different addresses
-    // Validators needs to lock, which can be only used by the msg.sender
-    electValidators(json);
+    // fund the CeloUnreleasedTreasury
+    vm.startBroadcast(configurationFileRawJSON.readUint(".deployerPrivateKey"));
+
+    // doing a native transfer is not allowed by the unreleased treasury
+    uint256 treasuryBalance = configurationFileRawJSON.readUint(
+      ".celoUnreleasedTreasury.initialBalance"
+    );
+    IERC20(registry.getAddressForStringOrDie("GoldToken")).transfer(
+      registry.getAddressForStringOrDie("CeloUnreleasedTreasury"),
+      treasuryBalance
+    );
+    vm.stopBroadcast();
+  }
+
+  /**
+   * Second part of the migration, deploys EpochManager and Governance
+   */
+  function runAfterMigration() public {
+    setupUsingRegistry();
 
     vm.startBroadcast(DEPLOYER_ACCOUNT);
+    // increase the salt to avoid address collision from previous run
+    proxyFactory = IProxyFactory(deployContract("ProxyFactory", bytes32(uint256(1))));
 
-    captureEpochManagerEnablerValidators();
-
+    checkUnreleasedTreasuryBalance();
+    migrateEpochManager(configurationFileRawJSON);
+    migrateScoreManager();
     vm.stopBroadcast();
+
+    initializeEpochManager(configurationFileRawJSON);
+
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
+    migrateGovernance(configurationFileRawJSON);
+
+    SECP256K1Address = address(new SECP256K1());
+    vm.stopBroadcast();
+
+    electValidators(configurationFileRawJSON);
+  }
+
+  function checkUnreleasedTreasuryBalance() internal {
+    address celoUnreleasedTreasury = address(getCeloUnreleasedTreasury());
+    uint256 balance = getCeloToken().balanceOf(celoUnreleasedTreasury);
+    console.log("Unreleased Treasury balance: ", balance, "CELO");
   }
 
   /**
@@ -292,95 +253,58 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function migrateRegistry() public {
-    setImplementationOnProxy(
-      IProxy(REGISTRY_ADDRESS),
+    setImplementationOnProxyAndAddToRegistry(
       "Registry",
-      abi.encodeWithSelector(IRegistryInitializer.initialize.selector),
-      SolidityVersions.SOLIDITY_05
+      IProxy(REGISTRY_ADDRESS),
+      abi.encodeWithSelector(IRegistryInitializer.initialize.selector)
     );
-    // set registry in registry itself
-    console.log("Owner of the Registry Proxy is", IProxy(REGISTRY_ADDRESS)._getOwner());
-    addToRegistry("Registry", REGISTRY_ADDRESS);
     console.log("Done migration registry");
   }
 
   function migrateFreezer() public {
     deployProxiedContract(
       "Freezer",
-      abi.encodeWithSelector(IFreezerInitializer.initialize.selector),
-      SolidityVersions.SOLIDITY_05
+      abi.encodeWithSelector(IFreezerInitializer.initialize.selector)
     );
   }
 
-  function migrateFeeCurrencyWhitelist() public {
-    deployProxiedContract(
-      "FeeCurrencyWhitelist",
-      abi.encodeWithSelector(IFeeCurrencyWhitelist.initialize.selector),
-      SolidityVersions.SOLIDITY_05
+  function migrateFeeCurrencyDirectory(string memory json) public {
+    address feeCurrencyDirectoryProxyAddress = configurationFileRawJSON.readAddress(
+      ".proxies.feeCurrencyDirectory"
     );
-  }
-
-  function migrateFeeCurrencyDirectory() public {
-    deployProxiedContract(
+    setImplementationOnProxyAndAddToRegistry(
       "FeeCurrencyDirectory",
-      abi.encodeWithSelector(IFeeCurrencyDirectoryInitializer.initialize.selector),
-      SolidityVersions.SOLIDITY_08
+      IProxy(feeCurrencyDirectoryProxyAddress),
+      abi.encodeWithSelector(IFeeCurrencyDirectoryInitializer.initialize.selector)
     );
   }
 
   function migrateCeloToken(string memory json) public {
-    // TODO change pre-funded addresses to make it match circulation supply
-    address celoProxyAddress = deployProxiedContract(
+    // TODO: change pre-funded addresses to make it match circulation supply
+    // pre deployed celo token proxy address from L2Genesis.s.sol
+    address celoProxyAddress = configurationFileRawJSON.readAddress(".proxies.celoToken");
+
+    setImplementationOnProxyAndAddToRegistry(
       "GoldToken",
-      abi.encodeWithSelector(ICeloTokenInitializer.initialize.selector, REGISTRY_ADDRESS),
-      SolidityVersions.SOLIDITY_05
+      IProxy(celoProxyAddress),
+      abi.encodeWithSelector(ICeloTokenInitializer.initialize.selector, REGISTRY_ADDRESS)
     );
 
     addToRegistry("CeloToken", celoProxyAddress);
-    bool frozen = abi.decode(json.parseRaw(".goldToken.frozen"), (bool));
+
+    bool frozen = configurationFileRawJSON.readBool(".goldToken.frozen");
     if (frozen) {
       getFreezer().freeze(celoProxyAddress);
     }
   }
 
   function migrateSortedOracles(string memory json) public {
-    uint256 reportExpirySeconds = abi.decode(
-      json.parseRaw(".sortedOracles.reportExpirySeconds"),
-      (uint256)
+    uint256 reportExpirySeconds = configurationFileRawJSON.readUint(
+      ".sortedOracles.reportExpirySeconds"
     );
     deployProxiedContract(
       "SortedOracles",
-      abi.encodeWithSelector(ISortedOraclesInitializer.initialize.selector, reportExpirySeconds),
-      SolidityVersions.SOLIDITY_05
-    );
-  }
-
-  function migrateGasPriceMinimum(string memory json) public {
-    uint256 gasPriceMinimumFloor = abi.decode(
-      json.parseRaw(".gasPriceMinimum.minimumFloor"),
-      (uint256)
-    );
-    uint256 targetDensity = abi.decode(json.parseRaw(".gasPriceMinimum.targetDensity"), (uint256));
-    uint256 adjustmentSpeed = abi.decode(
-      json.parseRaw(".gasPriceMinimum.adjustmentSpeed"),
-      (uint256)
-    );
-    uint256 baseFeeOpCodeActivationBlock = abi.decode(
-      json.parseRaw(".gasPriceMinimum.baseFeeOpCodeActivationBlock"),
-      (uint256)
-    );
-
-    deployProxiedContract(
-      "GasPriceMinimum",
-      abi.encodeWithSelector(
-        IGasPriceMinimumInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
-        gasPriceMinimumFloor,
-        targetDensity,
-        adjustmentSpeed,
-        baseFeeOpCodeActivationBlock
-      ),
-      SolidityVersions.SOLIDITY_08
+      abi.encodeWithSelector(ISortedOraclesInitializer.initialize.selector, reportExpirySeconds)
     );
   }
 
@@ -388,10 +312,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     address[] memory owners = new address[](1);
     owners[0] = DEPLOYER_ACCOUNT;
 
-    uint256 required = abi.decode(json.parseRaw(".reserveSpenderMultiSig.required"), (uint256));
-    uint256 internalRequired = abi.decode(
-      json.parseRaw(".reserveSpenderMultiSig.internalRequired"),
-      (uint256)
+    bool required = configurationFileRawJSON.readBool(".reserveSpenderMultiSig.required");
+    bool internalRequired = configurationFileRawJSON.readBool(
+      ".reserveSpenderMultiSig.internalRequired"
     );
 
     // Deploys and adds the ReserveSpenderMultiSig to the Registry for ease of reference.
@@ -402,36 +325,36 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       abi.encodeWithSelector(
         IReserveSpenderMultiSig.initialize.selector,
         owners,
-        required,
-        internalRequired
-      ),
-      SolidityVersions.SOLIDITY_05
+        required ? 1 : 0,
+        internalRequired ? 1 : 0
+      )
     );
   }
 
   function migrateReserve(string memory json) public {
-    uint256 tobinTaxStalenessThreshold = abi.decode(
-      json.parseRaw(".reserve.tobinTaxStalenessThreshold"),
-      (uint256)
-    );
-    uint256 spendingRatio = abi.decode(json.parseRaw(".reserve.spendingRatio"), (uint256));
-    uint256 frozenGold = abi.decode(json.parseRaw(".reserve.frozenGold"), (uint256));
-    uint256 frozenDays = abi.decode(json.parseRaw(".reserve.frozenDays"), (uint256));
-    bytes32[] memory assetAllocationSymbols = abi.decode(
-      json.parseRaw(".reserve.assetAllocationSymbols"),
-      (bytes32[])
+    console.log(
+      "WARNING: The Reserve contract is not really a smart contract relevant to us anymore. \n"
+      "We only have it because the StableTokens need it for compatibility."
     );
 
-    uint256[] memory assetAllocationWeights = abi.decode(
-      json.parseRaw(".reserve.assetAllocationWeights"),
-      (uint256[])
+    uint256 tobinTaxStalenessThreshold = configurationFileRawJSON.readUint(
+      ".reserve.tobinTaxStalenessThreshold"
     );
-    uint256 tobinTax = abi.decode(json.parseRaw(".reserve.tobinTax"), (uint256));
-    uint256 tobinTaxReserveRatio = abi.decode(
-      json.parseRaw(".reserve.tobinTaxReserveRatio"),
-      (uint256)
+    uint256 spendingRatio = configurationFileRawJSON.readUint(".reserve.spendingRatio");
+    uint256 frozenGold = configurationFileRawJSON.readUint(".reserve.frozenGold");
+    uint256 frozenDays = configurationFileRawJSON.readUint(".reserve.frozenDays");
+    bytes32[] memory assetAllocationSymbols = configurationFileRawJSON.readBytes32Array(
+      ".reserve.assetAllocationSymbols"
     );
-    uint256 initialBalance = abi.decode(json.parseRaw(".reserve.initialBalance"), (uint256));
+
+    uint256[] memory assetAllocationWeights = configurationFileRawJSON.readUintArray(
+      ".reserve.assetAllocationWeights"
+    );
+    uint256 tobinTax = configurationFileRawJSON.readUint(".reserve.tobinTax");
+    uint256 tobinTaxReserveRatio = configurationFileRawJSON.readUint(
+      ".reserve.tobinTaxReserveRatio"
+    );
+    uint256 initialBalance = configurationFileRawJSON.readUint(".reserve.initialBalance");
 
     address reserveProxyAddress = deployProxiedContract(
       "Reserve",
@@ -446,15 +369,14 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         assetAllocationWeights,
         tobinTax,
         tobinTaxReserveRatio
-      ),
-      SolidityVersions.SOLIDITY_05
+      )
     );
 
     // TODO this should be a transfer from the deployer rather than a deal
     vm.deal(reserveProxyAddress, initialBalance);
 
     // Adds ReserveSpenderMultiSig to Reserve
-    bool useSpender = abi.decode(json.parseRaw(".reserveSpenderMultiSig.required"), (bool));
+    bool useSpender = configurationFileRawJSON.readBool(".reserveSpenderMultiSig.required");
     address spender = useSpender
       ? registry.getAddressForString("ReserveSpenderMultiSig")
       : DEPLOYER_ACCOUNT;
@@ -463,104 +385,101 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     console.log("reserveSpenderMultiSig added as Reserve spender");
   }
 
+  struct StableTokenDeployParams {
+    uint8 decimals;
+    uint256 inflationRate;
+    uint256 inflationFactorUpdatePeriod;
+    bool frozen;
+    uint256 celoPrice;
+    uint256 intrinsicGas;
+  }
+
   function deployStable(
     string memory name,
     string memory symbol,
-    string memory sufix,
-    uint8 decimals,
-    uint256 inflationRate,
-    uint256 inflationFactorUpdatePeriod,
+    string memory suffix,
     address[] memory initialBalanceAddresses,
     uint256[] memory initialBalanceValues,
-    bool frozen,
-    uint256 celoPrice
+    StableTokenDeployParams memory params
   ) public {
-    string memory exchangeIdentifier = string.concat("Exchange", sufix);
+    string memory exchangeIdentifier = string.concat("Exchange", suffix);
     address stableTokenProxyAddress = deployProxiedContract(
-      string.concat("StableToken", sufix),
+      string.concat("StableToken", suffix),
       abi.encodeWithSelector(
         IStableTokenInitialize.initialize.selector,
         name,
         symbol,
-        decimals,
+        params.decimals,
         REGISTRY_ADDRESS,
-        inflationRate,
-        inflationFactorUpdatePeriod,
+        params.inflationRate,
+        params.inflationFactorUpdatePeriod,
         initialBalanceAddresses,
         initialBalanceValues,
         exchangeIdentifier
-      ),
-      SolidityVersions.SOLIDITY_05
+      )
     );
 
-    if (frozen) {
+    if (params.frozen) {
       getFreezer().freeze(stableTokenProxyAddress);
     }
 
     // TODO add more configurable oracles from the json
     getSortedOracles().addOracle(stableTokenProxyAddress, DEPLOYER_ACCOUNT);
 
-    if (celoPrice != 0) {
-      console.log("before report");
-      getSortedOracles().report(stableTokenProxyAddress, celoPrice * 1e24, address(0), address(0)); // TODO use fixidity
-      console.log("After report report");
+    if (params.celoPrice != 0) {
+      getSortedOracles().report(
+        stableTokenProxyAddress,
+        params.celoPrice * 1e24,
+        address(0),
+        address(0)
+      ); // TODO use fixidity
     }
 
     IReserve(registry.getAddressForStringOrDie("Reserve")).addToken(stableTokenProxyAddress);
 
-    getFeeCurrencyWhitelist().addToken(stableTokenProxyAddress);
-
-    /*
-    Arbitrary intrinsic gas number take from existing `FeeCurrencyDirectory.t.sol` tests
-    Source: https://github.com/celo-org/celo-monorepo/blob/2cec07d43328cf4216c62491a35eacc4960fffb6/packages/protocol/test-sol/common/FeeCurrencyDirectory.t.sol#L27 
-        */
-    uint256 mockIntrinsicGas = 21000;
-
     IFeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory"))
-      .setCurrencyConfig(stableTokenProxyAddress, address(getSortedOracles()), mockIntrinsicGas);
+      .setCurrencyConfig(stableTokenProxyAddress, address(getSortedOracles()), params.intrinsicGas);
   }
 
   function migrateStableToken(string memory json) public {
-    string[] memory names = abi.decode(json.parseRaw(".stableTokens.names"), (string[]));
-    string[] memory symbols = abi.decode(json.parseRaw(".stableTokens.symbols"), (string[]));
-    string[] memory contractSufixs = abi.decode(
-      json.parseRaw(".stableTokens.contractSufixs"),
-      (string[])
+    console.log(
+      "WARNING: The Mento integration in this migration script is from a very old Mento version. \n"
+      "At this point, it mostly serves as an example of an ERC20 token with support for fee abstraction."
+    );
+
+    string[] memory names = configurationFileRawJSON.readStringArray(".stableTokens.names");
+    string[] memory symbols = configurationFileRawJSON.readStringArray(".stableTokens.symbols");
+    string[] memory contractSuffixes = configurationFileRawJSON.readStringArray(
+      ".stableTokens.contractSuffixes"
     );
 
     require(names.length == symbols.length, "Ticker and stable names should match");
-
-    uint8 decimals = abi.decode(json.parseRaw(".stableTokens.decimals"), (uint8));
-    uint256 inflationRate = abi.decode(json.parseRaw(".stableTokens.inflationRate"), (uint256));
-    uint256 inflationFactorUpdatePeriod = abi.decode(
-      json.parseRaw(".stableTokens.inflationPeriod"),
-      (uint256)
-    );
-    uint256 initialBalanceValue = abi.decode(
-      json.parseRaw(".stableTokens.initialBalance"),
-      (uint256)
-    );
-    bool frozen = abi.decode(json.parseRaw(".stableTokens.frozen"), (bool));
-    uint256 celoPrice = abi.decode(json.parseRaw(".stableTokens.celoPrice"), (uint256));
 
     address[] memory initialBalanceAddresses = new address[](1);
     initialBalanceAddresses[0] = DEPLOYER_ACCOUNT;
 
     uint256[] memory initialBalanceValues = new uint256[](1);
-    initialBalanceValues[0] = initialBalanceValue;
+    initialBalanceValues[0] = configurationFileRawJSON.readUint(".stableTokens.initialBalance");
 
-    for (uint256 i; i < names.length; i++) {
+    StableTokenDeployParams memory params = StableTokenDeployParams({
+      decimals: abi.decode(configurationFileRawJSON.parseRaw(".stableTokens.decimals"), (uint8)),
+      inflationRate: configurationFileRawJSON.readUint(".stableTokens.inflationRate"),
+      inflationFactorUpdatePeriod: configurationFileRawJSON.readUint(
+        ".stableTokens.inflationPeriod"
+      ),
+      frozen: configurationFileRawJSON.readBool(".stableTokens.frozen"),
+      celoPrice: configurationFileRawJSON.readUint(".stableTokens.celoPrice"),
+      intrinsicGas: json.readUint(".feeCurrencyDirectory.intrinsicGas")
+    });
+
+    for (uint8 i; i < names.length; i++) {
       deployStable(
         names[i],
         symbols[i],
-        contractSufixs[i],
-        decimals,
-        inflationRate,
-        inflationFactorUpdatePeriod,
+        contractSuffixes[i],
         initialBalanceAddresses,
         initialBalanceValues,
-        frozen,
-        celoPrice
+        params
       );
     }
   }
@@ -569,10 +488,10 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // TODO make this for all stables (using a loop like in stable)
 
     string memory stableTokenIdentifier = "StableToken";
-    uint256 spread = abi.decode(json.parseRaw(".exchange.spread"), (uint256));
-    uint256 reserveFraction = abi.decode(json.parseRaw(".exchange.reserveFraction"), (uint256));
-    uint256 updateFrequency = abi.decode(json.parseRaw(".exchange.updateFrequency"), (uint256));
-    uint256 minimumReports = abi.decode(json.parseRaw(".exchange.minimumReports"), (uint256));
+    uint256 spread = configurationFileRawJSON.readUint(".exchange.spread");
+    uint256 reserveFraction = configurationFileRawJSON.readUint(".exchange.reserveFraction");
+    uint256 updateFrequency = configurationFileRawJSON.readUint(".exchange.updateFrequency");
+    uint256 minimumReports = configurationFileRawJSON.readUint(".exchange.minimumReports");
 
     address exchangeProxyAddress = deployProxiedContract(
       "Exchange",
@@ -584,11 +503,10 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         reserveFraction,
         updateFrequency,
         minimumReports
-      ),
-      SolidityVersions.SOLIDITY_05
+      )
     );
 
-    bool frozen = abi.decode(json.parseRaw(".exchange.frozen"), (bool));
+    bool frozen = configurationFileRawJSON.readBool(".exchange.frozen");
     if (frozen) {
       getFreezer().freeze(exchangeProxyAddress);
     }
@@ -599,15 +517,14 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function migrateAccount() public {
     address accountsProxyAddress = deployProxiedContract(
       "Accounts",
-      abi.encodeWithSelector(IAccountsInitializer.initialize.selector, REGISTRY_ADDRESS),
-      SolidityVersions.SOLIDITY_05
+      abi.encodeWithSelector(IAccountsInitializer.initialize.selector, REGISTRY_ADDRESS)
     );
 
     IAccounts(accountsProxyAddress).setEip712DomainSeparator();
   }
 
   function migrateLockedCelo(string memory json) public {
-    uint256 unlockingPeriod = abi.decode(json.parseRaw(".lockedGold.unlockingPeriod"), (uint256));
+    uint256 unlockingPeriod = configurationFileRawJSON.readUint(".lockedGold.unlockingPeriod");
 
     address LockedCeloProxyAddress = deployProxiedContract(
       "LockedGold",
@@ -615,42 +532,34 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         ILockedGoldInitializer.initialize.selector,
         REGISTRY_ADDRESS,
         unlockingPeriod
-      ),
-      SolidityVersions.SOLIDITY_05
+      )
     );
 
     addToRegistry("LockedCelo", LockedCeloProxyAddress);
   }
 
   function migrateValidators(string memory json) public {
-    uint256 groupRequirementValue = abi.decode(
-      json.parseRaw(".validators.groupLockedGoldRequirements.value"),
-      (uint256)
+    uint256 groupRequirementValue = configurationFileRawJSON.readUint(
+      ".validators.groupLockedGoldRequirements.value"
     );
-    uint256 groupRequirementDuration = abi.decode(
-      json.parseRaw(".validators.groupLockedGoldRequirements.duration"),
-      (uint256)
+    uint256 groupRequirementDuration = configurationFileRawJSON.readUint(
+      ".validators.groupLockedGoldRequirements.duration"
     );
-    uint256 validatorRequirementValue = abi.decode(
-      json.parseRaw(".validators.validatorLockedGoldRequirements.value"),
-      (uint256)
+    uint256 validatorRequirementValue = configurationFileRawJSON.readUint(
+      ".validators.validatorLockedGoldRequirements.value"
     );
-    uint256 validatorRequirementDuration = abi.decode(
-      json.parseRaw(".validators.validatorLockedGoldRequirements.duration"),
-      (uint256)
+    uint256 validatorRequirementDuration = configurationFileRawJSON.readUint(
+      ".validators.validatorLockedGoldRequirements.duration"
     );
-    uint256 membershipHistoryLength = abi.decode(
-      json.parseRaw(".validators.membershipHistoryLength"),
-      (uint256)
+    uint256 membershipHistoryLength = configurationFileRawJSON.readUint(
+      ".validators.membershipHistoryLength"
     );
-    uint256 slashingMultiplierResetPeriod = abi.decode(
-      json.parseRaw(".validators.slashingMultiplierResetPeriod"),
-      (uint256)
+    uint256 slashingMultiplierResetPeriod = configurationFileRawJSON.readUint(
+      ".validators.slashingMultiplierResetPeriod"
     );
-    uint256 maxGroupSize = abi.decode(json.parseRaw(".validators.maxGroupSize"), (uint256));
-    uint256 commissionUpdateDelay = abi.decode(
-      json.parseRaw(".validators.commissionUpdateDelay"),
-      (uint256)
+    uint256 maxGroupSize = configurationFileRawJSON.readUint(".validators.maxGroupSize");
+    uint256 commissionUpdateDelay = configurationFileRawJSON.readUint(
+      ".validators.commissionUpdateDelay"
     );
 
     InitParamsTunnel memory initParamsTunnel = InitParamsTunnel({
@@ -670,27 +579,22 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         slashingMultiplierResetPeriod,
         maxGroupSize,
         initParamsTunnel
-      ),
-      SolidityVersions.SOLIDITY_08
+      )
     );
   }
 
   function migrateElection(string memory json) public {
-    uint256 minElectableValidators = abi.decode(
-      json.parseRaw(".election.minElectableValidators"),
-      (uint256)
+    uint256 minElectableValidators = configurationFileRawJSON.readUint(
+      ".election.minElectableValidators"
     );
-    uint256 maxElectableValidators = abi.decode(
-      json.parseRaw(".election.maxElectableValidators"),
-      (uint256)
+    uint256 maxElectableValidators = configurationFileRawJSON.readUint(
+      ".election.maxElectableValidators"
     );
-    uint256 maxNumGroupsVotedFor = abi.decode(
-      json.parseRaw(".election.maxNumGroupsVotedFor"),
-      (uint256)
+    uint256 maxNumGroupsVotedFor = configurationFileRawJSON.readUint(
+      ".election.maxNumGroupsVotedFor"
     );
-    uint256 electabilityThreshold = abi.decode(
-      json.parseRaw(".election.electabilityThreshold"),
-      (uint256)
+    uint256 electabilityThreshold = configurationFileRawJSON.readUint(
+      ".election.electabilityThreshold"
     );
 
     deployProxiedContract(
@@ -702,55 +606,46 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         maxElectableValidators,
         maxNumGroupsVotedFor,
         electabilityThreshold
-      ),
-      SolidityVersions.SOLIDITY_05
+      )
     );
+
+    console.log(" Done deploying:", "Election");
+    console.log("------------------------------");
   }
 
   function migrateEpochRewards(string memory json) public {
-    uint256 targetVotingYieldInitial = abi.decode(
-      json.parseRaw(".epochRewards.targetVotingYieldParameters.initial"),
-      (uint256)
+    uint256 targetVotingYieldInitial = configurationFileRawJSON.readUint(
+      ".epochRewards.targetVotingYieldParameters.initial"
     );
-    uint256 targetVotingYieldMax = abi.decode(
-      json.parseRaw(".epochRewards.targetVotingYieldParameters.max"),
-      (uint256)
+    uint256 targetVotingYieldMax = configurationFileRawJSON.readUint(
+      ".epochRewards.targetVotingYieldParameters.max"
     );
-    uint256 targetVotingYieldAdjustmentFactor = abi.decode(
-      json.parseRaw(".epochRewards.targetVotingYieldParameters.adjustmentFactor"),
-      (uint256)
+    uint256 targetVotingYieldAdjustmentFactor = configurationFileRawJSON.readUint(
+      ".epochRewards.targetVotingYieldParameters.adjustmentFactor"
     );
-    uint256 rewardsMultiplierMax = abi.decode(
-      json.parseRaw(".epochRewards.rewardsMultiplierParameters.max"),
-      (uint256)
+    uint256 rewardsMultiplierMax = configurationFileRawJSON.readUint(
+      ".epochRewards.rewardsMultiplierParameters.max"
     );
-    uint256 rewardsMultiplierUnderspendAdjustmentFactor = abi.decode(
-      json.parseRaw(".epochRewards.rewardsMultiplierParameters.adjustmentFactors.underspend"),
-      (uint256)
+    uint256 rewardsMultiplierUnderspendAdjustmentFactor = configurationFileRawJSON.readUint(
+      ".epochRewards.rewardsMultiplierParameters.adjustmentFactors.underspend"
     );
-    uint256 rewardsMultiplierOverspendAdjustmentFactor = abi.decode(
-      json.parseRaw(".epochRewards.rewardsMultiplierParameters.adjustmentFactors.overspend"),
-      (uint256)
+    uint256 rewardsMultiplierOverspendAdjustmentFactor = configurationFileRawJSON.readUint(
+      ".epochRewards.rewardsMultiplierParameters.adjustmentFactors.overspend"
     );
-    uint256 targetVotingGoldFraction = abi.decode(
-      json.parseRaw(".epochRewards.targetVotingGoldFraction"),
-      (uint256)
+    uint256 targetVotingGoldFraction = configurationFileRawJSON.readUint(
+      ".epochRewards.targetVotingGoldFraction"
     );
-    uint256 targetValidatorEpochPayment = abi.decode(
-      json.parseRaw(".epochRewards.maxValidatorEpochPayment"),
-      (uint256)
+    uint256 targetValidatorEpochPayment = configurationFileRawJSON.readUint(
+      ".epochRewards.maxValidatorEpochPayment"
     );
-    uint256 communityRewardFraction = abi.decode(
-      json.parseRaw(".epochRewards.communityRewardFraction"),
-      (uint256)
+    uint256 communityRewardFraction = configurationFileRawJSON.readUint(
+      ".epochRewards.communityRewardFraction"
     );
-    address carbonOffsettingPartner = abi.decode(
-      json.parseRaw(".epochRewards.carbonOffsettingPartner"),
-      (address)
+    address carbonOffsettingPartner = configurationFileRawJSON.readAddress(
+      ".epochRewards.carbonOffsettingPartner"
     );
-    uint256 carbonOffsettingFraction = abi.decode(
-      json.parseRaw(".epochRewards.carbonOffsettingFraction"),
-      (uint256)
+    uint256 carbonOffsettingFraction = configurationFileRawJSON.readUint(
+      ".epochRewards.carbonOffsettingFraction"
     );
 
     address epochRewardsProxy = deployProxiedContract(
@@ -769,125 +664,37 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         communityRewardFraction,
         carbonOffsettingPartner,
         carbonOffsettingFraction
-      ),
-      SolidityVersions.SOLIDITY_05
+      )
     );
 
-    bool frozen = abi.decode(json.parseRaw(".epochRewards.frozen"), (bool));
+    bool frozen = configurationFileRawJSON.readBool(".epochRewards.frozen");
 
     if (frozen) {
       getFreezer().freeze(epochRewardsProxy);
     }
   }
 
-  function migrateRandom(string memory json) public {
-    uint256 randomnessBlockRetentionWindow = abi.decode(
-      json.parseRaw(".random.randomnessBlockRetentionWindow"),
-      (uint256)
-    );
-
-    deployProxiedContract(
-      "Random",
-      abi.encodeWithSelector(
-        IRandomInitializer.initialize.selector,
-        randomnessBlockRetentionWindow
-      ),
-      SolidityVersions.SOLIDITY_05
-    );
-  }
-
   function migrateEscrow() public {
-    deployProxiedContract(
-      "Escrow",
-      abi.encodeWithSelector(IEscrowInitializer.initialize.selector),
-      SolidityVersions.SOLIDITY_05
-    );
-  }
-
-  function migrateBlockchainParameters(string memory json) public {
-    uint256 gasForNonGoldCurrencies = abi.decode(
-      json.parseRaw(".blockchainParameters.gasForNonGoldCurrencies"),
-      (uint256)
-    );
-    uint256 gasLimit = abi.decode(json.parseRaw(".blockchainParameters.gasLimit"), (uint256));
-    uint256 lookbackWindow = abi.decode(
-      json.parseRaw(".blockchainParameters.lookbackWindow"),
-      (uint256)
-    );
-
-    deployProxiedContract(
-      "BlockchainParameters",
-      abi.encodeWithSelector(
-        IBlockchainParametersInitializer.initialize.selector,
-        gasForNonGoldCurrencies,
-        gasLimit,
-        lookbackWindow
-      ),
-      SolidityVersions.SOLIDITY_05
-    );
+    deployProxiedContract("Escrow", abi.encodeWithSelector(IEscrowInitializer.initialize.selector));
   }
 
   function migrateGovernanceSlasher() public {
     deployProxiedContract(
       "GovernanceSlasher",
-      abi.encodeWithSelector(IGovernanceSlasherInitializer.initialize.selector, REGISTRY_ADDRESS),
-      SolidityVersions.SOLIDITY_05
+      abi.encodeWithSelector(IGovernanceSlasherInitializer.initialize.selector, REGISTRY_ADDRESS)
     );
 
     getLockedGold().addSlasher("GovernanceSlasher");
-  }
-
-  function migrateDoubleSigningSlasher(string memory json) public {
-    uint256 penalty = abi.decode(json.parseRaw(".doubleSigningSlasher.penalty"), (uint256));
-    uint256 reward = abi.decode(json.parseRaw(".doubleSigningSlasher.reward"), (uint256));
-
-    deployProxiedContract(
-      "DoubleSigningSlasher",
-      abi.encodeWithSelector(
-        IDoubleSigningSlasherInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
-        penalty,
-        reward
-      ),
-      SolidityVersions.SOLIDITY_05
-    );
-
-    getLockedGold().addSlasher("DoubleSigningSlasher");
-  }
-
-  function migrateDowntimeSlasher(string memory json) public {
-    uint256 penalty = abi.decode(json.parseRaw(".downtimeSlasher.penalty"), (uint256));
-    uint256 reward = abi.decode(json.parseRaw(".downtimeSlasher.reward"), (uint256));
-    uint256 slashableDowntime = abi.decode(
-      json.parseRaw(".downtimeSlasher.slashableDowntime"),
-      (uint256)
-    );
-
-    deployProxiedContract(
-      "DowntimeSlasher",
-      abi.encodeWithSelector(
-        IDowntimeSlasherInitializer.initialize.selector,
-        REGISTRY_ADDRESS,
-        penalty,
-        reward,
-        slashableDowntime
-      ),
-      SolidityVersions.SOLIDITY_05
-    );
-
-    getLockedGold().addSlasher("DowntimeSlasher");
   }
 
   function migrateGovernanceApproverMultiSig(string memory json) public {
     address[] memory owners = new address[](1);
     owners[0] = DEPLOYER_ACCOUNT;
 
-    uint256 required = abi.decode(json.parseRaw(".governanceApproverMultiSig.required"), (uint256));
-    uint256 internalRequired = abi.decode(
-      json.parseRaw(".governanceApproverMultiSig.internalRequired"),
-      (uint256)
+    bool required = configurationFileRawJSON.readBool(".governanceApproverMultiSig.required");
+    bool internalRequired = configurationFileRawJSON.readBool(
+      ".governanceApproverMultiSig.internalRequired"
     );
-
     // This adds the multisig to the registry, which is not a case in mainnet but it's useful to keep a reference
     // of the deployed contract
     deployProxiedContract(
@@ -895,18 +702,16 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       abi.encodeWithSelector(
         IGovernanceApproverMultiSigInitializer.initialize.selector,
         owners,
-        required,
-        internalRequired
-      ),
-      SolidityVersions.SOLIDITY_05
+        required ? 1 : 0,
+        internalRequired ? 1 : 0
+      )
     );
   }
 
   function migrateFederatedAttestations() public {
     deployProxiedContract(
       "FederatedAttestations",
-      abi.encodeWithSelector(IFederatedAttestationsInitializer.initialize.selector),
-      SolidityVersions.SOLIDITY_05
+      abi.encodeWithSelector(IFederatedAttestationsInitializer.initialize.selector)
     );
   }
 
@@ -921,8 +726,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         REGISTRY_ADDRESS,
         tokenAddresses,
         minimumReports
-      ),
-      SolidityVersions.SOLIDITY_05
+      )
     );
   }
 
@@ -937,21 +741,24 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         REGISTRY_ADDRESS,
         tokenAddresses,
         minimumReports
-      ),
-      SolidityVersions.SOLIDITY_05
+      )
     );
   }
 
   function migrateFeeHandler(string memory json) public {
-    address newFeeBeneficiary = abi.decode(json.parseRaw(".feeHandler.beneficiary"), (address));
-    uint256 newBurnFraction = abi.decode(json.parseRaw(".feeHandler.burnFraction"), (uint256));
+    address newFeeBeneficiary = configurationFileRawJSON.readAddress(".feeHandler.beneficiary");
+    uint256 newBurnFraction = configurationFileRawJSON.readUint(".feeHandler.burnFraction");
     address[] memory tokens;
     address[] memory handlers;
     uint256[] memory newLimits;
     uint256[] memory newMaxSlippages;
 
-    address feeHandlerProxyAddress = deployProxiedContract(
+    // pre deployed fee handler proxy address from L2Genesis.s.sol
+    address feeHandlerProxyAddress = configurationFileRawJSON.readAddress(".proxies.feeHandler");
+
+    setImplementationOnProxyAndAddToRegistry(
       "FeeHandler",
+      IProxy(feeHandlerProxyAddress),
       abi.encodeWithSelector(
         IFeeHandlerInitializer.initialize.selector,
         REGISTRY_ADDRESS,
@@ -961,8 +768,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         handlers,
         newLimits,
         newMaxSlippages
-      ),
-      SolidityVersions.SOLIDITY_05
+      )
     );
 
     IFeeHandler(feeHandlerProxyAddress).addToken(
@@ -974,91 +780,105 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function migrateOdisPayments() public {
     deployProxiedContract(
       "OdisPayments",
-      abi.encodeWithSelector(IOdisPaymentsInitializer.initialize.selector),
-      SolidityVersions.SOLIDITY_05
+      abi.encodeWithSelector(IOdisPaymentsInitializer.initialize.selector)
     );
   }
 
-  function migrateCeloUnreleasedTreasury() public {
-    deployProxiedContract(
+  function migrateCeloUnreleasedTreasury(string memory json) public {
+    // pre deployed celo unreleased treasury proxy address from L2Genesis.s.sol
+    address celoUnreleasedTreasury = configurationFileRawJSON.readAddress(
+      ".proxies.celoUnreleasedTreasury"
+    );
+
+    setImplementationOnProxyAndAddToRegistry(
       "CeloUnreleasedTreasury",
+      IProxy(celoUnreleasedTreasury),
       abi.encodeWithSelector(
         ICeloUnreleasedTreasuryInitializer.initialize.selector,
         REGISTRY_ADDRESS
-      ),
-      SolidityVersions.SOLIDITY_08
-    );
-  }
-
-  function migrateEpochManagerEnabler() public {
-    deployProxiedContract(
-      "EpochManagerEnabler",
-      abi.encodeWithSelector(IEpochManagerEnablerInitializer.initialize.selector, REGISTRY_ADDRESS),
-      SolidityVersions.SOLIDITY_08
+      )
     );
   }
 
   function migrateScoreManager() public {
     deployProxiedContract(
       "ScoreManager",
-      abi.encodeWithSelector(IScoreManagerInitializer.initialize.selector),
-      SolidityVersions.SOLIDITY_08
+      abi.encodeWithSelector(IScoreManagerInitializer.initialize.selector)
     );
   }
 
+  function initializeEpochManager(string memory json) public {
+    console.log("Initialize EpochManager...");
+    uint256[] memory valKeys = configurationFileRawJSON.readUintArray(".validators.valKeys");
+    uint256 maxGroupSize = configurationFileRawJSON.readUint(".validators.maxGroupSize");
+    uint256 groupCount = configurationFileRawJSON.readUint(".validators.groupCount");
+    uint256 totalValidators = maxGroupSize * groupCount;
+    address[] memory signers = new address[](totalValidators);
+    IAccounts accounts = getAccounts();
+    uint256 count = 0;
+
+    for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
+      for (uint256 validatorIndex = 0; validatorIndex < maxGroupSize; validatorIndex++) {
+        uint256 validatorKeyIndex = getValidatorKeyIndex(
+          groupCount,
+          groupIndex,
+          validatorIndex,
+          maxGroupSize
+        );
+        address account = vm.addr(valKeys[validatorKeyIndex]);
+        signers[count] = accounts.getValidatorSigner(account);
+        count++;
+      }
+    }
+
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
+    IEpochManager(getEpochManager()).initializeSystem(1, block.number, signers);
+    vm.stopBroadcast();
+  }
+
   function migrateEpochManager(string memory json) public {
-    address newEpochDuration = abi.decode(
-      json.parseRaw(".epochManager.newEpochDuration"),
-      (address)
-    );
+    uint256 newEpochDuration = configurationFileRawJSON.readUint(".epochManager.newEpochDuration");
 
     deployProxiedContract(
       "EpochManager",
       abi.encodeWithSelector(
         IEpochManagerInitializer.initialize.selector,
         REGISTRY_ADDRESS,
-        newEpochDuration
-      ),
-      SolidityVersions.SOLIDITY_08
+        newEpochDuration,
+        registry.getAddressForStringOrDie("SortedOracles")
+      )
     );
   }
 
   function migrateGovernance(string memory json) public {
-    bool useApprover = abi.decode(json.parseRaw(".governanceApproverMultiSig.required"), (bool));
+    bool useApprover = configurationFileRawJSON.readBool(".governanceApproverMultiSig.required");
 
     address approver = useApprover
       ? registry.getAddressForString("GovernanceApproverMultiSig")
       : DEPLOYER_ACCOUNT;
-    uint256 concurrentProposals = abi.decode(
-      json.parseRaw(".governance.concurrentProposals"),
-      (uint256)
+    uint256 concurrentProposals = configurationFileRawJSON.readUint(
+      ".governance.concurrentProposals"
     );
-    uint256 minDeposit = abi.decode(json.parseRaw(".governance.minDeposit"), (uint256));
-    uint256 queueExpiry = abi.decode(json.parseRaw(".governance.queueExpiry"), (uint256));
-    uint256 dequeueFrequency = abi.decode(json.parseRaw(".governance.dequeueFrequency"), (uint256));
-    uint256 referendumStageDuration = abi.decode(
-      json.parseRaw(".governance.referendumStageDuration"),
-      (uint256)
+    uint256 minDeposit = configurationFileRawJSON.readUint(".governance.minDeposit");
+    uint256 queueExpiry = configurationFileRawJSON.readUint(".governance.queueExpiry");
+    uint256 dequeueFrequency = configurationFileRawJSON.readUint(".governance.dequeueFrequency");
+    uint256 referendumStageDuration = configurationFileRawJSON.readUint(
+      ".governance.referendumStageDuration"
     );
-    uint256 executionStageDuration = abi.decode(
-      json.parseRaw(".governance.executionStageDuration"),
-      (uint256)
+    uint256 executionStageDuration = configurationFileRawJSON.readUint(
+      ".governance.executionStageDuration"
     );
-    uint256 participationBaseline = abi.decode(
-      json.parseRaw(".governance.participationBaseline"),
-      (uint256)
+    uint256 participationBaseline = configurationFileRawJSON.readUint(
+      ".governance.participationBaseline"
     );
-    uint256 participationFloor = abi.decode(
-      json.parseRaw(".governance.participationFloor"),
-      (uint256)
+    uint256 participationFloor = configurationFileRawJSON.readUint(
+      ".governance.participationFloor"
     );
-    uint256 baselineUpdateFactor = abi.decode(
-      json.parseRaw(".governance.baselineUpdateFactor"),
-      (uint256)
+    uint256 baselineUpdateFactor = configurationFileRawJSON.readUint(
+      ".governance.baselineUpdateFactor"
     );
-    uint256 baselineQuorumFactor = abi.decode(
-      json.parseRaw(".governance.baselineQuorumFactor"),
-      (uint256)
+    uint256 baselineQuorumFactor = configurationFileRawJSON.readUint(
+      ".governance.baselineQuorumFactor"
     );
 
     address governanceProxyAddress = deployProxiedContract(
@@ -1077,8 +897,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         participationFloor,
         baselineUpdateFactor,
         baselineQuorumFactor
-      ),
-      SolidityVersions.SOLIDITY_05
+      )
     );
 
     _setConstitution(governanceProxyAddress, json);
@@ -1086,26 +905,31 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function _transferOwnerShipCoreContract(address governanceAddress, string memory json) public {
-    bool skipTransferOwnership = abi.decode(
-      json.parseRaw(".governance.skipTransferOwnership"),
-      (bool)
+    bool skipTransferOwnership = configurationFileRawJSON.readBool(
+      ".governance.skipTransferOwnership"
     );
     if (!skipTransferOwnership) {
-      // BlockchainParameters ownership transitioned to governance in a follow-up script.?
       for (uint256 i = 0; i < contractsInRegistry.length; i++) {
         string memory contractToTransfer = contractsInRegistry[i];
         console.log("Transferring ownership of: ", contractToTransfer);
+
+        // Transfer proxy ownership
         IProxy proxy = IProxy(registry.getAddressForStringOrDie(contractToTransfer));
+        console.log("Previous proxy owner was: ", proxy._getOwner());
         proxy._transferOwnership(governanceAddress);
+        console.log("New proxy owner is: ", proxy._getOwner());
+
+        // Transfer contract ownership
+        Ownable ownable = Ownable(registry.getAddressForStringOrDie(contractToTransfer));
+        console.log("Previous contract owner was: ", ownable.owner());
+        ownable.transferOwnership(governanceAddress);
+        console.log("New contract owner is: ", ownable.owner());
       }
     }
   }
 
-  function _setConstitution(address _governanceAddress, string memory _json) public {
-    bool skipSetConstitution_ = abi.decode(
-      _json.parseRaw(".governance.skipSetConstitution"),
-      (bool)
-    );
+  function _setConstitution(address _governanceAddress, string memory _configulationJSON) public {
+    bool skipSetConstitution_ = _configulationJSON.readBool(".governance.skipSetConstitution");
     IGovernance governance_ = IGovernance(_governanceAddress);
     registry = IRegistry(REGISTRY_ADDRESS);
 
@@ -1144,19 +968,26 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function registerValidator(
-    uint256 validatorIndex,
     uint256 validatorKey,
+    uint256 signerKey,
     uint256 amountToLock,
     address groupToAffiliate
   ) public returns (address) {
     vm.startBroadcast(validatorKey);
     lockGold(amountToLock);
-    address accountAddress = (new ForceTx()).identity();
+    address accountAddress = vm.addr(validatorKey);
+    address signerAddress = vm.addr(signerKey);
 
-    (bytes memory ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(accountAddress, validatorKey);
+    // Authorize validator signer (without public key — can't use WithPublicKey variant
+    // because updateEcdsaPublicKey requires isValidator, and we haven't registered yet)
+    (uint8 sv, bytes32 sr, bytes32 ss) = getParsedSignatureOfAddress(accountAddress, signerKey);
+    getAccounts().authorizeValidatorSigner(signerAddress, sv, sr, ss);
+
+    // Register with the signer's ECDSA public key
+    (bytes memory ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(accountAddress, signerKey);
     getValidators().registerValidatorNoBls(ecdsaPubKey);
     getValidators().affiliate(groupToAffiliate);
-    console.log("Done registering validators");
+    console.log("Done registering validator, signer: ", signerAddress);
 
     vm.stopBroadcast();
     return accountAddress;
@@ -1177,13 +1008,13 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 commission,
     string memory json
   ) public returns (address accountAddress) {
-    string memory groupName = abi.decode(json.parseRaw(".validators.groupName"), (string));
+    string memory groupName = configurationFileRawJSON.readString(".validators.groupName");
     vm.startBroadcast(validator0Key);
     lockGold(amountToLock);
     getAccounts().setName(groupName);
     getValidators().registerValidatorGroup(commission);
 
-    accountAddress = (new ForceTx()).identity();
+    accountAddress = vm.addr(validator0Key);
     vm.stopBroadcast();
   }
 
@@ -1204,8 +1035,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     bytes32 _r,
     bytes32 _s
   ) public returns (bytes memory) {
-    address SECP256K1Address = actor("SECP256K1Address");
-    deployCodeTo("SECP256K1.sol:SECP256K1", SECP256K1Address);
     ISECP256K1 sECP256K1 = ISECP256K1(SECP256K1Address);
 
     string memory header = "\x19Ethereum Signed Message:\n32";
@@ -1217,10 +1046,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       uint256(_s)
     );
     return abi.encodePacked(x, y);
-  }
-
-  function actor(string memory name) internal returns (address) {
-    return vm.addr(uint256(keccak256(abi.encodePacked(name))));
   }
 
   function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32) {
@@ -1241,35 +1066,31 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function electValidators(string memory json) public {
     console.log("Electing validators: ");
 
-    uint256 commission = abi.decode(json.parseRaw(".validators.commission"), (uint256));
-    uint256 minElectableValidators = abi.decode(
-      json.parseRaw(".election.minElectableValidators"),
-      (uint256)
+    uint256 commission = configurationFileRawJSON.readUint(".validators.commission");
+    uint256 minElectableValidators = configurationFileRawJSON.readUint(
+      ".election.minElectableValidators"
     );
-    uint256[] memory valKeys = abi.decode(json.parseRaw(".validators.valKeys"), (uint256[]));
-    uint256 maxGroupSize = abi.decode(json.parseRaw(".validators.maxGroupSize"), (uint256));
-    uint256 validatorLockedGoldRequirements = abi.decode(
-      json.parseRaw(".validators.validatorLockedGoldRequirements.value"),
-      (uint256)
+    uint256[] memory valKeys = configurationFileRawJSON.readUintArray(".validators.valKeys");
+    string memory signersMnemonic = configurationFileRawJSON.readString(
+      ".validators.signersMnemonic"
     );
-    // attestationKeys not migrated
+    uint256 maxGroupSize = configurationFileRawJSON.readUint(".validators.maxGroupSize");
+    uint256 validatorLockedGoldRequirements = configurationFileRawJSON.readUint(
+      ".validators.validatorLockedGoldRequirements.value"
+    );
+    uint256 groupCount = configurationFileRawJSON.readUint(".validators.groupCount");
 
     if (valKeys.length == 0) {
       console.log("  No validators to register");
     }
-
     if (valKeys.length < minElectableValidators) {
       console.log(
         "Warning: Have ${valKeys.length} Validator keys but require a minimum of ${config.election.minElectableValidators} Validators in order for a new validator set to be elected."
       );
     }
 
-    uint256 groupCount = 3;
-    console.log("groupCount", groupCount);
-
-    address[] memory groups = new address[](groupCount);
-
     // register 3 validator groups
+    address[] memory groups = new address[](groupCount);
     for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
       address groupAddress = registerValidatorGroup(
         valKeys[groupIndex],
@@ -1281,10 +1102,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       console.log("registered group: ", groupAddress);
     }
 
-    console.log("  * Registering validators ... Count: ", valKeys.length - groupCount);
-    // Split the validator keys into groups that will fit within the max group size.
+    console.log("  * Registering validators... Count: ", valKeys.length - groupCount);
 
-    // TODO change name of variable amount of groups for amount in group
+    IValidators validators = getValidators();
+    uint256 signerIndex = 0;
+
     for (uint256 groupIndex = 0; groupIndex < groupCount; groupIndex++) {
       address groupAddress = groups[groupIndex];
       console.log("Registering members for group: ", groupAddress);
@@ -1295,45 +1117,34 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
           validatorIndex,
           maxGroupSize
         );
+
+        uint256 signerKey = vm.deriveKey(signersMnemonic, uint32(signerIndex));
+        signerIndex++;
+
         console.log("Registering validator #: ", validatorIndex);
         address validator = registerValidator(
-          validatorIndex,
           valKeys[validatorKeyIndex],
+          signerKey,
           validatorLockedGoldRequirements,
           groupAddress
         );
-        // TODO start broadcast
-        console.log("Adding to group...");
 
+        console.log("Adding to group...");
         vm.startBroadcast(groups[groupIndex]);
         address greater = groupIndex == 0 ? address(0) : groups[groupIndex - 1];
 
         if (validatorIndex == 0) {
-          getValidators().addFirstMember(validator, address(0), greater);
+          validators.addFirstMember(validator, address(0), greater);
           console.log("Making group vote for itself");
         } else {
-          getValidators().addMember(validator);
+          validators.addMember(validator);
         }
+
+        console.log("Voting for group...");
         getElection().vote(groupAddress, validatorLockedGoldRequirements, address(0), greater);
 
         vm.stopBroadcast();
       }
     }
-  }
-
-  function captureEpochManagerEnablerValidators() public {
-    address numberValidatorsInCurrentSetPrecompileAddress = 0x00000000000000000000000000000000000000f9;
-    numberValidatorsInCurrentSetPrecompileAddress.call(
-      abi.encodeWithSignature("setNumberOfValidators()")
-    );
-
-    address validatorSignerAddressFromCurrentSetPrecompileAddress = 0x00000000000000000000000000000000000000fa;
-    validatorSignerAddressFromCurrentSetPrecompileAddress.call(
-      abi.encodeWithSignature("setValidators()")
-    );
-
-    address epochManagerEnabler = registry.getAddressForString("EpochManagerEnabler");
-    IEpochManagerEnabler epochManagerEnablerContract = IEpochManagerEnabler(epochManagerEnabler);
-    epochManagerEnablerContract.captureEpochAndValidators();
   }
 }

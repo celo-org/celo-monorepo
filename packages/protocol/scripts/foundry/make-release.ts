@@ -72,8 +72,7 @@ interface MakeReleaseArgv {
   proposal: string
   librariesFile: string
   initializeData: string
-  buildDirectory05: string
-  buildDirectory08: string
+  buildDirectory: string
   branch: string
   network: string
   privateKey?: string
@@ -1192,17 +1191,10 @@ async function main() {
         demandOption: true,
         description: 'Path to the JSON file with initialization data for contracts.',
       })
-      .option('buildDirectory05', {
+      .option('buildDirectory', {
         type: 'string',
         demandOption: true,
-        description:
-          'Path to the Foundry build output directory for Solidity 0.5 contracts (e.g., out-branch-truffle-compat).',
-      })
-      .option('buildDirectory08', {
-        type: 'string',
-        demandOption: true,
-        description:
-          'Path to the Foundry build output directory for Solidity 0.8 contracts (e.g., out-branch-truffle-compat8).',
+        description: 'Path to the Foundry build output directory (e.g., out/).',
       })
       .option('branch', {
         type: 'string',
@@ -1238,19 +1230,14 @@ async function main() {
       }).argv
 
     const networkName = argv.network!
-    const buildDir05 = argv.buildDirectory05
-    const buildDir08 = argv.buildDirectory08
-
+    const buildDirBase = argv.buildDirectory
+    const buildDir05 = `${buildDirBase}-truffle-compat`
+    const buildDir08 = `${buildDirBase}-truffle-compat8`
     if (!existsSync(buildDir05)) {
-      throw new Error(
-        `${buildDir05} directory not found. Make sure to run foundry build with truffle-compat profile first`
-      )
+      throw new Error(`${buildDir05} directory not found. Make sure to run foundry build first`)
     }
-
     if (!existsSync(buildDir08)) {
-      throw new Error(
-        `${buildDir08} directory not found. Make sure to run foundry build with truffle-compat8 profile first`
-      )
+      throw new Error(`${buildDir08} directory not found. Make sure to run foundry build first`)
     }
 
     // Check for Celoscan API key early (before deployment) for production networks

@@ -1,4 +1,8 @@
 # docs: https://getfoundry.sh/config/reference/default-config
+
+[lint]
+lint_on_build = false
+
 [profile.default]
 src = 'contracts-0.8'
 out = 'out'
