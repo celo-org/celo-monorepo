@@ -188,10 +188,6 @@ contract E2E_GovernanceBase is Devchain {
 contract E2E_Governance is E2E_GovernanceBase {
   function test_shouldIncrementProposalCount() public virtual {
     // setup values
-
-    // console.log("Proposed with proposalId:", proposalId);
-
-    // assert
     _propose();
     assertEq(governance.proposalCount(), proposalId, "proposal should be the first");
   }
@@ -218,7 +214,6 @@ contract E2E_Governance is E2E_GovernanceBase {
       0 // greater
     );
 
-    // assert
     assertEq(governance.getUpvotes(4), locked);
     assertGt(locked, 0);
   }
@@ -227,14 +222,12 @@ contract E2E_Governance is E2E_GovernanceBase {
     _propose();
     _approveProposal();
 
-    // assert
     assertTrue(governance.isApproved(proposalId));
   }
 
   function test_shouldIncrementVoteTotals() public {
     _propose();
     _vote();
-    // assert
     (uint256 yesVotes, , ) = governance.getVoteTotals(proposalId);
     assertEq(yesVotes, locked);
   }
