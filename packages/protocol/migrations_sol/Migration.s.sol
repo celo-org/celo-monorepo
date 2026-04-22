@@ -455,18 +455,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     require(names.length == symbols.length, "Ticker and stable names should match");
 
-    // uint8 decimals = abi.decode(
-    //   configurationFileRawJSON.parseRaw(".stableTokens.decimals"),
-    //   (uint8)
-    // );
-    // uint256 inflationRate = configurationFileRawJSON.readUint(".stableTokens.inflationRate");
-    // uint256 inflationFactorUpdatePeriod = configurationFileRawJSON.readUint(
-    //   ".stableTokens.inflationPeriod"
-    // );
-    // uint256 initialBalanceValue = configurationFileRawJSON.readUint(".stableTokens.initialBalance");
-    // bool frozen = configurationFileRawJSON.readBool(".stableTokens.frozen");
-    // uint256 celoPrice = configurationFileRawJSON.readUint(".stableTokens.celoPrice");
-
     address[] memory initialBalanceAddresses = new address[](1);
     initialBalanceAddresses[0] = DEPLOYER_ACCOUNT;
 

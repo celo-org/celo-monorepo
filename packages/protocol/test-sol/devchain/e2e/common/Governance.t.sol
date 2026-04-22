@@ -292,23 +292,6 @@ contract E2E_GovernanceSlashing is E2E_Governance {
     vm.stopPrank();
   }
 
-  // not responding under Foundry 1.5
-  // function beforeTestSetup(
-  //   bytes4 _testSelector
-  // ) public pure virtual override returns (bytes[] memory beforeCalldata_) {
-  //   if (
-  //     _testSelector == this.test_shouldSetApprovedSlashingZero.selector ||
-  //     _testSelector == this.test_shouldSlashAccount.selector
-  //   ) {
-  //     beforeCalldata_ = new bytes[](5);
-  //     beforeCalldata_[0] = abi.encodePacked(this.test_shouldIncrementProposalCount.selector);
-  //     beforeCalldata_[1] = abi.encodePacked(this.test_shouldUpvoteProposal.selector);
-  //     beforeCalldata_[2] = abi.encodePacked(this.test_shouldApproveProposal.selector);
-  //     beforeCalldata_[3] = abi.encodePacked(this.test_shouldIncrementVoteTotals.selector);
-  //     beforeCalldata_[4] = abi.encodePacked(this.test_shouldExecuteProposal.selector);
-  //   } else return super.beforeTestSetup(_testSelector);
-  // }
-
   function _propose() public override {
     // setup values
     uint256[] memory values_ = new uint256[](2);
