@@ -291,9 +291,13 @@ export const verifyBytecodes = async (
   chainLookup: ChainLookup,
   initializationData: InitializationData = {},
   version?: number,
-  network = 'development'
+  network = 'development',
+  extraTxs: ProposalTx[] = []
 ) => {
-  assertValidProposalTransactions(proposal)
+  const releaseProposal = proposal.filter(
+    (tx) => !extraTxs.some((extra) => JSON.stringify(extra) === JSON.stringify(tx))
+  )
+  assertValidProposalTransactions(releaseProposal)
   assertValidInitializationData(artifacts, proposal, chainLookup, initializationData)
 
   const compiledContracts = Array.prototype.concat.apply([], artifacts.map(a => a.listArtifacts())).map((a) => getContractName(a))

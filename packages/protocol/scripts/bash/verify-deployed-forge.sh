@@ -10,18 +10,21 @@ set -euo pipefail
 # -f: Boolean flag to indicate if the Forno service should be used to connect to
 #     the network
 # -l: Path to a file to which logs should be appended
+# -e: Path to extra transactions JSON file (optional, used to skip validation of appended TXs)
 
 BRANCH=""
 NETWORK=""
 FORNO=""
 LOG_FILE="/dev/stdout"
+EXTRA_TXS=""
 
-while getopts 'b:n:fl:' flag; do
+while getopts 'b:n:fl:e:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
     f) FORNO="--forno" ;;
     l) LOG_FILE="${OPTARG}" ;;
+    e) EXTRA_TXS="${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -40,4 +43,9 @@ build_tag_foundry $BRANCH $LOG_FILE truffle-compat8 foundry.toml.bak
 
 mv foundry.toml.bak foundry.toml
 
-TS_NODE_CACHE=false yarn ts-node --preferTsExts ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "$NETWORK-$BRANCH-libraries.json" $FORNO
+EXTRA_TXS_FLAG=""
+if [ -n "$EXTRA_TXS" ]; then
+  EXTRA_TXS_FLAG="--extraTxs $EXTRA_TXS"
+fi
+
+TS_NODE_CACHE=false yarn ts-node --preferTsExts ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "$NETWORK-$BRANCH-libraries.json" $FORNO $EXTRA_TXS_FLAG

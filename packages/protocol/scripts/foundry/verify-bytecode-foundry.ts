@@ -32,7 +32,15 @@ import * as viemChains from 'viem/chains'
  */
 
 const argv = require('minimist')(process.argv.slice(2), {
-  string: ['build_artifacts', 'proposal', 'initialize_data', 'network', 'librariesFile', 'branch'],
+  string: [
+    'build_artifacts',
+    'proposal',
+    'initialize_data',
+    'network',
+    'librariesFile',
+    'branch',
+    'extraTxs',
+  ],
 })
 
 const branch = (argv.branch ? argv.branch : '') as string
@@ -43,6 +51,7 @@ const proposal: ProposalTx[] = argv.proposal ? readJsonSync(argv.proposal) : []
 const initializationData: InitializationData = argv.initialize_data
   ? readJsonSync(argv.initialize_data)
   : {}
+const extraTxs: ProposalTx[] = argv.extraTxs ? readJsonSync(argv.extraTxs) : []
 const librariesFile = argv.librariesFile ?? 'libraries.json'
 
 if (!existsSync(buildDir05)) {
@@ -142,7 +151,8 @@ verifyBytecodes(
   chainLookup,
   initializationData,
   version,
-  network
+  network,
+  extraTxs
 )
   .then(({ libraryLinkingInfo, verifiedLibraries }) => {
     const allMapping = libraryLinkingInfo.getAddressMapping()

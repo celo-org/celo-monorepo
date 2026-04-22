@@ -14,6 +14,7 @@ set -euo pipefail
 # -u: Custom RPC URL (optional, overrides network default).
 # -s: Skip contract verification (optional).
 # -a: Celoscan API key for verification (optional, can also use CELOSCAN_API_KEY env var).
+# -e: Path to extra transactions JSON file to append to the proposal (optional).
 
 BRANCH=""
 PRIVATE_KEY=""
@@ -25,8 +26,9 @@ REPORT=""
 RPC_URL=""
 SKIP_VERIFICATION=""
 CELOSCAN_API_KEY_ARG=""
+EXTRA_TXS=""
 
-while getopts 'b:k:i:l:n:p:r:u:sa:' flag; do
+while getopts 'b:k:i:l:n:p:r:u:sa:e:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     k) PRIVATE_KEY="${OPTARG}" ;;
@@ -38,6 +40,7 @@ while getopts 'b:k:i:l:n:p:r:u:sa:' flag; do
     u) RPC_URL="${OPTARG}" ;;
     s) SKIP_VERIFICATION="true" ;;
     a) CELOSCAN_API_KEY_ARG="${OPTARG}" ;;
+    e) EXTRA_TXS="${OPTARG}" ;;
     *)
       echo "Unexpected option ${flag}" >&2
       exit 1
@@ -78,6 +81,9 @@ if [ -n "$SKIP_VERIFICATION" ]; then
 fi
 if [ -n "$CELOSCAN_API_KEY_ARG" ]; then
   OPTIONAL_FLAGS="$OPTIONAL_FLAGS --celoscanApiKey $CELOSCAN_API_KEY_ARG"
+fi
+if [ -n "$EXTRA_TXS" ]; then
+  OPTIONAL_FLAGS="$OPTIONAL_FLAGS --extraTxs $EXTRA_TXS"
 fi
 
 yarn ts-node --transpile-only ./scripts/foundry/make-release.ts \
