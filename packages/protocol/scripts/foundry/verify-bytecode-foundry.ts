@@ -41,6 +41,7 @@ const argv = require('minimist')(process.argv.slice(2), {
     'branch',
     'extraTxs',
   ],
+  boolean: ['allowError'],
 })
 
 const branch = (argv.branch ? argv.branch : '') as string
@@ -52,6 +53,7 @@ const initializationData: InitializationData = argv.initialize_data
   ? readJsonSync(argv.initialize_data)
   : {}
 const extraTxs: ProposalTx[] = argv.extraTxs ? readJsonSync(argv.extraTxs) : []
+const allowError: boolean = argv.allowError ?? false
 const librariesFile = argv.librariesFile ?? 'libraries.json'
 
 if (!existsSync(buildDir05)) {
@@ -152,9 +154,10 @@ verifyBytecodes(
   initializationData,
   version,
   network,
-  extraTxs
+  extraTxs,
+  allowError
 )
-  .then(({ libraryLinkingInfo, verifiedLibraries }) => {
+  .then(({ libraryLinkingInfo, verifiedLibraries, hasErrors }) => {
     const allMapping = libraryLinkingInfo.getAddressMapping()
     const verifiedMapping = {}
     for (const library of verifiedLibraries) {
@@ -162,9 +165,16 @@ verifyBytecodes(
     }
 
     /* eslint-disable no-console */
-    console.log(`\n✅ All contracts and libraries verified successfully!`)
-    console.info(`Writing linked library addresses to ${librariesFile}`)
-    writeJsonSync(librariesFile, verifiedMapping, { spaces: 2 })
+    if (hasErrors) {
+      const errFile = librariesFile.replace(/\.json$/, '-err.json')
+      console.info(`Writing linked library addresses to ${errFile}`)
+      writeJsonSync(errFile, verifiedMapping, { spaces: 2 })
+      process.exit(1)
+    } else {
+      console.log(`\n✅ All contracts and libraries verified successfully!`)
+      console.info(`Writing linked library addresses to ${librariesFile}`)
+      writeJsonSync(librariesFile, verifiedMapping, { spaces: 2 })
+    }
   })
   .catch((error) => {
     console.info('Script errored!', error)

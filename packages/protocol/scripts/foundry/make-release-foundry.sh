@@ -62,12 +62,26 @@ if [ -n "$PROPOSAL" ]; then
 fi
 PROPOSAL="proposal-$NETWORK-$BRANCH.json"
 
+source scripts/bash/warn-extra-transactions.sh
+warn_extra_transactions "$BRANCH" "$EXTRA_TXS"
+
 source scripts/bash/validate-libraries-filename.sh
 validate_libraries_filename "$LIBRARIES" "$NETWORK" "$BRANCH"
+
+source scripts/bash/validate-report-filename.sh
+validate_report_filename "$REPORT" "$BRANCH"
 
 source scripts/bash/validate-libraries-bytecode.sh
 VALIDATION_RPC_URL="${RPC_URL:-$(get_forno_url "$NETWORK")}"
 validate_libraries_bytecode "$LIBRARIES" "$VALIDATION_RPC_URL"
+
+# Build contract artifacts from the release branch.
+# NOTE: duplicated from verify-deployed-forge.sh — keep in sync.
+source scripts/bash/release-lib.sh
+cp foundry.toml foundry.toml.bak
+build_tag_foundry "$BRANCH" /dev/stdout truffle-compat foundry.toml.bak
+build_tag_foundry "$BRANCH" /dev/stdout truffle-compat8 foundry.toml.bak
+mv foundry.toml.bak foundry.toml
 
 BUILD_DIR="./out-${BRANCH}"
 

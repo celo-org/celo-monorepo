@@ -222,6 +222,66 @@ const dfsStep = async (queue: QueueEntry[], visited: Set<string>, context: Verif
   }
 }
 
+/**
+ * Strips extra transactions from the end of the proposal and validates they match
+ * the provided extraTxs file. If a proposal tx has an `address` field and the
+ * extra tx uses a contract name, the address is verified against the registry.
+ * Returns only the release transactions.
+ */
+const stripAndValidateExtraTxs = async (
+  proposal: ProposalTx[],
+  extraTxs: ProposalTx[],
+  registry: RegistryLookup
+): Promise<ProposalTx[]> => {
+  if (extraTxs.length === 0) {
+    return proposal
+  }
+
+  if (proposal.length < extraTxs.length) {
+    throw new Error(
+      `Proposal has ${proposal.length} transaction(s) but extra transactions file has ${extraTxs.length}`
+    )
+  }
+
+  const tail = proposal.slice(-extraTxs.length)
+  const releaseTxs = proposal.slice(0, -extraTxs.length)
+
+  for (let i = 0; i < extraTxs.length; i++) {
+    const proposalTx = tail[i]
+    const extraTx = extraTxs[i]
+
+    if ((proposalTx as any).address && extraTx.contract) {
+      // Registry stores contracts without the Proxy suffix
+      const registryName = ContractNameExtractorRegex.test(extraTx.contract)
+        ? ContractNameExtractorRegex.exec(extraTx.contract)[1]
+        : extraTx.contract
+      const registryAddress = await registry.getAddressForString(registryName)
+      if (registryAddress.toLowerCase() !== (proposalTx as any).address.toLowerCase()) {
+        throw new Error(
+          `Extra transaction at index ${i}: address mismatch for ${extraTx.contract}.\n` +
+          `  Registry address: ${registryAddress}\n` +
+          `  Proposal address: ${(proposalTx as any).address}`
+        )
+      }
+    }
+
+    if (
+      proposalTx.function !== extraTx.function ||
+      proposalTx.value !== extraTx.value ||
+      JSON.stringify(proposalTx.args) !== JSON.stringify(extraTx.args)
+    ) {
+      throw new Error(
+        `Extra transaction at index ${i} does not match the proposal.\n` +
+        `  Expected: ${JSON.stringify(extraTx)}\n` +
+        `  Got:      ${JSON.stringify(proposalTx)}`
+      )
+    }
+  }
+
+  console.info(`Verified ${extraTxs.length} extra transaction(s) match the end of the proposal`)
+  return releaseTxs
+}
+
 const assertValidProposalTransactions = (proposal: ProposalTx[]) => {
   const invalidTransactions = proposal.filter(
     (tx) => !isProxyRepointTransaction(tx) && !isRegistryRepointTransaction(tx)
@@ -292,13 +352,12 @@ export const verifyBytecodes = async (
   initializationData: InitializationData = {},
   version?: number,
   network = 'development',
-  extraTxs: ProposalTx[] = []
+  extraTxs: ProposalTx[] = [],
+  allowError = false
 ) => {
-  const releaseProposal = proposal.filter(
-    (tx) => !extraTxs.some((extra) => JSON.stringify(extra) === JSON.stringify(tx))
-  )
+  const releaseProposal = await stripAndValidateExtraTxs(proposal, extraTxs, registry)
   assertValidProposalTransactions(releaseProposal)
-  assertValidInitializationData(artifacts, proposal, chainLookup, initializationData)
+  assertValidInitializationData(artifacts, releaseProposal, chainLookup, initializationData)
 
   const compiledContracts = Array.prototype.concat.apply([], artifacts.map(a => a.listArtifacts())).map((a) => getContractName(a))
 
@@ -314,8 +373,26 @@ export const verifyBytecodes = async (
     (contract) => compiledContracts.includes(contract)
   )
 
-  const queue: QueueEntry[] = filteredContracts.map((contract) => ({ contract }))
-  const visited: Set<string> = new Set(filteredContracts)
+  // If a proposal is provided, only verify contracts referenced in it.
+  let contractsToVerify: string[]
+  if (releaseProposal.length > 0) {
+    const proposalContracts = new Set<string>()
+    for (const tx of releaseProposal) {
+      if (isProxyRepointTransaction(tx)) {
+        const match = ContractNameExtractorRegex.exec(tx.contract)
+        if (match) proposalContracts.add(match[1])
+      } else if (isRegistryRepointTransaction(tx)) {
+        proposalContracts.add(tx.args[0])
+      }
+    }
+    contractsToVerify = filteredContracts.filter((c) => proposalContracts.has(c))
+    console.info(`Proposal provided: verifying only ${contractsToVerify.length} contract(s): ${contractsToVerify.join(', ')}`)
+  } else {
+    contractsToVerify = filteredContracts
+  }
+
+  const queue: QueueEntry[] = contractsToVerify.map((contract) => ({ contract }))
+  const visited: Set<string> = new Set(contractsToVerify)
 
   const governanceAddress = await registry.getAddressForString('Governance')
   const context: VerificationContext = {
@@ -323,7 +400,7 @@ export const verifyBytecodes = async (
     libraryLinkingInfo: new LibraryLinkingInfo(),
     registry,
     governanceAddress,
-    proposal,
+    proposal: releaseProposal,
     proxyLookup,
     chainLookup,
     network,
@@ -337,8 +414,13 @@ export const verifyBytecodes = async (
   }
 
   if (errors.length > 0) {
-    throw new Error(errors.join('\n'))
+    if (allowError) {
+      console.error(`\n⚠️  Verification completed with ${errors.length} error(s):`)
+      errors.forEach((e) => console.error(`  - ${e}`))
+    } else {
+      throw new Error(errors.join('\n'))
+    }
   }
 
-  return { libraryLinkingInfo: context.libraryLinkingInfo, verifiedLibraries }
+  return { libraryLinkingInfo: context.libraryLinkingInfo, verifiedLibraries, hasErrors: errors.length > 0 }
 }

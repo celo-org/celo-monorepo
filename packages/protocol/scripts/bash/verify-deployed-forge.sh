@@ -10,27 +10,39 @@ set -euo pipefail
 # -f: Boolean flag to indicate if the Forno service should be used to connect to
 #     the network
 # -l: Path to a file to which logs should be appended
+# -p: Path to the proposal JSON file (optional)
+# -i: Path to the initialization data JSON file (optional)
 # -e: Path to extra transactions JSON file (optional, used to skip validation of appended TXs)
+# -a: Allow errors during verification (writes libraries to -err.json instead of failing)
 
 BRANCH=""
 NETWORK=""
 FORNO=""
 LOG_FILE="/dev/stdout"
+PROPOSAL=""
+INITIALIZE_DATA=""
 EXTRA_TXS=""
+ALLOW_ERROR=""
 
-while getopts 'b:n:fl:e:' flag; do
+while getopts 'b:n:fl:p:i:e:a' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
     f) FORNO="--forno" ;;
     l) LOG_FILE="${OPTARG}" ;;
+    p) PROPOSAL="${OPTARG}" ;;
+    i) INITIALIZE_DATA="${OPTARG}" ;;
     e) EXTRA_TXS="${OPTARG}" ;;
+    a) ALLOW_ERROR="--allowError" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
 
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
+
+source scripts/bash/warn-extra-transactions.sh
+warn_extra_transactions "$BRANCH" "$EXTRA_TXS"
 
 source scripts/bash/release-lib.sh
 source scripts/bash/warn-if-libraries-exist.sh
@@ -43,9 +55,15 @@ build_tag_foundry $BRANCH $LOG_FILE truffle-compat8 foundry.toml.bak
 
 mv foundry.toml.bak foundry.toml
 
-EXTRA_TXS_FLAG=""
+OPTIONAL_FLAGS=""
+if [ -n "$PROPOSAL" ]; then
+  OPTIONAL_FLAGS="$OPTIONAL_FLAGS --proposal $PROPOSAL"
+fi
+if [ -n "$INITIALIZE_DATA" ]; then
+  OPTIONAL_FLAGS="$OPTIONAL_FLAGS --initialize_data $INITIALIZE_DATA"
+fi
 if [ -n "$EXTRA_TXS" ]; then
-  EXTRA_TXS_FLAG="--extraTxs $EXTRA_TXS"
+  OPTIONAL_FLAGS="$OPTIONAL_FLAGS --extraTxs $EXTRA_TXS"
 fi
 
-TS_NODE_CACHE=false yarn ts-node --preferTsExts ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "$NETWORK-$BRANCH-libraries.json" $FORNO $EXTRA_TXS_FLAG
+TS_NODE_CACHE=false yarn ts-node --preferTsExts ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "$NETWORK-$BRANCH-libraries.json" $FORNO $OPTIONAL_FLAGS $ALLOW_ERROR
