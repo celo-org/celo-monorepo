@@ -186,6 +186,7 @@ jobs:
       - name: Restore script permissions
         run: chmod +x scripts/foundry/*.sh
       - name: Generate migrations and run devchain
+        # Using bash command instead of yarn anvil-devchain:start to avoid yarn dependency
         run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
       - name: Run migration tests against local anvil devchain
         run: |
