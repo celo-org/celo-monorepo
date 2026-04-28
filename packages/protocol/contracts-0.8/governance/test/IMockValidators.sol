@@ -29,6 +29,12 @@ interface IMockValidators {
 
   function setCommission(address group, uint256 commission) external;
 
+  function setVoterRewardCommission(address group, uint256 commission) external;
+
+  function getVoterRewardCommission(
+    address group
+  ) external view returns (uint256, uint256, uint256);
+
   function setAccountLockedGoldRequirement(address account, uint256 value) external;
 
   function halveSlashingMultiplier(address) external;
@@ -61,4 +67,8 @@ interface IMockValidators {
   function setEpochRewards(address account, uint256 reward) external;
 
   function mintedStable() external view returns (uint256);
+
+  function maxVoterRewardCommission() external view returns (uint256);
+
+  function setMaxVoterRewardCommission(uint256 maxCommission) external;
 }

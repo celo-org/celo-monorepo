@@ -73,6 +73,11 @@ contract EpochManagerTest is TestWithUtils08 {
     address indexed group,
     uint256 indexed epochNumber
   );
+  event VoterRewardCommissionDistributed(
+    address indexed group,
+    uint256 commission,
+    uint256 indexed epochNumber
+  );
 
   function setUp() public virtual override {
     super.setUp();
@@ -994,5 +999,566 @@ contract EpochManagerTest_getElectedSignerByIndex is EpochManagerTest {
 
     electedSigners[1] = accountsContract.getValidatorSigner(knownElectedAccounts[1]);
     assertEq(epochManagerContract.getElectedSignerByIndex(1), electedSigners[1]);
+  }
+}
+
+contract EpochManagerTest_voterRewardCommission is EpochManagerTest {
+  uint256 groupEpochRewards = 1000e18;
+  uint256 tenPercent = 100000000000000000000000; // FixidityLib.newFixedFraction(10, 100)
+
+  function setUp() public override(EpochManagerTest) {
+    super.setUp();
+
+    setupAndElectValidators();
+
+    // Set max voter reward commission to unlimited (fixed1) so commission tests work
+    validators.setMaxVoterRewardCommission(FIXED1);
+    election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
+  }
+
+  function test_distributesFullRewardsWhenNoVoterRewardCommission() public {
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+    epochManagerContract.processGroup(group, address(0), address(0));
+
+    assertEq(
+      election.distributedEpochRewards(group),
+      groupEpochRewards,
+      "Full rewards should be distributed when no commission is set"
+    );
+  }
+
+  function test_deductsVoterRewardCommissionAndReleasesToGroup() public {
+    validators.setVoterRewardCommission(group, tenPercent);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+
+    uint256 groupBalanceBefore = celoToken.balanceOf(group);
+
+    epochManagerContract.processGroup(group, address(0), address(0));
+
+    // Voters should receive 90% of rewards
+    uint256 expectedVoterRewards = 900 ether;
+    assertEq(
+      election.distributedEpochRewards(group),
+      expectedVoterRewards,
+      "Voters should receive rewards minus commission"
+    );
+
+    // Group should receive 10% as CELO from treasury
+    uint256 expectedCommission = 100 ether;
+    uint256 groupBalanceAfter = celoToken.balanceOf(group);
+    assertEq(
+      groupBalanceAfter - groupBalanceBefore,
+      expectedCommission,
+      "Group should receive commission CELO from treasury"
+    );
+  }
+
+  function test_emitsVoterRewardCommissionDistributedEvent() public {
+    validators.setVoterRewardCommission(group, tenPercent);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+
+    uint256 expectedCommission = 100 ether;
+
+    vm.expectEmit(true, true, true, true);
+    emit VoterRewardCommissionDistributed(group, expectedCommission, firstEpochNumber);
+
+    epochManagerContract.processGroup(group, address(0), address(0));
+  }
+
+  function test_handlesZeroEpochRewards() public {
+    // When epoch rewards are zero, no distribution should happen
+    election.setGroupEpochRewardsBasedOnScore(group, 0);
+    validators.setVoterRewardCommission(group, tenPercent);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+    epochManagerContract.processGroup(group, address(0), address(0));
+
+    assertEq(
+      election.distributedEpochRewards(group),
+      0,
+      "No rewards should be distributed for zero epoch rewards"
+    );
+  }
+
+  function test_handlesFullCommission() public {
+    uint256 fullCommission = 1000000000000000000000000; // FixidityLib.fixed1() = 100%
+    validators.setVoterRewardCommission(group, fullCommission);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+
+    uint256 groupBalanceBefore = celoToken.balanceOf(group);
+
+    epochManagerContract.processGroup(group, address(0), address(0));
+
+    // Voters should receive nothing
+    assertEq(
+      election.distributedEpochRewards(group),
+      0,
+      "Voters should receive nothing with 100% commission"
+    );
+
+    // Group should receive everything
+    uint256 groupBalanceAfter = celoToken.balanceOf(group);
+    assertEq(
+      groupBalanceAfter - groupBalanceBefore,
+      groupEpochRewards,
+      "Group should receive all rewards as commission"
+    );
+  }
+
+  function test_deductsCommissionViaFinishNextEpochProcess() public {
+    validators.setVoterRewardCommission(group, tenPercent);
+
+    epochManagerContract.startNextEpochProcess();
+
+    (
+      address[] memory groups,
+      address[] memory lessers,
+      address[] memory greaters
+    ) = getGroupsWithLessersAndGreaters();
+
+    uint256 groupBalanceBefore = celoToken.balanceOf(group);
+
+    epochManagerContract.finishNextEpochProcess(groups, lessers, greaters);
+
+    // Voters should receive 90% of rewards
+    uint256 expectedVoterRewards = 900 ether;
+    assertEq(
+      election.distributedEpochRewards(group),
+      expectedVoterRewards,
+      "Voters should receive rewards minus commission via finishNextEpochProcess"
+    );
+
+    // Group should receive 10% as CELO from treasury
+    uint256 expectedCommission = 100 ether;
+    uint256 groupBalanceAfter = celoToken.balanceOf(group);
+    assertEq(
+      groupBalanceAfter - groupBalanceBefore,
+      expectedCommission,
+      "Group should receive commission via finishNextEpochProcess"
+    );
+  }
+
+  function test_noTreasuryReleaseWhenCommissionRoundsToZero() public {
+    // With small epoch rewards, the multiplication result should round down to 0.
+    uint256 tinyCommission = 1;
+    validators.setVoterRewardCommission(group, tinyCommission);
+
+
+    election.setGroupEpochRewardsBasedOnScore(group, 1);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+
+    uint256 groupBalanceBefore = celoToken.balanceOf(group);
+
+    epochManagerContract.processGroup(group, address(0), address(0));
+
+    // Commission rounds to 0, so group should not receive any CELO
+    uint256 groupBalanceAfter = celoToken.balanceOf(group);
+    assertEq(
+      groupBalanceAfter,
+      groupBalanceBefore,
+      "No CELO should be released when commission rounds to zero"
+    );
+
+    // Full rewards should go to voters
+    assertEq(
+      election.distributedEpochRewards(group),
+      1,
+      "Full rewards should go to voters when commission rounds to zero"
+    );
+  }
+}
+
+contract EpochManagerTest_voterRewardCommission_Fuzz is EpochManagerTest {
+  function setUp() public override(EpochManagerTest) {
+    super.setUp();
+    setupAndElectValidators();
+    validators.setMaxVoterRewardCommission(FIXED1);
+  }
+
+  /// @notice Conservation invariant: commission + voterRewards == totalEpochRewards
+  /// for any valid commission rate.
+  function test_conservesTotalRewardsForAnyCommission(uint256 commissionRate) public {
+    commissionRate = bound(commissionRate, 1, FIXED1);
+    uint256 groupEpochRewards = 1000e18;
+
+    validators.setVoterRewardCommission(group, commissionRate);
+    election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+
+    uint256 groupBalanceBefore = celoToken.balanceOf(group);
+    epochManagerContract.processGroup(group, address(0), address(0));
+    uint256 groupBalanceAfter = celoToken.balanceOf(group);
+
+    uint256 commissionReceived = groupBalanceAfter - groupBalanceBefore;
+    uint256 voterRewardsDistributed = election.distributedEpochRewards(group);
+
+    assertEq(
+      commissionReceived + voterRewardsDistributed,
+      groupEpochRewards,
+      "Conservation: commission + voter rewards must equal total epoch rewards"
+    );
+  }
+
+  /// @notice Conservation invariant holds for any epoch reward amount.
+  function test_conservesTotalRewardsForAnyEpochRewardAmount(uint256 rewardAmount) public {
+    // Bound below treasury balance — allocateValidatorsRewards() consumes part of it first.
+    rewardAmount = bound(rewardAmount, 1, L2_INITIAL_STASH_BALANCE / 2);
+    uint256 commissionRate = 100000000000000000000000; // 10%
+
+    validators.setVoterRewardCommission(group, commissionRate);
+    election.setGroupEpochRewardsBasedOnScore(group, rewardAmount);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+
+    uint256 groupBalanceBefore = celoToken.balanceOf(group);
+    epochManagerContract.processGroup(group, address(0), address(0));
+    uint256 groupBalanceAfter = celoToken.balanceOf(group);
+
+    uint256 commissionReceived = groupBalanceAfter - groupBalanceBefore;
+    uint256 voterRewardsDistributed = election.distributedEpochRewards(group);
+
+    assertEq(
+      commissionReceived + voterRewardsDistributed,
+      rewardAmount,
+      "Conservation: commission + voter rewards must equal total epoch rewards"
+    );
+  }
+
+  /// @notice Conservation invariant holds for any commission rate AND any reward amount.
+  function test_conservesTotalRewardsForAnyCommissionAndRewards(
+    uint256 commissionRate,
+    uint256 rewardAmount
+  ) public {
+    commissionRate = bound(commissionRate, 1, FIXED1);
+    rewardAmount = bound(rewardAmount, 1, L2_INITIAL_STASH_BALANCE / 2);
+
+    validators.setVoterRewardCommission(group, commissionRate);
+    election.setGroupEpochRewardsBasedOnScore(group, rewardAmount);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+
+    uint256 groupBalanceBefore = celoToken.balanceOf(group);
+    epochManagerContract.processGroup(group, address(0), address(0));
+    uint256 groupBalanceAfter = celoToken.balanceOf(group);
+
+    uint256 commissionReceived = groupBalanceAfter - groupBalanceBefore;
+    uint256 voterRewardsDistributed = election.distributedEpochRewards(group);
+
+    assertEq(
+      commissionReceived + voterRewardsDistributed,
+      rewardAmount,
+      "Conservation: commission + voter rewards must equal total epoch rewards"
+    );
+  }
+
+  /// @notice Verify the commission math matches expected FixidityLib calculation.
+  /// commissionAmount = floor(epochRewards * commissionRate / FIXED1)
+  function test_commissionAmountMatchesExpectedCalculation(
+    uint256 commissionRate,
+    uint256 rewardAmount
+  ) public {
+    commissionRate = bound(commissionRate, 1, FIXED1);
+    rewardAmount = bound(rewardAmount, 1, L2_INITIAL_STASH_BALANCE / 2);
+
+    validators.setVoterRewardCommission(group, commissionRate);
+    election.setGroupEpochRewardsBasedOnScore(group, rewardAmount);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+
+    uint256 groupBalanceBefore = celoToken.balanceOf(group);
+    epochManagerContract.processGroup(group, address(0), address(0));
+    uint256 groupBalanceAfter = celoToken.balanceOf(group);
+
+    uint256 commissionReceived = groupBalanceAfter - groupBalanceBefore;
+
+    // Expected: FixidityLib.newFixed(rewardAmount).multiply(wrap(commissionRate)).fromFixed()
+    // which is: (rewardAmount * FIXED1) * commissionRate / FIXED1 / FIXED1
+    //         = rewardAmount * commissionRate / FIXED1
+    uint256 expectedCommission = (rewardAmount * commissionRate) / FIXED1;
+
+    assertEq(
+      commissionReceived,
+      expectedCommission,
+      "Commission amount must match FixidityLib floor calculation"
+    );
+  }
+
+  /// @notice At 100% commission, group receives all rewards and voters receive nothing.
+  function test_fullCommissionForAnyRewardAmount(uint256 rewardAmount) public {
+    rewardAmount = bound(rewardAmount, 1, L2_INITIAL_STASH_BALANCE / 2);
+
+    validators.setVoterRewardCommission(group, FIXED1);
+    election.setGroupEpochRewardsBasedOnScore(group, rewardAmount);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+
+    uint256 groupBalanceBefore = celoToken.balanceOf(group);
+    epochManagerContract.processGroup(group, address(0), address(0));
+    uint256 groupBalanceAfter = celoToken.balanceOf(group);
+
+    assertEq(
+      groupBalanceAfter - groupBalanceBefore,
+      rewardAmount,
+      "Group should receive all rewards at 100% commission"
+    );
+    assertEq(
+      election.distributedEpochRewards(group),
+      0,
+      "Voters should receive nothing at 100% commission"
+    );
+  }
+}
+
+contract EpochManagerTest_voterRewardCommission_DuringEpochProcessing is EpochManagerTest {
+  uint256 groupEpochRewards = 1000e18;
+  uint256 tenPercent = 100000000000000000000000; // FixidityLib.newFixedFraction(10, 100)
+  uint256 fiftyPercent = 500000000000000000000000; // FixidityLib.newFixedFraction(50, 100)
+
+  function setUp() public override(EpochManagerTest) {
+    super.setUp();
+    setupAndElectValidators();
+    validators.setMaxVoterRewardCommission(FIXED1);
+    election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
+  }
+
+  /// @notice Demonstrates that commission read at processGroup() time uses the
+  /// value active at that moment — NOT the value at epoch start.
+  /// A group can activate a new commission between setToProcessGroups() and
+  /// processGroup() to apply a different rate to already-computed rewards.
+  function test_usesCommissionActiveAtProcessingTime() public {
+    // Set initial commission to 10%
+    validators.setVoterRewardCommission(group, tenPercent);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+    // Rewards are now computed and stored in processedGroups[group] = 1000e18
+
+    // --- Simulate group activating a queued commission update mid-processing ---
+    // In production, this would be updateVoterRewardCommission() called by the group.
+    // Using the mock's direct setter to simulate the effect.
+    validators.setVoterRewardCommission(group, fiftyPercent);
+
+    uint256 groupBalanceBefore = celoToken.balanceOf(group);
+    epochManagerContract.processGroup(group, address(0), address(0));
+    uint256 groupBalanceAfter = celoToken.balanceOf(group);
+
+    uint256 commissionReceived = groupBalanceAfter - groupBalanceBefore;
+    uint256 voterRewardsDistributed = election.distributedEpochRewards(group);
+
+    // Commission should be 50% of 1000e18 = 500e18 (the NEW rate, not the 10% initial)
+    uint256 expectedCommission = 500e18;
+    uint256 expectedVoterRewards = 500e18;
+
+    assertEq(
+      commissionReceived,
+      expectedCommission,
+      "Commission should use the rate active at processGroup time (50%), not at epoch start (10%)"
+    );
+    assertEq(
+      voterRewardsDistributed,
+      expectedVoterRewards,
+      "Voter rewards should reflect the commission rate active at processGroup time"
+    );
+  }
+
+  /// @notice A group can reduce its commission to 0 during epoch processing,
+  /// causing voters to receive full rewards despite commission being set at epoch start.
+  function test_usesZeroCommissionWhenRemovedDuringProcessing() public {
+    validators.setVoterRewardCommission(group, fiftyPercent);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+
+    // Group removes commission mid-processing
+    validators.setVoterRewardCommission(group, 0);
+
+    uint256 groupBalanceBefore = celoToken.balanceOf(group);
+    epochManagerContract.processGroup(group, address(0), address(0));
+    uint256 groupBalanceAfter = celoToken.balanceOf(group);
+
+    assertEq(
+      groupBalanceAfter,
+      groupBalanceBefore,
+      "Group should receive nothing when commission zeroed during processing"
+    );
+    assertEq(
+      election.distributedEpochRewards(group),
+      groupEpochRewards,
+      "Voters should receive full rewards when commission zeroed during processing"
+    );
+  }
+
+  /// @notice Conservation invariant holds even when commission changes mid-processing.
+  function test_conservesTotalRewardsWhenCommissionChangedDuringProcessing(
+    uint256 initialRate,
+    uint256 newRate
+  ) public {
+    initialRate = bound(initialRate, 1, FIXED1);
+    newRate = bound(newRate, 0, FIXED1);
+
+    validators.setVoterRewardCommission(group, initialRate);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+
+    // Change commission mid-processing
+    validators.setVoterRewardCommission(group, newRate);
+
+    uint256 groupBalanceBefore = celoToken.balanceOf(group);
+    epochManagerContract.processGroup(group, address(0), address(0));
+    uint256 groupBalanceAfter = celoToken.balanceOf(group);
+
+    uint256 commissionReceived = groupBalanceAfter - groupBalanceBefore;
+    uint256 voterRewardsDistributed = election.distributedEpochRewards(group);
+
+    assertEq(
+      commissionReceived + voterRewardsDistributed,
+      groupEpochRewards,
+      "Conservation must hold even when commission changes during epoch processing"
+    );
+
+    // Verify the NEW rate was used, not the initial one
+    uint256 expectedCommission = (groupEpochRewards * newRate) / FIXED1;
+    assertEq(
+      commissionReceived,
+      expectedCommission,
+      "Commission should be calculated using the rate active at processGroup time"
+    );
+  }
+}
+
+contract EpochManagerTest_voterRewardCommission_MaxCapClamp is EpochManagerTest {
+  uint256 groupEpochRewards = 1000e18;
+  uint256 fiftyPercent = 500000000000000000000000; // 50%
+  uint256 twentyPercent = 200000000000000000000000; // 20%
+  uint256 tenPercent = 100000000000000000000000; // 10%
+
+  function setUp() public override(EpochManagerTest) {
+    super.setUp();
+    setupAndElectValidators();
+    election.setGroupEpochRewardsBasedOnScore(group, groupEpochRewards);
+  }
+
+  /// @notice When a group's active commission (50%) exceeds the governance cap (20%),
+  /// the effective commission is clamped to the cap at distribution time.
+  function test_clampsCommissionToMaxCapAtDistributionTime() public {
+    // Group has 50% commission active
+    validators.setVoterRewardCommission(group, fiftyPercent);
+    // Governance sets cap to 20%
+    validators.setMaxVoterRewardCommission(twentyPercent);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+
+    uint256 groupBalanceBefore = celoToken.balanceOf(group);
+    epochManagerContract.processGroup(group, address(0), address(0));
+    uint256 groupBalanceAfter = celoToken.balanceOf(group);
+
+    uint256 commissionReceived = groupBalanceAfter - groupBalanceBefore;
+
+    // Should be clamped to 20%, not the group's 50%
+    uint256 expectedCommission = 200e18; // 20% of 1000e18
+    assertEq(
+      commissionReceived,
+      expectedCommission,
+      "Commission should be clamped to maxVoterRewardCommission"
+    );
+
+    // Voters get the remaining 80%
+    assertEq(
+      election.distributedEpochRewards(group),
+      800e18,
+      "Voters should receive rewards minus clamped commission"
+    );
+  }
+
+  /// @notice When commission is below the cap, no clamping occurs.
+  function test_doesNotClampWhenCommissionBelowCap() public {
+    validators.setVoterRewardCommission(group, tenPercent);
+    validators.setMaxVoterRewardCommission(twentyPercent);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+
+    uint256 groupBalanceBefore = celoToken.balanceOf(group);
+    epochManagerContract.processGroup(group, address(0), address(0));
+    uint256 groupBalanceAfter = celoToken.balanceOf(group);
+
+    // 10% commission, below 20% cap — no clamping
+    assertEq(
+      groupBalanceAfter - groupBalanceBefore,
+      100 ether,
+      "Commission below cap should not be clamped"
+    );
+  }
+
+  /// @notice When maxVoterRewardCommission is 0 (default), commission is clamped to 0.
+  function test_clampsCommissionToZeroWhenMaxCapIsZero() public {
+    validators.setVoterRewardCommission(group, fiftyPercent);
+    // maxVoterRewardCommission defaults to 0 = commissions disabled
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+
+    uint256 groupBalanceBefore = celoToken.balanceOf(group);
+    epochManagerContract.processGroup(group, address(0), address(0));
+    uint256 groupBalanceAfter = celoToken.balanceOf(group);
+
+    // maxVoterRewardCommission is 0, so commission is clamped to 0
+    assertEq(
+      groupBalanceAfter - groupBalanceBefore,
+      0,
+      "Commission should be clamped to 0 when max cap is 0"
+    );
+  }
+
+  /// @notice Conservation invariant holds with clamping — for any commission and cap combo.
+  function test_conservesTotalRewardsWithClamping(uint256 commissionRate, uint256 maxCap) public {
+    commissionRate = bound(commissionRate, 1, FIXED1);
+    maxCap = bound(maxCap, 1, FIXED1);
+
+    validators.setVoterRewardCommission(group, commissionRate);
+    validators.setMaxVoterRewardCommission(maxCap);
+
+    epochManagerContract.startNextEpochProcess();
+    epochManagerContract.setToProcessGroups();
+
+    uint256 groupBalanceBefore = celoToken.balanceOf(group);
+    epochManagerContract.processGroup(group, address(0), address(0));
+    uint256 groupBalanceAfter = celoToken.balanceOf(group);
+
+    uint256 commissionReceived = groupBalanceAfter - groupBalanceBefore;
+    uint256 voterRewardsDistributed = election.distributedEpochRewards(group);
+
+    assertEq(
+      commissionReceived + voterRewardsDistributed,
+      groupEpochRewards,
+      "Conservation must hold with max cap clamping"
+    );
+
+    // Effective rate should be min(commissionRate, maxCap)
+    uint256 effectiveRate = commissionRate < maxCap ? commissionRate : maxCap;
+    uint256 expectedCommission = (groupEpochRewards * effectiveRate) / FIXED1;
+    assertEq(
+      commissionReceived,
+      expectedCommission,
+      "Commission should use min(groupCommission, maxCap)"
+    );
   }
 }
