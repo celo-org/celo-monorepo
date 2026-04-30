@@ -260,7 +260,7 @@ Unified script for executing OPSuccinct upgrade transactions on Celo Mainnet. Ac
 - Single entry point for all OPSuccinct upgrades (v1, v102, v2, v201)
 - Loads signer addresses and signatures from per-version `secrets/.env.signers.*` file
 - Hardcoded per-version nonces and calldata (verbatim from `CeloSuperchainOps/upgrades/mainnet/*.json`)
-- Per-version approval flow (GC included for v1, v102, v201; skipped for v2)
+- Per-version approval flow (GC included for v1, v102; skipped for v2 and v201)
 - Uses Multicall3 as the target with delegatecall
 - Helper functions (`safe_tx_hash`, `safe_exec`) for DRY Safe interactions
 
@@ -388,14 +388,14 @@ VERSION="v3" PK="0x..." SENDER="0x..." SIG="0x..." ACCOUNT="0x..." TEAM="council
 
 ## Execution Flow
 
-### Full Nested Flow (exec.sh, exec-v2v3.sh, exec-succinct.sh `v1|v102|v201`)
+### Full Nested Flow (exec.sh, exec-v2v3.sh, exec-succinct.sh `v1|v102`)
 
 1. **Grand Child Approval**: Approve Council transaction
 2. **Council Approval**: Approve Parent transaction
 3. **cLabs Approval**: Approve Parent transaction
 4. **Parent Execution**: Execute upgrade via delegatecall
 
-### Jovian Flow (exec-jovian.sh, exec-jovian-sepolia.sh, exec-succinct.sh `v2`)
+### Jovian Flow (exec-jovian.sh, exec-jovian-sepolia.sh, exec-succinct.sh `v2|v201`)
 
 1. **Council Approval**: Approve Parent transaction
 2. **cLabs Approval**: Approve Parent transaction

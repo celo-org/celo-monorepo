@@ -12,8 +12,8 @@ esac
 REPO_ROOT=$(git rev-parse --show-toplevel)
 
 # ─── Per-version signer file + USE_GC ────────────────────────
-# v1 / v102 / v201: nested GC flow (GC → Council → cLabs → Parent).
-# v2:               skip GC (matches exec-jovian.sh succ-v2 branch).
+# v1 / v102:   nested GC flow (GC → Council → cLabs → Parent).
+# v2 / v201:   skip GC — Council → cLabs → Parent (GC did not sign).
 case $VERSION in
   v1)   SIGNER_FILE="$REPO_ROOT/secrets/.env.signers.succinct";    USE_GC=true  ;;
   v102) SIGNER_FILE="$REPO_ROOT/secrets/.env.signers.succinct102"; USE_GC=true  ;;
@@ -22,7 +22,7 @@ case $VERSION in
 esac
 
 # required decoded file
-[ ! -f "$SIGNER_FILE" ] && echo "Need to decode $(basename $SIGNER_FILE).enc first" && exit 1
+[ ! -f "$SIGNER_FILE" ] && echo "Need to decode $(basename "$SIGNER_FILE").enc first" && exit 1
 
 # load decoded signers
 source "$SIGNER_FILE"
