@@ -288,25 +288,23 @@ Unified script for executing OPSuccinct upgrade transactions on Celo Mainnet. Ac
 | v1      | 24           | 21          | 23            | 5        | `0xcA11...` (Multicall3) | Register OPSuccinctFaultDisputeGame v1.0.0                    |
 | v102    | 25           | 22          | 24            | 6        | `0xcA11...` (Multicall3) | Register OPSuccinctFaultDisputeGame v1.0.2                    |
 | v2      | 28           | 26          | 28            | —        | `0xcA11...` (Multicall3) | v2.0.0: set impl (game type 42) + transfer SystemConfig owner |
-| v201    | 29           | 30          | 29            | 8        | `0xcA11...` (Multicall3) | v2.0.1: set impl (game type 42)                               |
+| v201    | 29           | 30          | 29            | —        | `0xcA11...` (Multicall3) | v2.0.1: set impl (game type 42)                               |
 
 **Approval Flow (per version):**
 
-| Version        | Flow                                                                   |
-| -------------- | ---------------------------------------------------------------------- |
-| v1, v102, v201 | **Grand Child → Council → cLabs → Parent**                             |
-| v2             | **Council → cLabs → Parent** (no GC; matches `exec-jovian.sh` succ-v2) |
+| Version  | Flow                                                                 |
+| -------- | -------------------------------------------------------------------- |
+| v1, v102 | **Grand Child → Council → cLabs → Parent**                           |
+| v2, v201 | **Council → cLabs → Parent** (no GC; GC did not sign these upgrades) |
 
 **Signers (per version):**
 
-| Version | cLabs (6)                     | Council (5 or 6)              | Grand Child (2) |
-| ------- | ----------------------------- | ----------------------------- | --------------- |
-| v1      | 09C, 21E, 481, 4D8, 8B4, E00  | 148, 5F7, 6FD, B96, D0C       | C96, D80        |
-| v102    | 09C, 0BD, 21E, 4D8, 8B4, E00  | 148, 2BE, 6FD, B96, D0C       | C96, D80        |
-| v2      | 0Bd, 21e, 4D8, 74b, 812, 8b4  | 148, 2BE, 5f7, 6FD, B96, C91  | —               |
-| v201    | TBD (placeholder = v2 roster) | TBD (placeholder = v2 roster) | TBD (C96, D80)  |
-
-> `v201` rosters are `TODO` placeholders until `.env.signers.succinct201` is finalized.
+| Version | cLabs (6)                    | Council (5 or 6)             | Grand Child (2) |
+| ------- | ---------------------------- | ---------------------------- | --------------- |
+| v1      | 09C, 21E, 481, 4D8, 8B4, E00 | 148, 5F7, 6FD, B96, D0C      | C96, D80        |
+| v102    | 09C, 0BD, 21E, 4D8, 8B4, E00 | 148, 2BE, 6FD, B96, D0C      | C96, D80        |
+| v2      | 0Bd, 21e, 4D8, 74b, 812, 8b4 | 148, 2BE, 5f7, 6FD, B96, C91 | —               |
+| v201    | 21e, 4D8, 74b, 812, 8b4, E00 | 148, 2BE, 5f7, 6FD, B96, d0c | —               |
 
 **Example Execution:**
 
