@@ -5,7 +5,7 @@ This directory contains scripts for executing OPCM upgrade transactions through 
 ## Prerequisites
 
 - Valid signatures from desired Multisig signatories for transaction execution
-- For scripts that load signatures from file (`exec-v2v3.sh`, `exec-succinct.sh`, `exec-succinct-v102.sh`, `exec-jovian.sh`, `exec-basefee.sh`): Decrypted signer files are required. Run from repo root:
+- For scripts that load signatures from file (`exec-v2v3.sh`, `exec-succinct.sh`, `exec-jovian.sh`, `exec-basefee.sh`): Decrypted signer files are required. Run from repo root:
   ```bash
   ./scripts/key_placer.sh decrypt
   ```
@@ -17,6 +17,7 @@ This directory contains scripts for executing OPCM upgrade transactions through 
   - `secrets/.env.signers.v4`
   - `secrets/.env.signers.v5`
   - `secrets/.env.signers.succinct200`
+  - `secrets/.env.signers.succinct201`
   - `secrets/.env.signers.basefee`
 
 ## Scripts
@@ -252,15 +253,16 @@ PK="0x..." ./exec-basefee.sh
 
 ### `exec-succinct.sh`
 
-Script used to execute the OP Succinct upgrade transaction through the nested Safe multisig chain. Contains hardcoded transaction data and signatures loaded from a decoded signers file.
+Unified script for executing OPSuccinct upgrade transactions on Celo Mainnet. Accepts a version argument (`v1`, `v102`, `v2`, or `v201`) and dispatches to the correct calldata, nonces, signer file, and approval flow. Replaces the previous split into `exec-succinct.sh` (v1) and `exec-succinct-v102.sh` (v102).
 
 **Features:**
 
-- Loads signer addresses and signatures from `secrets/.env.signers.succinct`
-- Hardcoded nonces and calldata for the Succinct upgrade
-- Executes the full approval chain: Grand Child → Council → cLabs → Parent
+- Single entry point for all OPSuccinct upgrades (v1, v102, v2, v201)
+- Loads signer addresses and signatures from per-version `secrets/.env.signers.*` file
+- Hardcoded per-version nonces and calldata (verbatim from `CeloSuperchainOps/upgrades/mainnet/*.json`)
+- Per-version approval flow (GC included for v1, v102; skipped for v2 and v201)
 - Uses Multicall3 as the target with delegatecall
-- Pre-configured cLabs (6 signers), Council (5 signers), and Grand Child (2 signers)
+- Helper functions (`safe_tx_hash`, `safe_exec`) for DRY Safe interactions
 
 **Required Environment Variables:**
 
@@ -270,68 +272,47 @@ Script used to execute the OP Succinct upgrade transaction through the nested Sa
 
 - `RPC_URL` - RPC endpoint (defaults to `http://127.0.0.1:8545`)
 
-**Required Files:**
+**Required Files (per version):**
 
-- `secrets/.env.signers.succinct` - Decoded signers file containing signer addresses and signatures (must be decrypted before running)
+| Version | Signer file                        | Must be decrypted before running |
+| ------- | ---------------------------------- | -------------------------------- |
+| v1      | `secrets/.env.signers.succinct`    | ✓                                |
+| v102    | `secrets/.env.signers.succinct102` | ✓                                |
+| v2      | `secrets/.env.signers.succinct200` | ✓                                |
+| v201    | `secrets/.env.signers.succinct201` | ✓                                |
 
 **Upgrade Configuration:**
 
-- **Target Address**: `0xcA11bde05977b3631167028862bE2a173976CA11` (Multicall3)
-- **Parent Nonce**: 24
-- **cLabs Nonce**: 21
-- **Council Nonce**: 23
-- **Grand Child Nonce**: 5
+| Version | Parent Nonce | cLabs Nonce | Council Nonce | GC Nonce | Target                   | Description                                                   |
+| ------- | ------------ | ----------- | ------------- | -------- | ------------------------ | ------------------------------------------------------------- |
+| v1      | 24           | 21          | 23            | 5        | `0xcA11...` (Multicall3) | Register OPSuccinctFaultDisputeGame v1.0.0                    |
+| v102    | 25           | 22          | 24            | 6        | `0xcA11...` (Multicall3) | Register OPSuccinctFaultDisputeGame v1.0.2                    |
+| v2      | 28           | 26          | 28            | —        | `0xcA11...` (Multicall3) | v2.0.0: set impl (game type 42) + transfer SystemConfig owner |
+| v201    | 29           | 30          | 29            | —        | `0xcA11...` (Multicall3) | v2.0.1: set impl (game type 42)                               |
 
-**Signers:**
+**Approval Flow (per version):**
 
-| Safe        | Count | Address suffixes             |
-| ----------- | ----- | ---------------------------- |
-| cLabs       | 6     | 09C, 21E, 481, 4D8, 8B4, E00 |
-| Council     | 5     | 148, 5F7, 6FD, B96, D0C      |
-| Grand Child | 2     | C96, D80                     |
+| Version  | Flow                                                                 |
+| -------- | -------------------------------------------------------------------- |
+| v1, v102 | **Grand Child → Council → cLabs → Parent**                           |
+| v2, v201 | **Council → cLabs → Parent** (no GC; GC did not sign these upgrades) |
 
-**Example Execution:**
+**Signers (per version):**
 
-```bash
-PK="0x..." ./exec-succinct.sh
-```
-
-### `exec-succinct-v102.sh`
-
-Script for executing Succinct prover v1.0.2 upgrade. Contains hardcoded transaction data and pre-configured signatures for the Succinct v1.0.2 upgrade, loaded from a separate encrypted signer file.
-
-**Features:**
-
-- Loads signatures from `secrets/.env.signers.succinct102` (decrypted via `key_placer.sh`)
-- Hardcoded transaction data for Succinct v1.0.2 upgrade via Multicall3
-- Pre-configured signatures from all multisig members:
-  - 6 cLabs signers (09C, 0BD, 21E, 4D8, 8B4, E00)
-  - 5 Council signers (148, 2BE, 6FD, B96, D0C)
-  - 2 Grand Child (0xD1C) signers (C96, D80)
-- Executes through complete approval chain: Grand Child → Council → cLabs → Parent
-- Uses `aggregate3` calldata format for batched operations
-
-**Required Environment Variables:**
-
-- `PK` - Private key for transaction execution
-
-**Optional Environment Variables:**
-
-- `RPC_URL` - RPC endpoint (defaults to `http://127.0.0.1:8545`)
-
-**Configuration:**
-
-- **Parent Nonce**: 25
-- **cLabs Nonce**: 22
-- **Council Nonce**: 24
-- **Grand Child Nonce**: 6
-- **Target**: `0xcA11bde05977b3631167028862bE2a173976CA11` (Multicall3)
-- **Refund Receiver**: `0x95ffac468e37ddeef407ffef18f0cc9e86d8f13b`
+| Version | cLabs (6)                    | Council (5 or 6)             | Grand Child (2) |
+| ------- | ---------------------------- | ---------------------------- | --------------- |
+| v1      | 09C, 21E, 481, 4D8, 8B4, E00 | 148, 5F7, 6FD, B96, D0C      | C96, D80        |
+| v102    | 09C, 0BD, 21E, 4D8, 8B4, E00 | 148, 2BE, 6FD, B96, D0C      | C96, D80        |
+| v2      | 0Bd, 21e, 4D8, 74b, 812, 8b4 | 148, 2BE, 5f7, 6FD, B96, C91 | —               |
+| v201    | 21e, 4D8, 74b, 812, 8b4, E00 | 148, 2BE, 5f7, 6FD, B96, d0c | —               |
 
 **Example Execution:**
 
 ```bash
-PK="0x..." ./exec-succinct-v102.sh
+PK="0x..." ./exec-succinct.sh v1
+PK="0x..." ./exec-succinct.sh v102
+PK="0x..." ./exec-succinct.sh v2
+PK="0x..." ./exec-succinct.sh v201
 ```
 
 ### `exec-mocked.sh`
@@ -407,20 +388,20 @@ VERSION="v3" PK="0x..." SENDER="0x..." SIG="0x..." ACCOUNT="0x..." TEAM="council
 
 ## Execution Flow
 
-### Full Nested Flow (exec.sh, exec-v2v3.sh, exec-succinct.sh, exec-succinct-v102.sh)
+### Full Nested Flow (exec.sh, exec-v2v3.sh, exec-succinct.sh `v1|v102`)
 
 1. **Grand Child Approval**: Approve Council transaction
 2. **Council Approval**: Approve Parent transaction
 3. **cLabs Approval**: Approve Parent transaction
 4. **Parent Execution**: Execute upgrade via delegatecall
 
-### Jovian Flow (exec-jovian.sh, exec-jovian-sepolia.sh)
+### Jovian Flow (exec-jovian.sh, exec-jovian-sepolia.sh, exec-succinct.sh `v2|v201`)
 
 1. **Council Approval**: Approve Parent transaction
 2. **cLabs Approval**: Approve Parent transaction
 3. **Parent Execution**: Execute upgrade via delegatecall
 
-No Grand Child by default. Optional via `USE_GC=true` on mainnet.
+No Grand Child. For `exec-jovian.sh` the GC flow is optionally re-enabled via `USE_GC=true` on mainnet.
 
 ### Direct cLabs Flow (exec-basefee.sh)
 
