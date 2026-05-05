@@ -151,6 +151,8 @@ contract FeeHandler is
     return _setDistributionAndBurnAmounts(tokenStates[tokenAddress], IERC20(tokenAddress));
   }
 
+  // Incorrect calculation in _setBeneficiaryFraction:
+  // https://github.com/celo-org/celo-monorepo/issues/11735
   function changeOtherBeneficiaryAllocation(
     address beneficiary,
     uint256 _newFraction
@@ -185,6 +187,8 @@ contract FeeHandler is
     emit BeneficiaryRemoved(beneficiary);
   }
 
+  // Incorrect calculation in _setBeneficiaryFraction:
+  // https://github.com/celo-org/celo-monorepo/issues/11735
   function setBeneficiaryFraction(
     address beneficiaryAddress,
     uint256 _newFraction
@@ -523,6 +527,9 @@ contract FeeHandler is
     emit CarbonFractionSet(_newFraction);
   }
 
+  // Incorrect calculation: adds newFraction to the running total without
+  // subtracting the prior beneficiary.fraction.
+  // https://github.com/celo-org/celo-monorepo/issues/11735
   function _setBeneficiaryFraction(
     address beneficiaryAddress,
     FixidityLib.Fraction memory newFraction
