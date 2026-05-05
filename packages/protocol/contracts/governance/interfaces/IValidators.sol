@@ -15,10 +15,13 @@ interface IValidators {
   function reorderMember(address, address, address) external returns (bool);
   function updateCommission() external;
   function setNextCommissionUpdate(uint256) external;
+  function updateVoterRewardCommission() external;
+  function setNextVoterRewardCommissionUpdate(uint256) external;
   function resetSlashingMultiplier() external;
 
   // only owner
   function setCommissionUpdateDelay(uint256) external;
+  function setMaxVoterRewardCommission(uint256) external;
   function setMaxGroupSize(uint256) external returns (bool);
   function setMembershipHistoryLength(uint256) external returns (bool);
   function setGroupLockedGoldRequirements(uint256, uint256) external returns (bool);
@@ -36,6 +39,8 @@ interface IValidators {
   // view functions
   function maxGroupSize() external view returns (uint256);
   function getCommissionUpdateDelay() external view returns (uint256);
+  function getVoterRewardCommission(address) external view returns (uint256, uint256, uint256);
+  function maxVoterRewardCommission() external view returns (uint256);
   function getMembershipHistory(
     address
   ) external view returns (uint256[] memory, address[] memory, uint256, uint256);

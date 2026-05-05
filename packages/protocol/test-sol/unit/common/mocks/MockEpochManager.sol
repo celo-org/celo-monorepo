@@ -161,6 +161,9 @@ contract MockEpochManager is IEpochManager {
   function isOnEpochProcess() external view returns (bool) {
     return isProcessingEpoch;
   }
+  function isEpochProcessingStarted() external view returns (bool) {
+    return isProcessingEpoch;
+  }
 
   function getEpochByBlockNumber(
     uint256

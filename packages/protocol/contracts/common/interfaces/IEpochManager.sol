@@ -40,6 +40,7 @@ interface IEpochManager {
   function isBlocked() external view returns (bool);
   function isTimeForNextEpoch() external view returns (bool);
   function isOnEpochProcess() external view returns (bool);
+  function isEpochProcessingStarted() external view returns (bool);
   function getFirstBlockAtEpoch(uint256) external view returns (uint256);
   function getLastBlockAtEpoch(uint256) external view returns (uint256);
 }
