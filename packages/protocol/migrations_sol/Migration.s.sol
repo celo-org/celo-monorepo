@@ -909,8 +909,18 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       ".governance.skipTransferOwnership"
     );
     if (!skipTransferOwnership) {
+      string[] memory contractsToTransfer = new string[](
+        contractsInRegistry.length + mentoContractsInRegistry.length
+      );
       for (uint256 i = 0; i < contractsInRegistry.length; i++) {
-        string memory contractToTransfer = contractsInRegistry[i];
+        contractsToTransfer[i] = contractsInRegistry[i];
+      }
+      for (uint256 i = 0; i < mentoContractsInRegistry.length; i++) {
+        contractsToTransfer[contractsInRegistry.length + i] = mentoContractsInRegistry[i];
+      }
+
+      for (uint256 i = 0; i < contractsToTransfer.length; i++) {
+        string memory contractToTransfer = contractsToTransfer[i];
         console.log("Transferring ownership of: ", contractToTransfer);
 
         // Transfer proxy ownership
