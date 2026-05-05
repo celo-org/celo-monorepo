@@ -19,10 +19,6 @@ case $NETWORK in
     echo "Detected supported network: $NETWORK"
     CHAIN_ID=11155111
     ;;
-  "holesky")
-    echo "Detected supported network: $NETWORK"
-    CHAIN_ID=17000
-    ;;
   *)
     echo "Unsupported network: $NETWORK" && exit 1
     ;;

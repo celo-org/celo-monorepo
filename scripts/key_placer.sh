@@ -11,6 +11,10 @@ files=(
   "secrets/.env.signers.v3:celo-testnet-production"
   "secrets/.env.signers.succinct:celo-testnet-production"
   "secrets/.env.signers.succinct102:celo-testnet-production"
+  "secrets/.env.signers.v4:celo-testnet-production"
+  "secrets/.env.signers.v5:celo-testnet-production"
+  "secrets/.env.signers.succinct200:celo-testnet-production"
+  "secrets/.env.signers.basefee:celo-testnet-production"
 )
 
 if [[ -z "$1" ]]; then
