@@ -26,6 +26,7 @@ contract MockValidators is IValidators {
   mapping(address => address[]) private members;
   mapping(address => address) private affiliations;
   mapping(address => uint256) private commissions;
+  mapping(address => uint256) private voterRewardCommissions;
   uint256 private numRegisteredValidators;
   mapping(address => uint256) private epochRewards;
   uint256 public mintedStable;
@@ -40,6 +41,10 @@ contract MockValidators is IValidators {
 
   function setValidatorGroup(address group) external {
     isValidatorGroup[group] = true;
+  }
+
+  function setIsValidatorGroup(address group, bool value) external {
+    isValidatorGroup[group] = value;
   }
 
   function affiliate(address group) external returns (bool) {
@@ -64,6 +69,16 @@ contract MockValidators is IValidators {
 
   function setCommission(address group, uint256 commission) external {
     commissions[group] = commission;
+  }
+
+  function setVoterRewardCommission(address group, uint256 commission) external {
+    voterRewardCommissions[group] = commission;
+  }
+
+  function getVoterRewardCommission(
+    address group
+  ) external view returns (uint256, uint256, uint256) {
+    return (voterRewardCommissions[group], 0, 0);
   }
 
   function setAccountLockedGoldRequirement(address account, uint256 value) external {
@@ -190,6 +205,24 @@ contract MockValidators is IValidators {
 
   function setCommissionUpdateDelay(uint256) external {
     revert("Method not implemented in mock");
+  }
+
+  function setNextVoterRewardCommissionUpdate(uint256) external {
+    revert("Method not implemented in mock");
+  }
+
+  function updateVoterRewardCommission() external {
+    revert("Method not implemented in mock");
+  }
+
+  uint256 private _maxVoterRewardCommission;
+
+  function setMaxVoterRewardCommission(uint256 maxCommission) external {
+    _maxVoterRewardCommission = maxCommission;
+  }
+
+  function maxVoterRewardCommission() external view returns (uint256) {
+    return _maxVoterRewardCommission;
   }
 
   function resetSlashingMultiplier() external {
