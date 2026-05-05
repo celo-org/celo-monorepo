@@ -9,6 +9,7 @@ import {
 } from '@celo/protocol/lib/bytecode-foundry'
 import { getArtifactByName, getContractName, getDeployedBytecode } from '@celo/protocol/lib/compatibility/internal'
 import { verifyProxyStorageProofFoundry } from '@celo/protocol/lib/proxy-utils'
+import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9'
@@ -255,7 +256,11 @@ const stripAndValidateExtraTxs = async (
       const registryName = ContractNameExtractorRegex.test(extraTx.contract)
         ? ContractNameExtractorRegex.exec(extraTx.contract)[1]
         : extraTx.contract
-      const registryAddress = await registry.getAddressForString(registryName)
+      // The Registry isn't registered in itself; it lives at a well-known address.
+      const registryAddress =
+        registryName === 'Registry'
+          ? celoRegistryAddress
+          : await registry.getAddressForString(registryName)
       if (registryAddress.toLowerCase() !== (proposalTx as any).address.toLowerCase()) {
         throw new Error(
           `Extra transaction at index ${i}: address mismatch for ${extraTx.contract}.\n` +
