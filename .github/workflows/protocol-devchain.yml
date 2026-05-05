@@ -43,7 +43,7 @@ jobs:
         run: git config --global --add safe.directory '*'
       - name: Generate devchain of previous release
         run: |
-          yarn anvil-devchain:start-L2
+          yarn anvil-devchain:start
           mkdir .tmp/devchain
           mv .tmp/devchain.json .tmp/devchain
           mv .tmp/l2-devchain.json .tmp/devchain
