@@ -5,13 +5,7 @@ import { Test } from "celo-foundry-8/Test.sol";
 import "forge-std-8/console.sol";
 
 import { GasSponsoredOFTBridge } from "@celo-contracts-8/common/GasSponsoredOFTBridge.sol";
-import {
-  IOFT,
-  SendParam,
-  MessagingFee,
-  MessagingReceipt,
-  OFTReceipt
-} from "@celo-contracts-8/common/interfaces/ILayerZeroOFT.sol";
+import { IOFT, SendParam, MessagingFee, MessagingReceipt, OFTReceipt } from "@celo-contracts-8/common/interfaces/ILayerZeroOFT.sol";
 import { ISortedOracles } from "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import { IERC20 } from "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import { IERC20Metadata } from "@openzeppelin/contracts8/token/ERC20/extensions/IERC20Metadata.sol";
@@ -38,7 +32,12 @@ contract ForkMockOFT is IOFT {
     SendParam calldata _sendParam,
     MessagingFee calldata,
     address
-  ) external payable override returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt) {
+  )
+    external
+    payable
+    override
+    returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt)
+  {
     // Pull tokens from the bridge (simulates OFT locking/burning tokens)
     IERC20(_token).safeTransferFrom(msg.sender, address(this), _sendParam.amountLD);
     _nonce++;
@@ -251,7 +250,11 @@ contract GasSponsoredOFTBridgeForkTest is Test {
     assertEq(celoSpent, nativeFee, "Bridge should spend exact native fee");
 
     // Verify OFT received the bridge amount
-    assertEq(IERC20(USDT).balanceOf(address(mockOft)), bridgeAmount, "OFT should receive bridge amount");
+    assertEq(
+      IERC20(USDT).balanceOf(address(mockOft)),
+      bridgeAmount,
+      "OFT should receive bridge amount"
+    );
 
     // Verify bridge collected the fee
     assertEq(

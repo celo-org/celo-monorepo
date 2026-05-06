@@ -3,13 +3,7 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts8/token/ERC20/utils/SafeERC20.sol";
-import {
-  IOFT,
-  SendParam,
-  MessagingFee,
-  MessagingReceipt,
-  OFTReceipt
-} from "@celo-contracts-8/common/interfaces/ILayerZeroOFT.sol";
+import { IOFT, SendParam, MessagingFee, MessagingReceipt, OFTReceipt } from "@celo-contracts-8/common/interfaces/ILayerZeroOFT.sol";
 
 /**
  * @dev Mock OFT that accepts token transfers and consumes the native fee.
@@ -32,7 +26,12 @@ contract MockOFT is IOFT {
     SendParam calldata _sendParam,
     MessagingFee calldata,
     address
-  ) external payable override returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt) {
+  )
+    external
+    payable
+    override
+    returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt)
+  {
     // Pull tokens from caller (the bridge contract)
     IERC20(_token).safeTransferFrom(msg.sender, address(this), _sendParam.amountLD);
 

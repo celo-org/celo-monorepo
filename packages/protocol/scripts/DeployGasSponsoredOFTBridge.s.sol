@@ -13,7 +13,10 @@ contract DeployGasSponsoredOFTBridge is Script {
     require(tokenAddress != address(0), "TOKEN_ADDRESS environment variable not set");
 
     address sortedOraclesAddress = vm.envAddress("SORTED_ORACLES_ADDRESS");
-    require(sortedOraclesAddress != address(0), "SORTED_ORACLES_ADDRESS environment variable not set");
+    require(
+      sortedOraclesAddress != address(0),
+      "SORTED_ORACLES_ADDRESS environment variable not set"
+    );
 
     address oracleRateFeedId = vm.envAddress("ORACLE_RATE_FEED_ID");
     require(oracleRateFeedId != address(0), "ORACLE_RATE_FEED_ID environment variable not set");

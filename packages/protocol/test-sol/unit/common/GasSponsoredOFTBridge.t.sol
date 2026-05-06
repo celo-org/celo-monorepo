@@ -4,13 +4,7 @@ pragma solidity >=0.8.7 <0.8.20;
 import { Test } from "celo-foundry-8/Test.sol";
 
 import { GasSponsoredOFTBridge } from "@celo-contracts-8/common/GasSponsoredOFTBridge.sol";
-import {
-  IOFT,
-  SendParam,
-  MessagingFee,
-  MessagingReceipt,
-  OFTReceipt
-} from "@celo-contracts-8/common/interfaces/ILayerZeroOFT.sol";
+import { IOFT, SendParam, MessagingFee, MessagingReceipt, OFTReceipt } from "@celo-contracts-8/common/interfaces/ILayerZeroOFT.sol";
 import { ISortedOracles } from "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import { IERC20Metadata } from "@openzeppelin/contracts8/token/ERC20/extensions/IERC20Metadata.sol";
 
@@ -57,7 +51,12 @@ contract GasSponsoredOFTBridgeTestBase is Test {
     mockOracle.setMedianRate(oracleRateFeedId, ORACLE_NUMERATOR, ORACLE_DENOMINATOR);
 
     // Deploy bridge
-    bridge = new GasSponsoredOFTBridge(token, ISortedOracles(address(mockOracle)), oracleRateFeedId, MAX_GAS);
+    bridge = new GasSponsoredOFTBridge(
+      token,
+      ISortedOracles(address(mockOracle)),
+      oracleRateFeedId,
+      MAX_GAS
+    );
 
     // Fund the bridge with CELO so it can sponsor gas
     vm.deal(address(bridge), 10 ether);
@@ -137,7 +136,14 @@ contract GasSponsoredOFTBridge_Send is GasSponsoredOFTBridgeTestBase {
       (ORACLE_DENOMINATOR * 1e18 * 10_000);
 
     vm.expectEmit(true, true, false, true);
-    emit LogSend(user, address(mockOft), bridgeAmount, nativeFee, expectedFee, bridgeAmount + expectedFee);
+    emit LogSend(
+      user,
+      address(mockOft),
+      bridgeAmount,
+      nativeFee,
+      expectedFee,
+      bridgeAmount + expectedFee
+    );
 
     vm.prank(user);
     bridge.send(IOFT(address(mockOft)), _defaultSendParam(bridgeAmount), _defaultFee(nativeFee));

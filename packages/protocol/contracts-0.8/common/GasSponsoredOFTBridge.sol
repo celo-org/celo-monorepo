@@ -122,7 +122,11 @@ contract GasSponsoredOFTBridge is Ownable, ReentrancyGuard {
     IOFT _oft,
     SendParam calldata _sendParam,
     MessagingFee calldata _fee
-  ) external nonReentrant returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt) {
+  )
+    external
+    nonReentrant
+    returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt)
+  {
     require(allowedOFTs[address(_oft)], "OFT not whitelisted");
     require(_fee.lzTokenFee == 0, "LZ token fee not supported");
     require(_fee.nativeFee <= maxGas, "Gas limit exceeded");
@@ -137,11 +141,7 @@ contract GasSponsoredOFTBridge is Ownable, ReentrancyGuard {
     token.safeApprove(address(_oft), _sendParam.amountLD);
 
     // Execute the OFT send, sponsoring the CELO.
-    (msgReceipt, oftReceipt) = _oft.send{ value: _fee.nativeFee }(
-      _sendParam,
-      _fee,
-      address(this)
-    );
+    (msgReceipt, oftReceipt) = _oft.send{ value: _fee.nativeFee }(_sendParam, _fee, address(this));
 
     // Reset leftover allowance to prevent dangling approvals.
     token.safeApprove(address(_oft), 0);
