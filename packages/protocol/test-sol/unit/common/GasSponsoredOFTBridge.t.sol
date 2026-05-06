@@ -67,8 +67,9 @@ contract GasSponsoredOFTBridgeTestBase is Test {
     vm.prank(user);
     token.approve(address(bridge), type(uint256).max);
 
-    // Set up operator
+    // Set up operator and whitelist the mock OFT
     bridge.setOperator(operator, true);
+    bridge.setAllowedOFT(address(mockOft), true);
   }
 
   function _defaultSendParam(uint256 amount) internal pure returns (SendParam memory) {
@@ -173,6 +174,22 @@ contract GasSponsoredOFTBridge_Send is GasSponsoredOFTBridgeTestBase {
     vm.prank(user);
     vm.expectRevert("No oracle rate available");
     bridge.send(IOFT(address(mockOft)), _defaultSendParam(100e6), _defaultFee(0.01 ether));
+  }
+
+  function test_Revert_Send_StaleOracleRate() public {
+    mockOracle.setExpired(oracleRateFeedId, true);
+
+    vm.prank(user);
+    vm.expectRevert("Oracle rate is stale");
+    bridge.send(IOFT(address(mockOft)), _defaultSendParam(100e6), _defaultFee(0.01 ether));
+  }
+
+  function test_Revert_Send_OFTNotWhitelisted() public {
+    MockOFT rogue = new MockOFT(address(token));
+
+    vm.prank(user);
+    vm.expectRevert("OFT not whitelisted");
+    bridge.send(IOFT(address(rogue)), _defaultSendParam(100e6), _defaultFee(0.01 ether));
   }
 }
 
@@ -287,6 +304,21 @@ contract GasSponsoredOFTBridge_AccessControl is GasSponsoredOFTBridgeTestBase {
     vm.expectRevert("Feed ID is zero address");
     bridge.setOracleRateFeedId(address(0));
   }
+
+  function test_SetAllowedOFT() public {
+    address newOft = address(0x9999);
+    bridge.setAllowedOFT(newOft, true);
+    assertTrue(bridge.allowedOFTs(newOft));
+
+    bridge.setAllowedOFT(newOft, false);
+    assertFalse(bridge.allowedOFTs(newOft));
+  }
+
+  function test_Revert_SetAllowedOFT_NotOwner() public {
+    vm.prank(user);
+    vm.expectRevert("Ownable: caller is not the owner");
+    bridge.setAllowedOFT(address(0x9999), true);
+  }
 }
 
 // =============================================================================
@@ -315,11 +347,17 @@ contract GasSponsoredOFTBridge_Execute is GasSponsoredOFTBridgeTestBase {
     bridge.execute(address(0xBEEF), 0, "");
   }
 
+  function test_Revert_Execute_CannotCallSelf() public {
+    vm.prank(operator);
+    vm.expectRevert("Cannot call self");
+    bridge.execute(address(bridge), 0, abi.encodeWithSignature("setMaxGas(uint256)", 999));
+  }
+
   function test_Revert_Execute_CallFails() public {
-    // Call a contract that will revert
+    // Call an address that will revert
     vm.prank(operator);
     vm.expectRevert("Execute call failed");
-    bridge.execute(address(bridge), 0, abi.encodeWithSignature("nonExistentFunction()"));
+    bridge.execute(address(mockOft), 0, abi.encodeWithSignature("nonExistentFunction()"));
   }
 }
 

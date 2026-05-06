@@ -13,9 +13,14 @@ contract MockSortedOraclesForBridge is ISortedOracles {
   }
 
   mapping(address => Rate) private _rates;
+  mapping(address => bool) private _expired;
 
   function setMedianRate(address token, uint256 numerator, uint256 denominator) external {
     _rates[token] = Rate(numerator, denominator);
+  }
+
+  function setExpired(address token, bool expired) external {
+    _expired[token] = expired;
   }
 
   function medianRate(address token) external view override returns (uint256, uint256) {
@@ -29,8 +34,8 @@ contract MockSortedOraclesForBridge is ISortedOracles {
   function report(address, uint256, address, address) external override {}
   function removeExpiredReports(address, uint256) external override {}
 
-  function isOldestReportExpired(address) external pure override returns (bool, address) {
-    return (false, address(0));
+  function isOldestReportExpired(address token) external view override returns (bool, address) {
+    return (_expired[token], address(0));
   }
 
   function numRates(address) external pure override returns (uint256) {

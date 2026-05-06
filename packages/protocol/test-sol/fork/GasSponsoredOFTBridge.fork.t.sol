@@ -95,8 +95,9 @@ contract GasSponsoredOFTBridgeForkTest is Test {
     // Deploy a mock OFT (since we don't have a real USDT OFT on Celo)
     mockOft = new ForkMockOFT(USDT);
 
-    // Set up operator
+    // Set up operator and whitelist the mock OFT
     bridge.setOperator(operator, true);
+    bridge.setAllowedOFT(address(mockOft), true);
 
     vm.stopPrank();
 
@@ -109,6 +110,15 @@ contract GasSponsoredOFTBridgeForkTest is Test {
     // User approves the bridge to spend USDT
     vm.prank(user);
     IERC20(USDT).approve(address(bridge), type(uint256).max);
+
+    // On a fork snapshot, oracle reports may be naturally expired.
+    // Mock the staleness check so fork tests exercise rate conversion logic.
+    // (Staleness revert is covered by unit tests.)
+    vm.mockCall(
+      SORTED_ORACLES,
+      abi.encodeWithSelector(ISortedOracles.isOldestReportExpired.selector, USDT_ADAPTER),
+      abi.encode(false, address(0))
+    );
   }
 
   // =========================================================================

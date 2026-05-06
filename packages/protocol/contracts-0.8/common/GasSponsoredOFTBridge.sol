@@ -2,6 +2,7 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts8/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts8/token/ERC20/utils/SafeERC20.sol";
@@ -22,7 +23,7 @@ import "./interfaces/ILayerZeroOFT.sol";
  * Adapted from Arbitrum's TransactionValueHelper
  * (0xa90f03c856D01F698E7071B393387cd75a8a319A) for the Celo ecosystem.
  */
-contract GasSponsoredOFTBridge is Ownable {
+contract GasSponsoredOFTBridge is Ownable, ReentrancyGuard {
   using SafeERC20 for IERC20;
 
   event LogSetMaxGas(uint256 maxGas);
@@ -65,6 +66,9 @@ contract GasSponsoredOFTBridge is Ownable {
 
   /// @notice Addresses authorized to call execute().
   mapping(address => bool) public operators;
+
+  /// @notice Whitelisted OFT contracts that send() can route through.
+  mapping(address => bool) public allowedOFTs;
 
   modifier onlyOperators() {
     require(operators[msg.sender] || msg.sender == owner(), "Not operator or owner");
@@ -118,7 +122,8 @@ contract GasSponsoredOFTBridge is Ownable {
     IOFT _oft,
     SendParam calldata _sendParam,
     MessagingFee calldata _fee
-  ) external returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt) {
+  ) external nonReentrant returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt) {
+    require(allowedOFTs[address(_oft)], "OFT not whitelisted");
     require(_fee.nativeFee <= maxGas, "Gas limit exceeded");
     require(address(this).balance >= _fee.nativeFee, "Insufficient CELO balance");
 
@@ -126,6 +131,8 @@ contract GasSponsoredOFTBridge is Ownable {
 
     // Pull bridge amount from user and approve OFT to spend it.
     token.safeTransferFrom(msg.sender, address(this), _sendParam.amountLD);
+    // Reset allowance to 0 first to avoid safeApprove revert on non-zero -> non-zero.
+    token.safeApprove(address(_oft), 0);
     token.safeApprove(address(_oft), _sendParam.amountLD);
 
     // Execute the OFT send, sponsoring the CELO.
@@ -134,6 +141,9 @@ contract GasSponsoredOFTBridge is Ownable {
       _fee,
       address(this)
     );
+
+    // Reset leftover allowance to prevent dangling approvals.
+    token.safeApprove(address(_oft), 0);
 
     // Calculate how much CELO was actually spent.
     uint256 celoSpent = celoBefore - address(this).balance;
@@ -203,11 +213,17 @@ contract GasSponsoredOFTBridge is Ownable {
     emit LogOperatorChanged(_operator, _enabled);
   }
 
+  function setAllowedOFT(address _oft, bool _allowed) external onlyOwner {
+    allowedOFTs[_oft] = _allowed;
+  }
+
   /**
    * @notice Execute an arbitrary call with native value. Intended for operator
    *         maintenance tasks (e.g. withdrawing accumulated fees, rebalancing CELO).
+   * @dev Cannot target this contract to prevent self-destructive calls.
    */
   function execute(address _to, uint256 _value, bytes calldata _data) external onlyOperators {
+    require(_to != address(this), "Cannot call self");
     (bool success, ) = _to.call{ value: _value }(_data);
     require(success, "Execute call failed");
     emit LogExecute(msg.sender, _to, _value, _data);
@@ -230,6 +246,9 @@ contract GasSponsoredOFTBridge is Ownable {
   function _celoToToken(uint256 _celoAmount) internal view returns (uint256) {
     (uint256 numerator, uint256 denominator) = sortedOracles.medianRate(oracleRateFeedId);
     require(denominator > 0, "No oracle rate available");
+
+    (bool isExpired, ) = sortedOracles.isOldestReportExpired(oracleRateFeedId);
+    require(!isExpired, "Oracle rate is stale");
 
     return
       (_celoAmount * numerator * tokenPrecision * priceFactor) /
