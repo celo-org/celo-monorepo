@@ -124,6 +124,7 @@ contract GasSponsoredOFTBridge is Ownable, ReentrancyGuard {
     MessagingFee calldata _fee
   ) external nonReentrant returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt) {
     require(allowedOFTs[address(_oft)], "OFT not whitelisted");
+    require(_fee.lzTokenFee == 0, "LZ token fee not supported");
     require(_fee.nativeFee <= maxGas, "Gas limit exceeded");
     require(address(this).balance >= _fee.nativeFee, "Insufficient CELO balance");
 
@@ -213,8 +214,11 @@ contract GasSponsoredOFTBridge is Ownable, ReentrancyGuard {
     emit LogOperatorChanged(_operator, _enabled);
   }
 
+  event LogAllowedOFTChanged(address indexed oft, bool allowed);
+
   function setAllowedOFT(address _oft, bool _allowed) external onlyOwner {
     allowedOFTs[_oft] = _allowed;
+    emit LogAllowedOFTChanged(_oft, _allowed);
   }
 
   /**
@@ -246,6 +250,7 @@ contract GasSponsoredOFTBridge is Ownable, ReentrancyGuard {
   function _celoToToken(uint256 _celoAmount) internal view returns (uint256) {
     (uint256 numerator, uint256 denominator) = sortedOracles.medianRate(oracleRateFeedId);
     require(denominator > 0, "No oracle rate available");
+    require(numerator > 0, "Oracle rate numerator is zero");
 
     (bool isExpired, ) = sortedOracles.isOldestReportExpired(oracleRateFeedId);
     require(!isExpired, "Oracle rate is stale");

@@ -191,6 +191,25 @@ contract GasSponsoredOFTBridge_Send is GasSponsoredOFTBridgeTestBase {
     vm.expectRevert("OFT not whitelisted");
     bridge.send(IOFT(address(rogue)), _defaultSendParam(100e6), _defaultFee(0.01 ether));
   }
+
+  function test_Revert_Send_LzTokenFeeNotSupported() public {
+    vm.prank(user);
+    vm.expectRevert("LZ token fee not supported");
+    bridge.send(
+      IOFT(address(mockOft)),
+      _defaultSendParam(100e6),
+      MessagingFee({ nativeFee: 0.01 ether, lzTokenFee: 1 })
+    );
+  }
+
+  function test_Revert_Send_ZeroNumeratorOracle() public {
+    // Oracle returns numerator=0 denominator=1e24 (broken rate)
+    mockOracle.setMedianRate(oracleRateFeedId, 0, 1e24);
+
+    vm.prank(user);
+    vm.expectRevert("Oracle rate numerator is zero");
+    bridge.send(IOFT(address(mockOft)), _defaultSendParam(100e6), _defaultFee(0.01 ether));
+  }
 }
 
 // =============================================================================
