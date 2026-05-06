@@ -18,6 +18,11 @@
     "./dist",
     "!**/*.js.map"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
+  },
   "exports": {
     ".": {
       "import": "./dist/esm/index.js",

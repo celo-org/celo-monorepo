@@ -13,7 +13,7 @@ import {
   BuildTarget,
   CONTRACTS_08_PACKAGE_DESTINATION_DIR,
   CONTRACTS_08_SOURCE_DIR,
-  CONTRACTS_PACKAGE_SRC_DIR,
+  // CONTRACTS_PACKAGE_SRC_DIR - unused: we use process.cwd() for correct path resolution in CI
   PublishContracts,
   TSCONFIG_PATH,
 } from './consts'
@@ -260,22 +260,24 @@ function processRawJsonsAndPrepareExports() {
   return exports
 }
 
+const DRY_RUN_VERSION = '0.0.0-dry-run'
+
 function prepareAbisPackageJson(exports: Exports) {
   log('Preparing @celo/abis package.json')
-  const packageJsonPath = path.join(ABIS_PACKAGE_SRC_DIR, 'package.json')
+  // Use process.cwd() so paths are correct when run with working-directory: packages/protocol (e.g. in CI)
+  const packageJsonPath = path.resolve(process.cwd(), 'abis', 'package.json')
 
+  const version = process.env.RELEASE_VERSION || DRY_RUN_VERSION
   if (process.env.RELEASE_VERSION) {
-    log('Replacing @celo/abis version with RELEASE_VERSION)')
-
-    replacePackageVersionAndMakePublic(packageJsonPath, (json) => {
-      log('Setting @celo/abis exports')
-      json.exports = exports
-    })
-
-    return
+    log('Replacing @celo/abis version with RELEASE_VERSION')
+  } else {
+    log(`Using placeholder version ${DRY_RUN_VERSION} for dry run`)
   }
 
-  log('Skipping @celo/abis package.json preparation (no RELEASE_VERSION provided)')
+  replacePackageVersionAndMakePublic(packageJsonPath, version, (json) => {
+    log('Setting @celo/abis exports')
+    json.exports = exports
+  })
 }
 
 function prepareContractsPackage() {
@@ -283,15 +285,16 @@ function prepareContractsPackage() {
   log(contracts08CpCommand)
   child_process.execSync(contracts08CpCommand)
 
+  const version = process.env.RELEASE_VERSION || DRY_RUN_VERSION
   if (process.env.RELEASE_VERSION) {
-    log('Replacing @celo/contracts version with RELEASE_VERSION)')
-    const packageJsonPath = path.join(CONTRACTS_PACKAGE_SRC_DIR, 'package.json')
-    replacePackageVersionAndMakePublic(packageJsonPath)
-
-    return
+    log('Replacing @celo/contracts version with RELEASE_VERSION')
+  } else {
+    log(`Using placeholder version ${DRY_RUN_VERSION} for dry run`)
   }
 
-  log('Skipping @celo/contracts package.json preparation (no RELEASE_VERSION provided)')
+  // Use process.cwd() so paths are correct when run with working-directory: packages/protocol (e.g. in CI)
+  const packageJsonPath = path.resolve(process.cwd(), 'contracts', 'package.json')
+  replacePackageVersionAndMakePublic(packageJsonPath, version)
 }
 
 function lsRecursive(dir: string): string[] {
