@@ -7,7 +7,7 @@ import {
   stripMetadata,
   verifyAndStripLibraryPrefix,
 } from '@celo/protocol/lib/bytecode-foundry'
-import { getArtifactByName, getContractName, getDeployedBytecode } from '@celo/protocol/lib/compatibility/internal'
+import { Artifact, getArtifactByName, getContractName, getDeployedBytecode } from '@celo/protocol/lib/compatibility/internal'
 import { verifyProxyStorageProofFoundry } from '@celo/protocol/lib/proxy-utils'
 import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
@@ -270,10 +270,17 @@ const stripAndValidateExtraTxs = async (
       }
     }
 
+    const proposalAddress = (proposalTx as any).address
+    const extraAddress = (extraTx as any).address
     if (
+      proposalTx.contract !== extraTx.contract ||
       proposalTx.function !== extraTx.function ||
       proposalTx.value !== extraTx.value ||
-      JSON.stringify(proposalTx.args) !== JSON.stringify(extraTx.args)
+      JSON.stringify(proposalTx.args) !== JSON.stringify(extraTx.args) ||
+      // Address is an optional field, but if both are present they must match (case-insensitive)
+      (proposalAddress &&
+        extraAddress &&
+        proposalAddress.toLowerCase() !== extraAddress.toLowerCase())
     ) {
       throw new Error(
         `Extra transaction at index ${i} does not match the proposal.\n` +
@@ -364,7 +371,7 @@ export const verifyBytecodes = async (
   assertValidProposalTransactions(releaseProposal)
   assertValidInitializationData(artifacts, releaseProposal, chainLookup, initializationData)
 
-  const compiledContracts = Array.prototype.concat.apply([], artifacts.map(a => a.listArtifacts())).map((a) => getContractName(a))
+  const compiledContracts = Array.prototype.concat.apply([], artifacts.map((a: BuildArtifacts) => a.listArtifacts())).map((a: Artifact) => getContractName(a))
 
   if (version > 9) {
     ignoredContracts = [...ignoredContracts, ...ignoredContractsV9]

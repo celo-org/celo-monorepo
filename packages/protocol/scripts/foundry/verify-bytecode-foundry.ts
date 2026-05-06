@@ -52,7 +52,10 @@ const proposal: ProposalTx[] = argv.proposal ? readJsonSync(argv.proposal) : []
 const initializationData: InitializationData = argv.initialize_data
   ? readJsonSync(argv.initialize_data)
   : {}
-const extraTxs: ProposalTx[] = argv.extraTxs ? readJsonSync(argv.extraTxs) : []
+if (argv.extraTxs && !argv.proposal) {
+  console.warn('--extraTxs ignored because no --proposal was provided')
+}
+const extraTxs: ProposalTx[] = argv.extraTxs && argv.proposal ? readJsonSync(argv.extraTxs) : []
 const allowError: boolean = argv.allowError ?? false
 const librariesFile = argv.librariesFile ?? 'libraries.json'
 
