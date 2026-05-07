@@ -154,7 +154,7 @@ jobs:
       - name: Generate migrations on local devchain
         if: success() || failure()
         run: |
-          LOAD_STATE=${{ github.workspace }}/celo-optimism/packages/contracts-bedrock/anvil-state.json ./scripts/foundry/create_and_migrate_anvil_devchain.sh
+          LOAD_STATE=${{ github.workspace }}/celo-optimism/packages/contracts-bedrock/anvil-state.json yarn anvil-devchain:start
 
       - name: Run migration tests against local op-geth devchain
         run: |

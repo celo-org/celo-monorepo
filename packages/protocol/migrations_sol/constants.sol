@@ -35,7 +35,7 @@ contract MigrationsConstants is TestConstants {
     "Freezer",
     "Governance",
     "GovernanceSlasher",
-    "LockedGold",
+    "LockedGold", // TODO: eventually has to be renamed to LockedCelo
     "OdisPayments",
     "Registry",
     "ScoreManager",
@@ -43,6 +43,15 @@ contract MigrationsConstants is TestConstants {
     "Validators",
     "MentoFeeHandlerSeller",
     "UniswapFeeHandlerSeller"
+  ];
+
+  // Mento contracts deployed by the migration but not part of the core
+  // contractsInRegistry set (kept around mainly for StableToken compatibility).
+  string[] mentoContractsInRegistry = [
+    "Reserve",
+    "StableToken",
+    "StableTokenEUR",
+    "StableTokenBRL"
   ];
 
   function _markAs08Contract(string memory contractName) internal {
