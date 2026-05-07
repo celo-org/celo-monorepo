@@ -6,7 +6,6 @@ on:
     # monthly on 1 at 0:00 UTC
     - cron: 0 0 1 * *
   workflow_dispatch:
-  # WARNING: chaning this trigger could lead up to npm being pushed from a branch, instead of master 
 permissions:
   contents: read
 

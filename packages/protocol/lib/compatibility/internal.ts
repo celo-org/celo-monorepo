@@ -29,11 +29,27 @@ export const getArtifactByName = (contractName: string, artifacts: BuildArtifact
   )
 }
 
+export const getBytecode = (artifact: Artifact): string => {
+  if (typeof artifact.bytecode === "string") {
+    return artifact.bytecode
+  } else {
+    return artifact.bytecode.object
+  }
+}
+
 export const getDeployedBytecode = (artifact: Artifact): string => {
   if (typeof artifact.deployedBytecode === "string") {
     return artifact.deployedBytecode
   } else {
     return artifact.deployedBytecode.object
+  }
+}
+
+export const getSourceFile = (artifact: Artifact): string => {
+  if (typeof (artifact as any).metadata === "object") {
+    return Object.keys((artifact as any).metadata.sources)[0]
+  } else {
+    throw new Error("Artifact does not have metadata")
   }
 }
 
@@ -77,13 +93,14 @@ export interface LinkReferences {
 export interface Artifact {
   abi: any[]
   ast: any
-  bytecode: string
+  bytecode: (string | { object: string, linkReferences: LinkReferences })
   compiler: any
   contractName: string
   deployedBytecode: (string | { object: string, linkReferences: LinkReferences })
   deployedSourceMap: string
   fileName: string
   legacyAST?: any
+  metadata?: { compiler?: { version?: string } } // Foundry artifact metadata
   networks: any
   schemaVersion: string
   source: string
@@ -112,4 +129,3 @@ export interface StorageInfo {
   path?: string;
   contract?: string;
 }
-

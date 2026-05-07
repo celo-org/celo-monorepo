@@ -55,7 +55,7 @@ export interface LibraryLinks {
  * i.e. `sourcePath:libraryName`.
  * See https://docs.soliditylang.org/en/v0.8.13/using-the-compiler.html#library-linking
  */
-const getPlaceholderHash = (name: string): string => {
+export const getPlaceholderHash = (name: string): string => {
   const hash = keccak256(toHex(name))
   return hash.slice(2, 2 + 34)
 }
@@ -168,14 +168,20 @@ export class LibraryLinkingInfo {
    * Collects and/or checks addresses of linked libraries in a contract, given its deployed bytecode
    * and the expected library linking positions.
    */
-  collect = (bytecode: string, artifactLinking: ArtifactLibraryLinking) =>
+  collect = (bytecode: string, artifactLinking: ArtifactLibraryLinking, contractName?: string): string[] => {
+    const errors: string[] = []
     Object.keys(artifactLinking.links).forEach((library) => {
       artifactLinking.links[library].positions.forEach((position) => {
-        if (!this.addAddress(library, artifactLinking.links[library].placeholderHash, bytecode.slice(position, position + ADDRESS_LENGTH))) {
-          throw new Error(`Mismatched addresses for ${library} at ${position}`)
+        const extractedAddress = bytecode.slice(position, position + ADDRESS_LENGTH)
+        console.log(`  Extracted from ${contractName ?? 'unknown'} onchain bytecode at position ${position}: ${extractedAddress}`)
+        if (!this.addAddress(library, artifactLinking.links[library].placeholderHash, extractedAddress)) {
+          const msg = `Mismatched addresses for ${library} at position ${position} in ${contractName ?? 'unknown'}: expected ${this.info[library].address}, got ${extractedAddress}`
+          errors.push(msg)
         }
       })
     })
+    return errors
+  }
 
   getAddressMapping = (): { [library: string]: string } => {
     const mapping = {}

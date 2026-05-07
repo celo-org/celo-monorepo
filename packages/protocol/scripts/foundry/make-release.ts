@@ -3,22 +3,27 @@ import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
+import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { ForgeArtifact } from '@celo/protocol/scripts/foundry/ForgeArtifact'
 import { NULL_ADDRESS, eqAddress } from '@celo/utils/lib/address'
+import { exec } from 'child_process'
+import { createInterface } from 'readline'
 import { existsSync, readJsonSync, readdirSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
-import { TextEncoder } from 'util'
+import { TextEncoder, promisify } from 'util'
 import {
   Abi,
-  AbiParameter,
   Account,
   Chain,
   Hex,
   PublicClient,
+  Transport,
   Address as ViemAddress,
   WalletClient,
   createPublicClient,
   createWalletClient,
+  decodeFunctionResult,
+  defineChain,
   encodeFunctionData,
   http,
   keccak256,
@@ -30,6 +35,38 @@ import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import { getReleaseVersion, ignoredContractsV9 } from '../../lib/compatibility/ignored-contracts-v9'
 
+const execAsync = promisify(exec)
+
+// Use Pick to extract only the methods we need from viem's client types
+// This maintains compatibility with viem's complex generics
+type PublicClientMethods = Pick<
+  PublicClient<Transport, Chain>,
+  'call' | 'waitForTransactionReceipt'
+>
+
+type WalletClientMethods = Pick<
+  WalletClient<Transport, Chain, Account>,
+  'account' | 'chain' | 'deployContract' | 'writeContract'
+>
+
+// Registry ABI for getAddressForString - used for type-safe contract reads
+const registryGetAddressAbi = [
+  {
+    type: 'function',
+    name: 'getAddressForString',
+    inputs: [{ name: 'identifier', type: 'string' }],
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+  },
+] as const
+// AbiParameter type is inferred from Abi entries
+type AbiParameter = {
+  name?: string
+  type: string
+  internalType?: string
+  components?: AbiParameter[]
+}
+
 interface MakeReleaseArgv {
   report: string
   proposal: string
@@ -40,6 +77,341 @@ interface MakeReleaseArgv {
   network: string
   privateKey?: string
   mnemonic?: string
+  rpcUrl?: string
+  skipVerification?: boolean
+  celoscanApiKey?: string
+}
+
+// Track linked library for verification
+interface LinkedLibrary {
+  sourceFile: string
+  name: string
+  address: string
+}
+
+// Track deployed contracts for verification
+interface DeployedContract {
+  name: string
+  address: string
+  sourceFile: string
+  constructorArgs: any[]
+  isLibrary: boolean
+  compilerVersion: string
+  optimizerEnabled: boolean
+  optimizerRuns: number
+  evmVersion: string
+  linkedLibraries: LinkedLibrary[]
+  foundryProfile?: string // Foundry compilation profile for verification
+}
+
+// Network verification configuration
+interface VerificationConfig {
+  celoscanApiUrl: string
+  celoscanApiKey?: string
+  blockscoutApiUrl: string
+  chainId: number
+}
+
+const getVerificationConfig = (networkName: string): VerificationConfig | null => {
+  // Etherscan V2 API uses unified endpoint: https://api.etherscan.io/v2/api?chainid=CHAINID
+  // Works with a single API key for all supported chains
+  switch (networkName.toLowerCase()) {
+    case 'celo':
+    case 'mainnet':
+    case 'rc1':
+      return {
+        celoscanApiUrl: 'https://api.etherscan.io/v2/api?chainid=42220',
+        blockscoutApiUrl: 'https://celo.blockscout.com/api/',
+        chainId: 42220,
+      }
+    case 'celo-sepolia':
+      return {
+        celoscanApiUrl: 'https://api.etherscan.io/v2/api?chainid=11142220',
+        blockscoutApiUrl: 'https://celo-sepolia.blockscout.com/api/',
+        chainId: 11142220,
+      }
+    default:
+      // Local forks don't need verification
+      return null
+  }
+}
+
+// Store deployed contracts for verification
+const deployedContracts: DeployedContract[] = []
+
+const verifyContractOnBlockscout = async (
+  contract: DeployedContract,
+  config: VerificationConfig,
+  rpcUrl: string
+): Promise<boolean> => {
+  // Build forge verify-contract command for Blockscout
+  const cmd = [
+    'forge verify-contract',
+    `--rpc-url "${rpcUrl}"`,
+    contract.address,
+    `"${contract.sourceFile}:${contract.name}"`,
+    '--verifier blockscout',
+    `--verifier-url "${config.blockscoutApiUrl}"`,
+    `--compiler-version ${contract.compilerVersion}`,
+    `--evm-version ${contract.evmVersion}`,
+    '--watch',
+    '--retries 5',
+  ]
+
+  // Add optimizer settings
+  if (contract.optimizerEnabled) {
+    cmd.push(`--num-of-optimizations ${contract.optimizerRuns}`)
+  }
+
+  // Add constructor args if present
+  if (contract.constructorArgs && contract.constructorArgs.length > 0) {
+    const encodedArgs = encodeConstructorArgs(contract.constructorArgs)
+    if (encodedArgs) {
+      cmd.push(`--constructor-args ${encodedArgs}`)
+    }
+  }
+
+  // Add linked libraries if present (critical for contracts that use libraries)
+  if (contract.linkedLibraries && contract.linkedLibraries.length > 0) {
+    for (const lib of contract.linkedLibraries) {
+      cmd.push(`--libraries "${lib.sourceFile}:${lib.name}:${lib.address}"`)
+    }
+  }
+
+  const fullCmd = cmd.join(' ')
+
+  // Set FOUNDRY_PROFILE environment variable for proper compilation settings
+  const env = { ...process.env }
+  if (contract.foundryProfile) {
+    env.FOUNDRY_PROFILE = contract.foundryProfile
+  }
+
+  // Retry loop for handling "Address is not a smart-contract" errors
+  for (let attempt = 0; attempt <= VERIFICATION_MAX_RETRIES; attempt++) {
+    try {
+      await execAsync(fullCmd, {
+        cwd: process.cwd(),
+        timeout: 180000, // 3 minute timeout
+        env,
+      })
+
+      process.stdout.write(' Blockscout ✓')
+      return true
+    } catch (error: any) {
+      const isRetryable = isRetryableVerificationError(error)
+      const hasRetriesLeft = attempt < VERIFICATION_MAX_RETRIES
+
+      if (isRetryable && hasRetriesLeft) {
+        const delay = getRetryDelay(attempt)
+        process.stdout.write(` (retry ${attempt + 1}...)`)
+        await sleep(delay)
+        continue
+      }
+
+      process.stdout.write(' Blockscout ✗')
+      return false
+    }
+  }
+
+  return false
+}
+
+const verifyContractOnCeloscan = async (
+  contract: DeployedContract,
+  config: VerificationConfig,
+  rpcUrl: string
+): Promise<boolean> => {
+  if (!config.celoscanApiKey) {
+    process.stdout.write(' Celoscan (skipped)')
+    return false
+  }
+
+  // Build forge verify-contract command for Celoscan (Etherscan-compatible)
+  const cmd = [
+    'forge verify-contract',
+    `--rpc-url "${rpcUrl}"`,
+    contract.address,
+    `"${contract.sourceFile}:${contract.name}"`,
+    '--verifier etherscan',
+    `--verifier-url "${config.celoscanApiUrl}"`,
+    `--etherscan-api-key "${config.celoscanApiKey}"`,
+    `--chain-id ${config.chainId}`,
+    `--compiler-version ${contract.compilerVersion}`,
+    `--evm-version ${contract.evmVersion}`,
+    '--watch',
+    '--retries 5',
+  ]
+
+  // Add optimizer settings
+  if (contract.optimizerEnabled) {
+    cmd.push(`--num-of-optimizations ${contract.optimizerRuns}`)
+  }
+
+  // Add constructor args if present
+  if (contract.constructorArgs && contract.constructorArgs.length > 0) {
+    const encodedArgs = encodeConstructorArgs(contract.constructorArgs)
+    if (encodedArgs) {
+      cmd.push(`--constructor-args ${encodedArgs}`)
+    }
+  }
+
+  // Add linked libraries if present (critical for contracts that use libraries)
+  if (contract.linkedLibraries && contract.linkedLibraries.length > 0) {
+    for (const lib of contract.linkedLibraries) {
+      cmd.push(`--libraries "${lib.sourceFile}:${lib.name}:${lib.address}"`)
+    }
+  }
+
+  const fullCmd = cmd.join(' ')
+
+  // Set FOUNDRY_PROFILE environment variable for proper compilation settings
+  const env = { ...process.env }
+  if (contract.foundryProfile) {
+    env.FOUNDRY_PROFILE = contract.foundryProfile
+  }
+
+  // Retry loop for handling "Address is not a smart-contract" errors
+  for (let attempt = 0; attempt <= VERIFICATION_MAX_RETRIES; attempt++) {
+    try {
+      await execAsync(fullCmd, {
+        cwd: process.cwd(),
+        timeout: 180000, // 3 minute timeout
+        env,
+      })
+
+      process.stdout.write(' Celoscan ✓')
+      return true
+    } catch (error: any) {
+      const isRetryable = isRetryableVerificationError(error)
+      const hasRetriesLeft = attempt < VERIFICATION_MAX_RETRIES
+
+      if (isRetryable && hasRetriesLeft) {
+        const delay = getRetryDelay(attempt)
+        process.stdout.write(` (retry ${attempt + 1}...)`)
+        await sleep(delay)
+        continue
+      }
+
+      process.stdout.write(' Celoscan ✗')
+      return false
+    }
+  }
+
+  return false
+}
+
+// Helper to sleep for a given number of milliseconds
+const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
+
+const promptUserConfirmation = (message: string): Promise<boolean> => {
+  const rl = createInterface({ input: process.stdin, output: process.stdout })
+  return new Promise((resolve) => {
+    rl.question(`${message} (y/N): `, (answer) => {
+      rl.close()
+      resolve(answer.toLowerCase() === 'y')
+    })
+  })
+}
+
+// Retry configuration for verification
+const VERIFICATION_MAX_RETRIES = 6
+const VERIFICATION_INITIAL_DELAY_MS = 5000 // 5 seconds
+const VERIFICATION_MAX_DELAY_MS = 60000 // 1 minute
+
+// Calculate logarithmic delay: 5s, 10s, 20s, 40s... capped at 60s
+const getRetryDelay = (attempt: number): number => {
+  const delay = VERIFICATION_INITIAL_DELAY_MS * Math.pow(2, attempt)
+  return Math.min(delay, VERIFICATION_MAX_DELAY_MS)
+}
+
+// Check if error is retryable (block explorer hasn't indexed the contract yet)
+const isRetryableVerificationError = (error: any): boolean => {
+  const errorMessage = error?.message || ''
+  const stdout = error?.stdout || ''
+  const stderr = error?.stderr || ''
+  const fullMessage = `${errorMessage} ${stdout} ${stderr}`.toLowerCase()
+
+  return (
+    fullMessage.includes('address is not a smart-contract') ||
+    fullMessage.includes('contract not found') ||
+    fullMessage.includes('not yet indexed')
+  )
+}
+
+// Helper to encode constructor args for verification
+const encodeConstructorArgs = (args: any[]): string | null => {
+  if (!args || args.length === 0) return null
+
+  try {
+    // For simple boolean args (our common case: [false])
+    if (args.length === 1 && typeof args[0] === 'boolean') {
+      // false encodes to 0x0000...0000 (32 bytes of zeros)
+      // true encodes to 0x0000...0001 (31 bytes of zeros + 1)
+      return args[0]
+        ? '0x0000000000000000000000000000000000000000000000000000000000000001'
+        : '0x0000000000000000000000000000000000000000000000000000000000000000'
+    }
+
+    // For other cases, we'd need more sophisticated encoding
+    // This could be extended as needed
+    console.warn('Complex constructor args may need manual encoding')
+    return null
+  } catch (e) {
+    console.warn('Failed to encode constructor args:', e)
+    return null
+  }
+}
+
+const verifyAllContracts = async (
+  networkName: string,
+  rpcUrl: string,
+  celoscanApiKey?: string
+): Promise<void> => {
+  const config = getVerificationConfig(networkName)
+
+  if (!config) {
+    console.log('\nSkipping verification (not supported for this network/fork)')
+    return
+  }
+
+  if (deployedContracts.length === 0) {
+    console.log('\nNo contracts to verify')
+    return
+  }
+
+  // Set API key if provided
+  if (celoscanApiKey) {
+    config.celoscanApiKey = celoscanApiKey
+  }
+
+  console.log(`\nVerifying ${deployedContracts.length} contract(s) on ${networkName}...`)
+
+  // Wait for block explorers to index the contracts
+  process.stdout.write(`Waiting for indexing...`)
+  await new Promise((resolve) => setTimeout(resolve, 30000))
+  console.log(` done\n`)
+
+  let blockscoutSuccess = 0
+  let celoscanSuccess = 0
+
+  for (const contract of deployedContracts) {
+    // Single line per contract: Name (address) -> verification results
+    process.stdout.write(`  ${contract.name} (${contract.address.slice(0, 10)}...)`)
+
+    // Verify on Blockscout first (no API key needed)
+    const blockscoutResult = await verifyContractOnBlockscout(contract, config, rpcUrl)
+    if (blockscoutResult) blockscoutSuccess++
+
+    // Then verify on Celoscan (needs API key)
+    const celoscanResult = await verifyContractOnCeloscan(contract, config, rpcUrl)
+    if (celoscanResult) celoscanSuccess++
+
+    console.log() // newline after each contract
+  }
+
+  console.log(
+    `\nVerified: Blockscout ${blockscoutSuccess}/${deployedContracts.length}, Celoscan ${celoscanSuccess}/${deployedContracts.length}`
+  )
 }
 
 function bigIntReplacer(_key: string, value: any): unknown {
@@ -54,24 +426,32 @@ let ignoredContractsSet = new Set()
 class ContractAddresses {
   static async create(
     contracts: string[],
-    publicClient: PublicClient,
-    registryAbi: Abi,
+    publicClient: PublicClientMethods,
+    _registryAbi: Abi, // Kept for API compatibility, uses registryGetAddressAbi internally
     registryAddress: ViemAddress,
     libraryAddresses: LibraryAddresses['addresses']
   ) {
     const addresses = new Map<string, string>()
-    const functionName = 'getAddressForString'
-    const abi = registryAbi
     await Promise.all(
       contracts.map(async (contract: string) => {
         try {
-          const registeredAddress = (await publicClient.readContract({
-            address: registryAddress,
-            abi,
-            functionName,
+          // Use low-level call to avoid viem's strict readContract typing
+          const callData = encodeFunctionData({
+            abi: registryGetAddressAbi,
+            functionName: 'getAddressForString',
             args: [contract],
-            authorizationList: [],
-          })) as string
+          })
+          const result = await publicClient.call({
+            to: registryAddress,
+            data: callData,
+          })
+          const registeredAddress = result.data
+            ? decodeFunctionResult({
+                abi: registryGetAddressAbi,
+                functionName: 'getAddressForString',
+                data: result.data,
+              })
+            : NULL_ADDRESS
           if (registeredAddress && !eqAddress(registeredAddress, NULL_ADDRESS)) {
             addresses.set(contract, registeredAddress)
           }
@@ -107,6 +487,11 @@ interface ViemContract {
   abi: Abi
   bytecode: Hex
   sourceFiles: string[]
+  compilerVersion: string
+  optimizerEnabled: boolean
+  optimizerRuns: number
+  evmVersion: string
+  foundryProfile?: string // Foundry compilation profile for verification
 }
 
 const proxiedCoreContracts = new Set<string>([
@@ -136,13 +521,24 @@ const proxiedCoreContracts = new Set<string>([
   CeloContractName.GrandaMento,
   CeloContractName.FeeHandler,
   CeloContractName.FederatedAttestations,
+  CeloContractName.EpochManager,
+  CeloContractName.EpochManagerEnabler,
+  CeloContractName.ScoreManager,
+  CeloContractName.FeeCurrencyDirectory,
+  CeloContractName.CeloUnreleasedTreasury,
+  CeloContractName.OdisPayments,
 ])
 
 const isProxiedContract = (
   contractName: string,
-  contractArtifactPaths: Map<string, string>
+  buildDir05: string,
+  buildDir08: string
 ): boolean => {
-  return proxiedCoreContracts.has(contractName) || contractArtifactPaths.has(`${contractName}Proxy`)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return (
+    proxiedCoreContracts.has(contractName) ||
+    existsSync(getContractArtifactPath(`${contractName}Proxy`, buildDir05, buildDir08))
+  )
 }
 
 const isCoreContract = (contractName: string) =>
@@ -220,10 +616,12 @@ function getDefaultValueForSolidityType(
 const deployImplementation = async (
   contractName: string,
   contractArtifact: ViemContract,
-  walletClient: WalletClient,
-  publicClient: PublicClient,
+  walletClient: WalletClientMethods,
+  publicClient: PublicClientMethods,
   requireVersion = true,
-  gas?: bigint
+  gas?: bigint,
+  isLibrary = false,
+  linkedLibraries: LinkedLibrary[] = []
 ): Promise<ViemContract> => {
   let finalConstructorArgs: any[] = []
   const constructorAbiEntry = contractArtifact.abi.find((item) => item.type === 'constructor') as
@@ -271,6 +669,28 @@ const deployImplementation = async (
       )
     }
   }
+
+  // Track deployed contract for verification
+  // Determine source file from artifact's sourceFiles - find the one containing the contract
+  const sourceFile =
+    contractArtifact.sourceFiles.find((f) => f.includes(`${contractName}.sol`)) ||
+    contractArtifact.sourceFiles[0] ||
+    `contracts/${contractName}.sol`
+
+  deployedContracts.push({
+    name: contractName,
+    address: deployedAddress,
+    sourceFile,
+    constructorArgs: finalConstructorArgs,
+    isLibrary,
+    compilerVersion: contractArtifact.compilerVersion,
+    optimizerEnabled: contractArtifact.optimizerEnabled,
+    optimizerRuns: contractArtifact.optimizerRuns,
+    evmVersion: contractArtifact.evmVersion,
+    linkedLibraries,
+    foundryProfile: contractArtifact.foundryProfile,
+  })
+
   return { ...contractArtifact, address: deployedAddress }
 }
 
@@ -278,8 +698,8 @@ const deployProxy = async (
   contractName: string,
   proxyArtifact: ViemContract,
   addresses: ContractAddresses,
-  walletClient: WalletClient,
-  publicClient: PublicClient,
+  walletClient: WalletClientMethods,
+  publicClient: PublicClientMethods,
   gas?: bigint
 ): Promise<ViemContract> => {
   if (contractName === 'Governance') {
@@ -341,9 +761,11 @@ const deployCoreContract = async (
   addresses: ContractAddresses,
   report: ASTDetailedVersionedReport,
   initializationData: Record<string, unknown[]>,
-  walletClient: WalletClient,
-  publicClient: PublicClient,
-  contractArtifactPaths: Map<string, string>
+  walletClient: WalletClientMethods,
+  publicClient: PublicClientMethods,
+  buildDir05: string,
+  buildDir08: string,
+  linkedLibraries: LinkedLibrary[] = []
 ) => {
   const deployedImplementation = await deployImplementation(
     contractName,
@@ -351,7 +773,9 @@ const deployCoreContract = async (
     walletClient,
     publicClient,
     true,
-    undefined
+    undefined,
+    false, // isLibrary
+    linkedLibraries
   )
 
   const setImplementationTx: ProposalTx = {
@@ -365,9 +789,9 @@ const deployCoreContract = async (
     proposal.push(setImplementationTx)
   } else {
     const proxyArtifactName = `${contractName}Proxy`
-    const proxyArtifactPath = contractArtifactPaths.get(proxyArtifactName)
-    if (!proxyArtifactPath) {
-      throw new Error(`Proxy artifact ${proxyArtifactName} not found in artifact map.`)
+    const proxyArtifactPath = getContractArtifactPath(proxyArtifactName, buildDir05, buildDir08)
+    if (!existsSync(proxyArtifactPath)) {
+      throw new Error(`Proxy artifact ${proxyArtifactName} not found at ${proxyArtifactPath}.`)
     }
     let proxyArtifact: ViemContract
     try {
@@ -435,15 +859,17 @@ const deployLibrary = async (
   libraryName: string,
   libraryArtifact: ViemContract,
   addresses: ContractAddresses,
-  walletClient: WalletClient,
-  publicClient: PublicClient
+  walletClient: WalletClientMethods,
+  publicClient: PublicClientMethods
 ): Promise<void> => {
   const deployedLibrary = await deployImplementation(
     libraryName,
     libraryArtifact,
     walletClient,
     publicClient,
-    false
+    false,
+    undefined,
+    true // isLibrary = true
   )
   addresses.set(libraryName, deployedLibrary.address.substring(2))
 }
@@ -458,14 +884,12 @@ export interface ProposalTx {
 
 const getViemChain = (networkName: string): Chain => {
   switch (networkName.toLowerCase()) {
-    case 'alfajores':
-      return viemChains.celoAlfajores
     case 'celo':
     case 'mainnet':
     case 'rc1':
       return viemChains.celo
     case 'celo-sepolia':
-      return {
+      return defineChain({
         id: 11142220,
         name: 'Celo Sepolia',
         nativeCurrency: { name: 'Celo', symbol: 'CELO', decimals: 18 },
@@ -476,8 +900,9 @@ const getViemChain = (networkName: string): Chain => {
           default: { name: 'CeloScan', url: 'https://celo-sepolia.blockscout.com' },
         },
         testnet: true,
-      }
+      })
     default:
+      console.warn(`Unknown network ${networkName}, defaulting to Hardhat chain config`)
       return { ...viemChains.hardhat, id: 31337 }
   }
 }
@@ -486,16 +911,68 @@ const loadContractArtifact = (contractName: string, artifactPath: string): ViemC
   console.log('loadContractArtifact', contractName, artifactPath)
   const artifact = readJsonSync(artifactPath) as ForgeArtifact
   const sourceFiles = Object.keys(artifact.metadata.sources)
+
+  // Extract compiler settings from metadata
+  const compiler = artifact.metadata?.compiler || {}
+  const settings = artifact.metadata?.settings || {}
+  const optimizer = settings.optimizer || { enabled: true, runs: 200 }
+
+  // Use full compiler version (e.g., "0.5.14+commit.01f1aaa4") for verification
+  // Etherscan may require the full version to properly verify
+  const fullVersion = compiler.version || '0.8.19'
+
+  // Determine foundry profile based on source file paths
+  // contracts/ = truffle-compat (Solidity 0.5.x)
+  // contracts-0.8/ = truffle-compat8 (Solidity 0.8.x)
+  let foundryProfile: string | undefined
+  const mainSourceFile =
+    sourceFiles.find((f) => f.includes(`${contractName}.sol`)) || sourceFiles[0]
+  if (mainSourceFile) {
+    if (mainSourceFile.startsWith('contracts-0.8/')) {
+      foundryProfile = 'truffle-compat8'
+    } else if (mainSourceFile.startsWith('contracts/')) {
+      foundryProfile = 'truffle-compat'
+    }
+  }
+
   return {
     contractName,
     abi: artifact.abi as Abi,
     bytecode: artifact.bytecode.object,
     address: '0x0' as ViemAddress,
     sourceFiles,
+    compilerVersion: fullVersion,
+    optimizerEnabled: optimizer.enabled ?? true,
+    optimizerRuns: optimizer.runs ?? 200,
+    evmVersion: settings.evmVersion || 'paris',
+    foundryProfile,
   }
 }
 
-const findContractArtifacts = (baseDir: string, contractArtifactPathsMap: Map<string, string>) => {
+const contracts08Set = new Set(SOLIDITY_08_PACKAGE.contracts)
+
+const getContractBuildDir = (
+  contractName: string,
+  buildDir05: string,
+  buildDir08: string
+): string => {
+  if (contracts08Set.has(contractName)) {
+    return buildDir08
+  }
+  return buildDir05
+}
+
+const getContractArtifactPath = (
+  contractName: string,
+  buildDir05: string,
+  buildDir08: string
+): string => {
+  const buildDir = getContractBuildDir(contractName, buildDir05, buildDir08)
+  return join(buildDir, `${contractName}.sol`, `${contractName}.json`)
+}
+
+const listContractNames = (baseDir: string): string[] => {
+  const names: string[] = []
   const entries = readdirSync(baseDir, { withFileTypes: true })
   for (const entry of entries) {
     if (!entry.isDirectory() || !entry.name.endsWith('.sol')) {
@@ -508,43 +985,34 @@ const findContractArtifacts = (baseDir: string, contractArtifactPathsMap: Map<st
       if (!fileEntry.isFile() || !fileEntry.name.endsWith('.json')) {
         continue
       }
-
-      const contractName = basename(fileEntry.name as string, '.json')
-      const artifactFilePath = join(contractSolDirPath, fileEntry.name as string)
-
-      try {
-        const content = readJsonSync(artifactFilePath)
-        if (content.abi && content.bytecode) {
-          contractArtifactPathsMap.set(contractName, artifactFilePath)
-        } else {
-          console.warn(`Skipping non-ABI/bytecode file: ${artifactFilePath}`)
-        }
-      } catch (e) {
-        console.warn(`Skipping non-JSON or unreadable file: ${artifactFilePath}`)
-      }
+      names.push(basename(fileEntry.name as string, '.json'))
     }
   }
+  return names
 }
 
 const linkLibraries = (
   contractViemArtifact: ViemContract,
   contractDependencies: string[],
   addresses: ContractAddresses
-): void => {
+): LinkedLibrary[] => {
+  const linkedLibraries: LinkedLibrary[] = []
+
   if (!contractViemArtifact.bytecode.includes('__')) {
-    return
+    return linkedLibraries
   }
 
   if (contractDependencies.length === 0) {
     console.error(
       `No dependencies found for ${contractViemArtifact.contractName}. Skipping library linking.`
     )
-    return
+    return linkedLibraries
   }
 
   for (const dep of contractDependencies) {
     if (addresses.addresses.has(dep)) {
-      const libAddress = addresses.get(dep).replace('0x', '')
+      const libAddressWithPrefix = addresses.get(dep)
+      const libAddress = libAddressWithPrefix.replace('0x', '')
       const libSourceFilePath = contractViemArtifact.sourceFiles.find((file) =>
         file.includes(`${dep}.sol`)
       )
@@ -565,24 +1033,48 @@ const linkLibraries = (
           placeholderRegexDollar,
           libAddress
         ) as Hex
+
+        // Track the linked library for verification
+        // Ensure the address has 0x prefix for verification
+        const fullAddress = libAddressWithPrefix.startsWith('0x')
+          ? libAddressWithPrefix
+          : `0x${libAddressWithPrefix}`
+        linkedLibraries.push({
+          sourceFile: libSourceFilePath,
+          name: dep,
+          address: fullAddress,
+        })
       } else {
         console.log(`No placeholder match for ${dep} in ${contractViemArtifact.contractName}.`)
       }
     }
   }
+
+  if (contractViemArtifact.bytecode.includes('__')) {
+    const missingLibs = contractDependencies.filter((dep) => !addresses.addresses.has(dep))
+    throw new Error(
+      `Bytecode for ${contractViemArtifact.contractName} still contains unlinked library placeholders. ` +
+        `Missing library addresses: ${
+          missingLibs.length > 0 ? missingLibs.join(', ') : '(unknown - check libraries file)'
+        }`
+    )
+  }
+
+  return linkedLibraries
 }
 
 const performRelease = async (
   contractName: string,
   report: ASTDetailedVersionedReport,
   released: Set<string>,
-  contractArtifactPaths: Map<string, string>,
+  buildDir05: string,
+  buildDir08: string,
   dependencies: { get(key: string): string[] | undefined },
   addresses: ContractAddresses,
   proposal: ProposalTx[],
   initializationData: Record<string, unknown[]>,
-  walletClient: WalletClient,
-  publicClient: PublicClient
+  walletClient: WalletClientMethods,
+  publicClient: PublicClientMethods
 ): Promise<void> => {
   if (released.has(contractName)) return
 
@@ -591,9 +1083,9 @@ const performRelease = async (
 
   if (!shouldDeployContract && !shouldDeployLibrary) return
 
-  const artifactPath = contractArtifactPaths.get(contractName)
-  if (!artifactPath) {
-    throw new Error(`Artifact path for ${contractName} not found in map.`)
+  const artifactPath = getContractArtifactPath(contractName, buildDir05, buildDir08)
+  if (!existsSync(artifactPath)) {
+    throw new Error(`Artifact for ${contractName} not found at ${artifactPath}.`)
   }
 
   let contractViemArtifact: ViemContract
@@ -613,7 +1105,8 @@ const performRelease = async (
           dependency,
           report,
           released,
-          contractArtifactPaths,
+          buildDir05,
+          buildDir08,
           dependencies,
           addresses,
           proposal,
@@ -624,7 +1117,37 @@ const performRelease = async (
       }
     }
 
-    linkLibraries(contractViemArtifact, contractDependencies, addresses)
+    // Check for missing library addresses (not in libraries file and not yet deployed)
+    const missingLibraries = contractDependencies.filter((dep) => !addresses.addresses.has(dep))
+    if (missingLibraries.length > 0) {
+      console.warn(
+        `\nWARNING: ${contractName} requires libraries not found in the libraries file: ${missingLibraries.join(
+          ', '
+        )}`
+      )
+      console.warn(
+        `Missing libraries is often due to an error in the libraries file. Deploying the wrong version can lead to errors.`
+      )
+      const confirmed = await promptUserConfirmation(
+        `Deploy missing libraries (${missingLibraries.join(', ')})?`
+      )
+      if (!confirmed) {
+        throw new Error(
+          `Aborting: missing libraries for ${contractName}: ${missingLibraries.join(', ')}`
+        )
+      }
+      for (const lib of missingLibraries) {
+        const libArtifactPath = getContractArtifactPath(lib, buildDir05, buildDir08)
+        if (!existsSync(libArtifactPath)) {
+          throw new Error(`Artifact for library ${lib} not found at ${libArtifactPath}.`)
+        }
+        const libArtifact = loadContractArtifact(lib, libArtifactPath)
+        await deployLibrary(lib, libArtifact, addresses, walletClient, publicClient)
+        released.add(lib)
+      }
+    }
+
+    const linkedLibraries = linkLibraries(contractViemArtifact, contractDependencies, addresses)
 
     await deployCoreContract(
       contractName,
@@ -635,7 +1158,9 @@ const performRelease = async (
       initializationData,
       walletClient,
       publicClient,
-      contractArtifactPaths
+      buildDir05,
+      buildDir08,
+      linkedLibraries
     )
   } else if (shouldDeployLibrary) {
     await deployLibrary(contractName, contractViemArtifact, addresses, walletClient, publicClient)
@@ -679,10 +1204,24 @@ async function main() {
       .option('network', {
         type: 'string',
         demandOption: true,
-        description: 'Network name (e.g., alfajores, mainnet, development).',
+        description: 'Network name (e.g., celo-sepolia, celo, mainnet).',
       })
       .option('privateKey', { type: 'string', description: 'Private key for deployment.' })
       .option('mnemonic', { type: 'string', description: 'Mnemonic for deployment.' })
+      .option('rpcUrl', {
+        type: 'string',
+        description: 'Custom RPC URL (overrides network default, useful for local anvil forks).',
+      })
+      .option('skipVerification', {
+        type: 'boolean',
+        default: false,
+        description: 'Skip contract verification on block explorers.',
+      })
+      .option('celoscanApiKey', {
+        type: 'string',
+        description:
+          'Celoscan API key for contract verification (can also be set via CELOSCAN_API_KEY env var or .env.json).',
+      })
       .check((currentArgs) => {
         if (!currentArgs.privateKey && !currentArgs.mnemonic) {
           throw new Error('Either --privateKey or --mnemonic must be provided.')
@@ -691,26 +1230,72 @@ async function main() {
       }).argv
 
     const networkName = argv.network!
-    const buildDir = argv.buildDirectory
-    if (!existsSync(buildDir)) {
-      throw new Error(`${buildDir} directory not found. Make sure to run foundry build first`)
+    const buildDirBase = argv.buildDirectory
+    const buildDir05 = `${buildDirBase}-truffle-compat`
+    const buildDir08 = `${buildDirBase}-truffle-compat8`
+    if (!existsSync(buildDir05)) {
+      throw new Error(`${buildDir05} directory not found. Make sure to run foundry build first`)
     }
+    if (!existsSync(buildDir08)) {
+      throw new Error(`${buildDir08} directory not found. Make sure to run foundry build first`)
+    }
+
+    // Check for Celoscan API key early (before deployment) for production networks
+    const isProductionNetwork = ['celo', 'mainnet', 'rc1', 'celo-sepolia'].includes(
+      networkName.toLowerCase()
+    )
+    const isLocalFork = !!argv.rpcUrl
+
+    if (isProductionNetwork && !isLocalFork && !argv.skipVerification) {
+      // Load Celoscan API key from various sources
+      let celoscanApiKey = argv.celoscanApiKey || process.env.CELOSCAN_API_KEY
+
+      // Try loading from .env.json if not set
+      if (!celoscanApiKey) {
+        const envJsonPath = join(process.cwd(), '.env.json')
+        if (existsSync(envJsonPath)) {
+          try {
+            const envJson = readJsonSync(envJsonPath)
+            celoscanApiKey = envJson.celoScanApiKey || envJson.celoscanApiKey
+          } catch (e) {
+            // Failed to parse .env.json - fall through to validation check below
+            // which will throw a descriptive error if API key is still missing
+            console.warn(`Warning: Could not read Celoscan API key from ${envJsonPath}: ${e}`)
+          }
+        }
+      }
+
+      if (!celoscanApiKey) {
+        throw new Error(
+          `Celoscan API key is required for ${networkName}. ` +
+            `Provide it via:\n` +
+            `  - CLI flag: -a YOUR_API_KEY\n` +
+            `  - Environment variable: CELOSCAN_API_KEY\n` +
+            `  - Config file: packages/protocol/.env.json (celoScanApiKey)\n` +
+            `Or use -s to skip verification.`
+        )
+      }
+    }
+
     const viemChain = getViemChain(networkName)
 
-    if (!viemChain.rpcUrls.default?.http?.[0]) {
-      throw new Error(`RPC URL for network ${networkName} could not be determined.`)
+    // Use custom rpcUrl if provided, otherwise use chain default
+    let transportUrl: string
+    if (argv.rpcUrl) {
+      transportUrl = argv.rpcUrl
+      console.log(`Using custom RPC URL: ${transportUrl}`)
+    } else if (viemChain.rpcUrls.default?.http?.[0]) {
+      transportUrl = viemChain.rpcUrls.default.http[0]
+    } else {
+      throw new Error(
+        `RPC URL for network ${networkName} could not be determined. Provide --rpcUrl parameter.`
+      )
     }
-
-    const transportUrl = viemChain.rpcUrls.default.http[0]
-    const publicClientInternal = createPublicClient({
+    const publicClient = createPublicClient({
       chain: viemChain,
       transport: http(transportUrl),
     })
 
-    const publicClient = {
-      ...publicClientInternal,
-      account: undefined,
-    } as PublicClient
     let account: Account
 
     if (argv.privateKey) {
@@ -739,28 +1324,20 @@ async function main() {
       ignoredContractsSet = new Set(ignoredContractsV9)
     }
 
-    const contractArtifactPaths = new Map<string, string>()
+    const names05 = listContractNames(buildDir05)
+    const names08 = listContractNames(buildDir08)
+    const allContractNamesFromDirs = [...new Set([...names05, ...names08])].sort()
 
-    findContractArtifacts(buildDir, contractArtifactPaths)
-
-    if (contractArtifactPaths.size === 0) {
-      console.warn(
-        `No contract artifacts found in ${buildDir}. Ensure the directory is correct and contains Foundry outputs.`
-      )
-    }
-
-    const registryArtifactPath = contractArtifactPaths.get('Registry')
-    if (!registryArtifactPath) {
+    const registryArtifactPath = getContractArtifactPath('Registry', buildDir05, buildDir08)
+    if (!existsSync(registryArtifactPath)) {
       throw new Error(
-        `Registry.json artifact not found in ${buildDir} or its subdirectories. ` +
-          `Please ensure it is compiled and present in the Foundry output format (e.g., ${String(
-            buildDir
-          )}/Registry.sol/Registry.json).`
+        `Registry.json artifact not found at ${registryArtifactPath}. ` +
+          `Please ensure it is compiled and present in the Foundry output format.`
       )
     }
     const registryArtifact = loadContractArtifact('Registry', registryArtifactPath)
 
-    const allContractNames = Array.from(contractArtifactPaths.keys()).filter(
+    const allContractNames = allContractNamesFromDirs.filter(
       (contractName) =>
         !ignoredContractsSet.has(contractName) &&
         !ignoredContractsSet.has(contractName.replace('Proxy', ''))
@@ -778,12 +1355,13 @@ async function main() {
     const proposal: ProposalTx[] = []
 
     for (const contractName of allContractNames) {
-      if (isCoreContract(contractName) && isProxiedContract(contractName, contractArtifactPaths)) {
+      if (isCoreContract(contractName) && isProxiedContract(contractName, buildDir05, buildDir08)) {
         await performRelease(
           contractName,
           report,
           released,
-          contractArtifactPaths,
+          buildDir05,
+          buildDir08,
           dependencies,
           addresses,
           proposal,
@@ -796,6 +1374,32 @@ async function main() {
 
     writeJsonSync(argv.proposal, proposal, { spaces: 2 })
     console.log(`Proposal successfully written to ${argv.proposal}`)
+
+    // Contract verification
+    if (isLocalFork) {
+      console.log('\nContract verification skipped (custom RPC URL indicates local fork)')
+    } else if (argv.skipVerification) {
+      console.log('\nContract verification skipped (--skipVerification flag)')
+    } else {
+      // Load Celoscan API key (already validated at start for production networks)
+      let celoscanApiKey = argv.celoscanApiKey || process.env.CELOSCAN_API_KEY
+
+      if (!celoscanApiKey) {
+        const envJsonPath = join(process.cwd(), '.env.json')
+        if (existsSync(envJsonPath)) {
+          try {
+            const envJson = readJsonSync(envJsonPath)
+            celoscanApiKey = envJson.celoScanApiKey || envJson.celoscanApiKey
+          } catch (e) {
+            // Failed to parse .env.json - verifyAllContracts handles undefined
+            // gracefully by skipping Celoscan verification (Blockscout still works)
+            console.warn(`Warning: Could not read Celoscan API key from ${envJsonPath}: ${e}`)
+          }
+        }
+      }
+
+      await verifyAllContracts(networkName, transportUrl, celoscanApiKey)
+    }
   } catch (error) {
     console.error('Error during script execution:', error)
   }

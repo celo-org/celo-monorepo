@@ -9,13 +9,13 @@ const argv = require('minimist')(process.argv.slice(2), {
   boolean: ['reset'],
 })
 
-const ALFAJORES_NETWORKID = 11142220
+const CELOSEPOLIA_NETWORKID = 11142220
 
 const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
 const INTEGRATION_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const INTEGRATION_TESTING_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
-const ALFAJORES_FROM = '0x59A60D2B488154dc5CB48c42347Df222e13C70Ba'
+const CELOSEPOLIA_FROM = '0x33c35343B08ff91a9d7a07daa34eDce5248bE318'
 
 const gasLimit = 20000000
 const hostAddress = process.env.CELO_NODE_ADDRESS || '127.0.0.1'
@@ -34,7 +34,7 @@ const defaultConfig = {
 
 function readMnemonic(networkName) {
   dotenv = require('dotenv').config({
-    path: require('path').resolve(__dirname, `../../.env.mnemonic.${networkName}`),
+    path: require('path').resolve(__dirname, `../../.env.mnemonic.${networkName.replace('-', '')}`),
   })
 
   const privateKey = process.env.DEPLOYER_PRIVATE_KEY
@@ -49,7 +49,7 @@ function readMnemonic(networkName) {
 }
 
 const fornoUrls = {
-  alfajores: 'https://forno.celo-sepolia.celo-testnet.org',
+  'celo-sepolia': 'https://forno.celo-sepolia.celo-testnet.org',
   rc1: 'https://forno.celo.org',
   mainnet: 'https://forno.celo.org',
 }
@@ -70,13 +70,16 @@ const networks = {
     gas: gasLimit,
     gasPrice: 100000000000,
     privateKeyAvailable: false,
+    proposer: '0xc11F5aC70B86517Dcc10f20d8B0D5e77EBb956Ce',
+    approver: '0x41822d8A191fcfB1cfcA5F7048818aCd8eE933d3',
+    voter: '0xb073014a4c60c9824B597375C5e2d49e765cf811',
   },
   testnet_prod: defaultConfig,
   anvil: {
     ...defaultConfig,
-    network_id: 31337,
+    network_id: '*', // Accept any chain ID for anvil fork testing
     from: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
-    port: devPort,
+    port: devPort, // Use port 8546 for anvil (matches ANVIL_PORT in constants.sh)
   },
   // New testnets
   integration: {
@@ -90,11 +93,14 @@ const networks = {
     network_id: 1101,
     port: devPort,
   },
-  alfajores: {
+  'celo-sepolia': {
     ...defaultConfig,
-    network_id: ALFAJORES_NETWORKID,
-    from: ALFAJORES_FROM,
+    network_id: CELOSEPOLIA_NETWORKID,
+    from: CELOSEPOLIA_FROM,
     privateKeyAvailable: true,
+    proposer: '0x95a40aA01d2d72b4122C19c86160710D01224ada',
+    approver: '0x95a40aA01d2d72b4122C19c86160710D01224ada',
+    voter: '0x95a40aA01d2d72b4122C19c86160710D01224ada',
   },
 }
 
@@ -137,4 +143,4 @@ if (process.argv.includes('--forno')) {
   }
 }
 
-module.exports = { networks: networks }
+module.exports = { networks: networks, fornoUrls: fornoUrls }
