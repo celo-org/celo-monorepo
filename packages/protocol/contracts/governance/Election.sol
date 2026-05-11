@@ -1069,9 +1069,9 @@ contract Election is
     uint256 newVoteTotal = votes.total.eligible.getValue(group).add(value);
     votes.total.eligible.update(group, newVoteTotal, lesser, greater);
 
-    if (allowedToVoteOverMaxNumberOfGroups[account]) {
-      updateTotalVotesByAccountForGroup(account, group);
-    }
+    // Always refresh the cache so cachedVotesPerGroup[g] stays equal to the
+    // current live votes for (account, g). Mirrors decrementTotalVotes.
+    updateTotalVotesByAccountForGroup(account, group);
   }
 
   /**
@@ -1096,9 +1096,9 @@ contract Election is
       votes.total.eligible.update(group, newVoteTotal, lesser, greater);
     }
 
-    if (allowedToVoteOverMaxNumberOfGroups[account]) {
-      updateTotalVotesByAccountForGroup(account, group);
-    }
+    // Always refresh the cache so cachedVotesPerGroup[g] stays equal to the
+    // current live votes for (account, g). Mirrors incrementTotalVotes.
+    updateTotalVotesByAccountForGroup(account, group);
   }
 
   /**
