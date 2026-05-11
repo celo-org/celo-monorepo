@@ -13,7 +13,7 @@ warn_extra_transactions() {
   source scripts/bash/extract-release-version.sh
   extract_release_version "$BRANCH"
   local MATCHING_FILES
-  MATCHING_FILES=$(find releaseData/extraTransactions/ -name "*.json" 2>/dev/null | grep "release${RELEASE_VERSION}" || true)
+  MATCHING_FILES=$(find releaseData/extraTransactions/ -name "*.json" 2>/dev/null | grep -E "release${RELEASE_VERSION}[-.]" || true)
   if [ -n "$MATCHING_FILES" ]; then
     echo -e "\033[31mWarning: Found extra transactions file(s) but no -e flag was provided:\033[0m" >&2
     echo "$MATCHING_FILES" | sed 's/^/\t/' >&2
