@@ -1,8 +1,19 @@
 [
   {
+    "contract": "EpochManagerProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0x91e35ccea07a15af477e189c1e2bd12569dfc535"
+    ],
+    "value": "0"
+  },
+  {
     "contract": "Registry",
     "function": "setAddressFor",
-    "args": ["EpochManager", "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"],
+    "args": [
+      "EpochManager",
+      "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"
+    ],
     "value": "0",
     "description": "Temporarily set Governance as EpochManager in Registry"
   },
@@ -19,7 +30,10 @@
   {
     "contract": "Registry",
     "function": "setAddressFor",
-    "args": ["EpochManager", "0xF424B5e85B290b66aC20f8A9EAB75E25a526725E"],
+    "args": [
+      "EpochManager",
+      "0xF424B5e85B290b66aC20f8A9EAB75E25a526725E"
+    ],
     "value": "0",
     "description": "Restore EpochManager in Registry to original address"
   }
