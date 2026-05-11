@@ -234,6 +234,13 @@ const stripAndValidateExtraTxs = async (
   extraTxs: ProposalTx[],
   registry: RegistryLookup
 ): Promise<ProposalTx[]> => {
+  if (!Array.isArray(proposal)) {
+    throw new Error('proposal must be an array of transactions')
+  }
+  if (!Array.isArray(extraTxs)) {
+    throw new Error('extraTxs must be an array of transactions')
+  }
+
   if (extraTxs.length === 0) {
     return proposal
   }
@@ -397,6 +404,9 @@ export const verifyBytecodes = async (
         proposalContracts.add(tx.args[0])
       }
     }
+    
+    // If a proposal is provided, only verify the contracts to be upgraded or created
+    // this prevents the verification from failing if other contracts are out of sync for a particular chain.
     contractsToVerify = filteredContracts.filter((c) => proposalContracts.has(c))
     console.info(`Proposal provided: verifying only ${contractsToVerify.length} contract(s): ${contractsToVerify.join(', ')}`)
   } else {
