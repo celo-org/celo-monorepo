@@ -8,7 +8,9 @@ CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|
 echo "BRANCH: $BRANCH"
 
 # Before CR7, UsingRegistry and UsingRegistryV2 had been deployed, they need to keep getting deployed to keep the release reports without changes.
-VERSION_NUMBER=$(echo "$BRANCH" | grep -o 'v[0-9]\+' | tr -dc '0-9')
+source scripts/bash/extract-release-version.sh
+extract_release_version "$BRANCH"
+VERSION_NUMBER=$RELEASE_VERSION
 
 echo "VERSION_NUMBER: $VERSION_NUMBER"
 
