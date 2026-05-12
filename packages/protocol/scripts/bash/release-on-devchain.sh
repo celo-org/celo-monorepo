@@ -51,7 +51,7 @@ git checkout $BRANCH -- migrationsConfig.js
 
 source scripts/bash/contract-exclusion-regex.sh
 
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//_/g')
 REPORT="report-$BRANCH-$CURRENT_BRANCH.json"
 
 yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/contracts --new_contracts build/contracts --exclude $CONTRACT_EXCLUSION_REGEX --new_branch $BRANCH --output_file $REPORT
