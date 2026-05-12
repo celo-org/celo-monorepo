@@ -110,14 +110,6 @@ contract GasSponsoredOFTBridgeForkTest is Test {
     vm.prank(user);
     IERC20(USDT).approve(address(bridge), type(uint256).max);
 
-    // On a fork snapshot, oracle reports may be naturally expired.
-    // Mock the staleness check so fork tests exercise rate conversion logic.
-    // (Staleness revert is covered by unit tests.)
-    vm.mockCall(
-      SORTED_ORACLES,
-      abi.encodeWithSelector(ISortedOracles.isOldestReportExpired.selector, USDT_ADAPTER),
-      abi.encode(false, address(0))
-    );
   }
 
   // =========================================================================

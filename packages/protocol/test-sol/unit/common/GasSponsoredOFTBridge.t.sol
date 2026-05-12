@@ -182,14 +182,6 @@ contract GasSponsoredOFTBridge_Send is GasSponsoredOFTBridgeTestBase {
     bridge.send(IOFT(address(mockOft)), _defaultSendParam(100e6), _defaultFee(0.01 ether));
   }
 
-  function test_Revert_Send_StaleOracleRate() public {
-    mockOracle.setExpired(oracleRateFeedId, true);
-
-    vm.prank(user);
-    vm.expectRevert("Oracle rate is stale");
-    bridge.send(IOFT(address(mockOft)), _defaultSendParam(100e6), _defaultFee(0.01 ether));
-  }
-
   function test_Revert_Send_OFTNotWhitelisted() public {
     MockOFT rogue = new MockOFT(address(token));
 

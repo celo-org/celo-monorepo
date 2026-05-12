@@ -249,11 +249,12 @@ contract GasSponsoredOFTBridge is Ownable, ReentrancyGuard {
    */
   function _celoToToken(uint256 _celoAmount) internal view returns (uint256) {
     (uint256 numerator, uint256 denominator) = sortedOracles.medianRate(oracleRateFeedId);
+    // denominator == 0 means no oracle rates exist (SortedOracles returns 0 when numRates == 0).
+    // Note: isOldestReportExpired is NOT used here because it doesn't follow the
+    // equivalentToken mapping that medianRate uses — it would always return true for
+    // rate feeds that rely on an equivalent token (e.g. USDT adapter → cUSD).
     require(denominator > 0, "No oracle rate available");
     require(numerator > 0, "Oracle rate numerator is zero");
-
-    (bool isExpired, ) = sortedOracles.isOldestReportExpired(oracleRateFeedId);
-    require(!isExpired, "Oracle rate is stale");
 
     return
       (_celoAmount * numerator * tokenPrecision * priceFactor) /
