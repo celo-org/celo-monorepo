@@ -9,14 +9,10 @@ validate_libraries_filename() {
   local LIBRARIES="$1"
   local NETWORK="$2"
   local BRANCH="$3"
-  local VERSION_NUMBER
-  VERSION_NUMBER=$(echo "$BRANCH" | grep -o 'v[0-9]\+' | tr -dc '0-9')
 
-  if [ -z "$VERSION_NUMBER" ] || [ "$VERSION_NUMBER" -lt 1 ]; then
-    echo "Error: Could not extract a valid version number from branch '$BRANCH'." >&2
-    echo "Branch must match the pattern *vN (e.g., core-contracts.v15)." >&2
-    exit 1
-  fi
+  source scripts/bash/extract-release-version.sh
+  extract_release_version "$BRANCH"
+  local VERSION_NUMBER=$RELEASE_VERSION
 
   local PREVIOUS_VERSION=$((VERSION_NUMBER - 1))
   local PREVIOUS_BRANCH
