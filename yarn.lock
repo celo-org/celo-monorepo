@@ -537,10 +537,10 @@
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-6.0.0.tgz#23811b0bc8730a0d13fa90df55a7ec0e90d370cd"
   integrity sha512-z29p7glyh69R4tKSbZuomEvnAihmzgQKxmGoqt/4S6zSx6uOjTILUlhqlcDl2Wbkd+V0h85ft14nui2HXY2Lsg==
 
-"@celo/base@^6.1.0":
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/@celo/base/-/base-6.1.0.tgz#58a7a7cfb5d47bc9e680fe2e0eee58c234cb570b"
-  integrity sha512-R6ko2QCfEU32akBsaSNsDYduktgwIKHcJ61SbR7EsXA1VE31/44Qh8kMzfgeahyk375DUCe3pJIKwx5zg1tFHg==
+"@celo/base@^7.0.2", "@celo/base@^7.0.3":
+  version "7.0.4"
+  resolved "https://registry.yarnpkg.com/@celo/base/-/base-7.0.4.tgz#92b8c1ebf81a8500918458fcd5b0d0d9d77a00a1"
+  integrity sha512-LUWVdqchXVKlp9h4Kh190wKE6DDy+zAREfVbKBIH/AWvrGv3EWQSUSDj3C8vrZjJ5wiCGt/ws+5+39Iao/W02Q==
 
 "@celo/bls12377js@0.1.1":
   version "0.1.1"
@@ -568,14 +568,14 @@
     web3-eth-contract "1.10.0"
 
 "@celo/cryptographic-utils@^5.0.7":
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/@celo/cryptographic-utils/-/cryptographic-utils-5.1.0.tgz#64adcf4fe852d209cc4443d5e1ad9897d03de611"
-  integrity sha512-UWdg+sQJaf5vaN7F52OqmPL5bG94Av8IfWzZH4u9FQaE1slzd9xz5fB7DYuBdjpXWcSGqhZyK0/8pooJXtu7xA==
+  version "5.1.3"
+  resolved "https://registry.yarnpkg.com/@celo/cryptographic-utils/-/cryptographic-utils-5.1.3.tgz#7c4f9b01ab0a60c63df931cf64e54e5628ed2e11"
+  integrity sha512-aOmbxokr+Rqbcf1TXkSCQOYI7GSdrjwzdtXZB8fW8o6QduLyIMocq9HMxXOk6SFs7KhUQvCBYRK4anAIy+T1MA==
   dependencies:
-    "@celo/base" "^6.1.0"
+    "@celo/base" "^7.0.2"
     "@celo/bls12377js" "0.1.1"
-    "@celo/utils" "^7.0.0"
-    "@noble/ciphers" "0.4.1"
+    "@celo/utils" "^8.0.2"
+    "@noble/ciphers" "1.1.3"
     "@noble/curves" "1.3.0"
     "@noble/hashes" "1.3.3"
     "@scure/bip32" "^1.3.3"
@@ -638,21 +638,21 @@
     web3-eth-abi "1.10.0"
     web3-utils "1.10.0"
 
-"@celo/utils@^7.0.0":
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-7.0.0.tgz#76bf2576d74daf43ec3801fe45cf78b8e6eacff1"
-  integrity sha512-oxAMm19lMs3myhHt2BpuWm01mxZ9ZD73uydQFdgeVj5cNVRKumzMGSEfb0qCQ2hiCHL15R/lCtBqqiRy0wD1LA==
+"@celo/utils@^8.0.2":
+  version "8.0.3"
+  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-8.0.3.tgz#918e5fc32668e6174da49f5f87fea7cda671332e"
+  integrity sha512-eHXSqRGWzXLGnfqq4eq37JAUnalqX5EIhlXyqSmxtIxc0Shkzlq7hrMpxI4diUS/T2zCcs9OQtr2ihjGxzqtqA==
   dependencies:
-    "@celo/base" "^6.1.0"
+    "@celo/base" "^7.0.3"
     "@ethereumjs/rlp" "^5.0.2"
     "@ethereumjs/util" "8.0.5"
-    "@noble/ciphers" "0.4.1"
+    "@noble/ciphers" "1.1.3"
     "@noble/curves" "1.3.0"
     "@noble/hashes" "1.3.3"
     "@types/bn.js" "^5.1.0"
     "@types/node" "^18.7.16"
     bignumber.js "^9.0.0"
-    fp-ts "2.1.1"
+    fp-ts "2.16.9"
     io-ts "2.0.1"
     web3-eth-abi "1.10.4"
     web3-utils "1.10.4"
@@ -2551,10 +2551,10 @@
   resolved "https://registry.yarnpkg.com/@metamask/safe-event-emitter/-/safe-event-emitter-2.0.0.tgz#af577b477c683fad17c619a78208cede06f9605c"
   integrity sha512-/kSXhY692qiV1MXu6EeOZvg5nECLclxNXcKCxJ3cXQgYuRymRHpdx/t7JXfsK+JLjwA1e1c1/SBrlQYpusC29Q==
 
-"@noble/ciphers@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@noble/ciphers/-/ciphers-0.4.1.tgz#977fc35f563a4ca315ebbc4cbb1f9b670bd54456"
-  integrity sha512-QCOA9cgf3Rc33owG0AYBB9wszz+Ul2kramWN8tXG44Gyciud/tbkEqvxRF/IpqQaBpRBNi9f4jdNxqB2CQCIXg==
+"@noble/ciphers@1.1.3":
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@noble/ciphers/-/ciphers-1.1.3.tgz#eb27085aa7ce94d8c6eaeb64299bab0589920ec1"
+  integrity sha512-Ygv6WnWJHLLiW4fnNDC1z+i13bud+enXOFRBlpxI+NJliPWx5wdR+oWlTjLuBPTqjUjtHXtjkU6w3kuuH6upZA==
 
 "@noble/curves@1.1.0", "@noble/curves@~1.1.0":
   version "1.1.0"
@@ -9789,6 +9789,11 @@ fp-ts@2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.1.1.tgz#c910544499d7c959351bb4260ee7c44a544084c1"
   integrity sha512-YcWhMdDCFCja0MmaDroTgNu+NWWrrnUEn92nvDgrtVy9Z71YFnhNVIghoHPt8gs82ijoMzFGeWKvArbyICiJgw==
+
+fp-ts@2.16.9:
+  version "2.16.9"
+  resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.16.9.tgz#99628fc5e0bb3b432c4a16d8f4455247380bae8a"
+  integrity sha512-+I2+FnVB+tVaxcYyQkHUq7ZdKScaBlX53A41mxQtpIccsfyv8PzdzP7fzp2AY832T4aoK6UZ5WRX/ebGd8uZuQ==
 
 fresh@0.5.2:
   version "0.5.2"
