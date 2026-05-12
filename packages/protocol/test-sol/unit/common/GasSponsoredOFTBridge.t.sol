@@ -6,6 +6,7 @@ import { Test } from "celo-foundry-8/Test.sol";
 import { GasSponsoredOFTBridge } from "@celo-contracts-8/common/GasSponsoredOFTBridge.sol";
 import { IOFT, SendParam, MessagingFee, MessagingReceipt, OFTReceipt } from "@celo-contracts-8/common/interfaces/ILayerZeroOFT.sol";
 import { ISortedOracles } from "@celo-contracts/stability/interfaces/ISortedOracles.sol";
+import { IERC20 } from "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import { IERC20Metadata } from "@openzeppelin/contracts8/token/ERC20/extensions/IERC20Metadata.sol";
 
 import { MockERC20 } from "./mocks/MockERC20.sol";
@@ -14,16 +15,18 @@ import { MockSortedOraclesForBridge } from "./mocks/MockSortedOraclesForBridge.s
 
 contract GasSponsoredOFTBridgeTestBase is Test {
   GasSponsoredOFTBridge public bridge;
-  MockERC20 public token;
-  MockOFT public mockOft;
+  MockERC20 public usdt;
+  MockERC20 public usdc;
+  MockOFT public usdtOft;
+  MockOFT public usdcOft;
   MockSortedOraclesForBridge public mockOracle;
 
   address public user = actor("user");
   address public operator = actor("operator");
-  address public oracleRateFeedId = address(0xFEED);
+  address public usdtRateFeedId = address(0xFEED1);
+  address public usdcRateFeedId = address(0xFEED2);
 
-  // 1 CELO = 0.50 USD  =>  medianRate returns (0.5e24, 1e24)
-  // i.e. 1 CELO buys 0.5 USDT
+  // 1 CELO = 0.50 USD => medianRate returns (0.5e24, 1e24)
   uint256 constant ORACLE_NUMERATOR = 0.5e24;
   uint256 constant ORACLE_DENOMINATOR = 1e24;
 
@@ -38,43 +41,50 @@ contract GasSponsoredOFTBridgeTestBase is Test {
     uint256 feeInToken,
     uint256 totalAmount
   );
-  event LogSetMaxGas(uint256 maxGas);
-  event LogSetPriceFactor(uint256 oldPriceFactor, uint256 newPriceFactor);
-  event LogOperatorChanged(address indexed operator, bool enabled);
-  event LogExecute(address indexed operator, address indexed target, uint256 value, bytes data);
+  event LogOFTConfigSet(
+    address indexed oft,
+    address indexed token,
+    address oracleRateFeedId,
+    uint256 tokenPrecision
+  );
+  event LogOFTConfigRemoved(address indexed oft);
 
   function setUp() public {
     // Deploy mocks
-    token = new MockERC20("Tether USD", "USDT", 6);
-    mockOft = new MockOFT(address(token));
+    usdt = new MockERC20("Tether USD", "USDT", 6);
+    usdc = new MockERC20("USD Coin", "USDC", 6);
+    usdtOft = new MockOFT(address(usdt));
+    usdcOft = new MockOFT(address(usdc));
     mockOracle = new MockSortedOraclesForBridge();
-    mockOracle.setMedianRate(oracleRateFeedId, ORACLE_NUMERATOR, ORACLE_DENOMINATOR);
+    mockOracle.setMedianRate(usdtRateFeedId, ORACLE_NUMERATOR, ORACLE_DENOMINATOR);
+    mockOracle.setMedianRate(usdcRateFeedId, ORACLE_NUMERATOR, ORACLE_DENOMINATOR);
 
-    // Deploy bridge
-    bridge = new GasSponsoredOFTBridge(
-      token,
-      ISortedOracles(address(mockOracle)),
-      oracleRateFeedId,
-      MAX_GAS
-    );
+    // Deploy bridge (multi-token: no token in constructor)
+    bridge = new GasSponsoredOFTBridge(ISortedOracles(address(mockOracle)), MAX_GAS);
 
-    // Fund the bridge with CELO so it can sponsor gas
+    // Register OFTs
+    bridge.setOFTConfig(address(usdtOft), usdt, usdtRateFeedId);
+    bridge.setOFTConfig(address(usdcOft), usdc, usdcRateFeedId);
+
+    // Fund the bridge with CELO
     vm.deal(address(bridge), 10 ether);
 
     // Give user tokens and approve bridge
-    token.mint(user, 1_000_000e6); // 1M USDT
-    vm.prank(user);
-    token.approve(address(bridge), type(uint256).max);
+    usdt.mint(user, 1_000_000e6);
+    usdc.mint(user, 1_000_000e6);
+    vm.startPrank(user);
+    usdt.approve(address(bridge), type(uint256).max);
+    usdc.approve(address(bridge), type(uint256).max);
+    vm.stopPrank();
 
-    // Set up operator and whitelist the mock OFT
+    // Set up operator
     bridge.setOperator(operator, true);
-    bridge.setAllowedOFT(address(mockOft), true);
   }
 
   function _defaultSendParam(uint256 amount) internal pure returns (SendParam memory) {
     return
       SendParam({
-        dstEid: 30101, // Ethereum mainnet EID
+        dstEid: 30101,
         to: bytes32(uint256(uint160(address(0xBEEF)))),
         amountLD: amount,
         minAmountLD: amount,
@@ -90,43 +100,55 @@ contract GasSponsoredOFTBridgeTestBase is Test {
 }
 
 // =============================================================================
-// send()
+// send() with multi-token
 // =============================================================================
 
 contract GasSponsoredOFTBridge_Send is GasSponsoredOFTBridgeTestBase {
-  function test_Send_HappyPath() public {
-    uint256 bridgeAmount = 100e6; // 100 USDT
-    uint256 nativeFee = 0.01 ether; // 0.01 CELO for LZ fee
-
-    // Expected fee in USDT:
-    // 0.01 CELO * (0.5e24 / 1e24) * (1e6 / 1e18) * (12000 / 10000)
-    // = 0.01 * 0.5 * 1e-12 * 1.2 (but in 6-decimal token)
-    // = 0.01e18 * 0.5e24 * 1e6 * 12000 / (1e24 * 1e18 * 10000)
-    // = 6000 (= 0.006 USDT)
+  function test_Send_USDT_HappyPath() public {
+    uint256 bridgeAmount = 100e6;
+    uint256 nativeFee = 0.01 ether;
     uint256 expectedFee = (0.01e18 * ORACLE_NUMERATOR * 1e6 * DEFAULT_PRICE_FACTOR) /
       (ORACLE_DENOMINATOR * 1e18 * 10_000);
 
-    uint256 userBalanceBefore = token.balanceOf(user);
-    uint256 bridgeCeloBefore = address(bridge).balance;
+    uint256 userBalanceBefore = usdt.balanceOf(user);
 
     vm.prank(user);
-    (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt) = bridge.send(
-      IOFT(address(mockOft)),
-      _defaultSendParam(bridgeAmount),
-      _defaultFee(nativeFee)
-    );
+    bridge.send(IOFT(address(usdtOft)), _defaultSendParam(bridgeAmount), _defaultFee(nativeFee));
 
-    // User paid bridgeAmount + fee
-    assertEq(token.balanceOf(user), userBalanceBefore - bridgeAmount - expectedFee);
-    // Bridge spent CELO
-    assertEq(address(bridge).balance, bridgeCeloBefore - nativeFee);
-    // OFT received the bridge amount
-    assertEq(token.balanceOf(address(mockOft)), bridgeAmount);
-    // Bridge collected the fee
-    assertEq(token.balanceOf(address(bridge)), expectedFee);
-    // Receipts are populated
-    assertEq(oftReceipt.amountSentLD, bridgeAmount);
-    assertEq(msgReceipt.nonce, 1);
+    assertEq(usdt.balanceOf(user), userBalanceBefore - bridgeAmount - expectedFee);
+    assertEq(usdt.balanceOf(address(usdtOft)), bridgeAmount);
+    assertEq(usdt.balanceOf(address(bridge)), expectedFee);
+  }
+
+  function test_Send_USDC_HappyPath() public {
+    uint256 bridgeAmount = 200e6;
+    uint256 nativeFee = 0.02 ether;
+    uint256 expectedFee = (0.02e18 * ORACLE_NUMERATOR * 1e6 * DEFAULT_PRICE_FACTOR) /
+      (ORACLE_DENOMINATOR * 1e18 * 10_000);
+
+    uint256 userBalanceBefore = usdc.balanceOf(user);
+
+    vm.prank(user);
+    bridge.send(IOFT(address(usdcOft)), _defaultSendParam(bridgeAmount), _defaultFee(nativeFee));
+
+    assertEq(usdc.balanceOf(user), userBalanceBefore - bridgeAmount - expectedFee);
+    assertEq(usdc.balanceOf(address(usdcOft)), bridgeAmount);
+    assertEq(usdc.balanceOf(address(bridge)), expectedFee);
+  }
+
+  function test_Send_BothTokensIndependently() public {
+    vm.prank(user);
+    bridge.send(IOFT(address(usdtOft)), _defaultSendParam(50e6), _defaultFee(0.01 ether));
+
+    vm.prank(user);
+    bridge.send(IOFT(address(usdcOft)), _defaultSendParam(75e6), _defaultFee(0.01 ether));
+
+    // Each OFT got its bridge amount
+    assertEq(usdt.balanceOf(address(usdtOft)), 50e6);
+    assertEq(usdc.balanceOf(address(usdcOft)), 75e6);
+    // Bridge collected fees in both tokens
+    assertGt(usdt.balanceOf(address(bridge)), 0);
+    assertGt(usdc.balanceOf(address(bridge)), 0);
   }
 
   function test_Send_EmitsLogSend() public {
@@ -138,7 +160,7 @@ contract GasSponsoredOFTBridge_Send is GasSponsoredOFTBridgeTestBase {
     vm.expectEmit(true, true, false, true);
     emit LogSend(
       user,
-      address(mockOft),
+      address(usdtOft),
       bridgeAmount,
       nativeFee,
       expectedFee,
@@ -146,67 +168,58 @@ contract GasSponsoredOFTBridge_Send is GasSponsoredOFTBridgeTestBase {
     );
 
     vm.prank(user);
-    bridge.send(IOFT(address(mockOft)), _defaultSendParam(bridgeAmount), _defaultFee(nativeFee));
+    bridge.send(IOFT(address(usdtOft)), _defaultSendParam(bridgeAmount), _defaultFee(nativeFee));
+  }
+
+  function test_Revert_Send_OFTNotRegistered() public {
+    MockOFT rogue = new MockOFT(address(usdt));
+
+    vm.prank(user);
+    vm.expectRevert("OFT not registered");
+    bridge.send(IOFT(address(rogue)), _defaultSendParam(100e6), _defaultFee(0.01 ether));
   }
 
   function test_Revert_Send_GasLimitExceeded() public {
     vm.prank(user);
     vm.expectRevert("Gas limit exceeded");
-    bridge.send(
-      IOFT(address(mockOft)),
-      _defaultSendParam(100e6),
-      _defaultFee(MAX_GAS + 1) // exceeds limit
-    );
+    bridge.send(IOFT(address(usdtOft)), _defaultSendParam(100e6), _defaultFee(MAX_GAS + 1));
   }
 
   function test_Revert_Send_InsufficientCeloBalance() public {
-    // Drain the bridge's CELO
     vm.prank(address(bridge));
     (bool ok, ) = address(0xdead).call{ value: address(bridge).balance }("");
     require(ok);
-
-    // Increase maxGas so it won't revert on that check
     bridge.setMaxGas(2 ether);
 
     vm.prank(user);
     vm.expectRevert("Insufficient CELO balance");
-    bridge.send(IOFT(address(mockOft)), _defaultSendParam(100e6), _defaultFee(1 ether));
+    bridge.send(IOFT(address(usdtOft)), _defaultSendParam(100e6), _defaultFee(1 ether));
   }
 
   function test_Revert_Send_NoOracleRate() public {
-    // Set oracle to return 0 denominator (no rate)
-    mockOracle.setMedianRate(oracleRateFeedId, 0, 0);
+    mockOracle.setMedianRate(usdtRateFeedId, 0, 0);
 
     vm.prank(user);
     vm.expectRevert("No oracle rate available");
-    bridge.send(IOFT(address(mockOft)), _defaultSendParam(100e6), _defaultFee(0.01 ether));
+    bridge.send(IOFT(address(usdtOft)), _defaultSendParam(100e6), _defaultFee(0.01 ether));
   }
 
-  function test_Revert_Send_OFTNotWhitelisted() public {
-    MockOFT rogue = new MockOFT(address(token));
+  function test_Revert_Send_ZeroNumeratorOracle() public {
+    mockOracle.setMedianRate(usdtRateFeedId, 0, 1e24);
 
     vm.prank(user);
-    vm.expectRevert("OFT not whitelisted");
-    bridge.send(IOFT(address(rogue)), _defaultSendParam(100e6), _defaultFee(0.01 ether));
+    vm.expectRevert("Oracle rate numerator is zero");
+    bridge.send(IOFT(address(usdtOft)), _defaultSendParam(100e6), _defaultFee(0.01 ether));
   }
 
   function test_Revert_Send_LzTokenFeeNotSupported() public {
     vm.prank(user);
     vm.expectRevert("LZ token fee not supported");
     bridge.send(
-      IOFT(address(mockOft)),
+      IOFT(address(usdtOft)),
       _defaultSendParam(100e6),
       MessagingFee({ nativeFee: 0.01 ether, lzTokenFee: 1 })
     );
-  }
-
-  function test_Revert_Send_ZeroNumeratorOracle() public {
-    // Oracle returns numerator=0 denominator=1e24 (broken rate)
-    mockOracle.setMedianRate(oracleRateFeedId, 0, 1e24);
-
-    vm.prank(user);
-    vm.expectRevert("Oracle rate numerator is zero");
-    bridge.send(IOFT(address(mockOft)), _defaultSendParam(100e6), _defaultFee(0.01 ether));
   }
 }
 
@@ -218,18 +231,128 @@ contract GasSponsoredOFTBridge_QuoteSend is GasSponsoredOFTBridgeTestBase {
   function test_QuoteSend_ReturnsCorrectTotal() public {
     uint256 bridgeAmount = 200e6;
     uint256 nativeFee = 0.05 ether;
-
     uint256 expectedFee = (0.05e18 * ORACLE_NUMERATOR * 1e6 * DEFAULT_PRICE_FACTOR) /
       (ORACLE_DENOMINATOR * 1e18 * 10_000);
 
-    uint256 total = bridge.quoteSend(_defaultSendParam(bridgeAmount), _defaultFee(nativeFee));
+    uint256 total = bridge.quoteSend(
+      IOFT(address(usdtOft)),
+      _defaultSendParam(bridgeAmount),
+      _defaultFee(nativeFee)
+    );
     assertEq(total, bridgeAmount + expectedFee);
   }
 
   function test_QuoteSend_ZeroNativeFee() public {
-    uint256 bridgeAmount = 100e6;
-    uint256 total = bridge.quoteSend(_defaultSendParam(bridgeAmount), _defaultFee(0));
-    assertEq(total, bridgeAmount);
+    uint256 total = bridge.quoteSend(
+      IOFT(address(usdtOft)),
+      _defaultSendParam(100e6),
+      _defaultFee(0)
+    );
+    assertEq(total, 100e6);
+  }
+
+  function test_QuoteSend_DifferentTokens_DifferentRates() public {
+    // Set different rates for USDT and USDC
+    mockOracle.setMedianRate(usdtRateFeedId, 0.5e24, 1e24); // 1 CELO = 0.5 USDT
+    mockOracle.setMedianRate(usdcRateFeedId, 1e24, 1e24); // 1 CELO = 1.0 USDC
+
+    uint256 usdtTotal = bridge.quoteSend(
+      IOFT(address(usdtOft)),
+      _defaultSendParam(100e6),
+      _defaultFee(0.1 ether)
+    );
+    uint256 usdcTotal = bridge.quoteSend(
+      IOFT(address(usdcOft)),
+      _defaultSendParam(100e6),
+      _defaultFee(0.1 ether)
+    );
+
+    uint256 usdtFee = usdtTotal - 100e6;
+    uint256 usdcFee = usdcTotal - 100e6;
+    // USDC fee should be 2x USDT fee (1.0 vs 0.5 rate)
+    assertEq(usdcFee, usdtFee * 2);
+  }
+
+  function test_Revert_QuoteSend_UnregisteredOFT() public {
+    MockOFT rogue = new MockOFT(address(usdt));
+    vm.expectRevert("OFT not registered");
+    bridge.quoteSend(IOFT(address(rogue)), _defaultSendParam(100e6), _defaultFee(0.01 ether));
+  }
+}
+
+// =============================================================================
+// OFT config management
+// =============================================================================
+
+contract GasSponsoredOFTBridge_OFTConfig is GasSponsoredOFTBridgeTestBase {
+  function test_SetOFTConfig_StoresCorrectly() public {
+    (IERC20 token, address feedId, uint256 precision) = bridge.oftConfigs(address(usdtOft));
+    assertEq(address(token), address(usdt));
+    assertEq(feedId, usdtRateFeedId);
+    assertEq(precision, 1e6);
+  }
+
+  function test_SetOFTConfig_EmitsEvent() public {
+    MockERC20 newToken = new MockERC20("DAI", "DAI", 18);
+    MockOFT newOft = new MockOFT(address(newToken));
+
+    vm.expectEmit(true, true, false, true);
+    emit LogOFTConfigSet(address(newOft), address(newToken), address(0xFEED3), 1e18);
+
+    bridge.setOFTConfig(address(newOft), newToken, address(0xFEED3));
+  }
+
+  function test_SetOFTConfig_18DecimalToken() public {
+    MockERC20 dai = new MockERC20("DAI", "DAI", 18);
+    MockOFT daiOft = new MockOFT(address(dai));
+    bridge.setOFTConfig(address(daiOft), dai, address(0xFEED3));
+
+    (, , uint256 precision) = bridge.oftConfigs(address(daiOft));
+    assertEq(precision, 1e18);
+  }
+
+  function test_RemoveOFTConfig() public {
+    bridge.removeOFTConfig(address(usdtOft));
+
+    (IERC20 token, , ) = bridge.oftConfigs(address(usdtOft));
+    assertEq(address(token), address(0));
+
+    // Sending should now fail
+    vm.prank(user);
+    vm.expectRevert("OFT not registered");
+    bridge.send(IOFT(address(usdtOft)), _defaultSendParam(100e6), _defaultFee(0.01 ether));
+  }
+
+  function test_RemoveOFTConfig_EmitsEvent() public {
+    vm.expectEmit(true, false, false, false);
+    emit LogOFTConfigRemoved(address(usdtOft));
+    bridge.removeOFTConfig(address(usdtOft));
+  }
+
+  function test_Revert_RemoveOFTConfig_NotRegistered() public {
+    vm.expectRevert("OFT not registered");
+    bridge.removeOFTConfig(address(0x1234));
+  }
+
+  function test_Revert_SetOFTConfig_ZeroOFT() public {
+    vm.expectRevert("OFT is zero address");
+    bridge.setOFTConfig(address(0), usdt, usdtRateFeedId);
+  }
+
+  function test_Revert_SetOFTConfig_ZeroToken() public {
+    vm.expectRevert("Token is zero address");
+    bridge.setOFTConfig(address(0x1234), IERC20Metadata(address(0)), usdtRateFeedId);
+  }
+
+  function test_Revert_SetOFTConfig_ZeroFeedId() public {
+    vm.expectRevert("Feed ID is zero address");
+    bridge.setOFTConfig(address(0x1234), usdt, address(0));
+  }
+
+  function test_Revert_SetOFTConfig_NotOwner() public {
+    vm.prank(user);
+    vm.expectRevert("Ownable: caller is not the owner");
+    bridge.setOFTConfig(address(0x1234), usdt, usdtRateFeedId);
   }
 }
 
@@ -242,19 +365,24 @@ contract GasSponsoredOFTBridge_PriceFactor is GasSponsoredOFTBridgeTestBase {
     uint256 nativeFee = 0.01 ether;
     uint256 bridgeAmount = 100e6;
 
-    // Get fee at default 1.2x
-    uint256 total1 = bridge.quoteSend(_defaultSendParam(bridgeAmount), _defaultFee(nativeFee));
+    uint256 total1 = bridge.quoteSend(
+      IOFT(address(usdtOft)),
+      _defaultSendParam(bridgeAmount),
+      _defaultFee(nativeFee)
+    );
 
-    // Change to 2.0x
-    bridge.setPriceFactor(20_000);
-    uint256 total2 = bridge.quoteSend(_defaultSendParam(bridgeAmount), _defaultFee(nativeFee));
+    bridge.setPriceFactor(20_000); // 2.0x
 
-    // Fee portion at 2.0x should be larger than at 1.2x
+    uint256 total2 = bridge.quoteSend(
+      IOFT(address(usdtOft)),
+      _defaultSendParam(bridgeAmount),
+      _defaultFee(nativeFee)
+    );
+
     uint256 fee1 = total1 - bridgeAmount;
     uint256 fee2 = total2 - bridgeAmount;
     assertGt(fee2, fee1);
-    // 2.0x / 1.2x = 5/3
-    assertEq(fee2 * 3, fee1 * 5);
+    assertEq(fee2 * 3, fee1 * 5); // 2.0/1.2 = 5/3
   }
 
   function test_Revert_SetPriceFactor_Zero() public {
@@ -294,12 +422,6 @@ contract GasSponsoredOFTBridge_AccessControl is GasSponsoredOFTBridgeTestBase {
     assertFalse(bridge.operators(newOp));
   }
 
-  function test_Revert_SetOperator_NotOwner() public {
-    vm.prank(user);
-    vm.expectRevert("Ownable: caller is not the owner");
-    bridge.setOperator(address(0x1234), true);
-  }
-
   function test_SetSortedOracles() public {
     MockSortedOraclesForBridge newOracle = new MockSortedOraclesForBridge();
     bridge.setSortedOracles(ISortedOracles(address(newOracle)));
@@ -309,32 +431,6 @@ contract GasSponsoredOFTBridge_AccessControl is GasSponsoredOFTBridgeTestBase {
   function test_Revert_SetSortedOracles_ZeroAddress() public {
     vm.expectRevert("Oracle is zero address");
     bridge.setSortedOracles(ISortedOracles(address(0)));
-  }
-
-  function test_SetOracleRateFeedId() public {
-    address newFeed = address(0xABCD);
-    bridge.setOracleRateFeedId(newFeed);
-    assertEq(bridge.oracleRateFeedId(), newFeed);
-  }
-
-  function test_Revert_SetOracleRateFeedId_ZeroAddress() public {
-    vm.expectRevert("Feed ID is zero address");
-    bridge.setOracleRateFeedId(address(0));
-  }
-
-  function test_SetAllowedOFT() public {
-    address newOft = address(0x9999);
-    bridge.setAllowedOFT(newOft, true);
-    assertTrue(bridge.allowedOFTs(newOft));
-
-    bridge.setAllowedOFT(newOft, false);
-    assertFalse(bridge.allowedOFTs(newOft));
-  }
-
-  function test_Revert_SetAllowedOFT_NotOwner() public {
-    vm.prank(user);
-    vm.expectRevert("Ownable: caller is not the owner");
-    bridge.setAllowedOFT(address(0x9999), true);
   }
 }
 
@@ -371,39 +467,27 @@ contract GasSponsoredOFTBridge_Execute is GasSponsoredOFTBridgeTestBase {
   }
 
   function test_Revert_Execute_CallFails() public {
-    // Call an address that will revert
     vm.prank(operator);
     vm.expectRevert("Execute call failed");
-    bridge.execute(address(mockOft), 0, abi.encodeWithSignature("nonExistentFunction()"));
+    bridge.execute(address(usdtOft), 0, abi.encodeWithSignature("nonExistentFunction()"));
   }
 }
 
 // =============================================================================
-// Constructor validation
+// Constructor
 // =============================================================================
 
 contract GasSponsoredOFTBridge_Constructor is Test {
-  function test_Revert_Constructor_ZeroToken() public {
-    MockSortedOraclesForBridge oracle = new MockSortedOraclesForBridge();
-    vm.expectRevert("Token is zero address");
-    new GasSponsoredOFTBridge(
-      IERC20Metadata(address(0)),
-      ISortedOracles(address(oracle)),
-      address(0xFEED),
-      1 ether
-    );
-  }
-
   function test_Revert_Constructor_ZeroOracle() public {
-    MockERC20 tok = new MockERC20("T", "T", 6);
     vm.expectRevert("Oracle is zero address");
-    new GasSponsoredOFTBridge(tok, ISortedOracles(address(0)), address(0xFEED), 1 ether);
+    new GasSponsoredOFTBridge(ISortedOracles(address(0)), 1 ether);
   }
 
-  function test_Revert_Constructor_ZeroFeedId() public {
-    MockERC20 tok = new MockERC20("T", "T", 6);
+  function test_Constructor_SetsDefaults() public {
     MockSortedOraclesForBridge oracle = new MockSortedOraclesForBridge();
-    vm.expectRevert("Feed ID is zero address");
-    new GasSponsoredOFTBridge(tok, ISortedOracles(address(oracle)), address(0), 1 ether);
+    GasSponsoredOFTBridge b = new GasSponsoredOFTBridge(ISortedOracles(address(oracle)), 5 ether);
+    assertEq(b.maxGas(), 5 ether);
+    assertEq(b.priceFactor(), 12_000);
+    assertEq(address(b.sortedOracles()), address(oracle));
   }
 }

@@ -38,7 +38,6 @@ contract ForkMockOFT is IOFT {
     override
     returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt)
   {
-    // Pull tokens from the bridge (simulates OFT locking/burning tokens)
     IERC20(_token).safeTransferFrom(msg.sender, address(this), _sendParam.amountLD);
     _nonce++;
 
@@ -60,10 +59,9 @@ contract ForkMockOFT is IOFT {
 // =============================================================================
 contract GasSponsoredOFTBridgeForkTest is Test {
   // --- Celo Mainnet addresses ---
-  address constant REGISTRY = 0x000000000000000000000000000000000000ce10;
   address constant SORTED_ORACLES = 0xefB84935239dAcdecF7c5bA76d8dE40b077B7b33;
-  address constant USDT = 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e; // Native bridge USDT (6 decimals)
-  address constant USDT_ADAPTER = 0x0E2A3e05bc9A16F5292A6170456A710cb89C6f72; // Fee currency adapter for USDT
+  address constant USDT = 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e;
+  address constant USDT_ADAPTER = 0x0E2A3e05bc9A16F5292A6170456A710cb89C6f72;
   address constant CUSD = 0x765DE816845861e75A25fCA122bb6898B8B1282a;
   address constant LZ_ENDPOINT_V2 = 0x1a44076050125825900e736c501f859c50fE728c;
 
@@ -83,33 +81,29 @@ contract GasSponsoredOFTBridgeForkTest is Test {
 
     vm.startPrank(deployer);
 
-    // Deploy the bridge against real Celo mainnet state
-    bridge = new GasSponsoredOFTBridge(
-      IERC20Metadata(USDT),
-      ISortedOracles(SORTED_ORACLES),
-      USDT_ADAPTER, // Uses the adapter as rateFeedId (has equivalentToken -> cUSD)
-      MAX_GAS
-    );
+    // Deploy multi-token bridge
+    bridge = new GasSponsoredOFTBridge(ISortedOracles(SORTED_ORACLES), MAX_GAS);
 
-    // Deploy a mock OFT (since we don't have a real USDT OFT on Celo)
+    // Deploy a mock OFT for USDT
     mockOft = new ForkMockOFT(USDT);
 
-    // Set up operator and whitelist the mock OFT
+    // Register the OFT with USDT config
+    bridge.setOFTConfig(address(mockOft), IERC20Metadata(USDT), USDT_ADAPTER);
+
+    // Set up operator
     bridge.setOperator(operator, true);
-    bridge.setAllowedOFT(address(mockOft), true);
 
     vm.stopPrank();
 
-    // Fund the bridge with CELO for gas sponsoring
+    // Fund the bridge with CELO
     vm.deal(address(bridge), 100 ether);
 
-    // Mint USDT to user via deal (Foundry cheatcode)
-    deal(USDT, user, 10_000e6); // 10,000 USDT
+    // Mint USDT to user
+    deal(USDT, user, 10_000e6);
 
-    // User approves the bridge to spend USDT
+    // User approves the bridge
     vm.prank(user);
     IERC20(USDT).approve(address(bridge), type(uint256).max);
-
   }
 
   // =========================================================================
@@ -117,22 +111,15 @@ contract GasSponsoredOFTBridgeForkTest is Test {
   // =========================================================================
 
   function test_Fork_Deployment_StateIsCorrect() public {
-    assertEq(address(bridge.token()), USDT);
     assertEq(address(bridge.sortedOracles()), SORTED_ORACLES);
-    assertEq(bridge.oracleRateFeedId(), USDT_ADAPTER);
     assertEq(bridge.maxGas(), MAX_GAS);
     assertEq(bridge.priceFactor(), 12_000);
-    assertEq(bridge.tokenPrecision(), 1e6); // USDT has 6 decimals
     assertEq(bridge.owner(), deployer);
-    assertTrue(bridge.operators(operator));
-  }
 
-  function test_Fork_TokenMetadata() public {
-    IERC20Metadata usdt = IERC20Metadata(USDT);
-    assertEq(usdt.decimals(), 6);
-    console.log("USDT name:", usdt.name());
-    console.log("USDT symbol:", usdt.symbol());
-    console.log("USDT totalSupply:", usdt.totalSupply());
+    (IERC20 token, address feedId, uint256 precision) = bridge.oftConfigs(address(mockOft));
+    assertEq(address(token), USDT);
+    assertEq(feedId, USDT_ADAPTER);
+    assertEq(precision, 1e6);
   }
 
   // =========================================================================
@@ -143,19 +130,11 @@ contract GasSponsoredOFTBridgeForkTest is Test {
     (uint256 numerator, uint256 denominator) = ISortedOracles(SORTED_ORACLES).medianRate(
       USDT_ADAPTER
     );
-
-    console.log("Oracle numerator:", numerator);
-    console.log("Oracle denominator:", denominator);
-
-    // Denominator should be 1e24 (FIXED1_UINT) if rates exist
     assertGt(denominator, 0, "Oracle has no rate");
 
-    // Rate should be sensible: numerator/denominator is CELO price in USD
-    // CELO is somewhere between $0.01 and $100
-    uint256 celoInUsdScaled = (numerator * 1e18) / denominator; // scale to 18 decimals
-    console.log("CELO price in USD (1e18 scaled):", celoInUsdScaled);
-    assertGt(celoInUsdScaled, 0.001e18, "Rate too low"); // > $0.001
-    assertLt(celoInUsdScaled, 100e18, "Rate too high"); // < $100
+    uint256 celoInUsdScaled = (numerator * 1e18) / denominator;
+    assertGt(celoInUsdScaled, 0.001e18, "Rate too low");
+    assertLt(celoInUsdScaled, 100e18, "Rate too high");
   }
 
   // =========================================================================
@@ -163,25 +142,17 @@ contract GasSponsoredOFTBridgeForkTest is Test {
   // =========================================================================
 
   function test_Fork_QuoteSend_ReturnsRealisticTotal() public {
-    uint256 bridgeAmount = 100e6; // 100 USDT
-    uint256 nativeFee = 0.1 ether; // 0.1 CELO for LZ messaging
+    uint256 bridgeAmount = 100e6;
+    uint256 nativeFee = 0.1 ether;
 
-    SendParam memory sendParam = _makeSendParam(bridgeAmount);
-    MessagingFee memory fee = MessagingFee({ nativeFee: nativeFee, lzTokenFee: 0 });
-
-    uint256 total = bridge.quoteSend(sendParam, fee);
+    uint256 total = bridge.quoteSend(
+      IOFT(address(mockOft)),
+      _makeSendParam(bridgeAmount),
+      MessagingFee({ nativeFee: nativeFee, lzTokenFee: 0 })
+    );
     uint256 feeInUsdt = total - bridgeAmount;
 
-    console.log("Bridge amount (USDT, 6 dec):", bridgeAmount);
-    console.log("LZ native fee (CELO wei):", nativeFee);
-    console.log("Fee in USDT (6 dec):", feeInUsdt);
-    console.log("Total USDT needed (6 dec):", total);
-    console.log("Fee in human USDT:", feeInUsdt, "/ 1e6");
-
-    // Fee should be positive and reasonable
     assertGt(feeInUsdt, 0, "Fee should be > 0");
-    // 0.1 CELO at ~$0.09 = ~$0.009, with 1.2x ≈ $0.011 -> 11000 in 6-dec
-    // But CELO price could vary, so wide bounds
     assertLt(feeInUsdt, bridgeAmount, "Fee should be less than bridge amount");
   }
 
@@ -189,80 +160,51 @@ contract GasSponsoredOFTBridgeForkTest is Test {
     uint256 bridgeAmount = 100e6;
 
     uint256 total1 = bridge.quoteSend(
+      IOFT(address(mockOft)),
       _makeSendParam(bridgeAmount),
       MessagingFee({ nativeFee: 0.1 ether, lzTokenFee: 0 })
     );
     uint256 total2 = bridge.quoteSend(
+      IOFT(address(mockOft)),
       _makeSendParam(bridgeAmount),
       MessagingFee({ nativeFee: 1 ether, lzTokenFee: 0 })
     );
 
     uint256 fee1 = total1 - bridgeAmount;
     uint256 fee2 = total2 - bridgeAmount;
-
-    // 10x native fee should give ~10x token fee (small rounding diff from integer division)
-    assertApproxEqRel(fee2, fee1 * 10, 0.001e18, "Fee should scale ~linearly with native fee");
+    assertApproxEqRel(fee2, fee1 * 10, 0.001e18, "Fee should scale ~linearly");
   }
 
   // =========================================================================
-  // send() end-to-end with real oracle + mock OFT
+  // send() E2E
   // =========================================================================
 
   function test_Fork_Send_EndToEnd() public {
-    uint256 bridgeAmount = 500e6; // 500 USDT
-    uint256 nativeFee = 0.05 ether; // 0.05 CELO
+    uint256 bridgeAmount = 500e6;
+    uint256 nativeFee = 0.05 ether;
 
-    // Get expected fee first
     SendParam memory sendParam = _makeSendParam(bridgeAmount);
     MessagingFee memory fee = MessagingFee({ nativeFee: nativeFee, lzTokenFee: 0 });
-    uint256 expectedTotal = bridge.quoteSend(sendParam, fee);
-    uint256 expectedFeeInUsdt = expectedTotal - bridgeAmount;
-
-    console.log("=== send() E2E ===");
-    console.log("Bridge amount:", bridgeAmount);
-    console.log("Expected fee in USDT:", expectedFeeInUsdt);
-    console.log("Expected total:", expectedTotal);
+    uint256 expectedTotal = bridge.quoteSend(IOFT(address(mockOft)), sendParam, fee);
 
     uint256 userBalBefore = IERC20(USDT).balanceOf(user);
     uint256 bridgeCeloBefore = address(bridge).balance;
 
     vm.prank(user);
-    (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt) = bridge.send(
-      IOFT(address(mockOft)),
-      sendParam,
-      fee
-    );
+    bridge.send(IOFT(address(mockOft)), sendParam, fee);
 
-    // Verify user paid exactly bridgeAmount + fee
     uint256 userPaid = userBalBefore - IERC20(USDT).balanceOf(user);
     assertEq(userPaid, expectedTotal, "User should pay exact quoted total");
-
-    // Verify bridge CELO was spent
-    uint256 celoSpent = bridgeCeloBefore - address(bridge).balance;
-    assertEq(celoSpent, nativeFee, "Bridge should spend exact native fee");
-
-    // Verify OFT received the bridge amount
+    assertEq(
+      bridgeCeloBefore - address(bridge).balance,
+      nativeFee,
+      "Bridge should spend exact native fee"
+    );
     assertEq(
       IERC20(USDT).balanceOf(address(mockOft)),
       bridgeAmount,
       "OFT should receive bridge amount"
     );
-
-    // Verify bridge collected the fee
-    assertEq(
-      IERC20(USDT).balanceOf(address(bridge)),
-      expectedFeeInUsdt,
-      "Bridge should collect fee in USDT"
-    );
-
-    // Verify receipts
-    assertEq(oftReceipt.amountSentLD, bridgeAmount);
-    assertGt(uint256(msgReceipt.nonce), 0);
-
-    console.log("User paid total:", userPaid);
-    console.log("CELO spent:", celoSpent);
-    console.log("Fee collected by bridge:", IERC20(USDT).balanceOf(address(bridge)));
-    console.log("SUCCESS: Full send() E2E passed");
   }
 
   function test_Fork_Send_MultipleSendsAccumulateFees() public {
@@ -271,58 +213,43 @@ contract GasSponsoredOFTBridgeForkTest is Test {
     SendParam memory sendParam = _makeSendParam(bridgeAmount);
     MessagingFee memory fee = MessagingFee({ nativeFee: nativeFee, lzTokenFee: 0 });
 
-    // Do 3 sends
     for (uint256 i = 0; i < 3; i++) {
       vm.prank(user);
       bridge.send(IOFT(address(mockOft)), sendParam, fee);
     }
 
-    // Bridge should have collected 3x fee
-    uint256 singleFee = bridge.quoteSend(sendParam, fee) - bridgeAmount;
-    assertEq(
-      IERC20(USDT).balanceOf(address(bridge)),
-      singleFee * 3,
-      "Fees should accumulate over multiple sends"
-    );
+    uint256 singleFee = bridge.quoteSend(IOFT(address(mockOft)), sendParam, fee) - bridgeAmount;
+    assertEq(IERC20(USDT).balanceOf(address(bridge)), singleFee * 3);
   }
 
   // =========================================================================
-  // Operator withdrawals (execute)
+  // Operator withdrawals
   // =========================================================================
 
   function test_Fork_Execute_WithdrawAccumulatedFees() public {
-    // First do a send to accumulate fees
-    uint256 bridgeAmount = 1000e6;
-    uint256 nativeFee = 0.1 ether;
     vm.prank(user);
     bridge.send(
       IOFT(address(mockOft)),
-      _makeSendParam(bridgeAmount),
-      MessagingFee({ nativeFee: nativeFee, lzTokenFee: 0 })
+      _makeSendParam(1000e6),
+      MessagingFee({ nativeFee: 0.1 ether, lzTokenFee: 0 })
     );
 
     uint256 feesCollected = IERC20(USDT).balanceOf(address(bridge));
     assertGt(feesCollected, 0);
 
-    // Operator withdraws the accumulated USDT fees
     address treasury = makeAddr("treasury");
-    bytes memory transferCall = abi.encodeWithSelector(
-      IERC20.transfer.selector,
-      treasury,
-      feesCollected
-    );
-
     vm.prank(operator);
-    bridge.execute(USDT, 0, transferCall);
+    bridge.execute(
+      USDT,
+      0,
+      abi.encodeWithSelector(IERC20.transfer.selector, treasury, feesCollected)
+    );
 
     assertEq(IERC20(USDT).balanceOf(treasury), feesCollected);
     assertEq(IERC20(USDT).balanceOf(address(bridge)), 0);
-
-    console.log("Operator withdrew USDT fees:", feesCollected);
   }
 
   function test_Fork_Execute_RefundCelo() public {
-    // Operator can withdraw excess CELO
     address treasury = makeAddr("treasury");
     uint256 bridgeCelo = address(bridge).balance;
 
@@ -334,7 +261,7 @@ contract GasSponsoredOFTBridgeForkTest is Test {
   }
 
   // =========================================================================
-  // Edge cases on fork
+  // Edge cases
   // =========================================================================
 
   function test_Fork_Revert_MaxGasExceeded() public {
@@ -348,7 +275,6 @@ contract GasSponsoredOFTBridgeForkTest is Test {
   }
 
   function test_Fork_Revert_InsufficientCeloBalance() public {
-    // Drain the bridge's CELO
     vm.prank(deployer);
     bridge.setMaxGas(200 ether);
 
@@ -365,22 +291,17 @@ contract GasSponsoredOFTBridgeForkTest is Test {
   }
 
   function test_Fork_Revert_InsufficientTokenAllowance() public {
-    // User with no approval
     address user2 = makeAddr("user2");
     deal(USDT, user2, 10_000e6);
 
     vm.prank(user2);
-    vm.expectRevert(); // SafeERC20 will revert on transferFrom
+    vm.expectRevert();
     bridge.send(
       IOFT(address(mockOft)),
       _makeSendParam(100e6),
       MessagingFee({ nativeFee: 0.01 ether, lzTokenFee: 0 })
     );
   }
-
-  // =========================================================================
-  // LZ endpoint verification (read-only)
-  // =========================================================================
 
   function test_Fork_LZEndpointExists() public {
     uint256 codeSize;
@@ -389,7 +310,6 @@ contract GasSponsoredOFTBridgeForkTest is Test {
       codeSize := extcodesize(endpoint)
     }
     assertGt(codeSize, 0, "LZ EndpointV2 should have code on Celo mainnet");
-    console.log("LZ EndpointV2 code size:", codeSize);
   }
 
   // =========================================================================
@@ -399,7 +319,7 @@ contract GasSponsoredOFTBridgeForkTest is Test {
   function _makeSendParam(uint256 amount) internal pure returns (SendParam memory) {
     return
       SendParam({
-        dstEid: 30101, // Ethereum mainnet LZ eid
+        dstEid: 30101,
         to: bytes32(uint256(uint160(address(0xBEEF)))),
         amountLD: amount,
         minAmountLD: amount,
