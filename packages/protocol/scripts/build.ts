@@ -2,78 +2,57 @@
 
 import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
-import fsExtraPkg from 'fs-extra'
+import { existsSync, readFileSync } from 'fs'
 import minimist, { ParsedArgs } from 'minimist'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
-import { contractPackages, CoreContracts, ImplContracts, Interfaces, ROOT_DIR } from './consts'
+import { CoreContracts, ImplContracts, Interfaces, ROOT_DIR } from './consts'
 
-const { existsSync, readJSONSync } = fsExtraPkg
+const readJSON = (file: string) => JSON.parse(readFileSync(file, 'utf-8'))
 
-const BUILD_DIR = path.join(ROOT_DIR, process.env.BUILD_DIR ?? './build')
+const FOUNDRY_OUT_05 = 'out-truffle-compat'
+const FOUNDRY_OUT_08 = 'out-truffle-compat-0.8'
 
 function exec(cmd: string) {
   return execSync(cmd, { cwd: ROOT_DIR, stdio: 'inherit' })
 }
 
 function hasEmptyBytecode(contract: any) {
-  return contract.bytecode === '0x'
+  const bytecode =
+    typeof contract.bytecode === 'string' ? contract.bytecode : contract.bytecode?.object
+  return !bytecode || bytecode === '0x'
 }
 
-function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
-  console.info(`protocol: Compiling solidity to ${outdir}`)
+function compile({ coreContractsOnly }: BuildTargets) {
+  console.info(`protocol: Compiling solidity with foundry (truffle-compat profiles)`)
 
-  // the reason to generate a different folder is to avoid path collisions, which could be very dangerous
-  for (const contractPackage of contractPackages) {
-    console.info(`Building Contracts for package ${contractPackage.name}`)
-
-    const contractPath = path.join(
-      './',
-      contractPackage.folderPath,
-      contractPackage.path,
-      contractPackage.contractsFolder
-    )
-    if (!existsSync(contractPath)) {
-      console.info(`Contract package named ${contractPackage.name} doesn't exist`)
-      continue
-    }
-
-    exec(
-      `yarn run truffle compile --silent --contracts_directory=${contractPath} --contracts_build_directory=${outdir}/contracts-${contractPackage.name} --config ${contractPackage.truffleConfig} --verbose-rpc` // todo change to outdir
-    )
-  }
-
-  // compile everything else
-  try {
-    exec(
-      `yarn run --silent truffle compile --contracts_directory="./contracts/" --build_directory=${outdir}`
-    )
-  } catch (e) {
-    console.error(e)
-    console.info(
-      `
-
-    If error is something like "using solc 0.5.13, but  specify "pragma solidity >=0.8.7 <0.8.20".
-    Then try to delete the 0.8 folder inside of contracts folder (not the contracts-0.8 folder)
-
-    `
-    )
-    process.exit(1)
-  }
+  exec(`FOUNDRY_PROFILE=truffle-compat forge build`)
+  exec(`FOUNDRY_PROFILE=truffle-compat8 forge build`)
 
   const contracts = coreContractsOnly ? CoreContracts : ImplContracts
-  // check that there were no errors
   for (const contractName of contracts) {
     try {
-      const artifactPath = `${outdir}/contracts/${contractName}.json`
-      const artifactPath8 = `${outdir}/contracts-0.8/${contractName}.json`
-      let is08 = false
-      // This is issuing a warning: https://github.com/celo-org/celo-monorepo/issues/10564
-      if (existsSync(artifactPath8)) {
-        is08 = true
+      const artifactPath05 = path.join(
+        ROOT_DIR,
+        FOUNDRY_OUT_05,
+        `${contractName}.sol`,
+        `${contractName}.json`
+      )
+      const artifactPath08 = path.join(
+        ROOT_DIR,
+        FOUNDRY_OUT_08,
+        `${contractName}.sol`,
+        `${contractName}.json`
+      )
+      const artifactPath = existsSync(artifactPath08) ? artifactPath08 : artifactPath05
+      if (!existsSync(artifactPath)) {
+        console.debug(
+          `WARNING: ${contractName} artifact could not be fetched. Maybe it doesn't exist?`
+        )
+        continue
       }
-      const fileStr = readJSONSync(is08 ? artifactPath8 : artifactPath)
-      if (hasEmptyBytecode(fileStr)) {
+      const artifact = readJSON(artifactPath)
+      if (hasEmptyBytecode(artifact)) {
         console.error(
           `${contractName} has empty bytecode. Maybe you forgot to fully implement an interface?`
         )
@@ -81,46 +60,30 @@ function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
       }
     } catch (e) {
       console.info(e)
-      console.debug(
-        `WARNING: ${contractName} artifact could not be fetched. Maybe it doesn't exist?`
-      )
+      console.debug(`WARNING: failed to inspect artifact for ${contractName}`)
     }
   }
 }
 
-function generateFilesForTruffle({ coreContractsOnly, truffleTypes: outdir }: BuildTargets) {
-  // eslint-disable-next-line
-  for (let externalContractPackage of contractPackages) {
-    const outdirExternal = outdir + '-' + externalContractPackage.name
-    console.info(
-      `protocol: Generating Truffle Types for external dependency ${externalContractPackage.name} to ${outdirExternal}`
-    )
+function getContractList(coreContractsOnly: boolean) {
+  return coreContractsOnly ? CoreContracts : [...CoreContracts, 'Proxy', ...Interfaces]
+}
 
-    const artifactPath = `${BUILD_DIR}/contracts-${externalContractPackage.name}/*.json`
-    exec(
-      `yarn run --silent typechain --target=truffle --outDir "${outdirExternal}" "${artifactPath}"`
-    )
-  }
-
-  console.info(`protocol: Generating Truffle Types to ${outdir}`)
-  exec(`rm -rf "${outdir}"`)
-
-  const globPattern = coreContractsOnly
-    ? `${BUILD_DIR}/contracts/@(${CoreContracts.join('|')}).json`
-    : `${BUILD_DIR}/contracts/*.json`
-
-  exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}"`)
+function foundryGlobs(contractList: string[]): string[] {
+  const alternation = contractList.join('|')
+  return [FOUNDRY_OUT_05, FOUNDRY_OUT_08].map(
+    (dir) => `${dir}/@(${alternation}).sol/@(${alternation}).json`
+  )
 }
 
 function generateFilesForEthers({ coreContractsOnly, ethersTypes: outdir }: BuildTargets) {
   console.info(`protocol: Generating Ethers Types to ${outdir}`)
   exec(`rm -rf "${outdir}"`)
 
-  const contractKitContracts = getContractList(coreContractsOnly)
-
-  const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
-
-  exec(`yarn run --silent typechain --target=ethers-v5 --outDir "${outdir}" "${globPattern}"`)
+  const globs = foundryGlobs(getContractList(coreContractsOnly))
+    .map((g) => `"${g}"`)
+    .join(' ')
+  exec(`yarn run --silent typechain --target=ethers-v5 --outDir "${outdir}" ${globs}`)
 }
 
 async function generateFilesForContractKit({ coreContractsOnly, web3Types: outdir }: BuildTargets) {
@@ -128,33 +91,16 @@ async function generateFilesForContractKit({ coreContractsOnly, web3Types: outdi
   exec(`rm -rf ${outdir}`)
   const relativePath = path.relative(ROOT_DIR, outdir)
 
-  const contractKitContracts = getContractList(coreContractsOnly)
-
-  const globPattern = `${BUILD_DIR}/contracts*/@(${contractKitContracts.join('|')}).json`
-
   const cwd = process.cwd()
 
-  await tsGenerator(
-    { cwd, loggingLvl: 'info' },
-    new Web3V1Celo({
-      cwd,
-      rawConfig: {
-        files: globPattern,
-        outDir: relativePath,
-      },
-    })
-  )
-
-  for (const externalContractPackage of contractPackages) {
+  for (const glob of foundryGlobs(getContractList(coreContractsOnly))) {
     await tsGenerator(
       { cwd, loggingLvl: 'info' },
       new Web3V1Celo({
         cwd,
         rawConfig: {
-          files: `${BUILD_DIR}/contracts-${
-            externalContractPackage.name
-          }/@(${externalContractPackage.contracts.join('|')}).json`,
-          outDir: path.join(relativePath, externalContractPackage.name),
+          files: glob,
+          outDir: relativePath,
         },
       })
     )
@@ -166,7 +112,6 @@ async function generateFilesForContractKit({ coreContractsOnly, web3Types: outdi
 const _buildTargets: ParsedArgs = {
   _: [] as string[],
   solidity: undefined,
-  truffleTypes: undefined,
   web3Types: undefined,
   ethersTypes: undefined,
 } as const
@@ -174,16 +119,9 @@ type BuildTargets = Record<keyof typeof _buildTargets, string> & {
   coreContractsOnly: boolean
 }
 
-function getContractList(coreContractsOnly: boolean) {
-  return coreContractsOnly ? CoreContracts : [...CoreContracts, 'Proxy', ...Interfaces]
-}
-
 async function main(buildTargets: BuildTargets) {
   if (buildTargets.solidity) {
     compile(buildTargets)
-  }
-  if (buildTargets.truffleTypes) {
-    generateFilesForTruffle(buildTargets)
   }
   if (buildTargets.ethersTypes) {
     generateFilesForEthers(buildTargets)
