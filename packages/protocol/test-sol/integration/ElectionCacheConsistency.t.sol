@@ -2,16 +2,19 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Accounts.sol";
-import "@celo-contracts/common/Freezer.sol";
-import "@celo-contracts/common/Registry.sol";
+import { FixidityLib } from "@celo-contracts/common/FixidityLib.sol";
+import { Accounts } from "@celo-contracts/common/Accounts.sol";
+import { Freezer } from "@celo-contracts/common/Freezer.sol";
+// Registry.sol is imported so its bytecode is in the artifacts —
+// TestWithUtils.setupRegistry() uses deployCodeTo("Registry.sol", ...).
+import { Registry } from "@celo-contracts/common/Registry.sol";
 
-import "@celo-contracts/governance/Election.sol";
-import "@celo-contracts/governance/LockedGold.sol";
-import "@celo-contracts/governance/Governance.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
-import "@celo-contracts/identity/test/MockRandom.sol";
+import { Election } from "@celo-contracts/governance/Election.sol";
+import { LockedGold } from "@celo-contracts/governance/LockedGold.sol";
+import { Governance } from "@celo-contracts/governance/Governance.sol";
+import { Proposals } from "@celo-contracts/governance/Proposals.sol";
+import { MockValidators } from "@celo-contracts/governance/test/MockValidators.sol";
+import { MockRandom } from "@celo-contracts/identity/test/MockRandom.sol";
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
