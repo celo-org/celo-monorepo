@@ -145,7 +145,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
     address[] memory members = new address[](1);
     members[0] = actor("validatorMember");
     for (uint256 i = 0; i < n; i++) {
-      address g = address(uint160(0xA000 + allGroups.length));
+      address g = address(uint160(allGroups.length + 0x10));
       validators.setMembers(g, members);
       address greater = allGroups.length == 0 ? address(0) : allGroups[allGroups.length - 1];
       // Mark eligible via Election; Election restricts this to the registered
