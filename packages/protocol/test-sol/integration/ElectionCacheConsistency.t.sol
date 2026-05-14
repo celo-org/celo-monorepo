@@ -37,14 +37,12 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
 
   // ---- actors ----
   address voter = actor("voter");
-  address proposer = address(this);
   address approver = actor("approver");
 
   // ---- election config ----
   uint256 constant ELECTABLE_MIN = 1;
   uint256 constant ELECTABLE_MAX = 1;
   uint256 constant MAX_NUM_GROUPS = 3;
-  uint256 constant ELECTABILITY_THRESHOLD = 0; // permissive
 
   uint256 constant UNLOCKING_PERIOD = 3 * 86400;
 
@@ -121,7 +119,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
 
     // Create proposer + voter as registered accounts (no vote-signer
     // authorization -- direct registered-account path).
-    accounts.createAccount(); // proposer = address(this)
+    accounts.createAccount();
     vm.prank(voter);
     accounts.createAccount();
 
