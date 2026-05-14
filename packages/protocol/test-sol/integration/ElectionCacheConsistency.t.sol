@@ -211,7 +211,11 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
 
     (uint256 yes, , ) = governance.getVoteTotals(proposalId);
     assertEq(yes, SMALL_LOCK, "yes votes equal the current small lock, not the historical sum");
-    assertLt(yes, CYCLES * PER_CYCLE_LOCK / 1000, "yes votes nowhere near accumulated historical locks");
+    assertLt(
+      yes,
+      (CYCLES * PER_CYCLE_LOCK) / 1000,
+      "yes votes nowhere near accumulated historical locks"
+    );
   }
 
   // Same as test_multiCycle_cacheClearsEveryRevoke but with the mainnet
@@ -436,21 +440,33 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
     values[0] = 0;
     address[] memory destinations = new address[](1);
     destinations[0] = REGISTRY_ADDRESS;
-    bytes memory data = abi.encodeWithSignature("setAddressFor(string,address)", "dummy", address(0x1));
+    bytes memory data = abi.encodeWithSignature(
+      "setAddressFor(string,address)",
+      "dummy",
+      address(0x1)
+    );
     uint256[] memory dataLengths = new uint256[](1);
     dataLengths[0] = data.length;
 
     return governance.propose.value(MIN_DEPOSIT)(values, destinations, data, dataLengths, "url");
   }
 
-  function _neighbors(address group, uint256 increment) internal view returns (address lesser, address greater) {
-    (address[] memory keys, uint256[] memory vals) = election.getTotalVotesForEligibleValidatorGroups();
+  function _neighbors(
+    address group,
+    uint256 increment
+  ) internal view returns (address lesser, address greater) {
+    (address[] memory keys, uint256[] memory vals) = election
+      .getTotalVotesForEligibleValidatorGroups();
     uint256 newValue = election.getTotalVotesForGroup(group) + increment;
     return _findNeighbors(keys, vals, group, newValue);
   }
 
-  function _neighborsForDecrement(address group, uint256 decrement) internal view returns (address lesser, address greater) {
-    (address[] memory keys, uint256[] memory vals) = election.getTotalVotesForEligibleValidatorGroups();
+  function _neighborsForDecrement(
+    address group,
+    uint256 decrement
+  ) internal view returns (address lesser, address greater) {
+    (address[] memory keys, uint256[] memory vals) = election
+      .getTotalVotesForEligibleValidatorGroups();
     uint256 current = election.getTotalVotesForGroup(group);
     uint256 newValue = current >= decrement ? current - decrement : 0;
     return _findNeighbors(keys, vals, group, newValue);
