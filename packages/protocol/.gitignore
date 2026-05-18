@@ -45,8 +45,9 @@ wagmi.config.js.map
 
 abis/src-generated/
 abis/lib/
-# these are copied from contracts-08 folder for purposes of publishing to npm
-contracts/0.8
+# Staging dir assembled by `yarn utils:prepare-contracts-and-abis-publishing`
+# from contracts/ and contracts-0.8/; npm publish runs from here.
+contracts-package-abi/
 
 broadcast/
 

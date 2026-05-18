@@ -11,9 +11,9 @@ import {
   AliasedContracts,
   BUILD_EXECUTABLE,
   BuildTarget,
-  CONTRACTS_08_PACKAGE_DESTINATION_DIR,
   CONTRACTS_08_SOURCE_DIR,
   CONTRACTS_PACKAGE_SRC_DIR,
+  CONTRACTS_PACKAGE_STAGING_DIR,
   PublishContracts,
   TSCONFIG_PATH,
 } from './consts'
@@ -30,7 +30,7 @@ try {
   fs.writeFileSync(TSCONFIG_PATH, JSON.stringify(tsconfig, null, 4))
 
   // Start from scratch
-  rmrfSync([ABIS_BUILD_DIR, ABIS_DIST_DIR, CONTRACTS_08_PACKAGE_DESTINATION_DIR])
+  rmrfSync([ABIS_BUILD_DIR, ABIS_DIST_DIR, CONTRACTS_PACKAGE_STAGING_DIR])
   fs.mkdirSync(ABIS_BUILD_DIR, { recursive: true })
   fs.mkdirSync(ABIS_DIST_DIR, { recursive: true })
 
@@ -279,13 +279,20 @@ function prepareAbisPackageJson(exports: Exports) {
 }
 
 function prepareContractsPackage() {
-  const contracts08CpCommand = `cp -r ${CONTRACTS_08_SOURCE_DIR} ${CONTRACTS_08_PACKAGE_DESTINATION_DIR}`
-  log(contracts08CpCommand)
-  child_process.execSync(contracts08CpCommand)
+  // Assemble the staging dir from the source trees. We never mutate
+  // CONTRACTS_PACKAGE_SRC_DIR or CONTRACTS_08_SOURCE_DIR — the published
+  // tarball is built entirely under CONTRACTS_PACKAGE_STAGING_DIR.
+  fs.mkdirSync(CONTRACTS_PACKAGE_STAGING_DIR, { recursive: true })
+  const cp05 = `cp -R ${CONTRACTS_PACKAGE_SRC_DIR}/. ${CONTRACTS_PACKAGE_STAGING_DIR}/`
+  log(cp05)
+  child_process.execSync(cp05)
+  const cp08 = `cp -R ${CONTRACTS_08_SOURCE_DIR} ${path.join(CONTRACTS_PACKAGE_STAGING_DIR, '0.8')}`
+  log(cp08)
+  child_process.execSync(cp08)
 
   if (process.env.RELEASE_VERSION) {
     log('Replacing @celo/contracts version with RELEASE_VERSION)')
-    const packageJsonPath = path.join(CONTRACTS_PACKAGE_SRC_DIR, 'package.json')
+    const packageJsonPath = path.join(CONTRACTS_PACKAGE_STAGING_DIR, 'package.json')
     replacePackageVersionAndMakePublic(packageJsonPath)
 
     return
