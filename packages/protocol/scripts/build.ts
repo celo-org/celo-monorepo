@@ -8,7 +8,17 @@ import path from 'path'
 import { tsGenerator } from 'ts-generator'
 import { contractPackages, CoreContracts, ImplContracts, Interfaces, ROOT_DIR } from './consts'
 
-const readJSON = (file: string) => JSON.parse(readFileSync(file, 'utf-8'))
+type Bytecode = string | { object?: string } | null | undefined
+
+interface ContractArtifact {
+  abi?: unknown
+  bytecode?: Bytecode
+  deployedBytecode?: Bytecode
+  contractName?: string
+}
+
+const readJSON = (file: string): ContractArtifact =>
+  JSON.parse(readFileSync(file, 'utf-8')) as ContractArtifact
 
 const FOUNDRY_OUT_05 = 'out-truffle-compat'
 const FOUNDRY_OUT_08 = 'out-truffle-compat-0.8'
@@ -17,13 +27,13 @@ function exec(cmd: string) {
   return execSync(cmd, { cwd: ROOT_DIR, stdio: 'inherit' })
 }
 
-function hasEmptyBytecode(contract: any) {
+function hasEmptyBytecode(contract: ContractArtifact) {
   const bytecode =
     typeof contract.bytecode === 'string' ? contract.bytecode : contract.bytecode?.object
   return !bytecode || bytecode === '0x'
 }
 
-function normalizeBytecode(bytecode: any): string {
+function normalizeBytecode(bytecode: Bytecode): string {
   if (typeof bytecode === 'string') return bytecode
   return bytecode?.object ?? '0x'
 }
