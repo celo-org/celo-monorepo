@@ -76,6 +76,16 @@ jobs:
         shell: bash
         run: yarn
 
+      - name: Install Foundry
+        # foundry-toolchain v1.7.0 https://github.com/foundry-rs/foundry-toolchain/releases/tag/v1.7.0
+        uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
+        with:
+          # TODO: Standardize Foundry version across workflows https://github.com/celo-org/celo-monorepo/issues/11714
+          version: 'v1.0.0'
+      - name: Install forge dependencies
+        working-directory: packages/protocol
+        run: forge install
+
       - name: Determine release type and version (or dry run)
         # This is what sets the RELEASE_TYPE and RELEASE_VERSION env variables
         run: yarn --silent release:determine-release-version >> "$GITHUB_ENV"
