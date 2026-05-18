@@ -1,6 +1,6 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import path from 'path'
-import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
+import { SOLIDITY_05_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 
 export const ROOT_DIR = path.join(__dirname, '../')
 export const CONTRACTS_PACKAGE_SRC_DIR = path.join(__dirname, '../contracts')
@@ -91,18 +91,13 @@ export const OtherContracts = [
   'UsingRegistry',
 ]
 
-export const contractPackages = [MENTO_PACKAGE, SOLIDITY_08_PACKAGE].filter(Boolean)
+export const contractPackages = [SOLIDITY_05_PACKAGE, SOLIDITY_08_PACKAGE]
 
 export const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract'] as const
 
 export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreContracts)
 
-export const PublishContracts = [
-  ...CoreContracts,
-  ...Interfaces,
-  PROXY_CONTRACT,
-  ...MENTO_PACKAGE.contracts,
-]
+export const PublishContracts = [...CoreContracts, ...Interfaces, PROXY_CONTRACT]
 
 export const AliasedContracts = {
   [CeloContractName.GoldToken]: CeloContractName.CeloToken,

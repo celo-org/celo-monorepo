@@ -2,11 +2,11 @@
 
 import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
-import { existsSync, readFileSync } from 'fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs'
 import minimist, { ParsedArgs } from 'minimist'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
-import { CoreContracts, ImplContracts, Interfaces, ROOT_DIR } from './consts'
+import { contractPackages, CoreContracts, ImplContracts, Interfaces, ROOT_DIR } from './consts'
 
 const readJSON = (file: string) => JSON.parse(readFileSync(file, 'utf-8'))
 
@@ -23,7 +23,48 @@ function hasEmptyBytecode(contract: any) {
   return !bytecode || bytecode === '0x'
 }
 
-function compile({ coreContractsOnly }: BuildTargets) {
+function normalizeBytecode(bytecode: any): string {
+  if (typeof bytecode === 'string') return bytecode
+  return bytecode?.object ?? '0x'
+}
+
+// Foundry artifacts are nested as `<outDir>/<Name>.sol/<Name>.json` and use
+// `{abi, bytecode: {object,...}, deployedBytecode: {...}, ...}`. The publishing
+// pipeline expects the legacy truffle-style flat layout
+// `<destDir>/<Name>.json` with `{contractName, abi, bytecode, deployedBytecode}`.
+function emitTruffleStyleArtifacts(outdir: string) {
+  for (const pkg of contractPackages) {
+    if (!pkg.forgeOutDir || !pkg.destDir) continue
+    const forgeDir = path.join(ROOT_DIR, pkg.forgeOutDir)
+    if (!existsSync(forgeDir)) continue
+
+    const destDir = path.join(outdir, pkg.destDir)
+    mkdirSync(destDir, { recursive: true })
+
+    for (const entry of readdirSync(forgeDir)) {
+      if (!entry.endsWith('.sol')) continue
+      const contractName = entry.slice(0, -'.sol'.length)
+      const artifactPath = path.join(forgeDir, entry, `${contractName}.json`)
+      if (!existsSync(artifactPath)) continue
+      const artifact = readJSON(artifactPath)
+      writeFileSync(
+        path.join(destDir, `${contractName}.json`),
+        JSON.stringify(
+          {
+            contractName,
+            abi: artifact.abi,
+            bytecode: normalizeBytecode(artifact.bytecode),
+            deployedBytecode: normalizeBytecode(artifact.deployedBytecode),
+          },
+          null,
+          2
+        )
+      )
+    }
+  }
+}
+
+function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
   console.info(`protocol: Compiling solidity with foundry (truffle-compat profiles)`)
 
   exec(`FOUNDRY_PROFILE=truffle-compat forge build`)
@@ -62,6 +103,11 @@ function compile({ coreContractsOnly }: BuildTargets) {
       console.info(e)
       console.debug(`WARNING: failed to inspect artifact for ${contractName}`)
     }
+  }
+
+  if (outdir) {
+    console.info(`protocol: Writing truffle-style artifacts to ${outdir}`)
+    emitTruffleStyleArtifacts(path.resolve(outdir))
   }
 }
 

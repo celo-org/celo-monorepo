@@ -3,7 +3,7 @@ import * as child_process from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
 import { sync as rmrfSync } from 'rimraf'
-import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
+import { SOLIDITY_05_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 import {
   ABIS_BUILD_DIR,
   ABIS_DIST_DIR,
@@ -40,10 +40,10 @@ try {
   // Generate web3 typings
   build(`--web3Types ${path.join(ABIS_BUILD_DIR, 'web3')}`)
 
-  // Merge contracts-0.8, contracts-mento, etc.. at the root of the build dir
+  // Merge per-package subfolders at the root of the build dir
   log('Merging files at the root of the build dir')
   mergeFromFolder(
-    ['contracts', `contracts-${MENTO_PACKAGE.name}`, `contracts-${SOLIDITY_08_PACKAGE.name}`],
+    [SOLIDITY_05_PACKAGE.destDir, SOLIDITY_08_PACKAGE.destDir],
     path.join(ABIS_BUILD_DIR)
   )
 
@@ -307,7 +307,9 @@ function lsRecursive(dir: string): string[] {
 
 function build(cmd: string) {
   log(`Running build for ${cmd}`)
-  child_process.execSync(`BUILD_DIR=./build ts-node ${BUILD_EXECUTABLE} ${cmd}`, {
+  // --preferTsExts: stale compiled .js files live alongside .ts in scripts/.
+  // Without this flag ts-node resolves `./consts` to the stale consts.js.
+  child_process.execSync(`BUILD_DIR=./build ts-node --preferTsExts ${BUILD_EXECUTABLE} ${cmd}`, {
     stdio: 'inherit',
   })
 }
