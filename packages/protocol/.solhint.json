@@ -1,8 +1,0 @@
-{
-  "extends": "solhint:default",
-  "rules": {
-    "function-max-lines": "off",
-    "max-line-length": "off",
-    "ordering": "warn"
-  }
-}
