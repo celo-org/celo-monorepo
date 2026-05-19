@@ -12,8 +12,8 @@ on:
       - 'packages/protocol/contracts-0.8/**'
       - 'packages/protocol/lib/**'
       - 'packages/protocol/scripts/**'
-      - '!packages/protocol/scripts/foundry/**'  
-      - '!packages/protocol/scripts/truffle/**' 
+      - '!packages/protocol/scripts/foundry/**'
+      - '!packages/protocol/scripts/truffle/**'
 
   # pull requests result in dry runs, since no git tag is present unless current branch folllows release branch pattern
   pull_request:
@@ -24,8 +24,7 @@ on:
       - 'packages/protocol/contracts-0.8/**'
       - 'packages/protocol/lib/**'
       - 'packages/protocol/scripts/**'
-      - '!packages/protocol/scripts/foundry/**'  
-      - '!packages/protocol/scripts/truffle/**'  
+      - '!packages/protocol/scripts/foundry/**'
      
   release:
     types: [released]

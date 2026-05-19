@@ -20,11 +20,9 @@ echo "Forge version: $($FORGE --version)"
 # Start a local anvil instance
 $PWD/scripts/foundry/start_anvil.sh --celo
 
-# build standard forge artifacts, needed to deploy precompiles
+# Build the libraries
 FOUNDRY_PROFILE=truffle-compat forge build
-
-# build standard forge artifacts, needed to deploy precompiles
-forge build # TODO is this duplicated?
+FOUNDRY_PROFILE=truffle-compat8 forge build
 
 # Deploy libraries to the anvil instance
 source $PWD/scripts/foundry/deploy_libraries.sh
