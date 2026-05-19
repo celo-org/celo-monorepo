@@ -1,11 +1,22 @@
 /* tslint:disable no-console */
 
+// Flag ordering:
+//   --solidity <outdir>   Runs `forge build` and writes truffle-style flat JSONs
+//                         ({contractName, abi, bytecode, deployedBytecode}) to
+//                         <outdir>/contracts/ and <outdir>/contracts-0.8/.
+//   --web3Types <outdir>  Reads the truffle-style JSONs (set BUILD_DIR to point
+//                         at the same dir --solidity wrote to) and generates
+//                         web3 typings. REQUIRES --solidity to have run first.
+//   --ethersTypes <outdir> Same as --web3Types but for ethers-v5. REQUIRES
+//                         --solidity to have run first.
+
 import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs'
 import minimist, { ParsedArgs } from 'minimist'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
+import { SOLIDITY_05_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 import { contractPackages, CoreContracts, ImplContracts, Interfaces, ROOT_DIR } from './consts'
 
 type Bytecode = string | { object?: string } | null | undefined
@@ -51,8 +62,7 @@ function emitTruffleStyleArtifacts(outdir: string) {
     const destDir = path.join(outdir, pkg.destDir)
     mkdirSync(destDir, { recursive: true })
 
-    for (const entry of readdirSync(forgeDir)) {
-      if (!entry.endsWith('.sol')) continue
+    for (const entry of readdirSync(forgeDir).filter((e) => e.endsWith('.sol'))) {
       const contractName = entry.slice(0, -'.sol'.length)
       const artifactPath = path.join(forgeDir, entry, `${contractName}.json`)
       if (!existsSync(artifactPath)) continue
@@ -125,18 +135,40 @@ function getContractList(coreContractsOnly: boolean) {
   return coreContractsOnly ? CoreContracts : [...CoreContracts, 'Proxy', ...Interfaces]
 }
 
-function foundryGlobs(contractList: string[]): string[] {
+// Truffle-style flat artifacts directory that `--solidity` writes to and that
+// `--web3Types` / `--ethersTypes` then read. Defaults to ./build (matching the
+// BUILD_DIR env convention used by package.json's build scripts).
+const BUILD_DIR = path.resolve(ROOT_DIR, process.env.BUILD_DIR ?? './build')
+
+function truffleStyleGlobs(contractList: string[]): string[] {
   const alternation = contractList.join('|')
-  return [FOUNDRY_OUT_05, FOUNDRY_OUT_08].map(
-    (dir) => `${dir}/@(${alternation}).sol/@(${alternation}).json`
+  // Matches the layout emitTruffleStyleArtifacts() writes: ${BUILD_DIR}/<destDir>/<Name>.json.
+  return [SOLIDITY_05_PACKAGE.destDir, SOLIDITY_08_PACKAGE.destDir].map(
+    (dir) => `${BUILD_DIR}/${dir}/@(${alternation}).json`
   )
+}
+
+// Fails loudly so callers see the ordering requirement instead of a cryptic
+// typechain error (e.g. "json.bytecode.match is not a function") if --solidity
+// hasn't been run yet.
+function assertTruffleArtifactsExist() {
+  for (const sub of [SOLIDITY_05_PACKAGE.destDir, SOLIDITY_08_PACKAGE.destDir]) {
+    const dir = path.join(BUILD_DIR, sub)
+    if (!existsSync(dir)) {
+      throw new Error(
+        `Truffle-style artifacts not found at ${dir}. Run \`build.ts --solidity ${BUILD_DIR}\` first ` +
+          `(or set BUILD_DIR to the dir that --solidity wrote to).`
+      )
+    }
+  }
 }
 
 function generateFilesForEthers({ coreContractsOnly, ethersTypes: outdir }: BuildTargets) {
   console.info(`protocol: Generating Ethers Types to ${outdir}`)
+  assertTruffleArtifactsExist()
   exec(`rm -rf "${outdir}"`)
 
-  const globs = foundryGlobs(getContractList(coreContractsOnly))
+  const globs = truffleStyleGlobs(getContractList(coreContractsOnly))
     .map((g) => `"${g}"`)
     .join(' ')
   exec(`yarn run --silent typechain --target=ethers-v5 --outDir "${outdir}" ${globs}`)
@@ -144,12 +176,13 @@ function generateFilesForEthers({ coreContractsOnly, ethersTypes: outdir }: Buil
 
 async function generateFilesForContractKit({ coreContractsOnly, web3Types: outdir }: BuildTargets) {
   console.info(`protocol: Generating Web3 Types to ${outdir}`)
+  assertTruffleArtifactsExist()
   exec(`rm -rf ${outdir}`)
   const relativePath = path.relative(ROOT_DIR, outdir)
 
   const cwd = process.cwd()
 
-  for (const glob of foundryGlobs(getContractList(coreContractsOnly))) {
+  for (const glob of truffleStyleGlobs(getContractList(coreContractsOnly))) {
     await tsGenerator(
       { cwd, loggingLvl: 'info' },
       new Web3V1Celo({

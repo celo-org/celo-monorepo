@@ -283,12 +283,17 @@ function prepareContractsPackage() {
   // CONTRACTS_PACKAGE_SRC_DIR or CONTRACTS_08_SOURCE_DIR — the published
   // tarball is built entirely under CONTRACTS_PACKAGE_STAGING_DIR.
   fs.mkdirSync(CONTRACTS_PACKAGE_STAGING_DIR, { recursive: true })
-  const cp05 = `cp -R ${CONTRACTS_PACKAGE_SRC_DIR}/. ${CONTRACTS_PACKAGE_STAGING_DIR}/`
-  log(cp05)
-  child_process.execSync(cp05)
-  const cp08 = `cp -R ${CONTRACTS_08_SOURCE_DIR} ${path.join(CONTRACTS_PACKAGE_STAGING_DIR, '0.8')}`
-  log(cp08)
-  child_process.execSync(cp08)
+  const copies = [
+    // 0.5 contents land at the staging root (matches existing npm layout)
+    { src: `${CONTRACTS_PACKAGE_SRC_DIR}/.`, dest: `${CONTRACTS_PACKAGE_STAGING_DIR}/` },
+    // 0.8 contracts land under staging/0.8/
+    { src: CONTRACTS_08_SOURCE_DIR, dest: path.join(CONTRACTS_PACKAGE_STAGING_DIR, '0.8') },
+  ]
+  for (const { src, dest } of copies) {
+    const cmd = `cp -R ${src} ${dest}`
+    log(cmd)
+    child_process.execSync(cmd)
+  }
 
   if (process.env.RELEASE_VERSION) {
     log('Replacing @celo/contracts version with RELEASE_VERSION)')

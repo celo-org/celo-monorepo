@@ -3,8 +3,8 @@ import path from 'path'
 import { SOLIDITY_05_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 
 export const ROOT_DIR = path.join(__dirname, '../')
-export const CONTRACTS_PACKAGE_SRC_DIR = path.join(__dirname, '../contracts')
-export const CONTRACTS_08_SOURCE_DIR = path.join(ROOT_DIR, 'contracts-0.8')
+export const CONTRACTS_PACKAGE_SRC_DIR = path.join(ROOT_DIR, SOLIDITY_05_PACKAGE.path)
+export const CONTRACTS_08_SOURCE_DIR = path.join(ROOT_DIR, SOLIDITY_08_PACKAGE.path)
 // Staging dir that the publishing pipeline assembles from contracts/ and
 // contracts-0.8/. `npm publish` runs from here, so the source trees are never
 // mutated by a publish run.

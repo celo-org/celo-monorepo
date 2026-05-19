@@ -24,7 +24,7 @@ $PWD/scripts/foundry/start_anvil.sh --celo
 FOUNDRY_PROFILE=truffle-compat forge build
 
 # build standard forge artifacts, needed to deploy precompiles
-forge build
+forge build # TODO is this duplicated?
 
 # Deploy libraries to the anvil instance
 source $PWD/scripts/foundry/deploy_libraries.sh
