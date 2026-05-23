@@ -54,7 +54,7 @@ module.exports = {
       'error',
       { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
     ],
-    // i dont trust this rule
+    // I don't trust this rule
     '@typescript-eslint/no-unnecessary-type-assertion': 'off',
     '@typescript-eslint/no-misused-promises': 'off',
     '@typescript-eslint/adjacent-overload-signatures': 'error',

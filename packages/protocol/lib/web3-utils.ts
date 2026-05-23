@@ -45,7 +45,7 @@ export async function sendTransactionWithPrivateKey<T>(
       ...txArgs,
       data: encodedTxData,
       from: address,
-      // make sure to use enough gas but dont overspend
+      // make sure to use enough gas but don't overspend
       // or we will run into "block gas limit exceeded" errors
       gas: estimatedGas * 2,
     },
