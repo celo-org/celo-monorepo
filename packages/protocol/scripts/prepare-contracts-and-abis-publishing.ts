@@ -103,7 +103,6 @@ try {
   // Cleanup
   log('Cleaning up folders and checking out dirty git files')
   rmrfSync(`rm -rf ${ABIS_BUILD_DIR}/contracts*`)
-  rmrfSync(`rm -rf ${ABIS_BUILD_DIR}/truffle*`)
   child_process.execSync(`git checkout ${TSCONFIG_PATH}`, { stdio: 'inherit' })
 }
 

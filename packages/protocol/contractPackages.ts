@@ -5,7 +5,7 @@ export interface ContractPackage {
   contracts: string[]
   contractsFolder?: string
   proxyContracts?: string[]
-  truffleConfig?: string
+  truffleConfig?: string // TODO renaame to env config
   solidityVersion?: string
   proxiesPath?: string
   // Foundry artifact directory (relative to packages/protocol) where `forge build`
