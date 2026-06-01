@@ -96,7 +96,12 @@ export const OtherContracts = [
 
 export const contractPackages = [SOLIDITY_05_PACKAGE, SOLIDITY_08_PACKAGE]
 
-export const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract'] as const
+export const Interfaces = [
+  'ICeloToken',
+  'IERC20',
+  'IERC20CeloTokens',
+  'ICeloVersionedContract',
+] as const
 
 export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreContracts)
 
