@@ -171,6 +171,44 @@ contract GasSponsoredOFTBridge_Send is GasSponsoredOFTBridgeTestBase {
     bridge.send(IOFT(address(usdtOft)), _defaultSendParam(bridgeAmount), _defaultFee(nativeFee));
   }
 
+  function test_Send_RefundsOFTDustToUser() public {
+    uint256 bridgeAmount = 100e6;
+    uint256 dust = 7; // shared-decimal normalization remainder
+    uint256 nativeFee = 0.01 ether;
+    uint256 expectedFee = (0.01e18 * ORACLE_NUMERATOR * 1e6 * DEFAULT_PRICE_FACTOR) /
+      (ORACLE_DENOMINATOR * 1e18 * 10_000);
+
+    usdtOft.setDust(dust);
+    uint256 userBalanceBefore = usdt.balanceOf(user);
+
+    vm.prank(user);
+    bridge.send(IOFT(address(usdtOft)), _defaultSendParam(bridgeAmount), _defaultFee(nativeFee));
+
+    // User is charged only the bridged amount (amountLD - dust) plus the fee; dust refunded.
+    assertEq(usdt.balanceOf(user), userBalanceBefore - (bridgeAmount - dust) - expectedFee);
+    // Only the dust-normalized amount reached the OFT.
+    assertEq(usdt.balanceOf(address(usdtOft)), bridgeAmount - dust);
+    // Bridge retains only the fee; no dust is trapped.
+    assertEq(usdt.balanceOf(address(bridge)), expectedFee);
+  }
+
+  function test_Send_EmitsLogSend_WithDustNormalizedAmount() public {
+    uint256 bridgeAmount = 100e6;
+    uint256 dust = 7;
+    uint256 nativeFee = 0.01 ether;
+    uint256 expectedFee = (0.01e18 * ORACLE_NUMERATOR * 1e6 * DEFAULT_PRICE_FACTOR) /
+      (ORACLE_DENOMINATOR * 1e18 * 10_000);
+    uint256 amountSent = bridgeAmount - dust;
+
+    usdtOft.setDust(dust);
+
+    vm.expectEmit(true, true, false, true);
+    emit LogSend(user, address(usdtOft), amountSent, nativeFee, expectedFee, amountSent + expectedFee);
+
+    vm.prank(user);
+    bridge.send(IOFT(address(usdtOft)), _defaultSendParam(bridgeAmount), _defaultFee(nativeFee));
+  }
+
   function test_Revert_Send_OFTNotRegistered() public {
     MockOFT rogue = new MockOFT(address(usdt));
 

@@ -14,12 +14,21 @@ contract MockOFT is IOFT {
   address public immutable _token;
   uint64 private _nonce;
 
+  /// @dev Amount of dust the OFT drops from each send (simulates shared-decimal
+  ///      normalization where amountSentLD = amountLD - dust). Defaults to 0.
+  uint256 public dust;
+
   constructor(address token_) {
     _token = token_;
   }
 
   function token() external view override returns (address) {
     return _token;
+  }
+
+  /// @dev Test helper to simulate shared-decimal dust removal.
+  function setDust(uint256 dust_) external {
+    dust = dust_;
   }
 
   function send(
@@ -32,8 +41,12 @@ contract MockOFT is IOFT {
     override
     returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt)
   {
-    // Pull tokens from caller (the bridge contract)
-    IERC20(_token).safeTransferFrom(msg.sender, address(this), _sendParam.amountLD);
+    // Bridgeable amount after dropping shared-decimal dust.
+    uint256 amountSent = _sendParam.amountLD - dust;
+
+    // Pull only the bridgeable amount from caller (the bridge contract); the
+    // dust is left behind, mirroring a real OFT's _removeDust behaviour.
+    IERC20(_token).safeTransferFrom(msg.sender, address(this), amountSent);
 
     _nonce++;
 
@@ -43,9 +56,6 @@ contract MockOFT is IOFT {
       fee: MessagingFee({ nativeFee: msg.value, lzTokenFee: 0 })
     });
 
-    oftReceipt = OFTReceipt({
-      amountSentLD: _sendParam.amountLD,
-      amountReceivedLD: _sendParam.amountLD
-    });
+    oftReceipt = OFTReceipt({ amountSentLD: amountSent, amountReceivedLD: amountSent });
   }
 }

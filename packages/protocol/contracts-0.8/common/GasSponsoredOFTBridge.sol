@@ -103,10 +103,10 @@ contract GasSponsoredOFTBridge is Ownable, ReentrancyGuard {
   /// @notice Emitted on every successful bridge send.
   /// @param sender The user who initiated the bridge.
   /// @param oft The OFT contract used.
-  /// @param amountLD The token amount bridged (in local decimals).
+  /// @param amountLD The token amount actually bridged (in local decimals, after OFT dust removal).
   /// @param nativeFee The CELO amount the bridge spent on the LZ messaging fee.
   /// @param feeInToken The token amount charged to the user for the CELO sponsorship.
-  /// @param totalAmount amountLD + feeInToken (total token cost to the user).
+  /// @param totalAmount amountLD + feeInToken (net token cost to the user, dust refunded).
   event LogSend(
     address indexed sender,
     address indexed oft,
@@ -227,6 +227,14 @@ contract GasSponsoredOFTBridge is Ownable, ReentrancyGuard {
     // Reset leftover allowance to prevent dangling approvals.
     config.token.safeApprove(address(_oft), 0);
 
+    // The OFT may debit less than amountLD due to shared-decimal dust removal
+    // (amountSentLD <= amountLD). Refund the non-bridgeable dust to the user so they
+    // are only charged for what was actually bridged, never leaving it stuck here.
+    uint256 dust = _sendParam.amountLD - oftReceipt.amountSentLD;
+    if (dust > 0) {
+      config.token.safeTransfer(msg.sender, dust);
+    }
+
     // Calculate how much CELO was actually spent (may differ from _fee.nativeFee
     // if the OFT refunds unused CELO back to this contract).
     uint256 celoSpent = celoBefore - address(this).balance;
@@ -237,13 +245,14 @@ contract GasSponsoredOFTBridge is Ownable, ReentrancyGuard {
     // Charge the user for the CELO that was spent.
     config.token.safeTransferFrom(msg.sender, address(this), feeInToken);
 
+    // Report the amount actually bridged (post dust refund), not the requested amountLD.
     emit LogSend(
       msg.sender,
       address(_oft),
-      _sendParam.amountLD,
+      oftReceipt.amountSentLD,
       celoSpent,
       feeInToken,
-      _sendParam.amountLD + feeInToken
+      oftReceipt.amountSentLD + feeInToken
     );
   }
 
