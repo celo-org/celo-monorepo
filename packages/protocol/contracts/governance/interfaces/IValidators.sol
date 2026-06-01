@@ -41,6 +41,7 @@ interface IValidators {
   function getCommissionUpdateDelay() external view returns (uint256);
   function getVoterRewardCommission(address) external view returns (uint256, uint256, uint256);
   function maxVoterRewardCommission() external view returns (uint256);
+  function maxVoterRewardCommissionLastReducedBlock() external view returns (uint256);
   function getMembershipHistory(
     address
   ) external view returns (uint256[] memory, address[] memory, uint256, uint256);

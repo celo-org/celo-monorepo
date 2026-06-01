@@ -139,6 +139,13 @@ contract Validators is
   // Set to FixidityLib.fixed1() for unlimited.
   FixidityLib.Fraction public maxVoterRewardCommission;
 
+  // Block number of the most recent reduction of maxVoterRewardCommission. Queued voter
+  // reward commission updates whose activation block is at or before this block are
+  // invalidated and must be re-queued. This prevents a matured-but-unactivated queued
+  // update from reviving after governance lowers (e.g. to 0) and later restores the cap
+  // (Hashlock 5th audit, Q-01).
+  uint256 public maxVoterRewardCommissionLastReducedBlock;
+
   event MaxGroupSizeSet(uint256 size);
   event CommissionUpdateDelaySet(uint256 delay);
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
@@ -488,8 +495,16 @@ contract Validators is
       commissionFraction.lte(maxVoterRewardCommission),
       "Voter reward commission exceeds max allowed"
     );
+    // Reject no-op queues. The value that would otherwise take effect is the pending
+    // queued value when an update is already queued, or the active commission otherwise.
+    // Comparing against the active value alone (Hashlock 5th audit, L-02) made it
+    // impossible to overwrite a stale non-zero queued value with 0 once the active
+    // commission was already 0 (e.g. after governance lowered the cap to 0).
+    FixidityLib.Fraction memory currentTarget = group.nextVoterRewardCommissionBlock != 0
+      ? group.nextVoterRewardCommission
+      : group.voterRewardCommission;
     require(
-      !commissionFraction.equals(group.voterRewardCommission),
+      !commissionFraction.equals(currentTarget),
       "Voter reward commission must be different"
     );
 
@@ -512,6 +527,14 @@ contract Validators is
     require(
       group.nextVoterRewardCommissionBlock <= block.number,
       "Can't apply voter reward commission update yet"
+    );
+
+    // Invalidate updates that matured before governance reduced the cap. Without this,
+    // a queued update blocked by a cap reduction (e.g. to 0) would silently revive and
+    // activate without a fresh delay once the cap was restored (Hashlock 5th audit, Q-01).
+    require(
+      group.nextVoterRewardCommissionBlock > maxVoterRewardCommissionLastReducedBlock,
+      "Voter reward commission cap reduced since queued; re-queue required"
     );
 
     // Re-check max cap at activation time. Governance may have lowered the cap since the
@@ -873,7 +896,7 @@ contract Validators is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 4, 1, 0);
+    return (1, 4, 1, 1);
   }
 
   /**
@@ -930,6 +953,11 @@ contract Validators is
       !maxCommissionFraction.equals(maxVoterRewardCommission),
       "Max voter reward commission not changed"
     );
+    // Record reductions so that previously queued updates cannot silently revive once the
+    // cap is later restored (Hashlock 5th audit, Q-01); they must be re-queued instead.
+    if (maxCommissionFraction.lt(maxVoterRewardCommission)) {
+      maxVoterRewardCommissionLastReducedBlock = block.number;
+    }
     maxVoterRewardCommission = maxCommissionFraction;
     emit MaxVoterRewardCommissionSet(maxCommission);
   }
