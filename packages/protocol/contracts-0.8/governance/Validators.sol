@@ -503,10 +503,7 @@ contract Validators is
     FixidityLib.Fraction memory currentTarget = group.nextVoterRewardCommissionBlock != 0
       ? group.nextVoterRewardCommission
       : group.voterRewardCommission;
-    require(
-      !commissionFraction.equals(currentTarget),
-      "Voter reward commission must be different"
-    );
+    require(!commissionFraction.equals(currentTarget), "Voter reward commission must be different");
 
     group.nextVoterRewardCommission = commissionFraction;
     uint256 activationBlock = block.number + commissionUpdateDelay;
