@@ -203,7 +203,14 @@ contract GasSponsoredOFTBridge_Send is GasSponsoredOFTBridgeTestBase {
     usdtOft.setDust(dust);
 
     vm.expectEmit(true, true, false, true);
-    emit LogSend(user, address(usdtOft), amountSent, nativeFee, expectedFee, amountSent + expectedFee);
+    emit LogSend(
+      user,
+      address(usdtOft),
+      amountSent,
+      nativeFee,
+      expectedFee,
+      amountSent + expectedFee
+    );
 
     vm.prank(user);
     bridge.send(IOFT(address(usdtOft)), _defaultSendParam(bridgeAmount), _defaultFee(nativeFee));
