@@ -225,6 +225,10 @@ contract MockValidators is IValidators {
     return _maxVoterRewardCommission;
   }
 
+  function maxVoterRewardCommissionLastReducedBlock() external view returns (uint256) {
+    return 0;
+  }
+
   function resetSlashingMultiplier() external {
     revert("Method not implemented in mock");
   }
