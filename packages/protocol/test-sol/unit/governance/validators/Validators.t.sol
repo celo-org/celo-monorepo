@@ -2620,8 +2620,8 @@ contract ValidatorsTest_SetNextVoterRewardCommissionUpdate is ValidatorsTest {
     validators.setNextVoterRewardCommissionUpdate(commission);
   }
 
-  // L-02 (Hashlock 5th audit): a stale non-zero queued value must be clearable to 0 even
-  // when the active commission is already 0 and the cap has been lowered to 0.
+  // A stale non-zero queued value must be clearable to 0 even when the active commission
+  // is already 0 and the cap has been lowered to 0.
   function test_ShouldClearStaleQueuedValueToZero_WhenActiveAndCapAreZero() public {
     uint256 maxCap = FixidityLib.newFixedFraction(20, 100).unwrap(); // 20%
     validators.setMaxVoterRewardCommission(maxCap);
@@ -2770,8 +2770,8 @@ contract ValidatorsTest_UpdateVoterRewardCommission is ValidatorsTest {
     assertEq(_commission, commission);
   }
 
-  // Q-01 (Hashlock 5th audit): a matured-but-unactivated queued update must not revive
-  // after governance lowers the cap (e.g. to 0) and later restores it. It must be re-queued.
+  // A matured-but-unactivated queued update must not revive after governance lowers the
+  // cap (e.g. to 0) and later restores it. It must be re-queued.
   function test_Reverts_WhenCapReducedAfterMaturityThenRestored() public {
     uint256 commission = FixidityLib.newFixedFraction(5, 100).unwrap(); // 5%
     vm.prank(group);
