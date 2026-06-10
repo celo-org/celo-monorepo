@@ -904,7 +904,7 @@ contract Validators is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 4, 1, 1);
+    return (1, 4, 1, 0);
   }
 
   /**
