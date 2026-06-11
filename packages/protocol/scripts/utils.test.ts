@@ -131,7 +131,12 @@ describe('utils', () => {
     })
 
     it("determines for release git branch when major version doesn't match", () => {
-      execSyncMock.mockReturnValue('11.2.3')
+      execSyncMock.mockImplementation((command: string) => {
+        if (command === 'npm view @celo/contracts versions --json') {
+          return JSON.stringify(['11.2.3'])
+        }
+        return '11.2.3'
+      })
 
       const nextVersion = determineNextVersion(
         '',
@@ -140,7 +145,7 @@ describe('utils', () => {
         'alpha'
       )
 
-      expect(execSyncMock).toHaveBeenCalledTimes(2)
+      expect(execSyncMock).toHaveBeenCalledTimes(3)
       expect(execSyncMock).toHaveBeenNthCalledWith(
         1,
         'npm view @celo/contracts@latest version',
@@ -151,9 +156,66 @@ describe('utils', () => {
         'npm view @celo/contracts@canary version',
         expect.anything()
       )
+      expect(execSyncMock).toHaveBeenNthCalledWith(
+        3,
+        'npm view @celo/contracts versions --json',
+        expect.anything()
+      )
 
       expect(nextVersion).not.toBeNull()
       expect(retrieveReleaseInformation(nextVersion!)).toEqual(['12.0.0-canary.0', 'canary'])
+    })
+
+    it('continues the canary line of an older release branch when the canary dist-tag points at a newer major', () => {
+      execSyncMock.mockImplementation((command: string) => {
+        if (command === 'npm view @celo/contracts@latest version') {
+          return '14.0.1'
+        }
+        if (command === 'npm view @celo/contracts@canary version') {
+          return '17.0.0-canary.4'
+        }
+        if (command === 'npm view @celo/contracts versions --json') {
+          return JSON.stringify([
+            '14.0.1',
+            '16.0.0-canary.7',
+            '16.0.0-canary.8',
+            '17.0.0-canary.4',
+          ])
+        }
+        throw new Error(`unexpected command: ${command}`)
+      })
+
+      const nextVersion = determineNextVersion(
+        '',
+        'release/core-contracts/16',
+        '@celo/contracts',
+        ''
+      )
+
+      expect(nextVersion).not.toBeNull()
+      expect(retrieveReleaseInformation(nextVersion!)).toEqual(['16.0.0-canary.9', 'canary'])
+    })
+
+    it('starts a fresh canary line when no version of the branch major has been published', () => {
+      execSyncMock.mockImplementation((command: string) => {
+        if (command === 'npm view @celo/contracts versions --json') {
+          return JSON.stringify(['14.0.1', '17.0.0-canary.4'])
+        }
+        if (command === 'npm view @celo/contracts@latest version') {
+          return '14.0.1'
+        }
+        return '17.0.0-canary.4'
+      })
+
+      const nextVersion = determineNextVersion(
+        '',
+        'release/core-contracts/16',
+        '@celo/contracts',
+        ''
+      )
+
+      expect(nextVersion).not.toBeNull()
+      expect(retrieveReleaseInformation(nextVersion!)).toEqual(['16.0.0-canary.0', 'canary'])
     })
 
     it("determines based on manually provided npm tag that already exists, doesn't fallback to 'canary'", () => {

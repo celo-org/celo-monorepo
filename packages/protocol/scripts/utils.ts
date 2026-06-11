@@ -1,6 +1,6 @@
 import { execSync } from 'child_process'
 import * as fs from 'fs'
-import { SemVer } from 'semver'
+import { compare, SemVer } from 'semver'
 
 const DAILY_RELEASE_TAG = 'canary'
 const WORKING_RELEASE_BRANCH_PREFIX = 'release/core-contracts/'
@@ -64,12 +64,18 @@ export const determineNextVersion = (
     const lastVersion = getPreviousVersion(npmPackage, DAILY_RELEASE_TAG, 'latest')
     const lastVersionSemVer = new SemVer(lastVersion)
 
-    const firstCanaryOfMajor = lastVersionSemVer.major !== major
-    nextVersion = lastVersionSemVer.inc(
-      firstCanaryOfMajor ? 'premajor' : 'prerelease',
-      DAILY_RELEASE_TAG
-    )
-    nextVersion.major = major
+    if (lastVersionSemVer.major === major) {
+      nextVersion = lastVersionSemVer.inc('prerelease', DAILY_RELEASE_TAG)
+    } else {
+      // the canary dist-tag can point at a different major (e.g. an older release
+      // branch publishing after a newer one already took over the tag), so continue
+      // from the highest published version of this branch's major instead
+      const lastVersionOfMajor = getLatestVersionOfMajor(npmPackage, major)
+      nextVersion =
+        lastVersionOfMajor !== null
+          ? lastVersionOfMajor.inc('prerelease', DAILY_RELEASE_TAG)
+          : new SemVer(`${major}.0.0-${DAILY_RELEASE_TAG}.0`)
+    }
   } else if (isValidNpmTag(npmTag)) {
     const lastVersion = getPreviousVersion(npmPackage, npmTag, DAILY_RELEASE_TAG)
     nextVersion = new SemVer(lastVersion).inc('prerelease', npmTag)
@@ -105,6 +111,27 @@ export function fetchVersionFromNpm(npmPackage: string, tag: string) {
   })
     .toString()
     .trim()
+}
+
+// the highest published version of the package within the given major, or null when none exists
+export function getLatestVersionOfMajor(npmPackage: string, major: number): SemVer | null {
+  try {
+    const parsed: string | string[] = JSON.parse(
+      execSync(`npm view ${npmPackage} versions --json`, {
+        stdio: ['ignore', 'pipe', 'ignore'],
+      }).toString()
+    )
+    // npm prints a plain string instead of an array when only one version exists
+    const versions = Array.isArray(parsed) ? parsed : [parsed]
+    const versionsOfMajor = versions
+      .map((version) => new SemVer(version))
+      .filter((version) => version.major === major)
+      .sort(compare)
+
+    return versionsOfMajor.length ? versionsOfMajor[versionsOfMajor.length - 1] : null
+  } catch (e) {
+    return null
+  }
 }
 
 export function getVersionFromGitTag(matchedTag: RegExpMatchArray) {
