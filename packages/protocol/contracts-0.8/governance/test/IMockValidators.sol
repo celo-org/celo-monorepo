@@ -18,6 +18,7 @@ interface IMockValidators {
   function setValidator(address) external;
 
   function setValidatorGroup(address group) external;
+  function setIsValidatorGroup(address group, bool value) external;
 
   function affiliate(address group) external returns (bool);
 
@@ -28,6 +29,12 @@ interface IMockValidators {
   function setMembers(address group, address[] calldata _members) external;
 
   function setCommission(address group, uint256 commission) external;
+
+  function setVoterRewardCommission(address group, uint256 commission) external;
+
+  function getVoterRewardCommission(
+    address group
+  ) external view returns (uint256, uint256, uint256);
 
   function setAccountLockedGoldRequirement(address account, uint256 value) external;
 
@@ -61,4 +68,8 @@ interface IMockValidators {
   function setEpochRewards(address account, uint256 reward) external;
 
   function mintedStable() external view returns (uint256);
+
+  function maxVoterRewardCommission() external view returns (uint256);
+
+  function setMaxVoterRewardCommission(uint256 maxCommission) external;
 }
