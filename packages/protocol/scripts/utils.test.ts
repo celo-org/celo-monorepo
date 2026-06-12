@@ -175,12 +175,7 @@ describe('utils', () => {
           return '17.0.0-canary.4'
         }
         if (command === 'npm view @celo/contracts versions --json') {
-          return JSON.stringify([
-            '14.0.1',
-            '16.0.0-canary.7',
-            '16.0.0-canary.8',
-            '17.0.0-canary.4',
-          ])
+          return JSON.stringify(['14.0.1', '16.0.0-canary.7', '16.0.0-canary.8', '17.0.0-canary.4'])
         }
         throw new Error(`unexpected command: ${command}`)
       })

@@ -189,6 +189,10 @@ jobs:
   publish:
     name: Publish to npm
     needs: build
+    # determine-release-version leaves the version empty outside release branches/tags
+    # (e.g. on pull requests); npm >= 11 rejects even --dry-run publishes of an
+    # already-published version, so skip the job instead of dry-running
+    if: ${{ needs.build.outputs.release_version != '' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
