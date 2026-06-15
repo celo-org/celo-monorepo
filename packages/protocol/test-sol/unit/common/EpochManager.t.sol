@@ -30,6 +30,7 @@ contract EpochManagerTest is TestWithUtils08 {
   address carbonOffsettingPartner;
   address communityRewardFund;
   address reserveAddress;
+  address lockedGoldAddress;
   address scoreManagerAddress;
 
   uint256 firstEpochNumber = 3;
@@ -97,6 +98,7 @@ contract EpochManagerTest is TestWithUtils08 {
     scoreManagerAddress = actor("scoreManagerAddress");
 
     reserveAddress = actor("reserve");
+    lockedGoldAddress = actor("lockedGold");
 
     carbonOffsettingPartner = actor("carbonOffsettingPartner");
     communityRewardFund = actor("communityRewardFund");
@@ -115,6 +117,7 @@ contract EpochManagerTest is TestWithUtils08 {
     registry.setAddressFor(ScoreManagerContract, address(scoreManager));
     registry.setAddressFor(StableTokenContract, address(stableToken));
     registry.setAddressFor(ReserveContract, reserveAddress);
+    registry.setAddressFor(LockedGoldContract, lockedGoldAddress);
     registry.setAddressFor(ElectionContract, address(election));
 
     celoUnreleasedTreasury.setRegistry(REGISTRY_ADDRESS);
