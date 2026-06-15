@@ -1,0 +1,26 @@
+[
+  {
+    "contract": "Registry",
+    "function": "setAddressFor",
+    "args": ["EpochManager", "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"],
+    "value": "0",
+    "description": "Temporarily set Governance as EpochManager in Registry"
+  },
+  {
+    "contract": "CeloUnreleasedTreasury",
+    "function": "release",
+    "args": [
+      "0x6cC083Aed9e3ebe302A6336dBC7c921C9f03349E",
+      "1979490000000000000000000"
+    ],
+    "value": "0",
+    "description": "Transfer 1,979,490 CELO to LockedCelo"
+  },
+  {
+    "contract": "Registry",
+    "function": "setAddressFor",
+    "args": ["EpochManager", "0xF424B5e85B290b66aC20f8A9EAB75E25a526725E"],
+    "value": "0",
+    "description": "Restore EpochManager in Registry to original address"
+  }
+]

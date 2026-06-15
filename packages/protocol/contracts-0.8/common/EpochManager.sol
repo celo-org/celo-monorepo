@@ -71,6 +71,14 @@ contract EpochManager is
 
   uint256 public toProcessGroups = 0;
 
+  // Sum of voter rewards actually distributed to elected groups during the
+  // current epoch. May be less than `epochProcessing.totalRewardsVoter` due to
+  // per-group score, slashing multipliers, and integer rounding in
+  // `Election.getGroupEpochRewardsBasedOnScore`.
+  // NOTE: declared after all pre-existing state variables to preserve the
+  // proxy storage layout on in-place upgrades.
+  uint256 public totalDistributedVoterRewards;
+
   /**
    * @notice Event emitted when epochProcessing has begun.
    * @param epochNumber The epoch number that is being processed.
@@ -336,6 +344,7 @@ contract EpochManager is
       if (voterRewards > 0) {
         election.distributeEpochRewards(group, voterRewards, lesser, greater);
       }
+      totalDistributedVoterRewards += voterRewards;
     }
 
     delete processedGroups[group];
@@ -401,6 +410,7 @@ contract EpochManager is
         if (voterRewards > 0) {
           election.distributeEpochRewards(groups[i], voterRewards, lessers[i], greaters[i]);
         }
+        totalDistributedVoterRewards += voterRewards;
       }
 
       delete processedGroups[groups[i]];
@@ -841,6 +851,13 @@ contract EpochManager is
     _setElectedSigners(_newlyElected);
 
     ICeloUnreleasedTreasury celoUnreleasedTreasury = getCeloUnreleasedTreasury();
+    // Release only the voter rewards that were actually distributed to groups
+    // (post score, slashing multiplier, and rounding) to avoid stranding excess
+    // CELO in LockedGold without matching vote units.
+    celoUnreleasedTreasury.release(
+      registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID),
+      totalDistributedVoterRewards
+    );
     celoUnreleasedTreasury.release(
       registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID),
       _epochProcessing.totalRewardsCommunity
@@ -855,6 +872,7 @@ contract EpochManager is
     _epochProcessing.totalRewardsVoter = 0;
     _epochProcessing.totalRewardsCommunity = 0;
     _epochProcessing.totalRewardsCarbonFund = 0;
+    totalDistributedVoterRewards = 0;
 
     emit EpochProcessingEnded(currentEpochNumber - 1);
   }
