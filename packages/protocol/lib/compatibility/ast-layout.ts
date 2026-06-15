@@ -194,7 +194,7 @@ export const reportLayoutIncompatibilities = (oldArtifactsSet: BuildArtifacts[],
     const reports = newArtifacts.listArtifacts()
       .filter((newArtifact: any) => {
         // TODO this code looks very repeated from ast-code.ts
-        // Matches all Truffle project artifacts (core contracts and test resource contracts)
+        // Matches Foundry core contracts
         const foundryCoreContractPathPattern = /^contracts(-0\.8)?\//
         // Matches Foundry test resource contracts
         const foundryTestContractPathPattern = /^test-ts/

@@ -26,6 +26,12 @@ get_previous_libraries_filename() {
   get_libraries_filename "$NETWORK" "$PREVIOUS_BRANCH"
 }
 
+# Validates that a libraries file is from the previous release.
+# Expected naming convention: $NETWORK-$PREVIOUS_BRANCH-libraries.json
+# where PREVIOUS_BRANCH has version number N-1 relative to the current branch.
+#
+# Usage: validate_libraries_filename <libraries_path> <network> <branch>
+
 validate_libraries_filename() {
   local LIBRARIES="$1"
   local NETWORK="$2"

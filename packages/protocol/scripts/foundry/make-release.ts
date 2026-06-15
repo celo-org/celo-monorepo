@@ -80,6 +80,7 @@ interface MakeReleaseArgv {
   rpcUrl?: string
   skipVerification?: boolean
   celoscanApiKey?: string
+  extraTxs?: string
 }
 
 // Track linked library for verification
@@ -1222,6 +1223,10 @@ async function main() {
         description:
           'Celoscan API key for contract verification (can also be set via CELOSCAN_API_KEY env var or .env.json).',
       })
+      .option('extraTxs', {
+        type: 'string',
+        description: 'Path to a JSON file with extra transactions to append to the proposal.',
+      })
       .check((currentArgs) => {
         if (!currentArgs.privateKey && !currentArgs.mnemonic) {
           throw new Error('Either --privateKey or --mnemonic must be provided.')
@@ -1370,6 +1375,15 @@ async function main() {
           publicClient
         )
       }
+    }
+
+    if (argv.extraTxs) {
+      const extraTransactions: ProposalTx[] = readJsonSync(argv.extraTxs)
+      if (!Array.isArray(extraTransactions)) {
+        throw new Error(`Extra transactions file must contain a JSON array`)
+      }
+      proposal.push(...extraTransactions)
+      console.log(`Appended ${extraTransactions.length} extra transaction(s) from ${argv.extraTxs}`)
     }
 
     writeJsonSync(argv.proposal, proposal, { spaces: 2 })

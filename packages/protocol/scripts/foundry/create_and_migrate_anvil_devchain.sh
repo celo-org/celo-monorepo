@@ -24,6 +24,9 @@ $PWD/scripts/foundry/start_anvil.sh --celo
 FOUNDRY_PROFILE=truffle-compat forge build
 FOUNDRY_PROFILE=truffle-compat8 forge build
 
+# build standard forge artifacts, needed to deploy precompiles
+forge build
+
 # Deploy libraries to the anvil instance
 source $PWD/scripts/foundry/deploy_libraries.sh
 echo "Library flags 0.5 are: $LIBRARY_FLAGS"

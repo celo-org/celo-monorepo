@@ -13,6 +13,8 @@ set -euo pipefail
 # -i: Path to the data needed to initialize contracts (if verifying a smart contracts release).
 # -p: Path to an optional proposal file, to verify the bytecodes of the core contracts after a
 #     proposed release.
+# -e: Path to extra transactions JSON file (optional, used to skip validation of appended TXs)
+# -a: Allow errors during verification (writes libraries to -err.json instead of failing)
 
 BRANCH=""
 NETWORK=""
@@ -20,8 +22,10 @@ FORNO=""
 LOG_FILE="/dev/stdout"
 PROPOSAL=""
 INITIALIZE_DATA=""
+EXTRA_TXS=""
+ALLOW_ERROR=""
 
-while getopts 'b:n:fl:i:p:' flag; do
+while getopts 'b:n:fl:i:p:e:a' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
@@ -29,12 +33,17 @@ while getopts 'b:n:fl:i:p:' flag; do
     l) LOG_FILE="${OPTARG}" ;;
     i) INITIALIZE_DATA="--initialize_data $(realpath $OPTARG)" ;;
     p) PROPOSAL="--proposal $(realpath $OPTARG)" ;;
+    e) EXTRA_TXS="--extraTxs $(realpath $OPTARG)" ;;
+    a) ALLOW_ERROR="--allowError" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
 
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
+
+source scripts/bash/warn-extra-transactions.sh
+warn_extra_transactions "$BRANCH" "$EXTRA_TXS"
 
 source scripts/bash/release-lib.sh
 source scripts/bash/warn-if-libraries-exist.sh
@@ -49,4 +58,4 @@ build_tag_foundry $BRANCH $LOG_FILE truffle-compat8 foundry.toml.bak
 
 mv foundry.toml.bak foundry.toml
 
-yarn ts-node ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "$LIBRARIES_FILE" $FORNO $PROPOSAL $INITIALIZE_DATA
+yarn ts-node ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "$LIBRARIES_FILE" $FORNO $PROPOSAL $INITIALIZE_DATA $EXTRA_TXS $ALLOW_ERROR

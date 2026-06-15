@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - tag: core-contracts.v14.anvil
+          - tag: core-contracts.v16
             node-version: 18
     steps:
       - uses: actions/checkout@v4
