@@ -1,8 +1,5 @@
 /* tslint:disable: object-literal-sort-keys */
 require('ts-node/register')
-var Web3 = require('web3')
-
-const HDWalletProvider = require('@truffle/hdwallet-provider')
 
 const argv = require('minimist')(process.argv.slice(2), {
   string: ['truffle_override', 'network'],
@@ -128,20 +125,6 @@ if (process.argv.includes('--forno')) {
 
   networks[argv.network].host = undefined
   networks[argv.network].port = undefined
-
-  if (networks[argv.network].privateKeyAvailable) {
-    console.log('Network is supposed to have a private key available, using HDWalletProvider')
-    networks[argv.network].provider = function () {
-      return new HDWalletProvider({
-        privateKeys: [readMnemonic(argv.network)],
-        providerOrUrl: fornoUrls[argv.network],
-      })
-    }
-  } else {
-    networks[argv.network].provider = function () {
-      return new Web3.providers.HttpProvider(fornoUrls[argv.network])
-    }
-  }
 }
 
 module.exports = { networks: networks, fornoUrls: fornoUrls }

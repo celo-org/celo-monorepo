@@ -12,8 +12,8 @@ on:
       - 'packages/protocol/contracts-0.8/**'
       - 'packages/protocol/lib/**'
       - 'packages/protocol/scripts/**'
-      - '!packages/protocol/scripts/foundry/**'  
-      - '!packages/protocol/scripts/truffle/**' 
+      - '!packages/protocol/scripts/foundry/**'
+      - '!packages/protocol/scripts/truffle/**'
 
   # pull requests result in dry runs, since no git tag is present unless current branch folllows release branch pattern
   pull_request:
@@ -24,8 +24,7 @@ on:
       - 'packages/protocol/contracts-0.8/**'
       - 'packages/protocol/lib/**'
       - 'packages/protocol/scripts/**'
-      - '!packages/protocol/scripts/foundry/**'  
-      - '!packages/protocol/scripts/truffle/**'  
+      - '!packages/protocol/scripts/foundry/**'
      
   release:
     types: [released]
@@ -76,6 +75,16 @@ jobs:
         shell: bash
         run: yarn
 
+      - name: Install Foundry
+        # foundry-toolchain v1.7.0 https://github.com/foundry-rs/foundry-toolchain/releases/tag/v1.7.0
+        uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
+        with:
+          # TODO: Standardize Foundry version across workflows https://github.com/celo-org/celo-monorepo/issues/11714
+          version: 'v1.0.0'
+      - name: Install forge dependencies
+        working-directory: packages/protocol
+        run: forge install
+
       - name: Determine release type and version (or dry run)
         # This is what sets the RELEASE_TYPE and RELEASE_VERSION env variables
         run: yarn --silent release:determine-release-version >> "$GITHUB_ENV"
@@ -110,8 +119,8 @@ jobs:
             echo "Dry run mode, exiting successfully."
             exit 0
           fi
-          npm dist-tag add @celo/contracts@$RELEASE_VERSION $COMMIT_HASH              
-        working-directory: packages/protocol/contracts
+          npm dist-tag add @celo/contracts@$RELEASE_VERSION $COMMIT_HASH
+        working-directory: packages/protocol/contracts-package-abi
         env:
           RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}

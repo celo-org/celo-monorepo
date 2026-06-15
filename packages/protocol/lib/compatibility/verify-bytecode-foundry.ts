@@ -9,9 +9,17 @@ import {
 } from '@celo/protocol/lib/bytecode-foundry'
 import { getArtifactByName, getContractName, getDeployedBytecode } from '@celo/protocol/lib/compatibility/internal'
 import { verifyProxyStorageProofFoundry } from '@celo/protocol/lib/proxy-utils'
-import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9'
+
+// TODO remove this duplicate
+export interface ProposalTx {
+  contract: string
+  function: string
+  args: string[]
+  value: string
+  description?: string
+}
 
 export interface RegistryLookup {
   getAddressForString: (name: string) => Promise<string>
