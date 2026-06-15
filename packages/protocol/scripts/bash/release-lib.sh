@@ -2,7 +2,7 @@
 
 
 function checkout_build_sources() {
-  local BUILD_SOURCES="contracts contracts-0.8 test-sol foundry.toml remappings.txt"
+  local BUILD_SOURCES="contracts contracts-0.8 test-sol migrations_sol foundry.toml remappings.txt"
   local FROM=$1
   local LOG_FILE=$2
   # The third argument is optional. We temporarily allow unset variables.
