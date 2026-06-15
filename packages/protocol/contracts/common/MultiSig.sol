@@ -22,7 +22,7 @@ import { IMultiSig } from "./interfaces/IMultiSig.sol";
  * owned by a single owner. Safely increasing the owner set and requirement at
  * the same time is not trivial. One way to work around this situation is to
  * first add a second address controlled by the original owner, increase the
- * requirement, and then replace the auxillary address with the intended second
+ * requirement, and then replace the auxiliary address with the intended second
  * owner.
  * Again, this is just one example, in general make sure to verify this contract
  * will support your intended usage. The goal of this contract is to offer a
