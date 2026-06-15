@@ -39,16 +39,7 @@ export interface ProposalTx {
 }
 
 const argv = require('minimist')(process.argv.slice(2), {
-  string: [
-    'build_artifacts',
-    'proposal',
-    'initialize_data',
-    'network',
-    'librariesFile',
-    'branch',
-    'extraTxs',
-  ],
-  boolean: ['allowError'],
+  string: ['build_artifacts', 'proposal', 'initialize_data', 'network', 'librariesFile', 'branch'],
 })
 
 const branch = (argv.branch ? argv.branch : '') as string
@@ -59,11 +50,6 @@ const proposal: ProposalTx[] = argv.proposal ? readJsonSync(argv.proposal) : []
 const initializationData: InitializationData = argv.initialize_data
   ? readJsonSync(argv.initialize_data)
   : {}
-if (argv.extraTxs && !argv.proposal) {
-  console.warn('--extraTxs ignored because no --proposal was provided')
-}
-const extraTxs: ProposalTx[] = argv.extraTxs && argv.proposal ? readJsonSync(argv.extraTxs) : []
-const allowError: boolean = argv.allowError ?? false
 const librariesFile = argv.librariesFile ?? 'libraries.json'
 
 if (!existsSync(buildDir05)) {
@@ -173,11 +159,9 @@ verifyBytecodes(
   chainLookup,
   initializationData,
   version,
-  network,
-  extraTxs,
-  allowError
+  network
 )
-  .then(({ libraryLinkingInfo, verifiedLibraries, hasErrors }) => {
+  .then(({ libraryLinkingInfo, verifiedLibraries }) => {
     const allMapping = libraryLinkingInfo.getAddressMapping()
     const verifiedMapping = {}
     for (const library of verifiedLibraries) {
@@ -185,16 +169,9 @@ verifyBytecodes(
     }
 
     /* eslint-disable no-console */
-    if (hasErrors) {
-      const errFile = librariesFile.replace(/\.json$/, '-err.json')
-      console.info(`Writing linked library addresses to ${errFile}`)
-      writeJsonSync(errFile, verifiedMapping, { spaces: 2 })
-      process.exit(1)
-    } else {
-      console.log(`\n✅ All contracts and libraries verified successfully!`)
-      console.info(`Writing linked library addresses to ${librariesFile}`)
-      writeJsonSync(librariesFile, verifiedMapping, { spaces: 2 })
-    }
+    console.log(`\n✅ All contracts and libraries verified successfully!`)
+    console.info(`Writing linked library addresses to ${librariesFile}`)
+    writeJsonSync(librariesFile, verifiedMapping, { spaces: 2 })
   })
   .catch((error) => {
     console.info('Script errored!', error)
