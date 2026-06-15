@@ -117,6 +117,13 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
     uint256 activationBlock
   );
   event ValidatorGroupCommissionUpdated(address indexed group, uint256 commission);
+  event ValidatorGroupVoterRewardCommissionUpdateQueued(
+    address indexed group,
+    uint256 commission,
+    uint256 activationBlock
+  );
+  event ValidatorGroupVoterRewardCommissionUpdated(address indexed group, uint256 commission);
+  event MaxVoterRewardCommissionSet(uint256 maxCommission);
   event ValidatorEpochPaymentDistributed(
     address indexed validator,
     uint256 validatorPayment,
@@ -2494,5 +2501,574 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
     validators.resetSlashingMultiplier();
     (, , , , , uint256 actualMultiplier, ) = validators.getValidatorGroup(group);
     assertEq(actualMultiplier, FixidityLib.fixed1().unwrap());
+  }
+}
+
+contract ValidatorsTest_SetNextVoterRewardCommissionUpdate is ValidatorsTest {
+  uint256 newVoterRewardCommission = FixidityLib.newFixedFraction(5, 100).unwrap(); // 5%
+
+  function setUp() public {
+    super.setUp();
+    _registerValidatorGroupHelper(group, 1);
+    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().unwrap());
+  }
+
+  function test_ShouldNotSetVoterRewardCommissionImmediately() public {
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(newVoterRewardCommission);
+
+    (uint256 _commission, , ) = validators.getVoterRewardCommission(group);
+    assertEq(_commission, 0, "Voter reward commission should not be set immediately");
+  }
+
+  function test_ShouldSetNextVoterRewardCommission() public {
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(newVoterRewardCommission);
+
+    (, uint256 _nextCommission, ) = validators.getVoterRewardCommission(group);
+    assertEq(_nextCommission, newVoterRewardCommission);
+  }
+
+  function test_ShouldSetNextVoterRewardCommissionBlock() public {
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(newVoterRewardCommission);
+
+    (, , uint256 _nextBlock) = validators.getVoterRewardCommission(group);
+    assertEq(_nextBlock, commissionUpdateDelay.add(uint256(block.number)));
+  }
+
+  function test_Emits_VoterRewardCommissionUpdateQueuedEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorGroupVoterRewardCommissionUpdateQueued(
+      group,
+      newVoterRewardCommission,
+      commissionUpdateDelay.add(uint256(block.number))
+    );
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(newVoterRewardCommission);
+  }
+
+  function test_Reverts_WhenCommissionIsUnchanged() public {
+    vm.expectRevert("Voter reward commission must be different");
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(0); // default is 0
+  }
+
+  function test_Reverts_WhenCommissionGreaterThan100Percent() public {
+    vm.expectRevert("Voter reward commission can't be greater than 100%");
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(FixidityLib.fixed1().unwrap().add(1));
+  }
+
+  function test_Reverts_WhenNotValidatorGroup() public {
+    vm.expectRevert("Not a validator group");
+    vm.prank(validator);
+    validators.setNextVoterRewardCommissionUpdate(newVoterRewardCommission);
+  }
+
+  function test_Reverts_WhenCommissionExceedsMax() public {
+    uint256 maxCommission = FixidityLib.newFixedFraction(2, 100).unwrap(); // 2%
+    validators.setMaxVoterRewardCommission(maxCommission);
+
+    vm.expectRevert("Voter reward commission exceeds max allowed");
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(newVoterRewardCommission); // 5% > 2%
+  }
+
+  function test_ShouldAllowCommissionAtMax() public {
+    uint256 maxCommission = FixidityLib.newFixedFraction(5, 100).unwrap(); // 5%
+    validators.setMaxVoterRewardCommission(maxCommission);
+
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(newVoterRewardCommission); // 5% == 5%
+
+    (, uint256 _nextCommission, ) = validators.getVoterRewardCommission(group);
+    assertEq(_nextCommission, newVoterRewardCommission);
+  }
+
+  function test_ShouldAllowExactly100PercentCommission() public {
+    uint256 fullCommission = FixidityLib.fixed1().unwrap(); // 100%
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(fullCommission);
+
+    (, uint256 _nextCommission, ) = validators.getVoterRewardCommission(group);
+    assertEq(_nextCommission, fullCommission);
+  }
+
+  function test_ShouldOverwritePreviouslyQueuedUpdate() public {
+    uint256 firstCommission = FixidityLib.newFixedFraction(5, 100).unwrap(); // 5%
+    uint256 secondCommission = FixidityLib.newFixedFraction(10, 100).unwrap(); // 10%
+
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(firstCommission);
+
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(secondCommission);
+
+    (, uint256 _nextCommission, ) = validators.getVoterRewardCommission(group);
+    assertEq(_nextCommission, secondCommission, "Should overwrite with second value");
+  }
+
+  function test_Reverts_WhenRequeuingSameQueuedValue() public {
+    uint256 commission = FixidityLib.newFixedFraction(5, 100).unwrap(); // 5%
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(commission);
+
+    // Re-queuing the same pending value is a no-op and must revert.
+    vm.expectRevert("Voter reward commission must be different");
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(commission);
+  }
+
+  // A stale non-zero queued value must be clearable to 0 even when the active commission
+  // is already 0 and the cap has been lowered to 0.
+  function test_ShouldClearStaleQueuedValueToZero_WhenActiveAndCapAreZero() public {
+    uint256 maxCap = FixidityLib.newFixedFraction(20, 100).unwrap(); // 20%
+    validators.setMaxVoterRewardCommission(maxCap);
+
+    // Queue 5% while active commission is still 0.
+    uint256 commission = FixidityLib.newFixedFraction(5, 100).unwrap();
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(commission);
+
+    // Governance disables commissions entirely.
+    validators.setMaxVoterRewardCommission(0);
+
+    // Group clears its stale queued 5% back to 0 (only 0 is allowed under a 0 cap).
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(0);
+
+    (, uint256 _nextCommission, ) = validators.getVoterRewardCommission(group);
+    assertEq(_nextCommission, 0, "Stale queued value should be cleared to 0");
+  }
+}
+
+contract ValidatorsTest_UpdateVoterRewardCommission is ValidatorsTest {
+  uint256 newVoterRewardCommission = FixidityLib.newFixedFraction(5, 100).unwrap(); // 5%
+
+  function setUp() public {
+    super.setUp();
+    _registerValidatorGroupHelper(group, 1);
+    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().unwrap());
+  }
+
+  function test_ShouldSetVoterRewardCommission() public {
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(newVoterRewardCommission);
+
+    blockTravel(commissionUpdateDelay);
+
+    vm.prank(group);
+    validators.updateVoterRewardCommission();
+
+    (uint256 _commission, , ) = validators.getVoterRewardCommission(group);
+    assertEq(_commission, newVoterRewardCommission);
+  }
+
+  function test_Emits_VoterRewardCommissionUpdatedEvent() public {
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(newVoterRewardCommission);
+
+    blockTravel(commissionUpdateDelay);
+
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorGroupVoterRewardCommissionUpdated(group, newVoterRewardCommission);
+
+    vm.prank(group);
+    validators.updateVoterRewardCommission();
+  }
+
+  function test_Reverts_WhenDelayNotPassed() public {
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(newVoterRewardCommission);
+
+    vm.expectRevert("Can't apply voter reward commission update yet");
+    vm.prank(group);
+    validators.updateVoterRewardCommission();
+  }
+
+  function test_Reverts_WhenNoUpdateQueued() public {
+    vm.expectRevert("No voter reward commission update queued");
+    vm.prank(group);
+    validators.updateVoterRewardCommission();
+  }
+
+  function test_Reverts_WhenApplyingAlreadyAppliedUpdate() public {
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(newVoterRewardCommission);
+    blockTravel(commissionUpdateDelay);
+
+    vm.prank(group);
+    validators.updateVoterRewardCommission();
+
+    vm.expectRevert("No voter reward commission update queued");
+    vm.prank(group);
+    validators.updateVoterRewardCommission();
+  }
+
+  function test_ClearsPendingValuesAfterUpdate() public {
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(newVoterRewardCommission);
+
+    blockTravel(commissionUpdateDelay);
+
+    vm.prank(group);
+    validators.updateVoterRewardCommission();
+
+    (, uint256 _next, uint256 _block) = validators.getVoterRewardCommission(group);
+    assertEq(_next, 0, "Next commission should be cleared");
+    assertEq(_block, 0, "Next block should be cleared");
+  }
+
+  function test_Reverts_WhenNotValidatorGroup() public {
+    vm.expectRevert("Not a validator group");
+    vm.prank(validator);
+    validators.updateVoterRewardCommission();
+  }
+
+  function test_Reverts_WhenMaxCapLoweredAfterQueue() public {
+    uint256 maxCap = FixidityLib.newFixedFraction(20, 100).unwrap(); // 20%
+    validators.setMaxVoterRewardCommission(maxCap);
+
+    // Queue 15% — valid at queue time (below 20% cap)
+    uint256 commission = FixidityLib.newFixedFraction(15, 100).unwrap();
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(commission);
+
+    // Governance lowers cap to 10%
+    uint256 newMaxCap = FixidityLib.newFixedFraction(10, 100).unwrap();
+    validators.setMaxVoterRewardCommission(newMaxCap);
+
+    blockTravel(commissionUpdateDelay);
+
+    // Activation should revert because queued 15% exceeds new 10% cap
+    vm.expectRevert("Voter reward commission exceeds max allowed");
+    vm.prank(group);
+    validators.updateVoterRewardCommission();
+  }
+
+  function test_ShouldActivate_WhenQueuedValueStillBelowLoweredCap() public {
+    uint256 maxCap = FixidityLib.newFixedFraction(20, 100).unwrap(); // 20%
+    validators.setMaxVoterRewardCommission(maxCap);
+
+    // Queue 5% — valid at queue time
+    uint256 commission = FixidityLib.newFixedFraction(5, 100).unwrap();
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(commission);
+
+    // Governance lowers cap to 10%
+    uint256 newMaxCap = FixidityLib.newFixedFraction(10, 100).unwrap();
+    validators.setMaxVoterRewardCommission(newMaxCap);
+
+    blockTravel(commissionUpdateDelay);
+
+    // Activation should succeed because queued 5% is still below new 10% cap
+    vm.prank(group);
+    validators.updateVoterRewardCommission();
+
+    (uint256 _commission, , ) = validators.getVoterRewardCommission(group);
+    assertEq(_commission, commission);
+  }
+
+  // A matured-but-unactivated queued update must not revive after governance lowers the
+  // cap (e.g. to 0) and later restores it. It must be re-queued.
+  function test_Reverts_WhenCapReducedAfterMaturityThenRestored() public {
+    uint256 commission = FixidityLib.newFixedFraction(5, 100).unwrap(); // 5%
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(commission);
+
+    // The update matures.
+    blockTravel(commissionUpdateDelay);
+
+    // Governance disables commissions, then restores the cap.
+    validators.setMaxVoterRewardCommission(0);
+    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().unwrap());
+
+    // The stale matured update must not auto-activate; it requires re-queueing.
+    vm.expectRevert("Voter reward commission cap reduced since queued; re-queue required");
+    vm.prank(group);
+    validators.updateVoterRewardCommission();
+  }
+
+  function test_ShouldActivate_WhenRequeuedAfterCapReduction() public {
+    uint256 commission = FixidityLib.newFixedFraction(5, 100).unwrap(); // 5%
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(commission);
+    blockTravel(commissionUpdateDelay);
+
+    // Cap reduced then restored, invalidating the matured queue.
+    validators.setMaxVoterRewardCommission(0);
+    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().unwrap());
+
+    // Re-queue with a fresh delay after the last reduction. The no-op guard in
+    // setNextVoterRewardCommissionUpdate compares against the (now invalidated) queued
+    // value, so the re-queue must differ from it; re-queuing the identical 5% in one step
+    // is not currently supported. See known limitation tracked in follow-up.
+    uint256 requeuedCommission = FixidityLib.newFixedFraction(6, 100).unwrap(); // 6%
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(requeuedCommission);
+    blockTravel(commissionUpdateDelay);
+
+    vm.prank(group);
+    validators.updateVoterRewardCommission();
+
+    (uint256 _commission, , ) = validators.getVoterRewardCommission(group);
+    assertEq(_commission, requeuedCommission, "Re-queued update should activate");
+  }
+
+  function test_Reverts_WhenEpochProcessingStarted() public {
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(newVoterRewardCommission);
+    blockTravel(commissionUpdateDelay);
+
+    epochManager.setIsOnEpochProcess(true);
+
+    vm.expectRevert("Cannot update voter reward commission during epoch processing");
+    vm.prank(group);
+    validators.updateVoterRewardCommission();
+  }
+}
+
+contract ValidatorsTest_SetMaxVoterRewardCommission is ValidatorsTest {
+  function setUp() public {
+    super.setUp();
+  }
+
+  function test_ShouldSetMaxVoterRewardCommission() public {
+    uint256 maxCommission = FixidityLib.newFixedFraction(20, 100).unwrap(); // 20%
+    validators.setMaxVoterRewardCommission(maxCommission);
+    assertEq(validators.maxVoterRewardCommission(), maxCommission);
+  }
+
+  function test_Emits_MaxVoterRewardCommissionSetEvent() public {
+    uint256 maxCommission = FixidityLib.newFixedFraction(20, 100).unwrap();
+    vm.expectEmit(true, true, true, true);
+    emit MaxVoterRewardCommissionSet(maxCommission);
+    validators.setMaxVoterRewardCommission(maxCommission);
+  }
+
+  function test_Reverts_WhenNotOwner() public {
+    uint256 maxCommission = FixidityLib.newFixedFraction(20, 100).unwrap();
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(group);
+    validators.setMaxVoterRewardCommission(maxCommission);
+  }
+
+  function test_Reverts_WhenGreaterThan100Percent() public {
+    vm.expectRevert("Max voter reward commission can't be greater than 100%");
+    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().unwrap().add(1));
+  }
+
+  function test_Reverts_WhenUnchanged() public {
+    vm.expectRevert("Max voter reward commission not changed");
+    validators.setMaxVoterRewardCommission(0); // default is 0
+  }
+
+  function test_ShouldAllow100PercentMax() public {
+    uint256 fullMax = FixidityLib.fixed1().unwrap(); // 100%
+    validators.setMaxVoterRewardCommission(fullMax);
+    assertEq(validators.maxVoterRewardCommission(), fullMax);
+  }
+
+  function test_Reverts_WhenEpochProcessingStarted() public {
+    epochManager.setIsOnEpochProcess(true);
+    uint256 maxCommission = FixidityLib.newFixedFraction(20, 100).unwrap();
+    vm.expectRevert("Cannot update max voter reward commission during epoch processing");
+    validators.setMaxVoterRewardCommission(maxCommission);
+  }
+
+  function test_ShouldRecordReductionBlock_OnlyOnReduction() public {
+    // Raising from 0 to 20% is not a reduction.
+    validators.setMaxVoterRewardCommission(FixidityLib.newFixedFraction(20, 100).unwrap());
+    assertEq(validators.maxVoterRewardCommissionLastReducedBlock(), 0, "Raise must not record");
+
+    // Lowering to 10% records the current block.
+    blockTravel(5);
+    validators.setMaxVoterRewardCommission(FixidityLib.newFixedFraction(10, 100).unwrap());
+    assertEq(
+      validators.maxVoterRewardCommissionLastReducedBlock(),
+      block.number,
+      "Reduction must record block"
+    );
+
+    // Raising again leaves the recorded reduction block unchanged.
+    uint256 recorded = validators.maxVoterRewardCommissionLastReducedBlock();
+    blockTravel(5);
+    validators.setMaxVoterRewardCommission(FixidityLib.newFixedFraction(30, 100).unwrap());
+    assertEq(
+      validators.maxVoterRewardCommissionLastReducedBlock(),
+      recorded,
+      "Raise must not overwrite reduction block"
+    );
+  }
+}
+
+contract ValidatorsTest_GetVoterRewardCommission is ValidatorsTest {
+  function setUp() public {
+    super.setUp();
+    _registerValidatorGroupHelper(group, 1);
+    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().unwrap());
+  }
+
+  function test_ShouldReturnZeroByDefault() public {
+    (uint256 _commission, uint256 _next, uint256 _block) = validators.getVoterRewardCommission(
+      group
+    );
+    assertEq(_commission, 0);
+    assertEq(_next, 0);
+    assertEq(_block, 0);
+  }
+
+  function test_ShouldReturnCorrectValues() public {
+    uint256 newCommission = FixidityLib.newFixedFraction(10, 100).unwrap(); // 10%
+
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(newCommission);
+    blockTravel(commissionUpdateDelay);
+    vm.prank(group);
+    validators.updateVoterRewardCommission();
+
+    (uint256 _commission, , ) = validators.getVoterRewardCommission(group);
+    assertEq(_commission, newCommission);
+  }
+
+  function test_Reverts_WhenNotValidatorGroup() public {
+    vm.expectRevert("Not a validator group");
+    validators.getVoterRewardCommission(validator);
+  }
+
+  function test_ShouldReturnPendingValuesBeforeActivation() public {
+    uint256 newCommission = FixidityLib.newFixedFraction(10, 100).unwrap(); // 10%
+
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(newCommission);
+
+    (uint256 _commission, uint256 _next, uint256 _block) = validators.getVoterRewardCommission(
+      group
+    );
+    assertEq(_commission, 0, "Current commission should still be 0");
+    assertEq(_next, newCommission, "Next commission should be set");
+    assertGt(_block, block.number, "Activation block should be in the future");
+  }
+}
+
+contract ValidatorsTest_VoterRewardCommission_Fuzz is ValidatorsTest {
+  using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
+
+  function setUp() public {
+    super.setUp();
+    _registerValidatorGroupHelper(group, 1);
+    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().unwrap());
+  }
+
+  /// @notice Any commission in (0, fixed1()] should be queueable.
+  function test_ShouldQueueAnyValidCommission(uint256 commission) public {
+    commission = bound(commission, 1, FixidityLib.fixed1().unwrap());
+
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(commission);
+
+    (, uint256 _nextCommission, uint256 _nextBlock) = validators.getVoterRewardCommission(group);
+    assertEq(_nextCommission, commission, "Queued commission should match input");
+    assertEq(
+      _nextBlock,
+      commissionUpdateDelay.add(uint256(block.number)),
+      "Activation block should be block.number + delay"
+    );
+  }
+
+  /// @notice Any commission in (0, fixed1()] should survive the full queue + activate cycle.
+  function test_ShouldQueueAndActivateAnyValidCommission(uint256 commission) public {
+    commission = bound(commission, 1, FixidityLib.fixed1().unwrap());
+
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(commission);
+
+    blockTravel(commissionUpdateDelay);
+
+    vm.prank(group);
+    validators.updateVoterRewardCommission();
+
+    (uint256 _commission, uint256 _next, uint256 _block) = validators.getVoterRewardCommission(
+      group
+    );
+    assertEq(_commission, commission, "Active commission should match queued value");
+    assertEq(_next, 0, "Pending commission should be cleared");
+    assertEq(_block, 0, "Pending block should be cleared");
+  }
+
+  /// @notice Any commission above maxVoterRewardCommission should revert at queue time.
+  function test_ShouldRevertForAnyCommissionAboveMax(uint256 commission, uint256 maxCap) public {
+    maxCap = bound(maxCap, 1, FixidityLib.fixed1().unwrap().sub(1));
+    commission = bound(commission, maxCap.add(1), FixidityLib.fixed1().unwrap());
+
+    validators.setMaxVoterRewardCommission(maxCap);
+
+    vm.expectRevert("Voter reward commission exceeds max allowed");
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(commission);
+  }
+
+  /// @notice Any commission at or below maxVoterRewardCommission should succeed.
+  function test_ShouldAcceptAnyCommissionAtOrBelowMax(uint256 commission, uint256 maxCap) public {
+    maxCap = bound(maxCap, 1, FixidityLib.fixed1().unwrap());
+    commission = bound(commission, 1, maxCap);
+
+    validators.setMaxVoterRewardCommission(maxCap);
+
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(commission);
+
+    (, uint256 _nextCommission, ) = validators.getVoterRewardCommission(group);
+    assertEq(_nextCommission, commission, "Commission at or below max should be queued");
+  }
+
+  /// @notice When governance lowers the cap after queuing, activation should revert
+  /// if the queued value exceeds the new cap.
+  function test_ShouldRevertActivationWhenCapLoweredBelowQueued(
+    uint256 commission,
+    uint256 initialCap,
+    uint256 newCap
+  ) public {
+    // Set up: initialCap >= commission > newCap > 0
+    initialCap = bound(initialCap, 3, FixidityLib.fixed1().unwrap());
+    commission = bound(commission, 2, initialCap);
+    newCap = bound(newCap, 1, commission.sub(1));
+
+    validators.setMaxVoterRewardCommission(initialCap);
+
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(commission);
+
+    // Governance lowers cap
+    validators.setMaxVoterRewardCommission(newCap);
+
+    blockTravel(commissionUpdateDelay);
+
+    vm.expectRevert("Voter reward commission exceeds max allowed");
+    vm.prank(group);
+    validators.updateVoterRewardCommission();
+  }
+
+  /// @notice Any commission above fixed1() should always revert (regardless of max cap).
+  function test_ShouldRevertForAnyCommissionAbove100Percent(uint256 commission) public {
+    commission = bound(commission, FixidityLib.fixed1().unwrap().add(1), uint256(-1));
+
+    vm.expectRevert("Voter reward commission can't be greater than 100%");
+    vm.prank(group);
+    validators.setNextVoterRewardCommissionUpdate(commission);
+  }
+
+  /// @notice Max voter reward commission can be set to any value in [1, fixed1()].
+  function test_ShouldSetAnyValidMaxVoterRewardCommission(uint256 maxCommission) public {
+    maxCommission = bound(maxCommission, 1, FixidityLib.fixed1().unwrap());
+
+    validators.setMaxVoterRewardCommission(maxCommission);
+    assertEq(
+      validators.maxVoterRewardCommission(),
+      maxCommission,
+      "Max commission should match input"
+    );
   }
 }
