@@ -1,0 +1,34 @@
+[
+  {
+    "contract": "ElectionProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0x111ce579e4e036eb9094366c44ff4e883345e491"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "EpochManagerProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0x810125013107fbffd2cc01dce79356af4268ded9"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "ValidatorsProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0xdb0a170f7b0d7cf29af0269719c1b56c0d55e607"
+    ],
+    "value": "0"
+  },
+  {
+    "address": "0x5E7b295bd8D80625e2cCac97C98123aaEB5E7Ea5",
+    "function": "setMaxVoterRewardCommission(uint256)",
+    "args": [
+      "1000000000000000000000000"
+    ],
+    "value": "0"
+  }
+]
