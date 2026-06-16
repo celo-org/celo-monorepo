@@ -263,18 +263,12 @@ function prepareAbisPackageJson(exports: Exports) {
   log('Preparing @celo/abis package.json')
   const packageJsonPath = path.join(ABIS_PACKAGE_SRC_DIR, 'package.json')
 
-  if (process.env.RELEASE_VERSION) {
-    log('Replacing @celo/abis version with RELEASE_VERSION)')
-
-    replacePackageVersionAndMakePublic(packageJsonPath, (json) => {
-      log('Setting @celo/abis exports')
-      json.exports = exports
-    })
-
-    return
-  }
-
-  log('Skipping @celo/abis package.json preparation (no RELEASE_VERSION provided)')
+  // Always prepare the manifest; replacePackageVersionAndMakePublic sets the real
+  // RELEASE_VERSION or a dry-run placeholder so `npm publish --dry-run` stays valid.
+  replacePackageVersionAndMakePublic(packageJsonPath, (json) => {
+    log('Setting @celo/abis exports')
+    json.exports = exports
+  })
 }
 
 function prepareContractsPackage() {
@@ -294,15 +288,10 @@ function prepareContractsPackage() {
     child_process.execSync(cmd)
   }
 
-  if (process.env.RELEASE_VERSION) {
-    log('Replacing @celo/contracts version with RELEASE_VERSION)')
-    const packageJsonPath = path.join(CONTRACTS_PACKAGE_STAGING_DIR, 'package.json')
-    replacePackageVersionAndMakePublic(packageJsonPath)
-
-    return
-  }
-
-  log('Skipping @celo/contracts package.json preparation (no RELEASE_VERSION provided)')
+  // Always prepare the manifest; replacePackageVersionAndMakePublic sets the real
+  // RELEASE_VERSION or a dry-run placeholder so `npm publish --dry-run` stays valid.
+  const packageJsonPath = path.join(CONTRACTS_PACKAGE_STAGING_DIR, 'package.json')
+  replacePackageVersionAndMakePublic(packageJsonPath)
 }
 
 function lsRecursive(dir: string): string[] {
