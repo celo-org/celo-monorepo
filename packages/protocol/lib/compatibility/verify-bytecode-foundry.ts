@@ -267,14 +267,24 @@ const dfsStep = async (queue: QueueEntry[], visited: Set<string>, context: Verif
 }
 
 const assertValidProposalTransactions = (proposal: ProposalTx[]) => {
-  const invalidTransactions = proposal.filter(
+  const unverifiableTransactions = proposal.filter(
     (tx) => !isProxyRepointTransaction(tx) && !isRegistryRepointTransaction(tx)
   )
-  if (invalidTransactions.length > 0) {
-    throw new Error(`Proposal contains invalid release transactions ${invalidTransactions}`)
+  if (unverifiableTransactions.length > 0) {
+    // Transactions that are neither proxy repoints nor registry repoints (e.g.
+    // governance config calls such as Validators.setMaxVoterRewardCommission) deploy
+    // no bytecode, so there is nothing for this tool to verify. Surface them clearly
+    // for manual review instead of failing the whole bytecode verification.
+    console.warn(
+      `⚠️  Proposal contains ${unverifiableTransactions.length} transaction(s) with no ` +
+        `bytecode to verify — review these manually:\n` +
+        unverifiableTransactions
+          .map((tx) => `     - ${tx.contract}.${tx.function}(${(tx.args || []).join(', ')})`)
+          .join('\n')
+    )
+  } else {
+    console.info('Proposal contains only valid release transactions!')
   }
-
-  console.info('Proposal contains only valid release transactions!')
 }
 
 const assertValidInitializationData = (
