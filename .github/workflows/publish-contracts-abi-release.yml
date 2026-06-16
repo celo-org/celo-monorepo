@@ -40,7 +40,9 @@ permissions:
 
 jobs:
   publish:
-    runs-on: ['self-hosted', 'org', 'npm-publish']
+    # github-hosted runner required: npm OIDC trusted publishing auto-enables
+    # sigstore provenance, which is only supported on github-hosted runners.
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       id-token: write
