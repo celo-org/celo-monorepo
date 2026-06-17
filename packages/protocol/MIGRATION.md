@@ -296,9 +296,34 @@ forge test --match-path "test-sol/integration/*"
 ## STATUS (live)
 
 - P0 infra: DONE (baselines for 27 impls, storage-diff.sh gate, plan) — commit `edcb127ff`
-- **FeeCurrencyWhitelist**: DONE, storage-gate OK, common suite 644/644 green — commit `3481e8766`
-- Remaining impls: Accounts, GoldToken, FeeHandler(+sellers), Freezer, Registry, MultiSig, Governance, Election, LockedGold, EpochRewards, ReleaseGold(+MultiSig), GovernanceApproverMultiSig, slashers(3), BlockchainParameters, Attestations, Escrow, FederatedAttestations, OdisPayments, Random, SortedOracles
-- Test-conversion burden map (`new X(` sites): Accounts 14, Freezer 6, LockedGold 5, GoldToken 4, Election/Registry/UniswapSeller 3, Mento/FederatedAtt/SortedOracles 2, most others 0–1 (0 often means a Mock subclass deployed via `new XMock()` — that also needs converting).
+- **DONE (migrated, storage-gated, full unit+integration suites green, committed):**
+  FeeCurrencyWhitelist, OdisPayments, GovernanceSlasher, DowntimeSlasher (+SlasherUtil),
+  FederatedAttestations, DoubleSigningSlasher, BlockchainParameters, Escrow, Random, SortedOracles
+  — 10 contracts. Full sweep: `forge test --match-path "test-sol/unit/*"` -> 2209 passed, 0 failed;
+  integration 12 passed. (Note: CI per-domain jobs bump `--block-gas-limit 50000000` for
+  network/validators/voting/stability/identity; the catch-all/common jobs do NOT — don't pass the
+  cap to the catch-all or heavy Heap/Election tests hit the lowered limit.)
+- **REMAINING impls (~14):** Accounts, GoldToken, FeeHandler, FeeHandlerSeller,
+  MentoFeeHandlerSeller, UniswapFeeHandlerSeller, Freezer, Registry, MultiSig (+ReleaseGoldMultiSig,
+  GovernanceApproverMultiSig), Governance, Election, LockedGold, EpochRewards, ReleaseGold, Attestations.
+- More lessons: (1) Solidity 0.5 interfaces CANNOT inherit — test superset interfaces must be
+  standalone. (2) deployable 0.8 mocks must live in a plain `.sol` (not `.t.sol`) or forge runs their
+  `test*` helpers as cases. (3) a contract used cross-domain needs a CompileX forcer in EACH consuming
+  domain's path. (4) interfaces must NOT add getters whose types pull a 0.5-only lib into the shared
+  interface (0.8 importers break) — isolate such getters in a test-only interface. (5) running parallel
+  migration agents that touch the SAME test file clobbers edits — serialize coupled groups. (6) keep
+  devchain compile-list files (05Links.sol / Import05Dependencies.sol) in sync — drop migrated contracts.
+- Extra gotchas learned (added to recipe lessons): never put `owner()`/`isOwner()` in an interface
+  (collides with OZ Ownable under 0.8); interfaces with struct params need
+  `pragma experimental ABIEncoderV2`; mock subclasses overriding precompile getters require the base
+  fn to be `virtual` (several added in contracts-0.8/common/UsingPrecompiles.sol); deployCodeTo uses a
+  FIXED address and does NOT reset storage so avoid double-init; remove events re-declared in a base;
+  preserve `onlyL1` on mock overrides so L2-revert tests still fire.
+- Test-conversion burden map (`new X(` sites): Accounts 14, Freezer 6, LockedGold 5, GoldToken 4,
+  Election/Registry/UniswapSeller 3, Mento/SortedOracles 2, most others 0–1 (0 often = a Mock subclass
+  deployed via `new XMock()` that also needs converting).
+- MultiSig must migrate together with ReleaseGoldMultiSig + GovernanceApproverMultiSig (they inherit it).
+  FeeHandlerSeller is the base for Mento/Uniswap sellers (migrate together).
 
 ## Sequencing summary
 
