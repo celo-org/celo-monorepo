@@ -43,6 +43,7 @@ export const SOLIDITY_08_PACKAGE = {
     'EpochManagerEnabler',
     'ScoreManager',
     'AddressLinkedList', // FIXME: https://github.com/celo-org/celo-monorepo/issues/11684
+    'FeeCurrencyWhitelist',
   ],
   proxyContracts: [
     'GasPriceMinimumProxy',

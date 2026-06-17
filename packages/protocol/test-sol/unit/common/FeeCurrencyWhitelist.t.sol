@@ -2,10 +2,14 @@
 pragma solidity ^0.5.13;
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-import "@celo-contracts/common/FeeCurrencyWhitelist.sol";
+import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 
+// The contract under test now lives in contracts-0.8; this 0.5 test deploys the
+// compiled 0.8 bytecode (via deployCodeTo) and interacts through the interface.
 contract FeeCurrencyWhitelistTest is TestWithUtils {
-  FeeCurrencyWhitelist feeCurrencyWhitelist;
+  IFeeCurrencyWhitelist feeCurrencyWhitelist;
+  address feeCurrencyWhitelistAddress;
   address nonOwner;
   address owner;
 
@@ -15,15 +19,16 @@ contract FeeCurrencyWhitelistTest is TestWithUtils {
     owner = address(this);
     nonOwner = actor("nonOwner");
 
-    feeCurrencyWhitelist = new FeeCurrencyWhitelist(true);
+    feeCurrencyWhitelistAddress = actor("feeCurrencyWhitelist");
+    deployCodeTo("FeeCurrencyWhitelistCompile", feeCurrencyWhitelistAddress);
+    feeCurrencyWhitelist = IFeeCurrencyWhitelist(feeCurrencyWhitelistAddress);
     feeCurrencyWhitelist.initialize();
   }
 }
 
 contract FeeCurrencyWhitelistInitialize is FeeCurrencyWhitelistTest {
   function test_InitializeOwner() public {
-    assertTrue(feeCurrencyWhitelist.isOwner());
-    assertEq(feeCurrencyWhitelist.owner(), address(this));
+    assertEq(IOwnable(feeCurrencyWhitelistAddress).owner(), address(this));
   }
 
   function test_ShouldNotBeCallableAgain() public {

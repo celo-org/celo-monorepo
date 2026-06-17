@@ -1,11 +1,12 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
 
-import "./interfaces/IFeeCurrencyWhitelist.sol";
-import "../common/Initializable.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
+import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+import "../../contracts/common/Initializable.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "./IsL2Check.sol";
 
 /**
  * @title Holds a whitelist of the ERC20+ tokens that can be used to pay for gas
@@ -29,7 +30,7 @@ contract FeeCurrencyWhitelist is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.

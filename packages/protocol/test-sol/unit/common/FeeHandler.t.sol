@@ -14,7 +14,7 @@ import { StableToken } from "@mento-core/contracts/StableToken.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Freezer.sol";
 import "@celo-contracts/common/GoldToken.sol";
-import "@celo-contracts/common/FeeCurrencyWhitelist.sol";
+import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import "@celo-contracts/common/MentoFeeHandlerSeller.sol";
 import "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
 import "@celo-contracts/uniswap/test/MockUniswapV2Router02.sol";
@@ -46,7 +46,7 @@ contract FeeHandlerTest is TestWithUtils {
   MockUniswapV2Factory uniswapFactory;
   MockUniswapV2Factory uniswapFactory2;
 
-  FeeCurrencyWhitelist feeCurrencyWhitelist;
+  IFeeCurrencyWhitelist feeCurrencyWhitelist;
 
   MentoFeeHandlerSeller mentoSeller;
   UniswapFeeHandlerSeller uniswapFeeHandlerSeller;
@@ -101,7 +101,9 @@ contract FeeHandlerTest is TestWithUtils {
     registry = IRegistry(REGISTRY_ADDRESS);
     feeHandler = new FeeHandler(true);
     freezer = new Freezer(true);
-    feeCurrencyWhitelist = new FeeCurrencyWhitelist(true);
+    address feeCurrencyWhitelistAddress = actor("feeCurrencyWhitelist");
+    deployCodeTo("FeeCurrencyWhitelistCompile", feeCurrencyWhitelistAddress);
+    feeCurrencyWhitelist = IFeeCurrencyWhitelist(feeCurrencyWhitelistAddress);
     mentoSeller = new MentoFeeHandlerSeller(true);
     uniswapFeeHandlerSeller = new UniswapFeeHandlerSeller(true);
 
