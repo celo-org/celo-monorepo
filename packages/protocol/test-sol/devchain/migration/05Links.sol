@@ -9,7 +9,6 @@ import "@celo-contracts/governance/GovernanceSlasher.sol";
 import "@celo-contracts/governance/LockedGold.sol";
 import "@celo-contracts/common/Freezer.sol";
 import "@celo-contracts/common/FeeHandler.sol";
-import "@celo-contracts/identity/OdisPayments.sol";
 import "@celo-contracts/identity/Random.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/UniswapFeeHandlerSeller.sol";

@@ -44,6 +44,7 @@ export const SOLIDITY_08_PACKAGE = {
     'ScoreManager',
     'AddressLinkedList', // FIXME: https://github.com/celo-org/celo-monorepo/issues/11684
     'FeeCurrencyWhitelist',
+    'OdisPayments',
   ],
   proxyContracts: [
     'GasPriceMinimumProxy',

@@ -5,7 +5,9 @@ pragma experimental ABIEncoderV2;
 import "celo-foundry/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
-import "@celo-contracts/identity/OdisPayments.sol";
+import "@celo-contracts/identity/interfaces/IOdisPayments.sol";
+import "@celo-contracts/identity/interfaces/IOdisPaymentsInitializer.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 import { StableToken } from "@mento-core/contracts/StableToken.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Freezer.sol";
@@ -17,7 +19,10 @@ contract OdisPaymentsFoundryTest is Test, TestConstants {
 
   Registry registry;
   Freezer freezer;
-  OdisPayments odisPayments;
+  // OdisPayments now lives in contracts-0.8; deployed via deployCodeTo and used
+  // through its interface from this 0.5 test.
+  IOdisPayments odisPayments;
+  address odisPaymentsAddress;
   StableToken stableToken;
 
   address sender;
@@ -30,13 +35,15 @@ contract OdisPaymentsFoundryTest is Test, TestConstants {
 
     registry = Registry(REGISTRY_ADDRESS);
     freezer = new Freezer(true);
-    odisPayments = new OdisPayments(true);
+    odisPaymentsAddress = actor("odisPayments");
+    deployCodeTo("OdisPaymentsCompile", odisPaymentsAddress);
+    odisPayments = IOdisPayments(odisPaymentsAddress);
     stableToken = new StableToken(true);
 
     sender = actor("sender");
     receiver = actor("receiver");
 
-    odisPayments.initialize();
+    IOdisPaymentsInitializer(odisPaymentsAddress).initialize();
     registry.setAddressFor("StableToken", address(stableToken));
 
     address[] memory addresses = new address[](2);
@@ -71,12 +78,12 @@ contract OdisPaymentsFoundryTest_Initialize is OdisPaymentsFoundryTest {
   }
 
   function test_ShouldHaveSetOwner() public {
-    assertEq(odisPayments.owner(), address(this));
+    assertEq(IOwnable(odisPaymentsAddress).owner(), address(this));
   }
 
   function test_ShouldNotBeCallableAgain() public {
     vm.expectRevert("contract already initialized");
-    odisPayments.initialize();
+    IOdisPaymentsInitializer(odisPaymentsAddress).initialize();
   }
 }
 
@@ -136,7 +143,9 @@ contract OdisPaymentsFoundryTest_PayInCUSD is OdisPaymentsFoundryTest {
   }
 
   function test_ShouldRevertIfTransferFails() public {
-    vm.expectRevert("SafeERC20: low-level call failed");
+    // OZ v4.x SafeERC20 bubbles up the token's own revert reason instead of the
+    // generic "SafeERC20: low-level call failed" used by the old OZ v2.x.
+    vm.expectRevert("transfer value exceeded sender's allowance for recipient");
     vm.prank(sender);
     odisPayments.payInCUSD(sender, valueApprovedForTransfer + 1);
 
