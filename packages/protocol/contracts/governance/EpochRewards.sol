@@ -489,8 +489,10 @@ contract EpochRewards is
   ) internal view returns (FixidityLib.Fraction memory) {
     uint256 targetSupply = getTargetGoldTotalSupply();
     uint256 allocatedSupply = ICeloToken(address(getCeloToken())).allocatedSupply();
+
     uint256 remainingSupply = GOLD_SUPPLY_CAP.sub(allocatedSupply.add(targetGoldSupplyIncrease));
     uint256 targetRemainingSupply = GOLD_SUPPLY_CAP.sub(targetSupply);
+
     FixidityLib.Fraction memory remainingToTargetRatio = FixidityLib
       .newFixed(remainingSupply)
       .divide(FixidityLib.newFixed(targetRemainingSupply));

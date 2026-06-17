@@ -1,4 +1,4 @@
-import { Artifact, TypeInfo, makeZContract, getContractName, getArtifactByName } from '@celo/protocol/lib/compatibility/internal';
+import { Artifact, TypeInfo, getArtifactByName, getContractName, makeZContract } from '@celo/protocol/lib/compatibility/internal';
 import {
   BuildArtifacts,
   Operation,
@@ -193,14 +193,13 @@ export const reportLayoutIncompatibilities = (oldArtifactsSet: BuildArtifacts[],
   for (const newArtifacts of newArtifactsSets) {
     const reports = newArtifacts.listArtifacts()
       .filter((newArtifact: any) => {
-        // Matches all Truffle project artifacts (core contracts and test resource contracts)
-        const truffleProjectContractPathPattern = /^project:/
+        // TODO this code looks very repeated from ast-code.ts
         // Matches Foundry core contracts
         const foundryCoreContractPathPattern = /^contracts(-0\.8)?\//
         // Matches Foundry test resource contracts
         const foundryTestContractPathPattern = /^test-ts/
         const path = newArtifact.ast.absolutePath
-        return truffleProjectContractPathPattern.test(path) || foundryCoreContractPathPattern.test(path) || foundryTestContractPathPattern.test(path)
+        return foundryCoreContractPathPattern.test(path) || foundryTestContractPathPattern.test(path)
       })
       .map((newArtifact: any) => {
       for (const oldArtifacts of oldArtifactsSet) {
