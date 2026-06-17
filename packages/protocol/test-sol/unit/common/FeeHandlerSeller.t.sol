@@ -5,11 +5,11 @@ pragma experimental ABIEncoderV2;
 // Helper contracts
 
 import { CeloTokenMock } from "@test-sol/unit/common/CeloTokenMock.sol";
-import { FeeHandlerSeller } from "@celo-contracts/common/FeeHandlerSeller.sol";
-import { MentoFeeHandlerSeller } from "@celo-contracts/common/MentoFeeHandlerSeller.sol";
-import { UniswapFeeHandlerSeller } from "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+
+import "@test-sol/unit/common/interfaces/IFeeHandlerSellerTest.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 
 contract FeeHandlerSellerTest is TestWithUtils {
   // Actors
@@ -18,14 +18,14 @@ contract FeeHandlerSellerTest is TestWithUtils {
 
   // Contract instances
   CeloTokenMock celoToken; // Using mock token to work around missing transfer precompile
-  FeeHandlerSeller mentoFeeHandlerSeller;
-  FeeHandlerSeller uniswapFeeHandlerSeller;
+  IFeeHandlerSellerTest mentoFeeHandlerSeller;
+  IFeeHandlerSellerTest uniswapFeeHandlerSeller;
 
   address oracle;
   address sortedOracles;
 
   // Helper data structures
-  FeeHandlerSeller[] feeHandlerSellerInstances;
+  IFeeHandlerSellerTest[] feeHandlerSellerInstances;
 
   event OracleAddressSet(address _token, address _oracle);
 
@@ -38,8 +38,13 @@ contract FeeHandlerSellerTest is TestWithUtils {
 
     registry.setAddressFor("SortedOracles", sortedOracles);
 
-    mentoFeeHandlerSeller = new MentoFeeHandlerSeller(true);
-    uniswapFeeHandlerSeller = new UniswapFeeHandlerSeller(true);
+    address mentoSellerAddress = actor("mentoFeeHandlerSeller");
+    deployCodeTo("MentoFeeHandlerSellerCompile", mentoSellerAddress);
+    mentoFeeHandlerSeller = IFeeHandlerSellerTest(mentoSellerAddress);
+
+    address uniswapSellerAddress = actor("uniswapFeeHandlerSeller");
+    deployCodeTo("UniswapFeeHandlerSellerCompile", uniswapSellerAddress);
+    uniswapFeeHandlerSeller = IFeeHandlerSellerTest(uniswapSellerAddress);
 
     feeHandlerSellerInstances.push(mentoFeeHandlerSeller);
     feeHandlerSellerInstances.push(uniswapFeeHandlerSeller);
@@ -66,7 +71,7 @@ contract FeeHandlerSellerTest_Transfer is FeeHandlerSellerTest {
         "Balance of contract should be 1 at start"
       );
 
-      vm.prank(feeHandlerSellerInstances[i].owner());
+      vm.prank(IOwnable(address(feeHandlerSellerInstances[i])).owner());
       feeHandlerSellerInstances[i].transfer(address(celoToken), ONE_CELOTOKEN, RECEIVER_ADDRESS);
 
       assertEq(
@@ -98,7 +103,7 @@ contract FeeHandlerSellerTest_SetMinimumReports is FeeHandlerSellerTest {
 
   function test_SetMinimumReports_ShouldSucceedWhen_CalledByOwner() public {
     for (uint256 i = 0; i < feeHandlerSellerInstances.length; i++) {
-      vm.prank(feeHandlerSellerInstances[i].owner());
+      vm.prank(IOwnable(address(feeHandlerSellerInstances[i])).owner());
 
       feeHandlerSellerInstances[i].setMinimumReports(
         ARBITRARY_TOKEN_ADDRESS,

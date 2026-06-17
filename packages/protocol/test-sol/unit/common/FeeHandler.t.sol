@@ -5,8 +5,6 @@ pragma experimental ABIEncoderV2;
 // Refactor this test, make it easy to generate
 // will have to support more fees
 
-import "@celo-contracts/common/FeeHandler.sol";
-
 import "@test-sol/TestWithUtils.sol";
 
 import { Exchange } from "@mento-core/contracts/Exchange.sol";
@@ -15,14 +13,15 @@ import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Freezer.sol";
 import "@celo-contracts/common/GoldToken.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
-import "@celo-contracts/common/MentoFeeHandlerSeller.sol";
-import "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
 import "@celo-contracts/uniswap/test/MockUniswapV2Router02.sol";
 import "@celo-contracts/uniswap/test/MockUniswapV2Factory.sol";
 import "@celo-contracts/uniswap/test/MockERC20.sol";
 import "@celo-contracts/stability/test/MockSortedOracles.sol";
 import "@mento-core/test/mocks/MockReserve.sol";
 import "@celo-contracts/common/ProxyFactory.sol";
+
+import "@test-sol/unit/common/interfaces/IFeeHandlerTest.sol";
+import "@test-sol/unit/common/interfaces/IFeeHandlerSellerTest.sol";
 
 contract FeeHandlerTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
@@ -31,7 +30,7 @@ contract FeeHandlerTest is TestWithUtils {
   event BeneficiaryFractionSet(address beneficiary, uint256 fraction);
   event BeneficiaryNameSet(address beneficiary, string name);
 
-  FeeHandler feeHandler;
+  IFeeHandlerTest feeHandler;
 
   GoldToken celoToken;
   MockSortedOracles mockSortedOracles;
@@ -47,8 +46,8 @@ contract FeeHandlerTest is TestWithUtils {
 
   IFeeCurrencyWhitelist feeCurrencyWhitelist;
 
-  MentoFeeHandlerSeller mentoSeller;
-  UniswapFeeHandlerSeller uniswapFeeHandlerSeller;
+  IFeeHandlerSellerTest mentoSeller;
+  IFeeHandlerSellerTest uniswapFeeHandlerSeller;
 
   Exchange exchangeUSD;
   Exchange exchangeEUR;
@@ -98,13 +97,19 @@ contract FeeHandlerTest is TestWithUtils {
     stableToken = new StableToken(true);
     stableTokenEUR = new StableToken(true);
     registry = IRegistry(REGISTRY_ADDRESS);
-    feeHandler = new FeeHandler(true);
+    address feeHandlerAddress = actor("feeHandler");
+    deployCodeTo("FeeHandlerCompile", feeHandlerAddress);
+    feeHandler = IFeeHandlerTest(feeHandlerAddress);
     freezer = new Freezer(true);
     address feeCurrencyWhitelistAddress = actor("feeCurrencyWhitelist");
     deployCodeTo("FeeCurrencyWhitelistCompile", feeCurrencyWhitelistAddress);
     feeCurrencyWhitelist = IFeeCurrencyWhitelist(feeCurrencyWhitelistAddress);
-    mentoSeller = new MentoFeeHandlerSeller(true);
-    uniswapFeeHandlerSeller = new UniswapFeeHandlerSeller(true);
+    address mentoSellerAddress = actor("mentoSeller");
+    deployCodeTo("MentoFeeHandlerSellerCompile", mentoSellerAddress);
+    mentoSeller = IFeeHandlerSellerTest(mentoSellerAddress);
+    address uniswapSellerAddress = actor("uniswapFeeHandlerSeller");
+    deployCodeTo("UniswapFeeHandlerSellerCompile", uniswapSellerAddress);
+    uniswapFeeHandlerSeller = IFeeHandlerSellerTest(uniswapSellerAddress);
 
     tokenA = new MockERC20();
 

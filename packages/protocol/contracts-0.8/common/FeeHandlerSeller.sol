@@ -1,17 +1,18 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import { SafeMath } from "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
 import "./UsingRegistry.sol";
-import "../common/FixidityLib.sol";
-import "../common/Initializable.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/FixidityLib.sol";
+import "../../contracts/common/Initializable.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
 // Abstract class for a FeeHandlerSeller, as defined in CIP-52
 // https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md
-contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry, ICeloVersionedContract {
+abstract contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry, ICeloVersionedContract {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -38,7 +39,7 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry, ICeloVersion
   }
 
   /**
-  * @notice Allows owner to transfer tokens of this contract. It's meant for governance to 
+  * @notice Allows owner to transfer tokens of this contract. It's meant for governance to
     trigger use cases not contemplated in this contract.
     @param token The address of the token to transfer.
     @param amount The amount of tokens to transfer.
@@ -58,7 +59,7 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry, ICeloVersion
   }
 
   /**
-    @dev Calculates the minimum amount of tokens that should be received for the specified 
+    @dev Calculates the minimum amount of tokens that should be received for the specified
     amount with the given mid-price and maximum slippage.
     @param midPriceNumerator The numerator of the mid-price for the token pair.
     @param midPriceDenominator The denominator of the mid-price for the token pair.

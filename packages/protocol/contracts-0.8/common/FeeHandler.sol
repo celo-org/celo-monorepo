@@ -1,27 +1,26 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/math/Math.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/utils/EnumerableSet.sol";
+import { SafeMath } from "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
 
 import "./UsingRegistry.sol";
-import "../common/Freezable.sol";
-import "../common/FixidityLib.sol";
-import "../common/Initializable.sol";
+import "../../contracts/common/FixidityLib.sol";
+import "../../contracts/common/Initializable.sol";
 
-import "../common/interfaces/IFeeHandler.sol";
-import "../common/interfaces/IFeeHandlerSeller.sol";
+import "../../contracts/common/interfaces/IFeeHandler.sol";
+import "../../contracts/common/interfaces/IFeeHandlerSeller.sol";
 
 // TODO move to IStableToken when it adds method getExchangeRegistryId
-import "./interfaces/IStableTokenMento.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/interfaces/ICeloToken.sol";
+import "../../contracts/common/interfaces/IStableTokenMento.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/interfaces/ICeloToken.sol";
 
 // Using the minimal required signatures in the interfaces so more contracts could be compatible
-import "../common/libraries/ReentrancyGuard.sol";
+import "../../contracts/common/libraries/ReentrancyGuard.sol";
 
 // An implementation of FeeHandler as described in CIP-52
 // See https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md
@@ -30,10 +29,14 @@ contract FeeHandler is
   Initializable,
   UsingRegistry,
   ICeloVersionedContract,
-  Freezable,
   IFeeHandler,
   ReentrancyGuard
 {
+  // onlyWhenNotFrozen functions can only be called when the contract is not frozen.
+  modifier onlyWhenNotFrozen() {
+    require(!getFreezer().isFrozen(address(this)), "can't call when contract is frozen");
+    _;
+  }
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
   using EnumerableSet for EnumerableSet.AddressSet;
@@ -107,7 +110,7 @@ contract FeeHandler is
    * @notice Sets initialized == true on implementation contracts.
    * @param test Set to true to skip implementation initialisation.
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -141,7 +144,7 @@ contract FeeHandler is
   }
 
   // Without this the contract cant receive Celo as native transfer
-  function() external payable {}
+  receive() external payable {}
 
   function setCarbonFraction(uint256 newFraction) external onlyOwner {
     _setCarbonFraction(newFraction);
@@ -420,7 +423,7 @@ contract FeeHandler is
   }
 
   function getOtherBeneficiariesAddresses() external view returns (address[] memory) {
-    return otherBeneficiariesAddresses.values;
+    return otherBeneficiariesAddresses.values();
   }
 
   /**
@@ -447,7 +450,7 @@ contract FeeHandler is
       return false;
     }
 
-    uint256 currentDay = now / 1 days;
+    uint256 currentDay = block.timestamp / 1 days;
     // Pattern borrowed from Reserve.sol
     if (currentDay > tokenState.lastLimitDay) {
       tokenState.lastLimitDay = currentDay;
@@ -458,7 +461,7 @@ contract FeeHandler is
   }
 
   function getActiveTokens() public view returns (address[] memory) {
-    return activeTokens.values;
+    return activeTokens.values();
   }
 
   function _getBurnFraction() internal view returns (uint256) {
@@ -719,8 +722,8 @@ contract FeeHandler is
 
     _executePayment(tokenAddress, ignoreRenaming_carbonFeeBeneficiary, carbonFundAmount);
 
-    for (uint256 i = 0; i < EnumerableSet.length(otherBeneficiariesAddresses); i++) {
-      address beneficiary = otherBeneficiariesAddresses.get(i);
+    for (uint256 i = 0; i < otherBeneficiariesAddresses.length(); i++) {
+      address beneficiary = otherBeneficiariesAddresses.at(i);
       Beneficiary storage otherBeneficiary = otherBeneficiaries[beneficiary];
 
       uint256 amount = _calculateDistributeAmounts(
@@ -753,8 +756,8 @@ contract FeeHandler is
   }
 
   function _distributeAll() private {
-    for (uint256 i = 0; i < EnumerableSet.length(activeTokens); i++) {
-      address token = activeTokens.get(i);
+    for (uint256 i = 0; i < activeTokens.length(); i++) {
+      address token = activeTokens.at(i);
       _distribute(token);
     }
     // distribute Celo
@@ -762,7 +765,7 @@ contract FeeHandler is
   }
 
   function _handleAll() private {
-    _handle(activeTokens.values);
+    _handle(activeTokens.values());
   }
 
   function _handleCelo() private {

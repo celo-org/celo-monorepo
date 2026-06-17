@@ -56,6 +56,10 @@ export const SOLIDITY_08_PACKAGE = {
     'MultiSig',
     'GovernanceApproverMultiSig',
     'ReleaseGoldMultiSig',
+    'FeeHandler',
+    'FeeHandlerSeller',
+    'MentoFeeHandlerSeller',
+    'UniswapFeeHandlerSeller',
   ],
   proxyContracts: [
     'GasPriceMinimumProxy',

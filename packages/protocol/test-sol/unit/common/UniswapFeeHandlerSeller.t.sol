@@ -6,7 +6,8 @@ pragma experimental ABIEncoderV2;
 import { Test } from "celo-foundry/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
-import { UniswapFeeHandlerSeller } from "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
+import "@test-sol/unit/common/interfaces/IFeeHandlerSellerTest.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 
 contract UniswapFeeHandlerSellerTest is Test, TestConstants {
   // Actors
@@ -20,11 +21,13 @@ contract UniswapFeeHandlerSellerTest is Test, TestConstants {
   address ARBITRARY_ROUTER_ADDRESS_D = actor("Arbitrary Router Address D");
 
   // Contract instance
-  UniswapFeeHandlerSeller uniswapFeeHandlerSeller;
+  IFeeHandlerSellerTest uniswapFeeHandlerSeller;
 
   function setUp() public {
-    uniswapFeeHandlerSeller = new UniswapFeeHandlerSeller(true);
-    UNISWAP_FEE_HANDLER_SELLER_OWNER_ADDRESS = uniswapFeeHandlerSeller.owner();
+    address uniswapSellerAddress = actor("uniswapFeeHandlerSeller");
+    deployCodeTo("UniswapFeeHandlerSellerCompile", uniswapSellerAddress);
+    uniswapFeeHandlerSeller = IFeeHandlerSellerTest(uniswapSellerAddress);
+    UNISWAP_FEE_HANDLER_SELLER_OWNER_ADDRESS = IOwnable(uniswapSellerAddress).owner();
   }
 }
 
