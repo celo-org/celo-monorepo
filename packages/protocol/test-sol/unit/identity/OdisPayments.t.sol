@@ -9,16 +9,17 @@ import "@celo-contracts/identity/interfaces/IOdisPayments.sol";
 import "@celo-contracts/identity/interfaces/IOdisPaymentsInitializer.sol";
 import "@celo-contracts/common/interfaces/IOwnable.sol";
 import { StableToken } from "@mento-core/contracts/StableToken.sol";
-import "@celo-contracts/common/Registry.sol";
-import "@celo-contracts/common/Freezer.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts/common/interfaces/IFreezer.sol";
+import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
 
 contract OdisPaymentsFoundryTest is Test, TestConstants {
   uint256 FIXED1 = 1000000000000000000000000;
   uint256 SECONDS_IN_A_DAY = 60 * 60 * 24;
   uint256 startingBalanceCUSD = 1000;
 
-  Registry registry;
-  Freezer freezer;
+  IRegistry registry;
+  IFreezer freezer;
   // OdisPayments now lives in contracts-0.8; deployed via deployCodeTo and used
   // through its interface from this 0.5 test.
   IOdisPayments odisPayments;
@@ -33,8 +34,10 @@ contract OdisPaymentsFoundryTest is Test, TestConstants {
   function setUp() public {
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
-    registry = Registry(REGISTRY_ADDRESS);
-    freezer = new Freezer(true);
+    registry = IRegistry(REGISTRY_ADDRESS);
+    address freezerAddress = actor("freezer");
+    deployCodeTo("FreezerCompile", freezerAddress);
+    freezer = IFreezer(freezerAddress);
     odisPaymentsAddress = actor("odisPayments");
     deployCodeTo("OdisPaymentsCompile", odisPaymentsAddress);
     odisPayments = IOdisPayments(odisPaymentsAddress);
@@ -67,7 +70,7 @@ contract OdisPaymentsFoundryTest is Test, TestConstants {
       "Exchange" // USD
     );
 
-    freezer.initialize();
+    IFreezerInitializer(address(freezer)).initialize();
     registry.setAddressFor("Freezer", address(freezer));
   }
 }

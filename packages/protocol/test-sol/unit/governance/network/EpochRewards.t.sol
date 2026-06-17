@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 
-import "@celo-contracts/common/Registry.sol";
-import "@celo-contracts/common/Freezer.sol";
+import "@celo-contracts/common/interfaces/IFreezer.sol";
+import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
 
 import "@celo-contracts/governance/test/MockElection.sol";
 import { EpochRewardsMock } from "@celo-contracts/governance/test/EpochRewardsMock.sol";
@@ -42,7 +42,7 @@ contract EpochRewardsTest is TestWithUtils {
   MockStableToken mockStableToken;
   CeloTokenMock mockCeloToken;
   Reserve reserve;
-  Freezer freezer;
+  IFreezer freezer;
 
   address celoUnreleasedTreasuryAddress;
   address caller = address(this);
@@ -88,7 +88,15 @@ contract EpochRewardsTest is TestWithUtils {
     mockCeloToken = new CeloTokenMock();
     mockCeloToken.setRegistry(REGISTRY_ADDRESS);
 
-    freezer = new Freezer(true);
+    // Derive a fresh freezer address per call (keyed on the freshly-created
+    // epochRewards) so re-running preEpochRewardsSetup deploys a new,
+    // uninitialized Freezer instead of re-initializing one at a fixed address.
+    address freezerAddress = address(
+      uint160(uint256(keccak256(abi.encodePacked("freezer", address(epochRewards)))))
+    );
+    deployCodeTo("FreezerCompile", freezerAddress);
+    freezer = IFreezer(freezerAddress);
+    IFreezerInitializer(freezerAddress).initialize();
 
     celoUnreleasedTreasuryAddress = actor("celoUnreleasedTreasury");
     deployCodeTo("CeloUnreleasedTreasury.sol", abi.encode(false), celoUnreleasedTreasuryAddress);

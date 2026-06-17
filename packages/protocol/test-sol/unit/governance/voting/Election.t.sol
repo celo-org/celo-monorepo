@@ -5,14 +5,14 @@ pragma experimental ABIEncoderV2;
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/linkedlists/AddressSortedLinkedList.sol";
 import "@celo-contracts/identity/interfaces/IRandomMock.sol";
-import "@celo-contracts/common/Freezer.sol";
+import "@celo-contracts/common/interfaces/IFreezer.sol";
+import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
 
 import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";
 
@@ -32,7 +32,7 @@ contract ElectionTest is TestWithUtils {
 
   Accounts accounts;
   ElectionMock election;
-  Freezer freezer;
+  IFreezer freezer;
   MockLockedGold lockedGold;
   MockValidators validators;
   IRandomMock random;
@@ -146,7 +146,10 @@ contract ElectionTest is TestWithUtils {
     createAccount(address(this));
 
     election = new ElectionMock();
-    freezer = new Freezer(true);
+    address freezerAddress = actor("freezer");
+    deployCodeTo("FreezerCompile", freezerAddress);
+    freezer = IFreezer(freezerAddress);
+    IFreezerInitializer(freezerAddress).initialize();
     lockedGold = new MockLockedGold();
     validators = new MockValidators();
     address randomAddress = actor("random");

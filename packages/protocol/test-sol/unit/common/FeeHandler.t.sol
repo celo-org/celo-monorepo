@@ -10,7 +10,8 @@ import "@test-sol/TestWithUtils.sol";
 import { Exchange } from "@mento-core/contracts/Exchange.sol";
 import { StableToken } from "@mento-core/contracts/StableToken.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Freezer.sol";
+import "@celo-contracts/common/interfaces/IFreezer.sol";
+import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
 import "@celo-contracts/common/GoldToken.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import "@celo-contracts/uniswap/test/MockUniswapV2Router02.sol";
@@ -36,7 +37,7 @@ contract FeeHandlerTest is TestWithUtils {
   MockSortedOracles mockSortedOracles;
   MockReserve mockReserve;
 
-  Freezer freezer;
+  IFreezer freezer;
   MockERC20 tokenA;
 
   MockUniswapV2Router02 uniswapRouter;
@@ -100,7 +101,10 @@ contract FeeHandlerTest is TestWithUtils {
     address feeHandlerAddress = actor("feeHandler");
     deployCodeTo("FeeHandlerCompile", feeHandlerAddress);
     feeHandler = IFeeHandlerTest(feeHandlerAddress);
-    freezer = new Freezer(true);
+    address freezerAddress = actor("freezer");
+    deployCodeTo("FreezerCompile", freezerAddress);
+    freezer = IFreezer(freezerAddress);
+    IFreezerInitializer(freezerAddress).initialize();
     address feeCurrencyWhitelistAddress = actor("feeCurrencyWhitelist");
     deployCodeTo("FeeCurrencyWhitelistCompile", feeCurrencyWhitelistAddress);
     feeCurrencyWhitelist = IFeeCurrencyWhitelist(feeCurrencyWhitelistAddress);

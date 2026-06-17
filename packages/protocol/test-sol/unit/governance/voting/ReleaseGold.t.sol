@@ -10,7 +10,8 @@ import "@celo-contracts/identity/test/MockERC20Token.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 
 import "@celo-contracts/common/Accounts.sol";
-import "@celo-contracts/common/Freezer.sol";
+import "@celo-contracts/common/interfaces/IFreezer.sol";
+import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
 import "@celo-contracts/common/GoldToken.sol";
 import "@celo-contracts/governance/LockedGold.sol";
 import "@celo-contracts/governance/ReleaseGold.sol";
@@ -24,7 +25,7 @@ contract ReleaseGoldTest is TestWithUtils, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
 
   Accounts accounts;
-  Freezer freezer;
+  IFreezer freezer;
   GoldToken goldToken;
   MockStableToken stableToken;
   MockElection election;
@@ -91,7 +92,10 @@ contract ReleaseGoldTest is TestWithUtils, ECDSAHelper {
     walletAddress = beneficiary;
 
     accounts = new Accounts(true);
-    freezer = new Freezer(true);
+    address freezerAddress = actor("freezer");
+    deployCodeTo("FreezerCompile", freezerAddress);
+    freezer = IFreezer(freezerAddress);
+    IFreezerInitializer(freezerAddress).initialize();
     goldToken = new GoldToken(true);
     lockedGold = new LockedGold(true);
     election = new MockElection();

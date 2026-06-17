@@ -14,7 +14,7 @@ import "@celo-contracts/identity/interfaces/IRandomMock.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
-import "@celo-contracts/common/Registry.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/Accounts.sol";
 
 contract FederatedAttestationsFoundryTest is Test, TestConstants {
@@ -34,7 +34,7 @@ contract FederatedAttestationsFoundryTest is Test, TestConstants {
   MockValidators mockValidators;
   IRandomMock random;
   address randomAddress;
-  Registry registry;
+  IRegistry registry;
   Accounts accounts;
   IFederatedAttestations federatedAttestations;
   address federatedAttestationsAddress;
@@ -343,7 +343,7 @@ contract FederatedAttestationsFoundryTest is Test, TestConstants {
     randomAddress = actor("randomMock");
     deployCodeTo("MockRandom08", randomAddress);
     random = IRandomMock(randomAddress);
-    registry = Registry(REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
     accounts = new Accounts(true);
     federatedAttestationsAddress = actor("federatedAttestations");
     deployCodeTo("FederatedAttestationsCompile", federatedAttestationsAddress);

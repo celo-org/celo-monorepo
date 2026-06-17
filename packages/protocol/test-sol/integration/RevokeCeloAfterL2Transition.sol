@@ -4,7 +4,6 @@ pragma experimental ABIEncoderV2;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/GoldToken.sol";
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";

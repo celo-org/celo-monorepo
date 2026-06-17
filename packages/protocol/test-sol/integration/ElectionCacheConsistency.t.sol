@@ -4,10 +4,8 @@ pragma experimental ABIEncoderV2;
 
 import { FixidityLib } from "@celo-contracts/common/FixidityLib.sol";
 import { Accounts } from "@celo-contracts/common/Accounts.sol";
-import { Freezer } from "@celo-contracts/common/Freezer.sol";
-// Imported so its bytecode lands in the artifacts; TestWithUtils.setupRegistry
-// uses deployCodeTo("Registry.sol", ...).
-import { Registry } from "@celo-contracts/common/Registry.sol";
+import { IFreezer } from "@celo-contracts/common/interfaces/IFreezer.sol";
+import { IFreezerInitializer } from "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
 
 import { Election } from "@celo-contracts/governance/Election.sol";
 import { LockedGold } from "@celo-contracts/governance/LockedGold.sol";
@@ -23,7 +21,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
 
   Accounts accounts;
   Election election;
-  Freezer freezer;
+  IFreezer freezer;
   LockedGold lockedGold;
   MockValidators validators;
   IRandomMock random;
@@ -64,7 +62,10 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
     // can be called directly on the impl.
     accounts = new Accounts(true);
     election = new Election(true);
-    freezer = new Freezer(true);
+    address freezerAddress = actor("freezer");
+    deployCodeTo("FreezerCompile", freezerAddress);
+    freezer = IFreezer(freezerAddress);
+    IFreezerInitializer(freezerAddress).initialize();
     lockedGold = new LockedGold(true);
     validators = new MockValidators();
     address randomAddress = actor("random");

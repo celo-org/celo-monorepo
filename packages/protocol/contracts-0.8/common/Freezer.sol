@@ -1,9 +1,10 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
 
-import "./Initializable.sol";
-import "./interfaces/IFreezer.sol";
+import "../../contracts/common/Initializable.sol";
+import "../../contracts/common/interfaces/IFreezer.sol";
 
 contract Freezer is Ownable, Initializable, IFreezer {
   mapping(address => bool) public isFrozen;
@@ -12,7 +13,7 @@ contract Freezer is Ownable, Initializable, IFreezer {
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   function initialize() external initializer {
     _transferOwnership(msg.sender);

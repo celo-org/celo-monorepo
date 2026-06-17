@@ -5,7 +5,6 @@ import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Accounts.sol";
-import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/governance/LockedGold.sol";
 import "@celo-contracts/governance/Governance.sol";
 import "@celo-contracts/governance/test/MockElection.sol";

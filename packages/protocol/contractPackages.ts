@@ -60,6 +60,8 @@ export const SOLIDITY_08_PACKAGE = {
     'FeeHandlerSeller',
     'MentoFeeHandlerSeller',
     'UniswapFeeHandlerSeller',
+    'Freezer',
+    'Registry',
   ],
   proxyContracts: [
     'GasPriceMinimumProxy',

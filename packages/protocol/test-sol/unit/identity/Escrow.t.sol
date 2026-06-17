@@ -12,7 +12,7 @@ import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.so
 import "@celo-contracts/identity/test/MockAttestations.sol";
 import "@celo-contracts/identity/test/MockERC20Token.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Registry.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/Signatures.sol";
 import "@celo-contracts/common/interfaces/IOwnable.sol";
 
@@ -23,7 +23,7 @@ contract EscrowTest is Test, TestConstants {
   // through its interface from this 0.5 test.
   IEscrow escrowContract;
   address escrowContractAddress;
-  Registry registry;
+  IRegistry registry;
   MockAttestations mockAttestations;
   IFederatedAttestations federatedAttestations;
   MockERC20Token mockERC20Token;
@@ -89,7 +89,7 @@ contract EscrowTest is Test, TestConstants {
     deployCodeTo("EscrowCompile", escrowContractAddress);
     escrowContract = IEscrow(escrowContractAddress);
     IEscrowInitializer(escrowContractAddress).initialize();
-    registry = Registry(REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
     (receiver, receiverPK) = actorWithPK("receiver");
     (sender, senderPK) = actorWithPK("sender");
     trustedIssuer1 = actor("trustedIssuer1");

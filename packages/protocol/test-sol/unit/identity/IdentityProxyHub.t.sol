@@ -6,14 +6,15 @@ import "@celo-contracts/identity/IdentityProxy.sol";
 import "@celo-contracts/identity/IdentityProxyHub.sol";
 import "@celo-contracts/identity/test/IdentityProxyTest.sol";
 import "@celo-contracts/identity/test/MockAttestations.sol";
-import "@celo-contracts/common/Registry.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts/common/interfaces/IRegistryInitializer.sol";
 
 contract IdentityProxyHubTest is Test {
   IdentityProxy identityProxy;
   IdentityProxyTest identityProxyTest;
   IdentityProxyHub identityProxyHub;
   MockAttestations mockAttestations;
-  Registry registry;
+  IRegistry registry;
 
   address randomActor = actor("randomActor");
 
@@ -25,8 +26,10 @@ contract IdentityProxyHubTest is Test {
     identityProxyTest = new IdentityProxyTest();
     identityProxyHub = new IdentityProxyHub();
     mockAttestations = new MockAttestations();
-    registry = new Registry(true);
-    registry.initialize();
+    address registryAddress = actor("registry");
+    deployCodeTo("Registry.sol", abi.encode(true), registryAddress);
+    registry = IRegistry(registryAddress);
+    IRegistryInitializer(registryAddress).initialize();
     registry.setAddressFor("Attestations", address(mockAttestations));
     identityProxyHub.setRegistry(address(registry));
   }

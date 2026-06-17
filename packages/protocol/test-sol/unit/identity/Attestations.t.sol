@@ -8,7 +8,7 @@ import "@celo-contracts/identity/interfaces/IRandomMock.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
-import "@celo-contracts/common/Registry.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/Accounts.sol";
 
 contract AttestationsFoundryTest is Test {
@@ -27,7 +27,7 @@ contract AttestationsFoundryTest is Test {
   MockLockedGold mockLockedGold;
   MockValidators mockValidators;
   IRandomMock random;
-  Registry registry;
+  IRegistry registry;
   Accounts accounts;
 
   address caller;
@@ -280,7 +280,9 @@ contract AttestationsFoundryTest is Test {
     address randomAddress = actor("random");
     deployCodeTo("MockRandom08", randomAddress);
     random = IRandomMock(randomAddress);
-    registry = new Registry(true);
+    address registryAddress = actor("registry");
+    deployCodeTo("Registry.sol", abi.encode(true), registryAddress);
+    registry = IRegistry(registryAddress);
     accounts = new Accounts(true);
     random.initialize(256);
     random.addTestRandomness(0, bytes32(0));

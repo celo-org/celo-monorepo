@@ -5,7 +5,6 @@ pragma experimental ABIEncoderV2;
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
@@ -80,7 +79,7 @@ contract DoubleSigningSlasherBaseTest is TestWithUtils {
     deployCodeTo("DoubleSigningSlasherMock08", slasherAddress);
     slasher = IDoubleSigningSlasherMock(slasherAddress);
 
-    registry = Registry(REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
 
     accounts.createAccount();
 

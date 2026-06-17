@@ -3,7 +3,8 @@ pragma solidity ^0.5.13;
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
-import "@celo-contracts/common/Registry.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
+import "@test-sol/unit/common/interfaces/IRegistryTest.sol";
 
 contract RegistryTest is TestWithUtils {
   event RegistryUpdated(string identifier, bytes32 indexed identifierHash, address indexed addr);
@@ -14,22 +15,24 @@ contract RegistryTest is TestWithUtils {
   // hash is harcoded to avoid test and implementation changing at the same time
   bytes32 constant ID_HASH = 0x05445421d7b4d4c2e571c5a4ccf9317ec68601449f752c75ddbcc61a16061004;
 
-  Registry _registry;
+  IRegistryTest _registry;
   address owner;
 
   function setUp() public {
     super.setUp();
     whenL2WithEpochManagerInitialization();
     owner = address(this);
+    address registryTestAddress = actor("registryTest");
+    deployCodeTo("Registry.sol", abi.encode(true), registryTestAddress);
+    _registry = IRegistryTest(registryTestAddress);
     vm.prank(owner);
-    _registry = new Registry(true);
     _registry.initialize();
   }
 }
 
 contract RegistryTest_initialize is RegistryTest {
   function test_SetsTheOwner() public {
-    assertEq(_registry.owner(), owner);
+    assertEq(IOwnable(address(_registry)).owner(), owner);
   }
 
   function test_Reverts_WhenCalledAgain() public {
