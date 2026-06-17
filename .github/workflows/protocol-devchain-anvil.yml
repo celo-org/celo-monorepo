@@ -156,6 +156,18 @@ jobs:
         run: |
           LOAD_STATE=${{ github.workspace }}/celo-optimism/packages/contracts-bedrock/anvil-state.json yarn anvil-devchain:start
 
+      - name: Dump migrated devchain state to l2-devchain.json
+        if: success() || failure()
+        run: |
+          # In LOAD_STATE mode start_anvil.sh omits --dump-state, so anvil-devchain:start
+          # never persists the migrated state and the published package ships without a
+          # devchain. Dump the still-running anvil over RPC and decompress the gzip+hex
+          # payload into the plain-JSON file consumers load via --load-state.
+          source ./scripts/foundry/constants.sh
+          cast rpc --rpc-url "$ANVIL_RPC_URL" anvil_dumpState \
+            | tr -d '"' | sed 's/^0x//' | xxd -r -p | gunzip > ".tmp/devchain/$L2_DEVCHAIN_FILE_NAME"
+          ls -la ".tmp/devchain"
+
       - name: Run migration tests against local op-geth devchain
         run: |
           source ./scripts/foundry/constants.sh
