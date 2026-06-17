@@ -58,6 +58,10 @@ jobs:
       - name: Generate initial state for devchain
         run: yarn devchain:generate-initial-state --contracts-dir ${{ github.workspace }}/celo-optimism/packages/contracts-bedrock
         working-directory: packages/protocol
+      - name: Install celocli
+        run: |
+          sudo npm install -g @celo/celocli@latest --unsafe-perm
+          celocli --version
       - name: Generate devchain of previous release
         run: |
           LOAD_STATE=${{ github.workspace }}/celo-optimism/packages/contracts-bedrock/anvil-state.json yarn anvil-devchain:start
