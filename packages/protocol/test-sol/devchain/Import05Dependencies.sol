@@ -8,7 +8,6 @@ import { Accounts } from "@celo-contracts/common/Accounts.sol";
 import { Election } from "@celo-contracts/governance/Election.sol";
 import { Governance } from "@celo-contracts/governance/Governance.sol";
 import { LockedGold } from "@celo-contracts/governance/LockedGold.sol";
-import { GovernanceApproverMultiSig } from "@celo-contracts/governance/GovernanceApproverMultiSig.sol";
 import { ReserveSpenderMultiSig } from "@mento-core/contracts/ReserveSpenderMultiSig.sol";
 import { Reserve } from "@mento-core/contracts/Reserve.sol";
 import { StableToken } from "@mento-core/contracts/StableToken.sol";

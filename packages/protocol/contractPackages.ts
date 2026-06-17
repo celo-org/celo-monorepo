@@ -53,6 +53,9 @@ export const SOLIDITY_08_PACKAGE = {
     'Escrow',
     'Random',
     'SortedOracles',
+    'MultiSig',
+    'GovernanceApproverMultiSig',
+    'ReleaseGoldMultiSig',
   ],
   proxyContracts: [
     'GasPriceMinimumProxy',

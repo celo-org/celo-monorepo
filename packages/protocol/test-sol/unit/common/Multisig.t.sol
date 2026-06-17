@@ -1,13 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
+pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
-import "@celo-contracts/common/MultiSig.sol";
+// The contract under test now lives in contracts-0.8; this 0.5 test deploys the
+// compiled 0.8 bytecode (via deployCodeTo) and interacts through the interface.
+import { IMultiSigTest } from "@test-sol/unit/common/interfaces/IMultiSigTest.sol";
 
 contract MultiSigTest is Test {
   function() external payable {}
 
-  MultiSig public multiSig;
+  IMultiSigTest public multiSig;
+  address multiSigAddress;
   address owner0;
   address owner1;
   address newOwner;
@@ -29,7 +33,9 @@ contract MultiSigTest is Test {
   event InternalRequirementChange(uint256 internalRequired);
 
   function setUp() public {
-    multiSig = new MultiSig(true);
+    multiSigAddress = actor("multiSig");
+    deployCodeTo("MultiSigCompile", multiSigAddress);
+    multiSig = IMultiSigTest(multiSigAddress);
     owner0 = actor("owner0");
     owner1 = actor("owner1");
     sender = actor("sender");
@@ -75,14 +81,14 @@ contract MultiSigTest_fallbackFunction is MultiSigTest {
     vm.prank(sender);
     vm.expectEmit(true, false, false, false);
     emit Deposit(sender, amount);
-    uncheckedSendViaCall(address(multiSig), amount);
+    uncheckedSendViaCall(address(uint160(address(multiSig))), amount);
   }
 
   // TODO: Implement after pragma ^0.8
   function SKIP_test_doesNotEmitEvent_whenReceivingZeroValue() public {
     vm.prank(sender);
     vm.recordLogs();
-    uncheckedSendViaCall(address(multiSig), 0);
+    uncheckedSendViaCall(address(uint160(address(multiSig))), 0);
     // Vm.Log[] memory entries = vm.getRecordedLogs();
     // assertEq(entries.length, 0);
   }
