@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
 import "./UsingRegistry.sol";
-import "./Initializable.sol";
-import "./interfaces/ICeloToken.sol";
-import "./interfaces/ICeloTokenInitializer.sol";
-import "./interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/Initializable.sol";
+import "../../contracts/common/interfaces/ICeloToken.sol";
+import "../../contracts/common/interfaces/ICeloTokenInitializer.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
 /**
  * @title ERC20 interface for the CELO token.
@@ -45,23 +44,22 @@ contract GoldToken is
   // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address
   address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
 
-  event Transfer(address indexed from, address indexed to, uint256 value);
-
+  // Transfer and Approval events are inherited from IERC20.
   event TransferComment(string comment);
-
-  event Approval(address indexed owner, address indexed spender, uint256 value);
 
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress Address of the Registry contract.
    */
-  function initialize(address registryAddress) external initializer {
+  function initialize(
+    address registryAddress
+  ) external override(ICeloToken, ICeloTokenInitializer) initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
   }
@@ -73,7 +71,7 @@ contract GoldToken is
    * @return True if the transaction succeeds.
    */
   // solhint-disable-next-line no-simple-event-func-name
-  function transfer(address to, uint256 value) external returns (bool) {
+  function transfer(address to, uint256 value) external override returns (bool) {
     return _transferWithCheck(to, value);
   }
 
@@ -88,7 +86,7 @@ contract GoldToken is
     address to,
     uint256 value,
     string calldata comment
-  ) external returns (bool) {
+  ) external override returns (bool) {
     bool succeeded = _transferWithCheck(to, value);
     emit TransferComment(comment);
     return succeeded;
@@ -97,10 +95,10 @@ contract GoldToken is
   /**
    * @notice This function allows a user to burn a specific amount of tokens.
      Burning is implemented by sending tokens to the burn address.
-   * @param value: The amount of CELO to burn.
+   * @param value The amount of CELO to burn.
    * @return True if burn was successful.
    */
-  function burn(uint256 value) external returns (bool) {
+  function burn(uint256 value) external override returns (bool) {
     // not using transferWithCheck as the burn address can potentially be the zero address
     return _transfer(BURN_ADDRESS, value);
   }
@@ -111,7 +109,7 @@ contract GoldToken is
    * @param value The amount of CELO approved to the spender.
    * @return True if the transaction succeeds.
    */
-  function approve(address spender, uint256 value) external returns (bool) {
+  function approve(address spender, uint256 value) external override returns (bool) {
     require(spender != address(0), "cannot set allowance for 0");
     allowed[msg.sender][spender] = value;
     emit Approval(msg.sender, spender, value);
@@ -154,7 +152,11 @@ contract GoldToken is
    * @param value The amount of CELO to transfer.
    * @return True if the transaction succeeds.
    */
-  function transferFrom(address from, address to, uint256 value) external returns (bool) {
+  function transferFrom(
+    address from,
+    address to,
+    uint256 value
+  ) external override returns (bool) {
     require(to != address(0), "transfer attempted to reserved address 0x0");
     require(value <= balanceOf(from), "transfer value exceeded balance of sender");
     require(
@@ -163,7 +165,7 @@ contract GoldToken is
     );
 
     bool success;
-    (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(from, to, value));
+    (success, ) = TRANSFER.call{ value: 0, gas: gasleft() }(abi.encode(from, to, value));
     require(success, "CELO transfer failed");
 
     allowed[from][msg.sender] = allowed[from][msg.sender].sub(value);
@@ -174,21 +176,21 @@ contract GoldToken is
   /**
    * @return The name of the CELO token.
    */
-  function name() external view returns (string memory) {
+  function name() external view override returns (string memory) {
     return NAME;
   }
 
   /**
    * @return The symbol of the CELO token.
    */
-  function symbol() external view returns (string memory) {
+  function symbol() external view override returns (string memory) {
     return SYMBOL;
   }
 
   /**
    * @return The number of decimal places to which CELO is divisible.
    */
-  function decimals() external view returns (uint8) {
+  function decimals() external view override returns (uint8) {
     return DECIMALS;
   }
 
@@ -198,7 +200,7 @@ contract GoldToken is
    * @param spender The spender of the CELO.
    * @return The amount of CELO owner is allowing spender to spend.
    */
-  function allowance(address _owner, address spender) external view returns (uint256) {
+  function allowance(address _owner, address spender) external view override returns (uint256) {
     return allowed[_owner][spender];
   }
 
@@ -209,7 +211,7 @@ contract GoldToken is
    * @return Minor version of the contract.
    * @return Patch version of the contract.
    */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+  function getVersionNumber() external pure override returns (uint256, uint256, uint256, uint256) {
     return (1, 2, 0, 0);
   }
 
@@ -226,26 +228,26 @@ contract GoldToken is
    * @param _owner The address to query the balance of.
    * @return The balance of the specified address.
    */
-  function balanceOf(address _owner) public view returns (uint256) {
+  function balanceOf(address _owner) public view override returns (uint256) {
     return _owner.balance;
   }
 
   /**
    * @return The total amount of allocated CELO.
    */
-  function allocatedSupply() public view returns (uint256) {
+  function allocatedSupply() public view override returns (uint256) {
     return CELO_SUPPLY_CAP - getCeloUnreleasedTreasury().getRemainingBalanceToRelease();
   }
 
   /**
    * @return The total amount of CELO in existence, including what the burn address holds.
    */
-  function totalSupply() external view returns (uint256) {
+  function totalSupply() external view override(ICeloToken, IERC20) returns (uint256) {
     return CELO_SUPPLY_CAP;
   }
 
   /**
-   * @notice internal CELO transfer from one address to another.
+   * @notice Internal CELO transfer from one address to another.
    * @param to The address to transfer CELO to.
    * @param value The amount of CELO to transfer.
    * @return True if the transaction succeeds.
@@ -254,7 +256,7 @@ contract GoldToken is
     require(value <= balanceOf(msg.sender), "transfer value exceeded balance of sender");
 
     bool success;
-    (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(msg.sender, to, value));
+    (success, ) = TRANSFER.call{ value: 0, gas: gasleft() }(abi.encode(msg.sender, to, value));
     require(success, "CELO transfer failed");
     emit Transfer(msg.sender, to, value);
     return true;

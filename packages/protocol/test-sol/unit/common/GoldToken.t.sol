@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 
-import "@celo-contracts/common/GoldToken.sol";
-
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import { IGoldTokenTest } from "@test-sol/unit/common/interfaces/IGoldTokenTest.sol";
 
 contract CeloTokenTest is TestWithUtils {
-  GoldToken celoToken;
+  IGoldTokenTest celoToken;
 
   uint256 constant ONE_CELOTOKEN = 1000000000000000000;
   address receiver;
@@ -24,9 +23,9 @@ contract CeloTokenTest is TestWithUtils {
     celoUnreleasedTreasuryAddress = actor("celoUnreleasedTreasury");
     deployCodeTo("CeloUnreleasedTreasury.sol", abi.encode(false), celoUnreleasedTreasuryAddress);
 
-    vm.prank(celoTokenOwner);
-    celoToken = new GoldToken(true);
-    vm.prank(celoTokenOwner);
+    address celoTokenAddress = actor("goldToken");
+    deployCodeTo("GoldToken.sol", abi.encode(true), celoTokenAddress);
+    celoToken = IGoldTokenTest(celoTokenAddress);
     celoToken.setRegistry(REGISTRY_ADDRESS);
     registry.setAddressFor(CeloUnreleasedTreasuryContract, celoUnreleasedTreasuryAddress);
     receiver = actor("receiver");

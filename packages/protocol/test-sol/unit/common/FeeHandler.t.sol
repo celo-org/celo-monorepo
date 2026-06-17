@@ -12,7 +12,7 @@ import { StableToken } from "@mento-core/contracts/StableToken.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
-import "@celo-contracts/common/GoldToken.sol";
+import { IGoldTokenTest } from "@test-sol/unit/common/interfaces/IGoldTokenTest.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import "@celo-contracts/uniswap/test/MockUniswapV2Router02.sol";
 import "@celo-contracts/uniswap/test/MockUniswapV2Factory.sol";
@@ -33,7 +33,7 @@ contract FeeHandlerTest is TestWithUtils {
 
   IFeeHandlerTest feeHandler;
 
-  GoldToken celoToken;
+  IGoldTokenTest celoToken;
   MockSortedOracles mockSortedOracles;
   MockReserve mockReserve;
 
@@ -93,7 +93,9 @@ contract FeeHandlerTest is TestWithUtils {
     reserveFraction = FixidityLib.newFixedFraction(5, 100).unwrap();
     maxSlippage = FixidityLib.newFixedFraction(1, 100).unwrap();
 
-    celoToken = new GoldToken(true);
+    address celoTokenAddress = actor("goldToken");
+    deployCodeTo("GoldToken.sol", abi.encode(true), celoTokenAddress);
+    celoToken = IGoldTokenTest(celoTokenAddress);
     mockReserve = new MockReserve();
     stableToken = new StableToken(true);
     stableTokenEUR = new StableToken(true);

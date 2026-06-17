@@ -62,6 +62,7 @@ export const SOLIDITY_08_PACKAGE = {
     'UniswapFeeHandlerSeller',
     'Freezer',
     'Registry',
+    'GoldToken',
   ],
   proxyContracts: [
     'GasPriceMinimumProxy',

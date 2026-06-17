@@ -5,7 +5,7 @@ pragma experimental ABIEncoderV2;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Accounts.sol";
-import "@celo-contracts/common/GoldToken.sol";
+import { IGoldTokenTest } from "@test-sol/unit/common/interfaces/IGoldTokenTest.sol";
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 import "@celo-contracts/governance/interfaces/IValidators.sol";
 
@@ -35,7 +35,7 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
   IValidators public validators;
   LockedGold lockedGold;
   Governance governance;
-  GoldToken goldToken;
+  IGoldTokenTest goldToken;
   ReleaseGold releaseGold;
 
   address owner;
@@ -162,7 +162,9 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
     // TODO move to create2
     validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
     governance = new Governance(true);
-    goldToken = new GoldToken(true);
+    address goldTokenAddress = actor("goldToken");
+    deployCodeTo("GoldToken.sol", abi.encode(true), goldTokenAddress);
+    goldToken = IGoldTokenTest(goldTokenAddress);
     releaseGold = new ReleaseGold(true);
 
     registry.setAddressFor(AccountsContract, address(accounts));

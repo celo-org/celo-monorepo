@@ -21,7 +21,7 @@ contract LockedGoldTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
 
   Accounts accounts;
-  GoldToken celoToken;
+  CeloTokenMock celoToken;
   MockStableToken stableToken;
   MockElection election;
   MockGovernance governance;
