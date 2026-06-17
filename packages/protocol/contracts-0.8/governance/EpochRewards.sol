@@ -1,30 +1,36 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
 
-import "./interfaces/IEpochRewards.sol";
-import "../common/FixidityLib.sol";
-import "../common/Freezable.sol";
-import "../common/Initializable.sol";
+import "../../contracts/governance/interfaces/IEpochRewards.sol";
+import "../../contracts/common/FixidityLib.sol";
+import "../../contracts/common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/PrecompilesOverride.sol";
-import "../common/Permissioned.sol";
-import "../common/interfaces/ICeloToken.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
+import "../common/interfaces/IReserve.sol";
+import "../../contracts/common/interfaces/ICeloToken.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
-/**
- * @title Contract for calculating epoch rewards.
- */
+// Storage layout (must match 0.5 baseline):
+//   slot  0: _owner (address, 20 bytes) + initialized (bool, 1 byte) — packed
+//   slot  1: registry (address, 20 bytes)
+//   slot  2: startTime (uint256)
+//   slots 3-5: rewardsMultiplierParams (3 × FixidityLib.Fraction = 3 slots)
+//   slots 6-8: targetVotingYieldParams (3 × FixidityLib.Fraction = 3 slots)
+//   slot  9: targetVotingGoldFraction (FixidityLib.Fraction)
+//   slot 10: communityRewardFraction (FixidityLib.Fraction)
+//   slot 11: carbonOffsettingFraction (FixidityLib.Fraction)
+//   slot 12: carbonOffsettingPartner (address, 20 bytes)
+//   slot 13: targetValidatorEpochPayment (uint256)
 contract EpochRewards is
   ICeloVersionedContract,
   IEpochRewards,
   Ownable,
   Initializable,
   UsingRegistry,
-  PrecompilesOverride,
-  Freezable,
-  Permissioned
+  PrecompilesOverride
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -87,11 +93,23 @@ contract EpochRewards is
 
   event TargetVotingYieldUpdated(uint256 fraction);
 
+  // Freezable inline modifier (Freezable.sol is pragma ^0.5.13 and cannot be imported in 0.8)
+  modifier onlyWhenNotFrozen() {
+    require(!getFreezer().isFrozen(address(this)), "can't call when contract is frozen");
+    _;
+  }
+
+  // Permissioned inline modifier (Permissioned.sol is pragma ^0.5.13 and cannot be imported in 0.8)
+  modifier onlyPermitted(address permittedAddress) {
+    require(msg.sender == permittedAddress, "Only permitted address can call");
+    _;
+  }
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -138,7 +156,7 @@ contract EpochRewards is
     setCommunityRewardFraction(_communityRewardFraction);
     setCarbonOffsettingFund(_carbonOffsettingPartner, _carbonOffsettingFraction);
     setTargetVotingYield(targetVotingYieldInitial);
-    startTime = now;
+    startTime = block.timestamp;
   }
 
   /**
@@ -148,6 +166,7 @@ contract EpochRewards is
    */
   function updateTargetVotingYield()
     external
+    override(IEpochRewards)
     onlyPermitted(registry.getAddressFor(EPOCH_MANAGER_REGISTRY_ID))
     onlyWhenNotFrozen
   {
@@ -164,6 +183,7 @@ contract EpochRewards is
   function calculateTargetEpochRewards()
     external
     view
+    override(IEpochRewards)
     returns (uint256, uint256, uint256, uint256)
   {
     uint256 targetVoterReward = getTargetVoterRewards();
@@ -191,7 +211,12 @@ contract EpochRewards is
    * @return The max factor for target voting yield.
    * @return The adjustment factor for target voting yield.
    */
-  function getTargetVotingYieldParameters() external view returns (uint256, uint256, uint256) {
+  function getTargetVotingYieldParameters()
+    external
+    view
+    override(IEpochRewards)
+    returns (uint256, uint256, uint256)
+  {
     TargetVotingYieldParameters storage params = targetVotingYieldParams;
     return (params.target.unwrap(), params.max.unwrap(), params.adjustmentFactor.unwrap());
   }
@@ -202,7 +227,12 @@ contract EpochRewards is
    * @return The underspend adjustment factors.
    * @return The overspend adjustment factors.
    */
-  function getRewardsMultiplierParameters() external view returns (uint256, uint256, uint256) {
+  function getRewardsMultiplierParameters()
+    external
+    view
+    override(IEpochRewards)
+    returns (uint256, uint256, uint256)
+  {
     RewardsMultiplierParameters storage params = rewardsMultiplierParams;
     return (
       params.max.unwrap(),
@@ -215,7 +245,12 @@ contract EpochRewards is
    * @notice Returns the community reward fraction.
    * @return The percentage of total reward which goes to the community funds.
    */
-  function getCommunityRewardFraction() external view returns (uint256) {
+  function getCommunityRewardFraction()
+    external
+    view
+    override(IEpochRewards)
+    returns (uint256)
+  {
     return communityRewardFraction.unwrap();
   }
 
@@ -223,7 +258,12 @@ contract EpochRewards is
    * @notice Returns the carbon offsetting partner reward fraction.
    * @return The percentage of total reward which goes to the carbon offsetting partner.
    */
-  function getCarbonOffsettingFraction() external view returns (uint256) {
+  function getCarbonOffsettingFraction()
+    external
+    view
+    override(IEpochRewards)
+    returns (uint256)
+  {
     return carbonOffsettingFraction.unwrap();
   }
 
@@ -231,7 +271,12 @@ contract EpochRewards is
    * @notice Returns the target voting Gold fraction.
    * @return The percentage of floating Gold voting to target.
    */
-  function getTargetVotingGoldFraction() external view returns (uint256) {
+  function getTargetVotingGoldFraction()
+    external
+    view
+    override(IEpochRewards)
+    returns (uint256)
+  {
     return targetVotingGoldFraction.unwrap();
   }
 
@@ -239,7 +284,7 @@ contract EpochRewards is
    * @notice Returns the rewards multiplier based on the current and target Gold supplies.
    * @return The rewards multiplier based on the current and target Gold supplies.
    */
-  function getRewardsMultiplier() external view returns (uint256) {
+  function getRewardsMultiplier() external view override(IEpochRewards) returns (uint256) {
     return _getRewardsMultiplier(_getTargetGoldSupplyIncrease()).unwrap();
   }
 
@@ -250,7 +295,12 @@ contract EpochRewards is
    * @return Minor version of the contract.
    * @return Patch version of the contract.
    */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+  function getVersionNumber()
+    external
+    pure
+    override(ICeloVersionedContract)
+    returns (uint256, uint256, uint256, uint256)
+  {
     return (1, 2, 0, 0);
   }
 
@@ -331,8 +381,10 @@ contract EpochRewards is
   ) public onlyOwner returns (bool) {
     require(
       max != rewardsMultiplierParams.max.unwrap() ||
-        overspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.overspend.unwrap() ||
-        underspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.underspend.unwrap(),
+        overspendAdjustmentFactor !=
+        rewardsMultiplierParams.adjustmentFactors.overspend.unwrap() ||
+        underspendAdjustmentFactor !=
+        rewardsMultiplierParams.adjustmentFactors.underspend.unwrap(),
       "Bad rewards multiplier parameters"
     );
     rewardsMultiplierParams = RewardsMultiplierParameters(
@@ -393,7 +445,7 @@ contract EpochRewards is
    * @return The target Gold supply according to the epoch rewards target schedule.
    */
   function getTargetGoldTotalSupply() public view returns (uint256) {
-    uint256 timeSinceInitialization = now.sub(startTime);
+    uint256 timeSinceInitialization = block.timestamp.sub(startTime);
     if (timeSinceInitialization < SECONDS_LINEAR) {
       // Pay out half of all block rewards linearly.
       uint256 linearRewards = GOLD_SUPPLY_CAP.sub(GENESIS_GOLD_SUPPLY).div(2);
@@ -436,6 +488,10 @@ contract EpochRewards is
    * @notice Returns the fraction of floating Gold being used for voting in validator elections.
    * @return The fraction of floating Gold being used for voting in validator elections.
    */
+  function getReserve() internal view returns (IReserve) {
+    return IReserve(registry.getAddressForOrDie(keccak256(abi.encodePacked("Reserve"))));
+  }
+
   function getVotingGoldFraction() public view returns (uint256) {
     uint256 liquidGold = ICeloToken(address(getCeloToken())).allocatedSupply().sub(
       getReserve().getReserveGoldBalance()

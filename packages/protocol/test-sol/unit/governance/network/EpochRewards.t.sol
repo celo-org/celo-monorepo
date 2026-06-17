@@ -5,7 +5,9 @@ import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
 
 import "@celo-contracts/governance/test/MockElection.sol";
-import { EpochRewardsMock } from "@celo-contracts/governance/test/EpochRewardsMock.sol";
+import { IEpochRewardsMock } from "@celo-contracts/governance/interfaces/IEpochRewardsMock.sol";
+import { IEpochRewardsInitializer } from "@celo-contracts/governance/interfaces/IEpochRewardsInitializer.sol";
+import { IOwnable } from "@celo-contracts/common/interfaces/IOwnable.sol";
 import { Reserve } from "@lib/mento-core/contracts/Reserve.sol";
 
 import { MockSortedOracles } from "@celo-contracts/stability/test/MockSortedOracles.sol";
@@ -36,7 +38,8 @@ contract EpochRewardsTest is TestWithUtils {
   uint256[] initialAssetAllocationWeights;
 
   // Mocked contracts
-  EpochRewardsMock epochRewards;
+  IEpochRewardsMock epochRewards;
+  address epochRewardsAddress;
   MockElection election;
   MockSortedOracles mockSortedOracles;
   MockStableToken mockStableToken;
@@ -62,7 +65,7 @@ contract EpochRewardsTest is TestWithUtils {
     super.setUp();
     preEpochRewardsSetup();
 
-    epochRewards.initialize(
+    IEpochRewardsInitializer(epochRewardsAddress).initialize(
       address(registry),
       targetVotingYieldParamsInitial,
       targetVotingYieldParamsMax,
@@ -79,8 +82,11 @@ contract EpochRewardsTest is TestWithUtils {
     whenL2WithEpochManagerInitialization();
   }
   function preEpochRewardsSetup() public {
-    // Mocked contracts
-    epochRewards = new EpochRewardsMock();
+    // Deploy EpochRewardsMock08 (0.8) via deployCodeTo at a deterministic address.
+    epochRewardsAddress = actor("epochRewards");
+    deployCodeTo("EpochRewardsImplMock08", epochRewardsAddress);
+    epochRewards = IEpochRewardsMock(epochRewardsAddress);
+
     election = new MockElection();
     mockSortedOracles = new MockSortedOracles();
     mockStableToken = new MockStableToken();
@@ -92,7 +98,7 @@ contract EpochRewardsTest is TestWithUtils {
     // epochRewards) so re-running preEpochRewardsSetup deploys a new,
     // uninitialized Freezer instead of re-initializing one at a fixed address.
     address freezerAddress = address(
-      uint160(uint256(keccak256(abi.encodePacked("freezer", address(epochRewards)))))
+      uint160(uint256(keccak256(abi.encodePacked("freezer", epochRewardsAddress))))
     );
     deployCodeTo("FreezerCompile", freezerAddress);
     freezer = IFreezer(freezerAddress);
@@ -132,26 +138,11 @@ contract EpochRewardsTest is TestWithUtils {
 }
 
 contract EpochRewardsTest_initialize is EpochRewardsTest {
-  function setUp() public {
-    super.setUp();
-    preEpochRewardsSetup();
-    epochRewards.initialize(
-      address(registry),
-      targetVotingYieldParamsInitial,
-      targetVotingYieldParamsMax,
-      targetVotingYieldParamsAdjustmentFactor,
-      rewardsMultiplierMax,
-      rewardsMultiplierAdjustmentsUnderspend,
-      rewardsMultiplierAdjustmentsOverspend,
-      targetVotingGoldFraction,
-      targetValidatorEpochPayment,
-      communityRewardFraction,
-      address(0),
-      carbonOffsettingFraction
-    );
-  }
+  // Base setUp already deploys and initializes EpochRewardsMock08 once (owner = this).
+  // Re-running preEpochRewardsSetup()+initialize() against the same deployCodeTo address
+  // would double-initialize, so the base setUp is sufficient here.
   function test_ShouldHaveSetOwner() public {
-    assertEq(epochRewards.owner(), caller);
+    assertEq(IOwnable(epochRewardsAddress).owner(), caller);
   }
 
   function test_ShouldHaveSetTargetValidatorEpochPayment() public {
@@ -182,7 +173,7 @@ contract EpochRewardsTest_initialize is EpochRewardsTest {
 
   function test_shouldNotBeCallableAgain() public {
     vm.expectRevert("contract already initialized");
-    epochRewards.initialize(
+    IEpochRewardsInitializer(epochRewardsAddress).initialize(
       address(registry),
       targetVotingYieldParamsInitial,
       targetVotingYieldParamsMax,

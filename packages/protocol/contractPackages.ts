@@ -63,6 +63,7 @@ export const SOLIDITY_08_PACKAGE = {
     'Freezer',
     'Registry',
     'GoldToken',
+    'EpochRewards',
   ],
   proxyContracts: [
     'GasPriceMinimumProxy',

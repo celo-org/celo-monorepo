@@ -62,7 +62,7 @@ contract PrecompilesOverride is UsingPrecompiles, UsingRegistry {
    * @notice Gets the size of the current elected validator set.
    * @return Size of the current elected validator set.
    */
-  function numberValidatorsInCurrentSet() public view override returns (uint256) {
+  function numberValidatorsInCurrentSet() public view virtual override returns (uint256) {
     if (isL2()) {
       return getEpochManager().numberOfElectedInCurrentSet();
     } else {
