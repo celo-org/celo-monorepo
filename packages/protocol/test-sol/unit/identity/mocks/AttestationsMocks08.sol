@@ -1,13 +1,25 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.8.7 <0.8.20;
 
-import "../Attestations.sol";
+import "@celo-contracts-8/identity/Attestations.sol";
+import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/utils/math/SafeCast.sol";
+
+// Deployable 0.8 helper for the migrated Attestations contract, used by the 0.5 tests
+// via deployCodeTo. This lives in a plain .sol file (not .t.sol) so forge does NOT
+// treat its test*-prefixed helper methods (none here) as test cases.
 
 /*
  * We need a test contract that behaves like the actual Attestations contract,
  * but mocks the implementations of the validator set getters. Otherwise we
- * couldn't test `request` with the testnet
+ * couldn't test `request` with the testnet. This is the 0.8 port of the 0.5
+ * AttestationsTest, deployed via deployCodeTo("AttestationsTestMock08", ...).
  */
-contract AttestationsTest is Attestations(true) {
+contract AttestationsTestMock08 is Attestations(true) {
+  using SafeMath for uint256;
+  using SafeCast for uint256;
+
   address[] private __testValidators;
 
   // some deprecated functions are mocked here to ensure that the tests for

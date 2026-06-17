@@ -5,7 +5,7 @@ pragma experimental ABIEncoderV2;
 import "celo-foundry/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
-import "@celo-contracts/identity/test/AttestationsTest.sol";
+import "@celo-contracts/identity/interfaces/IAttestationsTest.sol";
 import "@celo-contracts/identity/interfaces/IFederatedAttestations.sol";
 import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
 import "@celo-contracts/common/interfaces/IOwnable.sol";
@@ -26,7 +26,8 @@ contract FederatedAttestationsFoundryTest is Test, TestConstants {
     VOTING_KEY_OFFSET
   }
 
-  AttestationsTest attestationsTest;
+  IAttestationsTest attestationsTest;
+  address attestationsTestAddress;
   MockERC20Token mockERC20Token;
   MockERC20Token otherMockERC20Token;
   MockElection mockElection;
@@ -334,7 +335,9 @@ contract FederatedAttestationsFoundryTest is Test, TestConstants {
 
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
-    attestationsTest = new AttestationsTest();
+    attestationsTestAddress = actor("attestationsTest");
+    deployCodeTo("AttestationsTestMock08", attestationsTestAddress);
+    attestationsTest = IAttestationsTest(attestationsTestAddress);
     mockERC20Token = new MockERC20Token();
     otherMockERC20Token = new MockERC20Token();
     mockElection = new MockElection();

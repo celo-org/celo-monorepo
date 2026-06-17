@@ -1,19 +1,20 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/utils/SafeCast.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts8/utils/math/SafeCast.sol";
+import "@openzeppelin/contracts8/utils/cryptography/ECDSA.sol";
 
-import "./interfaces/IAttestations.sol";
-import "../common/interfaces/IAccounts.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/identity/interfaces/IAttestations.sol";
+import "../../contracts/identity/interfaces/IRandom.sol";
+import "../../contracts/common/interfaces/IAccounts.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
-import "../common/Initializable.sol";
+import "../../contracts/common/Initializable.sol";
 import "../common/UsingRegistry.sol";
-import "../common/Signatures.sol";
-import "../common/UsingPrecompiles.sol";
-import "../common/libraries/ReentrancyGuard.sol";
+import "../../contracts/common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title Contract mapping identifiers to accounts
@@ -139,7 +140,7 @@ contract Attestations is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -193,7 +194,7 @@ contract Attestations is
       identifiers[identifier].accounts[index] = identifiers[identifier].accounts[newNumAccounts];
     }
     identifiers[identifier].accounts[newNumAccounts] = address(0x0);
-    identifiers[identifier].accounts.length = identifiers[identifier].accounts.length.sub(1);
+    identifiers[identifier].accounts.pop();
   }
 
   /**
@@ -478,7 +479,7 @@ contract Attestations is
     bytes32 s
   ) public view returns (address) {
     bytes32 codehash = keccak256(abi.encodePacked(identifier, account));
-    address signer = Signatures.getSignerOfMessageHash(codehash, v, r, s);
+    address signer = ECDSA.recover(ECDSA.toEthSignedMessageHash(codehash), v, r, s);
     address issuer = getAccounts().attestationSignerToAccount(signer);
 
     Attestation storage attestation = identifiers[identifier]
@@ -492,6 +493,14 @@ contract Attestations is
     require(!isAttestationExpired(attestation.blockNumber), "Attestation timed out");
 
     return issuer;
+  }
+
+  /**
+   * @notice Returns the Random contract from the registry.
+   * @return The IRandom contract.
+   */
+  function getRandom() internal view returns (IRandom) {
+    return IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
   }
 
   /**

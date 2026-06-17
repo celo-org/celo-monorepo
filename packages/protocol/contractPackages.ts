@@ -64,6 +64,7 @@ export const SOLIDITY_08_PACKAGE = {
     'Registry',
     'GoldToken',
     'EpochRewards',
+    'Attestations',
   ],
   proxyContracts: [
     'GasPriceMinimumProxy',

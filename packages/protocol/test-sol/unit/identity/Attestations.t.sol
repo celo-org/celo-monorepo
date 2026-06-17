@@ -2,7 +2,7 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
-import "@celo-contracts/identity/test/AttestationsTest.sol";
+import "@celo-contracts/identity/interfaces/IAttestationsTest.sol";
 import "@celo-contracts/identity/test/MockERC20Token.sol";
 import "@celo-contracts/identity/interfaces/IRandomMock.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
@@ -20,7 +20,8 @@ contract AttestationsFoundryTest is Test {
     VOTING_KEY_OFFSET
   }
 
-  AttestationsTest attestationsTest;
+  IAttestationsTest attestationsTest;
+  address attestationsTestAddress;
   MockERC20Token mockERC20Token;
   MockERC20Token otherMockERC20Token;
   MockElection mockElection;
@@ -271,7 +272,9 @@ contract AttestationsFoundryTest is Test {
   function setUp() public {
     phoneHash = keccak256(abi.encodePacked(phoneNumber));
 
-    attestationsTest = new AttestationsTest();
+    attestationsTestAddress = actor("attestationsTest");
+    deployCodeTo("AttestationsTestMock08", attestationsTestAddress);
+    attestationsTest = IAttestationsTest(attestationsTestAddress);
     mockERC20Token = new MockERC20Token();
     otherMockERC20Token = new MockERC20Token();
     mockElection = new MockElection();
