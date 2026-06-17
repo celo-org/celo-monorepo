@@ -46,33 +46,19 @@ jobs:
       - name: Install packages
         run: yarn
         working-directory: packages/protocol
-      # As of the L2 migration (core-contracts.v17) the devchain is built from the
-      # contracts-bedrock initial state and then migrated, mirroring protocol-devchain-anvil.yml.
-      - name: Checkout Optimism repo
-        uses: actions/checkout@v4
-        with:
-          repository: 'celo-org/optimism'
-          ref: 'celo/core-contracts-base'
-          path: celo-optimism
-          submodules: recursive
-      - name: Generate initial state for devchain
-        run: yarn devchain:generate-initial-state --contracts-dir ${{ github.workspace }}/celo-optimism/packages/contracts-bedrock
-        working-directory: packages/protocol
       - name: Install celocli
         run: |
           sudo npm install -g @celo/celocli@latest --unsafe-perm
           celocli --version
       - name: Generate devchain of previous release
         run: |
-          LOAD_STATE=${{ github.workspace }}/celo-optimism/packages/contracts-bedrock/anvil-state.json yarn anvil-devchain:start
-          # anvil-devchain:start loads the bedrock base and applies migrations but, in
-          # LOAD_STATE mode, start_anvil.sh does not pass --dump-state, so the post-migration
-          # state is never written. Dump the still-running anvil over RPC and decompress it
-          # into the plain-JSON file that release-on-devchain.sh loads via --load-state.
+          # Original-set monorepo tooling: anvil-devchain:start runs the core-contract
+          # migrations on a fresh `anvil --celo` and dumps state to .tmp/devchain/state.json
+          # via --state-interval. Rename it to the file release-on-devchain.sh loads.
+          yarn anvil-devchain:start
           source ./scripts/foundry/constants.sh
-          echo "Dumping migrated anvil state from $ANVIL_RPC_URL to .tmp/devchain/$L2_DEVCHAIN_FILE_NAME"
-          cast rpc --rpc-url "$ANVIL_RPC_URL" anvil_dumpState \
-            | tr -d '"' | sed 's/^0x//' | xxd -r -p | gunzip > ".tmp/devchain/$L2_DEVCHAIN_FILE_NAME"
+          sleep 2
+          cp ".tmp/devchain/state.json" ".tmp/devchain/$L2_DEVCHAIN_FILE_NAME"
         working-directory: packages/protocol
       - name: List generated devchain files
         run: ls -la packages/protocol/.tmp packages/protocol/.tmp/devchain || true
