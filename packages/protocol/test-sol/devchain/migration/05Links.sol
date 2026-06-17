@@ -1,8 +1,6 @@
 // This file exists only to force migration tests also compile below imported contracts.
 pragma solidity ^0.5.13;
 
-import "@celo-contracts/governance/BlockchainParameters.sol";
-import "@celo-contracts/governance/DoubleSigningSlasher.sol";
 import "@celo-contracts/governance/EpochRewards.sol";
 import "@celo-contracts/governance/LockedGold.sol";
 import "@celo-contracts/common/Freezer.sol";

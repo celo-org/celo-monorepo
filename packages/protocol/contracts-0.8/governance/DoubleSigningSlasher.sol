@@ -1,11 +1,16 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
 import "./SlasherUtil.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
+// Storage layout (must match 0.5 baseline):
+//   slot 0: _owner (address, 20 bytes) + initialized (bool, 1 byte) — packed
+//   slot 1: registry (address, 20 bytes)
+//   slot 2-3: slashingIncentives (inherited from SlasherUtil)
+//   slot 4: isSlashed
 contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
   using SafeMath for uint256;
 
@@ -19,7 +24,7 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public SlasherUtil(test) {}
+  constructor(bool test) SlasherUtil(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.

@@ -9,60 +9,30 @@ import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/DoubleSigningSlasher.sol";
-import "@celo-contracts/governance/test/MockUsingPrecompiles.sol";
+import "@celo-contracts/governance/interfaces/IDoubleSigningSlasherMock.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 
-contract DoubleSigningSlasherTest is
-  DoubleSigningSlasher(true),
-  MockUsingPrecompiles,
-  TestWithUtils
-{
-  struct SlashParams {
-    address signer;
-    uint256 index;
-    bytes headerA;
-    bytes headerB;
-    uint256 groupMembershipHistoryIndex;
-    address[] validatorElectionLessers;
-    address[] validatorElectionGreaters;
-    uint256[] validatorElectionIndices;
-    address[] groupElectionLessers;
-    address[] groupElectionGreaters;
-    uint256[] groupElectionIndices;
-  }
-
-  function mockSlash(SlashParams calldata slashParams, address _validator) external {
-    ph.mockReturn(
-      ph.GET_VALIDATOR(),
-      abi.encodePacked(slashParams.index, getBlockNumberFromHeader(slashParams.headerA)),
-      abi.encode(_validator)
-    );
-
-    slash(
-      slashParams.signer,
-      slashParams.index,
-      slashParams.headerA,
-      slashParams.headerB,
-      slashParams.groupMembershipHistoryIndex,
-      slashParams.validatorElectionLessers,
-      slashParams.validatorElectionGreaters,
-      slashParams.validatorElectionIndices,
-      slashParams.groupElectionLessers,
-      slashParams.groupElectionGreaters,
-      slashParams.groupElectionIndices
-    );
-  }
-}
+// DoubleSigningSlasher was migrated to contracts-0.8; the deployable mock
+// (DoubleSigningSlasherMock08) lives in
+// test-sol/unit/governance/validators/CompileDoubleSigningSlasher.t.sol and is
+// deployed here via deployCodeTo.
 
 contract DoubleSigningSlasherBaseTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
+
+  struct SlashingIncentives {
+    // Value of LockedGold to slash from the account.
+    uint256 penalty;
+    // Value of LockedGold to send to the observer.
+    uint256 reward;
+  }
 
   SlashingIncentives public expectedSlashingIncentives;
 
   Accounts accounts;
   MockValidators validators;
   MockLockedGold lockedGold;
-  DoubleSigningSlasherTest slasher;
+  IDoubleSigningSlasherMock public slasher;
 
   address nonOwner;
 
@@ -85,14 +55,7 @@ contract DoubleSigningSlasherBaseTest is TestWithUtils {
   address caller2;
   uint256 caller2PK;
 
-  struct SlashingIncentives {
-    // Value of LockedGold to slash from the account.
-    uint256 penalty;
-    // Value of LockedGold to send to the observer.
-    uint256 reward;
-  }
-
-  DoubleSigningSlasherTest.SlashParams params;
+  IDoubleSigningSlasherMock.SlashParams params;
 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
   event DoubleSigningSlashPerformed(address indexed validator, uint256 indexed blockNumber);
@@ -112,7 +75,12 @@ contract DoubleSigningSlasherBaseTest is TestWithUtils {
     accounts = new Accounts(true);
     validators = new MockValidators();
     lockedGold = new MockLockedGold();
-    slasher = new DoubleSigningSlasherTest();
+
+    address slasherAddress = actor("slasher");
+    deployCodeTo("DoubleSigningSlasherMock08", slasherAddress);
+    slasher = IDoubleSigningSlasherMock(slasherAddress);
+
+    registry = Registry(REGISTRY_ADDRESS);
 
     accounts.createAccount();
 
@@ -160,7 +128,7 @@ contract DoubleSigningSlasherBaseTest is TestWithUtils {
 
 contract DoubleSigningSlasherInitialize is DoubleSigningSlasherBaseTest {
   function test_ShouldHaveSetOwner() public {
-    assertEq(slasher.owner(), address(this));
+    assertEq(IOwnable(address(slasher)).owner(), address(this));
   }
 
   function test_ShouldHaveSetSlashingIncentives() public {
@@ -204,7 +172,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
   uint256[] groupElectionIndices = new uint256[](0);
 
   function test_Reverts_WhenL2() public {
-    params = DoubleSigningSlasherTest.SlashParams({
+    params = IDoubleSigningSlasherMock.SlashParams({
       signer: validator,
       index: validatorIndex,
       headerA: headerA,

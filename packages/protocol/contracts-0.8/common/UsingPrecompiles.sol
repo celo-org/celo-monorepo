@@ -174,7 +174,9 @@ contract UsingPrecompiles is IsL2Check {
    * @return Block number.
    * @dev This function will be deprecated in L2.
    */
-  function getBlockNumberFromHeader(bytes memory header) public view onlyL1 returns (uint256) {
+  function getBlockNumberFromHeader(
+    bytes memory header
+  ) public view virtual onlyL1 returns (uint256) {
     bytes memory out;
     bool success;
     (success, out) = BLOCK_NUMBER_FROM_HEADER.staticcall(abi.encodePacked(header));
@@ -188,7 +190,7 @@ contract UsingPrecompiles is IsL2Check {
    * @return Header hash.
    * @dev This function will be deprecated in L2.
    */
-  function hashHeader(bytes memory header) public view onlyL1 returns (bytes32) {
+  function hashHeader(bytes memory header) public view virtual onlyL1 returns (bytes32) {
     bytes memory out;
     bool success;
     (success, out) = HASH_HEADER.staticcall(abi.encodePacked(header));
@@ -222,7 +224,7 @@ contract UsingPrecompiles is IsL2Check {
    */
   function getVerifiedSealBitmapFromHeader(
     bytes memory header
-  ) public view onlyL1 returns (bytes32) {
+  ) public view virtual onlyL1 returns (bytes32) {
     bytes memory out;
     bool success;
     (success, out) = GET_VERIFIED_SEAL_BITMAP.staticcall(abi.encodePacked(header));
