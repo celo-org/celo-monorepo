@@ -48,6 +48,9 @@ export const SOLIDITY_08_PACKAGE = {
     'GovernanceSlasher',
     'DowntimeSlasher',
     'FederatedAttestations',
+    'DoubleSigningSlasher',
+    'BlockchainParameters',
+    'Escrow',
   ],
   proxyContracts: [
     'GasPriceMinimumProxy',

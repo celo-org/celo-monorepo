@@ -17,7 +17,7 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
   // For each signer address, check if a block header has already been slashed
   mapping(address => mapping(bytes32 => bool)) isSlashed;
 
-  event SlashingIncentivesSet(uint256 penalty, uint256 reward);
+  // SlashingIncentivesSet is inherited from SlasherUtil.
   event DoubleSigningSlashPerformed(address indexed validator, uint256 indexed blockNumber);
 
   /**

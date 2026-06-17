@@ -5,7 +5,6 @@ pragma experimental ABIEncoderV2;
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 import { ECDSAHelper } from "@test-sol/utils/ECDSAHelper.sol";
 
-import "@celo-contracts/identity/Escrow.sol";
 import "@celo-contracts/identity/test/MockAttestations.sol";
 import "@celo-contracts/identity/test/MockERC20Token.sol";
 import "@celo-contracts/common/FixidityLib.sol";

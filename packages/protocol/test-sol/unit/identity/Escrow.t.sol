@@ -5,7 +5,8 @@ pragma experimental ABIEncoderV2;
 import "celo-foundry/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
-import "@celo-contracts/identity/Escrow.sol";
+import "@celo-contracts/identity/interfaces/IEscrow.sol";
+import "@celo-contracts/identity/interfaces/IEscrowInitializer.sol";
 import "@celo-contracts/identity/interfaces/IFederatedAttestations.sol";
 import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
 import "@celo-contracts/identity/test/MockAttestations.sol";
@@ -13,11 +14,15 @@ import "@celo-contracts/identity/test/MockERC20Token.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Signatures.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 
 contract EscrowTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
-  Escrow escrowContract;
+  // Escrow now lives in contracts-0.8; deployed via deployCodeTo and used
+  // through its interface from this 0.5 test.
+  IEscrow escrowContract;
+  address escrowContractAddress;
   Registry registry;
   MockAttestations mockAttestations;
   IFederatedAttestations federatedAttestations;
@@ -80,8 +85,10 @@ contract EscrowTest is Test, TestConstants {
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
     mockERC20Token = new MockERC20Token();
-    escrowContract = new Escrow(true);
-    escrowContract.initialize();
+    escrowContractAddress = actor("escrow");
+    deployCodeTo("EscrowCompile", escrowContractAddress);
+    escrowContract = IEscrow(escrowContractAddress);
+    IEscrowInitializer(escrowContractAddress).initialize();
     registry = Registry(REGISTRY_ADDRESS);
     (receiver, receiverPK) = actorWithPK("receiver");
     (sender, senderPK) = actorWithPK("sender");
@@ -198,12 +205,12 @@ contract EscrowTest is Test, TestConstants {
 
 contract EscrowInitialize is EscrowTest {
   function test_Should_have_set_the_owner() public {
-    assertEq(escrowContract.owner(), address(this));
+    assertEq(IOwnable(escrowContractAddress).owner(), address(this));
   }
 
   function test_Reverts_If_InitializedAgain() public {
     vm.expectRevert("contract already initialized");
-    escrowContract.initialize();
+    IEscrowInitializer(escrowContractAddress).initialize();
   }
 }
 
@@ -721,7 +728,10 @@ contract EscrowTestsWithTokens is EscrowTest {
     address[] memory trustedIssuers = new address[](1);
     trustedIssuers[0] = trustedIssuer1;
 
-    vm.expectRevert("SafeERC20: low-level call failed");
+    // OZ v4.x SafeERC20 bubbles up the token's own revert reason instead of the
+    // generic "SafeERC20: low-level call failed" used by the old OZ v2.x. The mock
+    // token reverts via SafeMath when value exceeds the sender's balance.
+    vm.expectRevert("SafeMath: subtraction overflow");
 
     vm.prank(sender);
     escrowContract.transferWithTrustedIssuers(

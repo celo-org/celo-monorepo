@@ -1,15 +1,18 @@
 pragma solidity ^0.5.13;
 
-import "@celo-contracts/governance/BlockchainParameters.sol";
-
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+
+import "@celo-contracts/governance/interfaces/IBlockchainParameters.sol";
+import "@celo-contracts/governance/interfaces/IBlockchainParametersInitializer.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 
 contract BlockchainParametersTest is TestWithUtils {
   uint256 constant gasLimit = 7000000;
   uint256 constant gasForNonGoldCurrencies = 50000;
   address nonOwner;
 
-  BlockchainParameters blockchainParameters;
+  IBlockchainParameters blockchainParameters;
+  address blockchainParametersAddress;
 
   event IntrinsicGasForAlternativeFeeCurrencySet(uint256 gas);
   event BlockGasLimitSet(uint256 limit);
@@ -20,7 +23,9 @@ contract BlockchainParametersTest is TestWithUtils {
     super.setUp();
     nonOwner = actor("nonOwner");
     ph.setEpochSize(DAY / 5);
-    blockchainParameters = new BlockchainParameters(true);
+    blockchainParametersAddress = actor("blockchainParameters");
+    deployCodeTo("BlockchainParametersCompile", blockchainParametersAddress);
+    blockchainParameters = IBlockchainParameters(blockchainParametersAddress);
     whenL2WithEpochManagerInitialization();
   }
 }
@@ -30,7 +35,11 @@ contract BlockchainParametersTest_initialize is BlockchainParametersTest {
 
   function test_Reverts_WhenCalledOnL2() public {
     vm.expectRevert("This method is no longer supported in L2.");
-    blockchainParameters.initialize(gasForNonGoldCurrencies, gasLimit, lookbackWindow);
+    IBlockchainParametersInitializer(blockchainParametersAddress).initialize(
+      gasForNonGoldCurrencies,
+      gasLimit,
+      lookbackWindow
+    );
   }
 }
 

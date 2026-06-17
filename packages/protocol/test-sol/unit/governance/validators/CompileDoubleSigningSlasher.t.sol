@@ -69,7 +69,7 @@ contract DoubleSigningSlasherMock08 is DoubleSigningSlasher(true) {
 
   function getBlockNumberFromHeader(
     bytes memory header
-  ) public view override returns (uint256) {
+  ) public view override onlyL1 returns (uint256) {
     return _blockNumbers[keccak256(abi.encodePacked(header))];
   }
 
