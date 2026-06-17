@@ -15,11 +15,16 @@ contract DeployMIPS is Script {
   // CHALLENGE_PERIOD (optional) - challenge period for a new PreimageOracle if PREIMAGE_ORACLE is not provided
 
   error MissingEnvVars();
+  error InvalidOracleAddress();
 
   function run() external {
     address oracle_ = vm.envOr("PREIMAGE_ORACLE", address(0));
     uint256 minProposalSize_ = vm.envOr("MIN_PROPOSAL_SIZE", uint256(0));
     uint256 challengePeriod_ = vm.envOr("CHALLENGE_PERIOD", uint256(0));
+
+    if (oracle_ != address(0) && oracle_.code.length == 0) {
+      revert InvalidOracleAddress();
+    }
 
     if (oracle_ == address(0) && !(minProposalSize_ > 0 && challengePeriod_ > 0)) {
       revert MissingEnvVars();
