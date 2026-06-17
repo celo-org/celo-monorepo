@@ -11,7 +11,10 @@ import { SortedLinkedListWithMedian } from "contracts/common/linkedlists/SortedL
 import { FixidityLib } from "contracts/common/FixidityLib.sol";
 
 import { IBreakerBox } from "@celo-contracts/stability/interfaces/IBreakerBox.sol";
-import { SortedOracles } from "@celo-contracts/stability/SortedOracles.sol";
+import { ISortedOracles } from "@celo-contracts/stability/interfaces/ISortedOracles.sol";
+import { ISortedOraclesInitializer } from "@celo-contracts/stability/interfaces/ISortedOraclesInitializer.sol";
+import { ISortedOraclesTest } from "@test-sol/unit/stability/ISortedOraclesTest.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 
 contract MockBreakerBox is IBreakerBox {
   uint256 public tradingMode;
@@ -51,7 +54,10 @@ contract SortedOraclesTest is TestWithUtils {
   );
   event BreakerBoxUpdated(address indexed newBreakerBox);
 
-  SortedOracles sortedOracles;
+  // SortedOracles now lives in contracts-0.8; deployed via deployCodeTo and used
+  // through its interface from this 0.5 test.
+  ISortedOraclesTest sortedOracles;
+  address sortedOraclesAddress;
   address owner;
   address notOwner;
   address rando;
@@ -66,8 +72,10 @@ contract SortedOraclesTest is TestWithUtils {
   MockBreakerBox mockBreakerBox;
 
   function setUp() public {
-    sortedOracles = new SortedOracles(true);
-    sortedOracles.initialize(aReportExpiry);
+    sortedOraclesAddress = actor("sortedOracles");
+    deployCodeTo("SortedOraclesCompile", sortedOraclesAddress);
+    sortedOracles = ISortedOraclesTest(sortedOraclesAddress);
+    ISortedOraclesInitializer(sortedOraclesAddress).initialize(aReportExpiry);
 
     owner = address(this);
     notOwner = address(10);
@@ -76,7 +84,7 @@ contract SortedOraclesTest is TestWithUtils {
     oracle = address(4);
 
     mockBreakerBox = new MockBreakerBox();
-    sortedOracles.setBreakerBox(IBreakerBox(mockBreakerBox));
+    sortedOracles.setBreakerBox(address(mockBreakerBox));
     vm.startPrank(owner);
     currentPrank = owner;
   }
@@ -105,7 +113,7 @@ contract SortedOraclesTest is TestWithUtils {
  */
 contract SortedOracles_initialize is SortedOraclesTest {
   function test_initialize_shouldHaveSetTheOwner() public {
-    assertEq(sortedOracles.owner(), owner);
+    assertEq(IOwnable(sortedOraclesAddress).owner(), owner);
   }
 
   function test_initialize_shouldHaveSetReportExpiryToAReportExpiry() public {
@@ -218,22 +226,24 @@ contract SortedOracles_breakerBox is SortedOraclesTest {
   function test_setBreakerBox_whenCalledByNonOwner_shouldRevert() public {
     changePrank(notOwner);
     vm.expectRevert("Ownable: caller is not the owner");
-    sortedOracles.setBreakerBox(MockBreakerBox(address(0)));
+    sortedOracles.setBreakerBox(address(0));
   }
 
   function test_setBreakerBox_whenGivenAddressIsNull_shouldRevert() public {
     vm.expectRevert("BreakerBox address must be set");
-    sortedOracles.setBreakerBox(MockBreakerBox(address(0)));
+    sortedOracles.setBreakerBox(address(0));
   }
 
   function test_setBreakerBox_shouldUpdateAndEmit() public {
-    sortedOracles = new SortedOracles(true);
-    assertEq(address(sortedOracles.breakerBox()), address(0));
+    address freshOraclesAddress = actor("freshOracles");
+    deployCodeTo("SortedOraclesCompile", freshOraclesAddress);
+    ISortedOraclesTest freshSortedOracles = ISortedOraclesTest(freshOraclesAddress);
+    assertEq(freshSortedOracles.breakerBox(), address(0));
     vm.expectEmit(true, true, true, true);
     emit BreakerBoxUpdated(address(mockBreakerBox));
 
-    sortedOracles.setBreakerBox(mockBreakerBox);
-    assertEq(address(sortedOracles.breakerBox()), address(mockBreakerBox));
+    freshSortedOracles.setBreakerBox(address(mockBreakerBox));
+    assertEq(freshSortedOracles.breakerBox(), address(mockBreakerBox));
   }
 }
 
@@ -646,7 +656,7 @@ contract SortedOracles_report is SortedOraclesTest {
   function test_report_shouldCallBreakerBoxWithRateFeedID() public {
     // token is a legacy reference of rateFeedID
     sortedOracles.addOracle(token, oracle);
-    sortedOracles.setBreakerBox(mockBreakerBox);
+    sortedOracles.setBreakerBox(address(mockBreakerBox));
 
     vm.expectCall(
       address(mockBreakerBox),

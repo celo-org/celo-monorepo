@@ -11,7 +11,7 @@ import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/linkedlists/AddressSortedLinkedList.sol";
-import "@celo-contracts/identity/test/MockRandom.sol";
+import "@celo-contracts/identity/interfaces/IRandomMock.sol";
 import "@celo-contracts/common/Freezer.sol";
 
 import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";
@@ -35,7 +35,7 @@ contract ElectionTest is TestWithUtils {
   Freezer freezer;
   MockLockedGold lockedGold;
   MockValidators validators;
-  MockRandom random;
+  IRandomMock random;
 
   address nonOwner = actor("nonOwner");
   address owner = address(this);
@@ -149,7 +149,9 @@ contract ElectionTest is TestWithUtils {
     freezer = new Freezer(true);
     lockedGold = new MockLockedGold();
     validators = new MockValidators();
-    random = new MockRandom();
+    address randomAddress = actor("random");
+    deployCodeTo("MockRandom08", randomAddress);
+    random = IRandomMock(randomAddress);
 
     registry.setAddressFor("Accounts", address(accounts));
     registry.setAddressFor("Freezer", address(freezer));

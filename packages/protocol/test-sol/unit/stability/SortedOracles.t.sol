@@ -3,7 +3,10 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import { Test } from "celo-foundry/Test.sol";
-import { SortedOracles } from "@celo-contracts/stability/SortedOracles.sol";
+import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
+import "@celo-contracts/stability/interfaces/ISortedOraclesInitializer.sol";
+import "@test-sol/unit/stability/ISortedOraclesTest.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "@celo-contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
@@ -13,7 +16,10 @@ contract SortedOraclesTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
   using AddressSortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
 
-  SortedOracles sortedOracle;
+  // SortedOracles now lives in contracts-0.8; deployed via deployCodeTo and used
+  // through its interface from this 0.5 test.
+  ISortedOraclesTest sortedOracle;
+  address sortedOracleAddress;
 
   address oracleAccount;
   address aToken = 0x00000000000000000000000000000000DeaDBeef;
@@ -35,9 +41,11 @@ contract SortedOraclesTest is Test, TestConstants {
 
   function setUp() public {
     warp(0);
-    sortedOracle = new SortedOracles(true);
+    sortedOracleAddress = actor("sortedOracle");
+    deployCodeTo("SortedOraclesCompile", sortedOracleAddress);
+    sortedOracle = ISortedOraclesTest(sortedOracleAddress);
     oracleAccount = actor("oracleAccount");
-    sortedOracle.initialize(reportExpiry);
+    ISortedOraclesInitializer(sortedOracleAddress).initialize(reportExpiry);
   }
 
   function warp(uint256 timeToWarpTo) public {
@@ -47,7 +55,7 @@ contract SortedOraclesTest is Test, TestConstants {
 
 contract SortedOraclesTest_Initialize is SortedOraclesTest {
   function test_ownerSet() public {
-    assertEq(sortedOracle.owner(), address(this));
+    assertEq(IOwnable(sortedOracleAddress).owner(), address(this));
   }
 
   function test_ShouldSetReportExpiry() public {
@@ -56,7 +64,7 @@ contract SortedOraclesTest_Initialize is SortedOraclesTest {
 
   function test_ShouldRevert_WhenCalledAgain() public {
     vm.expectRevert("contract already initialized");
-    sortedOracle.initialize(reportExpiry);
+    ISortedOraclesInitializer(sortedOracleAddress).initialize(reportExpiry);
   }
 }
 
@@ -508,8 +516,6 @@ contract RemoveOracle is SortedOraclesTest {
     uint256 newMedianTimestamp = sortedOracle.medianTimestamp(aToken);
     assertEq(originalMedianTimestamp, newMedianTimestamp);
   }
-
-  // TODO: add test for not emitting any of the remove events once we migrate to 0.8
 
   function test_Emits_OracleRemovedEvent() public {
     vm.expectEmit(true, true, true, true);

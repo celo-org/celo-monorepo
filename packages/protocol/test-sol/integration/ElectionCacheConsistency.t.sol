@@ -14,7 +14,7 @@ import { LockedGold } from "@celo-contracts/governance/LockedGold.sol";
 import { Governance } from "@celo-contracts/governance/Governance.sol";
 import { Proposals } from "@celo-contracts/governance/Proposals.sol";
 import { MockValidators } from "@celo-contracts/governance/test/MockValidators.sol";
-import { MockRandom } from "@celo-contracts/identity/test/MockRandom.sol";
+import { IRandomMock } from "@celo-contracts/identity/interfaces/IRandomMock.sol";
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
@@ -26,7 +26,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
   Freezer freezer;
   LockedGold lockedGold;
   MockValidators validators;
-  MockRandom random;
+  IRandomMock random;
   Governance governance;
 
   address voter = actor("voter");
@@ -67,7 +67,9 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
     freezer = new Freezer(true);
     lockedGold = new LockedGold(true);
     validators = new MockValidators();
-    random = new MockRandom();
+    address randomAddress = actor("random");
+    deployCodeTo("MockRandom08", randomAddress);
+    random = IRandomMock(randomAddress);
     governance = new Governance(true);
 
     registry.setAddressFor("Accounts", address(accounts));

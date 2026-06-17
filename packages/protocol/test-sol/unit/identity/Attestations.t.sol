@@ -4,7 +4,7 @@ pragma solidity ^0.5.13;
 import "celo-foundry/Test.sol";
 import "@celo-contracts/identity/test/AttestationsTest.sol";
 import "@celo-contracts/identity/test/MockERC20Token.sol";
-import "@celo-contracts/identity/test/MockRandom.sol";
+import "@celo-contracts/identity/interfaces/IRandomMock.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
@@ -26,7 +26,7 @@ contract AttestationsFoundryTest is Test {
   MockElection mockElection;
   MockLockedGold mockLockedGold;
   MockValidators mockValidators;
-  MockRandom random;
+  IRandomMock random;
   Registry registry;
   Accounts accounts;
 
@@ -277,7 +277,9 @@ contract AttestationsFoundryTest is Test {
     mockElection = new MockElection();
     mockLockedGold = new MockLockedGold();
     mockValidators = new MockValidators();
-    random = new MockRandom();
+    address randomAddress = actor("random");
+    deployCodeTo("MockRandom08", randomAddress);
+    random = IRandomMock(randomAddress);
     registry = new Registry(true);
     accounts = new Accounts(true);
     random.initialize(256);

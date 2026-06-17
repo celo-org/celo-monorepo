@@ -51,6 +51,8 @@ export const SOLIDITY_08_PACKAGE = {
     'DoubleSigningSlasher',
     'BlockchainParameters',
     'Escrow',
+    'Random',
+    'SortedOracles',
   ],
   proxyContracts: [
     'GasPriceMinimumProxy',

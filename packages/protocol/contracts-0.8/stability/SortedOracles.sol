@@ -1,19 +1,19 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "./interfaces/ISortedOracles.sol";
 import "./interfaces/ISortedOraclesInitializer.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
-import "./interfaces/IBreakerBox.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/stability/interfaces/IBreakerBox.sol";
 
-import "../common/FixidityLib.sol";
-import "../common/Initializable.sol";
+import "../../contracts/common/FixidityLib.sol";
+import "../../contracts/common/Initializable.sol";
 import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../common/linkedlists/SortedLinkedListWithMedian.sol";
-import "../../contracts-0.8/common/interfaces/IOracle.sol";
+import "../common/interfaces/IOracle.sol";
 
 /**
  * @title   SortedOracles
@@ -100,7 +100,7 @@ contract SortedOracles is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -244,11 +244,12 @@ contract SortedOracles is
     timestamps[token].insert(
       msg.sender,
       // solhint-disable-next-line not-rely-on-time
-      now,
+      block.timestamp,
       timestamps[token].getHead(),
       address(0)
     );
-    emit OracleReported(token, msg.sender, now, value);
+    // solhint-disable-next-line not-rely-on-time
+    emit OracleReported(token, msg.sender, block.timestamp, value);
     uint256 newMedian = rates[token].getMedianValue();
     if (newMedian != originalMedian) {
       emit MedianUpdated(token, newMedian);
@@ -331,8 +332,8 @@ contract SortedOracles is
   /**
    * @notice Returns the exchange rate for a specified token.
    * @param token The token for which the exchange rate is being retrieved.
-   * @return uint256 The exchange rate for the specified token.
-   * @return uint256 The denominator for the exchange rate.
+   * @return numerator The exchange rate numerator for the specified token.
+   * @return denominator The denominator for the exchange rate.
    */
   function getExchangeRate(
     address token
@@ -415,7 +416,7 @@ contract SortedOracles is
     address oldest = timestamps[token].getTail();
     uint256 timestamp = timestamps[token].getValue(oldest);
     // solhint-disable-next-line not-rely-on-time
-    if (now.sub(timestamp) >= getTokenReportExpirySeconds(token)) {
+    if (block.timestamp.sub(timestamp) >= getTokenReportExpirySeconds(token)) {
       return (true, oldest);
     }
     return (false, oldest);
