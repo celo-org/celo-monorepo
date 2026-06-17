@@ -1,0 +1,106 @@
+[
+  {
+    "encoding": "inplace",
+    "label": "_owner",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "0",
+    "type": "address"
+  },
+  {
+    "encoding": "inplace",
+    "label": "initialized",
+    "numberOfBytes": "1",
+    "offset": 20,
+    "slot": "0",
+    "type": "bool"
+  },
+  {
+    "encoding": "inplace",
+    "label": "registry",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "1",
+    "type": "contract IRegistry"
+  },
+  {
+    "encoding": "inplace",
+    "label": "_guardCounter",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "2",
+    "type": "uint256"
+  },
+  {
+    "encoding": "inplace",
+    "label": "deprecated_lastLimitDay",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "3",
+    "type": "uint256"
+  },
+  {
+    "encoding": "inplace",
+    "label": "ignoreRenaming_inverseCarbonFraction",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "4",
+    "type": "struct FixidityLib.Fraction"
+  },
+  {
+    "encoding": "inplace",
+    "label": "ignoreRenaming_carbonFeeBeneficiary",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "5",
+    "type": "address"
+  },
+  {
+    "encoding": "inplace",
+    "label": "deprecated_celoToBeBurned",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "6",
+    "type": "uint256"
+  },
+  {
+    "encoding": "mapping",
+    "label": "tokenStates",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "7",
+    "type": "mapping(address => struct FeeHandler.TokenState)"
+  },
+  {
+    "encoding": "inplace",
+    "label": "activeTokens",
+    "numberOfBytes": "64",
+    "offset": 0,
+    "slot": "8",
+    "type": "struct EnumerableSet.AddressSet"
+  },
+  {
+    "encoding": "inplace",
+    "label": "totalFractionOfOtherBeneficiaries",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "10",
+    "type": "struct FixidityLib.Fraction"
+  },
+  {
+    "encoding": "mapping",
+    "label": "otherBeneficiaries",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "11",
+    "type": "mapping(address => struct FeeHandler.Beneficiary)"
+  },
+  {
+    "encoding": "inplace",
+    "label": "otherBeneficiariesAddresses",
+    "numberOfBytes": "64",
+    "offset": 0,
+    "slot": "12",
+    "type": "struct EnumerableSet.AddressSet"
+  }
+]

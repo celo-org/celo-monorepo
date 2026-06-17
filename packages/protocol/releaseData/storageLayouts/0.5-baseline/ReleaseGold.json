@@ -1,0 +1,114 @@
+[
+  {
+    "encoding": "inplace",
+    "label": "_owner",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "0",
+    "type": "address"
+  },
+  {
+    "encoding": "inplace",
+    "label": "registry",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "1",
+    "type": "contract IRegistry"
+  },
+  {
+    "encoding": "inplace",
+    "label": "_guardCounter",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "2",
+    "type": "uint256"
+  },
+  {
+    "encoding": "inplace",
+    "label": "initialized",
+    "numberOfBytes": "1",
+    "offset": 0,
+    "slot": "3",
+    "type": "bool"
+  },
+  {
+    "encoding": "inplace",
+    "label": "beneficiary",
+    "numberOfBytes": "20",
+    "offset": 1,
+    "slot": "3",
+    "type": "address payable"
+  },
+  {
+    "encoding": "inplace",
+    "label": "releaseOwner",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "4",
+    "type": "address"
+  },
+  {
+    "encoding": "inplace",
+    "label": "refundAddress",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "5",
+    "type": "address payable"
+  },
+  {
+    "encoding": "inplace",
+    "label": "totalWithdrawn",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "6",
+    "type": "uint256"
+  },
+  {
+    "encoding": "inplace",
+    "label": "maxDistribution",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "7",
+    "type": "uint256"
+  },
+  {
+    "encoding": "inplace",
+    "label": "liquidityProvisionMet",
+    "numberOfBytes": "1",
+    "offset": 0,
+    "slot": "8",
+    "type": "bool"
+  },
+  {
+    "encoding": "inplace",
+    "label": "canValidate",
+    "numberOfBytes": "1",
+    "offset": 1,
+    "slot": "8",
+    "type": "bool"
+  },
+  {
+    "encoding": "inplace",
+    "label": "canVote",
+    "numberOfBytes": "1",
+    "offset": 2,
+    "slot": "8",
+    "type": "bool"
+  },
+  {
+    "encoding": "inplace",
+    "label": "releaseSchedule",
+    "numberOfBytes": "160",
+    "offset": 0,
+    "slot": "9",
+    "type": "struct ReleaseGold.ReleaseSchedule"
+  },
+  {
+    "encoding": "inplace",
+    "label": "revocationInfo",
+    "numberOfBytes": "96",
+    "offset": 0,
+    "slot": "14",
+    "type": "struct ReleaseGold.RevocationInfo"
+  }
+]

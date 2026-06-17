@@ -1,0 +1,34 @@
+[
+  {
+    "encoding": "inplace",
+    "label": "_guardCounter",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "0",
+    "type": "uint256"
+  },
+  {
+    "encoding": "inplace",
+    "label": "_owner",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "1",
+    "type": "address"
+  },
+  {
+    "encoding": "inplace",
+    "label": "initialized",
+    "numberOfBytes": "1",
+    "offset": 20,
+    "slot": "1",
+    "type": "bool"
+  },
+  {
+    "encoding": "mapping",
+    "label": "totalPaidCUSD",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "2",
+    "type": "mapping(address => uint256)"
+  }
+]

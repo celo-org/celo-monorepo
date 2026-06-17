@@ -1,0 +1,90 @@
+[
+  {
+    "encoding": "inplace",
+    "label": "_owner",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "0",
+    "type": "address"
+  },
+  {
+    "encoding": "inplace",
+    "label": "initialized",
+    "numberOfBytes": "1",
+    "offset": 20,
+    "slot": "0",
+    "type": "bool"
+  },
+  {
+    "encoding": "inplace",
+    "label": "registry",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "1",
+    "type": "contract IRegistry"
+  },
+  {
+    "encoding": "inplace",
+    "label": "startTime",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "2",
+    "type": "uint256"
+  },
+  {
+    "encoding": "inplace",
+    "label": "rewardsMultiplierParams",
+    "numberOfBytes": "96",
+    "offset": 0,
+    "slot": "3",
+    "type": "struct EpochRewards.RewardsMultiplierParameters"
+  },
+  {
+    "encoding": "inplace",
+    "label": "targetVotingYieldParams",
+    "numberOfBytes": "96",
+    "offset": 0,
+    "slot": "6",
+    "type": "struct EpochRewards.TargetVotingYieldParameters"
+  },
+  {
+    "encoding": "inplace",
+    "label": "targetVotingGoldFraction",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "9",
+    "type": "struct FixidityLib.Fraction"
+  },
+  {
+    "encoding": "inplace",
+    "label": "communityRewardFraction",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "10",
+    "type": "struct FixidityLib.Fraction"
+  },
+  {
+    "encoding": "inplace",
+    "label": "carbonOffsettingFraction",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "11",
+    "type": "struct FixidityLib.Fraction"
+  },
+  {
+    "encoding": "inplace",
+    "label": "carbonOffsettingPartner",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "12",
+    "type": "address"
+  },
+  {
+    "encoding": "inplace",
+    "label": "targetValidatorEpochPayment",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "13",
+    "type": "uint256"
+  }
+]
