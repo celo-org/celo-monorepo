@@ -29,7 +29,7 @@ env:
   TERM: dumb
   GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
   # Git Tag for contract release to use
-  RELEASE_TAG: core-contracts.v16
+  RELEASE_TAG: core-contracts.v17
 
 # EXAMPLE on debug ssh step
 #  - name: Setup tmate session
@@ -185,18 +185,28 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Download protocol devchain artifact
-        uses: dawidd6/action-download-artifact@20319c5641d495c8a52e688b7dc5fada6c3a9fbc
-        with:
-          workflow: protocol-devchain.yml
-          name: devchain-${{ env.RELEASE_TAG }}
-          path: packages/protocol/.tmp/devchain
+      - name: Fetch baseline devchain from npm
+        working-directory: packages/protocol
+        run: |
+          # The baseline devchain is the published @celo/devchain-anvil package,
+          # generated for each release by protocol-devchain-anvil.yml.
+          # RELEASE_TAG=core-contracts.v17 -> @celo/devchain-anvil@17
+          VERSION=$(echo "$RELEASE_TAG" | sed -E 's/.*\.v//')
+          echo "Fetching @celo/devchain-anvil@$VERSION"
+          mkdir -p .tmp/devchain
+          npm pack "@celo/devchain-anvil@$VERSION"
+          tar xzf celo-devchain-anvil-*.tgz
+          cp package/devchain/l2-devchain.json .tmp/devchain/l2-devchain.json
+          rm -rf package celo-devchain-anvil-*.tgz
+          ls -la .tmp/devchain
       - name: Install Foundry
         # foundry-toolchain v1.7.0 https://github.com/foundry-rs/foundry-toolchain/releases/tag/v1.7.0
         uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
         with:
-          # TODO: Standardize Foundry version across workflows https://github.com/celo-org/celo-monorepo/issues/11714
-          version: 'v1.0.0'
+          # Must match the Foundry version that generated the devchain in
+          # protocol-devchain-anvil.yml (v1.5.0); anvil --load-state rejects a
+          # state dumped by a different version (missing field `coinbase`). See #11714.
+          version: 'v1.5.0'
 
       - name: Install forge dependencies
         working-directory: packages/protocol
