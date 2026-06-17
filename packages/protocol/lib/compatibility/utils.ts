@@ -3,7 +3,7 @@ import { reportLayoutIncompatibilities } from '@celo/protocol/lib/compatibility/
 import { Categorizer } from '@celo/protocol/lib/compatibility/categorizer';
 import { reportLibraryLinkingIncompatibilities } from '@celo/protocol/lib/compatibility/library-linking';
 import { ASTDetailedVersionedReport, ASTReports } from '@celo/protocol/lib/compatibility/report';
-import { linkedLibraries } from '@celo/protocol/migrationsConfig';
+import { linkedLibraries } from '@celo/protocol/lib/linked-libraries';
 import { BuildArtifacts, Contracts, getBuildArtifacts } from '@openzeppelin/upgrades';
 import { readJsonSync } from 'fs-extra';
 import { globSync } from 'glob'

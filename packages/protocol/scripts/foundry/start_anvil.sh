@@ -4,11 +4,35 @@ set -euo pipefail
 # Read environment variables and constants
 source $PWD/scripts/foundry/constants.sh
 
+USE_CELO=""
+
 # Parse command line options:
+#   --celo: Enable Celo mode in Anvil
 #   -p: Custom port number for Anvil to listen on (overrides default ANVIL_PORT)
 #   -l: Path to load existing Anvil state from (instead of creating new state)
 #   -f: Fork URL to fork from a live network
 #   -a: Enable auto-impersonate mode
+
+# Check for --celo flag first (long option)
+for arg in "$@"; do
+  if [ "$arg" = "--celo" ]; then
+    USE_CELO="--celo"
+    break
+  fi
+done
+
+# Filter out --celo from arguments before getopts processing
+FILTERED_ARGS=()
+for arg in "$@"; do
+  if [ "$arg" != "--celo" ]; then
+    FILTERED_ARGS+=("$arg")
+  fi
+done
+if [ ${#FILTERED_ARGS[@]} -gt 0 ]; then
+  set -- "${FILTERED_ARGS[@]}"
+else
+  set --
+fi
 
 while getopts 'p:l:f:a' flag; do
   case "${flag}" in
@@ -31,15 +55,16 @@ timestamp=`date -Iseconds`
 mkdir -p $ANVIL_FOLDER
 
 # create package.json
-echo "{\"name\": \"@celo/devchain-anvil\",\"version\": \"1.0.0\",\"repository\": { \"url\": \"https://github.com/celo-org/celo-monorepo\", \"directory\": \"packages/protocol/migrations_sol\" },\"homepage\": \"https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/migrations_sol/README.md\",\"description\": \"Anvil based devchain that contains core smart contracts of celo\",\"author\":\"Celo\",\"license\": \"LGPL-3.0\"}" > $TMP_FOLDER/package.json
+echo "{\"name\": \"@celo/devchain-anvil\",\"version\": \"0.0.0-placeholder\",\"repository\": { \"url\": \"https://github.com/celo-org/celo-monorepo\", \"directory\": \"packages/protocol/migrations_sol\" },\"homepage\": \"https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/migrations_sol/README.md\",\"description\": \"Anvil based devchain that contains core smart contracts of celo\",\"author\":\"Celo\",\"license\": \"LGPL-3.0\"}" > $TMP_FOLDER/package.json
 
 cp $PWD/migrations_sol/README.md $TMP_FOLDER/README.md
 
-if nc -z localhost $ANVIL_PORT; then
+ANVIL_PID=$(lsof -t -i:$ANVIL_PORT 2>/dev/null || true)
+if [ -n "$ANVIL_PID" ]; then
   echo "Port already used"
-  kill $(lsof -t -i:$ANVIL_PORT)
+  kill $ANVIL_PID
   sleep 5
-  echo "Killed previous Anvil"
+  echo "Killed previous Anvil (PID: $ANVIL_PID)"
 fi
 
 # Start anvil
@@ -62,15 +87,17 @@ if [ "${AUTO_IMPERSONATE:-}" = true ]; then
   IMPERSONATE_FLAGS="--auto-impersonate --accounts 0"
 fi
 
-anvil \
-$STATE_FLAGS \
-$FORK_FLAGS \
-$IMPERSONATE_FLAGS \
---port $ANVIL_PORT \
---gas-limit $GAS_LIMIT \
---code-size-limit $CODE_SIZE_LIMIT \
---balance $BALANCE \
---steps-tracing &
+$ANVIL \
+  $USE_CELO \
+  --port $ANVIL_PORT \
+  $STATE_FLAGS \
+  $FORK_FLAGS \
+  $IMPERSONATE_FLAGS \
+  --gas-limit $GAS_LIMIT \
+  --code-size-limit $CODE_SIZE_LIMIT \
+  --balance $BALANCE \
+  --block-time 1 \
+  --steps-tracing &
 
 # For context "&" tells the shell to start a command as a background process.
 # This allows you to continue executing other commands without waiting for the background command to finish.

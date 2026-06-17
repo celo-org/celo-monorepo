@@ -66,6 +66,15 @@ contract Validators is
     // sizeHistory[i] contains the last time the group contained i members.
     uint256[] sizeHistory;
     SlashingInfo slashInfo;
+    // Commission on voter CELO rewards (independent from validator payment commission above).
+    // Groups set this to take a percentage of epoch rewards that would otherwise go to voters.
+    // Currently active commission rate, applied at distribution time in EpochManager.
+    FixidityLib.Fraction voterRewardCommission;
+    // Pending commission rate queued via setNextVoterRewardCommissionUpdate, not yet active.
+    FixidityLib.Fraction nextVoterRewardCommission;
+    // Block at which the queued nextVoterRewardCommission becomes activatable via
+    // updateVoterRewardCommission. Set to block.number + commissionUpdateDelay at queue time.
+    uint256 nextVoterRewardCommissionBlock;
   }
 
   // Stores the epoch number at which a validator joined a particular group.
@@ -129,6 +138,17 @@ contract Validators is
   uint256 public slashingMultiplierResetPeriod;
   uint256 public deprecated_downtimeGracePeriod;
 
+  // Cap on voter reward commission to protect voters from excessive commission rates.
+  // Set via governance. Defaults to 0 (commissions disabled until governance sets a value).
+  // Set to FixidityLib.fixed1() for unlimited.
+  FixidityLib.Fraction public maxVoterRewardCommission;
+
+  // Block number of the most recent reduction of maxVoterRewardCommission. Queued voter
+  // reward commission updates whose activation block is at or before this block are
+  // invalidated and must be re-queued. This prevents a matured-but-unactivated queued
+  // update from reviving after governance lowers (e.g. to 0) and later restores the cap.
+  uint256 public maxVoterRewardCommissionLastReducedBlock;
+
   event MaxGroupSizeSet(uint256 size);
   event CommissionUpdateDelaySet(uint256 delay);
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
@@ -150,6 +170,13 @@ contract Validators is
     uint256 activationBlock
   );
   event ValidatorGroupCommissionUpdated(address indexed group, uint256 commission);
+  event ValidatorGroupVoterRewardCommissionUpdateQueued(
+    address indexed group,
+    uint256 commission,
+    uint256 activationBlock
+  );
+  event ValidatorGroupVoterRewardCommissionUpdated(address indexed group, uint256 commission);
+  event MaxVoterRewardCommissionSet(uint256 maxCommission);
 
   modifier onlySlasher() {
     require(getLockedGold().isSlasher(msg.sender), "Only registered slasher can call");
@@ -453,6 +480,85 @@ contract Validators is
   }
 
   /**
+   * @notice Queues an update to a validator group's voter reward commission.
+   * If there was a previously scheduled update, that is overwritten.
+   * @param commission Fixidity representation of the commission this group receives on epoch
+   *   voter rewards. Must be in the range [0, 1.0] and below maxVoterRewardCommission if set.
+   */
+  function setNextVoterRewardCommissionUpdate(uint256 commission) external {
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
+    require(isValidatorGroup(account), "Not a validator group");
+    ValidatorGroup storage group = groups[account];
+    FixidityLib.Fraction memory commissionFraction = FixidityLib.wrap(commission);
+    require(
+      commissionFraction.lte(FixidityLib.fixed1()),
+      "Voter reward commission can't be greater than 100%"
+    );
+    require(
+      commissionFraction.lte(maxVoterRewardCommission),
+      "Voter reward commission exceeds max allowed"
+    );
+    // Reject no-op queues. The value that would otherwise take effect is the pending
+    // queued value when an update is already queued, or the active commission otherwise.
+    // Comparing against the active value alone would make it impossible to overwrite a
+    // stale non-zero queued value with 0 once the active commission was already 0
+    // (e.g. after governance lowered the cap to 0).
+    FixidityLib.Fraction memory currentTarget = group.nextVoterRewardCommissionBlock != 0
+      ? group.nextVoterRewardCommission
+      : group.voterRewardCommission;
+    require(!commissionFraction.equals(currentTarget), "Voter reward commission must be different");
+
+    group.nextVoterRewardCommission = commissionFraction;
+    uint256 activationBlock = block.number + commissionUpdateDelay;
+    group.nextVoterRewardCommissionBlock = activationBlock;
+    emit ValidatorGroupVoterRewardCommissionUpdateQueued(account, commission, activationBlock);
+  }
+
+  /**
+   * @notice Updates a validator group's voter reward commission based on the previously queued
+   * update.
+   */
+  function updateVoterRewardCommission() external {
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
+    require(isValidatorGroup(account), "Not a validator group");
+    ValidatorGroup storage group = groups[account];
+
+    // Prevent activating a new commission while an epoch is being processed. Otherwise a group
+    // could change its rate between setToProcessGroups and individual processGroup calls,
+    // applying the new rate to already-earned voter rewards for the closed epoch.
+    require(
+      !getEpochManager().isEpochProcessingStarted(),
+      "Cannot update voter reward commission during epoch processing"
+    );
+
+    require(group.nextVoterRewardCommissionBlock != 0, "No voter reward commission update queued");
+    require(
+      group.nextVoterRewardCommissionBlock <= block.number,
+      "Can't apply voter reward commission update yet"
+    );
+
+    // Invalidate updates that matured before governance reduced the cap. Without this,
+    // a queued update blocked by a cap reduction (e.g. to 0) would silently revive and
+    // activate without a fresh delay once the cap was restored.
+    require(
+      group.nextVoterRewardCommissionBlock > maxVoterRewardCommissionLastReducedBlock,
+      "Voter reward commission cap reduced since queued; re-queue required"
+    );
+
+    // Re-check max cap at activation time. Governance may have lowered the cap since the
+    // update was queued.
+    require(
+      group.nextVoterRewardCommission.lte(maxVoterRewardCommission),
+      "Voter reward commission exceeds max allowed"
+    );
+
+    group.voterRewardCommission = group.nextVoterRewardCommission;
+    group.nextVoterRewardCommission = FixidityLib.wrap(0);
+    group.nextVoterRewardCommissionBlock = 0;
+    emit ValidatorGroupVoterRewardCommissionUpdated(account, group.voterRewardCommission.unwrap());
+  }
+
+  /**
    * @notice Removes a validator from the group for which it is a member.
    * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
    */
@@ -538,6 +644,25 @@ contract Validators is
       group.sizeHistory,
       group.slashInfo.multiplier.unwrap(),
       group.slashInfo.lastSlashed
+    );
+  }
+
+  /**
+   * @notice Returns the voter reward commission for a validator group.
+   * @param account The address of the validator group.
+   * @return The current voter reward commission (Fixidity).
+   * @return The queued voter reward commission (Fixidity).
+   * @return The block at which the queued commission activates.
+   */
+  function getVoterRewardCommission(
+    address account
+  ) external view returns (uint256, uint256, uint256) {
+    require(isValidatorGroup(account), "Not a validator group");
+    ValidatorGroup storage group = groups[account];
+    return (
+      group.voterRewardCommission.unwrap(),
+      group.nextVoterRewardCommission.unwrap(),
+      group.nextVoterRewardCommissionBlock
     );
   }
 
@@ -779,7 +904,7 @@ contract Validators is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 4, 0, 1);
+    return (1, 4, 1, 0);
   }
 
   /**
@@ -819,6 +944,37 @@ contract Validators is
     require(delay != commissionUpdateDelay, "commission update delay not changed");
     commissionUpdateDelay = delay;
     emit CommissionUpdateDelaySet(delay);
+  }
+
+  /**
+   * @notice Sets the maximum voter reward commission that groups can set.
+   * @param maxCommission Fixidity representation of the max commission.
+   *   Defaults to 0 (commissions disabled). Set to FixidityLib.fixed1() for unlimited.
+   */
+  function setMaxVoterRewardCommission(uint256 maxCommission) external onlyOwner {
+    // Block during epoch processing so all groups in the same epoch see the same effective cap
+    // when EpochManager._deductVoterRewardCommission clamps voter commissions at distribution time.
+    require(
+      !getEpochManager().isEpochProcessingStarted(),
+      "Cannot update max voter reward commission during epoch processing"
+    );
+
+    FixidityLib.Fraction memory maxCommissionFraction = FixidityLib.wrap(maxCommission);
+    require(
+      maxCommissionFraction.lte(FixidityLib.fixed1()),
+      "Max voter reward commission can't be greater than 100%"
+    );
+    require(
+      !maxCommissionFraction.equals(maxVoterRewardCommission),
+      "Max voter reward commission not changed"
+    );
+    // Record reductions so that previously queued updates cannot silently revive once the
+    // cap is later restored; they must be re-queued instead.
+    if (maxCommissionFraction.lt(maxVoterRewardCommission)) {
+      maxVoterRewardCommissionLastReducedBlock = block.number;
+    }
+    maxVoterRewardCommission = maxCommissionFraction;
+    emit MaxVoterRewardCommissionSet(maxCommission);
   }
 
   /**
