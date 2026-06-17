@@ -256,6 +256,50 @@ UsingRegistry, UsingRegistryV2NoMento (largest: 17 each), EpochManager, EpochMan
 - **14 clean files** (pragma-only, no body edits): ReleaseGoldMultiSig, GovernanceApproverMultiSig, FeeCurrencyWhitelist, Freezer, Freezable, InitializableProxy, ProxyFactory, UsingRegistryV2BackwardsCompatible, ExtractFunctionSignature, ExternalCall, FixidityLib, Permissioned, CalledByVm, ReentrancyGuard, SafeMathMem
 - `SafeMathMem.sol` — verify zero callers under 0.8, then **delete**
 
+## VERIFIED RECIPE (per implementation contract)
+
+Proven end-to-end on `FeeCurrencyWhitelist`. Steps:
+
+1. **Move + transform** `contracts/<dir>/X.sol` → `contracts-0.8/<dir>/X.sol`:
+   - `pragma solidity >=0.8.7 <0.8.20;`, SPDX `LGPL-3.0-only`
+   - constructor: drop `public` (0.8 forbids visibility on constructors)
+   - OZ imports: `openzeppelin-solidity/contracts/ownership/Ownable.sol` → `@openzeppelin/contracts8/access/Ownable.sol`; `math/SafeMath.sol` → `utils/math/SafeMath.sol`; `math/Math.sol` → `utils/math/Math.sol`; `token/ERC20/*` paths exist under `@openzeppelin/contracts8/token/ERC20/`
+   - **keep `using SafeMath for uint256`** (via OZ8) — `.add()/.sub()` bodies stay unchanged
+   - `now` → `block.timestamp`; `uint(-1)`/`uint256(-1)` → `type(uint256).max`; assembly `gas`→`gasleft()`, add `()` to `calldatasize`/etc.; `address(uint160(x))`→`payable(address(uint160(x)))` where payable needed
+   - imports: interfaces + `Initializable`/`FixidityLib`/`ReentrancyGuard` from `../../contracts/...` (reused 0.5 files, dual-pragma); `UsingRegistry`/`PrecompilesOverride`/linkedlists/`IsL2Check` from `../...` (0.8 tree)
+   - **preserve inheritance order exactly** (storage prefix depends on it)
+2. **Compile mock** `test-sol/unit/<domain>/mocks/XCompile.sol` (0.8): `contract XCompile is X(true) {}`
+3. **Compile forcer** `test-sol/unit/<domain>/CompileX.t.sol` (0.8): imports the mock + a `test_nop()` — REQUIRED so the mock enters the compile closure (string-only `deployCodeTo` refs are pruned by sparse compilation otherwise). Must sit in the domain dir so CI's `--match-path "test-sol/unit/<domain>/*"` compiles it.
+4. **Convert 0.5 tests** that do `new X(...)` (or `new XMock()` where the mock inherits X): import the interface, `deployCodeTo("XCompile", addr)` (bare name, 2-arg form), interact via interface. Watch OZ v4.9 API drops (`isOwner()` gone → use `owner()`); extend the interface if the test needs public methods it lacks.
+5. **Wire** `contractPackages.ts`: add `X` to `SOLIDITY_08_PACKAGE.contracts`.
+6. **Remove** `contracts/<dir>/X.sol`; drop dead imports in `test-sol/devchain/migration/0?Links.sol`.
+7. **Gate + test** (see commands).
+
+### Verification commands (foundry v1.0.0 — matches CI; `foundryup --install 1.0.0`)
+
+```
+# storage gate (must print "OK storage layout preserved")
+FOUNDRY_PROFILE=truffle-compat8 FOUNDRY_EXTRA_OUTPUT='["storageLayout"]' forge build
+./scripts/foundry/storage-diff.sh X            # or --all
+
+# tests — MUST use the domain glob, NOT a single file / --match-contract
+# (single-file / --match-* sparse-compiles and prunes string-deployed mocks → false "no matching artifact")
+forge test --match-path "test-sol/unit/common/*"
+forge test --match-path "test-sol/unit/governance/network/*"      # +--block-gas-limit 50000000
+forge test --match-path "test-sol/unit/governance/validators/*"   # +--block-gas-limit 50000000
+forge test --match-path "test-sol/unit/governance/voting/*"
+forge test --match-path "test-sol/unit/identity/*"                # +--block-gas-limit 50000000
+forge test --match-path "test-sol/unit/stability/*"               # +--block-gas-limit 50000000
+forge test --match-path "test-sol/integration/*"
+```
+
+## STATUS (live)
+
+- P0 infra: DONE (baselines for 27 impls, storage-diff.sh gate, plan) — commit `edcb127ff`
+- **FeeCurrencyWhitelist**: DONE, storage-gate OK, common suite 644/644 green — commit `3481e8766`
+- Remaining impls: Accounts, GoldToken, FeeHandler(+sellers), Freezer, Registry, MultiSig, Governance, Election, LockedGold, EpochRewards, ReleaseGold(+MultiSig), GovernanceApproverMultiSig, slashers(3), BlockchainParameters, Attestations, Escrow, FederatedAttestations, OdisPayments, Random, SortedOracles
+- Test-conversion burden map (`new X(` sites): Accounts 14, Freezer 6, LockedGold 5, GoldToken 4, Election/Registry/UniswapSeller 3, Mento/FederatedAtt/SortedOracles 2, most others 0–1 (0 often means a Mock subclass deployed via `new XMock()` — that also needs converting).
+
 ## Sequencing summary
 
 P0 (blocking) → PI interfaces + P1 libs → P2 common → P3 governance → P4 identity/stability → P5 uniswap/misc → P6 tests → P7 tooling. Build order within = the verified batches above. Each phase merges to branch green; **storage gate (empty diff vs P0 baseline) is the non-negotiable per-contract bar.**
