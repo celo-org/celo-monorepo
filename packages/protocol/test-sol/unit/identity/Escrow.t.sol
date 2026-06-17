@@ -6,7 +6,8 @@ import "celo-foundry/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
 import "@celo-contracts/identity/Escrow.sol";
-import "@celo-contracts/identity/FederatedAttestations.sol";
+import "@celo-contracts/identity/interfaces/IFederatedAttestations.sol";
+import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
 import "@celo-contracts/identity/test/MockAttestations.sol";
 import "@celo-contracts/identity/test/MockERC20Token.sol";
 import "@celo-contracts/common/FixidityLib.sol";
@@ -19,7 +20,7 @@ contract EscrowTest is Test, TestConstants {
   Escrow escrowContract;
   Registry registry;
   MockAttestations mockAttestations;
-  FederatedAttestations federatedAttestations;
+  IFederatedAttestations federatedAttestations;
   MockERC20Token mockERC20Token;
 
   event DefaultTrustedIssuerAdded(address indexed trustedIssuer);
@@ -89,9 +90,11 @@ contract EscrowTest is Test, TestConstants {
     vm.deal(receiver, ONE_GOLDTOKEN);
     vm.deal(sender, ONE_GOLDTOKEN);
     mockAttestations = new MockAttestations();
-    federatedAttestations = new FederatedAttestations(true);
+    address federatedAttestationsAddress = actor("federatedAttestations");
+    deployCodeTo("FederatedAttestationsCompile", federatedAttestationsAddress);
+    federatedAttestations = IFederatedAttestations(federatedAttestationsAddress);
     registry.setAddressFor("Attestations", address(mockAttestations));
-    registry.setAddressFor("FederatedAttestations", address(federatedAttestations));
+    registry.setAddressFor("FederatedAttestations", federatedAttestationsAddress);
   }
 
   function checkStateAfterDeletingPayment(

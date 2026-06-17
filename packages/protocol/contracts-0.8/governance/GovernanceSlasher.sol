@@ -1,14 +1,15 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
-import { Initializable } from "../common/Initializable.sol";
-import { UsingRegistry } from "../common/UsingRegistry.sol";
-import { ICeloVersionedContract } from "../common/interfaces/ICeloVersionedContract.sol";
-import { IValidators } from "./interfaces/IValidators.sol";
-import { ILockedGold } from "./interfaces/ILockedGold.sol";
-import { IGovernanceSlasher } from "./interfaces/IGovernanceSlasher.sol";
+import "../../contracts/common/Initializable.sol";
+import "../common/UsingRegistry.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/governance/interfaces/IValidators.sol";
+import "../../contracts/governance/interfaces/ILockedGold.sol";
+import "../../contracts/governance/interfaces/IGovernanceSlasher.sol";
 
 contract GovernanceSlasher is
   Ownable,
@@ -39,7 +40,7 @@ contract GovernanceSlasher is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -119,9 +120,9 @@ contract GovernanceSlasher is
   function slashL2(
     address account,
     address group,
-    address[] memory electionLessers,
-    address[] memory electionGreaters,
-    uint256[] memory electionIndices
+    address[] calldata electionLessers,
+    address[] calldata electionGreaters,
+    uint256[] calldata electionIndices
   ) public onlyAuthorizedToSlash returns (bool) {
     uint256 penalty = slashed[account];
     require(penalty > 0, "No penalty given by governance");

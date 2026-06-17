@@ -10,7 +10,6 @@ import { Governance } from "@celo-contracts/governance/Governance.sol";
 import { LockedGold } from "@celo-contracts/governance/LockedGold.sol";
 import { GovernanceApproverMultiSig } from "@celo-contracts/governance/GovernanceApproverMultiSig.sol";
 import { Escrow } from "@celo-contracts/identity/Escrow.sol";
-import { FederatedAttestations } from "@celo-contracts/identity/FederatedAttestations.sol";
 import { SortedOracles } from "@celo-contracts/stability/SortedOracles.sol";
 import { ReserveSpenderMultiSig } from "@mento-core/contracts/ReserveSpenderMultiSig.sol";
 import { Reserve } from "@mento-core/contracts/Reserve.sol";

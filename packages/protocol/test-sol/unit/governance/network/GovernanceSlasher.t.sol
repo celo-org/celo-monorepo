@@ -8,7 +8,9 @@ import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/governance/Proposals.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
-import "@celo-contracts/governance/GovernanceSlasher.sol";
+import "@celo-contracts/governance/interfaces/IGovernanceSlasher.sol";
+import "@celo-contracts/governance/interfaces/IGovernanceSlasherInitializer.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 
 contract GovernanceSlasherTest is TestWithUtils {
   event SlashingApproved(address indexed account, uint256 amount);
@@ -19,7 +21,10 @@ contract GovernanceSlasherTest is TestWithUtils {
   Accounts accounts;
   MockLockedGold mockLockedGold;
 
-  GovernanceSlasher public governanceSlasher;
+  // GovernanceSlasher now lives in contracts-0.8; deployed via deployCodeTo and
+  // used through its interface from this 0.5 test.
+  IGovernanceSlasher public governanceSlasher;
+  address governanceSlasherAddress;
   address owner;
   address nonOwner;
   address validator;
@@ -33,7 +38,7 @@ contract GovernanceSlasherTest is TestWithUtils {
   function setUp() public {
     super.setUp();
     preSetup();
-    governanceSlasher.initialize(REGISTRY_ADDRESS);
+    IGovernanceSlasherInitializer(governanceSlasherAddress).initialize(REGISTRY_ADDRESS);
     mockLockedGold.setAccountTotalLockedGold(validator, 5000);
     whenL2WithEpochManagerInitialization();
   }
@@ -47,7 +52,9 @@ contract GovernanceSlasherTest is TestWithUtils {
 
     accounts = new Accounts(true);
     mockLockedGold = new MockLockedGold();
-    governanceSlasher = new GovernanceSlasher(true);
+    governanceSlasherAddress = actor("governanceSlasher");
+    deployCodeTo("GovernanceSlasherCompile", governanceSlasherAddress);
+    governanceSlasher = IGovernanceSlasher(governanceSlasherAddress);
 
     registry.setAddressFor("Accounts", address(accounts));
     registry.setAddressFor("LockedGold", address(mockLockedGold));
@@ -55,19 +62,16 @@ contract GovernanceSlasherTest is TestWithUtils {
 }
 
 contract GovernanceSlasherTest_initialize is GovernanceSlasherTest {
-  function setUp() public {
-    super.setUp();
-    preSetup();
-    governanceSlasher.initialize(REGISTRY_ADDRESS);
-    mockLockedGold.setAccountTotalLockedGold(validator, 5000);
-  }
+  // Base setUp already deploys and initializes the slasher once (owner = this).
+  // Re-running preSetup()+initialize() against the fixed deployCodeTo address
+  // would double-initialize, so the base setUp is sufficient here.
   function test_shouldHaveSetOwner() public {
-    assertEq(governanceSlasher.owner(), owner);
+    assertEq(IOwnable(governanceSlasherAddress).owner(), owner);
   }
 
   function test_CanOnlyBeCalledOnce() public {
     vm.expectRevert("contract already initialized");
-    governanceSlasher.initialize(REGISTRY_ADDRESS);
+    IGovernanceSlasherInitializer(governanceSlasherAddress).initialize(REGISTRY_ADDRESS);
   }
 }
 

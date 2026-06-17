@@ -6,7 +6,9 @@ import "celo-foundry/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
 import "@celo-contracts/identity/test/AttestationsTest.sol";
-import "@celo-contracts/identity/FederatedAttestations.sol";
+import "@celo-contracts/identity/interfaces/IFederatedAttestations.sol";
+import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 import "@celo-contracts/identity/test/MockERC20Token.sol";
 import "@celo-contracts/identity/test/MockRandom.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
@@ -33,7 +35,8 @@ contract FederatedAttestationsFoundryTest is Test, TestConstants {
   MockRandom random;
   Registry registry;
   Accounts accounts;
-  FederatedAttestations federatedAttestations;
+  IFederatedAttestations federatedAttestations;
+  address federatedAttestationsAddress;
 
   address caller;
   uint256 callerPK;
@@ -339,7 +342,9 @@ contract FederatedAttestationsFoundryTest is Test, TestConstants {
     random = new MockRandom();
     registry = Registry(REGISTRY_ADDRESS);
     accounts = new Accounts(true);
-    federatedAttestations = new FederatedAttestations(true);
+    federatedAttestationsAddress = actor("federatedAttestations");
+    deployCodeTo("FederatedAttestationsCompile", federatedAttestationsAddress);
+    federatedAttestations = IFederatedAttestations(federatedAttestationsAddress);
     random.initialize(256);
     random.addTestRandomness(0, bytes32(0));
     accounts.initialize(address(registry));
@@ -442,12 +447,12 @@ contract FederatedAttestations_Initialize is FederatedAttestationsFoundryTest {
 
   function test_ShouldHaveSetOwner() public {
     vm.prank(caller);
-    federatedAttestations.initialize();
-    assertEq(federatedAttestations.owner(), caller);
+    IFederatedAttestationsInitializer(federatedAttestationsAddress).initialize();
+    assertEq(IOwnable(federatedAttestationsAddress).owner(), caller);
   }
 
   function test_ShouldHaveSetTheEIP712DomainSeparator() public {
-    federatedAttestations.initialize();
+    IFederatedAttestationsInitializer(federatedAttestationsAddress).initialize();
     bytes32 expectedDomainSeparator = keccak256(
       abi.encode(
         keccak256(
@@ -479,13 +484,13 @@ contract FederatedAttestations_Initialize is FederatedAttestationsFoundryTest {
     vm.expectEmit(true, true, true, true);
     emit EIP712DomainSeparatorSet(expectedDomainSeparator);
 
-    federatedAttestations.initialize();
+    IFederatedAttestationsInitializer(federatedAttestationsAddress).initialize();
   }
 
   function test_ShouldNotBeCallableAgain() public {
-    federatedAttestations.initialize();
+    IFederatedAttestationsInitializer(federatedAttestationsAddress).initialize();
     vm.expectRevert("contract already initialized");
-    federatedAttestations.initialize();
+    IFederatedAttestationsInitializer(federatedAttestationsAddress).initialize();
   }
 }
 
@@ -494,7 +499,7 @@ contract FederatedAttestations_LookupAttestations is FederatedAttestationsFoundr
 
   function setUp() public {
     super.setUp();
-    federatedAttestations.initialize();
+    IFederatedAttestationsInitializer(federatedAttestationsAddress).initialize();
   }
 
   function test_WhenIdentifierHasNotBeenRegistered_ShouldReturnEmptyList() public {
@@ -733,7 +738,7 @@ contract FederatedAttestations_LookupIdentifiers is FederatedAttestationsFoundry
 
   function setUp() public {
     super.setUp();
-    federatedAttestations.initialize();
+    IFederatedAttestationsInitializer(federatedAttestationsAddress).initialize();
   }
 
   function prepareTest_WhenAddressHasBEenRegistered() public {
@@ -885,7 +890,7 @@ contract FederatedAttestations_ValidateAttestation is FederatedAttestationsFound
 
   function setUp() public {
     super.setUp();
-    federatedAttestations.initialize();
+    IFederatedAttestationsInitializer(federatedAttestationsAddress).initialize();
   }
 
   function prepareTest_WithAnAuthorizedSigner(address issuer, address signer) public {
@@ -1078,7 +1083,7 @@ contract FederatedAttestations_RegisterAttestation is FederatedAttestationsFound
 
   function setUp() public {
     super.setUp();
-    federatedAttestations.initialize();
+    IFederatedAttestationsInitializer(federatedAttestationsAddress).initialize();
 
     vm.prank(issuer1);
     accounts.authorizeSigner(signer1, AttestationSignerRole);
@@ -1430,7 +1435,7 @@ contract FederatedAttestations_RevokeAttestation is FederatedAttestationsFoundry
 
   function setUp() public {
     super.setUp();
-    federatedAttestations.initialize();
+    IFederatedAttestationsInitializer(federatedAttestationsAddress).initialize();
 
     vm.prank(issuer1);
     accounts.authorizeSigner(signer1, AttestationSignerRole);
@@ -1633,7 +1638,7 @@ contract FederatedAttestations_RevokeAttestation is FederatedAttestationsFoundry
 contract FederatedAttestations_BatchRevokeAttestations is FederatedAttestationsFoundryTest {
   function setUp() public {
     super.setUp();
-    federatedAttestations.initialize();
+    IFederatedAttestationsInitializer(federatedAttestationsAddress).initialize();
 
     signAndRegisterAttestation(phoneHash, issuer1, account1, uint64(block.timestamp), signer1);
     signAndRegisterAttestation(

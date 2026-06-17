@@ -202,7 +202,9 @@ contract UsingPrecompiles is IsL2Check {
    * @return Bitmap parent seal with set bits at indices corresponding to signing validators.
    * @dev This function will be deprecated in L2.
    */
-  function getParentSealBitmap(uint256 blockNumber) public view onlyL1 returns (bytes32) {
+  function getParentSealBitmap(
+    uint256 blockNumber
+  ) public view virtual onlyL1 returns (bytes32) {
     bytes memory out;
     bool success;
     (success, out) = GET_PARENT_SEAL_BITMAP.staticcall(abi.encodePacked(blockNumber));

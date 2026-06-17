@@ -3,9 +3,7 @@ pragma solidity ^0.5.13;
 
 import "@celo-contracts/governance/BlockchainParameters.sol";
 import "@celo-contracts/governance/DoubleSigningSlasher.sol";
-import "@celo-contracts/governance/DowntimeSlasher.sol";
 import "@celo-contracts/governance/EpochRewards.sol";
-import "@celo-contracts/governance/GovernanceSlasher.sol";
 import "@celo-contracts/governance/LockedGold.sol";
 import "@celo-contracts/common/Freezer.sol";
 import "@celo-contracts/common/FeeHandler.sol";

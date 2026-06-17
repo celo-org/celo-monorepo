@@ -8,71 +8,13 @@ import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/DowntimeSlasher.sol";
-import "@celo-contracts/governance/test/MockUsingPrecompiles.sol";
+import "@celo-contracts/governance/interfaces/IDowntimeSlasherMock.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
-contract DowntimeSlasherMock is DowntimeSlasher(true), MockUsingPrecompiles, TestWithUtils {
-  struct SlashParams {
-    uint256[] startBlocks;
-    uint256[] endBlocks;
-    uint256[] signerIndices;
-    uint256 groupMembershipHistoryIndex;
-    address[] validatorElectionLessers;
-    address[] validatorElectionGreaters;
-    uint256[] validatorElectionIndices;
-    address[] groupElectionLessers;
-    address[] groupElectionGreaters;
-    uint256[] groupElectionIndices;
-  }
-
-  function mockSlash(SlashParams calldata slashParams, address[] calldata _validators) external {
-    require(
-      slashParams.signerIndices.length == _validators.length,
-      "validators list and signerIndices list length are different."
-    );
-
-    ph.mockReturn(
-      ph.GET_VALIDATOR(),
-      abi.encodePacked(slashParams.signerIndices[0], slashParams.startBlocks[0]),
-      abi.encode(_validators[0])
-    );
-
-    if (slashParams.signerIndices.length > 1) {
-      for (uint256 i = 0; i < slashParams.startBlocks.length; i = i.add(1)) {
-        if (i > 0) {
-          if (slashParams.startBlocks[i].mod(17280) == 1) {
-            ph.mockReturn(
-              ph.GET_VALIDATOR(),
-              abi.encodePacked(
-                slashParams.signerIndices[i.sub(1)],
-                slashParams.startBlocks[i].sub(1)
-              ),
-              abi.encode(_validators[0])
-            );
-            ph.mockReturn(
-              ph.GET_VALIDATOR(),
-              abi.encodePacked(slashParams.signerIndices[i], slashParams.startBlocks[i]),
-              abi.encode(_validators[1])
-            );
-          }
-        }
-      }
-    }
-    slash(
-      slashParams.startBlocks,
-      slashParams.endBlocks,
-      slashParams.signerIndices,
-      slashParams.groupMembershipHistoryIndex,
-      slashParams.validatorElectionLessers,
-      slashParams.validatorElectionGreaters,
-      slashParams.validatorElectionIndices,
-      slashParams.groupElectionLessers,
-      slashParams.groupElectionGreaters,
-      slashParams.groupElectionIndices
-    );
-  }
-}
+// DowntimeSlasher was migrated to contracts-0.8; the deployable mock (DowntimeSlasherMock08)
+// lives in test-sol/unit/governance/validators/CompileDowntimeSlasher.t.sol and is
+// deployed here via deployCodeTo.
 
 contract DowntimeSlasherTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
@@ -88,7 +30,7 @@ contract DowntimeSlasherTest is TestWithUtils {
   Accounts accounts;
   MockValidators validators;
   MockLockedGold lockedGold;
-  DowntimeSlasherMock public slasher;
+  IDowntimeSlasherMock public slasher;
 
   address nonOwner;
 
@@ -141,7 +83,7 @@ contract DowntimeSlasherTest is TestWithUtils {
   address[] public groupElectionGreaters = new address[](0);
   uint256[] public groupElectionIndices = new uint256[](0);
 
-  DowntimeSlasherMock.SlashParams slashParams;
+  IDowntimeSlasherMock.SlashParams slashParams;
   SlashingIncentives public expectedSlashingIncentives;
 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
@@ -174,7 +116,10 @@ contract DowntimeSlasherTest is TestWithUtils {
     accounts = new Accounts(true);
     validators = new MockValidators();
     lockedGold = new MockLockedGold();
-    slasher = new DowntimeSlasherMock();
+
+    address slasherAddress = actor("slasher");
+    deployCodeTo("DowntimeSlasherMock08", slasherAddress);
+    slasher = IDowntimeSlasherMock(slasherAddress);
 
     registry = Registry(REGISTRY_ADDRESS);
 
@@ -323,7 +268,7 @@ contract DowntimeSlasherTest is TestWithUtils {
 
 contract DowntimeSlasherTestInitialize is DowntimeSlasherTest {
   function test_ShouldHaveSetOwner() public {
-    assertEq(slasher.owner(), address(this));
+    assertEq(IOwnable(address(slasher)).owner(), address(this));
   }
 
   function test_ShouldHaveSetSlashingIncentives() public {
@@ -452,7 +397,7 @@ contract DowntimeSlasherTestSlash_WhenSlashing is DowntimeSlasherTest {
       _signerIndices
     );
 
-    slashParams = DowntimeSlasherMock.SlashParams({
+    slashParams = IDowntimeSlasherMock.SlashParams({
       startBlocks: _startBlocks,
       endBlocks: _endBlocks,
       signerIndices: _signerIndices,
@@ -481,7 +426,7 @@ contract DowntimeSlasherTestSlash_WhenSlashing is DowntimeSlasherTest {
     _endBlocks[0] = startBlock.add(slashableDowntime.sub(3));
     _endBlocks[1] = startBlock.add(slashableDowntime.sub(1));
 
-    slashParams = DowntimeSlasherMock.SlashParams({
+    slashParams = IDowntimeSlasherMock.SlashParams({
       startBlocks: _startBlocks,
       endBlocks: _endBlocks,
       signerIndices: _signerIndices,
