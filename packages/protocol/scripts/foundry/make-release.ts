@@ -956,10 +956,21 @@ const getContractBuildDir = (
   buildDir05: string,
   buildDir08: string
 ): string => {
-  if (contracts08Set.has(contractName)) {
-    return buildDir08
+  const preferred = contracts08Set.has(contractName) ? buildDir08 : buildDir05
+  const other = contracts08Set.has(contractName) ? buildDir05 : buildDir08
+  // A contract's Solidity version can differ between the baseline release and the
+  // new branch (e.g. contracts migrated 0.5 -> 0.8). contracts08Set reflects the new
+  // branch, so for the baseline fall back to whichever output dir actually has the
+  // artifact.
+  const preferredPath = join(preferred, `${contractName}.sol`, `${contractName}.json`)
+  if (existsSync(preferredPath)) {
+    return preferred
   }
-  return buildDir05
+  const otherPath = join(other, `${contractName}.sol`, `${contractName}.json`)
+  if (existsSync(otherPath)) {
+    return other
+  }
+  return preferred
 }
 
 const getContractArtifactPath = (
