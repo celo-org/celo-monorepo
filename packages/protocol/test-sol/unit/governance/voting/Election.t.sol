@@ -14,7 +14,7 @@ import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
 import { IElectionTest } from "@test-sol/unit/governance/voting/interfaces/IElectionTest.sol";
 
-import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";
+import { TestBlocker } from "@test-sol/unit/common/mocks/TestBlocker.sol";
 
 contract ElectionTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;

@@ -1,17 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
-// The contract under test now lives in contracts-0.8; this 0.5 test deploys the
-// compiled 0.8 bytecode (via deployCodeTo) and interacts through the interface.
-import { IMultiSigTest } from "@test-sol/unit/common/interfaces/IMultiSigTest.sol";
+import "celo-foundry-8/Test.sol";
+import { MultiSig } from "@celo-contracts-8/common/MultiSig.sol";
 
 contract MultiSigTest is Test {
-  function() external payable {}
+  receive() external payable {}
 
-  IMultiSigTest public multiSig;
-  address multiSigAddress;
+  MultiSig public multiSig;
   address owner0;
   address owner1;
   address newOwner;
@@ -32,10 +28,8 @@ contract MultiSigTest is Test {
   event RequirementChange(uint256 required);
   event InternalRequirementChange(uint256 internalRequired);
 
-  function setUp() public {
-    multiSigAddress = actor("multiSig");
-    deployCodeTo("MultiSigCompile", multiSigAddress);
-    multiSig = IMultiSigTest(multiSigAddress);
+  function setUp() public virtual {
+    multiSig = new MultiSig(true);
     owner0 = actor("owner0");
     owner1 = actor("owner1");
     sender = actor("sender");
@@ -73,7 +67,7 @@ contract MultiSigTest_fallbackFunction is MultiSigTest {
   uint256 amount = 100;
 
   function uncheckedSendViaCall(address payable _to, uint256 _amount) public payable {
-    (bool res, ) = _to.call.value(_amount)("");
+    (bool res, ) = _to.call{ value: _amount }("");
     require(res, "call failed");
   }
 
@@ -81,14 +75,14 @@ contract MultiSigTest_fallbackFunction is MultiSigTest {
     vm.prank(sender);
     vm.expectEmit(true, false, false, false);
     emit Deposit(sender, amount);
-    uncheckedSendViaCall(address(uint160(address(multiSig))), amount);
+    uncheckedSendViaCall(payable(address(multiSig)), amount);
   }
 
   // TODO: Implement after pragma ^0.8
   function SKIP_test_doesNotEmitEvent_whenReceivingZeroValue() public {
     vm.prank(sender);
     vm.recordLogs();
-    uncheckedSendViaCall(address(uint160(address(multiSig))), 0);
+    uncheckedSendViaCall(payable(address(multiSig)), 0);
     // Vm.Log[] memory entries = vm.getRecordedLogs();
     // assertEq(entries.length, 0);
   }
@@ -127,7 +121,7 @@ contract MultiSigTest_submitTransaction is MultiSigTest {
 contract MultiSigTest_confirmTransaction is MultiSigTest {
   uint256 txId = 0;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     vm.prank(owner0);
     multiSig.submitTransaction(address(multiSig), 0, addOwnerTxData);
@@ -159,7 +153,7 @@ contract MultiSigTest_confirmTransaction is MultiSigTest {
 contract MultiSigTest_revokeConfirmation is MultiSigTest {
   uint256 txId = 0;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     vm.prank(owner0);
     multiSig.submitTransaction(address(multiSig), 0, addOwnerTxData);
@@ -188,7 +182,7 @@ contract MultiSigTest_addOwner is MultiSigTest {
   uint256 txId = 0;
   address[] public updatedOwners;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     updatedOwners = [owner0, owner1, newOwner];
   }
@@ -224,7 +218,7 @@ contract MultiSigTest_removeOwner is MultiSigTest {
   uint256 txId = 0;
   address[] public updatedOwners;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     updatedOwners = [owner0];
   }
@@ -254,7 +248,7 @@ contract MultiSigTest_replaceOwner is MultiSigTest {
   uint256 txId = 0;
   address[] public updatedOwners;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     updatedOwners = [owner0, newOwner];
   }
@@ -345,7 +339,7 @@ contract MultiSigTest_changeInternalRequirements is MultiSigTest {
 contract MultiSigTest_confirmationCount is MultiSigTest {
   uint256 txId = 0;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     vm.prank(owner0);
     multiSig.submitTransaction(address(multiSig), 0, addOwnerTxData);
@@ -359,7 +353,7 @@ contract MultiSigTest_confirmationCount is MultiSigTest {
 contract MultiSigTest_getTransactionCount is MultiSigTest {
   uint256 txId = 0;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     vm.prank(owner0);
     multiSig.submitTransaction(address(multiSig), 0, addOwnerTxData);
@@ -371,7 +365,7 @@ contract MultiSigTest_getTransactionCount is MultiSigTest {
 }
 
 contract MultiSigTest_getOwners is MultiSigTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -383,7 +377,7 @@ contract MultiSigTest_getOwners is MultiSigTest {
 contract MultiSigTest_getConfirmations is MultiSigTest {
   uint256 txId = 0;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     vm.prank(owner0);
     multiSig.submitTransaction(address(multiSig), 0, addOwnerTxData);
@@ -399,7 +393,7 @@ contract MultiSigTest_getConfirmations is MultiSigTest {
 contract MultiSigTest_getTransactionIds is MultiSigTest {
   uint256 txId = 0;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     vm.prank(owner0);
     multiSig.submitTransaction(address(multiSig), 0, addOwnerTxData);

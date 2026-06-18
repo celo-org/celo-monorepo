@@ -1,34 +1,29 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
+import { FeeCurrencyWhitelist } from "@celo-contracts-8/common/FeeCurrencyWhitelist.sol";
 import "@celo-contracts/common/interfaces/IOwnable.sol";
 
-// The contract under test now lives in contracts-0.8; this 0.5 test deploys the
-// compiled 0.8 bytecode (via deployCodeTo) and interacts through the interface.
-contract FeeCurrencyWhitelistTest is TestWithUtils {
-  IFeeCurrencyWhitelist feeCurrencyWhitelist;
-  address feeCurrencyWhitelistAddress;
+contract FeeCurrencyWhitelistTest is TestWithUtils08 {
+  FeeCurrencyWhitelist feeCurrencyWhitelist;
   address nonOwner;
   address owner;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     whenL2WithEpochManagerInitialization();
     owner = address(this);
     nonOwner = actor("nonOwner");
 
-    feeCurrencyWhitelistAddress = actor("feeCurrencyWhitelist");
-    deployCodeTo("FeeCurrencyWhitelistCompile", feeCurrencyWhitelistAddress);
-    feeCurrencyWhitelist = IFeeCurrencyWhitelist(feeCurrencyWhitelistAddress);
+    feeCurrencyWhitelist = new FeeCurrencyWhitelist(true);
     feeCurrencyWhitelist.initialize();
   }
 }
 
 contract FeeCurrencyWhitelistInitialize is FeeCurrencyWhitelistTest {
   function test_InitializeOwner() public {
-    assertEq(IOwnable(feeCurrencyWhitelistAddress).owner(), address(this));
+    assertEq(IOwnable(address(feeCurrencyWhitelist)).owner(), address(this));
   }
 
   function test_ShouldNotBeCallableAgain() public {

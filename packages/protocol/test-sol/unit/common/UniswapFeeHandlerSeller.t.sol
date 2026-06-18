@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+pragma solidity >=0.8.7 <0.8.20;
 
 // Helper contracts
-import { Test } from "celo-foundry/Test.sol";
+import { Test } from "celo-foundry-8/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
-import "@test-sol/unit/common/interfaces/IFeeHandlerSellerTest.sol";
+import { UniswapFeeHandlerSeller } from "@celo-contracts-8/common/UniswapFeeHandlerSeller.sol";
 import "@celo-contracts/common/interfaces/IOwnable.sol";
 
 contract UniswapFeeHandlerSellerTest is Test, TestConstants {
@@ -21,13 +20,11 @@ contract UniswapFeeHandlerSellerTest is Test, TestConstants {
   address ARBITRARY_ROUTER_ADDRESS_D = actor("Arbitrary Router Address D");
 
   // Contract instance
-  IFeeHandlerSellerTest uniswapFeeHandlerSeller;
+  UniswapFeeHandlerSeller uniswapFeeHandlerSeller;
 
   function setUp() public {
-    address uniswapSellerAddress = actor("uniswapFeeHandlerSeller");
-    deployCodeTo("UniswapFeeHandlerSellerCompile", uniswapSellerAddress);
-    uniswapFeeHandlerSeller = IFeeHandlerSellerTest(uniswapSellerAddress);
-    UNISWAP_FEE_HANDLER_SELLER_OWNER_ADDRESS = IOwnable(uniswapSellerAddress).owner();
+    uniswapFeeHandlerSeller = new UniswapFeeHandlerSeller(true);
+    UNISWAP_FEE_HANDLER_SELLER_OWNER_ADDRESS = IOwnable(address(uniswapFeeHandlerSeller)).owner();
   }
 }
 

@@ -19,7 +19,7 @@ import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockGovernance.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 
-import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";
+import { TestBlocker } from "@test-sol/unit/common/mocks/TestBlocker.sol";
 
 contract LockedGoldTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;

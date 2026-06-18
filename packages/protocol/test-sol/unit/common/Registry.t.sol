@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
+import { Registry } from "@celo-contracts-8/common/Registry.sol";
 import "@celo-contracts/common/interfaces/IOwnable.sol";
-import "@test-sol/unit/common/interfaces/IRegistryTest.sol";
 
-contract RegistryTest is TestWithUtils {
+contract RegistryTest is TestWithUtils08 {
   event RegistryUpdated(string identifier, bytes32 indexed identifierHash, address indexed addr);
 
   address constant SOME_ADDRESS = address(0x06012c8cf97BEaD5deAe237070F9587f8E7A266d);
@@ -15,16 +15,14 @@ contract RegistryTest is TestWithUtils {
   // hash is harcoded to avoid test and implementation changing at the same time
   bytes32 constant ID_HASH = 0x05445421d7b4d4c2e571c5a4ccf9317ec68601449f752c75ddbcc61a16061004;
 
-  IRegistryTest _registry;
+  Registry _registry;
   address owner;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     whenL2WithEpochManagerInitialization();
     owner = address(this);
-    address registryTestAddress = actor("registryTest");
-    deployCodeTo("Registry.sol", abi.encode(true), registryTestAddress);
-    _registry = IRegistryTest(registryTestAddress);
+    _registry = new Registry(true);
     vm.prank(owner);
     _registry.initialize();
   }
