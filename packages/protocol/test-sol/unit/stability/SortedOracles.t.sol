@@ -1,25 +1,19 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 pragma experimental ABIEncoderV2;
 
-import { Test } from "celo-foundry/Test.sol";
-import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
-import "@celo-contracts/stability/interfaces/ISortedOraclesInitializer.sol";
-import "@test-sol/unit/stability/ISortedOraclesTest.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
+import { SortedOracles } from "@celo-contracts-8/stability/SortedOracles.sol";
+import { SortedLinkedListWithMedian } from "@celo-contracts-8/common/linkedlists/SortedLinkedListWithMedian.sol";
+import { AddressSortedLinkedListWithMedian } from "@celo-contracts-8/common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "@celo-contracts/common/interfaces/IOwnable.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol";
-import "@celo-contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
-import { TestConstants } from "@test-sol/constants.sol";
 
-contract SortedOraclesTest is Test, TestConstants {
+contract SortedOraclesTest is TestWithUtils08 {
   using FixidityLib for FixidityLib.Fraction;
   using AddressSortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
 
-  // SortedOracles now lives in contracts-0.8; deployed via deployCodeTo and used
-  // through its interface from this 0.5 test.
-  ISortedOraclesTest sortedOracle;
-  address sortedOracleAddress;
+  SortedOracles sortedOracle;
 
   address oracleAccount;
   address aToken = 0x00000000000000000000000000000000DeaDBeef;
@@ -39,13 +33,12 @@ contract SortedOraclesTest is Test, TestConstants {
   event TokenReportExpirySet(address token, uint256 reportExpiry);
   event EquivalentTokenSet(address indexed token, address indexed equivalentToken);
 
-  function setUp() public {
-    warp(0);
-    sortedOracleAddress = actor("sortedOracle");
-    deployCodeTo("SortedOraclesCompile", sortedOracleAddress);
-    sortedOracle = ISortedOraclesTest(sortedOracleAddress);
+  function setUp() public virtual override {
+    super.setUp();
+    vm.warp(YEAR);
+    sortedOracle = new SortedOracles(true);
     oracleAccount = actor("oracleAccount");
-    ISortedOraclesInitializer(sortedOracleAddress).initialize(reportExpiry);
+    sortedOracle.initialize(reportExpiry);
   }
 
   function warp(uint256 timeToWarpTo) public {
@@ -55,7 +48,7 @@ contract SortedOraclesTest is Test, TestConstants {
 
 contract SortedOraclesTest_Initialize is SortedOraclesTest {
   function test_ownerSet() public {
-    assertEq(IOwnable(sortedOracleAddress).owner(), address(this));
+    assertEq(IOwnable(address(sortedOracle)).owner(), address(this));
   }
 
   function test_ShouldSetReportExpiry() public {
@@ -64,7 +57,7 @@ contract SortedOraclesTest_Initialize is SortedOraclesTest {
 
   function test_ShouldRevert_WhenCalledAgain() public {
     vm.expectRevert("contract already initialized");
-    ISortedOraclesInitializer(sortedOracleAddress).initialize(reportExpiry);
+    sortedOracle.initialize(reportExpiry);
   }
 }
 
@@ -90,7 +83,12 @@ contract SetReportExpiry is SortedOraclesTest {
 }
 
 contract SortedOracles_SetEquivalentToken is SortedOraclesTest {
-  address bToken = actor("bToken");
+  address bToken = address(0xb00b);
+
+  function setUp() public override {
+    super.setUp();
+    bToken = actor("bToken");
+  }
 
   function test_ShouldSetReportExpiry() public {
     sortedOracle.setEquivalentToken(aToken, bToken);
@@ -122,7 +120,12 @@ contract SortedOracles_SetEquivalentToken is SortedOraclesTest {
 }
 
 contract SortedOracles_DeleteEquivalentToken is SortedOraclesTest {
-  address bToken = actor("bToken");
+  address bToken;
+
+  function setUp() public override {
+    super.setUp();
+    bToken = actor("bToken");
+  }
 
   function test_ShouldDeleteEquivalentToken() public {
     sortedOracle.setEquivalentToken(aToken, bToken);
@@ -225,7 +228,7 @@ contract GetTokenReportExpirySeconds is SortedOraclesTest {
 }
 
 contract RemoveExpiredReports is SortedOraclesTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     sortedOracle.addOracle(aToken, oracleAccount);
   }
@@ -250,7 +253,7 @@ contract RemoveExpiredReports is SortedOraclesTest {
       vm.prank(oracle);
       sortedOracle.report(
         aToken,
-        FixidityLib.newFixedFraction(2, 1).unwrap(),
+        FixidityLib.unwrap(FixidityLib.newFixedFraction(2, 1)),
         oracleAccount,
         address(0)
       );
@@ -299,7 +302,7 @@ contract RemoveExpiredReports is SortedOraclesTest {
 }
 
 contract IsOldestReportExpired is SortedOraclesTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     sortedOracle.addOracle(aToken, oracleAccount);
   }
@@ -397,10 +400,11 @@ contract IsOldestReportExpired is SortedOraclesTest {
 }
 
 contract RemoveOracle is SortedOraclesTest {
-  address oracleAccount2 = actor("oracleAccount2");
+  address oracleAccount2;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
+    oracleAccount2 = actor("oracleAccount2");
     sortedOracle.addOracle(aToken, oracleAccount);
   }
 
@@ -419,7 +423,7 @@ contract RemoveOracle is SortedOraclesTest {
     vm.prank(oracleAccount2);
     sortedOracle.report(
       aToken,
-      FixidityLib.newFixedFraction(5, 1).unwrap(),
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(5, 1)),
       oracleAccount,
       address(0)
     );
@@ -463,7 +467,7 @@ contract RemoveOracle is SortedOraclesTest {
     vm.prank(oracleAccount);
     sortedOracle.report(
       aToken,
-      FixidityLib.newFixedFraction(10, 1).unwrap(),
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(10, 1)),
       address(0),
       address(0)
     );
@@ -475,7 +479,7 @@ contract RemoveOracle is SortedOraclesTest {
     vm.prank(oracleAccount);
     sortedOracle.report(
       aToken,
-      FixidityLib.newFixedFraction(10, 1).unwrap(),
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(10, 1)),
       address(0),
       address(0)
     );
@@ -494,7 +498,7 @@ contract RemoveOracle is SortedOraclesTest {
     vm.prank(oracleAccount);
     sortedOracle.report(
       aToken,
-      FixidityLib.newFixedFraction(10, 1).unwrap(),
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(10, 1)),
       address(0),
       address(0)
     );
@@ -506,7 +510,7 @@ contract RemoveOracle is SortedOraclesTest {
     vm.prank(oracleAccount);
     sortedOracle.report(
       aToken,
-      FixidityLib.newFixedFraction(10, 1).unwrap(),
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(10, 1)),
       address(0),
       address(0)
     );
@@ -545,18 +549,20 @@ contract RemoveOracle is SortedOraclesTest {
 }
 
 contract Report is SortedOraclesTest {
-  uint256 value = FixidityLib.newFixedFraction(10, 1).unwrap();
-  uint256 newValue = FixidityLib.newFixedFraction(12, 1).unwrap();
+  uint256 value = FixidityLib.unwrap(FixidityLib.newFixedFraction(10, 1));
+  uint256 newValue = FixidityLib.unwrap(FixidityLib.newFixedFraction(12, 1));
 
-  address anotherOracle = actor("anotherOracle");
-  uint256 oracleValue1 = FixidityLib.newFixedFraction(2, 1).unwrap();
-  uint256 oracleValue2 = FixidityLib.newFixedFraction(3, 1).unwrap();
+  address anotherOracle;
+  uint256 oracleValue1 = FixidityLib.unwrap(FixidityLib.newFixedFraction(2, 1));
+  uint256 oracleValue2 = FixidityLib.unwrap(FixidityLib.newFixedFraction(3, 1));
   uint256 anotherOracleValue = FIXED1;
 
-  address bToken = actor("bToken");
+  address bToken;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
+    anotherOracle = actor("anotherOracle");
+    bToken = actor("bToken");
     sortedOracle.addOracle(aToken, oracleAccount);
   }
 
@@ -619,7 +625,7 @@ contract Report is SortedOraclesTest {
 
   function test_Emits_OracleReportedEvent() public {
     vm.expectEmit(true, true, true, true);
-    emit OracleReported(aToken, oracleAccount, now, value);
+    emit OracleReported(aToken, oracleAccount, block.timestamp, value);
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, value, address(0), address(0));
   }

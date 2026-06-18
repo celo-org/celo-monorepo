@@ -1,23 +1,22 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
-import "@celo-contracts/identity/interfaces/IRandomMock.sol";
+import { RandomTest08 } from "@test-sol/unit/identity/mocks/RandomMocks08.sol";
 
-// Random was migrated to contracts-0.8; the deployable mocks (MockRandom08, RandomTest08)
-// live in test-sol/unit/identity/CompileRandom.t.sol and are deployed via deployCodeTo.
+// Random was migrated to contracts-0.8; the deployable test helper (RandomTest08)
+// lives in test-sol/unit/identity/mocks/RandomMocks08.sol and is now instantiated
+// directly as a concrete 0.8 type.
 
-contract RandomTest_ is TestWithUtils {
-  IRandomMock random;
+contract RandomTest_ is TestWithUtils08 {
+  RandomTest08 random;
 
   event RandomnessBlockRetentionWindowSet(uint256 value);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
-    address randomAddress = actor("random");
-    deployCodeTo("RandomTest08", randomAddress);
-    random = IRandomMock(randomAddress);
+    random = new RandomTest08();
     random.initialize(256);
     whenL2WithEpochManagerInitialization();
   }

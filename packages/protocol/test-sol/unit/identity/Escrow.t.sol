@@ -1,32 +1,28 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
-import "@celo-contracts/identity/interfaces/IEscrow.sol";
-import "@celo-contracts/identity/interfaces/IEscrowInitializer.sol";
-import "@celo-contracts/identity/interfaces/IFederatedAttestations.sol";
-import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
-import "@celo-contracts/identity/test/MockAttestations.sol";
-import "@celo-contracts/identity/test/MockERC20Token.sol";
+import { Escrow } from "@celo-contracts-8/identity/Escrow.sol";
+import { FederatedAttestations } from "@celo-contracts-8/identity/FederatedAttestations.sol";
+import { MockAttestations08, MockERC20Token08 } from "@test-sol/unit/identity/mocks/EscrowMocks08.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts/common/Signatures.sol";
+import "@openzeppelin/contracts8/utils/cryptography/ECDSA.sol";
 import "@celo-contracts/common/interfaces/IOwnable.sol";
 
 contract EscrowTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
-  // Escrow now lives in contracts-0.8; deployed via deployCodeTo and used
-  // through its interface from this 0.5 test.
-  IEscrow escrowContract;
+  // Escrow and FederatedAttestations now live in contracts-0.8 and are
+  // instantiated directly as concrete 0.8 types.
+  Escrow escrowContract;
   address escrowContractAddress;
   IRegistry registry;
-  MockAttestations mockAttestations;
-  IFederatedAttestations federatedAttestations;
-  MockERC20Token mockERC20Token;
+  MockAttestations08 mockAttestations;
+  FederatedAttestations federatedAttestations;
+  MockERC20Token08 mockERC20Token;
 
   event DefaultTrustedIssuerAdded(address indexed trustedIssuer);
   event DefaultTrustedIssuerRemoved(address indexed trustedIssuer);
@@ -81,14 +77,13 @@ contract EscrowTest is Test, TestConstants {
   address trustedIssuer1;
   address trustedIssuer2;
 
-  function setUp() public {
+  function setUp() public virtual {
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
-    mockERC20Token = new MockERC20Token();
-    escrowContractAddress = actor("escrow");
-    deployCodeTo("EscrowCompile", escrowContractAddress);
-    escrowContract = IEscrow(escrowContractAddress);
-    IEscrowInitializer(escrowContractAddress).initialize();
+    mockERC20Token = new MockERC20Token08();
+    escrowContract = new Escrow(true);
+    escrowContractAddress = address(escrowContract);
+    escrowContract.initialize();
     registry = IRegistry(REGISTRY_ADDRESS);
     (receiver, receiverPK) = actorWithPK("receiver");
     (sender, senderPK) = actorWithPK("sender");
@@ -96,12 +91,10 @@ contract EscrowTest is Test, TestConstants {
     trustedIssuer2 = actor("trustedIssuer2");
     vm.deal(receiver, ONE_GOLDTOKEN);
     vm.deal(sender, ONE_GOLDTOKEN);
-    mockAttestations = new MockAttestations();
-    address federatedAttestationsAddress = actor("federatedAttestations");
-    deployCodeTo("FederatedAttestationsCompile", federatedAttestationsAddress);
-    federatedAttestations = IFederatedAttestations(federatedAttestationsAddress);
+    mockAttestations = new MockAttestations08();
+    federatedAttestations = new FederatedAttestations(true);
     registry.setAddressFor("Attestations", address(mockAttestations));
-    registry.setAddressFor("FederatedAttestations", federatedAttestationsAddress);
+    registry.setAddressFor("FederatedAttestations", address(federatedAttestations));
   }
 
   function checkStateAfterDeletingPayment(
@@ -210,7 +203,7 @@ contract EscrowInitialize is EscrowTest {
 
   function test_Reverts_If_InitializedAgain() public {
     vm.expectRevert("contract already initialized");
-    IEscrowInitializer(escrowContractAddress).initialize();
+    escrowContract.initialize();
   }
 }
 
@@ -250,7 +243,7 @@ contract EscrowAddDefaultTrustedIssuer is EscrowTest {
 
 contract EscrowWhenMaxTrustedIssuersHaveBeenAdded is EscrowTest {
   address[] expectedTrustedIssuers;
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     uint256 maxTrustedIssuers = escrowContract.MAX_TRUSTED_ISSUERS_PER_PAYMENT();
@@ -283,7 +276,7 @@ contract EscrowWhenMaxTrustedIssuersHaveBeenAdded is EscrowTest {
 }
 
 contract EscrowRemoveDefaultTrustedIssuer is EscrowTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
     address[] memory expected2 = new address[](1);
@@ -337,7 +330,7 @@ contract EscrowTestsWithTokens is EscrowTest {
   address withdrawKeyAddress = actor("withdrawKeyAddress");
   address anotherWithdrawKeyAddress = actor("anotherWithdrawKeyAddress");
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     mockERC20Token.mint(sender, aValue);
   }
@@ -831,7 +824,7 @@ contract EscrowWithdrawalTest is EscrowTest {
   address uniquePaymentIDWithdraw;
   uint256 uniquePaymentIDWithdrawPK;
 
-  function setUp() public {
+  function setUp() public override {
     (withdrawKeyAddress, withdrawalKeyAddressPK) = actorWithPK("withdrawKeyAddress");
     (anotherWithdrawKeyAddress, anotherWithdrawKeyAddressPK) = actorWithPK(
       "anotherWithdrawKeyAddress"
@@ -1344,7 +1337,7 @@ contract EscrowRevokeTestIdentifierEmptyMinAttestations0TrustedIssuersEmpty is E
   bytes32 r;
   bytes32 s;
 
-  function setUp() public {
+  function setUp() public override {
     (withdrawKeyAddress, withdrawalKeyAddressPK) = actorWithPK("withdrawKeyAddress");
     (anotherWithdrawKeyAddress, anotherWithdrawKeyAddressPK) = actorWithPK(
       "anotherWithdrawKeyAddress"
@@ -1495,7 +1488,7 @@ contract EscrowRevokeTestIdentifierNotEmptyMinAttestations0TrustedIssuersEmpty i
   bytes32 r;
   bytes32 s;
 
-  function setUp() public {
+  function setUp() public override {
     (withdrawKeyAddress, withdrawalKeyAddressPK) = actorWithPK("withdrawKeyAddress");
     (anotherWithdrawKeyAddress, anotherWithdrawKeyAddressPK) = actorWithPK(
       "anotherWithdrawKeyAddress"
@@ -1646,7 +1639,7 @@ contract EscrowRevokeTestIdentifierNotEmptyMinAttestations1TrustedIssuersNonEmpt
   bytes32 r;
   bytes32 s;
 
-  function setUp() public {
+  function setUp() public override {
     (withdrawKeyAddress, withdrawalKeyAddressPK) = actorWithPK("withdrawKeyAddress");
     (anotherWithdrawKeyAddress, anotherWithdrawKeyAddressPK) = actorWithPK(
       "anotherWithdrawKeyAddress"
