@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity >=0.5.13 <0.9.0;
+pragma solidity >=0.8.7 <0.8.20;
 pragma experimental ABIEncoderV2;
 
-import "@celo-contracts/governance/Proposals.sol";
+import "@celo-contracts-8/governance/Proposals.sol";
 
 // Standalone superset interface used by the 0.5 Governance tests to interact
 // with the 0.8 Governance implementation deployed via deployCodeTo. Solidity 0.5

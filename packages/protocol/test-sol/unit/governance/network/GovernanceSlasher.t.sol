@@ -1,28 +1,28 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
 import "@celo-contracts/common/interfaces/IAccountsTest.sol";
-import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/governance/Proposals.sol";
-import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/governance/interfaces/IGovernanceSlasher.sol";
 import "@celo-contracts/governance/interfaces/IGovernanceSlasherInitializer.sol";
 import "@celo-contracts/common/interfaces/IOwnable.sol";
 
-contract GovernanceSlasherTest is TestWithUtils {
+import { MockLockedGold08 } from "@test-sol/unit/governance/voting/mocks/MockLockedGold08.sol";
+import { MockValidators08Slasher } from "@test-sol/unit/governance/network/mocks/MockValidators08Slasher.sol";
+
+// Force compilation of GovernanceSlasherCompile artifact for deployCodeTo
+import "@test-sol/unit/governance/network/CompileGovernanceSlasher.t.sol";
+
+contract GovernanceSlasherTest is TestWithUtils08 {
   event SlashingApproved(address indexed account, uint256 amount);
   event GovernanceSlashPerformed(address indexed account, address indexed group, uint256 amount);
   event HavelSlashingMultiplierHalved(address validator);
   event ValidatorDeaffiliatedCalled(address validator);
 
   IAccountsTest accounts;
-  MockLockedGold mockLockedGold;
+  MockLockedGold08 mockLockedGold;
 
-  // GovernanceSlasher now lives in contracts-0.8; deployed via deployCodeTo and
-  // used through its interface from this 0.5 test.
   IGovernanceSlasher public governanceSlasher;
   address governanceSlasherAddress;
   address owner;
@@ -30,17 +30,17 @@ contract GovernanceSlasherTest is TestWithUtils {
   address validator;
   address slashedAddress;
 
-  address[] lessers = new address[](0);
-  address[] greaters = new address[](0);
-  uint256[] indices = new uint256[](0);
+  address[] lessers;
+  address[] greaters;
+  uint256[] indices;
   address internal slasherExecuter;
 
-  function setUp() public {
+  function setUp() public virtual override {
     super.setUp();
+    whenL2WithEpochManagerInitialization();
     preSetup();
     IGovernanceSlasherInitializer(governanceSlasherAddress).initialize(REGISTRY_ADDRESS);
     mockLockedGold.setAccountTotalLockedGold(validator, 5000);
-    whenL2WithEpochManagerInitialization();
   }
 
   function preSetup() public {
@@ -53,7 +53,7 @@ contract GovernanceSlasherTest is TestWithUtils {
     address accountsAddress = actor("Accounts");
     deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
     accounts = IAccountsTest(accountsAddress);
-    mockLockedGold = new MockLockedGold();
+    mockLockedGold = new MockLockedGold08();
     governanceSlasherAddress = actor("governanceSlasher");
     deployCodeTo("GovernanceSlasherCompile", governanceSlasherAddress);
     governanceSlasher = IGovernanceSlasher(governanceSlasherAddress);
@@ -64,9 +64,6 @@ contract GovernanceSlasherTest is TestWithUtils {
 }
 
 contract GovernanceSlasherTest_initialize is GovernanceSlasherTest {
-  // Base setUp already deploys and initializes the slasher once (owner = this).
-  // Re-running preSetup()+initialize() against the fixed deployCodeTo address
-  // would double-initialize, so the base setUp is sufficient here.
   function test_shouldHaveSetOwner() public {
     assertEq(IOwnable(governanceSlasherAddress).owner(), owner);
   }
@@ -111,8 +108,6 @@ contract GovernanceSlasherTest_approveSlashing is GovernanceSlasherTest {
 contract GovernanceSlasherTest_slash_WhenNotGroup is GovernanceSlasherTest {
   address group = address(0);
 
-  // only owner or multisig can call
-
   function test_ShouldDecrementCelo() public {
     governanceSlasher.approveSlashing(validator, 1000);
     governanceSlasher.slashL2(validator, group, lessers, greaters, indices);
@@ -140,15 +135,14 @@ contract GovernanceSlasherTest_slash_WhenNotGroup is GovernanceSlasherTest {
   }
 }
 
-// should work just like the deprecated version
 contract GovernanceSlasherTest_slash_WhenGroup is GovernanceSlasherTest {
   address group;
-  MockValidators validators;
+  MockValidators08Slasher validators;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
-    validators = new MockValidators();
+    validators = new MockValidators08Slasher();
     registry.setAddressFor("Validators", address(validators));
     (group, ) = actorWithPK("group");
 
@@ -164,7 +158,6 @@ contract GovernanceSlasherTest_slash_WhenGroup is GovernanceSlasherTest {
     mockLockedGold.setAccountTotalLockedGold(group, 5000);
   }
 
-  // functions should be decreased as usual
   function test_ShouldDecrementCelo() public {
     governanceSlasher.approveSlashing(validator, 1000);
     governanceSlasher.slashL2(validator, group, lessers, greaters, indices);
@@ -194,14 +187,12 @@ contract GovernanceSlasherTest_slash_WhenGroup is GovernanceSlasherTest {
   function test_validatorDeAffiliatedAndScoreReduced() public {
     governanceSlasher.approveSlashing(validator, 100);
 
-    // functions to affect validator called
     vm.expectEmit(true, true, true, true);
     emit ValidatorDeaffiliatedCalled(validator);
     vm.expectEmit(true, true, true, true);
     emit HavelSlashingMultiplierHalved(group);
 
     governanceSlasher.slashL2(validator, group, lessers, greaters, indices);
-    // assets removed, slashing called
     assertEq(mockLockedGold.accountTotalLockedGold(validator), 4900);
     assertEq(mockLockedGold.accountTotalLockedGold(group), 4900);
   }

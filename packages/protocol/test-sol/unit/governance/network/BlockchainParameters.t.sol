@@ -1,12 +1,14 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.8.7 <0.8.20;
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
+import { BlockchainParameters } from "@celo-contracts-8/governance/BlockchainParameters.sol";
 import "@celo-contracts/governance/interfaces/IBlockchainParameters.sol";
 import "@celo-contracts/governance/interfaces/IBlockchainParametersInitializer.sol";
 import "@celo-contracts/common/interfaces/IOwnable.sol";
 
-contract BlockchainParametersTest is TestWithUtils {
+contract BlockchainParametersTest is TestWithUtils08 {
   uint256 constant gasLimit = 7000000;
   uint256 constant gasForNonGoldCurrencies = 50000;
   address nonOwner;
@@ -19,12 +21,12 @@ contract BlockchainParametersTest is TestWithUtils {
   event UptimeLookbackWindowSet(uint256 window, uint256 activationEpoch);
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     nonOwner = actor("nonOwner");
     ph.setEpochSize(DAY / 5);
-    blockchainParametersAddress = actor("blockchainParameters");
-    deployCodeTo("BlockchainParametersCompile", blockchainParametersAddress);
+    BlockchainParameters bp = new BlockchainParameters(true);
+    blockchainParametersAddress = address(bp);
     blockchainParameters = IBlockchainParameters(blockchainParametersAddress);
     whenL2WithEpochManagerInitialization();
   }
