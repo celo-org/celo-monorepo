@@ -69,6 +69,7 @@ export const SOLIDITY_08_PACKAGE = {
     'ReleaseGold',
     'Accounts',
     'Election',
+    'Governance',
   ],
   proxyContracts: [
     'GasPriceMinimumProxy',

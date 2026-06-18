@@ -1,21 +1,31 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/math/Math.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/utils/Address.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/utils/Address.sol";
 
-import "./interfaces/IGovernance.sol";
+import "../../contracts/governance/interfaces/IGovernance.sol";
 import "./Proposals.sol";
-import "../common/interfaces/IAccounts.sol";
+import "../../contracts/common/interfaces/IAccounts.sol";
 import "../common/ExtractFunctionSignature.sol";
-import "../common/Initializable.sol";
-import "../common/FixidityLib.sol";
+import "../../contracts/common/Initializable.sol";
+import "../../contracts/common/FixidityLib.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
 import "../common/PrecompilesOverride.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/libraries/ReentrancyGuard.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/libraries/ReentrancyGuard.sol";
+
+// Storage layout (must match the 0.5 baseline). The inherited prefix is:
+//   slot 0: _owner (address) — Ownable
+//   slot 1: initialized (bool) — Initializable
+//   slot 2: _guardCounter (uint256) — ReentrancyGuard
+//   slot 3: registry (IRegistry) — UsingRegistry
+// PrecompilesOverride is zero-storage. Implementation storage starts at slot 4.
+// The inheritance order below (Ownable, Initializable, ReentrancyGuard,
+// UsingRegistry, PrecompilesOverride) reproduces the 0.5 contract exactly.
 
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
@@ -239,7 +249,10 @@ contract Governance is
    */
   modifier hotfixTimedOut(bytes32 hash) {
     require(hotfixes[hash].executionTimeLimit > 0, "hotfix not prepared");
-    require(hotfixes[hash].executionTimeLimit < now, "hotfix execution time limit not reached");
+    require(
+      hotfixes[hash].executionTimeLimit < block.timestamp,
+      "hotfix execution time limit not reached"
+    );
     _;
   }
 
@@ -247,7 +260,7 @@ contract Governance is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -296,10 +309,10 @@ contract Governance is
     setBaselineUpdateFactor(baselineUpdateFactor);
     setBaselineQuorumFactor(baselineQuorumFactor);
     // solhint-disable-next-line not-rely-on-time
-    lastDequeue = now;
+    lastDequeue = block.timestamp;
   }
 
-  function() external payable {
+  fallback() external payable {
     require(msg.data.length == 0, "unknown method");
   }
 
@@ -379,7 +392,13 @@ contract Governance is
     proposal.setDescriptionUrl(descriptionUrl);
     queue.push(proposalCount);
     // solhint-disable-next-line not-rely-on-time
-    emit ProposalQueued(proposalCount, msg.sender, proposal.transactions.length, msg.value, now);
+    emit ProposalQueued(
+      proposalCount,
+      msg.sender,
+      proposal.transactions.length,
+      msg.value,
+      block.timestamp
+    );
     return proposalCount;
   }
 
@@ -692,7 +711,7 @@ contract Governance is
   function prepareHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
     HotfixRecord storage _currentHotfix = hotfixes[hash];
 
-    uint256 _currentTime = now;
+    uint256 _currentTime = block.timestamp;
     require(hotfixExecutionTimeWindow > 0, "Hotfix execution time window not set");
     require(_currentHotfix.executionTimeLimit == 0, "Hotfix already prepared for this timeframe.");
     require(_currentHotfix.approved, "Hotfix not approved by approvers.");
@@ -729,7 +748,7 @@ contract Governance is
     require(!executed, "hotfix already executed");
     require(approved, "hotfix not approved");
     require(councilApproved, "hotfix not approved by security council");
-    require(executionTimeLimit >= now, "Execution time limit has already been reached.");
+    require(executionTimeLimit >= block.timestamp, "Execution time limit has already been reached.");
     Proposals.makeMem(values, destinations, data, dataLengths, msg.sender, 0).executeMem();
 
     hotfixes[hash].executed = true;
@@ -745,7 +764,7 @@ contract Governance is
     require(value != 0, "Nothing to withdraw");
     require(value <= address(this).balance, "Inconsistent balance");
     refundedDeposits[msg.sender] = 0;
-    msg.sender.sendValue(value);
+    payable(msg.sender).sendValue(value);
     return true;
   }
 
@@ -1187,7 +1206,7 @@ contract Governance is
    */
   function dequeueProposalsIfReady() public {
     // solhint-disable-next-line not-rely-on-time
-    if (now >= lastDequeue.add(dequeueFrequency)) {
+    if (block.timestamp >= lastDequeue.add(dequeueFrequency)) {
       uint256 numProposalsToDequeue = Math.min(concurrentProposals, queue.list.numElements);
       uint256[] memory dequeuedIds = queue.popN(numProposalsToDequeue);
 
@@ -1203,22 +1222,22 @@ contract Governance is
           proposal.deposit
         );
         // solhint-disable-next-line not-rely-on-time
-        proposal.timestamp = now;
+        proposal.timestamp = block.timestamp;
         if (emptyIndices.length != 0) {
           uint256 indexOfLastEmptyIndex = emptyIndices.length.sub(1);
           dequeued[emptyIndices[indexOfLastEmptyIndex]] = proposalId;
           delete emptyIndices[indexOfLastEmptyIndex];
-          emptyIndices.length = indexOfLastEmptyIndex;
+          emptyIndices.pop();
         } else {
           dequeued.push(proposalId);
         }
         // solhint-disable-next-line not-rely-on-time
-        emit ProposalDequeued(proposalId, now);
+        emit ProposalDequeued(proposalId, block.timestamp);
         wasAnyProposalDequeued = true;
       }
       if (wasAnyProposalDequeued) {
         // solhint-disable-next-line not-rely-on-time
-        lastDequeue = now;
+        lastDequeue = block.timestamp;
       }
     }
   }
@@ -1438,7 +1457,7 @@ contract Governance is
     );
     // solhint-disable-next-line not-rely-on-time
     if (
-      now >= stageStartTime &&
+      block.timestamp >= stageStartTime &&
       (proposal.transactions.length != 0 ||
         // proposals with 0 transactions can expire only when not approved or not passing
         !proposal.isApproved() ||
@@ -1448,7 +1467,7 @@ contract Governance is
     }
     stageStartTime = stageStartTime.sub(stageDurations.execution);
     // solhint-disable-next-line not-rely-on-time
-    if (now >= stageStartTime) {
+    if (block.timestamp >= stageStartTime) {
       return Proposals.Stage.Execution;
     }
     return Proposals.Stage.Referendum;
@@ -1497,7 +1516,6 @@ contract Governance is
    * @param yesVotes The yes votes weight.
    * @param noVotes The no votes weight.
    * @param abstainVotes The abstain votes weight.
-   * @return Whether or not the proposal is passing.
    */
   function _vote(
     Proposals.Proposal storage proposal,
@@ -1676,7 +1694,7 @@ contract Governance is
     Proposals.Proposal storage proposal
   ) private view returns (bool) {
     // solhint-disable-next-line not-rely-on-time
-    return now >= proposal.timestamp.add(queueExpiry);
+    return block.timestamp >= proposal.timestamp.add(queueExpiry);
   }
 
   /**

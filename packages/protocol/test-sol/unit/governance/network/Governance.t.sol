@@ -1,11 +1,11 @@
 pragma solidity ^0.5.13;
+pragma experimental ABIEncoderV2;
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 
-import "@celo-contracts/governance/Governance.sol";
 import "@celo-contracts/governance/Proposals.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
@@ -13,48 +13,7 @@ import "@celo-contracts/governance/test/TestTransactions.sol";
 import "@celo-contracts/common/interfaces/IAccountsTest.sol";
 import "@celo-contracts/common/Signatures.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-
-contract GovernanceMock is Governance(true) {
-  address[] validatorSet;
-
-  // Expose test utilities
-  function addValidator(address validator) external {
-    validatorSet.push(validator);
-  }
-
-  function setDeprecatedWeight(
-    address voterAddress,
-    uint256 proposalIndex,
-    uint256 weight,
-    uint256 proposalId
-  ) external {
-    Voter storage voter = voters[voterAddress];
-    VoteRecord storage voteRecord = voter.referendumVotes[proposalIndex];
-    voteRecord.deprecated_weight = weight;
-    voteRecord.proposalId = proposalId;
-  }
-
-  // exposes removeVotesWhenRevokingDelegatedVotes for tests
-  function removeVotesWhenRevokingDelegatedVotesTest(
-    address account,
-    uint256 maxAmountAllowed
-  ) public {
-    _removeVotesWhenRevokingDelegatedVotes(account, maxAmountAllowed);
-  }
-
-  // Minimally override core functions from UsingPrecompiles
-  function numberValidatorsInCurrentSet() public view returns (uint256) {
-    return validatorSet.length;
-  }
-
-  function numberValidatorsInSet(uint256) public view returns (uint256) {
-    return validatorSet.length;
-  }
-
-  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
-    return validatorSet[index];
-  }
-}
+import { IGovernanceTest } from "@test-sol/unit/governance/network/interfaces/IGovernanceTest.sol";
 
 contract GovernanceTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
@@ -80,7 +39,7 @@ contract GovernanceTest is TestWithUtils {
   uint256 constant QUERY_EXPIRY = 60 * 60;
   uint256 constant EXECUTION_STAGE_DURATION = 1 * 60;
 
-  GovernanceMock governance;
+  IGovernanceTest governance;
   IAccountsTest accounts;
   MockLockedGold mockLockedGold;
   MockValidators mockValidators;
@@ -214,7 +173,14 @@ contract GovernanceTest is TestWithUtils {
     accounts = IAccountsTest(accountsAddress);
     accounts.initialize(address(registry));
 
-    governance = new GovernanceMock();
+    // Derive a fresh Governance address per call (keyed on the freshly-created
+    // mockLockedGold) so re-running setUpContracts deploys a new, uninitialized
+    // Governance rather than re-initializing one at a fixed address.
+    address governanceAddress = address(
+      uint160(uint256(keccak256(abi.encodePacked("governance", address(mockLockedGold)))))
+    );
+    deployCodeTo("GovernanceMock08", governanceAddress);
+    governance = IGovernanceTest(governanceAddress);
     governance.initialize(
       address(registry),
       accApprover,

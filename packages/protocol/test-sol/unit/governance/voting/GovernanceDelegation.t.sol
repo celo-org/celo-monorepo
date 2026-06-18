@@ -6,36 +6,16 @@ import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IAccountsTest.sol";
 import { ILockedGoldTest } from "@test-sol/unit/governance/voting/interfaces/ILockedGoldTest.sol";
-import "@celo-contracts/governance/Governance.sol";
+import { IGovernanceTest } from "@test-sol/unit/governance/network/interfaces/IGovernanceTest.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
-
-contract GovernanceHarness is Governance(true) {
-  address[] internal validatorSet;
-
-  function addValidator(address validator) external {
-    validatorSet.push(validator);
-  }
-
-  function numberValidatorsInCurrentSet() public view returns (uint256) {
-    return validatorSet.length;
-  }
-
-  function numberValidatorsInSet(uint256) public view returns (uint256) {
-    return validatorSet.length;
-  }
-
-  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
-    return validatorSet[index];
-  }
-}
 
 contract GovernanceDelegationTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
 
   IAccountsTest accounts;
   ILockedGoldTest lockedGold;
-  GovernanceHarness governance;
+  IGovernanceTest governance;
   MockElection election;
   MockValidators validators;
 
@@ -59,7 +39,7 @@ contract GovernanceDelegationTest is TestWithUtils {
     deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
     accounts = IAccountsTest(accountsAddress);
     { address _lg = actor("LockedGold"); deployCodeTo("LockedGoldCompile", _lg); lockedGold = ILockedGoldTest(_lg); }
-    governance = new GovernanceHarness();
+    { address _g = actor("Governance"); deployCodeTo("GovernanceMock08", _g); governance = IGovernanceTest(_g); }
     election = new MockElection();
     validators = new MockValidators();
 

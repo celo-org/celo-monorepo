@@ -9,7 +9,7 @@ import { IFreezerInitializer } from "@celo-contracts/common/interfaces/IFreezerI
 
 import { IElectionTest } from "@test-sol/unit/governance/voting/interfaces/IElectionTest.sol";
 import { ILockedGoldTest } from "@test-sol/unit/governance/voting/interfaces/ILockedGoldTest.sol";
-import { Governance } from "@celo-contracts/governance/Governance.sol";
+import { IGovernanceTest } from "@test-sol/unit/governance/network/interfaces/IGovernanceTest.sol";
 import { Proposals } from "@celo-contracts/governance/Proposals.sol";
 import { MockValidators } from "@celo-contracts/governance/test/MockValidators.sol";
 import { IRandomMock } from "@celo-contracts/identity/interfaces/IRandomMock.sol";
@@ -25,7 +25,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
   ILockedGoldTest lockedGold;
   MockValidators validators;
   IRandomMock random;
-  Governance governance;
+  IGovernanceTest governance;
 
   address voter = actor("voter");
   address approver = actor("approver");
@@ -75,7 +75,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
     address randomAddress = actor("random");
     deployCodeTo("MockRandom08", randomAddress);
     random = IRandomMock(randomAddress);
-    governance = new Governance(true);
+    { address _g = actor("Governance"); deployCodeTo("GovernanceMock08", _g); governance = IGovernanceTest(_g); }
 
     registry.setAddressFor("Accounts", address(accounts));
     registry.setAddressFor("Election", address(election));

@@ -15,7 +15,7 @@ import { ILockedGoldTest } from "@test-sol/unit/governance/voting/interfaces/ILo
 import "@celo-contracts/governance/interfaces/IReleaseGold.sol";
 
 import "@celo-contracts/stability/test/MockStableToken.sol";
-import "@celo-contracts/governance/Governance.sol";
+import { IGovernanceTest } from "@test-sol/unit/governance/network/interfaces/IGovernanceTest.sol";
 
 import "@test-sol/utils/ECDSAHelper.sol";
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
@@ -34,7 +34,7 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
   ValidatorsMockTunnel public validatorsMockTunnel;
   IValidators public validators;
   ILockedGoldTest lockedGold;
-  Governance governance;
+  IGovernanceTest governance;
   IGoldTokenTest goldToken;
   IReleaseGold releaseGold;
 
@@ -165,7 +165,7 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
     validators = IValidators(validatorsAddress);
     // TODO move to create2
     validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
-    governance = new Governance(true);
+    { address _g = actor("Governance"); deployCodeTo("GovernanceMock08", _g); governance = IGovernanceTest(_g); }
     address goldTokenAddress = actor("goldToken");
     deployCodeTo("GoldToken.sol", abi.encode(true), goldTokenAddress);
     goldToken = IGoldTokenTest(goldTokenAddress);
