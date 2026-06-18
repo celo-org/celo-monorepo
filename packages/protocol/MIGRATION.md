@@ -293,7 +293,18 @@ forge test --match-path "test-sol/unit/stability/*"               # +--block-gas
 forge test --match-path "test-sol/integration/*"
 ```
 
-## STATUS (live)
+## STATUS: COMPLETE ✅
+
+All 27 upgradeable implementation contracts migrated from Solidity 0.5.x to 0.8.19
+(`contracts/` → `contracts-0.8/`). Verified end-to-end:
+- **Storage:** all 27 pass `storage-diff.sh --all` — byte-identical to the 0.5 baselines (ZERO drift).
+- **Tests:** `forge test --match-path "test-sol/unit/*"` → **2227 passed, 0 failed**; `test-sol/integration/*` → **18 passed, 0 failed**. (Run with foundry v1.0.0 to match CI; the catch-all/common jobs must NOT pass `--block-gas-limit 50000000`.)
+- **Build:** both `forge build` (default) and `FOUNDRY_PROFILE=truffle-compat8 forge build` green.
+- **Wiring:** all 27 added to `SOLIDITY_08_PACKAGE.contracts` in `contractPackages.ts`.
+- Proxies + interfaces + dual-pragma bases (Initializable/FixidityLib/ReentrancyGuard) intentionally remain in `contracts/`.
+- Remaining: P7 release-tooling simplification (dual-tree → single) is the documented follow-up; on-chain governance releases are out of scope.
+
+## STATUS (history)
 
 - P0 infra: DONE (baselines for 27 impls, storage-diff.sh gate, plan) — commit `edcb127ff`
 - **DONE (migrated, storage-gated, full unit+integration suites green, committed):**
