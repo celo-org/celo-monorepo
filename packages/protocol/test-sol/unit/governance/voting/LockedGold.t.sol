@@ -13,7 +13,7 @@ import "@test-sol/unit/common/CeloTokenMock.sol";
 // LockedGold has been migrated to 0.8 and is deployed via deployCodeTo; interact through the
 // standalone test interface below.
 import { ILockedGoldTest } from "@test-sol/unit/governance/voting/interfaces/ILockedGoldTest.sol";
-import "@celo-contracts/governance/Election.sol";
+import { IElectionTest } from "@test-sol/unit/governance/voting/interfaces/IElectionTest.sol";
 import "@celo-contracts/stability/test/MockStableToken.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockGovernance.sol";
@@ -1133,11 +1133,11 @@ contract LockedGoldTest_slash is LockedGoldTest {
   address groupMember = actor("groupMember");
   address delegatee = actor("delegatee");
 
-  Election electionSlashTest;
+  IElectionTest electionSlashTest;
 
   function setUp() public {
     super.setUp();
-    electionSlashTest = new Election(true);
+    { address _ea = actor("electionSlashTest"); deployCodeTo("ElectionCompile", _ea); electionSlashTest = IElectionTest(_ea); }
     registry.setAddressFor("Election", address(electionSlashTest));
     electionSlashTest.initialize(
       address(registry),

@@ -41,7 +41,7 @@ contract PrecompilesOverride is UsingPrecompiles, UsingRegistry {
    */
   function validatorSignerAddressFromCurrentSet(
     uint256 index
-  ) public view override returns (address) {
+  ) public view virtual override returns (address) {
     if (isL2()) {
       return getEpochManager().getElectedSignerByIndex(index);
     } else {

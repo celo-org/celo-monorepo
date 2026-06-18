@@ -7,7 +7,7 @@ import { IAccountsTest } from "@celo-contracts/common/interfaces/IAccountsTest.s
 import { IFreezer } from "@celo-contracts/common/interfaces/IFreezer.sol";
 import { IFreezerInitializer } from "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
 
-import { Election } from "@celo-contracts/governance/Election.sol";
+import { IElectionTest } from "@test-sol/unit/governance/voting/interfaces/IElectionTest.sol";
 import { ILockedGoldTest } from "@test-sol/unit/governance/voting/interfaces/ILockedGoldTest.sol";
 import { Governance } from "@celo-contracts/governance/Governance.sol";
 import { Proposals } from "@celo-contracts/governance/Proposals.sol";
@@ -20,7 +20,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
 
   IAccountsTest accounts;
-  Election election;
+  IElectionTest election;
   IFreezer freezer;
   ILockedGoldTest lockedGold;
   MockValidators validators;
@@ -63,7 +63,9 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
     address accountsAddress = actor("Accounts");
     deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
     accounts = IAccountsTest(accountsAddress);
-    election = new Election(true);
+    address electionAddress = actor("election");
+    deployCodeTo("ElectionCompile", electionAddress);
+    election = IElectionTest(electionAddress);
     address freezerAddress = actor("freezer");
     deployCodeTo("FreezerCompile", freezerAddress);
     freezer = IFreezer(freezerAddress);

@@ -1,21 +1,32 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/Math.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
-import "./interfaces/IElection.sol";
-import "./interfaces/IValidators.sol";
-import "../common/Initializable.sol";
-import "../common/FixidityLib.sol";
+import "../../contracts/governance/interfaces/IElection.sol";
+import "../../contracts/governance/interfaces/IValidators.sol";
+import "../../contracts/common/Initializable.sol";
+import "../../contracts/common/FixidityLib.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/libraries/Heap.sol";
-import "../common/libraries/ReentrancyGuard.sol";
-import "../common/Blockable.sol";
 import "../common/PrecompilesOverride.sol";
-import "../common/Permissioned.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../common/libraries/Heap.sol";
+import "../../contracts/common/libraries/ReentrancyGuard.sol";
+import "../common/Blockable.sol";
+
+// Storage layout (must match the 0.5 baseline):
+//   slot 0: _owner (address) — Ownable
+//   slot 1: _guardCounter (uint256) — ReentrancyGuard
+//   slot 2: initialized (bool, offset 0) — packed — Initializable
+//   slot 2: registry (IRegistry) — packed — UsingRegistry
+//   slot 3: votes (Votes struct)
+//   ...
+// Blockable uses a fixed keccak slot; does not consume a sequential slot.
+// Permissioned is inlined as a modifier (zero storage).
+// PrecompilesOverride is zero-storage (inherits UsingPrecompiles via UsingRegistry).
 
 /**
  * @title Manages the validator election process.
@@ -28,8 +39,7 @@ contract Election is
   Initializable,
   UsingRegistry,
   PrecompilesOverride,
-  Blockable,
-  Permissioned
+  Blockable
 {
   using AddressSortedLinkedList for SortedLinkedList.List;
   using FixidityLib for FixidityLib.Fraction;
@@ -130,6 +140,41 @@ contract Election is
 
   mapping(address => CachedVotes) public cachedVotesByAccount;
 
+  // Permissioned inline modifier (Permissioned.sol is pragma ^0.5.13 and cannot be imported in 0.8)
+  modifier onlyPermitted(address permittedAddress) {
+    require(msg.sender == permittedAddress, "Only permitted address can call");
+    _;
+  }
+
+  // Explicit overrides required because IElection declares owner() and the
+  // precompile functions are defined in both PrecompilesOverride and UsingPrecompiles.
+  function owner()
+    public
+    view
+    override(Ownable, IElection)
+    returns (address)
+  {
+    return super.owner();
+  }
+
+  function numberValidatorsInCurrentSet()
+    public
+    view
+    override(IElection, PrecompilesOverride)
+    returns (uint256)
+  {
+    return super.numberValidatorsInCurrentSet();
+  }
+
+  function validatorSignerAddressFromCurrentSet(uint256 index)
+    public
+    view
+    override(IElection, PrecompilesOverride)
+    returns (address)
+  {
+    return super.validatorSignerAddressFromCurrentSet(index);
+  }
+
   event ElectableValidatorsSet(uint256 min, uint256 max);
   event MaxNumGroupsVotedForSet(uint256 maxNumGroupsVotedFor);
   event ElectabilityThresholdSet(uint256 electabilityThreshold);
@@ -157,6 +202,12 @@ contract Election is
   event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
 
   /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) Initializable(test) {}
+
+  /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
    * @param minElectableValidators The minimum number of validators that can be elected.
@@ -178,12 +229,6 @@ contract Election is
     setMaxNumGroupsVotedFor(_maxNumGroupsVotedFor);
     setElectabilityThreshold(_electabilityThreshold);
   }
-
-  /**
-   * @notice Sets initialized == true on implementation contracts
-   * @param test Set to true to skip implementation initialization
-   */
-  constructor(bool test) public Initializable(test) {}
 
   /**
    * @notice Increments the number of total and pending votes for `group`.
@@ -242,7 +287,7 @@ contract Election is
   /**
    * @notice Converts `account`'s pending votes for `group` to active votes.
    * @param group The validator group to vote for.
-   * @param account The validateor group account's pending votes to active votes
+   * @param account The validator group account's pending votes to active votes
    * @return True upon success.
    * @dev Pending votes cannot be activated until an election has been held.
    */
@@ -343,7 +388,7 @@ contract Election is
     uint256 value,
     address lesser,
     address greater
-  ) external onlyPermitted(registry.getAddressFor(EPOCH_MANAGER_REGISTRY_ID)) {
+  ) external virtual onlyPermitted(registry.getAddressFor(EPOCH_MANAGER_REGISTRY_ID)) {
     _distributeEpochRewards(group, value, lesser, greater);
   }
 
@@ -382,7 +427,7 @@ contract Election is
    * @param value Maximum amount of votes to revoke.
    * @param lessers The groups receiving fewer votes than the i'th `group`, or 0 if
    *                the i'th `group` has the fewest votes of any validator group.
-   * @param greaters The groups receivier more votes than the i'th `group`, or 0 if
+   * @param greaters The groups receiving more votes than the i'th `group`, or 0 if
    *                the i'th `group` has the most votes of any validator group.
    * @param indices The indices of the i'th group in the account's voting list.
    * @return Number of votes successfully decremented.
@@ -403,7 +448,7 @@ contract Election is
       "Input lengths must be correspond."
     );
     // Iterate in reverse order to hopefully optimize removing pending votes before active votes
-    // And to attempt to preserve `account`'s earliest votes (assuming earliest = prefered)
+    // And to attempt to preserve `account`'s earliest votes (assuming earliest = preferred)
     for (uint256 i = info.groups.length; i > 0; i = i.sub(1)) {
       info.remainingValue = info.remainingValue.sub(
         _decrementVotes(
@@ -471,8 +516,8 @@ contract Election is
 
   /**
    * @notice Returns list of all validator groups and the number of votes they've received.
-   * @return List of all validator groups
-   * @return Number of votes each validator group received.
+   * @return groups List of all validator groups
+   * @return values Number of votes each validator group received.
    */
   function getTotalVotesForEligibleValidatorGroups()
     external
@@ -784,6 +829,7 @@ contract Election is
     }
     return res;
   }
+
   /**
    * @notice Returns the pending votes for `group` made by `account`.
    * @param group The address of the validator group.
@@ -895,7 +941,6 @@ contract Election is
     address greater,
     uint256 index
   ) internal onlyWhenNotBlocked returns (bool) {
-    // TODO(asa): Dedup with revokePending.
     require(group != address(0), "Group address zero");
     address account = getAccounts().voteSignerToAccount(msg.sender);
     require(0 < value, "Vote value cannot be zero");
@@ -970,7 +1015,7 @@ contract Election is
   function _electNValidatorSignerOrAccount(
     uint256 minElectableValidators,
     uint256 maxElectableValidators,
-    bool accounts // accounts or signers
+    bool useAccounts // accounts or signers
   ) internal view returns (address[] memory) {
     // Groups must have at least `electabilityThreshold` proportion of the total votes to be
     // considered for the election.
@@ -1031,7 +1076,7 @@ contract Election is
     for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
       // We use the validating delegate if one is set.
       address[] memory electedGroupValidators;
-      if (accounts) {
+      if (useAccounts) {
         electedGroupValidators = validators.getTopGroupValidatorsAccounts(
           electionGroups[i],
           numMembersElected[i]
@@ -1205,7 +1250,7 @@ contract Election is
     require(index < list.length && list[index] == element, "Bad index");
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];
-    list.length = lastIndex;
+    list.pop();
   }
 
   /**

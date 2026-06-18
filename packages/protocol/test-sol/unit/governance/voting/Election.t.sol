@@ -5,7 +5,6 @@ pragma experimental ABIEncoderV2;
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/common/interfaces/IAccountsTest.sol";
@@ -13,25 +12,15 @@ import "@celo-contracts/common/linkedlists/AddressSortedLinkedList.sol";
 import "@celo-contracts/identity/interfaces/IRandomMock.sol";
 import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
+import { IElectionTest } from "@test-sol/unit/governance/voting/interfaces/IElectionTest.sol";
 
 import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";
-
-contract ElectionMock is Election(true) {
-  function distributeEpochRewards(
-    address group,
-    uint256 value,
-    address lesser,
-    address greater
-  ) external {
-    return _distributeEpochRewards(group, value, lesser, greater);
-  }
-}
 
 contract ElectionTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
 
   IAccountsTest accounts;
-  ElectionMock election;
+  IElectionTest election;
   IFreezer freezer;
   MockLockedGold lockedGold;
   MockValidators validators;
@@ -147,7 +136,9 @@ contract ElectionTest is TestWithUtils {
 
     createAccount(address(this));
 
-    election = new ElectionMock();
+    address electionAddress = actor("election");
+    deployCodeTo("ElectionCompile", electionAddress);
+    election = IElectionTest(electionAddress);
     address freezerAddress = actor("freezer");
     deployCodeTo("FreezerCompile", freezerAddress);
     freezer = IFreezer(freezerAddress);
