@@ -166,7 +166,7 @@ Required in Mode B only:
 
 Optional with defaults:
 
-- Sibling repo paths → default: sibling directories of `$CELO_ROOT` (e.g. `$CELO_ROOT/../Optimism`, `$CELO_ROOT/../Optimism2`, `$CELO_ROOT/../SuperchainOps`, `$CELO_ROOT/../CeloSuperchainOps`, `$CELO_ROOT/../Succinct`, `$CELO_ROOT/../Succinct2`)
+- Sibling repo paths → default: sibling directories of `$CELO_ROOT` (e.g. `$CELO_ROOT/../Optimism`, `$CELO_ROOT/../Optimism2`, `$CELO_ROOT/../SuperchainOps`, `$CELO_ROOT/../CeloSuperchainOps`, `$CELO_ROOT/../Succinct`, `$CELO_ROOT/../Succinct2`, `$CELO_ROOT/../x-ray`)
 - `SUCCINCT_ROOT_MAINNET` → default `$CELO_ROOT/../Succinct2` (see §3.4)
 - Mocked signer addresses/PKs → defaults in §APPENDIX B
 
@@ -206,6 +206,7 @@ OP_ROOT_V5=<path>                 # default $CELO_ROOT/../Optimism2
 SUPERCHAIN_OPS=<path>             # default $CELO_ROOT/../SuperchainOps
 CELO_SUPERCHAIN_OPS=<path>        # default $CELO_ROOT/../CeloSuperchainOps
 SUCCINCT_ROOT=<path>              # default $CELO_ROOT/../Succinct
+XRAY_ROOT=<path>                  # default $CELO_ROOT/../x-ray (clone of https://github.com/celo-org/x-ray)
 NETWORK=<mainnet|sepolia|chaos>
 MODE=<A|B>
 INCLUDE_BASEFEE=<yes|no>          # Mode B only; Mode A forces 'no'
@@ -648,9 +649,11 @@ arrays (match §B.7 mocked defaults), three nonces (match §B.8 row for NETWORK+
 **Task**:
 1. `lsof -ti:$XRAY_PORT` — if non-empty, FAIL with `xray port $XRAY_PORT busy;
    orchestrator must resolve or override XRAY_PORT in CONTEXT_BLOCK`.
-2. `cd $CELO_ROOT/packages/op-tooling/x-ray && python3 -m http.server $XRAY_PORT
+2. Verify the x-ray checkout exists: `[ -d "$XRAY_ROOT" ]` — if missing, FAIL with
+   `XRAY_ROOT ($XRAY_ROOT) not found — x-ray now lives in its own repo; clone https://github.com/celo-org/x-ray`.
+3. `cd $XRAY_ROOT && python3 -m http.server $XRAY_PORT
    &>/tmp/xray-$RPC_PORT.log & echo $! > /tmp/xray-$RPC_PORT.pid`
-3. `sleep 2 && curl -sSf http://localhost:$XRAY_PORT | head -c 200`
+4. `sleep 2 && curl -sSf http://localhost:$XRAY_PORT | head -c 200`
 Tier: `haiku`.
 
 **Evidence**: `xray_pid=<N>; xray_port=$XRAY_PORT; curl_status=200`.
@@ -1394,7 +1397,7 @@ For all other cards, `PRIOR_EVIDENCE` may be omitted.
 - Exec script details: `packages/op-tooling/exec/README.md`.
 - Fork/mock details: `packages/op-tooling/fork/README.md`.
 - Verify details: `packages/op-tooling/verify/README.md`.
-- X-ray details: `packages/op-tooling/x-ray/README.md`.
+- X-ray details: `https://github.com/celo-org/x-ray` (own repo; no longer in this monorepo).
 
 Do not duplicate these into subagent prompts; reference the file paths instead.
 
