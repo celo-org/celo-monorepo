@@ -4,7 +4,7 @@ pragma solidity ^0.5.13;
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts/common/interfaces/IAccountsTest.sol";
 import { ILockedGoldTest } from "@test-sol/unit/governance/voting/interfaces/ILockedGoldTest.sol";
 import "@celo-contracts/governance/Governance.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
@@ -33,7 +33,7 @@ contract GovernanceHarness is Governance(true) {
 contract GovernanceDelegationTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
 
-  Accounts accounts;
+  IAccountsTest accounts;
   ILockedGoldTest lockedGold;
   GovernanceHarness governance;
   MockElection election;
@@ -55,7 +55,9 @@ contract GovernanceDelegationTest is TestWithUtils {
   function setUp() public {
     super.setUp();
 
-    accounts = new Accounts(true);
+    address accountsAddress = actor("Accounts");
+    deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
+    accounts = IAccountsTest(accountsAddress);
     { address _lg = actor("LockedGold"); deployCodeTo("LockedGoldCompile", _lg); lockedGold = ILockedGoldTest(_lg); }
     governance = new GovernanceHarness();
     election = new MockElection();

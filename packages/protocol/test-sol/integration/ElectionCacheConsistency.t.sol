@@ -3,7 +3,7 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import { FixidityLib } from "@celo-contracts/common/FixidityLib.sol";
-import { Accounts } from "@celo-contracts/common/Accounts.sol";
+import { IAccountsTest } from "@celo-contracts/common/interfaces/IAccountsTest.sol";
 import { IFreezer } from "@celo-contracts/common/interfaces/IFreezer.sol";
 import { IFreezerInitializer } from "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
 
@@ -19,7 +19,7 @@ import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 contract ElectionCacheConsistencyTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
 
-  Accounts accounts;
+  IAccountsTest accounts;
   Election election;
   IFreezer freezer;
   ILockedGoldTest lockedGold;
@@ -60,7 +60,9 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
 
     // constructor(true) bypasses the proxy initializer guard so initialize()
     // can be called directly on the impl.
-    accounts = new Accounts(true);
+    address accountsAddress = actor("Accounts");
+    deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
+    accounts = IAccountsTest(accountsAddress);
     election = new Election(true);
     address freezerAddress = actor("freezer");
     deployCodeTo("FreezerCompile", freezerAddress);

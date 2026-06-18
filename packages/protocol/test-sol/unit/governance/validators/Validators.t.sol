@@ -7,8 +7,9 @@ pragma experimental ABIEncoderV2;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts/common/interfaces/IAccountsTest.sol";
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 
 import "@celo-contracts/governance/interfaces/IValidators.sol";
@@ -40,7 +41,7 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
     FixidityLib.Fraction adjustmentSpeed;
   }
 
-  Accounts accounts;
+  IAccountsTest accounts;
   MockStableToken stableToken;
   MockElection election;
   ValidatorsMockTunnel public validatorsMockTunnel;
@@ -160,7 +161,9 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
       adjustmentSpeed: FixidityLib.newFixedFraction(5, 20)
     });
 
-    accounts = new Accounts(true);
+    address accountsAddress = actor("Accounts");
+    deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
+    accounts = IAccountsTest(accountsAddress);
     accounts.initialize(REGISTRY_ADDRESS);
 
     lockedGold = new MockLockedGold();

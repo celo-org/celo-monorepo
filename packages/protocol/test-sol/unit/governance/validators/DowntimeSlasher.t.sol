@@ -4,11 +4,12 @@ pragma experimental ABIEncoderV2;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts/common/interfaces/IAccountsTest.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/interfaces/IDowntimeSlasherMock.sol";
 import "@celo-contracts/common/interfaces/IOwnable.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 // DowntimeSlasher was migrated to contracts-0.8; the deployable mock (DowntimeSlasherMock08)
@@ -26,7 +27,7 @@ contract DowntimeSlasherTest is TestWithUtils {
     uint256 reward;
   }
 
-  Accounts accounts;
+  IAccountsTest accounts;
   MockValidators validators;
   MockLockedGold lockedGold;
   IDowntimeSlasherMock public slasher;
@@ -112,7 +113,9 @@ contract DowntimeSlasherTest is TestWithUtils {
 
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
-    accounts = new Accounts(true);
+    address accountsAddress = actor("Accounts");
+    deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
+    accounts = IAccountsTest(accountsAddress);
     validators = new MockValidators();
     lockedGold = new MockLockedGold();
 

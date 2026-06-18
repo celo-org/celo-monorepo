@@ -3,7 +3,6 @@ pragma solidity ^0.5.13;
 // this file only exists so that foundry compiles this contracts
 import { Proxy } from "@celo-contracts/common/Proxy.sol";
 import { ProxyFactory } from "@celo-contracts/common/ProxyFactory.sol";
-import { Accounts } from "@celo-contracts/common/Accounts.sol";
 import { Election } from "@celo-contracts/governance/Election.sol";
 import { Governance } from "@celo-contracts/governance/Governance.sol";
 import { ReserveSpenderMultiSig } from "@mento-core/contracts/ReserveSpenderMultiSig.sol";

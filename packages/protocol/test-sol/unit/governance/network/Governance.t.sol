@@ -10,7 +10,7 @@ import "@celo-contracts/governance/Proposals.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/governance/test/TestTransactions.sol";
-import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts/common/interfaces/IAccountsTest.sol";
 import "@celo-contracts/common/Signatures.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 
@@ -81,7 +81,7 @@ contract GovernanceTest is TestWithUtils {
   uint256 constant EXECUTION_STAGE_DURATION = 1 * 60;
 
   GovernanceMock governance;
-  Accounts accounts;
+  IAccountsTest accounts;
   MockLockedGold mockLockedGold;
   MockValidators mockValidators;
   TestTransactions testTransactions;
@@ -204,7 +204,14 @@ contract GovernanceTest is TestWithUtils {
     mockLockedGold = new MockLockedGold();
     mockLockedGold.setTotalLockedGold(VOTER_GOLD);
 
-    accounts = new Accounts(true);
+    // Derive a fresh Accounts address per call (keyed on the freshly-created
+    // mockValidators) so re-running setUpContracts deploys a new, uninitialized
+    // Accounts rather than re-initializing one at a fixed address.
+    address accountsAddress = address(
+      uint160(uint256(keccak256(abi.encodePacked("accounts", address(mockValidators)))))
+    );
+    deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
+    accounts = IAccountsTest(accountsAddress);
     accounts.initialize(address(registry));
 
     governance = new GovernanceMock();

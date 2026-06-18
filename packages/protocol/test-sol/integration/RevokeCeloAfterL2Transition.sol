@@ -3,8 +3,9 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts/common/interfaces/IAccountsTest.sol";
 import { IGoldTokenTest } from "@test-sol/unit/common/interfaces/IGoldTokenTest.sol";
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 import "@celo-contracts/governance/interfaces/IValidators.sol";
@@ -28,7 +29,7 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
 
   uint256 constant TOTAL_AMOUNT = 1 ether * 1_000_000;
 
-  Accounts accounts;
+  IAccountsTest accounts;
   MockStableToken stableToken;
   Election election;
   ValidatorsMockTunnel public validatorsMockTunnel;
@@ -152,7 +153,11 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
     setupRegistry();
     setupEpochManager();
 
-    accounts = new Accounts(true);
+    {
+      address accountsAddress = actor("Accounts");
+      deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
+      accounts = IAccountsTest(accountsAddress);
+    }
     stableToken = new MockStableToken();
     election = new Election(true);
     { address _lg = actor("LockedGold"); deployCodeTo("LockedGoldCompile", _lg); lockedGold = ILockedGoldTest(_lg); }

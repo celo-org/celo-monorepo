@@ -3,7 +3,7 @@ pragma solidity ^0.5.13;
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
-import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts/common/interfaces/IAccountsTest.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/governance/Proposals.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
@@ -18,7 +18,7 @@ contract GovernanceSlasherTest is TestWithUtils {
   event HavelSlashingMultiplierHalved(address validator);
   event ValidatorDeaffiliatedCalled(address validator);
 
-  Accounts accounts;
+  IAccountsTest accounts;
   MockLockedGold mockLockedGold;
 
   // GovernanceSlasher now lives in contracts-0.8; deployed via deployCodeTo and
@@ -50,7 +50,9 @@ contract GovernanceSlasherTest is TestWithUtils {
     slashedAddress = actor("slashedAddress");
     slasherExecuter = actor("slasherExecuter");
 
-    accounts = new Accounts(true);
+    address accountsAddress = actor("Accounts");
+    deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
+    accounts = IAccountsTest(accountsAddress);
     mockLockedGold = new MockLockedGold();
     governanceSlasherAddress = actor("governanceSlasher");
     deployCodeTo("GovernanceSlasherCompile", governanceSlasherAddress);

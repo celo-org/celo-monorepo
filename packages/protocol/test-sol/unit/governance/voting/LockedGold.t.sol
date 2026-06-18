@@ -6,8 +6,9 @@ import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
+import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts/common/interfaces/IAccountsTest.sol";
 import "@test-sol/unit/common/CeloTokenMock.sol";
 // LockedGold has been migrated to 0.8 and is deployed via deployCodeTo; interact through the
 // standalone test interface below.
@@ -23,7 +24,7 @@ import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";
 contract LockedGoldTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
 
-  Accounts accounts;
+  IAccountsTest accounts;
   CeloTokenMock celoToken;
   MockStableToken stableToken;
   MockElection election;
@@ -87,7 +88,9 @@ contract LockedGoldTest is TestWithUtils {
     super.setUp();
 
     celoToken = new CeloTokenMock();
-    accounts = new Accounts(true);
+    address accountsAddress = actor("Accounts");
+    deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
+    accounts = IAccountsTest(accountsAddress);
     address lockedGoldAddress = actor("LockedGold");
     deployCodeTo("LockedGoldCompile", lockedGoldAddress);
     lockedGold = ILockedGoldTest(lockedGoldAddress);

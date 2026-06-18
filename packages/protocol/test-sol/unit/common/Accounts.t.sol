@@ -2,8 +2,9 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
+import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts/common/interfaces/IAccountsTest.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
@@ -11,7 +12,7 @@ import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 contract AccountsTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
 
-  Accounts accounts;
+  IAccountsTest accounts;
   MockValidators validators;
 
   string constant name = "Account";
@@ -79,7 +80,9 @@ contract AccountsTest is TestWithUtils {
   function setUp() public {
     super.setUp();
 
-    accounts = new Accounts(true);
+    address accountsAddress = actor("Accounts");
+    deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
+    accounts = IAccountsTest(accountsAddress);
     validators = new MockValidators();
 
     registry.setAddressFor("Validators", address(validators));

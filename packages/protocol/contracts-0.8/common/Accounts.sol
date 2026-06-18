@@ -1,19 +1,22 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/utils/cryptography/ECDSA.sol";
 
-import "./interfaces/IAccounts.sol";
+import "../../contracts/common/interfaces/IAccounts.sol";
+import "../../contracts/common/interfaces/IAccountsInitializer.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
-import "../common/FixidityLib.sol";
-import "../common/Initializable.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/Signatures.sol";
+import "../../contracts/common/FixidityLib.sol";
+import "../../contracts/common/Initializable.sol";
+import "../../contracts/common/libraries/ReentrancyGuard.sol";
 import "../common/UsingRegistry.sol";
-import "../common/libraries/ReentrancyGuard.sol";
 
 contract Accounts is
   IAccounts,
+  IAccountsInitializer,
   ICeloVersionedContract,
   Ownable,
   ReentrancyGuard,
@@ -118,13 +121,13 @@ contract Accounts is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
    */
-  function initialize(address registryAddress) external initializer {
+  function initialize(address registryAddress) external override initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     _setEip712DomainSeparator();
@@ -133,7 +136,7 @@ contract Accounts is
   /**
    * @notice Sets the EIP712 domain separator for the Celo Accounts abstraction.
    */
-  function setEip712DomainSeparator() external {
+  function setEip712DomainSeparator() external override {
     _setEip712DomainSeparator();
   }
 
@@ -155,7 +158,7 @@ contract Accounts is
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) external {
+  ) external override {
     if (!isAccount(msg.sender)) {
       createAccount();
     }
@@ -168,7 +171,7 @@ contract Accounts is
    * @notice Setter for the metadata of an account.
    * @param metadataURL The URL to access the metadata.
    */
-  function setMetadataURL(string calldata metadataURL) external {
+  function setMetadataURL(string calldata metadataURL) external override {
     require(isAccount(msg.sender), "Unknown account");
     Account storage account = accounts[msg.sender];
     account.metadataURL = metadataURL;
@@ -199,7 +202,7 @@ contract Accounts is
     uint256 lastIndex = offchainStorageRoots[msg.sender].length - 1;
     bytes memory url = offchainStorageRoots[msg.sender][index];
     offchainStorageRoots[msg.sender][index] = offchainStorageRoots[msg.sender][lastIndex];
-    offchainStorageRoots[msg.sender].length--;
+    offchainStorageRoots[msg.sender].pop();
     emit OffchainStorageRootRemoved(msg.sender, url, index);
   }
 
@@ -216,7 +219,7 @@ contract Accounts is
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) external nonReentrant {
+  ) external override nonReentrant {
     legacyAuthorizeSignerWithSignature(signer, VoteSigner, v, r, s);
     setIndexedSigner(signer, VoteSigner);
 
@@ -236,7 +239,7 @@ contract Accounts is
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) external nonReentrant {
+  ) external override nonReentrant {
     legacyAuthorizeSignerWithSignature(signer, ValidatorSigner, v, r, s);
     setIndexedSigner(signer, ValidatorSigner);
 
@@ -259,7 +262,7 @@ contract Accounts is
     bytes32 r,
     bytes32 s,
     bytes calldata ecdsaPublicKey
-  ) external nonReentrant {
+  ) external override nonReentrant {
     legacyAuthorizeSignerWithSignature(signer, ValidatorSigner, v, r, s);
     setIndexedSigner(signer, ValidatorSigner);
 
@@ -278,7 +281,7 @@ contract Accounts is
    */
   function batchGetMetadataURL(
     address[] calldata accountsToQuery
-  ) external view returns (uint256[] memory, bytes memory) {
+  ) external view override returns (uint256[] memory, bytes memory) {
     uint256 totalSize = 0;
     uint256[] memory sizes = new uint256[](accountsToQuery.length);
     for (uint256 i = 0; i < accountsToQuery.length; i = i.add(1)) {
@@ -334,7 +337,9 @@ contract Accounts is
    * @return Beneficiary address of payment delegated.
    * @return Fraction of payment delegated.
    */
-  function getPaymentDelegation(address account) external view returns (address, uint256) {
+  function getPaymentDelegation(
+    address account
+  ) external view override returns (address, uint256) {
     PaymentDelegation storage delegation = paymentDelegations[account];
     return (delegation.beneficiary, delegation.fraction.unwrap());
   }
@@ -345,7 +350,7 @@ contract Accounts is
    * @dev Fails if the `signer` is not an account or currently authorized attestation signer.
    * @return The associated account that the signer is authorized to attest for.
    */
-  function attestationSignerToAccount(address signer) external view returns (address) {
+  function attestationSignerToAccount(address signer) external view override returns (address) {
     return signerToAccountWithRole(signer, AttestationSigner);
   }
 
@@ -355,7 +360,7 @@ contract Accounts is
    * @dev Fails if the `signer` is not an account or currently authorized vote signer.
    * @return The associated account that signer is authorized to vote for.
    */
-  function voteSignerToAccount(address signer) external view returns (address) {
+  function voteSignerToAccount(address signer) external view override returns (address) {
     return signerToAccountWithRole(signer, VoteSigner);
   }
 
@@ -365,7 +370,7 @@ contract Accounts is
    * @dev Fails if the `signer` is not an account or previously authorized signer.
    * @return The associated account.
    */
-  function signerToAccount(address signer) external view returns (address) {
+  function signerToAccount(address signer) external view override returns (address) {
     address authorizingAccount = authorizedBy[signer];
     if (authorizingAccount != address(0)) {
       return authorizingAccount;
@@ -389,7 +394,7 @@ contract Accounts is
    * @param account The address of the account.
    * @return Whether the account has specified a dedicated vote signer.
    */
-  function hasAuthorizedVoteSigner(address account) external view returns (bool) {
+  function hasAuthorizedVoteSigner(address account) external view override returns (bool) {
     return hasLegacySigner(account, VoteSigner);
   }
 
@@ -398,7 +403,7 @@ contract Accounts is
    * @param account The address of the account.
    * @return Whether the account has specified a dedicated validator signer.
    */
-  function hasAuthorizedValidatorSigner(address account) external view returns (bool) {
+  function hasAuthorizedValidatorSigner(address account) external view override returns (bool) {
     return hasLegacySigner(account, ValidatorSigner);
   }
 
@@ -407,7 +412,7 @@ contract Accounts is
    * @param account The address of the account.
    * @return Whether the account has specified a dedicated attestation signer.
    */
-  function hasAuthorizedAttestationSigner(address account) external view returns (bool) {
+  function hasAuthorizedAttestationSigner(address account) external view override returns (bool) {
     return hasLegacySigner(account, AttestationSigner);
   }
 
@@ -416,7 +421,7 @@ contract Accounts is
    * @param account The address of the account to get the name for.
    * @return name The name of the account.
    */
-  function getName(address account) external view returns (string memory) {
+  function getName(address account) external view override returns (string memory) {
     return accounts[account].name;
   }
 
@@ -425,7 +430,7 @@ contract Accounts is
    * @param account The address of the account to get the metadata for.
    * @return metadataURL The URL to access the metadata.
    */
-  function getMetadataURL(address account) external view returns (string memory) {
+  function getMetadataURL(address account) external view override returns (string memory) {
     return accounts[account].metadataURL;
   }
 
@@ -434,7 +439,7 @@ contract Accounts is
    * @param account The address of the account to get the key for
    * @return dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
    */
-  function getDataEncryptionKey(address account) external view returns (bytes memory) {
+  function getDataEncryptionKey(address account) external view override returns (bytes memory) {
     return accounts[account].dataEncryptionKey;
   }
 
@@ -443,7 +448,7 @@ contract Accounts is
    * @param account The address of the account to get the wallet address for
    * @return Wallet address
    */
-  function getWalletAddress(address account) external view returns (address) {
+  function getWalletAddress(address account) external view override returns (address) {
     return accounts[account].walletAddress;
   }
 
@@ -463,7 +468,7 @@ contract Accounts is
    * @return Minor version of the contract.
    * @return Patch version of the contract.
    */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+  function getVersionNumber() external pure override returns (uint256, uint256, uint256, uint256) {
     return (1, 2, 0, 0);
   }
 
@@ -471,7 +476,7 @@ contract Accounts is
    * @notice Creates an account.
    * @return True if account creation succeeded.
    */
-  function createAccount() public returns (bool) {
+  function createAccount() public override returns (bool) {
     require(
       isNotAccount(msg.sender) && isNotAuthorizedSigner(msg.sender),
       "Account already exists or address is an authorized signer for another account"
@@ -486,7 +491,7 @@ contract Accounts is
    * @notice Setter for the name of an account.
    * @param name The name to set.
    */
-  function setName(string memory name) public {
+  function setName(string memory name) public override {
     require(isAccount(msg.sender), "Register with createAccount to set account name");
     Account storage account = accounts[msg.sender];
     account.name = name;
@@ -505,10 +510,15 @@ contract Accounts is
    * @dev v, r, s constitute `signer`'s signature on `msg.sender` (unless the wallet address
    *      is 0x0 or msg.sender).
    */
-  function setWalletAddress(address walletAddress, uint8 v, bytes32 r, bytes32 s) public {
+  function setWalletAddress(
+    address walletAddress,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) public override {
     require(isAccount(msg.sender), "Unknown account");
     if (!(walletAddress == msg.sender || walletAddress == address(0x0))) {
-      address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
+      address signer = getSignerOfAddress(msg.sender, v, r, s);
       require(signer == walletAddress, "Invalid signature");
     }
     Account storage account = accounts[msg.sender];
@@ -520,7 +530,7 @@ contract Accounts is
    * @notice Setter for the data encryption key and version.
    * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
    */
-  function setAccountDataEncryptionKey(bytes memory dataEncryptionKey) public {
+  function setAccountDataEncryptionKey(bytes memory dataEncryptionKey) public override {
     require(dataEncryptionKey.length >= 33, "data encryption key length <= 32");
     Account storage account = accounts[msg.sender];
     account.dataEncryptionKey = dataEncryptionKey;
@@ -536,7 +546,7 @@ contract Accounts is
    * be greater than 1.
    * @dev Use `deletePaymentDelegation` to unset the payment delegation.
    */
-  function setPaymentDelegation(address beneficiary, uint256 fraction) public {
+  function setPaymentDelegation(address beneficiary, uint256 fraction) public override {
     require(isAccount(msg.sender), "Must first register address with Account.createAccount");
     require(beneficiary != address(0), "Beneficiary cannot be address 0x0");
     FixidityLib.Fraction memory f = FixidityLib.wrap(fraction);
@@ -621,7 +631,12 @@ contract Accounts is
    * @param s Output value s of the ECDSA signature.
    * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
    */
-  function authorizeAttestationSigner(address signer, uint8 v, bytes32 r, bytes32 s) public {
+  function authorizeAttestationSigner(
+    address signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) public override {
     legacyAuthorizeSignerWithSignature(signer, AttestationSigner, v, r, s);
     setIndexedSigner(signer, AttestationSigner);
 
@@ -798,7 +813,11 @@ contract Accounts is
    * @param signer The address of the signer.
    * @param role The role that has been authorized.
    */
-  function isSigner(address account, address signer, bytes32 role) public view returns (bool) {
+  function isSigner(
+    address account,
+    address signer,
+    bytes32 role
+  ) public view override returns (bool) {
     return
       isLegacySigner(account, signer, role) ||
       (signerAuthorizations[account][role][signer].completed && authorizedBy[signer] == account);
@@ -810,7 +829,7 @@ contract Accounts is
    * @dev Fails if the `signer` is not an account or currently authorized validator.
    * @return The associated account that signer is authorized to validate for.
    */
-  function validatorSignerToAccount(address signer) public view returns (address) {
+  function validatorSignerToAccount(address signer) public view override returns (address) {
     return signerToAccountWithRole(signer, ValidatorSigner);
   }
 
@@ -862,7 +881,7 @@ contract Accounts is
    * @param account The address of the account.
    * @return The address with which the account can sign votes.
    */
-  function getVoteSigner(address account) public view returns (address) {
+  function getVoteSigner(address account) public view override returns (address) {
     return getLegacySigner(account, VoteSigner);
   }
 
@@ -871,7 +890,7 @@ contract Accounts is
    * @param account The address of the account.
    * @return The address with which the account can register a validator or group.
    */
-  function getValidatorSigner(address account) public view returns (address) {
+  function getValidatorSigner(address account) public view override returns (address) {
     return getLegacySigner(account, ValidatorSigner);
   }
 
@@ -880,7 +899,7 @@ contract Accounts is
    * @param account The address of the account.
    * @return The address with which the account can sign attestations.
    */
-  function getAttestationSigner(address account) public view returns (address) {
+  function getAttestationSigner(address account) public view override returns (address) {
     return getLegacySigner(account, AttestationSigner);
   }
 
@@ -913,7 +932,7 @@ contract Accounts is
    * @param account The address of the account
    * @return Returns `true` if account exists. Returns `false` otherwise.
    */
-  function isAccount(address account) public view returns (bool) {
+  function isAccount(address account) public view override returns (bool) {
     return (accounts[account].exists);
   }
 
@@ -938,7 +957,8 @@ contract Accounts is
     bytes32 structHash = keccak256(
       abi.encode(EIP712_AUTHORIZE_SIGNER_TYPEHASH, account, signer, role)
     );
-    return Signatures.getSignerOfTypedDataHash(eip712DomainSeparator, structHash, v, r, s);
+    bytes32 typedDataHash = ECDSA.toTypedDataHash(eip712DomainSeparator, structHash);
+    return ECDSA.recover(typedDataHash, v, r, s);
   }
 
   /**
@@ -955,7 +975,7 @@ contract Accounts is
   function _setEip712DomainSeparator() internal {
     uint256 chainId;
     assembly {
-      chainId := chainid
+      chainId := chainid()
     }
 
     eip712DomainSeparator = keccak256(
@@ -1001,6 +1021,26 @@ contract Accounts is
     address signer
   ) internal view returns (bool) {
     return (authorizedBy[signer] == address(0) || authorizedBy[signer] == account);
+  }
+
+  /**
+   * @notice Given a signed address, returns the signer of the address.
+   * @param message The address that was signed.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev Replaces the 0.5 Signatures.getSignerOfAddress helper; prefixes the keccak of the
+   *      signed address with the Ethereum signed-message prefix before recovering.
+   */
+  function getSignerOfAddress(
+    address message,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) internal pure returns (address) {
+    bytes32 hash = keccak256(abi.encodePacked(message));
+    bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(hash);
+    return ECDSA.recover(prefixedHash, v, r, s);
   }
 
   function signerToAccountWithRole(address signer, bytes32 role) internal view returns (address) {
@@ -1064,7 +1104,7 @@ contract Accounts is
    * @dev v, r, s constitute `authorized`'s signature on `msg.sender`.
    */
   function authorizeAddress(address authorized, uint8 v, bytes32 r, bytes32 s) private {
-    address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
+    address signer = getSignerOfAddress(msg.sender, v, r, s);
     require(signer == authorized, "Invalid signature");
 
     authorize(authorized);

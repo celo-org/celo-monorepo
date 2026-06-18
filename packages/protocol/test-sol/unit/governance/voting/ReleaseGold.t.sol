@@ -9,7 +9,8 @@ import "@celo-contracts/identity/test/MockAttestations.sol";
 import "@celo-contracts/identity/test/MockERC20Token.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 
-import "@celo-contracts/common/Accounts.sol";
+import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
+import "@celo-contracts/common/interfaces/IAccountsTest.sol";
 import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
 import { IGoldTokenTest } from "@test-sol/unit/common/interfaces/IGoldTokenTest.sol";
@@ -87,7 +88,7 @@ interface IReleaseGoldTest {
 contract ReleaseGoldTest is TestWithUtils, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
 
-  Accounts accounts;
+  IAccountsTest accounts;
   IFreezer freezer;
   IGoldTokenTest goldToken;
   MockStableToken stableToken;
@@ -168,7 +169,9 @@ contract ReleaseGoldTest is TestWithUtils, ECDSAHelper {
     (beneficiary, beneficiaryPrivateKey) = actorWithPK("beneficiary");
     walletAddress = beneficiary;
 
-    accounts = new Accounts(true);
+    address accountsAddress = actor("Accounts");
+    deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
+    accounts = IAccountsTest(accountsAddress);
     address freezerAddress = actor("freezer");
     deployCodeTo("FreezerCompile", freezerAddress);
     freezer = IFreezer(freezerAddress);

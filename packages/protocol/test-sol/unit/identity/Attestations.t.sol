@@ -8,8 +8,9 @@ import "@celo-contracts/identity/interfaces/IRandomMock.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
+import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts/common/interfaces/IAccountsTest.sol";
 
 contract AttestationsFoundryTest is Test {
   enum KeyOffsets {
@@ -29,7 +30,7 @@ contract AttestationsFoundryTest is Test {
   MockValidators mockValidators;
   IRandomMock random;
   IRegistry registry;
-  Accounts accounts;
+  IAccountsTest accounts;
 
   address caller;
   uint256 callerPK;
@@ -286,7 +287,9 @@ contract AttestationsFoundryTest is Test {
     address registryAddress = actor("registry");
     deployCodeTo("Registry.sol", abi.encode(true), registryAddress);
     registry = IRegistry(registryAddress);
-    accounts = new Accounts(true);
+    address accountsAddress = actor("Accounts");
+    deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
+    accounts = IAccountsTest(accountsAddress);
     random.initialize(256);
     random.addTestRandomness(0, bytes32(0));
     accounts.initialize(address(registry));
