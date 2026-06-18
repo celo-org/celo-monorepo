@@ -1,21 +1,37 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/Math.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/utils/Address.sol";
-import "openzeppelin-solidity/contracts/utils/EnumerableSet.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/utils/Address.sol";
+import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
 
-import "./interfaces/ILockedGold.sol";
-import "./interfaces/ILockedGoldInitializer.sol";
+import "../../contracts/governance/interfaces/ILockedGold.sol";
+import "../../contracts/governance/interfaces/ILockedGoldInitializer.sol";
 
-import "../common/FixidityLib.sol";
-import "../common/Initializable.sol";
-import "../common/Signatures.sol";
-import "../common/UsingRegistry.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/libraries/ReentrancyGuard.sol";
+import "../../contracts/common/FixidityLib.sol";
+import "../../contracts/common/Initializable.sol";
 import "../common/Blockable.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/libraries/ReentrancyGuard.sol";
+
+import "../common/UsingRegistry.sol";
+
+// Storage layout (must match the 0.5 baseline):
+//   slot 0: _guardCounter (uint256) — ReentrancyGuard
+//   slot 1: initialized (bool, offset 0) + _owner (address, offset 1) — packed
+//           (Initializable then Ownable, inherited via UsingRegistry)
+//   slot 2: registry (IRegistry) — UsingRegistry
+//   slot 3: balances (mapping)
+//   slot 4: slashingMap (mapping)
+//   slot 5: slashingWhitelist (bytes32[])
+//   slot 6: totalNonvoting (uint256)
+//   slot 7: unlockingPeriod (uint256)
+//   slot 8: delegatorInfo (mapping)
+//   slot 9: totalDelegatedCelo (mapping)
+//   slot 10: maxDelegateesCount (uint256)
+// Blockable stores its address at a fixed keccak slot, so it does not consume a
+// sequential storage slot and the inheritance order above is preserved exactly.
 
 /**
  * @title Manages the CELO locked for use in Celo governance, election, and
@@ -125,7 +141,7 @@ contract LockedGold is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -213,7 +229,7 @@ contract LockedGold is
       "Either account doesn't have enough locked Celo or locked Celo is being used for voting."
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
-    uint256 available = now.add(unlockingPeriod);
+    uint256 available = block.timestamp.add(unlockingPeriod);
     // CERTORA: the slot containing the length could be MAX_UINT
     account.pendingWithdrawals.push(PendingWithdrawal(value, available));
     emit GoldUnlocked(msg.sender, value, available);
@@ -255,11 +271,11 @@ contract LockedGold is
     Balances storage account = balances[msg.sender];
     require(index < account.pendingWithdrawals.length, "Bad pending withdrawal index");
     PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
-    require(now >= pendingWithdrawal.timestamp, "Pending withdrawal not available");
+    require(block.timestamp >= pendingWithdrawal.timestamp, "Pending withdrawal not available");
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.pendingWithdrawals, index);
     require(value <= address(this).balance, "Inconsistent balance");
-    msg.sender.sendValue(value);
+    payable(msg.sender).sendValue(value);
     emit GoldWithdrawn(msg.sender, value);
   }
 
@@ -509,7 +525,7 @@ contract LockedGold is
     _updateDelegatedAmount(account);
 
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
-    address payable communityFundPayable = address(uint160(communityFund));
+    address payable communityFundPayable = payable(address(uint160(communityFund)));
     require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
     communityFundPayable.sendValue(maxSlash.sub(reward));
     emit AccountSlashed(account, maxSlash, reporter, reward);
@@ -610,8 +626,11 @@ contract LockedGold is
   function getPendingWithdrawals(
     address account
   ) external view returns (uint256[] memory, uint256[] memory) {
-    return
-      getPendingWithdrawalsInBatch(account, 0, balances[account].pendingWithdrawals.length - 1);
+    uint256 len = balances[account].pendingWithdrawals.length;
+    if (len == 0) {
+      return (new uint256[](0), new uint256[](0));
+    }
+    return getPendingWithdrawalsInBatch(account, 0, len - 1);
   }
 
   /**
@@ -703,7 +722,7 @@ contract LockedGold is
    * @param delegator The delegator address.
    */
   function getDelegateesOfDelegator(address delegator) public view returns (address[] memory) {
-    address[] memory values = delegatorInfo[delegator].delegatees.enumerate();
+    address[] memory values = delegatorInfo[delegator].delegatees.values();
     return values;
   }
 
@@ -905,7 +924,7 @@ contract LockedGold is
     address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
     EnumerableSet.AddressSet storage delegatees = delegatorInfo[delegatorAccount].delegatees;
     for (uint256 i = 0; i < delegatees.length(); i = i.add(1)) {
-      _updateDelegatedAmount(delegatorAccount, delegatees.get(i));
+      _updateDelegatedAmount(delegatorAccount, delegatees.at(i));
     }
   }
 
@@ -917,7 +936,7 @@ contract LockedGold is
   function deletePendingWithdrawal(PendingWithdrawal[] storage list, uint256 index) private {
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];
-    list.length = lastIndex;
+    list.pop();
   }
 
   /**

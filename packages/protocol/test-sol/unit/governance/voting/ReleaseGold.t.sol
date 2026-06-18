@@ -13,7 +13,7 @@ import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
 import { IGoldTokenTest } from "@test-sol/unit/common/interfaces/IGoldTokenTest.sol";
-import "@celo-contracts/governance/LockedGold.sol";
+import { ILockedGoldTest } from "@test-sol/unit/governance/voting/interfaces/ILockedGoldTest.sol";
 import "@celo-contracts/governance/ReleaseGold.sol";
 import "./mocks/ReleaseGoldMockTunnel.sol";
 import "@celo-contracts/stability/test/MockStableToken.sol";
@@ -31,7 +31,7 @@ contract ReleaseGoldTest is TestWithUtils, ECDSAHelper {
   MockElection election;
   MockGovernance governance;
   MockValidators validators;
-  LockedGold lockedGold;
+  ILockedGoldTest lockedGold;
   ReleaseGold releaseGold;
   ReleaseGold releaseGold2;
 
@@ -99,7 +99,7 @@ contract ReleaseGoldTest is TestWithUtils, ECDSAHelper {
     address goldTokenAddress = actor("goldToken");
     deployCodeTo("GoldToken.sol", abi.encode(true), goldTokenAddress);
     goldToken = IGoldTokenTest(goldTokenAddress);
-    lockedGold = new LockedGold(true);
+    { address _lg = actor("LockedGold"); deployCodeTo("LockedGoldCompile", _lg); lockedGold = ILockedGoldTest(_lg); }
     election = new MockElection();
     governance = new MockGovernance();
     validators = new MockValidators();

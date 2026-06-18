@@ -8,7 +8,7 @@ import { IFreezer } from "@celo-contracts/common/interfaces/IFreezer.sol";
 import { IFreezerInitializer } from "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
 
 import { Election } from "@celo-contracts/governance/Election.sol";
-import { LockedGold } from "@celo-contracts/governance/LockedGold.sol";
+import { ILockedGoldTest } from "@test-sol/unit/governance/voting/interfaces/ILockedGoldTest.sol";
 import { Governance } from "@celo-contracts/governance/Governance.sol";
 import { Proposals } from "@celo-contracts/governance/Proposals.sol";
 import { MockValidators } from "@celo-contracts/governance/test/MockValidators.sol";
@@ -22,7 +22,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
   Accounts accounts;
   Election election;
   IFreezer freezer;
-  LockedGold lockedGold;
+  ILockedGoldTest lockedGold;
   MockValidators validators;
   IRandomMock random;
   Governance governance;
@@ -66,7 +66,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
     deployCodeTo("FreezerCompile", freezerAddress);
     freezer = IFreezer(freezerAddress);
     IFreezerInitializer(freezerAddress).initialize();
-    lockedGold = new LockedGold(true);
+    { address _lg = actor("LockedGold"); deployCodeTo("LockedGoldCompile", _lg); lockedGold = ILockedGoldTest(_lg); }
     validators = new MockValidators();
     address randomAddress = actor("random");
     deployCodeTo("MockRandom08", randomAddress);

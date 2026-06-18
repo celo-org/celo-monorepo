@@ -4,10 +4,14 @@ pragma experimental ABIEncoderV2;
 
 import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@test-sol/unit/common/CeloTokenMock.sol";
-import "@celo-contracts/governance/LockedGold.sol";
+// LockedGold has been migrated to 0.8 and is deployed via deployCodeTo; interact through the
+// standalone test interface below.
+import { ILockedGoldTest } from "@test-sol/unit/governance/voting/interfaces/ILockedGoldTest.sol";
 import "@celo-contracts/governance/ReleaseGold.sol";
 import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/stability/test/MockStableToken.sol";
@@ -26,7 +30,7 @@ contract LockedGoldTest is TestWithUtils {
   MockElection election;
   MockGovernance governance;
   MockValidators validators;
-  LockedGold lockedGold;
+  ILockedGoldTest lockedGold;
   ReleaseGold releaseGold;
 
   uint256 HOUR = 60 * 60;
@@ -86,7 +90,9 @@ contract LockedGoldTest is TestWithUtils {
 
     celoToken = new CeloTokenMock();
     accounts = new Accounts(true);
-    lockedGold = new LockedGold(true);
+    address lockedGoldAddress = actor("LockedGold");
+    deployCodeTo("LockedGoldCompile", lockedGoldAddress);
+    lockedGold = ILockedGoldTest(lockedGoldAddress);
     election = new MockElection();
     validators = new MockValidators();
     governance = new MockGovernance();
@@ -276,7 +282,7 @@ contract LockedGoldTest_initialize is LockedGoldTest {
   }
 
   function test_ShouldSetOwner() public {
-    assertEq(lockedGold.owner(), caller);
+    assertEq(Ownable(address(lockedGold)).owner(), caller);
   }
 
   function test_ShouldSetRegistryAddress() public {
@@ -473,7 +479,9 @@ contract LockedGoldTest_unlock is LockedGoldTest {
   }
 
   function test_ShouldRevertWhenUnlockingMoreThenLocked_WhenThereAreNoBalanceRequirements() public {
-    vm.expectRevert("SafeMath: subtraction overflow");
+    // OZ v4 SafeMath.sub is native subtraction, so underflow is a 0.8 arithmetic
+    // panic (Panic(0x11)) rather than the old "SafeMath: subtraction overflow" string.
+    vm.expectRevert(abi.encodeWithSignature("Panic(uint256)", 0x11));
     lockedGold.unlock(value + 1);
   }
 

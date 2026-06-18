@@ -10,7 +10,7 @@ import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 import "@celo-contracts/governance/interfaces/IValidators.sol";
 
 import "@celo-contracts/governance/Election.sol";
-import "@celo-contracts/governance/LockedGold.sol";
+import { ILockedGoldTest } from "@test-sol/unit/governance/voting/interfaces/ILockedGoldTest.sol";
 import "@celo-contracts/governance/ReleaseGold.sol";
 
 import "@celo-contracts/stability/test/MockStableToken.sol";
@@ -33,7 +33,7 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
   Election election;
   ValidatorsMockTunnel public validatorsMockTunnel;
   IValidators public validators;
-  LockedGold lockedGold;
+  ILockedGoldTest lockedGold;
   Governance governance;
   IGoldTokenTest goldToken;
   ReleaseGold releaseGold;
@@ -155,7 +155,7 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
     accounts = new Accounts(true);
     stableToken = new MockStableToken();
     election = new Election(true);
-    lockedGold = new LockedGold(true);
+    { address _lg = actor("LockedGold"); deployCodeTo("LockedGoldCompile", _lg); lockedGold = ILockedGoldTest(_lg); }
     address validatorsAddress = actor("Validators");
     deployCodeTo("ValidatorsCompile", validatorsAddress);
     validators = IValidators(validatorsAddress);

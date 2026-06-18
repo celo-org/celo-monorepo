@@ -5,7 +5,7 @@ import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Accounts.sol";
-import "@celo-contracts/governance/LockedGold.sol";
+import { ILockedGoldTest } from "@test-sol/unit/governance/voting/interfaces/ILockedGoldTest.sol";
 import "@celo-contracts/governance/Governance.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
@@ -34,7 +34,7 @@ contract GovernanceDelegationTest is TestWithUtils {
   using FixidityLib for FixidityLib.Fraction;
 
   Accounts accounts;
-  LockedGold lockedGold;
+  ILockedGoldTest lockedGold;
   GovernanceHarness governance;
   MockElection election;
   MockValidators validators;
@@ -56,7 +56,7 @@ contract GovernanceDelegationTest is TestWithUtils {
     super.setUp();
 
     accounts = new Accounts(true);
-    lockedGold = new LockedGold(true);
+    { address _lg = actor("LockedGold"); deployCodeTo("LockedGoldCompile", _lg); lockedGold = ILockedGoldTest(_lg); }
     governance = new GovernanceHarness();
     election = new MockElection();
     validators = new MockValidators();
