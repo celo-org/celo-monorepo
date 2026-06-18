@@ -66,6 +66,7 @@ contract EpochManagerEnablerTest_initEpochManager is EpochManagerEnablerTest {
 
 contract EpochManagerEnablerTest_initEpochManager_L2 is EpochManagerEnablerTest_L2 {
   function test_CanBeCalledByAnyone() public {
+    epochManager.transferOwnership(address(epochManagerEnablerContract));
     vm.prank(nonOwner);
     epochManagerEnablerContract.initEpochManager();
 

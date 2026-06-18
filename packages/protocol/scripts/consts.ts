@@ -1,11 +1,14 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import path from 'path'
-import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
+import { SOLIDITY_05_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 
 export const ROOT_DIR = path.join(__dirname, '../')
-export const CONTRACTS_PACKAGE_SRC_DIR = path.join(__dirname, '../contracts')
-export const CONTRACTS_08_SOURCE_DIR = path.join(ROOT_DIR, 'contracts-0.8')
-export const CONTRACTS_08_PACKAGE_DESTINATION_DIR = path.join(CONTRACTS_PACKAGE_SRC_DIR, '0.8')
+export const CONTRACTS_PACKAGE_SRC_DIR = path.join(ROOT_DIR, SOLIDITY_05_PACKAGE.path)
+export const CONTRACTS_08_SOURCE_DIR = path.join(ROOT_DIR, SOLIDITY_08_PACKAGE.path)
+// Staging dir that the publishing pipeline assembles from contracts/ and
+// contracts-0.8/. `npm publish` runs from here, so the source trees are never
+// mutated by a publish run.
+export const CONTRACTS_PACKAGE_STAGING_DIR = path.join(ROOT_DIR, 'contracts-package-abi')
 export const ABIS_PACKAGE_SRC_DIR = path.join(__dirname, '../abis')
 export const ABIS_BUILD_DIR = path.join(ABIS_PACKAGE_SRC_DIR, 'src-generated')
 export const ABIS_DIST_DIR = path.join(ABIS_PACKAGE_SRC_DIR, 'dist')
@@ -91,18 +94,18 @@ export const OtherContracts = [
   'UsingRegistry',
 ]
 
-export const contractPackages = [MENTO_PACKAGE, SOLIDITY_08_PACKAGE].filter(Boolean)
+export const contractPackages = [SOLIDITY_05_PACKAGE, SOLIDITY_08_PACKAGE]
 
-export const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract'] as const
+export const Interfaces = [
+  'ICeloToken',
+  'IERC20',
+  'IERC20CeloTokens',
+  'ICeloVersionedContract',
+] as const
 
 export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreContracts)
 
-export const PublishContracts = [
-  ...CoreContracts,
-  ...Interfaces,
-  PROXY_CONTRACT,
-  ...MENTO_PACKAGE.contracts,
-]
+export const PublishContracts = [...CoreContracts, ...Interfaces, PROXY_CONTRACT]
 
 export const AliasedContracts = {
   [CeloContractName.GoldToken]: CeloContractName.CeloToken,

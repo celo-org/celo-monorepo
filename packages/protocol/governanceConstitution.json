@@ -2,20 +2,6 @@
   "Accounts": {
     "default": 600000000000000000000000
   },
-  "BlockchainParameters": {
-    "default": 900000000000000000000000,
-    "setBlockGasLimit": 800000000000000000000000,
-    "setIntrinsicGasForAlternativeFeeCurrency": 800000000000000000000000
-  },
-  "DoubleSigningSlasher": {
-    "default": 700000000000000000000000,
-    "setSlashingIncentives": 700000000000000000000000
-  },
-  "DowntimeSlasher": {
-    "default": 700000000000000000000000,
-    "setSlashingIncentives": 700000000000000000000000,
-    "setSlashableDowntime": 700000000000000000000000
-  },
   "Election": {
     "default": 800000000000000000000000,
     "setRegistry": 900000000000000000000000,
@@ -44,13 +30,6 @@
     "default": 600000000000000000000000,
     "freeze": 600000000000000000000000,
     "unfreeze": 600000000000000000000000
-  },
-  "GasPriceMinimum": {
-    "default": 700000000000000000000000,
-    "setRegistry": 900000000000000000000000,
-    "setAdjustmentSpeed": 700000000000000000000000,
-    "setTargetDensity": 700000000000000000000000,
-    "setGasPriceMinimumFloor": 700000000000000000000000
   },
   "GoldToken": {
     "default": 900000000000000000000000,
@@ -92,10 +71,6 @@
     "_transferOwnership": 900000000000000000000000,
     "_setAndInitializeImplementation": 900000000000000000000000,
     "_setImplementation": 900000000000000000000000
-  },
-  "Random": {
-    "default": 700000000000000000000000,
-    "setRandomnessBlockRetentionWindow": 700000000000000000000000
   },
   "Registry": {
     "default": 900000000000000000000000,

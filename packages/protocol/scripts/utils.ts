@@ -125,14 +125,14 @@ export function replacePackageVersionAndMakePublic(
 ) {
   const json: JSON = JSON.parse(fs.readFileSync(packageJsonPath).toString())
 
-  if (process.env.RELEASE_VERSION) {
-    console.info(`Replacing ${json.name as string} version with provided RELEASE_VERSION`)
-
-    json.version = process.env.RELEASE_VERSION
-    json.private = false
-  } else {
-    console.info('No RELEASE_VERSION provided')
-  }
+  // Always set a concrete version and make the package public. Real releases use the
+  // CI-provided RELEASE_VERSION; dry runs (PR validation) fall back to a placeholder so
+  // that `npm publish --dry-run` can parse the manifest — newer npm errors on a
+  // version-less / private package.
+  const version = process.env.RELEASE_VERSION || '0.0.0-dryrun'
+  console.info(`Setting ${json.name as string} version to ${version}`)
+  json.version = version
+  json.private = false
 
   if (onDone !== undefined) {
     onDone(json)

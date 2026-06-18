@@ -12,8 +12,8 @@ on:
       - 'packages/protocol/contracts-0.8/**'
       - 'packages/protocol/lib/**'
       - 'packages/protocol/scripts/**'
-      - '!packages/protocol/scripts/foundry/**'  
-      - '!packages/protocol/scripts/truffle/**' 
+      - '!packages/protocol/scripts/foundry/**'
+      - '!packages/protocol/scripts/truffle/**'
 
   # pull requests result in dry runs, since no git tag is present unless current branch folllows release branch pattern
   pull_request:
@@ -24,8 +24,7 @@ on:
       - 'packages/protocol/contracts-0.8/**'
       - 'packages/protocol/lib/**'
       - 'packages/protocol/scripts/**'
-      - '!packages/protocol/scripts/foundry/**'  
-      - '!packages/protocol/scripts/truffle/**'  
+      - '!packages/protocol/scripts/foundry/**'
      
   release:
     types: [released]
@@ -41,7 +40,9 @@ permissions:
 
 jobs:
   publish:
-    runs-on: ['self-hosted', 'org', 'npm-publish']
+    # github-hosted runner required: npm OIDC trusted publishing auto-enables
+    # sigstore provenance, which is only supported on github-hosted runners.
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       id-token: write
@@ -51,20 +52,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Akeyless Get Secrets
-        id: get_auth_token
-        uses: docker://us-west1-docker.pkg.dev/devopsre/akeyless-public/akeyless-action:latest
-        with:
-          api-url: https://api.gateway.akeyless.celo-networks-dev.org
-          access-id: p-kf9vjzruht6l
-          static-secrets: '{"/static-secrets/NPM/npm-publish-token":"NPM_TOKEN"}'
-
-      # Setup .npmrc file to publish to npm
+      # Publishing uses npm OIDC trusted publishing (configured on npmjs for
+      # @celo/contracts and @celo/abis -> celo-org/celo-monorepo /
+      # publish-contracts-abi-release.yml), so no long-lived npm token is required.
       - uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
-          #scope: '@celo'
+
+      - name: Update npm for OIDC trusted publishing
+        run: npm install -g npm@latest
 
       - name: 'Setup yarn'
         shell: bash
@@ -75,6 +72,16 @@ jobs:
       - name: 'Install packages'
         shell: bash
         run: yarn
+
+      - name: Install Foundry
+        # foundry-toolchain v1.7.0 https://github.com/foundry-rs/foundry-toolchain/releases/tag/v1.7.0
+        uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
+        with:
+          # TODO: Standardize Foundry version across workflows https://github.com/celo-org/celo-monorepo/issues/11714
+          version: 'v1.0.0'
+      - name: Install forge dependencies
+        working-directory: packages/protocol
+        run: forge install
 
       - name: Determine release type and version (or dry run)
         # This is what sets the RELEASE_TYPE and RELEASE_VERSION env variables
@@ -104,35 +111,37 @@ jobs:
       - name: Publish @celo/contracts
         run: |
           cat package.json
-          npm publish $RELEASE_TYPE $DRY_RUN
+          npm publish $RELEASE_TYPE $DRY_RUN --access public
           echo 'tagging version' $RELEASE_VERSION 'with commit hash' $COMMIT_HASH
           if [ -n "$DRY_RUN" ]; then
             echo "Dry run mode, exiting successfully."
             exit 0
           fi
-          npm dist-tag add @celo/contracts@$RELEASE_VERSION $COMMIT_HASH              
-        working-directory: packages/protocol/contracts
+          # OIDC trusted publishing authorizes `npm publish`; the dist-tag write may
+          # not be covered, so don't fail the release if the commit-hash tag can't be set.
+          npm dist-tag add @celo/contracts@$RELEASE_VERSION $COMMIT_HASH || echo "::warning::npm dist-tag add failed; $RELEASE_VERSION published but commit-hash tag not set"
+        working-directory: packages/protocol/contracts-package-abi
         env:
           RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
           DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
           COMMIT_HASH: ${{ env.COMMIT_HASH }}
 
       - name: Publish @celo/abis
         run: |
           cat package.json
-          npm publish $RELEASE_TYPE $DRY_RUN
+          npm publish $RELEASE_TYPE $DRY_RUN --access public
           echo 'tagging version' $RELEASE_VERSION 'with commit hash' $COMMIT_HASH
           if [ -n "$DRY_RUN" ]; then
             echo "Dry run mode, exiting successfully."
             exit 0
           fi
-          npm dist-tag add @celo/abis@$RELEASE_VERSION $COMMIT_HASH          
+          # OIDC trusted publishing authorizes `npm publish`; the dist-tag write may
+          # not be covered, so don't fail the release if the commit-hash tag can't be set.
+          npm dist-tag add @celo/abis@$RELEASE_VERSION $COMMIT_HASH || echo "::warning::npm dist-tag add failed; $RELEASE_VERSION published but commit-hash tag not set"
         working-directory: packages/protocol/abis
         env:
           RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
           DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
           COMMIT_HASH: ${{ env.COMMIT_HASH }}

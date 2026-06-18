@@ -5,7 +5,6 @@ import {
 import { getReleaseVersion } from '../../lib/compatibility/ignored-contracts-v9'
 
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 
 import { instantiateArtifactsFromForge } from '@celo/protocol/lib/compatibility/utils'
 import { existsSync, readJsonSync, writeJsonSync } from 'fs-extra'
@@ -30,6 +29,14 @@ import * as viemChains from 'viem/chains'
  *   --librariesFile: The file to which linked library addresses will be
  *   written (default: "libraries.json").
  */
+
+export interface ProposalTx {
+  contract: string
+  function: string
+  args: string[]
+  value: string
+  description?: string
+}
 
 const argv = require('minimist')(process.argv.slice(2), {
   string: ['build_artifacts', 'proposal', 'initialize_data', 'network', 'librariesFile', 'branch'],
