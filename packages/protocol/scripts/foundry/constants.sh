@@ -61,12 +61,9 @@ export CELO_UNRELEASED_TREASURY_INITIAL_BALANCE="$(($GOLD_TOKEN_CELO_SUPPLY_CAP 
 export RESERVE_INITIAL_BALANCE="5000000" # setting this here because it gets overwritten in the L2 migration script
 
 # Contract libraries
-export LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
-                "contracts/common/Signatures.sol:Signatures"
-                "contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList"
-                "contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"
-                "contracts/governance/Proposals.sol:Proposals"
-)
+# All core implementations are now Solidity 0.8, so there are no 0.5 linked libraries
+# left to deploy; the 0.8 libraries are in LIBRARIES_PATH_08.
+export LIBRARIES_PATH=()
 
 export LIBRARIES_PATH_08=("contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
                 "contracts-0.8/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
@@ -76,10 +73,7 @@ export LIBRARIES_PATH_08=("contracts-0.8/common/linkedlists/AddressLinkedList.so
 
 export LIBRARY_DEPENDENCIES_PATH=(
   "contracts/common/FixidityLib.sol"
-  "contracts/common/linkedlists/LinkedList.sol"
   "contracts-0.8/common/linkedlists/LinkedList.sol"
-  "contracts/common/linkedlists/SortedLinkedList.sol"
-  "contracts/common/linkedlists/SortedLinkedListWithMedian.sol"
   "contracts-0.8/common/linkedlists/SortedLinkedList.sol"
   "contracts-0.8/common/linkedlists/SortedLinkedListWithMedian.sol"
   "lib/openzeppelin-contracts/contracts/math/SafeMath.sol"
