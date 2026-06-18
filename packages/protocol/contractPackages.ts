@@ -66,6 +66,7 @@ export const SOLIDITY_08_PACKAGE = {
     'EpochRewards',
     'Attestations',
     'LockedGold',
+    'ReleaseGold',
   ],
   proxyContracts: [
     'GasPriceMinimumProxy',

@@ -12,7 +12,6 @@ import "@test-sol/unit/common/CeloTokenMock.sol";
 // LockedGold has been migrated to 0.8 and is deployed via deployCodeTo; interact through the
 // standalone test interface below.
 import { ILockedGoldTest } from "@test-sol/unit/governance/voting/interfaces/ILockedGoldTest.sol";
-import "@celo-contracts/governance/ReleaseGold.sol";
 import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/stability/test/MockStableToken.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
@@ -31,7 +30,6 @@ contract LockedGoldTest is TestWithUtils {
   MockGovernance governance;
   MockValidators validators;
   ILockedGoldTest lockedGold;
-  ReleaseGold releaseGold;
 
   uint256 HOUR = 60 * 60;
   uint256 DAY = 24 * HOUR;

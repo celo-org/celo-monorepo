@@ -11,7 +11,7 @@ import "@celo-contracts/governance/interfaces/IValidators.sol";
 
 import "@celo-contracts/governance/Election.sol";
 import { ILockedGoldTest } from "@test-sol/unit/governance/voting/interfaces/ILockedGoldTest.sol";
-import "@celo-contracts/governance/ReleaseGold.sol";
+import "@celo-contracts/governance/interfaces/IReleaseGold.sol";
 
 import "@celo-contracts/stability/test/MockStableToken.sol";
 import "@celo-contracts/governance/Election.sol";
@@ -36,7 +36,7 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
   ILockedGoldTest lockedGold;
   Governance governance;
   IGoldTokenTest goldToken;
-  ReleaseGold releaseGold;
+  IReleaseGold releaseGold;
 
   address owner;
   address accApprover;
@@ -165,7 +165,6 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
     address goldTokenAddress = actor("goldToken");
     deployCodeTo("GoldToken.sol", abi.encode(true), goldTokenAddress);
     goldToken = IGoldTokenTest(goldTokenAddress);
-    releaseGold = new ReleaseGold(true);
 
     registry.setAddressFor(AccountsContract, address(accounts));
     registry.setAddressFor(ElectionContract, address(election));
@@ -180,7 +179,9 @@ contract RevokeCeloAfterL2Transition is TestWithUtils, ECDSAHelper {
 
     accounts.initialize(REGISTRY_ADDRESS);
 
-    releaseGold = new ReleaseGold(true);
+    address releaseGoldAddress = actor("releaseGoldInstance");
+    deployCodeTo("ReleaseGoldCompile", releaseGoldAddress);
+    releaseGold = IReleaseGold(releaseGoldAddress);
 
     releaseGoldInitParams = ReleaseGoldMockTunnel.InitParams({
       releaseStartTime: block.timestamp + 5 * MINUTE,

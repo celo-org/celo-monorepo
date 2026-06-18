@@ -1,19 +1,26 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/Math.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
-import "openzeppelin-solidity/contracts/utils/Address.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts8/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts8/utils/Address.sol";
 
-import "./interfaces/IReleaseGold.sol";
+import "../../contracts/governance/interfaces/IReleaseGold.sol";
 
-import "../common/FixidityLib.sol";
-import "../common/libraries/ReentrancyGuard.sol";
-import "../common/Initializable.sol";
+import "../../contracts/common/FixidityLib.sol";
+import "../../contracts/common/libraries/ReentrancyGuard.sol";
+import "../../contracts/common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 
-contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializable {
+// Note: The inheritance order below is load-bearing. It must linearize to
+// Ownable -> UsingRegistry -> ReentrancyGuard -> Initializable so that the
+// inherited storage prefix is `_owner`(slot 0) -> `registry`(slot 1) ->
+// `_guardCounter`(slot 2) -> `initialized`(slot 3, packed with `beneficiary`),
+// matching the deployed 0.5 layout byte-for-byte.
+contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseGold {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
   using Address for address payable; // prettier-ignore
@@ -42,8 +49,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     uint256 revokeTime;
   }
 
-  // uint256(-1) == 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-  uint256 internal constant MAX_UINT = uint256(-1);
+  uint256 internal constant MAX_UINT = type(uint256).max;
 
   // Duration (in seconds) after gold is fully released
   // when gold should be switched back to control of releaseOwner.
@@ -138,9 +144,9 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   modifier onlyWhenInProperState() {
-    bool isRevoked = isRevoked();
+    bool revoked = isRevoked();
     require(
-      (msg.sender == releaseOwner && isRevoked) || (msg.sender == beneficiary && !isRevoked),
+      (msg.sender == releaseOwner && revoked) || (msg.sender == beneficiary && !revoked),
       "Must be called by releaseOwner when revoked or beneficiary before revocation"
     );
     _;
@@ -162,77 +168,107 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
+
+  // Grouped into two structs to stay within the non-IR compiler's stack limit (16 slots).
+  struct InitParams {
+    // The time (in Unix time) at which point releasing starts.
+    uint256 releaseStartTime;
+    // Duration (in seconds) after `releaseStartTime` of the golds' cliff.
+    uint256 releaseCliffTime;
+    // Number of releasing periods.
+    uint256 numReleasePeriods;
+    // Duration (in seconds) of each release period.
+    uint256 releasePeriod;
+    // The released gold amount per period.
+    uint256 amountReleasedPerPeriod;
+    // Whether the release schedule is revocable or not.
+    bool revocable;
+    // Address of the beneficiary to whom released tokens are transferred.
+    address payable beneficiary;
+  }
+
+  struct InitParams2 {
+    // Address capable of revoking, setting the liquidity provision and setting the withdrawal
+    // amount. 0x0 if grant is not subject to these operations.
+    address releaseOwner;
+    // Address that receives refunded funds if contract is revoked. 0x0 if not revocable.
+    address payable refundAddress;
+    // If this schedule is subject to a liquidity provision.
+    bool subjectToLiquidityProvision;
+    // Amount in range [0, 1000] (3 significant figures) indicating % of total balance available.
+    uint256 initialDistributionRatio;
+    // If this schedule's gold can be used for validating.
+    bool canValidate;
+    // If this schedule's gold can be used for voting.
+    bool canVote;
+    // Address of the deployed contracts registry.
+    address registryAddress;
+  }
 
   /**
    * @notice A constructor for initialising a new instance of a Releasing Schedule contract.
-   * @param releaseStartTime The time (in Unix time) at which point releasing starts.
-   * @param releaseCliffTime Duration (in seconds) after `releaseStartTime` of the golds' cliff.
-   * @param numReleasePeriods Number of releasing periods.
-   * @param releasePeriod Duration (in seconds) of each release period.
-   * @param amountReleasedPerPeriod The released gold amount per period.
-   * @param revocable Whether the release schedule is revocable or not.
-   * @param _beneficiary Address of the beneficiary to whom released tokens are transferred.
-   * @param _releaseOwner Address capable of revoking, setting the liquidity provision
-   *                      and setting the withdrawal amount.
-   *                      0x0 if grant is not subject to these operations.
-   * @param _refundAddress Address that receives refunded funds if contract is revoked.
-   *                       0x0 if contract is not revocable.
-   * @param subjectToLiquidityProvision If this schedule is subject to a liquidity provision.
-   * @param initialDistributionRatio Amount in range [0, 1000] (3 significant figures)
-   *                                 indicating % of total balance available for distribution.
-   * @param _canValidate If this schedule's gold can be used for validating.
-   * @param _canVote If this schedule's gold can be used for voting.
-   * @param registryAddress Address of the deployed contracts registry.
+   * @param params First group of init parameters (schedule timing and beneficiary).
+   * @param params2 Second group of init parameters (ownership, distribution, and permissions).
+   * @dev Parameters are split into two structs to stay within the non-IR compiler's stack limit.
    */
-  function initialize(
-    uint256 releaseStartTime,
-    uint256 releaseCliffTime,
-    uint256 numReleasePeriods,
-    uint256 releasePeriod,
-    uint256 amountReleasedPerPeriod,
-    bool revocable,
-    address payable _beneficiary,
-    address _releaseOwner,
-    address payable _refundAddress,
-    bool subjectToLiquidityProvision,
-    uint256 initialDistributionRatio,
-    bool _canValidate,
-    bool _canVote,
-    address registryAddress
-  ) external initializer {
+  function initialize(InitParams calldata params, InitParams2 calldata params2) external initializer {
     _transferOwnership(msg.sender);
-    releaseSchedule.numReleasePeriods = numReleasePeriods;
-    releaseSchedule.amountReleasedPerPeriod = amountReleasedPerPeriod;
-    releaseSchedule.releasePeriod = releasePeriod;
-    releaseSchedule.releaseCliff = releaseStartTime.add(releaseCliffTime);
-    releaseSchedule.releaseStartTime = releaseStartTime;
+    _initSchedule(params, params2.canValidate);
+    _initOwnership(params, params2);
+    _initDistribution(params2.initialDistributionRatio, params2.subjectToLiquidityProvision);
+    canValidate = params2.canValidate;
+    canVote = params2.canVote;
+    emit ReleaseGoldInstanceCreated(beneficiary, address(this));
+  }
+
+  /**
+   * @dev Sets up the release schedule fields and validates timing/beneficiary params.
+   */
+  function _initSchedule(InitParams calldata params, bool _canValidate) private {
+    releaseSchedule.numReleasePeriods = params.numReleasePeriods;
+    releaseSchedule.amountReleasedPerPeriod = params.amountReleasedPerPeriod;
+    releaseSchedule.releasePeriod = params.releasePeriod;
+    releaseSchedule.releaseCliff = params.releaseStartTime.add(params.releaseCliffTime);
+    releaseSchedule.releaseStartTime = params.releaseStartTime;
     // Expiry is opt-in for folks who can validate, opt-out for folks who cannot.
     // This is because folks who are running Validators or Groups are likely to want to keep
     // CELO in the ReleaseGold contract even after it becomes withdrawable.
-    revocationInfo.canExpire = !canValidate;
+    revocationInfo.canExpire = !_canValidate;
     require(releaseSchedule.numReleasePeriods >= 1, "There must be at least one releasing period");
     require(
       releaseSchedule.amountReleasedPerPeriod > 0,
       "The released amount per period must be greater than zero"
     );
     require(
-      _beneficiary != address(0),
+      params.beneficiary != address(0),
       "The release schedule beneficiary cannot be the zero address"
     );
-    require(registryAddress != address(0), "The registry address cannot be the zero address");
-    require(!(revocable && _canValidate), "Revocable contracts cannot validate");
-    require(initialDistributionRatio <= 1000, "Initial distribution ratio out of bounds");
+  }
+
+  /**
+   * @dev Sets up ownership, registry, revocation, and permission fields.
+   */
+  function _initOwnership(InitParams calldata params, InitParams2 calldata params2) private {
+    require(params2.registryAddress != address(0), "The registry address cannot be the zero address");
+    require(!(params.revocable && params2.canValidate), "Revocable contracts cannot validate");
     require(
-      (revocable && _refundAddress != address(0)) || (!revocable && _refundAddress == address(0)),
+      (params.revocable && params2.refundAddress != address(0)) ||
+        (!params.revocable && params2.refundAddress == address(0)),
       "If contract is revocable there must be an address to refund"
     );
-    setRegistry(registryAddress);
-    _setBeneficiary(_beneficiary);
-    revocationInfo.revocable = revocable;
-    releaseOwner = _releaseOwner;
-    refundAddress = _refundAddress;
+    setRegistry(params2.registryAddress);
+    _setBeneficiary(params.beneficiary);
+    revocationInfo.revocable = params.revocable;
+    releaseOwner = params2.releaseOwner;
+    refundAddress = params2.refundAddress;
+  }
 
+  /**
+   * @dev Sets up the distribution limit fields.
+   */
+  function _initDistribution(uint256 initialDistributionRatio, bool subjectToLiquidityProvision) private {
+    require(initialDistributionRatio <= 1000, "Initial distribution ratio out of bounds");
     if (initialDistributionRatio < 1000) {
       // Cannot use `getTotalBalance()` here because the factory has not yet sent the gold.
       uint256 totalGrant = releaseSchedule.amountReleasedPerPeriod.mul(
@@ -243,13 +279,10 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     } else {
       maxDistribution = MAX_UINT;
     }
-    liquidityProvisionMet = (subjectToLiquidityProvision) ? false : true;
-    canValidate = _canValidate;
-    canVote = _canVote;
-    emit ReleaseGoldInstanceCreated(beneficiary, address(this));
+    liquidityProvisionMet = subjectToLiquidityProvision ? false : true;
   }
 
-  function() external payable {}
+  receive() external payable {}
 
   /**
    * @notice Wrapper function for stable token transfer function.
@@ -594,7 +627,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @param value The value of gold to be locked.
    */
   function lockGold(uint256 value) external nonReentrant onlyBeneficiaryAndNotRevoked {
-    getLockedGold().lock.gas(gasleft()).value(value)();
+    getLockedGold().lock{ gas: gasleft(), value: value }();
   }
 
   /**

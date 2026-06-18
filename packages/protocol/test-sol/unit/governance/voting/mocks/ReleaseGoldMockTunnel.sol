@@ -2,11 +2,11 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "@celo-contracts/governance/ReleaseGold.sol";
+import "@celo-contracts/governance/interfaces/IReleaseGold.sol";
 import { Test as ForgeTest } from "forge-std/Test.sol";
 
 contract ReleaseGoldMockTunnel is ForgeTest {
-  ReleaseGold private releaseGoldTunnel;
+  IReleaseGold private releaseGoldTunnel;
   address payable releaseGoldContractAddress;
 
   struct InitParams {
@@ -31,7 +31,7 @@ contract ReleaseGoldMockTunnel is ForgeTest {
 
   constructor(address _releaseGoldContractAddress) public {
     releaseGoldContractAddress = address(uint160(_releaseGoldContractAddress));
-    releaseGoldTunnel = ReleaseGold(releaseGoldContractAddress);
+    releaseGoldTunnel = IReleaseGold(releaseGoldContractAddress);
   }
 
   function MockInitialize(
@@ -39,9 +39,12 @@ contract ReleaseGoldMockTunnel is ForgeTest {
     InitParams calldata params,
     InitParams2 calldata params2
   ) external returns (bool, bytes memory) {
+    // initialize(InitParams,InitParams2) where:
+    //   InitParams  = (uint256,uint256,uint256,uint256,uint256,bool,address)
+    //   InitParams2 = (address,address,bool,uint256,bool,bool,address)
     bytes4 selector = bytes4(
       keccak256(
-        "initialize(uint256,uint256,uint256,uint256,uint256,bool,address,address,address,bool,uint256,bool,bool,address)"
+        "initialize((uint256,uint256,uint256,uint256,uint256,bool,address),(address,address,bool,uint256,bool,bool,address))"
       )
     );
 
