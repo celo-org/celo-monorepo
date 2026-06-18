@@ -37,9 +37,27 @@ The Celo L2 sequencer collects transaction fees in two on-chain contracts:
 | File | Purpose |
 |------|---------|
 | `report.py` | Main entry point. P&L report + operator action plan. |
+| `execute-withdrawals.sh` | Runs steps [1]+[2] (`withdraw` + `handleAll` + `distribute` each stable) with reconciliation. Fork mode by default; mainnet is guarded. |
 | `prepare-safe-batch.py` | Generates a Safe Transaction Builder JSON batch for step [4]. |
 | `dune_sequencer_fees.sql` | Reference copy of the Dune query (`6898547`). |
 | `ALGORITHM.md` | Full algorithm documentation. |
+
+### Running steps [1]+[2]
+
+```bash
+# Safe: fork Celo mainnet, run with a throwaway key, reconcile every balance
+./execute-withdrawals.sh --fork
+
+# Mainnet (irreversible): guarded — needs a clean key + explicit opt-in
+EXECUTE_MAINNET=1 PK=<clean-key> RPC_URL=https://forno.celo.org \
+  ./execute-withdrawals.sh --mainnet
+```
+
+The script drains the vault (native CELO) and the FeeHandler (CELO + all five
+stablecoins) to the Operations Safe, then asserts: vault CELO == 0, each
+FeeHandler stablecoin == 0, and each Safe stablecoin grew by exactly the
+FeeHandler amount. Exit code 0 only if every check passes. It does **not** touch
+Governance — that is the 2-of-5 Safe batch (step [4]).
 
 ## Prerequisites
 
