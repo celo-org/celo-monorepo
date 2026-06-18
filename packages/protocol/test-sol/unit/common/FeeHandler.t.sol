@@ -284,6 +284,22 @@ contract FeeHandlerTest_changeOtherBeneficiaryAllocation is FeeHandlerTest {
     feeHandler.changeOtherBeneficiaryAllocation(op, (30 * 1e24) / 100);
     (uint256 fraction, , ) = feeHandler.getOtherBeneficiariesInfo(op);
     assertEq(fraction, (30 * 1e24) / 100);
+    // The running total must reflect the new fraction, not old+new. op is the only other
+    // beneficiary, so the total of others must equal its updated 30% (with the prior bug
+    // it would be 20% + 30% = 50%).
+    assertEq(
+      feeHandler.getTotalFractionOfOtherBeneficiariesAndCarbon(),
+      feeHandler.getCarbonFraction() + (30 * 1e24) / 100
+    );
+  }
+
+  function test_canIncreaseAllocationPastPriorPlusNew() public {
+    // With the bug, changing op from 20% to 90% double-counts the prior 20%, pushing the
+    // running total to 110% and reverting in checkTotalBeneficiary. The fix subtracts the
+    // prior fraction first, so 90% is valid.
+    feeHandler.changeOtherBeneficiaryAllocation(op, (90 * 1e24) / 100);
+    (uint256 fraction, , ) = feeHandler.getOtherBeneficiariesInfo(op);
+    assertEq(fraction, (90 * 1e24) / 100);
   }
 
   function test_Reverts_WHenBeneficiaryNotExists() public {

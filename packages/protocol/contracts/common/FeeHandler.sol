@@ -529,7 +529,13 @@ contract FeeHandler is
   ) internal {
     Beneficiary storage beneficiary = otherBeneficiaries[beneficiaryAddress];
     require(beneficiary.exists, "Beneficiary not found");
-    totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries.add(newFraction);
+    // Subtract the beneficiary's previously stored fraction before adding the new one.
+    // For addOtherBeneficiary the stored fraction is 0 (no-op); for setBeneficiaryFraction
+    // and changeOtherBeneficiaryAllocation it carries the prior value, so adding without
+    // subtracting would double-count it in the running total.
+    totalFractionOfOtherBeneficiaries = totalFractionOfOtherBeneficiaries
+      .subtract(beneficiary.fraction)
+      .add(newFraction);
     checkTotalBeneficiary();
     beneficiary.fraction = newFraction;
     emit BeneficiaryFractionSet(beneficiaryAddress, newFraction.unwrap());
