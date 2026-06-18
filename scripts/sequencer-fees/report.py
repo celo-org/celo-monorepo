@@ -610,6 +610,49 @@ def timestamp_to_block(ts: int, rpc: str) -> str:
     return cast_cmd(["cast", "find-block", "--rpc-url", rpc, str(ts)])
 
 
+class DuneRunError(Exception):
+    """Raised when a one-shot Dune SQL run fails or times out (as opposed to
+    completing successfully with zero rows)."""
+
+
+def dune_run_sql(api_key: str, sql: str, name: str, poll_secs: int = 3, max_polls: int = 60) -> list:
+    """Create, execute, and fetch a one-shot Dune query — deterministically.
+
+    Results are tied to THIS execution_id (not the query's latest execution), and
+    a not-finished execution raises DuneRunError rather than returning stale/empty
+    rows. An empty list means the query completed with zero rows (a real answer);
+    any failure raises so callers never silently use a wrong fallback.
+    """
+    create_resp = dune_request("/query", api_key, method="POST", body={
+        "name": name, "query_sql": sql, "is_private": False,
+    })
+    qid = create_resp.get("query_id")
+    if not qid:
+        raise DuneRunError("could not create Dune query")
+
+    exec_id = dune_request(f"/query/{qid}/execute", api_key, method="POST").get("execution_id")
+    if not exec_id:
+        raise DuneRunError("could not start Dune execution")
+
+    state = ""
+    for _ in range(max_polls):
+        status = dune_request(f"/execution/{exec_id}/status", api_key)
+        if status.get("is_execution_finished"):
+            state = status.get("state", "")
+            break
+        time.sleep(poll_secs)
+    else:
+        raise DuneRunError(f"execution {exec_id} did not finish in {poll_secs * max_polls}s")
+
+    if state != "QUERY_STATE_COMPLETED":
+        raise DuneRunError(f"execution {exec_id} ended in state {state}")
+
+    # Fetch results for THIS execution (not /query/{qid}/results, which returns
+    # the latest execution and can be stale or from a different run).
+    results = dune_request(f"/execution/{exec_id}/results", api_key)
+    return results.get("result", {}).get("rows", [])
+
+
 def suggest_date_range(rpc: str, api_key: str = None) -> tuple:
     """Suggest a date range: day after last withdrawal to yesterday.
 
@@ -627,46 +670,23 @@ def suggest_date_range(rpc: str, api_key: str = None) -> tuple:
 def _suggest_via_dune(api_key: str, yesterday: str) -> tuple:
     """Find last vault withdrawal using Dune API."""
     try:
-        # Create a temp query to find the last withdrawal
-        create_resp = dune_request("/query", api_key, method="POST", body={
-            "name": "tmp_last_vault_withdrawal",
-            "query_sql": (
-                "SELECT block_time FROM celo.logs "
-                "WHERE contract_address = 0x4200000000000000000000000000000000000011 "
-                "AND topic0 = 0x38e04cbeb8c10f8f568618aa75be0f10b6729b8b4237743b4de20cbcde2839ee "
-                "ORDER BY block_number DESC LIMIT 1"
-            ),
-            "is_private": False,
-        })
-        qid = create_resp.get("query_id")
-        if not qid:
-            return L2_GENESIS_DATE, yesterday, "could not create Dune query"
+        rows = dune_run_sql(api_key, (
+            "SELECT block_time FROM celo.logs "
+            "WHERE contract_address = 0x4200000000000000000000000000000000000011 "
+            "AND topic0 = 0x38e04cbeb8c10f8f568618aa75be0f10b6729b8b4237743b4de20cbcde2839ee "
+            "ORDER BY block_number DESC LIMIT 1"
+        ), "tmp_last_vault_withdrawal")
+    except DuneRunError as e:
+        # Do NOT silently fall back to genesis — a wrong window corrupts every
+        # downstream amount. Surface the failure so the operator re-runs.
+        raise SystemExit(f"Error: Dune withdrawal lookup failed ({e}). Re-run; do not trust a guessed range.")
 
-        # Execute
-        exec_resp = dune_request(f"/query/{qid}/execute", api_key, method="POST")
-        exec_id = exec_resp.get("execution_id")
+    if not rows:
+        return L2_GENESIS_DATE, yesterday, "no prior withdrawals found, using L2 genesis"
 
-        # Wait
-        for _ in range(20):
-            status = dune_request(f"/execution/{exec_id}/status", api_key)
-            if status.get("is_execution_finished"):
-                break
-            time.sleep(3)
-
-        # Fetch result
-        results = dune_request(f"/query/{qid}/results", api_key)
-        rows = results.get("result", {}).get("rows", [])
-
-        if not rows:
-            return L2_GENESIS_DATE, yesterday, "no prior withdrawals found, using L2 genesis"
-
-        withdrawal_time = rows[0].get("block_time", "")[:10]
-        from_date = (dt.datetime.strptime(withdrawal_time, "%Y-%m-%d") + dt.timedelta(days=1)).strftime("%Y-%m-%d")
-
-        return from_date, yesterday, f"last withdrawal was on {withdrawal_time}"
-
-    except Exception as e:
-        return L2_GENESIS_DATE, yesterday, f"Dune auto-detect failed ({e}), using L2 genesis"
+    withdrawal_time = rows[0].get("block_time", "")[:10]
+    from_date = (dt.datetime.strptime(withdrawal_time, "%Y-%m-%d") + dt.timedelta(days=1)).strftime("%Y-%m-%d")
+    return from_date, yesterday, f"last withdrawal was on {withdrawal_time}"
 
 
 def _suggest_via_rpc(rpc: str, yesterday: str) -> tuple:
@@ -706,31 +726,21 @@ def _suggest_via_rpc(rpc: str, yesterday: str) -> tuple:
 
 
 def last_withdrawal_on_or_before(api_key: str, cutoff: str) -> str:
-    """Return date (YYYY-MM-DD) of the last vault Withdrawal on/before cutoff, or '' if none."""
-    try:
-        create_resp = dune_request("/query", api_key, method="POST", body={
-            "name": "tmp_last_withdrawal_before_cutoff",
-            "query_sql": (
-                "SELECT block_time FROM celo.logs "
-                "WHERE contract_address = 0x4200000000000000000000000000000000000011 "
-                "AND topic0 = 0x38e04cbeb8c10f8f568618aa75be0f10b6729b8b4237743b4de20cbcde2839ee "
-                f"AND block_time < TIMESTAMP '{cutoff}' + INTERVAL '1' day "
-                "ORDER BY block_number DESC LIMIT 1"
-            ),
-            "is_private": False,
-        })
-        qid = create_resp.get("query_id")
-        if not qid:
-            return ""
-        exec_id = dune_request(f"/query/{qid}/execute", api_key, method="POST").get("execution_id")
-        for _ in range(20):
-            if dune_request(f"/execution/{exec_id}/status", api_key).get("is_execution_finished"):
-                break
-            time.sleep(3)
-        rows = dune_request(f"/query/{qid}/results", api_key).get("result", {}).get("rows", [])
-        return rows[0].get("block_time", "")[:10] if rows else ""
-    except Exception:
-        return ""
+    """Return date (YYYY-MM-DD) of the last vault Withdrawal on/before cutoff.
+
+    Empty string means there genuinely are no withdrawals in range. A query
+    failure raises (via dune_run_sql) rather than returning '' — otherwise a
+    transient Dune flake would silently widen the sweep window to L2 genesis and
+    corrupt every downstream amount.
+    """
+    rows = dune_run_sql(api_key, (
+        "SELECT block_time FROM celo.logs "
+        "WHERE contract_address = 0x4200000000000000000000000000000000000011 "
+        "AND topic0 = 0x38e04cbeb8c10f8f568618aa75be0f10b6729b8b4237743b4de20cbcde2839ee "
+        f"AND block_time < TIMESTAMP '{cutoff}' + INTERVAL '1' day "
+        "ORDER BY block_number DESC LIMIT 1"
+    ), "tmp_last_withdrawal_before_cutoff")
+    return rows[0].get("block_time", "")[:10] if rows else ""
 
 
 def count_withdrawals_via_dune(api_key: str, date_from: str, date_to: str) -> tuple:
@@ -739,37 +749,23 @@ def count_withdrawals_via_dune(api_key: str, date_from: str, date_to: str) -> tu
     Returns (count, days_list) or (None, None) on failure.
     """
     try:
-        create_resp = dune_request("/query", api_key, method="POST", body={
-            "name": "tmp_vault_withdrawals_in_period",
-            "query_sql": (
-                "SELECT date_trunc('day', block_time) AS day, COUNT(*) AS n "
-                "FROM celo.logs "
-                "WHERE contract_address = 0x4200000000000000000000000000000000000011 "
-                "AND topic0 = 0x38e04cbeb8c10f8f568618aa75be0f10b6729b8b4237743b4de20cbcde2839ee "
-                f"AND block_time >= TIMESTAMP '{date_from}' "
-                f"AND block_time < TIMESTAMP '{date_to}' + INTERVAL '1' day "
-                "GROUP BY 1 ORDER BY 1"
-            ),
-            "is_private": False,
-        })
-        qid = create_resp.get("query_id")
-        if not qid:
-            return None, None
-
-        exec_resp = dune_request(f"/query/{qid}/execute", api_key, method="POST")
-        exec_id = exec_resp.get("execution_id")
-        for _ in range(20):
-            status = dune_request(f"/execution/{exec_id}/status", api_key)
-            if status.get("is_execution_finished"):
-                break
-            time.sleep(3)
-
-        rows = dune_request(f"/query/{qid}/results", api_key).get("result", {}).get("rows", [])
-        total = sum(int(r.get("n", 0)) for r in rows)
-        days = [r.get("day", "")[:10] for r in rows]
-        return total, days
-    except Exception:
+        rows = dune_run_sql(api_key, (
+            "SELECT date_trunc('day', block_time) AS day, COUNT(*) AS n "
+            "FROM celo.logs "
+            "WHERE contract_address = 0x4200000000000000000000000000000000000011 "
+            "AND topic0 = 0x38e04cbeb8c10f8f568618aa75be0f10b6729b8b4237743b4de20cbcde2839ee "
+            f"AND block_time >= TIMESTAMP '{date_from}' "
+            f"AND block_time < TIMESTAMP '{date_to}' + INTERVAL '1' day "
+            "GROUP BY 1 ORDER BY 1"
+        ), "tmp_vault_withdrawals_in_period")
+    except DuneRunError:
+        # Reconciliation is informational (--detail only); a flake here is
+        # non-fatal — report it as "could not check" rather than crashing.
         return None, None
+
+    total = sum(int(r.get("n", 0)) for r in rows)
+    days = [r.get("day", "")[:10] for r in rows]
+    return total, days
 
 
 def check_operations_during_period(date_from: str, date_to: str, rpc: str, computed: list = None, totals: dict = None, api_key: str = None, sweep_celo: float = 0.0, detail: bool = False) -> None:
