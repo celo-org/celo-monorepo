@@ -15,9 +15,37 @@ contract MigrationsConstants is TestConstants {
   string[] solidity08Contracts = [
     "CeloUnreleasedTreasury",
     "EpochManager",
+    "EpochManagerEnabler",
     "FeeCurrencyDirectory",
     "ScoreManager",
-    "Validators"
+    "Validators",
+    "Accounts",
+    "Attestations",
+    "BlockchainParameters",
+    "DoubleSigningSlasher",
+    "DowntimeSlasher",
+    "Election",
+    "EpochRewards",
+    "Escrow",
+    "FederatedAttestations",
+    "FeeCurrencyWhitelist",
+    "FeeHandler",
+    "FeeHandlerSeller",
+    "Freezer",
+    "GoldToken",
+    "Governance",
+    "GovernanceApproverMultiSig",
+    "GovernanceSlasher",
+    "LockedGold",
+    "MentoFeeHandlerSeller",
+    "MultiSig",
+    "OdisPayments",
+    "Random",
+    "Registry",
+    "ReleaseGold",
+    "ReleaseGoldMultiSig",
+    "SortedOracles",
+    "UniswapFeeHandlerSeller"
   ];
 
   // List of contracts that are expected to be in Registry.sol
