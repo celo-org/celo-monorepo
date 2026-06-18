@@ -1,10 +1,27 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+// 0.8 ports of the identity proxy test fixtures (were
+// contracts/identity/test/IdentityProxyTest.sol and MockAttestations.sol).
 
-/**
- * @title A mock Attestations for testing.
- */
+contract IdentityProxyTest {
+  address public lastAddress;
+  uint256 public x;
+  uint256 public amountLastPaid;
+
+  function callMe() external {
+    lastAddress = msg.sender;
+  }
+
+  function payMe() external payable {
+    amountLastPaid = msg.value;
+  }
+
+  function setX(uint256 _x) external {
+    x = _x;
+  }
+}
+
 contract MockAttestations {
   enum AttestationStatus {
     None,

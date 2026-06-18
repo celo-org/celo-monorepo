@@ -1,16 +1,26 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.8.7 <0.8.20;
 
-import "@celo-contracts/common/Proxy.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import { GetSetV0, GetSetV1, HasInitializer, MsgSenderCheck } from "@test-sol/unit/common/mocks/ProxyMocks08.sol";
 
-import "@celo-contracts/common/test/GetSetV0.sol";
-import "@celo-contracts/common/test/GetSetV1.sol";
-import "@celo-contracts/common/test/HasInitializer.sol";
-import "@celo-contracts/common/test/MsgSenderCheck.sol";
+// Proxy stays at Solidity 0.5; deployed here via deployCodeTo and used through a
+// minimal local interface.
+interface IProxy {
+  function _getOwner() external view returns (address);
+  function _getImplementation() external view returns (address);
+  function _setImplementation(address implementation) external;
+  function _setAndInitializeImplementation(
+    address implementation,
+    bytes calldata callbackData
+  ) external payable;
+  function _transferOwnership(address newOwner) external;
+}
 
-contract ProxyTest is TestWithUtils {
-  Proxy proxy;
+contract ProxyTest is TestWithUtils08 {
+  IProxy proxy;
+  address proxyAddress;
   GetSetV0 getSet;
   GetSetV0 proxiedGetSet;
 
@@ -18,9 +28,11 @@ contract ProxyTest is TestWithUtils {
   event ImplementationSet(address indexed implementation);
   event OwnerSet(address indexed owner);
 
-  function setUp() public {
+  function setUp() public virtual override {
     nonOwner = actor("nonOwner");
-    proxy = new Proxy();
+    proxyAddress = actor("proxy");
+    deployCodeTo("Proxy.sol", proxyAddress);
+    proxy = IProxy(proxyAddress);
     getSet = new GetSetV0();
     proxiedGetSet = new GetSetV0();
   }
@@ -72,10 +84,10 @@ contract ProxyTest_setAndInitializeImplementation is ProxyTest {
   HasInitializer hasInitializer;
   HasInitializer proxiedHasInitializer;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     hasInitializer = new HasInitializer();
-    proxiedHasInitializer = HasInitializer(address(proxy));
+    proxiedHasInitializer = HasInitializer(proxyAddress);
   }
 
   function test_ShouldAllowTheOwnerToSetAnImplementation() public {
@@ -161,7 +173,7 @@ contract ProxyTest_transferOwnership is ProxyTest {
 contract ProxyTest_fallback is ProxyTest {
   uint256 numberTotest = 42;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     proxy._setImplementation(address(getSet));
   }
@@ -190,7 +202,7 @@ contract ProxyTest_fallback is ProxyTest {
 
   function test_ShouldBeAbleToProxyToTheNewContract_AfterChangingTheImplementation() public {
     GetSetV1 getSet1 = new GetSetV1();
-    GetSetV1 proxiedGetSet1 = GetSetV1(address(proxy));
+    GetSetV1 proxiedGetSet1 = GetSetV1(proxyAddress);
     proxy._setImplementation(address(getSet1));
 
     proxiedGetSet1.set(numberTotest, "DON'T PANIC");

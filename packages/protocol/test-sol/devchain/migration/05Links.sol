@@ -1,8 +1,9 @@
 // This file exists only to force migration tests also compile below imported contracts.
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.8.7 <0.8.20;
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
-contract BlockchainParametersTest is TestWithUtils {
+contract BlockchainParametersTest is TestWithUtils08 {
   function test_dummy_test() public {}
 }

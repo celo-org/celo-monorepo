@@ -1,18 +1,28 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
-import "@celo-contracts/identity/IdentityProxy.sol";
-import "@celo-contracts/identity/IdentityProxyHub.sol";
-import "@celo-contracts/identity/test/IdentityProxyTest.sol";
-import "@celo-contracts/identity/test/MockAttestations.sol";
+import "celo-foundry-8/Test.sol";
+import { IdentityProxyTest, MockAttestations } from "@test-sol/unit/identity/mocks/IdentityProxyMocks08.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IRegistryInitializer.sol";
 
+// IdentityProxy / IdentityProxyHub stay at Solidity 0.5; deployed via deployCodeTo
+// and used through minimal local interfaces.
+interface IIdentityProxyHub {
+  function makeCall(
+    bytes32 identifier,
+    address destination,
+    bytes calldata encodedFunctionCall
+  ) external payable;
+  function getOrDeployIdentityProxy(bytes32 identifier) external returns (address);
+  function getIdentityProxy(bytes32 identifier) external view returns (address);
+  function setRegistry(address registryAddress) external;
+}
+
 contract IdentityProxyHubTest is Test {
-  IdentityProxy identityProxy;
+  IIdentityProxyHub identityProxyHub;
+  address identityProxyHubAddress;
   IdentityProxyTest identityProxyTest;
-  IdentityProxyHub identityProxyHub;
   MockAttestations mockAttestations;
   IRegistry registry;
 
@@ -21,11 +31,12 @@ contract IdentityProxyHubTest is Test {
   bytes32 identifier =
     keccak256("0x00000000000000000000000000000000000000000000000000000000babecafe");
 
-  function setUp() public {
-    identityProxy = new IdentityProxy();
+  function setUp() public virtual {
     identityProxyTest = new IdentityProxyTest();
-    identityProxyHub = new IdentityProxyHub();
     mockAttestations = new MockAttestations();
+    identityProxyHubAddress = actor("identityProxyHub");
+    deployCodeTo("IdentityProxyHub.sol", identityProxyHubAddress);
+    identityProxyHub = IIdentityProxyHub(identityProxyHubAddress);
     address registryAddress = actor("registry");
     deployCodeTo("Registry.sol", abi.encode(true), registryAddress);
     registry = IRegistry(registryAddress);
@@ -70,36 +81,32 @@ contract IdentityProxyHubTest is Test {
 }
 
 contract IdentityProxyTestGetIdenityProxy is IdentityProxyHubTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
   function test_ReturnsTheCorrectCREATE2Address() public {
-    bytes memory bytecode = type(IdentityProxy).creationCode;
-    address expectedAddress = computeCreate2Address(
-      identifier,
-      address(identityProxyHub),
-      bytecode
-    );
-    IdentityProxy identityProxyReturned = identityProxyHub.getOrDeployIdentityProxy(identifier);
-    assertEq(expectedAddress, address(identityProxyReturned));
+    bytes memory bytecode = vm.getCode("IdentityProxy.sol:IdentityProxy");
+    address expectedAddress = computeCreate2Address(identifier, identityProxyHubAddress, bytecode);
+    address identityProxyReturned = identityProxyHub.getOrDeployIdentityProxy(identifier);
+    assertEq(expectedAddress, identityProxyReturned);
   }
 
   function test_ReturnsTheAddressOfAnIdentityProxy() public {
-    IdentityProxy identityProxyReturned = identityProxyHub.getOrDeployIdentityProxy(identifier);
+    address identityProxyReturned = identityProxyHub.getOrDeployIdentityProxy(identifier);
     identityProxyHub.getOrDeployIdentityProxy(identifier);
 
     bytes memory deployedCode = vm.getDeployedCode("IdentityProxy.sol:IdentityProxy");
-    assertEq(deployedCode, at(address(identityProxyReturned)));
+    assertEq(deployedCode, at(identityProxyReturned));
   }
 }
 
 contract IdentityProxyTestMakeCall_Failures is IdentityProxyHubTest {
   address identityProxyAddress;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
-    identityProxyAddress = address(identityProxyHub.getOrDeployIdentityProxy(identifier));
+    identityProxyAddress = identityProxyHub.getOrDeployIdentityProxy(identifier);
   }
 
   function test_FailsToCallIfSenderDoesNotHaveAtLeast3AttestationCompletions() public {
@@ -154,10 +161,10 @@ contract IdentityProxyTestMakeCall_WhenCalledByContractRelatedToTheIdentifier is
 {
   address identityProxyAddress;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
-    identityProxyAddress = address(identityProxyHub.getOrDeployIdentityProxy(identifier));
+    identityProxyAddress = identityProxyHub.getOrDeployIdentityProxy(identifier);
 
     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
@@ -223,7 +230,7 @@ contract IdentityProxyTestMakeCall_WhenCalledByContractRelatedToTheIdentifier is
 
   function test_CanSendAPayment() public {
     uint256 balanceBefore = address(identityProxyTest).balance;
-    identityProxyHub.makeCall.value(100)(
+    identityProxyHub.makeCall{ value: 100 }(
       identifier,
       address(identityProxyTest),
       abi.encodeWithSignature("payMe()")

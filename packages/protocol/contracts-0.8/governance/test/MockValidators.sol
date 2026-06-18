@@ -1,18 +1,10 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-
-import "../interfaces/IValidators.sol";
-
-// Mocks Validators, compatible with 0.5
-// For forge tests, can be avoided with calls to deployCodeTo
-
-/**
- * @title Holds a list of addresses of validators
- */
-contract MockValidators is IValidators {
-  using SafeMath for uint256;
-
+// 0.8 port of the full Validators mock (was contracts/governance/test/MockValidators.sol).
+// Standalone (does not inherit IValidators) so it stays decoupled from interface churn;
+// the selectors match the IValidators surface the consumers call.
+contract MockValidators {
   event HavelSlashingMultiplierHalved(address validator);
   event ValidatorDeaffiliatedCalled(address validator);
 
@@ -30,6 +22,7 @@ contract MockValidators is IValidators {
   uint256 private numRegisteredValidators;
   mapping(address => uint256) private epochRewards;
   uint256 public mintedStable;
+  uint256 private _maxVoterRewardCommission;
 
   function updateEcdsaPublicKey(address, address, bytes calldata) external returns (bool) {
     return true;
@@ -133,7 +126,7 @@ contract MockValidators is IValidators {
 
   function getGroupsNumMembers(address[] calldata groups) external view returns (uint256[] memory) {
     uint256[] memory numMembers = new uint256[](groups.length);
-    for (uint256 i = 0; i < groups.length; i = i.add(1)) {
+    for (uint256 i = 0; i < groups.length; i++) {
       numMembers[i] = getGroupNumMembers(groups[i]);
     }
     return numMembers;
@@ -150,15 +143,13 @@ contract MockValidators is IValidators {
   function getTopGroupValidators(address group, uint256 n) public view returns (address[] memory) {
     require(n <= members[group].length);
     address[] memory validators = new address[](n);
-    for (uint256 i = 0; i < n; i = i.add(1)) {
+    for (uint256 i = 0; i < n; i++) {
       validators[i] = members[group][i];
     }
     return validators;
   }
 
   // Not implemented in mock, added here to support the interface
-  // without the interface, missing function erros get hard to debug
-
   function addFirstMember(address, address, address) external returns (bool) {
     revert("Method not implemented in mock");
   }
@@ -215,8 +206,6 @@ contract MockValidators is IValidators {
     revert("Method not implemented in mock");
   }
 
-  uint256 private _maxVoterRewardCommission;
-
   function setMaxVoterRewardCommission(uint256 maxCommission) external {
     _maxVoterRewardCommission = maxCommission;
   }
@@ -238,7 +227,7 @@ contract MockValidators is IValidators {
   }
 
   function mintStableToEpochManager(uint256 amount) external {
-    mintedStable = mintedStable.add(amount);
+    mintedStable = mintedStable + amount;
   }
 
   function maxGroupSize() external view returns (uint256) {
