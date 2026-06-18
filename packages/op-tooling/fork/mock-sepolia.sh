@@ -1,5 +1,5 @@
 #!/bin/sh
-RPC_URL=http://127.0.0.1:8545
+RPC_URL="${RPC_URL:-http://127.0.0.1:8545}"
 
 # ── Network Selection ───────────────────────────────────────
 [ -z "${NETWORK:-}" ] && echo "Need to set the NETWORK via env" && exit 1;

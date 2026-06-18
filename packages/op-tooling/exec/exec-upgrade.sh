@@ -7,17 +7,20 @@ set -euo pipefail
 # Examples:
 #   ./exec-upgrade.sh mainnet succ-v201
 #   ./exec-upgrade.sh sepolia succ-v210
+#   OPCM_ADDRESS=0x... ./exec-upgrade.sh chaos v4
+#   SUCCINCT_IMPL=0x... ./exec-upgrade.sh chaos succ-v2
 #
 # Supported:
 #   mainnet: v2, v3, v4, v5, succ-v1, succ-v102, succ-v2, succ-v201, succ-v210
 #   sepolia: v4, v5, succ-v2, succ-v210
+#   chaos:   v4, v5, succ-v2   (flat single-owner Safe; calldata built dynamically)
 
 # ─── Args ────────────────────────────────────────────────────
-NETWORK=${1:?Usage: $0 <mainnet|sepolia> <version>}
-VERSION=${2:?Usage: $0 <mainnet|sepolia> <version>}
+NETWORK=${1:?Usage: $0 <mainnet|sepolia|chaos> <version>}
+VERSION=${2:?Usage: $0 <mainnet|sepolia|chaos> <version>}
 case $NETWORK in
-  mainnet|sepolia) ;;
-  *) echo "Usage: $0 <mainnet|sepolia> <version>" && exit 1 ;;
+  mainnet|sepolia|chaos) ;;
+  *) echo "Usage: $0 <mainnet|sepolia|chaos> <version>" && exit 1 ;;
 esac
 
 # get repo root
@@ -243,11 +246,34 @@ case "${NETWORK}-${VERSION}" in
     CALLDATA=0x82ad56cb00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000057c45d82d1a995f1e135b8d7edc0a6bb5211cfaa00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000004414f6b1a3000000000000000000000000000000000000000000000000000000000000002a00000000000000000000000036ad817e6a273a05d6f7638bc3a68a0233b0c33e00000000000000000000000000000000000000000000000000000000
     ;;
 
+  "chaos-v4"|"chaos-v5")
+    USE_GC=false
+    [ -z "${OPCM_ADDRESS:-}" ] && echo "OPCM_ADDRESS env required for chaos $VERSION" >&2 && exit 1
+    REFUND_RECEIVER=0xa3A3a43E2de78070129C697A5CdCa0618B1f574d
+    CHAOS_SYSTEM_CONFIG=0x6baf5959cc06a39793c338e6586f49473c731b4c
+    CHAOS_PROXY_ADMIN=0xb2a0c2b49cdc2d3f0a0a291be0a6c20559ec053e
+    PRESTATE=$([ "$VERSION" = v4 ] && echo 0x03eb07101fbdeaf3f04d9fb76526362c1eea2824e4c6e970bdb19675b72e4fc8 || echo 0x03caa1871bb9fe7f9b11217c245c16e4ded33367df5b3ccb2c6d0a847a217d1b)
+    TARGET_ADDRESS=$OPCM_ADDRESS
+    CALLDATA=$(cast calldata 'upgrade((address,address,bytes32)[],bool)' "[($CHAOS_SYSTEM_CONFIG,$CHAOS_PROXY_ADMIN,$PRESTATE)]" true)
+    ;;
+  "chaos-succ-v2")
+    USE_GC=false
+    [ -z "${SUCCINCT_IMPL:-}" ] && echo "SUCCINCT_IMPL env required for chaos succ-v2" >&2 && exit 1
+    REFUND_RECEIVER=0xa3A3a43E2de78070129C697A5CdCa0618B1f574d
+    CHAOS_SYSTEM_CONFIG=0x6baf5959cc06a39793c338e6586f49473c731b4c
+    CHAOS_DGF=0x338ac809e6a045cfc8aeb16ff8a4329147b61afb
+    SC_OWNER_TARGET=${SC_OWNER_TARGET:-0x6F8DB5374003c9ffa7084d8b65c57655963766a9}
+    TARGET_ADDRESS=$MULTICALL3
+    SET_IMPL=$(cast calldata 'setImplementation(uint32,address)' 42 $SUCCINCT_IMPL)
+    XFER_OWN=$(cast calldata 'transferOwnership(address)' $SC_OWNER_TARGET)
+    CALLDATA=$(cast calldata 'aggregate3((address,bool,bytes)[])' "[($CHAOS_DGF,false,$SET_IMPL),($CHAOS_SYSTEM_CONFIG,false,$XFER_OWN)]")
+    ;;
   *)
     echo "Unsupported: $NETWORK-$VERSION" >&2
     echo "Supported:" >&2
     echo "  mainnet: v2, v3, v4, v5, succ-v1, succ-v102, succ-v2, succ-v201, succ-v210" >&2
     echo "  sepolia: v4, v5, succ-v2, succ-v210" >&2
+    echo "  chaos:   v4, v5, succ-v2" >&2
     exit 1
     ;;
 esac
@@ -318,6 +344,27 @@ safe_exec() {
     -r $RPC_URL \
     "$@"
 }
+
+# Chaos: flat Safe (single owner, threshold 1) -- direct sign + exec.
+# No nested approval chain; the deployer PK is the Safe's sole owner.
+# TARGET_ADDRESS and CALLDATA were built dynamically in the per-version case.
+if [ "$NETWORK" = "chaos" ]; then
+  CHAOS_SAFE=0x6F8DB5374003c9ffa7084d8b65c57655963766a9
+  CHAOS_NONCE=$(cast call $CHAOS_SAFE "nonce()(uint256)" -r $RPC_URL)
+  echo "--------- CHAOS ${VERSION} ---------"
+  echo "Safe:   $CHAOS_SAFE (nonce $CHAOS_NONCE)"
+  echo "Target: $TARGET_ADDRESS"
+  echo "Refund: $REFUND_RECEIVER"
+  echo "Calldata: ${CALLDATA:0:74}..."
+  CHAOS_TX_HASH=$(safe_tx_hash $CHAOS_SAFE $TARGET_ADDRESS "$CALLDATA" $OP_DELEGATECALL $CHAOS_NONCE)
+  echo "Tx hash: $CHAOS_TX_HASH"
+  CHAOS_SIG=$(cast wallet sign --no-hash $CHAOS_TX_HASH --private-key $PK)
+  echo "--- Exec ---"
+  safe_exec $CHAOS_SAFE $TARGET_ADDRESS "$CALLDATA" $OP_DELEGATECALL "$CHAOS_SIG" --gas-limit 16000000
+  echo "Upgrade executed"
+  echo "--------- EOF ---------"
+  exit 0
+fi
 
 # ─── Banner ──────────────────────────────────────────────────
 echo "--------- $(echo $NETWORK | tr '[:lower:]' '[:upper:]') $(echo $VERSION | tr '[:lower:]' '[:upper:]') ---------"

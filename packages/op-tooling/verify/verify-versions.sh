@@ -90,6 +90,26 @@ case "$NETWORK" in
     ;;
 esac
 
+# ── Dynamic topology discovery (post-upgrade aware) ─────────
+# After a v4+ upgrade, SystemConfig.superchainConfig() points to the NEW CeloSuperchainConfig
+# proxy (not the pre-v4 hardcoded one). Same for AnchorStateRegistry via PermissionedGame.
+# X-ray uses this live discovery; verify-versions mirrors the same strategy so it reports
+# correct post-upgrade state on a fork.
+ZERO_ADDR="0x0000000000000000000000000000000000000000"
+
+LIVE_CSC=$(cast call "$SYSTEM_CONFIG_PROXY" "superchainConfig()(address)" -r "$RPC_URL" 2>/dev/null || echo "")
+if [ -n "$LIVE_CSC" ] && [ "$LIVE_CSC" != "$ZERO_ADDR" ]; then
+  CELO_SUPERCHAIN_CONFIG_PROXY="$LIVE_CSC"
+fi
+
+LIVE_PG_IMPL=$(cast call "$DISPUTE_GAME_FACTORY_PROXY" "gameImpls(uint32)(address)" 1 -r "$RPC_URL" 2>/dev/null || echo "")
+if [ -n "$LIVE_PG_IMPL" ] && [ "$LIVE_PG_IMPL" != "$ZERO_ADDR" ]; then
+  LIVE_ASR=$(cast call "$LIVE_PG_IMPL" "anchorStateRegistry()(address)" -r "$RPC_URL" 2>/dev/null || echo "")
+  if [ -n "$LIVE_ASR" ] && [ "$LIVE_ASR" != "$ZERO_ADDR" ]; then
+    ANCHOR_STATE_REGISTRY_PROXY="$LIVE_ASR"
+  fi
+fi
+
 # ── Derived Addresses ──────────────────────────────────────
 PROXY_ADMIN_OWNER=$(cast call "$PROXY_ADMIN" "owner()(address)" -r "$RPC_URL" 2>/dev/null || echo "0x0000000000000000000000000000000000000000")
 

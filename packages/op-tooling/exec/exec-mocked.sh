@@ -69,7 +69,7 @@ if [ "$USE_INTERNAL_COUNCIL" = "true" ] && [[ $(to_lower "$MOCKED_SIGNER_3") > $
 fi
 
 # rpc
-RPC_URL=http://127.0.0.1:8545
+RPC_URL="${RPC_URL:-http://127.0.0.1:8545}"
 
 # defaults
 VALUE=0

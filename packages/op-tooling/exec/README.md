@@ -32,6 +32,7 @@ Unified runner for executing OPCM upgrade transactions through the complete mult
 - Unified runner for all historical and current upgrades
 - Supports positional arguments for network and version selection
 - Extensive support for Mainnet (8 versions) and Sepolia (4 versions)
+- Chaos support (3 versions: `v4`, `v5`, `succ-v2`) as a flat single-owner Safe (threshold 1) with calldata built dynamically at runtime
 - Handles both 2-tier and 3-tier nested Safe approval flows
 - Dynamic parent signature ordering based on network-specific Safe addresses
 - Per-version `REFUND_RECEIVER` configuration to maintain signature validity
@@ -49,6 +50,9 @@ PK=0x... RPC_URL=... ./exec-upgrade.sh <network> <version>
 **Optional Environment Variables:**
 
 - `RPC_URL` - RPC endpoint (defaults to `http://127.0.0.1:8545`)
+- `OPCM_ADDRESS` - Deployed v4/v5 OPCM address (required for chaos `v4`/`v5`)
+- `SUCCINCT_IMPL` - Succinct dispute game implementation address (required for chaos `succ-v2`)
+- `SC_OWNER_TARGET` - SystemConfig ownership transfer target (optional, chaos `succ-v2`; defaults to the flat Safe)
 
 **Version Matrix:**
 
@@ -67,6 +71,9 @@ PK=0x... RPC_URL=... ./exec-upgrade.sh <network> <version>
 | sepolia | v5 | 2-tier (1-of-2 children) | `0x5e60d…` | inline |
 | sepolia | succ-v2 | 2-tier (1-of-2 children) | `0x5e60d…` | inline |
 | sepolia | succ-v210 | 2-tier (1-of-2 children) | `0x5e60d…` | inline |
+| chaos | v4 | flat Safe (1-of-1) | `0xa3A3a…` | deployer PK (dynamic calldata) |
+| chaos | v5 | flat Safe (1-of-1) | `0xa3A3a…` | deployer PK (dynamic calldata) |
+| chaos | succ-v2 | flat Safe (1-of-1) | `0xa3A3a…` | deployer PK (dynamic calldata) |
 
 **Adding a New Upgrade:**
 
@@ -87,6 +94,10 @@ To add a new upgrade, paste a new `"network-version")` case block in `exec-upgra
 - **cLabs Safe**: `0x769b480A8036873a2a5EB01FE39278e5Ab78Bb27`
 - **Council Safe**: `0x3b00043E8C82006fbE5f56b47F9889a04c20c5d6`
 
+#### Chaos
+
+- **Flat Safe**: `0x6F8DB5374003c9ffa7084d8b65c57655963766a9` (single owner, threshold 1)
+
 **Examples:**
 
 ```bash
@@ -99,6 +110,10 @@ PK="0x..." ./exec-upgrade.sh mainnet succ-v201
 
 # Sepolia
 PK="0x..." ./exec-upgrade.sh sepolia succ-v210
+
+# Chaos (flat single-owner Safe; calldata built dynamically)
+PK=0x... RPC_URL=... OPCM_ADDRESS=0x... ./exec-upgrade.sh chaos v4
+PK=0x... RPC_URL=... SUCCINCT_IMPL=0x... ./exec-upgrade.sh chaos succ-v2
 ```
 
 ### `exec-basefee.sh`
@@ -240,6 +255,15 @@ Used by current upgrades (mainnet `v4`, `v5`, `succ-v2`, `succ-v201`, and all Se
 2. **cLabs Approval**: Approve Parent transaction
 3. **Parent Execution**: Execute upgrade via delegatecall
 
+### Chaos Flow (flat Safe, single owner)
+
+Used by chaos upgrades (`v4`, `v5`, `succ-v2`). The flat Safe has a single owner (the deployer) and threshold 1, so there is no nested Council/cLabs/Parent approval chain.
+
+1. **Build Calldata**: Construct calldata dynamically at runtime — OPCM `upgrade` for `v4`/`v5` (from `OPCM_ADDRESS`), or Multicall3 `aggregate3` for `succ-v2` (from `SUCCINCT_IMPL`)
+2. **Read Nonce**: Read the Safe nonce on-chain
+3. **Sign**: Deployer PK signs the Safe `getTransactionHash` directly (one ECDSA signature)
+4. **Execute**: `execTransaction` (threshold 1, no nested approvals)
+
 ### Direct cLabs Flow
 
 Used by `exec-basefee.sh` only.
@@ -264,7 +288,7 @@ Used by `exec-mocked.sh`.
 - **Base Gas**: 0
 - **Gas Price**: 0
 - **Gas Token**: Zero address
-- **Refund Receiver**: Per-version (see Version Matrix). Mainnet v2/v3 use zero address; mainnet v4+ use `0x95ffac...`; Sepolia uses `0x5e60d...`
+- **Refund Receiver**: Per-version (see Version Matrix). Mainnet v2/v3 use zero address; mainnet v4+ use `0x95ffac...`; Sepolia uses `0x5e60d...`; chaos uses `0xa3A3a...`
 
 ### Calldata Structure
 
@@ -273,6 +297,8 @@ Two formats are used depending on the upgrade:
 - **OPCM upgrade** (selector `0xa4589780`, used by v2/v3/v4/v5): `[chain configs array] + [system config proxy] + [proxy admin] + [prestate hash]`
 - **Multicall3 `aggregate3`** (selector `0x82ad56cb`, used by all succ-* and basefee): batched calls (e.g., `DGF.setImplementation`, `SystemConfig.transferOwnership`)
 
+On chaos the calldata is not hardcoded; it is built dynamically at runtime — from `OPCM_ADDRESS` for the v4/v5 OPCM `upgrade`, or from `SUCCINCT_IMPL` for the succ-v2 Multicall3 `aggregate3`.
+
 ## Network Support
 
 | Network    | Environment | Use Case                        |
@@ -280,6 +306,7 @@ Two formats are used depending on the upgrade:
 | Local Fork | Development | Testing with mocked environment |
 | Mainnet    | Production  | Live network upgrades           |
 | Sepolia    | Staging     | Pre-production validation       |
+| Chaos      | Local fork (test network) | Chaos testnet upgrades (flat Safe) |
 
 ## Notes
 

@@ -73,11 +73,7 @@ contract SECP256K1 {
     uint256 r = 1;
     uint256 bit = U255_MAX_PLUS_1;
     assembly {
-      for {
-
-      } gt(bit, 0) {
-
-      } {
+      for {} gt(bit, 0) {} {
         r := mulmod(mulmod(r, r, P), exp(_base, iszero(iszero(and(_exp, bit)))), P)
         r := mulmod(mulmod(r, r, P), exp(_base, iszero(iszero(and(_exp, div(bit, 2))))), P)
         r := mulmod(mulmod(r, r, P), exp(_base, iszero(iszero(and(_exp, div(bit, 4))))), P)
