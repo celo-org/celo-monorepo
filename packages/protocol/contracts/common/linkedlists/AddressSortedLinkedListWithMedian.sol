@@ -1,7 +1,6 @@
-// SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity ^0.5.13;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./SortedLinkedListWithMedian.sol";
 
@@ -150,8 +149,9 @@ library AddressSortedLinkedListWithMedian {
     bytes32[] memory byteKeys = list.getKeys();
     address[] memory keys = new address[](byteKeys.length);
     uint256[] memory values = new uint256[](byteKeys.length);
-    SortedLinkedListWithMedian.MedianRelation[]
-      memory relations = new SortedLinkedListWithMedian.MedianRelation[](keys.length);
+    // prettier-ignore
+    SortedLinkedListWithMedian.MedianRelation[] memory relations =
+      new SortedLinkedListWithMedian.MedianRelation[](keys.length);
     for (uint256 i = 0; i < byteKeys.length; i = i.add(1)) {
       keys[i] = toAddress(byteKeys[i]);
       values[i] = list.getValue(byteKeys[i]);
@@ -161,10 +161,10 @@ library AddressSortedLinkedListWithMedian {
   }
 
   function toBytes(address a) public pure returns (bytes32) {
-    return bytes32(uint256(uint160(a)) << 96);
+    return bytes32(uint256(a) << 96);
   }
 
   function toAddress(bytes32 b) public pure returns (address) {
-    return address(uint160(uint256(b) >> 96));
+    return address(uint256(b) >> 96);
   }
 }

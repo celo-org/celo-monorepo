@@ -19,10 +19,7 @@ interface IMockExchangeReserve {
 }
 
 interface IMockExchangeSortedOracles {
-  function medianRate(address token)
-    external
-    view
-    returns (uint256 numerator, uint256 denominator);
+  function medianRate(address token) external view returns (uint256 numerator, uint256 denominator);
 }
 
 interface IMockExchangeRegistry {
@@ -93,9 +90,7 @@ contract MockExchange08 {
 
   function activateStable() external onlyOwner {
     require(stable == address(0), "StableToken address already activated");
-    stable = registry.getAddressForOrDie(
-      keccak256(abi.encodePacked(stableTokenRegistryId))
-    );
+    stable = registry.getAddressForOrDie(keccak256(abi.encodePacked(stableTokenRegistryId)));
     _updateBuckets();
   }
 
@@ -112,17 +107,12 @@ contract MockExchange08 {
     return buyAmount;
   }
 
-  function getBuyTokenAmount(
-    uint256 sellAmount,
-    bool sellGold
-  ) external view returns (uint256) {
+  function getBuyTokenAmount(uint256 sellAmount, bool sellGold) external view returns (uint256) {
     (uint256 buyTokenBucket, uint256 sellTokenBucket) = _getBuyAndSellBuckets(sellGold);
     return _getBuyTokenAmount(buyTokenBucket, sellTokenBucket, sellAmount);
   }
 
-  function getBuyAndSellBuckets(
-    bool sellGold
-  ) external view returns (uint256, uint256) {
+  function getBuyAndSellBuckets(bool sellGold) external view returns (uint256, uint256) {
     return _getBuyAndSellBuckets(sellGold);
   }
 
@@ -159,17 +149,13 @@ contract MockExchange08 {
 
   function _exchange(uint256 sellAmount, uint256 buyAmount, bool sellGold) private {
     IMockExchangeToken stableToken = IMockExchangeToken(stable);
-    IMockExchangeReserve reserve = IMockExchangeReserve(
-      registry.getAddressForOrDie(RESERVE_ID)
-    );
+    IMockExchangeReserve reserve = IMockExchangeReserve(registry.getAddressForOrDie(RESERVE_ID));
 
     if (sellGold) {
       goldBucket = goldBucket.add(sellAmount);
       stableBucket = stableBucket.sub(buyAmount);
       // Pull CELO (gold) from caller into reserve
-      IMockExchangeToken goldToken = IMockExchangeToken(
-        registry.getAddressForOrDie(GOLD_TOKEN_ID)
-      );
+      IMockExchangeToken goldToken = IMockExchangeToken(registry.getAddressForOrDie(GOLD_TOKEN_ID));
       require(
         goldToken.transferFrom(msg.sender, address(reserve), sellAmount),
         "Transfer of sell token failed"
@@ -205,9 +191,7 @@ contract MockExchange08 {
   }
 
   function _getUpdatedGoldBucket() private view returns (uint256) {
-    IMockExchangeReserve reserve = IMockExchangeReserve(
-      registry.getAddressForOrDie(RESERVE_ID)
-    );
+    IMockExchangeReserve reserve = IMockExchangeReserve(registry.getAddressForOrDie(RESERVE_ID));
     uint256 reserveGoldBalance = reserve.getUnfrozenReserveGoldBalance();
     return reserveFraction.multiply(FixidityLib.newFixed(reserveGoldBalance)).fromFixed();
   }

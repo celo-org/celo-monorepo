@@ -47,9 +47,7 @@ interface IAttestationsTest {
     bytes32[] calldata identifiersToLookup
   ) external view returns (uint256[] memory, address[] memory, uint64[] memory, uint64[] memory);
   function getAttestationRequestFee(address token) external view returns (uint256);
-  function lookupAccountsForIdentifier(
-    bytes32 identifier
-  ) external view returns (address[] memory);
+  function lookupAccountsForIdentifier(bytes32 identifier) external view returns (address[] memory);
   function requireNAttestationsRequested(
     bytes32 identifier,
     address account,

@@ -65,8 +65,7 @@ interface IEpochRewardsMock {
   function getVotingGoldFraction() external view returns (uint256);
 
   // Mock-specific method (overloaded getRewardsMultiplier from EpochRewardsMock)
-  function getRewardsMultiplier(uint256 targetGoldTotalSupplyIncrease)
-    external
-    view
-    returns (uint256);
+  function getRewardsMultiplier(
+    uint256 targetGoldTotalSupplyIncrease
+  ) external view returns (uint256);
 }

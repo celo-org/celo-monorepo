@@ -152,11 +152,7 @@ contract GoldToken is
    * @param value The amount of CELO to transfer.
    * @return True if the transaction succeeds.
    */
-  function transferFrom(
-    address from,
-    address to,
-    uint256 value
-  ) external override returns (bool) {
+  function transferFrom(address from, address to, uint256 value) external override returns (bool) {
     require(to != address(0), "transfer attempted to reserved address 0x0");
     require(value <= balanceOf(from), "transfer value exceeded balance of sender");
     require(

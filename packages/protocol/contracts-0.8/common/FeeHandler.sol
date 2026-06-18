@@ -144,7 +144,7 @@ contract FeeHandler is
   }
 
   // Without this the contract cant receive Celo as native transfer
-  receive() external payable {}
+  fallback() external payable {}
 
   function setCarbonFraction(uint256 newFraction) external onlyOwner {
     _setCarbonFraction(newFraction);

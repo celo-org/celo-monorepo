@@ -212,7 +212,10 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
    * @param params2 Second group of init parameters (ownership, distribution, and permissions).
    * @dev Parameters are split into two structs to stay within the non-IR compiler's stack limit.
    */
-  function initialize(InitParams calldata params, InitParams2 calldata params2) external initializer {
+  function initialize(
+    InitParams calldata params,
+    InitParams2 calldata params2
+  ) external initializer {
     _transferOwnership(msg.sender);
     _initSchedule(params, params2.canValidate);
     _initOwnership(params, params2);
@@ -250,7 +253,10 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
    * @dev Sets up ownership, registry, revocation, and permission fields.
    */
   function _initOwnership(InitParams calldata params, InitParams2 calldata params2) private {
-    require(params2.registryAddress != address(0), "The registry address cannot be the zero address");
+    require(
+      params2.registryAddress != address(0),
+      "The registry address cannot be the zero address"
+    );
     require(!(params.revocable && params2.canValidate), "Revocable contracts cannot validate");
     require(
       (params.revocable && params2.refundAddress != address(0)) ||
@@ -267,7 +273,10 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
   /**
    * @dev Sets up the distribution limit fields.
    */
-  function _initDistribution(uint256 initialDistributionRatio, bool subjectToLiquidityProvision) private {
+  function _initDistribution(
+    uint256 initialDistributionRatio,
+    bool subjectToLiquidityProvision
+  ) private {
     require(initialDistributionRatio <= 1000, "Initial distribution ratio out of bounds");
     if (initialDistributionRatio < 1000) {
       // Cannot use `getTotalBalance()` here because the factory has not yet sent the gold.
@@ -282,7 +291,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
     liquidityProvisionMet = subjectToLiquidityProvision ? false : true;
   }
 
-  receive() external payable {}
+  fallback() external payable {}
 
   /**
    * @notice Wrapper function for stable token transfer function.

@@ -51,10 +51,7 @@ library Heap {
    * @param keys Pointers to values
    * @param values Values that are compared, only the pointers are changed by this method.
    */
-  function heapifyDown(
-    uint256[] memory keys,
-    FixidityLib.Fraction[] memory values
-  ) internal pure {
+  function heapifyDown(uint256[] memory keys, FixidityLib.Fraction[] memory values) internal pure {
     siftDown(keys, values, 0, keys.length);
   }
 }

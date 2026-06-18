@@ -37,10 +37,7 @@ interface IMultiSigTest {
   function MAX_OWNER_COUNT() external view returns (uint256);
   function isConfirmed(uint256 transactionId) external view returns (bool);
   function getConfirmationCount(uint256 transactionId) external view returns (uint256 count);
-  function getTransactionCount(
-    bool pending,
-    bool executed
-  ) external view returns (uint256 count);
+  function getTransactionCount(bool pending, bool executed) external view returns (uint256 count);
   function getOwners() external view returns (address[] memory);
   function getConfirmations(
     uint256 transactionId

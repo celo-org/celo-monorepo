@@ -42,7 +42,7 @@ contract UniswapFeeHandlerSeller is FeeHandlerSeller {
   constructor(bool test) Initializable(test) {}
 
   // without this line the contract can't receive native Celo transfers
-  receive() external payable {}
+  fallback() external payable {}
 
   /**
    * @notice Allows owner to set the router for a token.
@@ -75,10 +75,7 @@ contract UniswapFeeHandlerSeller is FeeHandlerSeller {
       "Buy token can only be CELO token"
     );
 
-    require(
-      routerAddresses[sellTokenAddress].length() > 0,
-      "routerAddresses should be non empty"
-    );
+    require(routerAddresses[sellTokenAddress].length() > 0, "routerAddresses should be non empty");
 
     // An improvement to this function would be to allow the user to pass a path as argument
     // and if it generates a better outcome that the ones enabled that gets used

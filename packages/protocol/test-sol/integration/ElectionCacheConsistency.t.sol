@@ -220,7 +220,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils08 {
     }
 
     vm.prank(voter);
-    lockedGold.lock{value: SMALL_LOCK}();
+    lockedGold.lock{ value: SMALL_LOCK }();
     vm.prank(voter);
     election.setAllowedToVoteOverMaxNumberOfGroups(true);
 
@@ -268,7 +268,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils08 {
     }
 
     vm.prank(voter);
-    lockedGold.lock{value: mainnetSmallLock}();
+    lockedGold.lock{ value: mainnetSmallLock }();
     vm.prank(voter);
     election.setAllowedToVoteOverMaxNumberOfGroups(true);
 
@@ -297,7 +297,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils08 {
 
     vm.deal(voter, totalLock + 1 ether);
     vm.prank(voter);
-    lockedGold.lock{value: totalLock}();
+    lockedGold.lock{ value: totalLock }();
 
     vm.prank(voter);
     election.setAllowedToVoteOverMaxNumberOfGroups(true);
@@ -334,7 +334,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils08 {
 
     vm.deal(voter, totalLock + 1 ether);
     vm.prank(voter);
-    lockedGold.lock{value: totalLock}();
+    lockedGold.lock{ value: totalLock }();
 
     for (uint256 i = 0; i < MAX_NUM_GROUPS; i++) {
       assertEq(election.allowedToVoteOverMaxNumberOfGroups(voter), false);
@@ -355,7 +355,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils08 {
 
   function _runLockVoteRevokeCycle(uint256 lockAmount, address group) internal {
     vm.prank(voter);
-    lockedGold.lock{value: lockAmount}();
+    lockedGold.lock{ value: lockAmount }();
 
     (address lesser, address greater) = _neighbors(group, lockAmount);
     vm.prank(voter);
@@ -391,7 +391,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils08 {
     vm.deal(voter, BIG_LOCK + SMALL_LOCK + 1 ether);
 
     vm.prank(voter);
-    lockedGold.lock{value: BIG_LOCK}();
+    lockedGold.lock{ value: BIG_LOCK }();
 
     for (uint256 i = 0; i < firstVoteGroups.length; i++) {
       (address lesser, address greater) = _neighbors(firstVoteGroups[i], BIG_VOTE_PER_GROUP);
@@ -443,7 +443,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils08 {
 
   function _relockTinyAndVoteOverMaxGroups() internal {
     vm.prank(voter);
-    lockedGold.lock{value: SMALL_LOCK}();
+    lockedGold.lock{ value: SMALL_LOCK }();
 
     // groupsVotedFor.length == 0 here, so the flag flip is allowed.
     vm.prank(voter);
@@ -476,7 +476,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils08 {
     uint256[] memory dataLengths = new uint256[](1);
     dataLengths[0] = data.length;
 
-    return governance.propose{value: MIN_DEPOSIT}(values, destinations, data, dataLengths, "url");
+    return governance.propose{ value: MIN_DEPOSIT }(values, destinations, data, dataLengths, "url");
   }
 
   function _neighbors(

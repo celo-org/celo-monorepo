@@ -15,9 +15,7 @@ interface IRegistryTest {
 
   function getAddressFor(bytes32 identifierHash) external view returns (address);
 
-  function getAddressForStringOrDie(
-    string calldata identifier
-  ) external view returns (address);
+  function getAddressForStringOrDie(string calldata identifier) external view returns (address);
 
   function getAddressForString(string calldata identifier) external view returns (address);
 

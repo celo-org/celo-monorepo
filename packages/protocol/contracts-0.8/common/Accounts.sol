@@ -337,9 +337,7 @@ contract Accounts is
    * @return Beneficiary address of payment delegated.
    * @return Fraction of payment delegated.
    */
-  function getPaymentDelegation(
-    address account
-  ) external view override returns (address, uint256) {
+  function getPaymentDelegation(address account) external view override returns (address, uint256) {
     PaymentDelegation storage delegation = paymentDelegations[account];
     return (delegation.beneficiary, delegation.fraction.unwrap());
   }
@@ -510,12 +508,7 @@ contract Accounts is
    * @dev v, r, s constitute `signer`'s signature on `msg.sender` (unless the wallet address
    *      is 0x0 or msg.sender).
    */
-  function setWalletAddress(
-    address walletAddress,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  ) public override {
+  function setWalletAddress(address walletAddress, uint8 v, bytes32 r, bytes32 s) public override {
     require(isAccount(msg.sender), "Unknown account");
     if (!(walletAddress == msg.sender || walletAddress == address(0x0))) {
       address signer = getSignerOfAddress(msg.sender, v, r, s);

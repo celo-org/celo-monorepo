@@ -748,7 +748,10 @@ contract Governance is
     require(!executed, "hotfix already executed");
     require(approved, "hotfix not approved");
     require(councilApproved, "hotfix not approved by security council");
-    require(executionTimeLimit >= block.timestamp, "Execution time limit has already been reached.");
+    require(
+      executionTimeLimit >= block.timestamp,
+      "Execution time limit has already been reached."
+    );
     Proposals.makeMem(values, destinations, data, dataLengths, msg.sender, 0).executeMem();
 
     hotfixes[hash].executed = true;

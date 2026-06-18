@@ -100,9 +100,7 @@ contract MockValidators08 is IValidators {
     return validatorAccounts;
   }
 
-  function getGroupsNumMembers(
-    address[] calldata groups
-  ) external view returns (uint256[] memory) {
+  function getGroupsNumMembers(address[] calldata groups) external view returns (uint256[] memory) {
     uint256[] memory numMembers = new uint256[](groups.length);
     for (uint256 i = 0; i < groups.length; i++) {
       numMembers[i] = members[groups[i]].length;
@@ -241,7 +239,11 @@ contract MockValidators08 is IValidators {
 
   function getValidatorGroup(
     address
-  ) external pure returns (address[] memory, uint256, uint256, uint256, uint256[] memory, uint256, uint256) {
+  )
+    external
+    pure
+    returns (address[] memory, uint256, uint256, uint256, uint256[] memory, uint256, uint256)
+  {
     revert("Method not implemented in mock");
   }
 

@@ -83,10 +83,7 @@ interface IGovernanceTest {
   function execute(uint256 proposalId, uint256 index) external returns (bool);
   function withdraw() external returns (bool);
   function dequeueProposalsIfReady() external;
-  function removeVotesWhenRevokingDelegatedVotes(
-    address account,
-    uint256 newVotingPower
-  ) external;
+  function removeVotesWhenRevokingDelegatedVotes(address account, uint256 newVotingPower) external;
 
   // hotfixes
   function approveHotfix(bytes32 hash) external;
@@ -123,10 +120,7 @@ interface IGovernanceTest {
   function emptyIndices(uint256 index) external view returns (uint256);
   function getReferendumStageDuration() external view returns (uint256);
   function getExecutionStageDuration() external view returns (uint256);
-  function getParticipationParameters()
-    external
-    view
-    returns (uint256, uint256, uint256, uint256);
+  function getParticipationParameters() external view returns (uint256, uint256, uint256, uint256);
   function getConstitution(address destination, bytes4 functionId) external view returns (uint256);
   function isQueued(uint256 proposalId) external view returns (bool);
   function isProposalPassing(uint256 proposalId) external view returns (bool);

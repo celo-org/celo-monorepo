@@ -148,12 +148,7 @@ contract Election is
 
   // Explicit overrides required because IElection declares owner() and the
   // precompile functions are defined in both PrecompilesOverride and UsingPrecompiles.
-  function owner()
-    public
-    view
-    override(Ownable, IElection)
-    returns (address)
-  {
+  function owner() public view override(Ownable, IElection) returns (address) {
     return super.owner();
   }
 
@@ -166,12 +161,9 @@ contract Election is
     return super.numberValidatorsInCurrentSet();
   }
 
-  function validatorSignerAddressFromCurrentSet(uint256 index)
-    public
-    view
-    override(IElection, PrecompilesOverride)
-    returns (address)
-  {
+  function validatorSignerAddressFromCurrentSet(
+    uint256 index
+  ) public view override(IElection, PrecompilesOverride) returns (address) {
     return super.validatorSignerAddressFromCurrentSet(index);
   }
 

@@ -19,10 +19,7 @@ interface ILockedGoldTest {
 
   function delegateGovernanceVotes(address delegatee, uint256 delegateFraction) external;
   function revokeDelegatedGovernanceVotes(address delegatee, uint256 revokeFraction) external;
-  function updateDelegatedAmount(
-    address delegator,
-    address delegatee
-  ) external returns (uint256);
+  function updateDelegatedAmount(address delegator, address delegatee) external returns (uint256);
 
   function addSlasher(string calldata slasherIdentifier) external;
   function removeSlasher(string calldata slasherIdentifier, uint256 index) external;
@@ -67,9 +64,7 @@ interface ILockedGoldTest {
   ) external view returns (uint256[] memory, uint256[] memory);
 
   function getSlashingWhitelist() external view returns (bytes32[] memory);
-  function getDelegateesOfDelegator(
-    address delegator
-  ) external view returns (address[] memory);
+  function getDelegateesOfDelegator(address delegator) external view returns (address[] memory);
   function getDelegatorDelegateeInfo(
     address delegator,
     address delegatee

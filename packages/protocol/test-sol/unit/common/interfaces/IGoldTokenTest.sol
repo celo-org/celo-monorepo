@@ -14,7 +14,11 @@ interface IGoldTokenTest {
   function setRegistry(address registryAddress) external;
 
   // ICeloToken
-  function transferWithComment(address to, uint256 value, string calldata comment) external returns (bool);
+  function transferWithComment(
+    address to,
+    uint256 value,
+    string calldata comment
+  ) external returns (bool);
   function burn(uint256 value) external returns (bool);
   function name() external view returns (string memory);
   function symbol() external view returns (string memory);

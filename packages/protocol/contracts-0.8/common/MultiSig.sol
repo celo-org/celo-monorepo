@@ -127,11 +127,6 @@ contract MultiSig is Initializable, IMultiSig {
   constructor(bool test) Initializable(test) {}
 
   /// @dev Fallback function allows to deposit ether.
-  receive() external payable {
-    if (msg.value > 0) emit Deposit(msg.sender, msg.value);
-  }
-
-  /// @dev Fallback function allows to deposit ether.
   fallback() external payable {
     if (msg.value > 0) emit Deposit(msg.sender, msg.value);
   }

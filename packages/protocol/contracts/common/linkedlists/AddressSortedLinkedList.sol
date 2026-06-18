@@ -1,8 +1,7 @@
-// SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity ^0.5.13;
 
-import "@openzeppelin/contracts8/utils/math/Math.sol";
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/math/Math.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./SortedLinkedList.sol";
 
@@ -27,7 +26,7 @@ library AddressSortedLinkedList {
     uint256 value,
     address lesserKey,
     address greaterKey
-  ) internal {
+  ) public {
     list.insert(toBytes(key), value, toBytes(lesserKey), toBytes(greaterKey));
   }
 
@@ -36,7 +35,7 @@ library AddressSortedLinkedList {
    * @param list A storage pointer to the underlying list.
    * @param key The key of the element to remove.
    */
-  function remove(SortedLinkedList.List storage list, address key) internal {
+  function remove(SortedLinkedList.List storage list, address key) public {
     list.remove(toBytes(key));
   }
 
@@ -55,7 +54,7 @@ library AddressSortedLinkedList {
     uint256 value,
     address lesserKey,
     address greaterKey
-  ) internal {
+  ) public {
     list.update(toBytes(key), value, toBytes(lesserKey), toBytes(greaterKey));
   }
 
@@ -65,7 +64,7 @@ library AddressSortedLinkedList {
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
-  function contains(SortedLinkedList.List storage list, address key) internal view returns (bool) {
+  function contains(SortedLinkedList.List storage list, address key) public view returns (bool) {
     return list.contains(toBytes(key));
   }
 
@@ -75,10 +74,7 @@ library AddressSortedLinkedList {
    * @param key The element key.
    * @return The element value.
    */
-  function getValue(
-    SortedLinkedList.List storage list,
-    address key
-  ) internal view returns (uint256) {
+  function getValue(SortedLinkedList.List storage list, address key) public view returns (uint256) {
     return list.getValue(toBytes(key));
   }
 
@@ -89,7 +85,7 @@ library AddressSortedLinkedList {
    */
   function getElements(
     SortedLinkedList.List storage list
-  ) internal view returns (address[] memory, uint256[] memory) {
+  ) public view returns (address[] memory, uint256[] memory) {
     bytes32[] memory byteKeys = list.getKeys();
     address[] memory keys = new address[](byteKeys.length);
     uint256[] memory values = new uint256[](byteKeys.length);
@@ -101,17 +97,17 @@ library AddressSortedLinkedList {
   }
 
   /**
-   * @notice Returns the minimum of `max` and the number of elements in the list > threshold.
+   * @notice Returns the minimum of `max` and the  number of elements in the list > threshold.
    * @param list A storage pointer to the underlying list.
    * @param threshold The number that the element must exceed to be included.
    * @param max The maximum number returned by this function.
-   * @return The minimum of `max` and the number of elements in the list > threshold.
+   * @return The minimum of `max` and the  number of elements in the list > threshold.
    */
   function numElementsGreaterThan(
     SortedLinkedList.List storage list,
     uint256 threshold,
     uint256 max
-  ) internal view returns (uint256) {
+  ) public view returns (uint256) {
     uint256 revisedMax = Math.min(max, list.list.numElements);
     bytes32 key = list.list.head;
     for (uint256 i = 0; i < revisedMax; i = i.add(1)) {
@@ -132,7 +128,7 @@ library AddressSortedLinkedList {
   function headN(
     SortedLinkedList.List storage list,
     uint256 n
-  ) internal view returns (address[] memory) {
+  ) public view returns (address[] memory) {
     bytes32[] memory byteKeys = list.headN(n);
     address[] memory keys = new address[](n);
     for (uint256 i = 0; i < n; i = i.add(1)) {
@@ -146,15 +142,15 @@ library AddressSortedLinkedList {
    * @param list A storage pointer to the underlying list.
    * @return All element keys from head to tail.
    */
-  function getKeys(SortedLinkedList.List storage list) internal view returns (address[] memory) {
+  function getKeys(SortedLinkedList.List storage list) public view returns (address[] memory) {
     return headN(list, list.list.numElements);
   }
 
-  function toBytes(address a) internal pure returns (bytes32) {
-    return bytes32(uint256(uint160(a)) << 96);
+  function toBytes(address a) public pure returns (bytes32) {
+    return bytes32(uint256(a) << 96);
   }
 
-  function toAddress(bytes32 b) internal pure returns (address) {
-    return address(uint160(uint256(b) >> 96));
+  function toAddress(bytes32 b) public pure returns (address) {
+    return address(uint256(b) >> 96);
   }
 }

@@ -80,7 +80,6 @@ contract ValidatorsTest is ECDSAHelper08 {
   uint256 public maxGroupSize = 5;
   uint256 public commissionUpdateDelay = 3;
 
-
   event AccountSlashed(
     address indexed slashed,
     uint256 penalty,
@@ -428,7 +427,6 @@ contract ValidatorsTest is ECDSAHelper08 {
   function assertDoesNotEmit(function() action, string memory signatureString) internal {
     assertFalse(emitsLog(action, signatureString));
   }
-
 }
 
 contract ValidatorsTest_Initialize is ValidatorsTest {
@@ -1415,10 +1413,7 @@ contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
   function test_Reverts_WhenTheAccountIsAlreadyRegisteredValidator() public {
     _registerValidatorHelper(validator, validatorPk);
 
-    lockedGold.setAccountTotalLockedGold(
-      validator,
-      originalGroupLockedGoldRequirements.value - 11
-    );
+    lockedGold.setAccountTotalLockedGold(validator, originalGroupLockedGoldRequirements.value - 11);
     vm.expectRevert("Already registered as validator");
     vm.prank(validator);
     validators.registerValidatorGroup(commission.value);
@@ -1505,11 +1500,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
   function test_ShouldMarkAccountAsNotValidatorGroup_WhenItHasBeenMoreThanGrouplockedGoldRequirementDuration()
     public
   {
-    _removeMemberAndTimeTravel(
-      group,
-      validator,
-      originalGroupLockedGoldRequirements.duration + 1
-    );
+    _removeMemberAndTimeTravel(group, validator, originalGroupLockedGoldRequirements.duration + 1);
 
     vm.prank(group);
     validators.deregisterValidatorGroup(INDEX);
@@ -1522,11 +1513,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
   {
     address[] memory ExpectedRegisteredValidatorGroups = new address[](0);
 
-    _removeMemberAndTimeTravel(
-      group,
-      validator,
-      originalGroupLockedGoldRequirements.duration + 1
-    );
+    _removeMemberAndTimeTravel(group, validator, originalGroupLockedGoldRequirements.duration + 1);
     vm.prank(group);
     validators.deregisterValidatorGroup(INDEX);
     assertEq(validators.getRegisteredValidatorGroups(), ExpectedRegisteredValidatorGroups);
@@ -1535,11 +1522,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
   function test_ShouldResetAccountBalanceRequirements_WhenItHasBeenMoreThanGrouplockedGoldRequirementDuration()
     public
   {
-    _removeMemberAndTimeTravel(
-      group,
-      validator,
-      originalGroupLockedGoldRequirements.duration + 1
-    );
+    _removeMemberAndTimeTravel(group, validator, originalGroupLockedGoldRequirements.duration + 1);
 
     vm.prank(group);
     validators.deregisterValidatorGroup(INDEX);
@@ -1549,11 +1532,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
   function test_Emits_ValidatorGroupDeregistered_WhenItHasBeenMoreThanGrouplockedGoldRequirementDuration()
     public
   {
-    _removeMemberAndTimeTravel(
-      group,
-      validator,
-      originalGroupLockedGoldRequirements.duration + 1
-    );
+    _removeMemberAndTimeTravel(group, validator, originalGroupLockedGoldRequirements.duration + 1);
 
     vm.expectEmit(true, true, true, true);
     emit ValidatorGroupDeregistered(group);
@@ -1562,11 +1541,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
   }
 
   function test_Reverts_WhenItHasBeenLessThanGroupLockedGoldRequirementsDuration() public {
-    _removeMemberAndTimeTravel(
-      group,
-      validator,
-      originalGroupLockedGoldRequirements.duration - 1
-    );
+    _removeMemberAndTimeTravel(group, validator, originalGroupLockedGoldRequirements.duration - 1);
 
     vm.expectRevert("Hasn't been empty for long enough");
     vm.prank(group);
@@ -1738,10 +1713,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
   function test_Reverts_WhenGroupAlreadyHasMember_WhenGroupDosNotMeetLockedGoldRequirements()
     public
   {
-    lockedGold.setAccountTotalLockedGold(
-      group,
-      originalGroupLockedGoldRequirements.value * 2 - 11
-    );
+    lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value * 2 - 11);
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
 
@@ -2392,7 +2364,7 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
 
       if (i % gapSize == 0) {
         address _group = (i % (gapSize * gapSize)) != 0
-          ? vm.addr(i / gapSize % groupLength)
+          ? vm.addr((i / gapSize) % groupLength)
           : address(0);
 
         contractIndex += 1;
@@ -2428,11 +2400,7 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
         );
       } else {
         vm.expectRevert("index out of bounds");
-        validators.groupMembershipInEpoch(
-          validator,
-          epochInfoList[i].epochNumber,
-          uint256(1) + i
-        );
+        validators.groupMembershipInEpoch(validator, epochInfoList[i].epochNumber, uint256(1) + i);
       }
     }
   }

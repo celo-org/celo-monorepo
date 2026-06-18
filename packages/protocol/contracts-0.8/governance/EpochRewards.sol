@@ -245,12 +245,7 @@ contract EpochRewards is
    * @notice Returns the community reward fraction.
    * @return The percentage of total reward which goes to the community funds.
    */
-  function getCommunityRewardFraction()
-    external
-    view
-    override(IEpochRewards)
-    returns (uint256)
-  {
+  function getCommunityRewardFraction() external view override(IEpochRewards) returns (uint256) {
     return communityRewardFraction.unwrap();
   }
 
@@ -258,12 +253,7 @@ contract EpochRewards is
    * @notice Returns the carbon offsetting partner reward fraction.
    * @return The percentage of total reward which goes to the carbon offsetting partner.
    */
-  function getCarbonOffsettingFraction()
-    external
-    view
-    override(IEpochRewards)
-    returns (uint256)
-  {
+  function getCarbonOffsettingFraction() external view override(IEpochRewards) returns (uint256) {
     return carbonOffsettingFraction.unwrap();
   }
 
@@ -271,12 +261,7 @@ contract EpochRewards is
    * @notice Returns the target voting Gold fraction.
    * @return The percentage of floating Gold voting to target.
    */
-  function getTargetVotingGoldFraction()
-    external
-    view
-    override(IEpochRewards)
-    returns (uint256)
-  {
+  function getTargetVotingGoldFraction() external view override(IEpochRewards) returns (uint256) {
     return targetVotingGoldFraction.unwrap();
   }
 
@@ -381,10 +366,8 @@ contract EpochRewards is
   ) public onlyOwner returns (bool) {
     require(
       max != rewardsMultiplierParams.max.unwrap() ||
-        overspendAdjustmentFactor !=
-        rewardsMultiplierParams.adjustmentFactors.overspend.unwrap() ||
-        underspendAdjustmentFactor !=
-        rewardsMultiplierParams.adjustmentFactors.underspend.unwrap(),
+        overspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.overspend.unwrap() ||
+        underspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.underspend.unwrap(),
       "Bad rewards multiplier parameters"
     );
     rewardsMultiplierParams = RewardsMultiplierParameters(

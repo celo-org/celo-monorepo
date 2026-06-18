@@ -127,9 +127,9 @@ contract GovernanceDelegationTest is TestWithUtils08 {
     accounts.createAccount();
 
     vm.prank(delegator);
-    lockedGold.lock{value: LOCKED_AMOUNT}();
+    lockedGold.lock{ value: LOCKED_AMOUNT }();
     vm.prank(delegatee1);
-    lockedGold.lock{value: SMALL_LOCK}();
+    lockedGold.lock{ value: SMALL_LOCK }();
   }
 
   function test_ShouldReturnCorrectVotingAmount_WhenBothQueueAndReferendumActive() public {
@@ -237,7 +237,7 @@ contract GovernanceDelegationTest is TestWithUtils08 {
     bytes memory data = "";
     uint256[] memory lens = new uint256[](0);
     vm.prank(proposer);
-    return governance.propose{value: MIN_DEPOSIT}(vals, dests, data, lens, "url");
+    return governance.propose{ value: MIN_DEPOSIT }(vals, dests, data, lens, "url");
   }
 
   function _getDequeuedIndex(uint256 propId) private view returns (uint256) {

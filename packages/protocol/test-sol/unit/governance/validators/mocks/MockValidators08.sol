@@ -30,7 +30,10 @@ contract MockValidators08 {
     return address(0);
   }
 
-  function getGroupsWithLessors(address, address) external pure returns (address[] memory, address[] memory) {
+  function getGroupsWithLessors(
+    address,
+    address
+  ) external pure returns (address[] memory, address[] memory) {
     address[] memory a = new address[](0);
     return (a, a);
   }

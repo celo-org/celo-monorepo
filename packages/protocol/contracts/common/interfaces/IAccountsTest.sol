@@ -111,10 +111,7 @@ interface IAccountsTest {
   function hasAuthorizedVoteSigner(address account) external view returns (bool);
   function hasAuthorizedValidatorSigner(address account) external view returns (bool);
   function hasAuthorizedAttestationSigner(address account) external view returns (bool);
-  function hasAuthorizedSigner(
-    address account,
-    string calldata role
-  ) external view returns (bool);
+  function hasAuthorizedSigner(address account, string calldata role) external view returns (bool);
   function hasLegacySigner(address account, bytes32 role) external view returns (bool);
   function hasDefaultSigner(address account, bytes32 role) external view returns (bool);
   function hasIndexedSigner(address account, bytes32 role) external view returns (bool);
@@ -137,7 +134,10 @@ interface IAccountsTest {
   function authorizedBy(address signer) external view returns (address);
   function eip712DomainSeparator() external view returns (bytes32);
   function EIP712_AUTHORIZE_SIGNER_TYPEHASH() external view returns (bytes32);
-  function offchainStorageRoots(address account, uint256 index) external view returns (bytes memory);
+  function offchainStorageRoots(
+    address account,
+    uint256 index
+  ) external view returns (bytes memory);
 
   // --- version ---
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256);

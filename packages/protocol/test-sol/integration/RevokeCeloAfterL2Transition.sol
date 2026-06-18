@@ -229,9 +229,7 @@ contract RevokeCeloAfterL2Transition is ECDSAHelper08 {
 
     lockedGold.initialize(address(registry), unlockingPeriod);
 
-    Validators.InitParams memory vInitParams = Validators.InitParams({
-      commissionUpdateDelay: 3
-    });
+    Validators.InitParams memory vInitParams = Validators.InitParams({ commissionUpdateDelay: 3 });
     vm.prank(owner);
     validators.initialize(
       REGISTRY_ADDRESS,
@@ -284,7 +282,7 @@ contract RevokeCeloAfterL2Transition is ECDSAHelper08 {
       accounts.createAccount();
     }
     vm.deal(_group, 10000e18);
-    lockedGold.lock{value: 10000e18}();
+    lockedGold.lock{ value: 10000e18 }();
     validators.registerValidatorGroup(commission.unwrap());
     vm.stopPrank();
   }
@@ -328,7 +326,7 @@ contract RevokeCeloAfterL2Transition is ECDSAHelper08 {
 
     vm.deal(_validator, 10000e18);
     vm.prank(_validator);
-    lockedGold.lock{value: 10000e18}();
+    lockedGold.lock{ value: 10000e18 }();
 
     bytes memory _ecdsaPubKey = _generateEcdsaPubKey(_validator, _validatorPk);
 
@@ -367,7 +365,7 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
     uint256 pending = 11;
 
     deal(address(this), lockedGoldValue);
-    lockedGold.lock{value: lockedGoldValue}();
+    lockedGold.lock{ value: lockedGoldValue }();
     _registerValidatorGroupWithMembers(group, 1);
 
     election.vote(group, active, address(0), address(0));

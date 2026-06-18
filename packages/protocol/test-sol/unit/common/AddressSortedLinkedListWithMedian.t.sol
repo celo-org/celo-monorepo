@@ -48,9 +48,8 @@ contract AddressSortedLinkedListWithMedianMock {
     bytes32[] memory byteKeys = list.getKeys();
     address[] memory keys = new address[](byteKeys.length);
     uint256[] memory values = new uint256[](byteKeys.length);
-    SortedLinkedListWithMedian.MedianRelation[] memory relations = new SortedLinkedListWithMedian.MedianRelation[](
-      byteKeys.length
-    );
+    SortedLinkedListWithMedian.MedianRelation[]
+      memory relations = new SortedLinkedListWithMedian.MedianRelation[](byteKeys.length);
     for (uint256 i = 0; i < byteKeys.length; i++) {
       keys[i] = toAddress(byteKeys[i]);
       values[i] = list.getValue(byteKeys[i]);

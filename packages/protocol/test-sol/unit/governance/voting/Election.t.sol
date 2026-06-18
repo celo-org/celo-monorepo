@@ -124,7 +124,6 @@ contract ElectionTest is TestWithUtils08 {
     mockEpochManager.setCurrentEpochNumber(1);
   }
 
-
   function preElectionSetup() public {
     ph = new PrecompileHandler();
     ph.setEpochSize(DAY / 5);
@@ -2763,7 +2762,9 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
       actions[actionCount++] = VoteActionType.RevokeActive;
     }
 
-    VoteActionType action = actions[generatePRN(0, actionCount - 1, uint256(uint160(account.account)))];
+    VoteActionType action = actions[
+      generatePRN(0, actionCount - 1, uint256(uint160(account.account)))
+    ];
     uint256 value;
 
     vm.startPrank(account.account);

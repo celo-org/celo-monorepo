@@ -104,9 +104,7 @@ library UQ112x112_08 {
 
 library TransferHelper08 {
   function safeApprove(address token, address to, uint256 value) internal {
-    (bool success, bytes memory data) = token.call(
-      abi.encodeWithSelector(0x095ea7b3, to, value)
-    );
+    (bool success, bytes memory data) = token.call(abi.encodeWithSelector(0x095ea7b3, to, value));
     require(
       success && (data.length == 0 || abi.decode(data, (bool))),
       "TransferHelper::safeApprove: approve failed"
@@ -114,9 +112,7 @@ library TransferHelper08 {
   }
 
   function safeTransfer(address token, address to, uint256 value) internal {
-    (bool success, bytes memory data) = token.call(
-      abi.encodeWithSelector(0xa9059cbb, to, value)
-    );
+    (bool success, bytes memory data) = token.call(abi.encodeWithSelector(0xa9059cbb, to, value));
     require(
       success && (data.length == 0 || abi.decode(data, (bool))),
       "TransferHelper::safeTransfer: transfer failed"
@@ -339,9 +335,7 @@ contract UniswapV2ERC20_08 {
       abi.encodePacked(
         "\x19\x01",
         DOMAIN_SEPARATOR,
-        keccak256(
-          abi.encode(PERMIT_TYPEHASH, owner, spender, value, nonces[owner]++, deadline)
-        )
+        keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, value, nonces[owner]++, deadline))
       )
     );
     address recoveredAddress = ecrecover(digest, v, r, s);
@@ -512,18 +506,15 @@ contract MockUniswapV2Pair08 is UniswapV2ERC20_08 {
       balance0 = IERC20Uni(_token0).balanceOf(address(this));
       balance1 = IERC20Uni(_token1).balanceOf(address(this));
     }
-    uint256 amount0In = balance0 > _reserve0 - amount0Out
-      ? balance0 - (_reserve0 - amount0Out)
-      : 0;
-    uint256 amount1In = balance1 > _reserve1 - amount1Out
-      ? balance1 - (_reserve1 - amount1Out)
-      : 0;
+    uint256 amount0In = balance0 > _reserve0 - amount0Out ? balance0 - (_reserve0 - amount0Out) : 0;
+    uint256 amount1In = balance1 > _reserve1 - amount1Out ? balance1 - (_reserve1 - amount1Out) : 0;
     require(amount0In > 0 || amount1In > 0, "UniswapV2: INSUFFICIENT_INPUT_AMOUNT");
     {
       uint256 balance0Adjusted = balance0 * 1000 - amount0In * 3;
       uint256 balance1Adjusted = balance1 * 1000 - amount1In * 3;
       require(
-        balance0Adjusted * balance1Adjusted >= uint256(_reserve0) * uint256(_reserve1) * (1000 ** 2),
+        balance0Adjusted * balance1Adjusted >=
+          uint256(_reserve0) * uint256(_reserve1) * (1000 ** 2),
         "UniswapV2: K"
       );
     }
@@ -767,9 +758,8 @@ contract MockUniswapV2Router0208 {
       address to = i < path.length - 2
         ? UniswapV2Library08.pairFor(factory, output, path[i + 2], INIT_CODE_PAIR_HASH)
         : _to;
-      IUniswapV2Pair08(
-        UniswapV2Library08.pairFor(factory, input, output, INIT_CODE_PAIR_HASH)
-      ).swap(amount0Out, amount1Out, to, new bytes(0));
+      IUniswapV2Pair08(UniswapV2Library08.pairFor(factory, input, output, INIT_CODE_PAIR_HASH))
+        .swap(amount0Out, amount1Out, to, new bytes(0));
     }
   }
 
@@ -828,9 +818,7 @@ contract MockUniswapV2Router0208 {
         (uint256 reserveInput, uint256 reserveOutput) = input == token0
           ? (reserve0, reserve1)
           : (reserve1, reserve0);
-        amountInput =
-          IERC20Uni(input).balanceOf(address(pair)) -
-          reserveInput;
+        amountInput = IERC20Uni(input).balanceOf(address(pair)) - reserveInput;
         amountOutput = UniswapV2Library08.getAmountOut(amountInput, reserveInput, reserveOutput);
       }
       (uint256 amount0Out, uint256 amount1Out) = input == token0

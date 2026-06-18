@@ -45,13 +45,21 @@ interface ISortedOraclesTest {
   )
     external
     view
-    returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory);
+    returns (
+      address[] memory,
+      uint256[] memory,
+      SortedLinkedListWithMedian.MedianRelation[] memory
+    );
   function getTimestamps(
     address token
   )
     external
     view
-    returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory);
+    returns (
+      address[] memory,
+      uint256[] memory,
+      SortedLinkedListWithMedian.MedianRelation[] memory
+    );
   function isOracle(address token, address oracle) external view returns (bool);
   function reportExpirySeconds() external view returns (uint256);
   function tokenReportExpirySeconds(address token) external view returns (uint256);

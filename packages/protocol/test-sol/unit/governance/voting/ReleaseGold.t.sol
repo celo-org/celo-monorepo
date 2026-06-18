@@ -80,10 +80,7 @@ interface IReleaseGoldTest {
   function canValidate() external view returns (bool);
   function canVote() external view returns (bool);
   function EXPIRATION_TIME() external view returns (uint256);
-  function releaseSchedule()
-    external
-    view
-    returns (uint256, uint256, uint256, uint256, uint256);
+  function releaseSchedule() external view returns (uint256, uint256, uint256, uint256, uint256);
   function revocationInfo() external view returns (bool, bool, uint256, uint256);
   function initialize(ReleaseGold.InitParams calldata, ReleaseGold.InitParams2 calldata) external;
 }
@@ -180,7 +177,11 @@ contract ReleaseGoldTest is ECDSAHelper08 {
     address goldTokenAddress = actor("goldToken");
     deployCodeTo("GoldToken.sol", abi.encode(true), goldTokenAddress);
     goldToken = IGoldTokenTest(goldTokenAddress);
-    { address _lg = actor("LockedGold"); deployCodeTo("LockedGoldCompile", _lg); lockedGold = ILockedGoldTest(_lg); }
+    {
+      address _lg = actor("LockedGold");
+      deployCodeTo("LockedGoldCompile", _lg);
+      lockedGold = ILockedGoldTest(_lg);
+    }
     election = new MockElection();
     governance = new MockGovernance();
     validators = new MockValidators08();
@@ -208,8 +209,10 @@ contract ReleaseGoldTest is ECDSAHelper08 {
     // in our custom Accounts so they are accessible via registry lookup.
     address _v0 = actor("validator");
     address _v1 = actor("otherValidator");
-    vm.prank(_v0); accounts.createAccount();
-    vm.prank(_v1); accounts.createAccount();
+    vm.prank(_v0);
+    accounts.createAccount();
+    vm.prank(_v1);
+    accounts.createAccount();
 
     vm.prank(beneficiary);
     accounts.createAccount();
@@ -1143,13 +1146,7 @@ contract ReleaseGoldTest_AuthorizeWithPublicKeys_setup is ReleaseGoldTest {
 contract ReleaseGoldTest_AuthorizeWithPublicKeys is ReleaseGoldTest_AuthorizeWithPublicKeys_setup {
   function test_ShouldSetTheAuthorizedKeys_WhenUsingECDSAPublickKey() public {
     vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSignerWithPublicKey(
-      payable(authorized),
-      v,
-      r,
-      s,
-      ecdsaPublicKey
-    );
+    releaseGold.authorizeValidatorSignerWithPublicKey(payable(authorized), v, r, s, ecdsaPublicKey);
 
     assertEq(accounts.authorizedBy(authorized), address(releaseGold));
     assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
@@ -2173,13 +2170,7 @@ contract ReleaseGoldTest_GetWithdrawableAmount is ReleaseGoldTest {
     );
 
     vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSignerWithPublicKey(
-      payable(authorized),
-      v,
-      r,
-      s,
-      ecdsaPublicKey
-    );
+    releaseGold.authorizeValidatorSignerWithPublicKey(payable(authorized), v, r, s, ecdsaPublicKey);
 
     assertEq(releaseGold.getWithdrawableAmount(), expectedWithdrawalAmount);
   }

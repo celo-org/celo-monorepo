@@ -110,7 +110,7 @@ contract GovernanceTest is TestWithUtils08 {
 
   function makeValidProposal() internal returns (uint256) {
     return
-      governance.propose{value: DEPOSIT}(
+      governance.propose{ value: DEPOSIT }(
         okProp.values,
         okProp.destinations,
         okProp.data,
@@ -122,7 +122,7 @@ contract GovernanceTest is TestWithUtils08 {
   function makeEmptyProposal() internal returns (uint256) {
     Proposal memory emptyProposal;
     return
-      governance.propose{value: DEPOSIT}(
+      governance.propose{ value: DEPOSIT }(
         emptyProposal.values,
         emptyProposal.destinations,
         emptyProposal.data,
@@ -868,7 +868,7 @@ contract GovernanceTest_propose is GovernanceTest {
 
   function test_RevertIf_descriptionIsEmtpy_whenProposalWithOneTransaction() public {
     vm.expectRevert("Description url must have non-zero length");
-    governance.propose{value: DEPOSIT}(
+    governance.propose{ value: DEPOSIT }(
       okProp.values,
       okProp.destinations,
       okProp.data,
@@ -896,7 +896,7 @@ contract GovernanceTest_propose is GovernanceTest {
     // wait "dequeueFrequency"
     vm.warp(block.timestamp + DEQUEUE_FREQUENCY);
 
-    governance.propose{value: DEPOSIT}(
+    governance.propose{ value: DEPOSIT }(
       okProp.values,
       okProp.destinations,
       okProp.data,
@@ -922,7 +922,7 @@ contract GovernanceTest_propose is GovernanceTest {
   }
 
   function check_registerProposal(Proposal memory proposal) private {
-    uint256 id = governance.propose{value: DEPOSIT}(
+    uint256 id = governance.propose{ value: DEPOSIT }(
       proposal.values,
       proposal.destinations,
       proposal.data,
@@ -950,7 +950,7 @@ contract GovernanceTest_propose is GovernanceTest {
   }
 
   function check_registerProposalTransactions(Proposal memory proposal) private {
-    uint256 id = governance.propose{value: DEPOSIT}(
+    uint256 id = governance.propose{ value: DEPOSIT }(
       proposal.values,
       proposal.destinations,
       proposal.data,
@@ -975,7 +975,7 @@ contract GovernanceTest_propose is GovernanceTest {
   function check_emitsProposalQueuedEvents(Proposal memory proposal) private {
     vm.expectEmit(true, true, true, true);
     emit ProposalQueued(1, address(this), proposal.values.length, DEPOSIT, block.timestamp);
-    governance.propose{value: DEPOSIT}(
+    governance.propose{ value: DEPOSIT }(
       proposal.values,
       proposal.destinations,
       proposal.data,
@@ -2640,7 +2640,7 @@ contract GovernanceTest_execute is GovernanceTest {
   }
 
   function test_RevertIf_ProposalCannotExecuteSuccessfully() public {
-    proposalId = governance.propose{value: DEPOSIT}(
+    proposalId = governance.propose{ value: DEPOSIT }(
       failingProp.values,
       failingProp.destinations,
       failingProp.data,
@@ -2661,7 +2661,7 @@ contract GovernanceTest_execute is GovernanceTest {
 
   function test_RevertIf_ProposalCannotExecuteBecauseInvalidContractAddress() public {
     okProp.destinations[0] = actor("someAddress");
-    proposalId = governance.propose{value: DEPOSIT}(
+    proposalId = governance.propose{ value: DEPOSIT }(
       okProp.values,
       okProp.destinations,
       okProp.data,
@@ -2731,7 +2731,7 @@ contract GovernanceTest_execute is GovernanceTest {
     bytes memory txDataSecond = abi.encodeWithSignature(setValueSignature, 2, 1, true);
     twoTxProp.data = txDataFirst.concat(txDataSecond);
 
-    proposalId = governance.propose{value: DEPOSIT}(
+    proposalId = governance.propose{ value: DEPOSIT }(
       twoTxProp.values,
       twoTxProp.destinations,
       twoTxProp.data,
@@ -2756,7 +2756,7 @@ contract GovernanceTest_execute is GovernanceTest {
     bytes memory txDataSecond = abi.encodeWithSignature(setValueSignature, 2, 1, false); // fails
     twoTxProp.data = txDataFirst.concat(txDataSecond);
 
-    proposalId = governance.propose{value: DEPOSIT}(
+    proposalId = governance.propose{ value: DEPOSIT }(
       twoTxProp.values,
       twoTxProp.destinations,
       twoTxProp.data,
@@ -2817,7 +2817,7 @@ contract GovernanceTest_execute is GovernanceTest {
 
   // TODO fix when migrate to 0.8
   function SKIPtest_NoEmitProposalExecutedWhenEmptyProposalNotApproved() public {
-    proposalId = governance.propose{value: DEPOSIT}(
+    proposalId = governance.propose{ value: DEPOSIT }(
       emptyProp.values,
       emptyProp.destinations,
       emptyProp.data,
@@ -2840,7 +2840,7 @@ contract GovernanceTest_execute is GovernanceTest {
 
   // TODO fix when migrate to 0.8
   function SKIPtest_NoEmitProposalExecutedWhenEmptyProposalNotPassing() public {
-    proposalId = governance.propose{value: DEPOSIT}(
+    proposalId = governance.propose{ value: DEPOSIT }(
       emptyProp.values,
       emptyProp.destinations,
       emptyProp.data,
@@ -2862,7 +2862,7 @@ contract GovernanceTest_execute is GovernanceTest {
   }
 
   function setUpEmptyProposalReadyForExecution() public {
-    proposalId = governance.propose{value: DEPOSIT}(
+    proposalId = governance.propose{ value: DEPOSIT }(
       emptyProp.values,
       emptyProp.destinations,
       emptyProp.data,
@@ -2930,7 +2930,7 @@ contract GovernanceTest_execute is GovernanceTest {
   }
 
   function setup2TxProposal() private {
-    proposalId = governance.propose{value: DEPOSIT}(
+    proposalId = governance.propose{ value: DEPOSIT }(
       twoTxProp.values,
       twoTxProp.destinations,
       twoTxProp.data,

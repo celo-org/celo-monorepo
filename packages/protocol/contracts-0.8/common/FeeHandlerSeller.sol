@@ -12,7 +12,12 @@ import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
 // Abstract class for a FeeHandlerSeller, as defined in CIP-52
 // https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md
-abstract contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry, ICeloVersionedContract {
+abstract contract FeeHandlerSeller is
+  Ownable,
+  Initializable,
+  UsingRegistry,
+  ICeloVersionedContract
+{
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
