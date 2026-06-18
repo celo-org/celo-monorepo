@@ -32,6 +32,17 @@ contract Registry is IRegistry, IRegistryInitializer, Ownable, Initializable {
   }
 
   /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 2, 0, 0);
+  }
+
+  /**
    * @notice Associates the given address with the given identifier.
    * @param identifier Identifier of contract whose address we want to set.
    * @param addr Address of contract.

@@ -73,6 +73,6 @@ contract OdisPayments is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
+    return (1, 2, 0, 0);
   }
 }

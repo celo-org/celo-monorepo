@@ -50,7 +50,7 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 1);
+    return (1, 2, 0, 0);
   }
 
   /**

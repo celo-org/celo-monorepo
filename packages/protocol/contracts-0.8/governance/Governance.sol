@@ -1029,7 +1029,7 @@ contract Governance is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 5, 1, 0);
+    return (1, 6, 0, 0);
   }
 
   /**

@@ -208,7 +208,7 @@ contract GoldToken is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure override returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 0);
+    return (1, 3, 0, 0);
   }
 
   /**
