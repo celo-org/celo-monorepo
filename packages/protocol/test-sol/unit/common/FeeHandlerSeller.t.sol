@@ -1,50 +1,40 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+pragma solidity >=0.8.7 <0.8.20;
 
-// Helper contracts
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
-import { CeloTokenMock } from "@test-sol/unit/common/CeloTokenMock.sol";
-
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-
-import "@test-sol/unit/common/interfaces/IFeeHandlerSellerTest.sol";
+import { FeeHandlerSeller } from "@celo-contracts-8/common/FeeHandlerSeller.sol";
+import { MentoFeeHandlerSeller } from "@celo-contracts-8/common/MentoFeeHandlerSeller.sol";
+import { UniswapFeeHandlerSeller } from "@celo-contracts-8/common/UniswapFeeHandlerSeller.sol";
 import "@celo-contracts/common/interfaces/IOwnable.sol";
 
-contract FeeHandlerSellerTest is TestWithUtils {
+contract FeeHandlerSellerTest is TestWithUtils08 {
   // Actors
   address RECEIVER_ADDRESS = actor("Arbitrary Receiver");
   address NON_OWNER_ADDRESS = actor("Arbitrary Non-Owner");
 
-  // Contract instances
-  CeloTokenMock celoToken; // Using mock token to work around missing transfer precompile
-  IFeeHandlerSellerTest mentoFeeHandlerSeller;
-  IFeeHandlerSellerTest uniswapFeeHandlerSeller;
+  // Contract instances (celoToken is provided by TestWithUtils08)
+  FeeHandlerSeller mentoFeeHandlerSeller;
+  FeeHandlerSeller uniswapFeeHandlerSeller;
 
   address oracle;
   address sortedOracles;
 
   // Helper data structures
-  IFeeHandlerSellerTest[] feeHandlerSellerInstances;
+  FeeHandlerSeller[] feeHandlerSellerInstances;
 
   event OracleAddressSet(address _token, address _oracle);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
-    celoToken = new CeloTokenMock();
     oracle = actor("oracle");
     sortedOracles = actor("sortedOracles");
 
     registry.setAddressFor("SortedOracles", sortedOracles);
 
-    address mentoSellerAddress = actor("mentoFeeHandlerSeller");
-    deployCodeTo("MentoFeeHandlerSellerCompile", mentoSellerAddress);
-    mentoFeeHandlerSeller = IFeeHandlerSellerTest(mentoSellerAddress);
-
-    address uniswapSellerAddress = actor("uniswapFeeHandlerSeller");
-    deployCodeTo("UniswapFeeHandlerSellerCompile", uniswapSellerAddress);
-    uniswapFeeHandlerSeller = IFeeHandlerSellerTest(uniswapSellerAddress);
+    mentoFeeHandlerSeller = new MentoFeeHandlerSeller(true);
+    uniswapFeeHandlerSeller = new UniswapFeeHandlerSeller(true);
 
     feeHandlerSellerInstances.push(mentoFeeHandlerSeller);
     feeHandlerSellerInstances.push(uniswapFeeHandlerSeller);
