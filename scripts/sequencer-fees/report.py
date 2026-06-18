@@ -96,6 +96,69 @@ SURPLUS_RECIPIENT_DEFAULT = SAFE_ADDR      # placeholder = Operations Safe
 # SequencerFeeVault Withdrawal event topic
 WITHDRAWAL_TOPIC = "0x38e04cbeb8c10f8f568618aa75be0f10b6729b8b4237743b4de20cbcde2839ee"
 
+# ---------------------------------------------------------------------------
+# Color palette (ANSI). Disabled if stdout is not a TTY or NO_COLOR is set.
+# ---------------------------------------------------------------------------
+_USE_COLOR = sys.stdout.isatty() and not os.environ.get("NO_COLOR")
+
+# Verbose progress logging to stderr — only when --detail (set in main()).
+_VERBOSE = False
+
+
+def vlog(msg: str = "") -> None:
+    if _VERBOSE:
+        print(msg, file=sys.stderr)
+
+
+def _c(code: str) -> str:
+    return code if _USE_COLOR else ""
+
+
+RESET   = _c("\033[0m")
+BOLD    = _c("\033[1m")
+DIM     = _c("\033[2m")
+RED     = _c("\033[1;31m")
+GREEN   = _c("\033[1;32m")
+YELLOW  = _c("\033[1;33m")
+BLUE    = _c("\033[1;34m")
+MAGENTA = _c("\033[1;35m")
+CYAN    = _c("\033[1;36m")
+WHITE   = _c("\033[1;37m")
+# 256-color accents
+ORANGE  = _c("\033[38;5;208m")
+TEAL    = _c("\033[38;5;43m")
+PURPLE  = _c("\033[38;5;141m")
+GREY    = _c("\033[38;5;245m")
+
+
+def celo(amount, w=0):
+    """Bright green CELO amount."""
+    s = f"{amount:>{w},.2f}" if w else f"{amount:,.2f}"
+    return f"{GREEN}{s}{RESET} {DIM}CELO{RESET}"
+
+
+def usd(amount, w=0):
+    """Teal USD amount."""
+    s = f"{amount:>{w},.2f}" if w else f"{amount:,.2f}"
+    return f"{TEAL}${s}{RESET}"
+
+
+def num(amount, w=0):
+    """Bright white bare number."""
+    s = f"{amount:>{w},.2f}" if w else f"{amount:,.2f}"
+    return f"{WHITE}{s}{RESET}"
+
+
+def addr(a):
+    """Dim purple address."""
+    return f"{PURPLE}{a}{RESET}"
+
+
+def hdr(text):
+    """Colored section header line padded to 68 chars with dashes."""
+    dashes = "-" * max(0, 68 - len(text) - 4)
+    return f"{BOLD}{ORANGE}-- {text} {dashes}{RESET}"
+
 # Stablecoin USD prices (hardcoded pegs)
 STABLE_PEGS = {
     "USDT": 1.00,
@@ -180,27 +243,27 @@ def ensure_fresh_data(api_key: str, date_to: str, auto_refresh: bool) -> None:
     latest = info["latest_day"]
     executed = info["execution_ended"][:10] if info["execution_ended"] else "unknown"
 
-    print(f"Dune data: {info['total_rows']} rows, latest day: {latest}, last run: {executed}", file=sys.stderr)
+    vlog(f"Dune data: {info['total_rows']} rows, latest day: {latest}, last run: {executed}")
 
     if latest and latest < date_to:
         gap_days = (dt.datetime.strptime(date_to, "%Y-%m-%d") - dt.datetime.strptime(latest, "%Y-%m-%d")).days
 
         # 1 day behind is normal — prices.day updates at midnight UTC
         if gap_days <= 1:
-            print(f"Data is 1 day behind (normal — prices.day updates at midnight UTC).", file=sys.stderr)
-            print(f"Using --to {latest} instead.", file=sys.stderr)
+            vlog(f"Data is 1 day behind (normal — prices.day updates at midnight UTC).")
+            vlog(f"Using --to {latest} instead.")
             return  # don't refresh, just use what's available
 
-        print(f"WARNING: Data is {gap_days} day(s) behind requested --to date ({date_to}).", file=sys.stderr)
+        vlog(f"WARNING: Data is {gap_days} day(s) behind requested --to date ({date_to}).")
 
         if auto_refresh:
-            print("Auto-refreshing Dune query...", file=sys.stderr)
+            vlog("Auto-refreshing Dune query...")
             exec_id = trigger_execution(api_key)
             wait_for_execution(exec_id, api_key)
             new_info = get_last_execution_info(api_key)
-            print(f"Refreshed: {new_info['total_rows']} rows, latest day: {new_info['latest_day']}", file=sys.stderr)
+            vlog(f"Refreshed: {new_info['total_rows']} rows, latest day: {new_info['latest_day']}")
         else:
-            print("Use --refresh to update, or --auto-refresh to do it automatically.", file=sys.stderr)
+            vlog("Use --refresh to update, or --auto-refresh to do it automatically.")
 
 
 def fetch_results(api_key: str, limit: int = 500) -> list:
@@ -475,31 +538,23 @@ def print_report(computed: list, totals: dict, show_daily: bool = True):
     print("\n" + "=" * 80)
 
 
-def print_pre_cutoff_sweep(celo_total: float, usd_total: float, num_days: int) -> None:
-    """One-time sweep batch for pre-CGP-287 revenue.
+def print_pre_cutoff_sweep(sweep_from: str, num_days: int, celo_landed: float, stables: dict) -> None:
+    """One-time sweep batch for un-withdrawn pre-CGP-287 revenue.
 
-    CGP-287 already returned this revenue to Governance. The sweep moves the
-    equivalent CELO amount from a cold wallet to a TBD recipient (provided by
-    the operator). Generated as a separate Safe batch (sweep-batch.json).
+    Window = day after last vault withdrawal on/before cutoff -> cutoff. Already-
+    withdrawn pre-cutoff revenue is excluded (it's already in the Safe). Amounts
+    are the CELO + stables that landed in Vault+FeeHandler during the window.
     """
-    YELLOW = "\033[1;33m"
-    CYAN = "\033[1;36m"
-    BOLD = "\033[1m"
-    RESET = "\033[0m"
-
     print("")
-    print(f"{BOLD}-- CGP-287 PRE-CUTOFF SWEEP (one-time) ------------------------------{RESET}")
-    print(f"  Cutoff date:               {CGP_287_CUTOFF_DATE} (last day covered by CGP-287)")
-    print(f"  Pre-cutoff period:         {L2_GENESIS_DATE} -> {CGP_287_CUTOFF_DATE} ({num_days} days)")
-    print(f"  Pre-cutoff revenue (USD):  ${usd_total:,.2f}")
-    print(f"  {BOLD}Pre-cutoff CELO equiv:     {celo_total:,.2f} CELO{RESET}  (at daily prices)")
-    print(f"")
-    print(f"  {YELLOW}Generate sweep batch (cold wallet Safe -> TBD recipient):{RESET}")
-    print(f"  {CYAN}python3 prepare-sweep-batch.py \\")
-    print(f"    --celo-amount {celo_total:.6f} \\")
-    print(f"    --recipient <RECIPIENT_TBD> \\")
-    print(f"    --cold-wallet-safe <COLD_WALLET_SAFE> \\")
-    print(f"    > sweep-batch.json{RESET}")
+    print(hdr("[0] PRE-CUTOFF FUNDS (CGP-287, informational)"))
+    print(f"  {GREY}Window:{RESET} {CYAN}{sweep_from}{RESET} {GREY}->{RESET} {CYAN}{CGP_287_CUTOFF_DATE}{RESET} {DIM}({num_days} days){RESET}")
+    print(f"  {GREY}Accrued before CGP-287 cutoff (already paid to Governance by CGP-287).")
+    print(f"  This CELO lands in the Safe after step [1] and is reused in step [3]")
+    print(f"  to fund the stables exchange — not paid to Gov again.{RESET}")
+    print(f"  {BOLD}CELO:{RESET}    {celo(celo_landed, 14)}")
+    stable_str = "   ".join(f"{WHITE}{k}{RESET} {num(v)}" for k, v in stables.items() if v >= 0.01)
+    if stable_str:
+        print(f"  {BOLD}Stables:{RESET} {stable_str}")
 
 
 def write_csv(computed: list, totals: dict, path: str):
@@ -511,14 +566,14 @@ def write_csv(computed: list, totals: dict, path: str):
         for row in computed:
             f.write(",".join(str(row[k]) for k in keys) + "\n")
         f.write(",".join(str(totals.get(k, "")) for k in keys) + "\n")
-    print(f"CSV written to {path}", file=sys.stderr)
+    vlog(f"CSV written to {path}")
 
 
 def write_json(computed: list, totals: dict, path: str):
     output = {"daily": computed, "totals": totals}
     with open(path, "w") as f:
         json.dump(output, f, indent=2)
-    print(f"JSON written to {path}", file=sys.stderr)
+    vlog(f"JSON written to {path}")
 
 
 # ---------------------------------------------------------------------------
@@ -528,6 +583,27 @@ def write_json(computed: list, totals: dict, path: str):
 def cast_cmd(args: list[str], timeout: int = 15) -> str:
     result = subprocess.run(args, capture_output=True, text=True, timeout=timeout)
     return result.stdout.strip() if result.returncode == 0 else ""
+
+
+# Uniswap V3 on Celo: QuoterV2, CELO/WETH 0.3% pool
+UNI_QUOTER = "0x82825d0554fA07f7FC52Ab63c961F330fdEFa8E8"
+CELO_TOKEN = "0x471EcE3750Da237f93B8E339c536989b8978a438"
+WETH_TOKEN = "0xD221812de1BD094f35587EE8E174B07B6167D9Af"
+
+
+def quote_celo_to_weth(celo_amount: float, rpc: str) -> float:
+    """Live Uniswap V3 quote: CELO -> WETH (0.3% fee). Returns WETH out, or 0 on failure."""
+    try:
+        amt_wei = int(celo_amount * 1e18)
+        out = cast_cmd([
+            "cast", "call", UNI_QUOTER,
+            "quoteExactInputSingle((address,address,uint256,uint24,uint160))(uint256,uint160,uint32,uint256)",
+            f"({CELO_TOKEN},{WETH_TOKEN},{amt_wei},3000,0)",
+            "--rpc-url", rpc,
+        ])
+        return int(out.split("\n")[0].split()[0]) / 1e18 if out else 0.0
+    except Exception:
+        return 0.0
 
 
 def timestamp_to_block(ts: int, rpc: str) -> str:
@@ -629,99 +705,131 @@ def _suggest_via_rpc(rpc: str, yesterday: str) -> tuple:
         return L2_GENESIS_DATE, yesterday, f"auto-detect failed ({e}), using L2 genesis"
 
 
-def check_operations_during_period(date_from: str, date_to: str, rpc: str, computed: list = None, totals: dict = None) -> None:
-    """Check if vault.withdraw() was called during the reporting period."""
-    print("\n-- RECONCILIATION CHECK ---------------------------------------------")
-
+def last_withdrawal_on_or_before(api_key: str, cutoff: str) -> str:
+    """Return date (YYYY-MM-DD) of the last vault Withdrawal on/before cutoff, or '' if none."""
     try:
-        ts_from = int(dt.datetime.strptime(date_from, "%Y-%m-%d").replace(
-            tzinfo=dt.timezone.utc).timestamp())
-        ts_to = int(dt.datetime.strptime(date_to, "%Y-%m-%d").replace(
-            tzinfo=dt.timezone.utc).timestamp()) + 86400
+        create_resp = dune_request("/query", api_key, method="POST", body={
+            "name": "tmp_last_withdrawal_before_cutoff",
+            "query_sql": (
+                "SELECT block_time FROM celo.logs "
+                "WHERE contract_address = 0x4200000000000000000000000000000000000011 "
+                "AND topic0 = 0x38e04cbeb8c10f8f568618aa75be0f10b6729b8b4237743b4de20cbcde2839ee "
+                f"AND block_time < TIMESTAMP '{cutoff}' + INTERVAL '1' day "
+                "ORDER BY block_number DESC LIMIT 1"
+            ),
+            "is_private": False,
+        })
+        qid = create_resp.get("query_id")
+        if not qid:
+            return ""
+        exec_id = dune_request(f"/query/{qid}/execute", api_key, method="POST").get("execution_id")
+        for _ in range(20):
+            if dune_request(f"/execution/{exec_id}/status", api_key).get("is_execution_finished"):
+                break
+            time.sleep(3)
+        rows = dune_request(f"/query/{qid}/results", api_key).get("result", {}).get("rows", [])
+        return rows[0].get("block_time", "")[:10] if rows else ""
+    except Exception:
+        return ""
 
-        block_from = timestamp_to_block(ts_from, rpc)
-        block_to = timestamp_to_block(ts_to, rpc)
 
-        if not block_from or not block_to:
-            print("  Could not resolve block numbers - skipping check.")
-            return
+def count_withdrawals_via_dune(api_key: str, date_from: str, date_to: str) -> tuple:
+    """Count vault Withdrawal events in [date_from, date_to] via Dune (no block limit).
 
-        # Limit scan to 2M blocks to avoid timeout
-        partial_scan = False
-        if int(block_to) - int(block_from) > 2_000_000:
-            print(f"  Period spans {int(block_to) - int(block_from):,} blocks (>2M limit).")
-            print(f"  Scanning last 2M blocks only.")
-            block_from = str(int(block_to) - 2_000_000)
-            partial_scan = True
+    Returns (count, days_list) or (None, None) on failure.
+    """
+    try:
+        create_resp = dune_request("/query", api_key, method="POST", body={
+            "name": "tmp_vault_withdrawals_in_period",
+            "query_sql": (
+                "SELECT date_trunc('day', block_time) AS day, COUNT(*) AS n "
+                "FROM celo.logs "
+                "WHERE contract_address = 0x4200000000000000000000000000000000000011 "
+                "AND topic0 = 0x38e04cbeb8c10f8f568618aa75be0f10b6729b8b4237743b4de20cbcde2839ee "
+                f"AND block_time >= TIMESTAMP '{date_from}' "
+                f"AND block_time < TIMESTAMP '{date_to}' + INTERVAL '1' day "
+                "GROUP BY 1 ORDER BY 1"
+            ),
+            "is_private": False,
+        })
+        qid = create_resp.get("query_id")
+        if not qid:
+            return None, None
 
-        logs_raw = cast_cmd([
-            "cast", "logs",
-            "--from-block", block_from,
-            "--to-block", block_to,
-            "--address", VAULT,
-            WITHDRAWAL_TOPIC,
-            "--rpc-url", rpc,
-        ], timeout=30)
+        exec_resp = dune_request(f"/query/{qid}/execute", api_key, method="POST")
+        exec_id = exec_resp.get("execution_id")
+        for _ in range(20):
+            status = dune_request(f"/execution/{exec_id}/status", api_key)
+            if status.get("is_execution_finished"):
+                break
+            time.sleep(3)
 
-        withdrawal_count = logs_raw.count("transactionHash") if logs_raw else 0
+        rows = dune_request(f"/query/{qid}/results", api_key).get("result", {}).get("rows", [])
+        total = sum(int(r.get("n", 0)) for r in rows)
+        days = [r.get("day", "")[:10] for r in rows]
+        return total, days
+    except Exception:
+        return None, None
 
-        if withdrawal_count > 0:
-            print(f"  WARNING: vault.withdraw() was called {withdrawal_count} time(s) during this period!")
+
+def check_operations_during_period(date_from: str, date_to: str, rpc: str, computed: list = None, totals: dict = None, api_key: str = None, sweep_celo: float = 0.0, detail: bool = False) -> None:
+    """Check if vault.withdraw() was called during the reporting period (via Dune).
+
+    Reconciliation block (withdrawal scan + on-chain balances + NOTE) is only
+    printed with --detail. Vault/FeeHandler balances are always read (silently)
+    because the next-steps section needs them.
+    """
+    if detail:
+        print("\n-- RECONCILIATION CHECK ---------------------------------------------")
+        count, days = (None, None)
+        if api_key:
+            count, days = count_withdrawals_via_dune(api_key, date_from, date_to)
+        if count is None:
+            print(f"  Could not query withdrawals via Dune - skipping check.")
+        elif count > 0:
+            print(f"  WARNING: vault.withdraw() called {count} time(s) during this period!")
+            print(f"  Days: {', '.join(days)}")
             print(f"  Some CELO was already moved to the Safe.")
-            print(f"  RECOMMENDATION: Use --from with the day AFTER the last withdrawal.")
-        elif partial_scan:
-            print(f"  PARTIAL: No vault withdrawals in scanned 2M blocks (earlier blocks NOT checked).")
-            print(f"  Verify manually for blocks before {block_from} if period extends earlier.")
+            print(f"  RECOMMENDATION: Use --from the day AFTER the last withdrawal.")
         else:
-            print(f"  OK: No vault withdrawals during {date_from} to {date_to}.")
+            print(f"  OK: No vault withdrawals during {date_from} to {date_to} (full-period Dune scan).")
 
-    except Exception as e:
-        print(f"  Withdrawal check failed: {e}", file=sys.stderr)
-
-    # Read current on-chain balances for reconciliation
+    # Read current vault + FeeHandler balances (always — needed by next steps)
     try:
         vault_celo = cast_cmd(["cast", "balance", VAULT, "--rpc-url", rpc, "--ether"])
         fh_celo = cast_cmd(["cast", "balance", FEE_HANDLER, "--rpc-url", rpc, "--ether"])
-
         vault_f = float(vault_celo) if vault_celo else 0
         fh_f = float(fh_celo) if fh_celo else 0
 
-        print(f"")
-        print(f"  CURRENT ON-CHAIN BALANCES:")
-        print(f"  SequencerFeeVault:  {vault_f:>12,.2f} CELO  (tip + L1 data fee)")
-        print(f"  FeeHandler:         {fh_f:>12,.2f} CELO  (base fee)")
-        print(f"  Combined:           {vault_f + fh_f:>12,.2f} CELO")
-        print(f"")
-        print(f"  NOTE: The report shows TOTAL revenue ({date_from} to {date_to}),")
-        print(f"  but fees are split between two contracts:")
-        print(f"    - SequencerFeeVault receives tip + L1 data fee")
-        print(f"    - FeeHandler receives base fee")
-        print(f"  The combined balance will be LESS than the report total if")
-        print(f"  FeeHandler.handleAll() was called (it sells/burns CELO).")
+        if detail:
+            print(f"")
+            print(f"  CURRENT ON-CHAIN BALANCES:")
+            print(f"  SequencerFeeVault:  {vault_f:>12,.2f} CELO  (tip + L1 data fee)")
+            print(f"  FeeHandler:         {fh_f:>12,.2f} CELO  (base fee)")
+            print(f"  Combined:           {vault_f + fh_f:>12,.2f} CELO")
+            print(f"")
+            print(f"  NOTE: The report shows TOTAL revenue ({date_from} to {date_to}),")
+            print(f"  but fees are split between two contracts:")
+            print(f"    - SequencerFeeVault receives tip + L1 data fee")
+            print(f"    - FeeHandler receives base fee")
+            print(f"  The combined balance will be LESS than the report total if")
+            print(f"  FeeHandler.handleAll() was called (it sells/burns CELO).")
     except Exception:
         vault_f = 0
         fh_f = 0
 
-    # Next steps with colors
-    YELLOW = "\033[1;33m"
-    GREEN = "\033[1;32m"
-    CYAN = "\033[1;36m"
-    RED = "\033[1;31m"
-    BOLD = "\033[1m"
-    RESET = "\033[0m"
-
     print("")
-    print(f"{BOLD}-- NEXT STEPS -------------------------------------------------------{RESET}")
+    print(hdr("NEXT STEPS"))
     print("")
 
     # Step 1: Withdraw
     if vault_f > 1:
-        print(f"  {YELLOW}[1] WITHDRAW FROM VAULT{RESET}")
-        print(f"      {vault_f:,.0f} CELO ready to withdraw (permissionless, anyone can call)")
+        print(f"  {BOLD}{YELLOW}[1]{RESET} {BOLD}WITHDRAW FROM VAULT{RESET}")
+        print(f"      {celo(vault_f)} ready to withdraw  {DIM}(permissionless){RESET}")
         print(f"      {CYAN}cast send 0x4200000000000000000000000000000000000011 'withdraw()' \\")
         print(f"        --rpc-url https://forno.celo.org --private-key $PK{RESET}")
     else:
-        print(f"  {GREEN}[1] WITHDRAW FROM VAULT - already empty{RESET}")
+        print(f"  {BOLD}{GREEN}[1]{RESET} {BOLD}WITHDRAW FROM VAULT{RESET} {GREEN}- already empty{RESET}")
 
     print("")
 
@@ -739,9 +847,9 @@ def check_operations_during_period(date_from: str, date_to: str, rpc: str, compu
 
     # Step 2: Process FeeHandler (permissionless, sends to beneficiaries per current fractions)
     if fh_f > 1:
-        print(f"  {YELLOW}[2] PROCESS FEEHANDLER{RESET}")
-        print(f"      {fh_f:,.0f} CELO + stablecoins in FeeHandler (base fee portion)")
-        print(f"      handleAll() distributes: {carbon_frac*100:.0f}% to Carbon Fund, {clabs_frac*100:.0f}% to Operations Safe")
+        print(f"  {BOLD}{YELLOW}[2]{RESET} {BOLD}PROCESS FEEHANDLER{RESET}")
+        print(f"      {celo(fh_f)} + stablecoins  {DIM}(base fee portion){RESET}")
+        print(f"      handleAll() distributes: {ORANGE}{carbon_frac*100:.0f}%{RESET} Carbon Fund, {GREEN}{clabs_frac*100:.0f}%{RESET} Operations Safe")
         print(f"      {CYAN}cast send 0xcD437749E43A154C07F3553504c68fBfD56B8778 'handleAll()' \\")
         print(f"        --rpc-url https://forno.celo.org --private-key $PK{RESET}")
         # Iterate all known fee currency tokens in FeeHandler
@@ -753,198 +861,121 @@ def check_operations_during_period(date_from: str, date_to: str, rpc: str, compu
             ("BRLm", "0xe8537a3d056DA446677B9E9d6c5dB704EaAb4787", 18),
         ]
         fh_with_balance = []
-        for sym, addr, dec in fh_tokens:
+        for sym, taddr, dec in fh_tokens:
             try:
-                raw = cast_cmd(["cast", "call", addr, "balanceOf(address)(uint256)", FEE_HANDLER, "--rpc-url", rpc])
+                raw = cast_cmd(["cast", "call", taddr, "balanceOf(address)(uint256)", FEE_HANDLER, "--rpc-url", rpc])
                 bal = int(raw.split()[0]) / (10 ** dec) if raw else 0
                 if bal >= 1:
-                    fh_with_balance.append((sym, addr, bal))
+                    fh_with_balance.append((sym, taddr, bal))
             except Exception:
                 pass
 
         if fh_with_balance:
-            print(f"      Also stablecoins in FeeHandler — call distribute(token) for each:")
-            for sym, addr, bal in fh_with_balance:
-                print(f"        {sym}: {bal:,.2f}")
+            print(f"      {GREY}Also stablecoins in FeeHandler — distribute(token) each:{RESET}")
+            for sym, taddr, bal in fh_with_balance:
+                print(f"        {WHITE}{sym}{RESET}  {num(bal)}")
                 print(f"        {CYAN}cast send 0xcD437749E43A154C07F3553504c68fBfD56B8778 'distribute(address)' \\")
-                print(f"          {addr} \\")
+                print(f"          {taddr} \\")
                 print(f"          --rpc-url https://forno.celo.org --private-key $PK{RESET}")
 
     print("")
 
-    # Step 3: Cold-wallet top-up (BEFORE Safe batch)
+    # ---- Compute all distribution figures once (used by steps [3] and [4]) ----
+    safe_addr = "0x7A1E98FC9a008107DbD1f430a05Ace8cf6f3FE19"
     cold_topup = totals.get("stables_celo_equiv", 0) if totals else 0
     stables_usd_total = totals.get("stables_usd", 0) if totals else 0
-
-    safe_addr = "0x7A1E98FC9a008107DbD1f430a05Ace8cf6f3FE19"
-
-    print(f"  {YELLOW}[3] COLD-WALLET CELO TOP-UP TO SAFE{RESET}")
-    print(f"      Stables (${stables_usd_total:,.2f} USD) are RETAINED in the Safe.")
-    print(f"      Cold wallet sends the daily-priced CELO equivalent to the Safe so")
-    print(f"      Governance receives full revenue equivalent in CELO.")
-    print(f"      {BOLD}Amount to send from cold wallet: {cold_topup:,.2f} CELO{RESET}")
-    print(f"      Destination: {CYAN}{safe_addr}{RESET}")
-    print(f"      {CYAN}cast send {CELO_TOKEN_ADDR} 'transfer(address,uint256)' \\")
-    print(f"        {safe_addr} \\")
-    print(f"        $(cast --to-wei {cold_topup:.6f} ether) \\")
-    print(f"        --rpc-url https://forno.celo.org --private-key $COLD_PK{RESET}")
-    print("")
-
-    # Step 4: Generate Safe batch + execute
-    print(f"  {YELLOW}[4] DISTRIBUTE VIA SAFE BATCH{RESET}")
-    print(f"      - CELO -> Governance (after L1 cost + OP share + reserve withheld)")
-    print(f"      - OP share: CELO swapped -> WETH via Uniswap V3 -> OP recipient")
-    print(f"      - Stables: stay in Safe (NOT transferred)")
-    print(f"      Run AFTER steps [1], [2], [3] so all CELO is in the Safe")
-    print(f"")
-
+    surplus_celo = 0
+    safe_tokens = [
+        ("CELO", "0x471EcE3750Da237f93B8E339c536989b8978a438", 18),
+        ("USDT", "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e", 6),
+        ("USDC", "0xcebA9300f2b948710d2653dD7B07f33A8B32118C", 6),
+        ("USDm", "0x765DE816845861e75A25fCA122bb6898B8B1282a", 18),
+        ("EURm", "0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73", 18),
+    ]
     try:
         l1_cost = sum(r.get("total_l1_cost_celo", 0) for r in computed) if computed else 0
-
-        safe_tokens = [
-            ("CELO", "0x471EcE3750Da237f93B8E339c536989b8978a438", 18),
-            ("USDT", "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e", 6),
-            ("USDC", "0xcebA9300f2b948710d2653dD7B07f33A8B32118C", 6),
-            ("USDm", "0x765DE816845861e75A25fCA122bb6898B8B1282a", 18),
-            ("EURm", "0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73", 18),
-        ]
-
-        # Estimate Safe CELO after steps [1]+[2]+[3]
         vault_celo_raw = cast_cmd(["cast", "balance", VAULT, "--rpc-url", rpc, "--ether"])
         vault_celo_f = float(vault_celo_raw) if vault_celo_raw else 0
         fh_celo_to_safe = fh_f * clabs_frac
+        fee_celo = vault_celo_f + fh_celo_to_safe  # newly-withdrawn CELO fees
 
         op_share = totals.get("op_share_celo", 0) if totals else 0
-        op_share_weth_amt = totals.get("op_share_weth", 0) if totals else 0
         op_method_str = totals.get("op_share_method", "?") if totals else "?"
-
-        print(f"      Estimated Safe CELO after steps [1]+[2]+[3]:")
-        total_celo = 0
-        for name, addr, dec in safe_tokens:
-            bal_raw = cast_cmd(["cast", "call", addr, "balanceOf(address)(uint256)", safe_addr, "--rpc-url", rpc])
-            bal = int(bal_raw.split()[0]) / (10 ** dec) if bal_raw else 0
-            if name == "CELO":
-                total_celo = bal + vault_celo_f + fh_celo_to_safe + cold_topup
-
-        # CGP-287 residual: pre-cutoff revenue equiv MINUS what CGP-287 already paid to Gov.
-        # This residual physically sits in Vault/FH/Safe right now and must be carved out
-        # of the Gov transfer, routed to SURPLUS_RECIPIENT_DEFAULT (placeholder = Safe).
-        pre_cutoff_total_celo = sum(r["total_revenue_celo"] for r in pre_cutoff_computed) \
-            if 'pre_cutoff_computed' in globals() else 2600103
-        surplus_celo = max(pre_cutoff_total_celo - CGP_287_PAID_TO_GOV_CELO, 0)
-
-        # OP recipient placeholder = Safe -> swap SKIPPED, OP CELO stays in Safe.
+        # Live Uniswap V3 quote: OP share CELO -> WETH at current rate
+        op_share_weth_amt = quote_celo_to_weth(op_share, rpc) if op_share > 0 else 0
         op_recipient = os.environ.get("OP_SHARE_RECIPIENT", OP_SHARE_RECIPIENT_DEFAULT)
         op_is_placeholder = op_recipient.lower() == SAFE_ADDR.lower()
-        # Surplus recipient placeholder = Safe -> self-transfer (audit trail), stays in Safe.
-        surplus_recipient = os.environ.get("SURPLUS_RECIPIENT", SURPLUS_RECIPIENT_DEFAULT)
-        surplus_is_self = surplus_recipient.lower() == SAFE_ADDR.lower()
 
-        # OP CELO leaves Safe only if swap runs; surplus only if recipient != Safe.
-        op_celo_out = op_share if not op_is_placeholder else 0
-        surplus_celo_out = surplus_celo if not surplus_is_self else 0
-        # When OP/surplus stay in Safe, deduct from Gov so they remain rather than leak.
-        gov_celo = total_celo - l1_cost - op_celo_out - surplus_celo_out
-        if op_is_placeholder:
-            gov_celo -= op_share
-        if surplus_is_self:
-            gov_celo -= surplus_celo
+        # Pre-cutoff CELO (sweep_celo) lands in the Safe after step [1] and is
+        # operator funds. Use it toward the stables CELO-equiv top-up so the cold
+        # wallet only sends the remainder. Any leftover stays in the multisig.
+        precutoff_used = min(sweep_celo, cold_topup)
+        precutoff_leftover = sweep_celo - precutoff_used
+        cold_send = cold_topup - precutoff_used  # what the cold wallet must send
 
-        print(f"        Total CELO:       {total_celo:>12,.2f}  (Safe + Vault + {clabs_frac*100:.0f}% FeeHandler + cold top-up)")
-        print(f"        - L1 costs:       {l1_cost:>12,.0f}  CELO  -> {L1_COST_RECIPIENT_DEFAULT}")
+        # Gov's net CELO from fees (after L1/OP and any pre-cutoff that stays):
+        gov_from_fees = fee_celo - l1_cost - op_share - precutoff_leftover
+        total_celo = fee_celo + cold_send
+        gov_celo = gov_from_fees + cold_send
+        compute_ok = True
+    except Exception:
+        l1_cost = op_share = op_share_weth_amt = 0
+        vault_celo_f = fh_celo_to_safe = fee_celo = 0
+        gov_from_fees = gov_celo = total_celo = 0
+        precutoff_used = precutoff_leftover = cold_send = 0
+        op_is_placeholder = True
+        op_recipient = OP_SHARE_RECIPIENT_DEFAULT
+        op_method_str = "?"
+        compute_ok = False
+
+    # ---- Step 3: Cold-wallet exchange ----
+    print(f"  {BOLD}{YELLOW}[3]{RESET} {BOLD}COLD-WALLET EXCHANGE FOR RETAINED STABLES{RESET}")
+    print(f"      {GREY}Stablecoins STAY in the Safe (never sent to Gov). Pre-cutoff CELO")
+    print(f"      already in the Safe is used first; the cold wallet sends only the rest.{RESET}")
+    print(f"      Stables retained:           {usd(stables_usd_total)}  {DIM}(stay in Safe){RESET}")
+    print(f"      Stables CELO-equivalent:    {num(cold_topup, 14)}  {DIM}(= {usd(stables_usd_total)} at period prices){RESET}")
+    if precutoff_used > 0:
+        print(f"        - covered by pre-cutoff:  {num(precutoff_used, 14)}  {DIM}(CGP-287 CELO now in Safe after step [1]){RESET}")
+    print(f"        {BOLD}= Cold wallet provides:   {RED}{cold_send:>14,.2f}{RESET} {DIM}CELO{RESET}")
+    print(f"      {CYAN}cast send 0x471EcE3750Da237f93B8E339c536989b8978a438 'transfer(address,uint256)' \\")
+    print(f"        {safe_addr} \\")
+    print(f"        $(cast --to-wei {cold_send:.6f} ether)  --rpc-url https://forno.celo.org --private-key $COLD_PK{RESET}")
+    print(f"")
+
+    # ---- Step 4: Distribute CELO via Safe batch ----
+    print(f"  {BOLD}{YELLOW}[4]{RESET} {BOLD}DISTRIBUTE CELO VIA SAFE BATCH{RESET}")
+    print(f"      {GREY}Gov gets ONLY CELO (fees + stables equiv - OP - L1). OP share")
+    print(f"      -> WETH swap -> OP recipient. Stables stay. Run AFTER [1]-[3].{RESET}")
+    print(f"")
+    if compute_ok:
+        topup_note = f" + {cold_send:,.0f} cold send" if cold_send > 0 else ""
+        print(f"        {GREY}Distributable:{RESET}   {num(total_celo, 14)}  {DIM}(Vault + {clabs_frac*100:.0f}% FeeHandler{topup_note}; Safe pre-existing untouched){RESET}")
+        if precutoff_leftover > 0:
+            print(f"        {RED}- Pre-cutoff left:{RESET} {RED}{precutoff_leftover:>14,.0f}{RESET}  CELO  {DIM}-> stays in multisig (CGP-287){RESET}")
+        print(f"        {RED}- L1 costs:{RESET}      {RED}{l1_cost:>14,.0f}{RESET}  CELO  {DIM}->{RESET} {addr(L1_COST_RECIPIENT_DEFAULT)}")
+        print(f"        {RED}- OP share:{RESET}      {RED}{op_share:>14,.0f}{RESET}  CELO  {DIM}({op_method_str}){RESET}")
+        print(f"          {ORANGE}swap -> {op_share_weth_amt:.6f} WETH{RESET}  {DIM}(live Uniswap V3 quote, CELO/WETH 0.3%){RESET}")
         if op_is_placeholder:
-            print(f"        - OP share:       {op_share:>12,.0f}  CELO  ({op_method_str})  -> Safe (placeholder, swap SKIPPED)")
+            print(f"          {DIM}-> OP recipient TBD (set OP_SHARE_RECIPIENT; currently Safe placeholder){RESET}")
         else:
-            print(f"        - OP share:       {op_share:>12,.0f}  CELO  ({op_method_str})  -> swap to WETH (~{op_share_weth_amt:.4f}) -> {op_recipient}")
-        if surplus_is_self:
-            print(f"        - Surplus (CGP):  {surplus_celo:>12,.0f}  CELO  -> Safe self-transfer (residual = {pre_cutoff_total_celo:,.0f} - {CGP_287_PAID_TO_GOV_CELO:,.0f} paid)")
-        else:
-            print(f"        - Surplus (CGP):  {surplus_celo:>12,.0f}  CELO  -> {surplus_recipient}")
-        print(f"        = {BOLD}To Governance:  {gov_celo:>12,.2f} CELO{RESET}")
+            print(f"          {DIM}-> {op_recipient}{RESET}")
+        print(f"        {BOLD}{GREEN}= To Governance: {gov_celo:>14,.2f} CELO{RESET}  {DIM}(all CELO, incl. stables equiv){RESET}")
 
         print(f"")
-        print(f"      Stablecoins RETAINED in Safe (not transferred):")
-        for name, addr, dec in safe_tokens:
+        print(f"      {BOLD}Stablecoins RETAINED in Safe{RESET} {DIM}(never sent to Gov):{RESET}")
+        for name, taddr, dec in safe_tokens:
             if name == "CELO":
                 continue
-            bal_raw = cast_cmd(["cast", "call", addr, "balanceOf(address)(uint256)", safe_addr, "--rpc-url", rpc])
+            bal_raw = cast_cmd(["cast", "call", taddr, "balanceOf(address)(uint256)", safe_addr, "--rpc-url", rpc])
             bal = int(bal_raw.split()[0]) / (10 ** dec) if bal_raw else 0
-            fh_bal_raw = cast_cmd(["cast", "call", addr, "balanceOf(address)(uint256)", FEE_HANDLER, "--rpc-url", rpc])
+            fh_bal_raw = cast_cmd(["cast", "call", taddr, "balanceOf(address)(uint256)", FEE_HANDLER, "--rpc-url", rpc])
             fh_bal = int(fh_bal_raw.split()[0]) / (10 ** dec) if fh_bal_raw else 0
             total = bal + fh_bal * clabs_frac
             if total >= 0.01:
-                print(f"        {BOLD}{name}:  {total:>12,.2f}{RESET}  -> Safe")
-    except Exception:
-        l1_cost = 0
-        op_share = 0
-        op_share_weth_amt = 0
-        surplus_celo = 0
-        op_is_placeholder = True
-        surplus_is_self = True
+                print(f"        {WHITE}{name}{RESET}  {num(total, 12)}  {DIM}-> Safe{RESET}")
 
-    l1_recipient = os.environ.get("L1_COST_RECIPIENT", L1_COST_RECIPIENT_DEFAULT)
-    op_recipient = os.environ.get("OP_SHARE_RECIPIENT", OP_SHARE_RECIPIENT_DEFAULT)
-    surplus_recipient = os.environ.get("SURPLUS_RECIPIENT", SURPLUS_RECIPIENT_DEFAULT)
-
-    # Slippage suggestion: 99% of expected (1% slippage tolerance) — operator can override
-    weth_min_suggest = op_share_weth_amt * 0.99 if op_share_weth_amt > 0 else 0
-
-    print(f"")
-    print(f"      a) Generate the batch (run AFTER steps [1]+[2]+[3]):")
-    if op_is_placeholder:
-        print(f"         (OP recipient = Safe placeholder -> swap SKIPPED; --op-share-weth-min not needed)")
-    else:
-        print(f"         (--op-share-weth-min = {weth_min_suggest:.6f} WETH = 1% slippage; VERIFY via live pool quote before signing)")
-    print(f"      {CYAN}python3 prepare-safe-batch.py \\")
-    print(f"        --l1-cost-celo {l1_cost:.0f} \\")
-    print(f"        --l1-cost-recipient {l1_recipient} \\")
-    print(f"        --op-share-celo {op_share:.0f} \\")
-    print(f"        --op-share-recipient {op_recipient} \\")
-    if not op_is_placeholder:
-        print(f"        --op-share-weth-min {weth_min_suggest:.6f} \\")
-    print(f"        --surplus-celo {surplus_celo:.0f} \\")
-    print(f"        --surplus-recipient {surplus_recipient} \\")
-    print(f"        > batch.json{RESET}")
-    print(f"")
-    print(f"      b) Upload batch.json to Safe Transaction Builder:")
-    print(f"         {CYAN}https://app.safe.global/transactions/queue?safe=celo:{safe_addr}{RESET}")
-    print(f"         -> Transaction Builder -> drag & drop batch.json")
-    print(f"")
-    print(f"      c) 2-of-5 signers approve and execute")
-
-    print("")
-    print(f"  {YELLOW}[5] RECIPIENT ADDRESSES{RESET}")
-    print(f"      L1_COST_RECIPIENT  = {l1_recipient}  (hardwired default)")
-    if op_is_placeholder:
-        print(f"      OP_SHARE_RECIPIENT = {op_recipient}  {RED}(placeholder = Safe -> swap SKIPPED){RESET}")
-    else:
-        print(f"      OP_SHARE_RECIPIENT = {op_recipient}  (real address -> swap to WETH enabled)")
-    if surplus_is_self:
-        print(f"      SURPLUS_RECIPIENT  = {surplus_recipient}  {RED}(placeholder = Safe -> self-transfer){RESET}")
-    else:
-        print(f"      SURPLUS_RECIPIENT  = {surplus_recipient}  (real address)")
-    print(f"      Override via env vars (L1_COST_RECIPIENT, OP_SHARE_RECIPIENT, SURPLUS_RECIPIENT)")
-
-    # Stuck stablecoins in vault
-    try:
-        vault_usdt_raw = cast_cmd(["cast", "call",
-            "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e",
-            "balanceOf(address)(uint256)", VAULT, "--rpc-url", rpc])
-        vault_usdm_raw = cast_cmd(["cast", "call",
-            "0x765DE816845861e75A25fCA122bb6898B8B1282a",
-            "balanceOf(address)(uint256)", VAULT, "--rpc-url", rpc])
-        usdt_f = int(vault_usdt_raw.split()[0]) / 1e6 if vault_usdt_raw else 0
-        usdm_f = int(vault_usdm_raw.split()[0]) / 1e18 if vault_usdm_raw else 0
-        if usdt_f > 1 or usdm_f > 1:
-            print("")
-            print(f"  {RED}[!] STABLECOINS STUCK IN VAULT (no sweepERC20){RESET}")
-            if usdt_f > 1:
-                print(f"      USDT: {usdt_f:,.2f}")
-            if usdm_f > 1:
-                print(f"      USDm: {usdm_f:,.2f}")
-            print(f"      {BOLD}Requires vault contract upgrade to add sweepERC20().{RESET}")
-    except Exception:
-        pass
+    # NOTE: ERC-20 stablecoins stuck in the vault (no sweepERC20) are intentionally
+    # left untouched and excluded from all distribution math until a vault upgrade.
 
     print("")
     print("=" * 80)
@@ -968,6 +999,9 @@ def main():
     parser.add_argument("--json", dest="json_out", help="Output JSON to file")
     args = parser.parse_args()
 
+    global _VERBOSE
+    _VERBOSE = args.detail
+
     if not args.api_key:
         print("Error: DUNE_API_KEY not set. Use --api-key or set the env variable.", file=sys.stderr)
         sys.exit(1)
@@ -987,17 +1021,17 @@ def main():
         suggested_from, suggested_to, last_withdrawal_info = suggest_date_range(rpc, args.api_key)
         if not args.date_from:
             args.date_from = suggested_from
-            print(f"Auto-detected --from: {args.date_from} ({last_withdrawal_info})", file=sys.stderr)
+            vlog(f"Auto-detected --from: {args.date_from} ({last_withdrawal_info})")
         if not args.date_to:
             args.date_to = suggested_to
-            print(f"Auto-detected --to:   {args.date_to} (yesterday)", file=sys.stderr)
+            vlog(f"Auto-detected --to:   {args.date_to} (yesterday)")
         print("", file=sys.stderr)
 
     # Enforce CGP-287 cutoff: report covers strictly AFTER cutoff
     min_from = (dt.datetime.strptime(CGP_287_CUTOFF_DATE, "%Y-%m-%d") + dt.timedelta(days=1)).strftime("%Y-%m-%d")
     if args.date_from < min_from:
-        print(f"NOTE: --from {args.date_from} is on/before CGP-287 cutoff ({CGP_287_CUTOFF_DATE}).", file=sys.stderr)
-        print(f"      Bumping --from to {min_from} (pre-cutoff revenue handled by sweep batch).", file=sys.stderr)
+        vlog(f"NOTE: --from {args.date_from} is on/before CGP-287 cutoff ({CGP_287_CUTOFF_DATE}).")
+        vlog(f"      Bumping --from to {min_from} (pre-cutoff revenue handled by sweep batch).")
         args.date_from = min_from
         print("", file=sys.stderr)
 
@@ -1015,24 +1049,43 @@ def main():
 
     # Check freshness and optionally refresh
     if args.refresh:
-        print("Triggering Dune query execution...", file=sys.stderr)
+        vlog("Triggering Dune query execution...")
         exec_id = trigger_execution(args.api_key)
-        print(f"Execution ID: {exec_id}", file=sys.stderr)
+        vlog(f"Execution ID: {exec_id}")
         wait_for_execution(exec_id, args.api_key)
-        print("Query completed.", file=sys.stderr)
+        vlog("Query completed.")
     else:
         ensure_fresh_data(args.api_key, args.date_to, auto_refresh=args.auto_refresh)
 
     # Fetch results
-    print("Fetching Dune query results...", file=sys.stderr)
+    vlog("Fetching Dune query results...")
     rows = fetch_results(args.api_key)
-    print(f"Fetched {len(rows)} total rows.", file=sys.stderr)
+    vlog(f"Fetched {len(rows)} total rows.")
 
-    # Compute pre-cutoff sweep total (L2 genesis -> CGP-287 cutoff, inclusive)
-    pre_cutoff_rows = filter_rows(rows, L2_GENESIS_DATE, CGP_287_CUTOFF_DATE)
+    # Pre-cutoff sweep auto-detect: only needed when the latest vault withdrawal
+    # happened BEFORE the CGP-287 cutoff (so pre-cutoff revenue is still un-withdrawn
+    # in the contracts). If a withdrawal happened on/after cutoff, pre-cutoff was
+    # already drained -> no sweep.
+    today = dt.datetime.now(dt.timezone.utc).date().isoformat()
+    overall_last_wd = last_withdrawal_on_or_before(args.api_key, today)
+    show_sweep = (overall_last_wd == "") or (overall_last_wd < CGP_287_CUTOFF_DATE)
+
+    if overall_last_wd:
+        sweep_from = (dt.datetime.strptime(overall_last_wd, "%Y-%m-%d") + dt.timedelta(days=1)).strftime("%Y-%m-%d")
+    else:
+        sweep_from = L2_GENESIS_DATE
+    pre_cutoff_rows = filter_rows(rows, sweep_from, CGP_287_CUTOFF_DATE)
+    pre_cutoff_days = len(pre_cutoff_rows)
     pre_cutoff_computed = [compute_row(r) for r in pre_cutoff_rows]
-    pre_cutoff_celo = sum(r["total_revenue_celo"] for r in pre_cutoff_computed)
-    pre_cutoff_usd = sum(r["total_revenue_usd"] for r in pre_cutoff_computed)
+    sweep_celo = sum((r.get("fee_CELO", 0) or 0) for r in pre_cutoff_rows)
+    sweep_stables = {
+        "USDT": sum((r.get("fee_USDT", 0) or 0) for r in pre_cutoff_rows),
+        "USDC": sum((r.get("fee_USDC", 0) or 0) for r in pre_cutoff_rows),
+        "USDm": sum((r.get("fee_USDm", 0) or 0) for r in pre_cutoff_rows),
+        "EURm": sum((r.get("fee_EURm", 0) or 0) for r in pre_cutoff_rows),
+    }
+    if not show_sweep:
+        sweep_celo = 0  # already settled; nothing to carve in step [4]
 
     # Filter to date range
     filtered = filter_rows(rows, args.date_from, args.date_to)
@@ -1041,7 +1094,7 @@ def main():
         print("Try --refresh to update the Dune query.", file=sys.stderr)
         sys.exit(1)
 
-    print(f"Processing {len(filtered)} days in range.", file=sys.stderr)
+    vlog(f"Processing {len(filtered)} days in range.")
 
     # Compute derived fields
     computed = [compute_row(r) for r in filtered]
@@ -1051,16 +1104,18 @@ def main():
     if args.detail:
         print_report(computed, totals, show_daily=not args.no_daily)
     else:
-        print("=" * 80)
-        print(f"  CELO L2 SEQUENCER FEE REPORT  |  Period: {totals['day']} ({totals['num_days']} days)")
-        print(f"  (run with --detail for full P&L and daily breakdown)")
-        print("=" * 80)
+        print(f"{BOLD}{CYAN}{'=' * 80}{RESET}")
+        print(f"  {BOLD}{WHITE}CELO L2 SEQUENCER FEE REPORT{RESET}  {DIM}|{RESET}  {CYAN}{totals['day']}{RESET} {DIM}({totals['num_days']} days){RESET}")
+        print(f"  {DIM}run with --detail for full P&L and daily breakdown{RESET}")
+        print(f"{BOLD}{CYAN}{'=' * 80}{RESET}")
 
-    # Print pre-cutoff sweep section (one-time CGP-287 handling)
-    print_pre_cutoff_sweep(pre_cutoff_celo, pre_cutoff_usd, len(pre_cutoff_computed))
+    # Print pre-cutoff sweep section (step [0], one-time CGP-287 handling)
+    # Shown only when last withdrawal predates the CGP-287 cutoff (auto-detected).
+    if show_sweep:
+        print_pre_cutoff_sweep(sweep_from, pre_cutoff_days, sweep_celo, sweep_stables)
 
     # Reconciliation check
-    check_operations_during_period(args.date_from, args.date_to, rpc, computed, totals)
+    check_operations_during_period(args.date_from, args.date_to, rpc, computed, totals, args.api_key, sweep_celo, args.detail)
 
     if args.csv:
         write_csv(computed, totals, args.csv)
