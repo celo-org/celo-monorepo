@@ -71,6 +71,14 @@ contract EpochManager is
 
   uint256 public toProcessGroups = 0;
 
+  // Sum of voter rewards actually distributed to elected groups during the
+  // current epoch. May be less than `epochProcessing.totalRewardsVoter` due to
+  // per-group score, slashing multipliers, and integer rounding in
+  // `Election.getGroupEpochRewardsBasedOnScore`.
+  // NOTE: declared after all pre-existing state variables to preserve the
+  // proxy storage layout on in-place upgrades.
+  uint256 public totalDistributedVoterRewards;
+
   /**
    * @notice Event emitted when epochProcessing has begun.
    * @param epochNumber The epoch number that is being processed.
@@ -140,6 +148,18 @@ contract EpochManager is
   );
 
   /**
+   * @notice Emitted when voter reward commission is distributed to a group.
+   * @param group Address of the validator group receiving commission.
+   * @param commission Amount of CELO released to the group as commission.
+   * @param epochNumber The epoch number for which the commission is distributed.
+   */
+  event VoterRewardCommissionDistributed(
+    address indexed group,
+    uint256 commission,
+    uint256 indexed epochNumber
+  );
+
+  /**
    * @notice Throws if called by other than EpochManagerEnabler contract.
    */
   modifier onlyEpochManagerEnabler() {
@@ -168,24 +188,29 @@ contract EpochManager is
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
    * @param newEpochDuration The duration of an epoch in seconds.
+   * @param sortedOraclesAddress The address of the sorted oracles core smart contract.
    */
-  function initialize(address registryAddress, uint256 newEpochDuration) external initializer {
+  function initialize(
+    address registryAddress,
+    uint256 newEpochDuration,
+    address sortedOraclesAddress
+  ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setEpochDuration(newEpochDuration);
-    setOracleAddress(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
+    setOracleAddress(sortedOraclesAddress);
   }
 
   /**
    * @notice Initializes the EpochManager system, allowing it to start processing epoch
    * and distributing the epoch rewards.
-   * @dev Can only be called by the EpochManagerEnabler contract.
+   * @dev Can only be called by Owner. This function is only meant to be called during deployment of a new network.
    */
   function initializeSystem(
     uint256 firstEpochNumber,
     uint256 firstEpochBlock,
     address[] memory firstElected
-  ) external onlyEpochManagerEnabler {
+  ) external onlyOwner {
     require(
       getCeloToken().balanceOf(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURY_REGISTRY_ID)) >
         0,
@@ -315,7 +340,11 @@ contract EpochManager is
     IElection election = getElection();
 
     if (epochRewards != type(uint256).max) {
-      election.distributeEpochRewards(group, epochRewards, lesser, greater);
+      (, uint256 voterRewards) = _deductVoterRewardCommission(group, epochRewards);
+      if (voterRewards > 0) {
+        election.distributeEpochRewards(group, voterRewards, lesser, greater);
+      }
+      totalDistributedVoterRewards += voterRewards;
     }
 
     delete processedGroups[group];
@@ -376,7 +405,12 @@ contract EpochManager is
       // checks that group is actually from elected group
       require(epochRewards > 0, "group not from current elected set");
       if (epochRewards != type(uint256).max) {
-        election.distributeEpochRewards(groups[i], epochRewards, lessers[i], greaters[i]);
+        uint256 voterRewards;
+        (, voterRewards) = _deductVoterRewardCommission(groups[i], epochRewards);
+        if (voterRewards > 0) {
+          election.distributeEpochRewards(groups[i], voterRewards, lessers[i], greaters[i]);
+        }
+        totalDistributedVoterRewards += voterRewards;
       }
 
       delete processedGroups[groups[i]];
@@ -604,7 +638,7 @@ contract EpochManager is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 3);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -680,6 +714,62 @@ contract EpochManager is
   ) public view onlySystemAlreadyInitialized returns (uint256, uint256, uint256, uint256) {
     Epoch memory _epoch = epochs[epochNumber];
     return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
+  }
+
+  /**
+   * @notice Deducts voter reward commission for a group and releases CELO from treasury to group.
+   * @param group The validator group address.
+   * @param epochRewards The total voter epoch rewards for this group.
+   * @return commissionAmount The amount deducted as commission.
+   * @return voterRewards The remaining rewards to distribute to voters (epochRewards - commission).
+   * @dev ECONOMIC NOTE: Voter rewards are normally distributed as vote credit inflation via
+   * Election.distributeEpochRewards(), which creates deferred claims on the LockedGold pool
+   * redeemable when voters revoke and withdraw. This commission converts a portion of the
+   * already-budgeted totalRewardsVoter into an immediate CELO release from CeloUnreleasedTreasury.
+   * The total economic cost is unchanged — commission redirects part of the voter reward budget
+   * from deferred LockedGold claims to immediate treasury releases. The per-epoch treasury outflow
+   * from commission equals the sum of (groupVoterRewards * groupCommission) across all elected
+   * groups, bounded by maxVoterRewardCommission.
+   */
+  function _deductVoterRewardCommission(
+    address group,
+    uint256 epochRewards
+  ) internal returns (uint256 commissionAmount, uint256 voterRewards) {
+    IValidators validators = getValidators();
+
+    // If the group deregistered between epoch end and reward processing, skip commission.
+    if (!validators.isValidatorGroup(group)) {
+      return (0, epochRewards);
+    }
+
+    (uint256 voterRewardCommissionUnwrapped, , ) = validators.getVoterRewardCommission(group);
+
+    if (voterRewardCommissionUnwrapped == 0) {
+      return (0, epochRewards);
+    }
+
+    // Clamp to the governance-set max cap. Both setNextVoterRewardCommissionUpdate and
+    // updateVoterRewardCommission already enforce this cap at queue and activation time,
+    // so this branch is only reachable if governance lowered maxVoterRewardCommission AFTER
+    // a group's commission was activated. Acts as a defense-in-depth guard at distribution time.
+    uint256 maxCommission = validators.maxVoterRewardCommission();
+    if (voterRewardCommissionUnwrapped > maxCommission) {
+      voterRewardCommissionUnwrapped = maxCommission;
+    }
+
+    commissionAmount = FixidityLib
+      .newFixed(epochRewards)
+      .multiply(FixidityLib.wrap(voterRewardCommissionUnwrapped))
+      .fromFixed();
+    voterRewards = epochRewards - commissionAmount;
+
+    if (commissionAmount > 0) {
+      // Release CELO from treasury directly to the group.
+      // This mirrors the pattern used for community and carbon fund rewards
+      // in _finishEpochHelper().
+      getCeloUnreleasedTreasury().release(group, commissionAmount);
+      emit VoterRewardCommissionDistributed(group, commissionAmount, currentEpochNumber);
+    }
   }
 
   /**
@@ -761,6 +851,13 @@ contract EpochManager is
     _setElectedSigners(_newlyElected);
 
     ICeloUnreleasedTreasury celoUnreleasedTreasury = getCeloUnreleasedTreasury();
+    // Release only the voter rewards that were actually distributed to groups
+    // (post score, slashing multiplier, and rounding) to avoid stranding excess
+    // CELO in LockedGold without matching vote units.
+    celoUnreleasedTreasury.release(
+      registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID),
+      totalDistributedVoterRewards
+    );
     celoUnreleasedTreasury.release(
       registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID),
       _epochProcessing.totalRewardsCommunity
@@ -775,6 +872,7 @@ contract EpochManager is
     _epochProcessing.totalRewardsVoter = 0;
     _epochProcessing.totalRewardsCommunity = 0;
     _epochProcessing.totalRewardsCarbonFund = 0;
+    totalDistributedVoterRewards = 0;
 
     emit EpochProcessingEnded(currentEpochNumber - 1);
   }

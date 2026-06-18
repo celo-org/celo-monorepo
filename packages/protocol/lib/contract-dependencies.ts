@@ -1,4 +1,4 @@
-import { linkedLibraries } from '@celo/protocol/migrationsConfig'
+import { linkedLibraries } from '@celo/protocol/lib/linked-libraries'
 
 export class ContractDependencies {
   dependencies: Map<string, string[]>

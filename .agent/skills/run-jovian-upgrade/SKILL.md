@@ -262,7 +262,7 @@ MUST update the CONTEXT_BLOCK between TODOs when each slot is filled:
 | `NEW_CSC`    | T20                  | `cast call $SYSTEM_CONFIG "superchainConfig()(address)"`                           |
 | `NEW_ASR`    | T20                  | `cast call <PERM_GAME_V4> "anchorStateRegistry()(address)"`                        |
 | `OLD_CSC`    | **Mode A mainnet**: §B.4 literal at T01. **Other networks**: T11 dynamic capture from `SystemConfig.superchainConfig()` on the pre-v4 fork state | see §B.4b sepolia note |
-| `SUCCINCT_IMPL_ADDR` | **Mainnet**: §B.4 literal at T01 (initial). **Sepolia**: T01 grep from `exec-jovian-sepolia.sh SUCCINCT_IMPL=` line. **Chaos**: T01 grep from same script's chaos branch. T10 may override if Strategy A (deploy) succeeds — see §5.10. | §B.4 / §B.4b / §F.2 |
+| `SUCCINCT_IMPL_ADDR` | **Mainnet**: §B.4 literal at T01 (initial). **Sepolia**: T01 reads it from the matching `"sepolia-succ-vX")` case's CALLDATA in `exec-upgrade.sh` (impl embedded in the calldata blob, and in the `setImplementation(42, 0x...)` comment above the case where present) — succ-v2 → `0x67cd626e1c2534cd5a129ba9208de69b305ffbd3`, succ-v210 → `0x36ad817e6a273a05d6f7638bc3a68a0233b0c33e`. **Chaos**: operator-provided via the `SUCCINCT_IMPL` env to `./exec-upgrade.sh chaos succ-v2` (the planted/deployed impl captured at T01/T10) — NOT grep-ed from any script. T10 may override if Strategy A (deploy) succeeds — see §5.10. | §B.4 / §B.4b / §F.2 |
 | `SUCCINCT_PROPOSAL_ADDR` | T01 from §F.2 per NETWORK. | §F.2 literal |
 | `SUCCINCT_DEPLOY_STRATEGY` | T10 — set to `deploy` if Strategy A succeeds, `setcode` if fallback used. | §5.10 |
 | `SUCCINCT_REPO` | T01 — resolved per §3.4: mainnet → `$SUCCINCT_ROOT_MAINNET`, sepolia/chaos → `$SUCCINCT_ROOT`. | §3.4 |
@@ -345,18 +345,18 @@ with skipped phases marked as explicit SKIP TODOs). Use these exact subjects ver
 | T16 | Sign v5 (clabs + council) via CeloSuperchainOps                      | §5.16   |
 | T17 | Sign succ-v2 (clabs + council) via CeloSuperchainOps                 | §5.17   |
 | T18 | Simulate v4 via SuperchainOps (REQUIRED; skip only with documented reason) | §5.18 |
-| T19 | Execute v4 (exec-mocked.sh mainnet / exec-jovian-sepolia.sh sep/chaos) | §5.19   |
+| T19 | Execute v4 (exec-mocked.sh mainnet / exec-upgrade.sh sepolia v4 / exec-upgrade.sh chaos v4) | §5.19   |
 | T20 | CP1.1 — run post-v4 validation queries (discover $NEW_ASR, $NEW_CSC) | §5.20   |
 | T21 | CP1.2 — render PASS/FAIL table                                       | §5.21   |
 | T22 | CP1.3 — x-ray offer                                                  | §5.22   |
 | T23 | CP1.4 — checkpoint gate                                              | §5.23   |
 | T24 | Simulate v5 via SuperchainOps (REQUIRED; skip only with documented reason) | §5.24 |
-| T25 | Execute v5 (exec-mocked.sh mainnet / exec-jovian-sepolia.sh sep/chaos) | §5.25   |
+| T25 | Execute v5 (exec-mocked.sh mainnet / exec-upgrade.sh sepolia v5 / exec-upgrade.sh chaos v5) | §5.25   |
 | T26 | CP2.1 — run post-v5 validation queries                               | §5.26   |
 | T27 | CP2.2 — render PASS/FAIL table                                       | §5.27   |
 | T28 | CP2.3 — x-ray offer                                                  | §5.28   |
 | T29 | CP2.4 — checkpoint gate                                              | §5.29   |
-| T30 | Execute succ-v2 (exec-mocked.sh mainnet / exec-jovian-sepolia.sh sep/chaos: succinct-v2) | §5.30 |
+| T30 | Execute succ-v2 (exec-mocked.sh mainnet / exec-upgrade.sh sepolia succ-v2 / exec-upgrade.sh chaos succ-v2) | §5.30 |
 | T31 | CP3.1 — run post-succ-v2 validation queries                          | §5.31   |
 | T32 | CP3.2 — render PASS/FAIL table                                       | §5.32   |
 | T33 | CP3.3 — x-ray offer                                                  | §5.33   |
@@ -393,18 +393,18 @@ with skipped phases marked as explicit SKIP TODOs). Use these exact subjects ver
 | T16 | SKIP sign v5 — real sigs in secrets/.env.signers.v5                  | §5.16   |
 | T17 | SKIP sign succ-v2 — real sigs in secrets/.env.signers.succinct200    | §5.17   |
 | T18 | Simulate v4 via SuperchainOps (REQUIRED; skip only with documented reason) | §5.18 |
-| T19 | Execute v4 via exec-jovian.sh v4                                     | §5.19   |
+| T19 | Execute v4 via exec-upgrade.sh mainnet v4                            | §5.19   |
 | T20 | CP1.1 — run post-v4 validation queries                               | §5.20   |
 | T21 | CP1.2 — render PASS/FAIL table                                       | §5.21   |
 | T22 | CP1.3 — x-ray offer                                                  | §5.22   |
 | T23 | CP1.4 — checkpoint gate                                              | §5.23   |
 | T24 | Simulate v5 via SuperchainOps (REQUIRED)                             | §5.24   |
-| T25 | Execute v5 via exec-jovian.sh v5                                     | §5.25   |
+| T25 | Execute v5 via exec-upgrade.sh mainnet v5                            | §5.25   |
 | T26 | CP2.1 — run post-v5 validation queries                               | §5.26   |
 | T27 | CP2.2 — render PASS/FAIL table                                       | §5.27   |
 | T28 | CP2.3 — x-ray offer                                                  | §5.28   |
 | T29 | CP2.4 — checkpoint gate                                              | §5.29   |
-| T30 | Execute succ-v2 via exec-jovian.sh succ-v2                           | §5.30   |
+| T30 | Execute succ-v2 via exec-upgrade.sh mainnet succ-v2                  | §5.30   |
 | T31 | CP3.1 — post-succ-v2 queries                                         | §5.31   |
 | T32 | CP3.2 — render PASS/FAIL table                                       | §5.32   |
 | T33 | CP3.3 — x-ray offer                                                  | §5.33   |
@@ -496,9 +496,15 @@ Tier: `haiku`.
    `SUCCINCT_IMPL_ADDR` from §B.4 literals; on **sepolia/chaos**, `OLD_CSC` is
    deferred (set to empty placeholder — captured later at T11 from
    `SystemConfig.superchainConfig()` on the pre-v4 fork and copied into
-   CONTEXT_BLOCK before T12 dispatches), and `SUCCINCT_IMPL_ADDR` is captured
-   at T01 with
-   `grep -m1 'SUCCINCT_IMPL[_ADDR]*=' $CELO_ROOT/packages/op-tooling/exec/exec-jovian-sepolia.sh | sed 's/.*=//'`.
+   CONTEXT_BLOCK before T12 dispatches). On **sepolia**, `SUCCINCT_IMPL_ADDR` is
+   read at T01 from the matching `"sepolia-succ-vX")` case's CALLDATA in
+   `$CELO_ROOT/packages/op-tooling/exec/exec-upgrade.sh` (the impl is embedded in
+   the calldata blob, and in the `setImplementation(42, 0x...)` comment above the
+   case where present): succ-v2 → `0x67cd626e1c2534cd5a129ba9208de69b305ffbd3`,
+    succ-v210 → `0x36ad817e6a273a05d6f7638bc3a68a0233b0c33e`. On **chaos**,
+    `SUCCINCT_IMPL_ADDR` is operator-provided via the `SUCCINCT_IMPL` env to
+    `./exec-upgrade.sh chaos succ-v2` (the planted/deployed impl captured at
+    T01/T10) — NOT grep-ed from any script.
    `EXPECTED_NEW_ASR` is populated from §B.4 on mainnet and left empty on
    non-mainnet runs (compared dynamically at T20).
 3. **OPCM resolution**: Mode B sets `OPCM_V4` and `OPCM_V5` from §B.5. Mode A leaves
@@ -558,8 +564,8 @@ allowed in T02.
    fails, record `succinct_build=failed` — T10 will use Strategy B fallback.
 7. Report `succinct_build=ok|failed; fdg_config=$SUCCINCT_CONFIG_FILE|missing`.
 
-**Task (Mode B)**: only check `$CELO_ROOT/packages/op-tooling/exec/exec-jovian.sh`
-(mainnet) or `exec-jovian-sepolia.sh` (sepolia/chaos) exists AND
+**Task (Mode B)**: only check `$CELO_ROOT/packages/op-tooling/exec/exec-upgrade.sh`
+exists (unified runner for mainnet, sepolia, and chaos) AND
 `$CELO_ROOT/secrets/.env.signers.{v4,v5,succinct200}` are decrypted. If
 `INCLUDE_BASEFEE=yes`, ALSO check `$CELO_ROOT/secrets/.env.signers.basefee` — this
 is the pre-check so Phase 8 does not late-fail at T36.
@@ -914,10 +920,11 @@ NETWORK=$NETWORK TEST_PK=0x04cdae0aa51355d0bad6ec4e200138c71ca6686de3924382a048c
 ```
 `<ver>` = `v4` (T15), `v5` (T16), `succ-v2` (T17) — this is the CSCOps `just`
 recipe name and is uniform across networks. Note the downstream exec version
-string differs: on **mainnet** `exec-mocked.sh` / `exec-jovian.sh` take
-`VERSION=succ-v2`; on **sepolia/chaos** `exec-jovian-sepolia.sh` takes
-`succinct-v2` as the positional argument (see §B.4b "Sepolia naming"). The CSCOps
-sign step always uses `succ-v2`; do not substitute.
+string differs: on **mainnet** `exec-mocked.sh` takes `VERSION=succ-v2` and
+`exec-upgrade.sh` takes `succ-v2` as the positional version argument; on
+**sepolia** `exec-upgrade.sh` also takes `succ-v2` positionally (see §B.4b
+"Sepolia naming"). Chaos exec uses `./exec-upgrade.sh chaos` — see §5.19. The CSCOps sign step always
+uses `succ-v2`; do not substitute.
 
 **Task (Mode A, NETWORK=chaos)**: `STATUS: SKIP` with evidence
 `SKIP: chaos uses flat Safe, no nested CSCOps signing`.
@@ -964,9 +971,11 @@ Tier: `sonnet`.
 
 **Exec script selection**:
 - `NETWORK=mainnet, MODE=A`: `./exec-mocked.sh` (VERSION env)
-- `NETWORK=mainnet, MODE=B`: `./exec-jovian.sh v4`
-- `NETWORK=sepolia|chaos`, both modes: `./exec-jovian-sepolia.sh v4` (uses
-  hardcoded sigs; mock-sepolia.sh pre-setup is compatible)
+- `NETWORK=mainnet, MODE=B`: `./exec-upgrade.sh mainnet v4` (positional args)
+- `NETWORK=sepolia`, both modes: `./exec-upgrade.sh sepolia v4` (positional args;
+  uses hardcoded sigs; mock-sepolia.sh pre-setup is compatible)
+- `NETWORK=chaos`: `OPCM_ADDRESS=0x<v4_opcm> ./exec-upgrade.sh chaos v4` (flat Safe;
+  deployer PK signs directly; dynamic calldata; Safe nonce read on-chain)
 
 **Task (Mode A mainnet)**:
 ```
@@ -982,13 +991,19 @@ SIGNER_4_PK=0x04cdae0aa51355d0bad6ec4e200138c71ca6686de3924382a048c9cbf38ddef9 \
 **Task (Mode B mainnet)**:
 ```
 cd $CELO_ROOT/packages/op-tooling/exec
-RPC_URL=$RPC_URL PK=<real DEPLOYER_PK> ./exec-jovian.sh v4
+RPC_URL=$RPC_URL PK=<real DEPLOYER_PK> ./exec-upgrade.sh mainnet v4
 ```
 
-**Task (sepolia/chaos)**:
+**Task (sepolia)**:
 ```
 cd $CELO_ROOT/packages/op-tooling/exec
-RPC_URL=$RPC_URL NETWORK=$NETWORK PK=<real DEPLOYER_PK> ./exec-jovian-sepolia.sh v4
+RPC_URL=$RPC_URL PK=<real DEPLOYER_PK> ./exec-upgrade.sh sepolia v4
+```
+
+**Task (chaos)**:
+```
+cd $CELO_ROOT/packages/op-tooling/exec
+RPC_URL=$RPC_URL OPCM_ADDRESS=<v4 OPCM addr> PK=<real DEPLOYER_PK> ./exec-upgrade.sh chaos v4
 ```
 
 Grep for `Tx executed` / `status 1 (success)`. Tier: `sonnet`.
@@ -1041,7 +1056,9 @@ Tier: `sonnet`.
 
 **PRECONDITION**: T21 STATUS=PASS AND T23 gate completed AND T24 STATUS=PASS|SKIP.
 
-Same shape as T19 with `VERSION=v5` / `exec-jovian.sh v5` / `exec-jovian-sepolia.sh v5`.
+Same shape as T19 with `VERSION=v5` (mainnet Mode A `exec-mocked.sh`) /
+`./exec-upgrade.sh mainnet v5` (mainnet Mode B) / `./exec-upgrade.sh sepolia v5`
+(sepolia) / `OPCM_ADDRESS=0x<v5_opcm> ./exec-upgrade.sh chaos v5` (chaos) — see §5.19.
 Tier: `sonnet`.
 
 **Evidence**: `tx_status=success; tx_hash=0x<...>`.
@@ -1066,9 +1083,9 @@ Same shape as CP1.
 **PRECONDITION**: T27 STATUS=PASS AND T29 gate completed.
 
 **Version string by network**:
-- `NETWORK=mainnet`: `VERSION=succ-v2` / `./exec-jovian.sh succ-v2`
-- `NETWORK=sepolia|chaos`: `./exec-jovian-sepolia.sh succinct-v2` (the `-v2` spelling
-  differs — `succinct-v2` NOT `succ-v2`)
+- `NETWORK=mainnet`: `VERSION=succ-v2` (Mode A `exec-mocked.sh`) / `./exec-upgrade.sh mainnet succ-v2` (Mode B)
+- `NETWORK=sepolia`: `./exec-upgrade.sh sepolia succ-v2` (positional; `exec-upgrade.sh` uses the `succ-v2` token, not `succinct-v2`)
+- `NETWORK=chaos`: `SUCCINCT_IMPL=0x<impl> ./exec-upgrade.sh chaos succ-v2` (positional; `SC_OWNER_TARGET` optional, defaults to the flat Safe)
 
 Same exec-script shape as T19 with the correct version string. Tier: `sonnet`.
 
@@ -1427,7 +1444,7 @@ Sepolia/chaos proxy addresses → §B.4b below + `packages/op-tooling/verify/ver
 
 ### B.4b Sepolia & Chaos proxy addresses
 
-Sourced from `packages/op-tooling/exec/exec-jovian-sepolia.sh` and
+Sourced from `packages/op-tooling/exec/exec-upgrade.sh` and
 `packages/op-tooling/verify/verify-versions.sh`. Use when `NETWORK=sepolia` or `chaos`.
 
 **Sepolia**:
@@ -1440,7 +1457,7 @@ Sourced from `packages/op-tooling/exec/exec-jovian-sepolia.sh` and
 | OLD ASR (pre-v4)      | `0xD73BA8168A61F3E917F0930D5C0401aA47e269D6`              |
 | OLD CSC (pre-v4)      | **capture dynamically at T11** from `SystemConfig.superchainConfig()` and store as `OLD_CSC` in CONTEXT_BLOCK. Not hardcoded. |
 | SuperchainConfig      | `0x31bEef32135c90AE8E56Fb071B3587de289Aaf77`              |
-| Succinct impl target  | **capture at T01** via `grep -m1 'SUCCINCT_IMPL=' $CELO_ROOT/packages/op-tooling/exec/exec-jovian-sepolia.sh` (or the `SUCCINCT_IMPL_ADDR` variable). Store as `SUCCINCT_IMPL_ADDR`. |
+| Succinct impl target  | **capture at T01** from the matching `"sepolia-succ-vX")` case's CALLDATA in `$CELO_ROOT/packages/op-tooling/exec/exec-upgrade.sh` (impl embedded in the calldata blob and the `setImplementation(42, 0x...)` comment above the case where present): succ-v2 → `0x67cd626e1c2534cd5a129ba9208de69b305ffbd3`, succ-v210 → `0x36ad817e6a273a05d6f7638bc3a68a0233b0c33e`. Store as `SUCCINCT_IMPL_ADDR`. On chaos this is operator-provided via the `SUCCINCT_IMPL` env to `./exec-upgrade.sh chaos succ-v2` (see §B.4b "Chaos flow divergence"). |
 | EXPECTED_NEW_ASR      | empty on sepolia (discover dynamically at T20)             |
 
 **Chaos**: flat Safe topology, no nested approval chain. Addresses:
@@ -1452,16 +1469,19 @@ Sourced from `packages/op-tooling/exec/exec-jovian-sepolia.sh` and
 | ProxyAdmin          | `0xb2a0c2b49cdc2d3f0a0a291be0a6c20559ec053e` |
 | DisputeGameFactory  | `0x338ac809e6a045cfc8aeb16ff8a4329147b61afb` |
 
-**Sepolia naming**: the succinct version string in `exec-jovian-sepolia.sh` is
-`succinct-v2` (NOT `succ-v2`). T30 must pass `VERSION=succinct-v2` when `NETWORK=sepolia`.
+**Sepolia naming**: `exec-upgrade.sh` uses the `succ-v2` token for the succinct
+upgrade on BOTH sepolia and chaos (positional `./exec-upgrade.sh sepolia succ-v2` /
+`./exec-upgrade.sh chaos succ-v2`). T30 passes `succ-v2` for both networks.
 
 **Chaos flow divergence**: on chaos the Parent/cLabs/Council nested Safe chain
-does not exist. `exec-jovian-sepolia.sh` with `NETWORK=chaos` talks to the flat
-Safe directly and signs with the deployer PK (who must be a Safe owner).
-Consequently: T15/T16/T17 (`just sign` via CeloSuperchainOps) are not applicable
-on chaos — they return SKIP with reason `SKIP: chaos uses flat Safe, no nested
-signing`. CP1/CP2/CP3 nonce expectations use dynamic single-safe counters, not
-the three-Safe tuple.
+does not exist; the flat Safe is signed directly with the deployer PK (who must be
+a Safe owner). Chaos exec uses `./exec-upgrade.sh chaos <version>` (flat Safe,
+threshold 1, deployer PK signs; dynamic calldata; on-chain nonce). Supports only
+v4, v5, succ-v2.
+The non-chaos signing logic is unchanged: T15/T16/T17 (`just sign` via
+CeloSuperchainOps) are not applicable on chaos — they return SKIP with reason
+`SKIP: chaos uses flat Safe, no nested signing`. CP1/CP2/CP3 nonce expectations
+use dynamic single-safe counters, not the three-Safe tuple.
 
 ### B.5 Mode B OPCM addresses (no bootstrap)
 
@@ -1471,9 +1491,11 @@ the three-Safe tuple.
 ### B.6 SENDER addresses
 
 - mainnet: `0x95FFAC468e37DdeEF407FfEf18f0cC9E86D8f13B`
-- sepolia/chaos: read the `SENDER=` line from
-  `packages/op-tooling/exec/exec-mocked.sh` or `exec-jovian-sepolia.sh`. DO NOT guess.
-  The `$DEPLOYER_PK` must derive to the network's SENDER.
+- sepolia/chaos: `exec-upgrade.sh` has no `SENDER=` line — it derives the sender
+  from `PK` at runtime (`cast wallet address --private-key $PK`). The
+  `$DEPLOYER_PK` must derive to the network's SENDER; for the mocked mainnet flow
+  the `SENDER=` line still lives in `packages/op-tooling/exec/exec-mocked.sh`. DO
+  NOT guess.
 
 ### B.7 Default mocked signers (Mode A)
 
@@ -1521,7 +1543,7 @@ In Mode B the absolute numbers depend on on-chain history at block 24742240. The
 orchestrator captures them at T11 as `BASELINE_{PARENT,CLABS,COUNCIL}_NONCE` and
 compares *deltas* in later checkpoints.
 
-**Sepolia** (both modes; sourced from `exec-jovian-sepolia.sh` hardcoded nonces):
+**Sepolia** (both modes; sourced from `exec-upgrade.sh` hardcoded nonces):
 
 | Checkpoint            | Parent | cLabs | Council |
 | --------------------- | ------ | ----- | ------- |
@@ -1714,7 +1736,7 @@ via local deployment; Strategy B copies their bytecode from upstream.
 | -------- | ------------------------------------------ | ---------------------------------------------- |
 | mainnet  | `upgrades/mainnet/07-succ-v2.json`         | `0xE7bd695d6A17970A2D9dB55cfeF7F2024d630aE1`  |
 | sepolia  | `upgrades/sepolia/03-succ-v2.json`         | `0x67cd626E1C2534cD5A129ba9208de69B305Ffbd3`  |
-| chaos    | n/a (no proposal)                          | capture from `exec-jovian-sepolia.sh` `SUCCINCT_IMPL=` line |
+| chaos    | n/a (no proposal)                          | `SUCCINCT_IMPL` provided via env at exec time |
 
 At T01, populate `SUCCINCT_PROPOSAL_ADDR` from this table. On chaos, leave empty.
 
@@ -1740,8 +1762,10 @@ nonce is manually adjusted.
 **Sepolia**: deployed once, so the nonce is straightforward. Strategy A has a
 higher chance of matching if the correct Succinct repo commit is checked out.
 
-**Chaos**: no CeloSuperchainOps proposal exists. T10 always uses Strategy B
-(setCodeAtAddress from `$SUCCINCT_IMPL_ADDR` captured at T01).
+**Chaos**: no CeloSuperchainOps proposal exists; the chaos impl source is the
+planted/deployed impl (`SUCCINCT_IMPL_ADDR`) passed via the `SUCCINCT_IMPL` env to
+`./exec-upgrade.sh chaos succ-v2`. T10's chaos path (Strategy B setCodeAtAddress
+from `$SUCCINCT_IMPL_ADDR`) works again.
 
 ### F.4 Repo → vkey → address chain (why commits matter)
 

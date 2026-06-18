@@ -18,7 +18,7 @@ interface ISECP256K1 {
  * @dev Library providing arithmetic operations over signed `secpk256k1` signed message due to recover the signer public key EC point in `Solidity`.
  * @author cyphered.eth
  */
-library SECP256K1 {
+contract SECP256K1 {
   // Elliptic curve Constants
   uint256 private constant U255_MAX_PLUS_1 =
     57896044618658097711785492504343953926634992332820282019728792003956564819968;
@@ -73,11 +73,7 @@ library SECP256K1 {
     uint256 r = 1;
     uint256 bit = U255_MAX_PLUS_1;
     assembly {
-      for {
-
-      } gt(bit, 0) {
-
-      } {
+      for {} gt(bit, 0) {} {
         r := mulmod(mulmod(r, r, P), exp(_base, iszero(iszero(and(_exp, bit)))), P)
         r := mulmod(mulmod(r, r, P), exp(_base, iszero(iszero(and(_exp, div(bit, 2))))), P)
         r := mulmod(mulmod(r, r, P), exp(_base, iszero(iszero(and(_exp, div(bit, 4))))), P)
