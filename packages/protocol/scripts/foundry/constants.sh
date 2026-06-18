@@ -68,7 +68,11 @@ export LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWith
                 "contracts/governance/Proposals.sol:Proposals"
 )
 
-export LIBRARIES_PATH_08=("contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList")
+export LIBRARIES_PATH_08=("contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
+                "contracts-0.8/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
+                "contracts-0.8/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"
+                "contracts-0.8/governance/Proposals.sol:Proposals"
+)
 
 export LIBRARY_DEPENDENCIES_PATH=(
   "contracts/common/FixidityLib.sol"
@@ -76,11 +80,15 @@ export LIBRARY_DEPENDENCIES_PATH=(
   "contracts-0.8/common/linkedlists/LinkedList.sol"
   "contracts/common/linkedlists/SortedLinkedList.sol"
   "contracts/common/linkedlists/SortedLinkedListWithMedian.sol"
+  "contracts-0.8/common/linkedlists/SortedLinkedList.sol"
+  "contracts-0.8/common/linkedlists/SortedLinkedListWithMedian.sol"
   "lib/openzeppelin-contracts/contracts/math/SafeMath.sol"
   "lib/openzeppelin-contracts8/contracts/utils/math/SafeMath.sol"
   "lib/openzeppelin-contracts/contracts/math/Math.sol"
   "lib/openzeppelin-contracts/contracts/cryptography/ECDSA.sol"
   "lib/openzeppelin-contracts/contracts/utils/Address.sol"
+  "lib/openzeppelin-contracts8/contracts/utils/Address.sol"
   "lib/solidity-bytes-utils/contracts/BytesLib.sol"
+  "lib/solidity-bytes-utils-8/contracts/BytesLib.sol"
   "lib/celo-foundry/lib/forge-std/src/console.sol"
 )
