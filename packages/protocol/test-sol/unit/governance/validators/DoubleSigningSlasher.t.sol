@@ -1,23 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 pragma experimental ABIEncoderV2;
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/interfaces/IAccountsTest.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
-import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/interfaces/IDoubleSigningSlasherMock.sol";
+import "@test-sol/unit/governance/validators/mocks/MockValidators08.sol";
+import "@test-sol/unit/governance/validators/mocks/MockLockedGold08.sol";
 import "@celo-contracts/common/interfaces/IOwnable.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@test-sol/unit/governance/validators/mocks/DoubleSigningSlasherMock08.sol";
 
-// DoubleSigningSlasher was migrated to contracts-0.8; the deployable mock
-// (DoubleSigningSlasherMock08) lives in
-// test-sol/unit/governance/validators/CompileDoubleSigningSlasher.t.sol and is
-// deployed here via deployCodeTo.
-
-contract DoubleSigningSlasherBaseTest is TestWithUtils {
+contract DoubleSigningSlasherBaseTest is TestWithUtils08 {
   using FixidityLib for FixidityLib.Fraction;
 
   struct SlashingIncentives {
@@ -29,10 +23,9 @@ contract DoubleSigningSlasherBaseTest is TestWithUtils {
 
   SlashingIncentives public expectedSlashingIncentives;
 
-  IAccountsTest accounts;
-  MockValidators validators;
-  MockLockedGold lockedGold;
-  IDoubleSigningSlasherMock public slasher;
+  MockValidators08 validators;
+  MockLockedGold08 lockedGold;
+  DoubleSigningSlasherMock08 public slasher;
 
   address nonOwner;
 
@@ -55,12 +48,12 @@ contract DoubleSigningSlasherBaseTest is TestWithUtils {
   address caller2;
   uint256 caller2PK;
 
-  IDoubleSigningSlasherMock.SlashParams params;
+  DoubleSigningSlasherMock08.SlashParams params;
 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
   event DoubleSigningSlashPerformed(address indexed validator, uint256 indexed blockNumber);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     ph.setEpochSize(100);
     (nonOwner, nonOwnerPK) = actorWithPK("nonOwner");
@@ -70,42 +63,24 @@ contract DoubleSigningSlasherBaseTest is TestWithUtils {
     (otherGroup, groupPK) = actorWithPK("otherGroup");
     (caller2, caller2PK) = actorWithPK("caller2");
 
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    validators = new MockValidators08();
+    lockedGold = new MockLockedGold08();
+    slasher = new DoubleSigningSlasherMock08();
 
-    address accountsAddress = actor("Accounts");
-    deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
-    accounts = IAccountsTest(accountsAddress);
-    validators = new MockValidators();
-    lockedGold = new MockLockedGold();
-
-    address slasherAddress = actor("slasher");
-    deployCodeTo("DoubleSigningSlasherMock08", slasherAddress);
-    slasher = IDoubleSigningSlasherMock(slasherAddress);
-
-    registry = IRegistry(REGISTRY_ADDRESS);
-
-    accounts.createAccount();
-
+    // Register additional accounts in the existing Accounts contract from super.setUp()
     vm.prank(nonOwner);
-    accounts.createAccount();
-
-    vm.prank(validator);
-    accounts.createAccount();
-
-    vm.prank(otherValidator);
-    accounts.createAccount();
+    accountsContract.createAccount();
 
     vm.prank(group);
-    accounts.createAccount();
+    accountsContract.createAccount();
 
     vm.prank(otherGroup);
-    accounts.createAccount();
+    accountsContract.createAccount();
 
-    accounts.initialize(REGISTRY_ADDRESS);
-
+    // Register mocks in the existing registry (validator/caller2 accounts already
+    // created by _registerAndElectValidatorsForL2 via whenL2WithEpochManagerInitialization)
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
-    registry.setAddressFor("Accounts", address(accounts));
 
     vm.prank(validator);
     validators.affiliate(group);
@@ -174,7 +149,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
   uint256[] groupElectionIndices = new uint256[](0);
 
   function test_Reverts_WhenL2() public {
-    params = IDoubleSigningSlasherMock.SlashParams({
+    params = DoubleSigningSlasherMock08.SlashParams({
       signer: validator,
       index: validatorIndex,
       headerA: headerA,

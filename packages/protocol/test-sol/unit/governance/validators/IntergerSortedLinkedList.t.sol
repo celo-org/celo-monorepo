@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
 
-import "@celo-contracts/common/test/IntegerSortedLinkedListMock.sol";
+import "@test-sol/unit/governance/validators/IntegerSortedLinkedListMock-8.sol";
 
 contract IntegerSortedLinkedListTest is Test {
   IntegerSortedLinkedListMock public integerSortedLinkedListMock;
@@ -13,7 +13,7 @@ contract IntegerSortedLinkedListTest is Test {
     uint256 value;
   }
 
-  function setUp() public {
+  function setUp() public virtual {
     integerSortedLinkedListMock = new IntegerSortedLinkedListMock();
   }
 }
@@ -86,7 +86,7 @@ contract IntegerSortedLinkedListTest_Update is IntegerSortedLinkedListTest {
   uint256 value = 10;
   uint256 newValue = 20;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     integerSortedLinkedListMock.insert(key, value, 0, 0);
   }
@@ -123,7 +123,7 @@ contract IntegerSortedLinkedListTest_Remove is IntegerSortedLinkedListTest {
   uint256 key = 1;
   uint256 value = 10;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     integerSortedLinkedListMock.insert(key, value, 0, 0);
   }
@@ -162,7 +162,7 @@ contract IntegerSortedLinkedListTest_PopN is IntegerSortedLinkedListTest {
   uint256 n = 3;
   uint256 numElements = 10;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     for (uint256 key = 1; key < numElements + 1; key++) {

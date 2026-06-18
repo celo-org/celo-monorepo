@@ -1,30 +1,22 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 pragma experimental ABIEncoderV2;
 
-// This test file is in 0.5 although the contract is in 0.8
-
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 import "@celo-contracts/common/FixidityLib.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
+import { Vm } from "forge-std-8/Vm.sol";
 import "@celo-contracts/common/interfaces/IAccountsTest.sol";
-import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
-
-import "@celo-contracts/governance/interfaces/IValidators.sol";
-
-import "@celo-contracts/stability/test/MockStableToken.sol";
+import "@celo-contracts-8/governance/Validators.sol";
+import "@celo-contracts-8/stability/test/MockStableToken.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
-import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
+import "@test-sol/unit/governance/validators/mocks/MockLockedGold08.sol";
+import "@test-sol/utils/ECDSAHelper08.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
+import "@test-sol/unit/governance/validators/mocks/MockEpochManagerForMembershipHistory.sol";
+import "@test-sol/unit/common/mocks/MockEpochManager.sol";
 
-import "@test-sol/utils/ECDSAHelper.sol";
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-
-contract ValidatorsTest is TestWithUtils, ECDSAHelper {
+contract ValidatorsTest is ECDSAHelper08 {
   using FixidityLib for FixidityLib.Fraction;
-  using SafeMath for uint256;
 
   struct ValidatorLockedGoldRequirements {
     uint256 value;
@@ -42,11 +34,11 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
   }
 
   IAccountsTest accounts;
-  MockStableToken stableToken;
+  MockStableToken08 stableToken;
   MockElection election;
-  ValidatorsMockTunnel public validatorsMockTunnel;
-  IValidators public validators;
-  MockLockedGold lockedGold;
+  Validators public validators;
+  MockLockedGold08 lockedGold;
+  MockEpochManager public mockEpochManager;
 
   address owner;
   address nonValidator;
@@ -88,8 +80,6 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
   uint256 public maxGroupSize = 5;
   uint256 public commissionUpdateDelay = 3;
 
-  ValidatorsMockTunnel.InitParams public initParams;
-  ValidatorsMockTunnel.InitParams2 public initParams2;
 
   event AccountSlashed(
     address indexed slashed,
@@ -134,7 +124,7 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
 
   event SendValidatorPaymentCalled(address validator);
 
-  function setUp() public {
+  function setUp() public virtual override {
     super.setUp();
     owner = address(this);
     group = actor("group");
@@ -166,10 +156,10 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
     accounts = IAccountsTest(accountsAddress);
     accounts.initialize(REGISTRY_ADDRESS);
 
-    lockedGold = new MockLockedGold();
+    lockedGold = new MockLockedGold08();
     election = new MockElection();
 
-    stableToken = new MockStableToken();
+    stableToken = new MockStableToken08();
 
     registry.setAddressFor(AccountsContract, address(accounts));
     registry.setAddressFor(ElectionContract, address(election));
@@ -191,33 +181,43 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
     vm.prank(nonValidator);
     accounts.createAccount();
 
+    // Limit elected validators to 2 so _registerAndElectValidatorsForL2 only registers
+    // actor("validator") and actor("otherValidator"), both of which are also registered above.
+    // This avoids vm.addr(i) addresses being registered in accountsContract (TestWithUtils08's
+    // Accounts) but not in ours, which would cause captureEpochAndValidators to fail.
+    numberValidators = 2;
     whenL2WithEpochManagerInitialization();
+
+    // Replace the real EpochManager_WithMocks with MockEpochManager so that
+    // sendValidatorPayment emits SendValidatorPaymentCalled (test-observable) rather
+    // than attempting real token transfers, and so epoch tracking remains controllable.
+    // Initialize with epoch 3 / firstBlock 34560, matching what whenL2WithEpochManagerInitialization sets.
+    address[] memory emptyElected = new address[](0);
+    mockEpochManager = new MockEpochManager();
+    mockEpochManager.initializeSystem(3, 34560, emptyElected);
+    registry.setAddressFor(EpochManagerContract, address(mockEpochManager));
   }
 
-  function deployAndInitValidatorsContract(address _validatorsContractAddress) public {
-    // ValidatorsCompile should be Validators.sol
-    // The reason is deployed like this is because is in an old solidity version
-    // and forge can't deploy contracts that are not imported explicitly
-    deployCodeTo("ValidatorsCompile", _validatorsContractAddress);
-    validators = IValidators(_validatorsContractAddress);
-    validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
+  function deployAndInitValidatorsContract(address) public {
+    validators = new Validators(true);
     registry.setAddressFor(ValidatorsContract, address(validators));
 
-    initParams = ValidatorsMockTunnel.InitParams({
-      registryAddress: REGISTRY_ADDRESS,
-      groupRequirementValue: originalGroupLockedGoldRequirements.value,
-      groupRequirementDuration: originalGroupLockedGoldRequirements.duration,
-      validatorRequirementValue: originalValidatorLockedGoldRequirements.value,
-      validatorRequirementDuration: originalValidatorLockedGoldRequirements.duration
-    });
-    initParams2 = ValidatorsMockTunnel.InitParams2({
-      _membershipHistoryLength: membershipHistoryLength,
-      _slashingMultiplierResetPeriod: slashingMultiplierResetPeriod,
-      _maxGroupSize: maxGroupSize,
-      _commissionUpdateDelay: commissionUpdateDelay
+    Validators.InitParams memory vInitParams = Validators.InitParams({
+      commissionUpdateDelay: commissionUpdateDelay
     });
 
-    validatorsMockTunnel.MockInitialize(owner, initParams, initParams2);
+    vm.prank(owner);
+    validators.initialize(
+      REGISTRY_ADDRESS,
+      originalGroupLockedGoldRequirements.value,
+      originalGroupLockedGoldRequirements.duration,
+      originalValidatorLockedGoldRequirements.value,
+      originalValidatorLockedGoldRequirements.duration,
+      membershipHistoryLength,
+      slashingMultiplierResetPeriod,
+      maxGroupSize,
+      vInitParams
+    );
   }
   function _registerValidatorGroupWithMembers(address _group, uint256 _numMembers) public {
     _registerValidatorGroupHelper(_group, _numMembers);
@@ -285,7 +285,7 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
     uint256 privateKey
   ) public pure returns (uint8, bytes32, bytes32) {
     bytes32 addressHash = keccak256(abi.encodePacked(_address));
-    bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
+    bytes32 prefixedHash = toEthSignedMessageHash(addressHash);
     return vm.sign(privateKey, prefixedHash);
   }
 
@@ -359,11 +359,11 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
 
     lockedGold.setAccountTotalLockedGold(
       _group,
-      originalGroupLockedGoldRequirements.value.mul(numMembers)
+      originalGroupLockedGoldRequirements.value * numMembers
     );
 
     vm.prank(_group);
-    validators.registerValidatorGroup(commission.unwrap());
+    validators.registerValidatorGroup(commission.value);
   }
 
   function _removeMemberAndTimeTravel(
@@ -379,13 +379,13 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
   function _calculateScore(uint256 _uptime, uint256 _gracePeriod) internal view returns (uint256) {
     return
       _safeExponent(
-        _max1(_uptime.add(_gracePeriod)),
+        _max1(_uptime + _gracePeriod),
         FixidityLib.wrap(originalValidatorScoreParameters.exponent)
       );
   }
 
   function _max1(uint256 num) internal pure returns (FixidityLib.Fraction memory) {
-    return num > FixidityLib.fixed1().unwrap() ? FixidityLib.fixed1() : FixidityLib.wrap(num);
+    return num > FixidityLib.fixed1().value ? FixidityLib.fixed1() : FixidityLib.wrap(num);
   }
 
   function _safeExponent(
@@ -393,33 +393,71 @@ contract ValidatorsTest is TestWithUtils, ECDSAHelper {
     FixidityLib.Fraction memory exponent
   ) internal pure returns (uint256) {
     if (FixidityLib.equals(base, FixidityLib.newFixed(0))) return 0;
-    if (FixidityLib.equals(exponent, FixidityLib.newFixed(0))) return FixidityLib.fixed1().unwrap();
+    if (FixidityLib.equals(exponent, FixidityLib.newFixed(0))) return FixidityLib.fixed1().value;
 
     FixidityLib.Fraction memory result = FixidityLib.fixed1();
 
-    for (uint256 i = 0; i < exponent.unwrap(); i++) {
+    for (uint256 i = 0; i < exponent.value; i++) {
       if (FixidityLib.multiply(result, base).value < 1) revert("SafeExponent: Overflow");
 
       result = FixidityLib.multiply(result, base);
     }
 
-    return result.unwrap();
+    return result.value;
   }
+  function containsLog(
+    Vm.Log[] memory logs,
+    string memory signatureString
+  ) private pure returns (bool) {
+    bytes32 signature = keccak256(abi.encodePacked(signatureString));
+    for (uint256 i = 0; i < logs.length; i++) {
+      if (logs[i].topics[0] == signature) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function emitsLog(function() action, string memory signatureString) private returns (bool) {
+    vm.recordLogs();
+    action();
+    Vm.Log[] memory entries = vm.getRecordedLogs();
+    return containsLog(entries, signatureString);
+  }
+
+  function assertDoesNotEmit(function() action, string memory signatureString) internal {
+    assertFalse(emitsLog(action, signatureString));
+  }
+
 }
 
 contract ValidatorsTest_Initialize is ValidatorsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     address newValidatorsContractAddress = actor("ValidatorsContract");
     deployAndInitValidatorsContract(newValidatorsContractAddress);
   }
   function test_ShouldhaveSetTheOwner() public {
-    assertEq(Ownable(address(validators)).owner(), owner, "Incorrect Owner.");
+    assertEq(IOwnable(address(validators)).owner(), owner, "Incorrect Owner.");
   }
 
   function test_Reverts_WhenCalledMoreThanOnce() public {
+    Validators.InitParams memory vInitParams = Validators.InitParams({
+      commissionUpdateDelay: commissionUpdateDelay
+    });
     vm.expectRevert("contract already initialized");
-    validatorsMockTunnel.MockInitialize(owner, initParams, initParams2);
+    vm.prank(owner);
+    validators.initialize(
+      REGISTRY_ADDRESS,
+      originalGroupLockedGoldRequirements.value,
+      originalGroupLockedGoldRequirements.duration,
+      originalValidatorLockedGoldRequirements.value,
+      originalValidatorLockedGoldRequirements.duration,
+      membershipHistoryLength,
+      slashingMultiplierResetPeriod,
+      maxGroupSize,
+      vInitParams
+    );
   }
 
   function test_shouldHaveSetGroupLockedGoldRequirements() public {
@@ -514,8 +552,6 @@ contract ValidatorsTest_ComputeEpochReward is ValidatorsTest {
 contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
   uint256 newSize = maxGroupSize + 1;
 
-  event MaxGroupSizeSet(uint256 size);
-
   function test_Emits_MaxGroupSizeSet() public {
     vm.expectEmit(true, true, true, true);
     emit MaxGroupSizeSet(newSize);
@@ -605,7 +641,7 @@ contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
 }
 
 contract ValidatorsTest_RegisterValidatorNoBls is ValidatorsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
@@ -755,7 +791,7 @@ contract ValidatorsTest_RegisterValidatorNoBls is ValidatorsTest {
   function test_Reverts_WhenAccountDoesNotMeetLockedGoldRequirements() public {
     lockedGold.setAccountTotalLockedGold(
       validator,
-      originalValidatorLockedGoldRequirements.value.sub(11)
+      originalValidatorLockedGoldRequirements.value - 11
     );
     vm.expectRevert("Deposit too small");
     vm.prank(validator);
@@ -770,7 +806,7 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValid
 {
   uint256 public constant INDEX = 0;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -838,7 +874,7 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
 {
   uint256 public constant INDEX = 0;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -858,7 +894,7 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
     _removeMemberAndTimeTravel(
       group,
       validator,
-      originalValidatorLockedGoldRequirements.duration.add(1)
+      originalValidatorLockedGoldRequirements.duration + 1
     );
     assertTrue(validators.isValidator(validator));
     _deregisterValidator(validator);
@@ -873,7 +909,7 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
     _removeMemberAndTimeTravel(
       group,
       validator,
-      originalValidatorLockedGoldRequirements.duration.add(1)
+      originalValidatorLockedGoldRequirements.duration + 1
     );
     assertTrue(validators.isValidator(validator));
     _deregisterValidator(validator);
@@ -886,7 +922,7 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
     _removeMemberAndTimeTravel(
       group,
       validator,
-      originalValidatorLockedGoldRequirements.duration.add(1)
+      originalValidatorLockedGoldRequirements.duration + 1
     );
     _deregisterValidator(validator);
     assertEq(validators.getAccountLockedGoldRequirement(validator), 0);
@@ -898,7 +934,7 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
     _removeMemberAndTimeTravel(
       group,
       validator,
-      originalValidatorLockedGoldRequirements.duration.add(1)
+      originalValidatorLockedGoldRequirements.duration + 1
     );
     vm.expectEmit(true, true, true, true);
     emit ValidatorDeregistered(validator);
@@ -911,7 +947,7 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
     _removeMemberAndTimeTravel(
       group,
       validator,
-      originalValidatorLockedGoldRequirements.duration.sub(1)
+      originalValidatorLockedGoldRequirements.duration - 1
     );
     vm.expectRevert("Not yet requirement end time");
     _deregisterValidator(validator);
@@ -933,7 +969,7 @@ contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirement
 {
   address nonRegisteredGroup;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     nonRegisteredGroup = actor("nonRegisteredGroup");
 
@@ -958,7 +994,7 @@ contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirement
   }
 
   function test_Reverts_WhenGroupDoesNotMeetLockedGoldrequirements() public {
-    lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value.sub(11));
+    lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value - 11);
 
     vm.expectRevert("Group doesn't meet requirements");
 
@@ -969,7 +1005,7 @@ contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirement
   function test_Reverts_WhenValidatorDoesNotMeetLockedGoldrequirements() public {
     lockedGold.setAccountTotalLockedGold(
       validator,
-      originalValidatorLockedGoldRequirements.value.sub(11)
+      originalValidatorLockedGoldRequirements.value - 11
     );
 
     vm.expectRevert("Validator doesn't meet requirements");
@@ -999,7 +1035,7 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
   uint256 validatorAffiliationEpochNumber;
   uint256 validatorAdditionEpochNumber;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     otherGroup = actor("otherGroup");
@@ -1119,7 +1155,7 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
   uint256 additionEpoch;
   uint256 deaffiliationEpoch;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -1249,7 +1285,7 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
 contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
   bytes validatorEcdsaPubKey;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     vm.prank(address(accounts));
@@ -1307,7 +1343,7 @@ contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
 }
 
 contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -1317,7 +1353,7 @@ contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
     lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value);
     vm.expectRevert("Cannot vote for more than max number of groups");
     vm.prank(group);
-    validators.registerValidatorGroup(commission.unwrap());
+    validators.registerValidatorGroup(commission.value);
   }
 
   function test_Reverts_WhenDelegatingCELO() public {
@@ -1325,7 +1361,7 @@ contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
     lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value);
     vm.expectRevert("Cannot delegate governance power");
     vm.prank(group);
-    validators.registerValidatorGroup(commission.unwrap());
+    validators.registerValidatorGroup(commission.value);
   }
 
   function test_ShouldMarkAccountAsValidatorGroup() public {
@@ -1349,7 +1385,7 @@ contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
     _registerValidatorGroupHelper(group, 1);
     (, uint256 _commission, , , , , ) = validators.getValidatorGroup(group);
 
-    assertEq(_commission, commission.unwrap());
+    assertEq(_commission, commission.value);
   }
 
   function test_ShouldSetAccountLockedGoldRequirements() public {
@@ -1364,16 +1400,16 @@ contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
     lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value);
 
     vm.expectEmit(true, true, true, true);
-    emit ValidatorGroupRegistered(group, commission.unwrap());
+    emit ValidatorGroupRegistered(group, commission.value);
     vm.prank(group);
-    validators.registerValidatorGroup(commission.unwrap());
+    validators.registerValidatorGroup(commission.value);
   }
 
   function test_Reverts_WhenAccountDoesNotMeetLockedGoldRequirements() public {
-    lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value.sub(11));
+    lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value - 11);
     vm.expectRevert("Not enough locked gold");
     vm.prank(group);
-    validators.registerValidatorGroup(commission.unwrap());
+    validators.registerValidatorGroup(commission.value);
   }
 
   function test_Reverts_WhenTheAccountIsAlreadyRegisteredValidator() public {
@@ -1381,27 +1417,27 @@ contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
 
     lockedGold.setAccountTotalLockedGold(
       validator,
-      originalGroupLockedGoldRequirements.value.sub(11)
+      originalGroupLockedGoldRequirements.value - 11
     );
     vm.expectRevert("Already registered as validator");
     vm.prank(validator);
-    validators.registerValidatorGroup(commission.unwrap());
+    validators.registerValidatorGroup(commission.value);
   }
 
   function test_Reverts_WhenTheAccountIsAlreadyRegisteredValidatorGroup() public {
     _registerValidatorGroupHelper(group, 1);
 
-    lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value.sub(11));
+    lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value - 11);
     vm.expectRevert("Already registered as group");
     vm.prank(group);
-    validators.registerValidatorGroup(commission.unwrap());
+    validators.registerValidatorGroup(commission.value);
   }
 }
 
 contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers is ValidatorsTest {
   uint256 public constant INDEX = 0;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -1439,7 +1475,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers is 
   function test_Reverts_WhenWrongIndexProvided() public {
     vm.expectRevert("deleteElement: index out of range");
     vm.prank(group);
-    validators.deregisterValidatorGroup(INDEX.add(1));
+    validators.deregisterValidatorGroup(INDEX + 1);
   }
 
   function test_Reverts_WhenAccountDoesNotHaveRegisteredValidatorGroup() public {
@@ -1453,7 +1489,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers is 
 contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is ValidatorsTest {
   uint256 public constant INDEX = 0;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -1472,7 +1508,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
     _removeMemberAndTimeTravel(
       group,
       validator,
-      originalGroupLockedGoldRequirements.duration.add(1)
+      originalGroupLockedGoldRequirements.duration + 1
     );
 
     vm.prank(group);
@@ -1489,7 +1525,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
     _removeMemberAndTimeTravel(
       group,
       validator,
-      originalGroupLockedGoldRequirements.duration.add(1)
+      originalGroupLockedGoldRequirements.duration + 1
     );
     vm.prank(group);
     validators.deregisterValidatorGroup(INDEX);
@@ -1502,7 +1538,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
     _removeMemberAndTimeTravel(
       group,
       validator,
-      originalGroupLockedGoldRequirements.duration.add(1)
+      originalGroupLockedGoldRequirements.duration + 1
     );
 
     vm.prank(group);
@@ -1516,7 +1552,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
     _removeMemberAndTimeTravel(
       group,
       validator,
-      originalGroupLockedGoldRequirements.duration.add(1)
+      originalGroupLockedGoldRequirements.duration + 1
     );
 
     vm.expectEmit(true, true, true, true);
@@ -1529,7 +1565,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
     _removeMemberAndTimeTravel(
       group,
       validator,
-      originalGroupLockedGoldRequirements.duration.sub(1)
+      originalGroupLockedGoldRequirements.duration - 1
     );
 
     vm.expectRevert("Hasn't been empty for long enough");
@@ -1550,7 +1586,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
 
   uint256[] expectedSizeHistory;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -1603,9 +1639,9 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
       .getMembershipHistory(validator);
 
     assertEq(_epochs.length, expectedEntries);
-    assertEq(_epochs[expectedEntries.sub(1)], _additionEpoch);
+    assertEq(_epochs[expectedEntries - 1], _additionEpoch);
     assertEq(_membershipGroups.length, expectedEntries);
-    assertEq(_membershipGroups[expectedEntries.sub(1)], group);
+    assertEq(_membershipGroups[expectedEntries - 1], group);
   }
 
   function test_ShouldMarkGroupAsEligible() public {
@@ -1647,7 +1683,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
 
     assertEq(expectedSizeHistory.length, 1);
 
-    for (uint256 i = 2; i < maxGroupSize.add(1); i++) {
+    for (uint256 i = 2; i < maxGroupSize + 1; i++) {
       uint256 _numMembers = i;
       uint256 _validator1Pk = i;
       address _validator1 = vm.addr(_validator1Pk);
@@ -1661,7 +1697,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
       validators.affiliate(group);
       lockedGold.setAccountTotalLockedGold(
         group,
-        originalGroupLockedGoldRequirements.value.mul(_numMembers)
+        originalGroupLockedGoldRequirements.value * _numMembers
       );
 
       vm.prank(group);
@@ -1676,14 +1712,14 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
 
       uint256 requirement = validators.getAccountLockedGoldRequirement(group);
 
-      assertEq(requirement, originalGroupLockedGoldRequirements.value.mul(_numMembers));
+      assertEq(requirement, originalGroupLockedGoldRequirements.value * _numMembers);
     }
   }
 
   function test_Reverts_WhenValidatorDoesNotMeetLockedGoldRequirements() public {
     lockedGold.setAccountTotalLockedGold(
       validator,
-      originalValidatorLockedGoldRequirements.value.sub(11)
+      originalValidatorLockedGoldRequirements.value - 11
     );
     vm.expectRevert("Validator requirements not met");
     vm.prank(group);
@@ -1693,7 +1729,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
   function test_Reverts_WhenGroupDoesNotHaveMember_WhenGroupDoesNotMeetLockedGoldRequirements()
     public
   {
-    lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value.sub(11));
+    lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value - 11);
     vm.expectRevert("Group requirements not met");
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
@@ -1704,7 +1740,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
   {
     lockedGold.setAccountTotalLockedGold(
       group,
-      originalGroupLockedGoldRequirements.value.mul(2).sub(11)
+      originalGroupLockedGoldRequirements.value * 2 - 11
     );
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
@@ -1745,7 +1781,7 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
   uint256 _registrationEpoch;
   uint256 _additionEpoch;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _registerValidatorGroupWithMembers(group, 1);
   }
@@ -1830,7 +1866,7 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
 }
 
 contract ValidatorsTest_ReorderMember is ValidatorsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _registerValidatorGroupWithMembers(group, 2);
   }
@@ -1879,9 +1915,9 @@ contract ValidatorsTest_ReorderMember is ValidatorsTest {
 }
 
 contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
-  uint256 newCommission = commission.unwrap().add(1);
+  uint256 newCommission = commission.value + 1;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _registerValidatorGroupHelper(group, 1);
   }
@@ -1892,7 +1928,7 @@ contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
 
     (, uint256 _commission, , , , , ) = validators.getValidatorGroup(group);
 
-    assertEq(_commission, commission.unwrap());
+    assertEq(_commission, commission.value);
   }
 
   function test_ShouldSetValidatorGroupNextCommission() public {
@@ -1908,7 +1944,7 @@ contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
     emit ValidatorGroupCommissionUpdateQueued(
       group,
       newCommission,
-      commissionUpdateDelay.add(uint256(block.number))
+      commissionUpdateDelay + block.number
     );
     vm.prank(group);
     validators.setNextCommissionUpdate(newCommission);
@@ -1918,23 +1954,23 @@ contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
     vm.expectRevert("Commission must be different");
 
     vm.prank(group);
-    validators.setNextCommissionUpdate(commission.unwrap());
+    validators.setNextCommissionUpdate(commission.value);
   }
 
   function test_Reverts_WhenCommissionGreaterThan1() public {
     vm.expectRevert("Commission can't be greater than 100%");
 
     vm.prank(group);
-    validators.setNextCommissionUpdate(FixidityLib.fixed1().unwrap().add(1));
+    validators.setNextCommissionUpdate(FixidityLib.fixed1().value + 1);
   }
 }
 
 contract ValidatorsTest_UpdateCommission_Setup is ValidatorsTest {}
 
 contract ValidatorsTest_UpdateCommission is ValidatorsTest {
-  uint256 newCommission = commission.unwrap().add(1);
+  uint256 newCommission = commission.value + 1;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 2);
@@ -2036,8 +2072,16 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
   address[] public actualMembershipHistoryGroups;
   uint256[] public actualMembershipHistoryEpochs;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
+
+    // Replace EpochManager with a lightweight mock that computes epoch numbers
+    // using the L1-precompile formula.  The real EpochManager_WithMocks never
+    // advances currentEpochNumber without full epoch processing, so all blocks
+    // would map to the same epoch and membership-history assertions would fail.
+    MockEpochManagerForMembershipHistory mockEM = new MockEpochManagerForMembershipHistory();
+    registry.setAddressFor(EpochManagerContract, address(mockEM));
+
     _registerValidatorHelper(validator, validatorPk);
 
     _registerValidatorGroupHelper(group, 1);
@@ -2102,7 +2146,7 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
     expectedMembershipHistoryGroups.push(address(0));
     expectedMembershipHistoryEpochs.push(validatorRegistrationEpochNumber);
 
-    for (uint256 i = 0; i < membershipHistoryLength.add(1); i++) {
+    for (uint256 i = 0; i < membershipHistoryLength + 1; i++) {
       travelNEpoch(1);
       uint256 epochNumber = getEpochNumber();
       vm.prank(validator);
@@ -2134,8 +2178,14 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
 }
 
 contract ValidatorsTest_GetMembershipInLastEpoch_Setup is ValidatorsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
+
+    // Replace EpochManager with the L1-formula mock so that travelNEpoch(1) advances
+    // the epoch visible to Validators, allowing getMembershipInLastEpoch to distinguish
+    // the previous epoch from the current one.
+    MockEpochManagerForMembershipHistory mockEM = new MockEpochManagerForMembershipHistory();
+    registry.setAddressFor(EpochManagerContract, address(mockEM));
 
     _registerValidatorHelper(validator, validatorPk);
 
@@ -2150,7 +2200,7 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest_GetMembership
   function test_ShouldAlwaysReturnCorrectMembershipForLastEpoch_WhenChangingMoreTimesThanMembershipHistoryLength()
     public
   {
-    for (uint256 i = 0; i < membershipHistoryLength.add(1); i++) {
+    for (uint256 i = 0; i < membershipHistoryLength + 1; i++) {
       travelNEpoch(1);
 
       vm.prank(validator);
@@ -2168,7 +2218,7 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest_GetMembership
 }
 
 contract ValidatorsTest_GetTopGroupValidators is ValidatorsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupWithMembersHavingSigners(group, 5);
@@ -2183,7 +2233,7 @@ contract ValidatorsTest_GetTopGroupValidators is ValidatorsTest {
 }
 
 contract ValidatorsTest_GetTopGroupValidatorsAccounts is ValidatorsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupWithMembersHavingSigners(group, 5);
@@ -2202,7 +2252,7 @@ contract ValidatorsTest_GetAccountLockedGoldRequirement is ValidatorsTest {
   uint256[] public actualRequirements;
   uint256[] removalTimestamps;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -2212,7 +2262,7 @@ contract ValidatorsTest_GetAccountLockedGoldRequirement is ValidatorsTest {
       vm.prank(vm.addr(i));
       validators.affiliate(group);
 
-      lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value.mul(i));
+      lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value * i);
 
       if (i == 1) {
         vm.prank(group);
@@ -2228,7 +2278,7 @@ contract ValidatorsTest_GetAccountLockedGoldRequirement is ValidatorsTest {
 
   function test_ShouldIncreaseRequirementsWithEachAddedMember() public {
     for (uint256 i = 0; i < numMembers; i++) {
-      assertEq(actualRequirements[i], originalGroupLockedGoldRequirements.value.mul(i.add(1)));
+      assertEq(actualRequirements[i], originalGroupLockedGoldRequirements.value * (i + 1));
     }
   }
 
@@ -2243,17 +2293,15 @@ contract ValidatorsTest_GetAccountLockedGoldRequirement is ValidatorsTest {
     for (uint256 i = 0; i < numMembers; i++) {
       assertEq(
         validators.getAccountLockedGoldRequirement(group),
-        originalGroupLockedGoldRequirements.value.mul(numMembers.sub(i))
+        originalGroupLockedGoldRequirements.value * (numMembers - i)
       );
 
       uint256 removalTimestamp = removalTimestamps[i];
-      uint256 requirementExpiry = originalGroupLockedGoldRequirements.duration.add(
-        removalTimestamp
-      );
+      uint256 requirementExpiry = originalGroupLockedGoldRequirements.duration + removalTimestamp;
 
       uint256 currentTimestamp = uint256(block.timestamp);
 
-      timeTravel(requirementExpiry.sub(currentTimestamp).add(1));
+      timeTravel(requirementExpiry - currentTimestamp + 1);
     }
   }
 }
@@ -2265,19 +2313,19 @@ contract ValidatorsTest_MintStableToEpochManager is ValidatorsTest {
   }
 
   function test_WhenMintAmountIsZero() public {
-    vm.prank(address(epochManager));
+    vm.prank(address(mockEpochManager));
     validators.mintStableToEpochManager(0);
   }
 
   function test_ShouldMintStableToEpochManager() public {
-    vm.prank(address(epochManager));
+    vm.prank(address(mockEpochManager));
     validators.mintStableToEpochManager(5);
-    assertEq(stableToken.balanceOf(address(epochManager)), 5);
+    assertEq(stableToken.balanceOf(address(mockEpochManager)), 5);
   }
 }
 
 contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -2321,8 +2369,15 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
 
   EpochInfo[] public epochInfoList;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
+
+    // Replace EpochManager with a lightweight mock that computes epoch numbers
+    // using the L1-precompile formula so that each travelNL2Epoch(1) call yields
+    // a distinct epoch number in both the Validators membership history and the
+    // test assertions.
+    MockEpochManagerForMembershipHistory mockEM = new MockEpochManagerForMembershipHistory();
+    registry.setAddressFor(EpochManagerContract, address(mockEM));
 
     _registerValidatorHelper(validator, validatorPk);
     contractIndex = 1;
@@ -2336,15 +2391,15 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
       uint256 epochNumber = getEpochNumber();
 
       if (i % gapSize == 0) {
-        address _group = (i % gapSize.mul(gapSize)) != 0
-          ? vm.addr(i.div(gapSize) % groupLength)
+        address _group = (i % (gapSize * gapSize)) != 0
+          ? vm.addr(i / gapSize % groupLength)
           : address(0);
 
         contractIndex += 1;
 
         epochInfoList.push(EpochInfo(epochNumber, _group));
 
-        if (i % (gapSize.mul(gapSize)) != 0) {
+        if (i % (gapSize * gapSize) != 0) {
           vm.prank(validator);
           validators.affiliate(_group);
 
@@ -2362,12 +2417,12 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
     for (uint256 i = 0; i < epochInfoList.length; i++) {
       address _group = epochInfoList[i].groupy;
 
-      if (epochInfoList.length.sub(i) <= membershipHistoryLength) {
+      if (epochInfoList.length - i <= membershipHistoryLength) {
         assertEq(
           validators.groupMembershipInEpoch(
             validator,
             epochInfoList[i].epochNumber,
-            uint256(1).add(i)
+            uint256(1) + i
           ),
           _group
         );
@@ -2376,7 +2431,7 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
         validators.groupMembershipInEpoch(
           validator,
           epochInfoList[i].epochNumber,
-          uint256(1).add(i)
+          uint256(1) + i
         );
       }
     }
@@ -2386,7 +2441,7 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
     vm.expectRevert("index out of bounds");
     validators.groupMembershipInEpoch(
       validator,
-      epochInfoList[epochInfoList.length.sub(2)].epochNumber,
+      epochInfoList[epochInfoList.length - 2].epochNumber,
       contractIndex
     );
   }
@@ -2395,35 +2450,35 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
     vm.expectRevert("provided index does not match provided epochNumber at index in history.");
     validators.groupMembershipInEpoch(
       validator,
-      epochInfoList[epochInfoList.length.sub(1)].epochNumber,
-      contractIndex.sub(2)
+      epochInfoList[epochInfoList.length - 1].epochNumber,
+      contractIndex - 2
     );
   }
 
   function test_Reverts_WhenProvidedEpochNumberGreaterThanCurrentEpochNumber() public {
     uint256 _epochNumber = getEpochNumber();
     vm.expectRevert("Epoch cannot be larger than current");
-    validators.groupMembershipInEpoch(validator, _epochNumber.add(1), contractIndex);
+    validators.groupMembershipInEpoch(validator, _epochNumber + 1, contractIndex);
   }
 
   function test_Reverts_WhenProvidedIndexGreaterThanIndexOnChain() public {
     uint256 _epochNumber = getEpochNumber();
     vm.expectRevert("index out of bounds");
-    validators.groupMembershipInEpoch(validator, _epochNumber, contractIndex.add(1));
+    validators.groupMembershipInEpoch(validator, _epochNumber, contractIndex + 1);
   }
 
   function test_Reverts_WhenProvidedIndexIsLessThanTailIndexOnChain() public {
     vm.expectRevert("provided index does not match provided epochNumber at index in history.");
     validators.groupMembershipInEpoch(
       validator,
-      epochInfoList[epochInfoList.length.sub(membershipHistoryLength).sub(1)].epochNumber,
-      contractIndex.sub(membershipHistoryLength)
+      epochInfoList[epochInfoList.length - membershipHistoryLength - 1].epochNumber,
+      contractIndex - membershipHistoryLength
     );
   }
 }
 
 contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -2439,7 +2494,7 @@ contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
       expectedMultiplier = FixidityLib.divide(expectedMultiplier, FixidityLib.newFixed(2));
       (, , , , , uint256 actualMultiplier, ) = validators.getValidatorGroup(group);
 
-      assertEq(actualMultiplier, expectedMultiplier.unwrap());
+      assertEq(actualMultiplier, expectedMultiplier.value);
     }
   }
 
@@ -2460,7 +2515,7 @@ contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
 }
 
 contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -2476,7 +2531,7 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
     (, , , , , uint256 initialMultiplier, ) = validators.getValidatorGroup(group);
 
     require(
-      initialMultiplier == FixidityLib.newFixedFraction(5, 10).unwrap(),
+      initialMultiplier == FixidityLib.newFixedFraction(5, 10).value,
       "initialMultiplier is incorrect"
     );
   }
@@ -2487,7 +2542,7 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
     vm.prank(group);
     validators.resetSlashingMultiplier();
     (, , , , , uint256 actualMultiplier, ) = validators.getValidatorGroup(group);
-    assertEq(actualMultiplier, FixidityLib.fixed1().unwrap());
+    assertEq(actualMultiplier, FixidityLib.fixed1().value);
   }
 
   function test_Reverts_WhenSlashingMultiplierIsResetBeforeResetPeriod() public {
@@ -2503,17 +2558,17 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
     vm.prank(group);
     validators.resetSlashingMultiplier();
     (, , , , , uint256 actualMultiplier, ) = validators.getValidatorGroup(group);
-    assertEq(actualMultiplier, FixidityLib.fixed1().unwrap());
+    assertEq(actualMultiplier, FixidityLib.fixed1().value);
   }
 }
 
 contract ValidatorsTest_SetNextVoterRewardCommissionUpdate is ValidatorsTest {
-  uint256 newVoterRewardCommission = FixidityLib.newFixedFraction(5, 100).unwrap(); // 5%
+  uint256 newVoterRewardCommission = FixidityLib.newFixedFraction(5, 100).value; // 5%
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _registerValidatorGroupHelper(group, 1);
-    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().unwrap());
+    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().value);
   }
 
   function test_ShouldNotSetVoterRewardCommissionImmediately() public {
@@ -2537,7 +2592,7 @@ contract ValidatorsTest_SetNextVoterRewardCommissionUpdate is ValidatorsTest {
     validators.setNextVoterRewardCommissionUpdate(newVoterRewardCommission);
 
     (, , uint256 _nextBlock) = validators.getVoterRewardCommission(group);
-    assertEq(_nextBlock, commissionUpdateDelay.add(uint256(block.number)));
+    assertEq(_nextBlock, commissionUpdateDelay + block.number);
   }
 
   function test_Emits_VoterRewardCommissionUpdateQueuedEvent() public {
@@ -2545,7 +2600,7 @@ contract ValidatorsTest_SetNextVoterRewardCommissionUpdate is ValidatorsTest {
     emit ValidatorGroupVoterRewardCommissionUpdateQueued(
       group,
       newVoterRewardCommission,
-      commissionUpdateDelay.add(uint256(block.number))
+      commissionUpdateDelay + block.number
     );
     vm.prank(group);
     validators.setNextVoterRewardCommissionUpdate(newVoterRewardCommission);
@@ -2560,7 +2615,7 @@ contract ValidatorsTest_SetNextVoterRewardCommissionUpdate is ValidatorsTest {
   function test_Reverts_WhenCommissionGreaterThan100Percent() public {
     vm.expectRevert("Voter reward commission can't be greater than 100%");
     vm.prank(group);
-    validators.setNextVoterRewardCommissionUpdate(FixidityLib.fixed1().unwrap().add(1));
+    validators.setNextVoterRewardCommissionUpdate(FixidityLib.fixed1().value + 1);
   }
 
   function test_Reverts_WhenNotValidatorGroup() public {
@@ -2570,7 +2625,7 @@ contract ValidatorsTest_SetNextVoterRewardCommissionUpdate is ValidatorsTest {
   }
 
   function test_Reverts_WhenCommissionExceedsMax() public {
-    uint256 maxCommission = FixidityLib.newFixedFraction(2, 100).unwrap(); // 2%
+    uint256 maxCommission = FixidityLib.newFixedFraction(2, 100).value; // 2%
     validators.setMaxVoterRewardCommission(maxCommission);
 
     vm.expectRevert("Voter reward commission exceeds max allowed");
@@ -2579,7 +2634,7 @@ contract ValidatorsTest_SetNextVoterRewardCommissionUpdate is ValidatorsTest {
   }
 
   function test_ShouldAllowCommissionAtMax() public {
-    uint256 maxCommission = FixidityLib.newFixedFraction(5, 100).unwrap(); // 5%
+    uint256 maxCommission = FixidityLib.newFixedFraction(5, 100).value; // 5%
     validators.setMaxVoterRewardCommission(maxCommission);
 
     vm.prank(group);
@@ -2590,7 +2645,7 @@ contract ValidatorsTest_SetNextVoterRewardCommissionUpdate is ValidatorsTest {
   }
 
   function test_ShouldAllowExactly100PercentCommission() public {
-    uint256 fullCommission = FixidityLib.fixed1().unwrap(); // 100%
+    uint256 fullCommission = FixidityLib.fixed1().value; // 100%
     vm.prank(group);
     validators.setNextVoterRewardCommissionUpdate(fullCommission);
 
@@ -2599,8 +2654,8 @@ contract ValidatorsTest_SetNextVoterRewardCommissionUpdate is ValidatorsTest {
   }
 
   function test_ShouldOverwritePreviouslyQueuedUpdate() public {
-    uint256 firstCommission = FixidityLib.newFixedFraction(5, 100).unwrap(); // 5%
-    uint256 secondCommission = FixidityLib.newFixedFraction(10, 100).unwrap(); // 10%
+    uint256 firstCommission = FixidityLib.newFixedFraction(5, 100).value; // 5%
+    uint256 secondCommission = FixidityLib.newFixedFraction(10, 100).value; // 10%
 
     vm.prank(group);
     validators.setNextVoterRewardCommissionUpdate(firstCommission);
@@ -2613,7 +2668,7 @@ contract ValidatorsTest_SetNextVoterRewardCommissionUpdate is ValidatorsTest {
   }
 
   function test_Reverts_WhenRequeuingSameQueuedValue() public {
-    uint256 commission = FixidityLib.newFixedFraction(5, 100).unwrap(); // 5%
+    uint256 commission = FixidityLib.newFixedFraction(5, 100).value; // 5%
     vm.prank(group);
     validators.setNextVoterRewardCommissionUpdate(commission);
 
@@ -2626,11 +2681,11 @@ contract ValidatorsTest_SetNextVoterRewardCommissionUpdate is ValidatorsTest {
   // A stale non-zero queued value must be clearable to 0 even when the active commission
   // is already 0 and the cap has been lowered to 0.
   function test_ShouldClearStaleQueuedValueToZero_WhenActiveAndCapAreZero() public {
-    uint256 maxCap = FixidityLib.newFixedFraction(20, 100).unwrap(); // 20%
+    uint256 maxCap = FixidityLib.newFixedFraction(20, 100).value; // 20%
     validators.setMaxVoterRewardCommission(maxCap);
 
     // Queue 5% while active commission is still 0.
-    uint256 commission = FixidityLib.newFixedFraction(5, 100).unwrap();
+    uint256 commission = FixidityLib.newFixedFraction(5, 100).value;
     vm.prank(group);
     validators.setNextVoterRewardCommissionUpdate(commission);
 
@@ -2647,12 +2702,12 @@ contract ValidatorsTest_SetNextVoterRewardCommissionUpdate is ValidatorsTest {
 }
 
 contract ValidatorsTest_UpdateVoterRewardCommission is ValidatorsTest {
-  uint256 newVoterRewardCommission = FixidityLib.newFixedFraction(5, 100).unwrap(); // 5%
+  uint256 newVoterRewardCommission = FixidityLib.newFixedFraction(5, 100).value; // 5%
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _registerValidatorGroupHelper(group, 1);
-    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().unwrap());
+    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().value);
   }
 
   function test_ShouldSetVoterRewardCommission() public {
@@ -2730,16 +2785,16 @@ contract ValidatorsTest_UpdateVoterRewardCommission is ValidatorsTest {
   }
 
   function test_Reverts_WhenMaxCapLoweredAfterQueue() public {
-    uint256 maxCap = FixidityLib.newFixedFraction(20, 100).unwrap(); // 20%
+    uint256 maxCap = FixidityLib.newFixedFraction(20, 100).value; // 20%
     validators.setMaxVoterRewardCommission(maxCap);
 
     // Queue 15% — valid at queue time (below 20% cap)
-    uint256 commission = FixidityLib.newFixedFraction(15, 100).unwrap();
+    uint256 commission = FixidityLib.newFixedFraction(15, 100).value;
     vm.prank(group);
     validators.setNextVoterRewardCommissionUpdate(commission);
 
     // Governance lowers cap to 10%
-    uint256 newMaxCap = FixidityLib.newFixedFraction(10, 100).unwrap();
+    uint256 newMaxCap = FixidityLib.newFixedFraction(10, 100).value;
     validators.setMaxVoterRewardCommission(newMaxCap);
 
     blockTravel(commissionUpdateDelay);
@@ -2751,16 +2806,16 @@ contract ValidatorsTest_UpdateVoterRewardCommission is ValidatorsTest {
   }
 
   function test_ShouldActivate_WhenQueuedValueStillBelowLoweredCap() public {
-    uint256 maxCap = FixidityLib.newFixedFraction(20, 100).unwrap(); // 20%
+    uint256 maxCap = FixidityLib.newFixedFraction(20, 100).value; // 20%
     validators.setMaxVoterRewardCommission(maxCap);
 
     // Queue 5% — valid at queue time
-    uint256 commission = FixidityLib.newFixedFraction(5, 100).unwrap();
+    uint256 commission = FixidityLib.newFixedFraction(5, 100).value;
     vm.prank(group);
     validators.setNextVoterRewardCommissionUpdate(commission);
 
     // Governance lowers cap to 10%
-    uint256 newMaxCap = FixidityLib.newFixedFraction(10, 100).unwrap();
+    uint256 newMaxCap = FixidityLib.newFixedFraction(10, 100).value;
     validators.setMaxVoterRewardCommission(newMaxCap);
 
     blockTravel(commissionUpdateDelay);
@@ -2776,7 +2831,7 @@ contract ValidatorsTest_UpdateVoterRewardCommission is ValidatorsTest {
   // A matured-but-unactivated queued update must not revive after governance lowers the
   // cap (e.g. to 0) and later restores it. It must be re-queued.
   function test_Reverts_WhenCapReducedAfterMaturityThenRestored() public {
-    uint256 commission = FixidityLib.newFixedFraction(5, 100).unwrap(); // 5%
+    uint256 commission = FixidityLib.newFixedFraction(5, 100).value; // 5%
     vm.prank(group);
     validators.setNextVoterRewardCommissionUpdate(commission);
 
@@ -2785,7 +2840,7 @@ contract ValidatorsTest_UpdateVoterRewardCommission is ValidatorsTest {
 
     // Governance disables commissions, then restores the cap.
     validators.setMaxVoterRewardCommission(0);
-    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().unwrap());
+    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().value);
 
     // The stale matured update must not auto-activate; it requires re-queueing.
     vm.expectRevert("Voter reward commission cap reduced since queued; re-queue required");
@@ -2794,20 +2849,20 @@ contract ValidatorsTest_UpdateVoterRewardCommission is ValidatorsTest {
   }
 
   function test_ShouldActivate_WhenRequeuedAfterCapReduction() public {
-    uint256 commission = FixidityLib.newFixedFraction(5, 100).unwrap(); // 5%
+    uint256 commission = FixidityLib.newFixedFraction(5, 100).value; // 5%
     vm.prank(group);
     validators.setNextVoterRewardCommissionUpdate(commission);
     blockTravel(commissionUpdateDelay);
 
     // Cap reduced then restored, invalidating the matured queue.
     validators.setMaxVoterRewardCommission(0);
-    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().unwrap());
+    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().value);
 
     // Re-queue with a fresh delay after the last reduction. The no-op guard in
     // setNextVoterRewardCommissionUpdate compares against the (now invalidated) queued
     // value, so the re-queue must differ from it; re-queuing the identical 5% in one step
     // is not currently supported. See known limitation tracked in follow-up.
-    uint256 requeuedCommission = FixidityLib.newFixedFraction(6, 100).unwrap(); // 6%
+    uint256 requeuedCommission = FixidityLib.newFixedFraction(6, 100).value; // 6%
     vm.prank(group);
     validators.setNextVoterRewardCommissionUpdate(requeuedCommission);
     blockTravel(commissionUpdateDelay);
@@ -2824,7 +2879,11 @@ contract ValidatorsTest_UpdateVoterRewardCommission is ValidatorsTest {
     validators.setNextVoterRewardCommissionUpdate(newVoterRewardCommission);
     blockTravel(commissionUpdateDelay);
 
-    epochManager.setIsOnEpochProcess(true);
+    vm.mockCall(
+      address(mockEpochManager),
+      abi.encodeWithSignature("isEpochProcessingStarted()"),
+      abi.encode(true)
+    );
 
     vm.expectRevert("Cannot update voter reward commission during epoch processing");
     vm.prank(group);
@@ -2833,25 +2892,25 @@ contract ValidatorsTest_UpdateVoterRewardCommission is ValidatorsTest {
 }
 
 contract ValidatorsTest_SetMaxVoterRewardCommission is ValidatorsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
   function test_ShouldSetMaxVoterRewardCommission() public {
-    uint256 maxCommission = FixidityLib.newFixedFraction(20, 100).unwrap(); // 20%
+    uint256 maxCommission = FixidityLib.newFixedFraction(20, 100).value; // 20%
     validators.setMaxVoterRewardCommission(maxCommission);
     assertEq(validators.maxVoterRewardCommission(), maxCommission);
   }
 
   function test_Emits_MaxVoterRewardCommissionSetEvent() public {
-    uint256 maxCommission = FixidityLib.newFixedFraction(20, 100).unwrap();
+    uint256 maxCommission = FixidityLib.newFixedFraction(20, 100).value;
     vm.expectEmit(true, true, true, true);
     emit MaxVoterRewardCommissionSet(maxCommission);
     validators.setMaxVoterRewardCommission(maxCommission);
   }
 
   function test_Reverts_WhenNotOwner() public {
-    uint256 maxCommission = FixidityLib.newFixedFraction(20, 100).unwrap();
+    uint256 maxCommission = FixidityLib.newFixedFraction(20, 100).value;
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(group);
     validators.setMaxVoterRewardCommission(maxCommission);
@@ -2859,7 +2918,7 @@ contract ValidatorsTest_SetMaxVoterRewardCommission is ValidatorsTest {
 
   function test_Reverts_WhenGreaterThan100Percent() public {
     vm.expectRevert("Max voter reward commission can't be greater than 100%");
-    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().unwrap().add(1));
+    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().value + 1);
   }
 
   function test_Reverts_WhenUnchanged() public {
@@ -2868,26 +2927,30 @@ contract ValidatorsTest_SetMaxVoterRewardCommission is ValidatorsTest {
   }
 
   function test_ShouldAllow100PercentMax() public {
-    uint256 fullMax = FixidityLib.fixed1().unwrap(); // 100%
+    uint256 fullMax = FixidityLib.fixed1().value; // 100%
     validators.setMaxVoterRewardCommission(fullMax);
     assertEq(validators.maxVoterRewardCommission(), fullMax);
   }
 
   function test_Reverts_WhenEpochProcessingStarted() public {
-    epochManager.setIsOnEpochProcess(true);
-    uint256 maxCommission = FixidityLib.newFixedFraction(20, 100).unwrap();
+    vm.mockCall(
+      address(mockEpochManager),
+      abi.encodeWithSignature("isEpochProcessingStarted()"),
+      abi.encode(true)
+    );
+    uint256 maxCommission = FixidityLib.newFixedFraction(20, 100).value;
     vm.expectRevert("Cannot update max voter reward commission during epoch processing");
     validators.setMaxVoterRewardCommission(maxCommission);
   }
 
   function test_ShouldRecordReductionBlock_OnlyOnReduction() public {
     // Raising from 0 to 20% is not a reduction.
-    validators.setMaxVoterRewardCommission(FixidityLib.newFixedFraction(20, 100).unwrap());
+    validators.setMaxVoterRewardCommission(FixidityLib.newFixedFraction(20, 100).value);
     assertEq(validators.maxVoterRewardCommissionLastReducedBlock(), 0, "Raise must not record");
 
     // Lowering to 10% records the current block.
     blockTravel(5);
-    validators.setMaxVoterRewardCommission(FixidityLib.newFixedFraction(10, 100).unwrap());
+    validators.setMaxVoterRewardCommission(FixidityLib.newFixedFraction(10, 100).value);
     assertEq(
       validators.maxVoterRewardCommissionLastReducedBlock(),
       block.number,
@@ -2897,7 +2960,7 @@ contract ValidatorsTest_SetMaxVoterRewardCommission is ValidatorsTest {
     // Raising again leaves the recorded reduction block unchanged.
     uint256 recorded = validators.maxVoterRewardCommissionLastReducedBlock();
     blockTravel(5);
-    validators.setMaxVoterRewardCommission(FixidityLib.newFixedFraction(30, 100).unwrap());
+    validators.setMaxVoterRewardCommission(FixidityLib.newFixedFraction(30, 100).value);
     assertEq(
       validators.maxVoterRewardCommissionLastReducedBlock(),
       recorded,
@@ -2907,10 +2970,10 @@ contract ValidatorsTest_SetMaxVoterRewardCommission is ValidatorsTest {
 }
 
 contract ValidatorsTest_GetVoterRewardCommission is ValidatorsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _registerValidatorGroupHelper(group, 1);
-    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().unwrap());
+    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().value);
   }
 
   function test_ShouldReturnZeroByDefault() public {
@@ -2923,7 +2986,7 @@ contract ValidatorsTest_GetVoterRewardCommission is ValidatorsTest {
   }
 
   function test_ShouldReturnCorrectValues() public {
-    uint256 newCommission = FixidityLib.newFixedFraction(10, 100).unwrap(); // 10%
+    uint256 newCommission = FixidityLib.newFixedFraction(10, 100).value; // 10%
 
     vm.prank(group);
     validators.setNextVoterRewardCommissionUpdate(newCommission);
@@ -2941,7 +3004,7 @@ contract ValidatorsTest_GetVoterRewardCommission is ValidatorsTest {
   }
 
   function test_ShouldReturnPendingValuesBeforeActivation() public {
-    uint256 newCommission = FixidityLib.newFixedFraction(10, 100).unwrap(); // 10%
+    uint256 newCommission = FixidityLib.newFixedFraction(10, 100).value; // 10%
 
     vm.prank(group);
     validators.setNextVoterRewardCommissionUpdate(newCommission);
@@ -2957,17 +3020,16 @@ contract ValidatorsTest_GetVoterRewardCommission is ValidatorsTest {
 
 contract ValidatorsTest_VoterRewardCommission_Fuzz is ValidatorsTest {
   using FixidityLib for FixidityLib.Fraction;
-  using SafeMath for uint256;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _registerValidatorGroupHelper(group, 1);
-    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().unwrap());
+    validators.setMaxVoterRewardCommission(FixidityLib.fixed1().value);
   }
 
   /// @notice Any commission in (0, fixed1()] should be queueable.
   function test_ShouldQueueAnyValidCommission(uint256 commission) public {
-    commission = bound(commission, 1, FixidityLib.fixed1().unwrap());
+    commission = bound(commission, 1, FixidityLib.fixed1().value);
 
     vm.prank(group);
     validators.setNextVoterRewardCommissionUpdate(commission);
@@ -2976,14 +3038,14 @@ contract ValidatorsTest_VoterRewardCommission_Fuzz is ValidatorsTest {
     assertEq(_nextCommission, commission, "Queued commission should match input");
     assertEq(
       _nextBlock,
-      commissionUpdateDelay.add(uint256(block.number)),
+      commissionUpdateDelay + block.number,
       "Activation block should be block.number + delay"
     );
   }
 
   /// @notice Any commission in (0, fixed1()] should survive the full queue + activate cycle.
   function test_ShouldQueueAndActivateAnyValidCommission(uint256 commission) public {
-    commission = bound(commission, 1, FixidityLib.fixed1().unwrap());
+    commission = bound(commission, 1, FixidityLib.fixed1().value);
 
     vm.prank(group);
     validators.setNextVoterRewardCommissionUpdate(commission);
@@ -3003,8 +3065,8 @@ contract ValidatorsTest_VoterRewardCommission_Fuzz is ValidatorsTest {
 
   /// @notice Any commission above maxVoterRewardCommission should revert at queue time.
   function test_ShouldRevertForAnyCommissionAboveMax(uint256 commission, uint256 maxCap) public {
-    maxCap = bound(maxCap, 1, FixidityLib.fixed1().unwrap().sub(1));
-    commission = bound(commission, maxCap.add(1), FixidityLib.fixed1().unwrap());
+    maxCap = bound(maxCap, 1, FixidityLib.fixed1().value - 1);
+    commission = bound(commission, maxCap + 1, FixidityLib.fixed1().value);
 
     validators.setMaxVoterRewardCommission(maxCap);
 
@@ -3015,8 +3077,9 @@ contract ValidatorsTest_VoterRewardCommission_Fuzz is ValidatorsTest {
 
   /// @notice Any commission at or below maxVoterRewardCommission should succeed.
   function test_ShouldAcceptAnyCommissionAtOrBelowMax(uint256 commission, uint256 maxCap) public {
-    maxCap = bound(maxCap, 1, FixidityLib.fixed1().unwrap());
+    maxCap = bound(maxCap, 1, FixidityLib.fixed1().value);
     commission = bound(commission, 1, maxCap);
+    vm.assume(maxCap != validators.maxVoterRewardCommission());
 
     validators.setMaxVoterRewardCommission(maxCap);
 
@@ -3035,9 +3098,11 @@ contract ValidatorsTest_VoterRewardCommission_Fuzz is ValidatorsTest {
     uint256 newCap
   ) public {
     // Set up: initialCap >= commission > newCap > 0
-    initialCap = bound(initialCap, 3, FixidityLib.fixed1().unwrap());
+    initialCap = bound(initialCap, 3, FixidityLib.fixed1().value);
     commission = bound(commission, 2, initialCap);
-    newCap = bound(newCap, 1, commission.sub(1));
+    newCap = bound(newCap, 1, commission - 1);
+    // Skip when initialCap matches the current value; the contract rejects no-op changes.
+    vm.assume(initialCap != validators.maxVoterRewardCommission());
 
     validators.setMaxVoterRewardCommission(initialCap);
 
@@ -3056,16 +3121,20 @@ contract ValidatorsTest_VoterRewardCommission_Fuzz is ValidatorsTest {
 
   /// @notice Any commission above fixed1() should always revert (regardless of max cap).
   function test_ShouldRevertForAnyCommissionAbove100Percent(uint256 commission) public {
-    commission = bound(commission, FixidityLib.fixed1().unwrap().add(1), uint256(-1));
+    commission = bound(commission, FixidityLib.fixed1().value + 1, type(uint256).max);
 
     vm.expectRevert("Voter reward commission can't be greater than 100%");
     vm.prank(group);
     validators.setNextVoterRewardCommissionUpdate(commission);
   }
 
-  /// @notice Max voter reward commission can be set to any value in [1, fixed1()].
+  /// @notice Max voter reward commission can be set to any value in [1, fixed1()] that
+  /// differs from the current value (the contract rejects no-op changes).
   function test_ShouldSetAnyValidMaxVoterRewardCommission(uint256 maxCommission) public {
-    maxCommission = bound(maxCommission, 1, FixidityLib.fixed1().unwrap());
+    maxCommission = bound(maxCommission, 1, FixidityLib.fixed1().value);
+    // Skip the degenerate case where the fuzz input equals the current value;
+    // the contract explicitly rejects no-op changes.
+    vm.assume(maxCommission != validators.maxVoterRewardCommission());
 
     validators.setMaxVoterRewardCommission(maxCommission);
     assertEq(

@@ -1,39 +1,38 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 pragma experimental ABIEncoderV2;
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import { ECDSAHelper08 } from "@test-sol/utils/ECDSAHelper08.sol";
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
 
-import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts8/utils/cryptography/ECDSA.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IAccountsTest.sol";
-import "@test-sol/unit/common/CeloTokenMock.sol";
+import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
 // LockedGold has been migrated to 0.8 and is deployed via deployCodeTo; interact through the
 // standalone test interface below.
 import { ILockedGoldTest } from "@test-sol/unit/governance/voting/interfaces/ILockedGoldTest.sol";
 import { IElectionTest } from "@test-sol/unit/governance/voting/interfaces/IElectionTest.sol";
-import "@celo-contracts/stability/test/MockStableToken.sol";
+import { LockedGoldCompile } from "@test-sol/unit/governance/voting/mocks/LockedGoldCompile.sol";
+import { ElectionCompile } from "@test-sol/unit/governance/voting/mocks/ElectionCompile.sol";
+import { MockStableToken08 } from "@celo-contracts-8/stability/test/MockStableToken.sol";
+import { MockValidators08 } from "@test-sol/unit/governance/voting/mocks/MockValidators08.sol";
+import { MockGovernance } from "@test-sol/unit/governance/mock/MockGovernance.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
-import "@celo-contracts/governance/test/MockGovernance.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
 
 import { TestBlocker } from "@test-sol/unit/common/mocks/TestBlocker.sol";
 
-contract LockedGoldTest is TestWithUtils {
+contract LockedGoldTest is ECDSAHelper08 {
   using FixidityLib for FixidityLib.Fraction;
 
   IAccountsTest accounts;
-  CeloTokenMock celoToken;
-  MockStableToken stableToken;
+  MockStableToken08 stableToken;
   MockElection election;
   MockGovernance governance;
-  MockValidators validators;
+  MockValidators08 validators;
   ILockedGoldTest lockedGold;
 
-  uint256 HOUR = 60 * 60;
-  uint256 DAY = 24 * HOUR;
   uint256 unlockingPeriod = 3 * DAY;
 
   address randomAddress = actor("randomAddress");
@@ -84,20 +83,23 @@ contract LockedGoldTest is TestWithUtils {
   );
   event MaxDelegateesCountSet(uint256 value);
 
-  function setUp() public {
+  function setUp() public virtual override {
     super.setUp();
 
-    celoToken = new CeloTokenMock();
     address accountsAddress = actor("Accounts");
     deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
     accounts = IAccountsTest(accountsAddress);
+    // Point the inherited accountsContract (used by whenL2WithEpochManagerInitialization to
+    // register elected validators) at the same Accounts instance registered below; otherwise
+    // captureEpochAndValidators resolves a different Accounts and reverts on unregistered validators.
+    accountsContract = IAccounts(accountsAddress);
     address lockedGoldAddress = actor("LockedGold");
     deployCodeTo("LockedGoldCompile", lockedGoldAddress);
     lockedGold = ILockedGoldTest(lockedGoldAddress);
     election = new MockElection();
-    validators = new MockValidators();
+    validators = new MockValidators08();
     governance = new MockGovernance();
-    stableToken = new MockStableToken();
+    stableToken = new MockStableToken08();
 
     registry.setAddressFor("Accounts", address(accounts));
     registry.setAddressFor("Election", address(election));
@@ -176,7 +178,7 @@ contract LockedGoldTest is TestWithUtils {
       _delegator,
       delegatee
     );
-    assertEq(FixidityLib.wrap(fraction * 100).fromFixed(), percent, "fraction incorrect");
+    assertEq(FixidityLib.fromFixed(FixidityLib.wrap(fraction * 100)), percent, "fraction incorrect");
     assertEq(currentAmount, amount, "amount incorrect");
   }
 
@@ -198,9 +200,9 @@ contract LockedGoldTest is TestWithUtils {
   function helper_WhenVoteSigners(WhenVoteSignerStruct memory config) public {
     if (config.lock) {
       vm.prank(config.delegator);
-      lockedGold.lock.value(1000)();
+      lockedGold.lock{value: 1000}();
       vm.prank(config.delegator2);
-      lockedGold.lock.value(1000)();
+      lockedGold.lock{value: 1000}();
     }
 
     if (config.delegator != address(0)) {
@@ -226,7 +228,7 @@ contract LockedGoldTest is TestWithUtils {
     vm.prank(_delegator);
     lockedGold.delegateGovernanceVotes(
       _delegatee,
-      FixidityLib.newFixedFraction(_percent, 100).unwrap()
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(_percent, 100))
     );
   }
 
@@ -234,13 +236,13 @@ contract LockedGoldTest is TestWithUtils {
     vm.prank(_delegator);
     lockedGold.revokeDelegatedGovernanceVotes(
       _delegatee,
-      FixidityLib.newFixedFraction(_percent, 100).unwrap()
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(_percent, 100))
     );
   }
 
   function lockCelo(address celoOwner, uint256 value) public {
     vm.prank(celoOwner);
-    lockedGold.lock.value(value)();
+    lockedGold.lock{value: value}();
   }
 
   function whenVoteSigner_LockedGoldDelegateGovernanceVotes() public {
@@ -278,7 +280,7 @@ contract LockedGoldTest is TestWithUtils {
 }
 
 contract LockedGoldTest_initialize is LockedGoldTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -301,7 +303,7 @@ contract LockedGoldTest_initialize is LockedGoldTest {
 }
 
 contract LockedGoldTest_setRegistry is LockedGoldTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -319,7 +321,7 @@ contract LockedGoldTest_setRegistry is LockedGoldTest {
 }
 
 contract LockedGoldTest_setUnlockingPeriod is LockedGoldTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -350,34 +352,34 @@ contract LockedGoldTest_setUnlockingPeriod is LockedGoldTest {
 
 contract LockedGoldTest_lock is LockedGoldTest {
   uint256 value = 1000;
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
   function test_ShouldIncreaseTheAccountsNonVotingLockedGoldBalance() public {
-    lockedGold.lock.value(value)();
+    lockedGold.lock{value: value}();
     assertEq(lockedGold.getAccountNonvotingLockedGold(caller), value);
   }
 
   function test_ShouldIncreaseTheAccountTOtalLockedGoldBalance() public {
-    lockedGold.lock.value(value)();
+    lockedGold.lock{value: value}();
     assertEq(lockedGold.getAccountTotalLockedGold(caller), value);
   }
 
   function test_ShouldIncreaseTheNonvotingLockedGoldBalance() public {
-    lockedGold.lock.value(value)();
+    lockedGold.lock{value: value}();
     assertEq(lockedGold.getNonvotingLockedGold(), value);
   }
 
   function test_ShouldIncreaseTheTotalLockedGoldBalance() public {
-    lockedGold.lock.value(value)();
+    lockedGold.lock{value: value}();
     assertEq(lockedGold.getTotalLockedGold(), value);
   }
 
   function test_Emits_AGoldLockedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit GoldLocked(caller, value);
-    lockedGold.lock.value(value)();
+    lockedGold.lock{value: value}();
   }
 
   function test_ShouldRevertWhenAccountDoesNotExist() public {
@@ -393,22 +395,25 @@ contract LockedGoldTest_lock is LockedGoldTest {
   function test_ShouldRevertWhenUserDoesntHaveEnoughBalance() public {
     vm.expectRevert();
     vm.prank(randomAddress);
-    lockedGold.lock.value(1)();
+    lockedGold.lock{value: 1}();
   }
 }
 
 contract LockedGoldTest_unlock is LockedGoldTest {
   uint256 value = 1000;
-  uint256 availabilityTime = unlockingPeriod + block.timestamp;
+  // Captured in setUp() after super.setUp() advances the block timestamp, so it matches the
+  // timestamp used by unlock() at call time.
+  uint256 availabilityTime;
 
   uint256 votingGold = 1;
   uint256 nonVotingGold = value - votingGold;
 
   uint256 balanceRequirement = 10;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
-    lockedGold.lock.value(value)();
+    availabilityTime = unlockingPeriod + block.timestamp;
+    lockedGold.lock{value: value}();
   }
 
   function test_ShouldAddAPendingWithdrawal_WhenAccountIsNotVotingInGovernance_WhenThereAreNoBalanceRequirements()
@@ -583,7 +588,7 @@ contract LockedGoldTest_unlock is LockedGoldTest {
 
 contract LockedGoldTest_unlockDelegation is LockedGoldTest {
   uint256 value = 1000;
-  uint256 availabilityTime = unlockingPeriod + block.timestamp;
+  uint256 availabilityTime;
 
   uint256 percentageToDelegate = 50;
   uint256 toUnlock = (value / 100) * (100 - percentageToDelegate); // 500
@@ -591,14 +596,15 @@ contract LockedGoldTest_unlockDelegation is LockedGoldTest {
 
   address delegatee = actor("delegatee");
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
-    lockedGold.lock.value(value)();
+    availabilityTime = unlockingPeriod + block.timestamp;
+    lockedGold.lock{value: value}();
     vm.prank(delegatee);
     accounts.createAccount();
     lockedGold.delegateGovernanceVotes(
       delegatee,
-      FixidityLib.newFixedFraction(percentageToDelegate, 100).unwrap()
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(percentageToDelegate, 100))
     );
     governance.setTotalVotes(delegatee, originallyDelegatedAmount);
     lockedGold.unlock(toUnlock);
@@ -632,7 +638,7 @@ contract LockedGoldTest_unlockDelegation is LockedGoldTest {
       caller,
       delegatee
     );
-    assertEq(FixidityLib.wrap(fraction * 100).fromFixed(), percentageToDelegate);
+    assertEq(FixidityLib.fromFixed(FixidityLib.wrap(fraction * 100)), percentageToDelegate);
     assertEq(currentAmount, originallyDelegatedAmount / 2);
   }
 
@@ -651,36 +657,36 @@ contract LockedGoldTest_unlockDelegation is LockedGoldTest {
       caller,
       delegatee
     );
-    assertEq(FixidityLib.wrap(fraction * 100).fromFixed(), percentageToDelegate);
+    assertEq(FixidityLib.fromFixed(FixidityLib.wrap(fraction * 100)), percentageToDelegate);
     assertEq(currentAmount, 0);
   }
 }
 
 contract LockedGoldTest_unlock_WhenDelegation2Delegatees is LockedGoldTest {
   uint256 value = 1000;
-  uint256 availabilityTime = unlockingPeriod + block.timestamp;
+  uint256 availabilityTime;
 
   uint256 percentageToDelegate = 50;
   uint256 toUnlock = (value / 100) * (100 - percentageToDelegate) + 1; // 501
   uint256 originallyDelegatedAmount = (value / 100) * percentageToDelegate; // 500
 
   address delegatee = actor("delegatee");
-  address delegatee2 = actor("delegatee2");
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
-    lockedGold.lock.value(value)();
+    availabilityTime = unlockingPeriod + block.timestamp;
+    lockedGold.lock{value: value}();
     vm.prank(delegatee);
     accounts.createAccount();
     vm.prank(delegatee2);
     accounts.createAccount();
     lockedGold.delegateGovernanceVotes(
       delegatee,
-      FixidityLib.newFixedFraction(percentageToDelegate, 100).unwrap()
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(percentageToDelegate, 100))
     );
     lockedGold.delegateGovernanceVotes(
       delegatee2,
-      FixidityLib.newFixedFraction(percentageToDelegate, 100).unwrap()
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(percentageToDelegate, 100))
     );
     governance.setTotalVotes(delegatee, originallyDelegatedAmount);
     governance.setTotalVotes(delegatee2, originallyDelegatedAmount);
@@ -723,18 +729,17 @@ contract LockedGoldTest_unlock_WhenDelegation2Delegatees is LockedGoldTest {
 
 contract LockedGoldTest_unlock_WhenDelegatingTo3Delegatees is LockedGoldTest {
   uint256 value = 5;
-  uint256 availabilityTime = unlockingPeriod + block.timestamp;
+  uint256 availabilityTime;
 
   uint256 percentageToDelegate = 33;
   uint256 toUnlock = 4;
 
   address delegatee = actor("delegatee");
-  address delegatee2 = actor("delegatee2");
-  address delegatee3 = actor("delegatee3");
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
-    lockedGold.lock.value(value)();
+    availabilityTime = unlockingPeriod + block.timestamp;
+    lockedGold.lock{value: value}();
     vm.prank(delegatee);
     accounts.createAccount();
     vm.prank(delegatee2);
@@ -743,15 +748,15 @@ contract LockedGoldTest_unlock_WhenDelegatingTo3Delegatees is LockedGoldTest {
     accounts.createAccount();
     lockedGold.delegateGovernanceVotes(
       delegatee,
-      FixidityLib.newFixedFraction(percentageToDelegate, 100).unwrap()
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(percentageToDelegate, 100))
     );
     lockedGold.delegateGovernanceVotes(
       delegatee2,
-      FixidityLib.newFixedFraction(percentageToDelegate, 100).unwrap()
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(percentageToDelegate, 100))
     );
     lockedGold.delegateGovernanceVotes(
       delegatee3,
-      FixidityLib.newFixedFraction(percentageToDelegate, 100).unwrap()
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(percentageToDelegate, 100))
     );
 
     governance.setTotalVotes(delegatee, 1);
@@ -859,9 +864,9 @@ contract LockedGoldTest_lock_AfterUnlocking is LockedGoldTest {
   uint256 index = 0;
   address delegatee = actor("delegatee");
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
-    lockedGold.lock.value(pendingWithdrawalValue)();
+    lockedGold.lock{value: pendingWithdrawalValue}();
   }
 
   function helper_unlockRelockSameAmount() public {
@@ -989,7 +994,7 @@ contract LockedGoldTest_lock_AfterUnlocking is LockedGoldTest {
   function test_ShouldUpdateDelegatorDelegateeAmount_WhenDelegating() public {
     vm.prank(delegatee);
     accounts.createAccount();
-    lockedGold.delegateGovernanceVotes(delegatee, FixidityLib.newFixedFraction(1, 1).unwrap());
+    lockedGold.delegateGovernanceVotes(delegatee, FixidityLib.unwrap(FixidityLib.newFixedFraction(1, 1)));
     lockedGold.unlock(pendingWithdrawalValue / 2);
 
     (uint256 expected, uint256 real) = lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
@@ -1021,9 +1026,9 @@ contract LockedGoldTest_withdraw is LockedGoldTest {
   uint256 value = 1000;
   uint256 index = 0;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
-    lockedGold.lock.value(value)();
+    lockedGold.lock{value: value}();
   }
 
   function test_ShouldRemoveThePendingWithdrawal_WhenItIsAFterTheAvailabilityTime() public {
@@ -1054,14 +1059,11 @@ contract LockedGoldTest_withdraw is LockedGoldTest {
     lockedGold.withdraw(index);
   }
 
-  function() external payable {}
+  receive() external payable {}
 }
 
 contract LockedGoldTest_addSlasher is LockedGoldTest {
-  string slasherName = "DowntimeSlasher";
-  address downtimeSlasher = actor(slasherName);
-
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     registry.setAddressFor(slasherName, downtimeSlasher);
   }
@@ -1086,12 +1088,10 @@ contract LockedGoldTest_addSlasher is LockedGoldTest {
 }
 
 contract LockedGoldTest_removeSlasher is LockedGoldTest {
-  string slasherName = "DowntimeSlasher";
   string governanceSlasherName = "GovernanceSlasher";
-  address downtimeSlasher = actor(slasherName);
   address governanceSlasher = actor(governanceSlasherName);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     registry.setAddressFor(slasherName, downtimeSlasher);
     registry.setAddressFor(governanceSlasherName, governanceSlasher);
@@ -1135,16 +1135,20 @@ contract LockedGoldTest_slash is LockedGoldTest {
 
   IElectionTest electionSlashTest;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
-    { address _ea = actor("electionSlashTest"); deployCodeTo("ElectionCompile", _ea); electionSlashTest = IElectionTest(_ea); }
+    {
+      address _ea = actor("electionSlashTest");
+      deployCodeTo("ElectionCompile", _ea);
+      electionSlashTest = IElectionTest(_ea);
+    }
     registry.setAddressFor("Election", address(electionSlashTest));
     electionSlashTest.initialize(
       address(registry),
       4,
       6,
       3,
-      FixidityLib.newFixedFraction(1, 100).unwrap()
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(1, 100))
     );
 
     address[] memory members = new address[](1);
@@ -1156,7 +1160,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
     registry.setAddressFor("Validators", address(validators));
     validators.setNumRegisteredValidators(1);
 
-    lockedGold.lock.value(value)();
+    lockedGold.lock{value: value}();
     registry.setAddressFor(slasherName, downtimeSlasher);
     lockedGold.addSlasher(slasherName);
 
@@ -1404,7 +1408,7 @@ contract LockedGoldTest_slash is LockedGoldTest {
     uint256 reward = value / 2;
     whenVoteSigner_LockedGoldDelegateGovernanceVotes();
     vm.prank(delegator);
-    lockedGold.delegateGovernanceVotes(delegatee1, FixidityLib.newFixedFraction(30, 100).unwrap());
+    lockedGold.delegateGovernanceVotes(delegatee1, FixidityLib.unwrap(FixidityLib.newFixedFraction(30, 100)));
     assertEq(lockedGold.getAccountNonvotingLockedGold(delegator), 1000);
     assertEq(lockedGold.getAccountTotalLockedGold(delegator), 1000);
     assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegatee1), 300);
@@ -1427,7 +1431,7 @@ contract LockedGoldTest_delegateGovernanceVotes is LockedGoldTest {
   uint256 delegatedAmount2 = (value * percentToDelegate2) / 100;
   uint256 delegatedAmount3 = (value * percentToDelegate3) / 100;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     vm.prank(delegatee1);
@@ -1452,13 +1456,13 @@ contract LockedGoldTest_delegateGovernanceVotes is LockedGoldTest {
 
   function test_ShouldRevertWhenDelegateeIsNotAccount() public {
     vm.expectRevert("Must first register address with Account.createAccount");
-    lockedGold.delegateGovernanceVotes(randomAddress, FixidityLib.newFixedFraction(1, 1).unwrap());
+    lockedGold.delegateGovernanceVotes(randomAddress, FixidityLib.unwrap(FixidityLib.newFixedFraction(1, 1)));
   }
 
   function test_ShouldRevert_WhenDelegatorIsNotAnAccount() public {
     vm.expectRevert("Must first register address with Account.createAccount");
     vm.prank(randomAddress);
-    lockedGold.delegateGovernanceVotes(caller, FixidityLib.newFixedFraction(1, 1).unwrap());
+    lockedGold.delegateGovernanceVotes(caller, FixidityLib.unwrap(FixidityLib.newFixedFraction(1, 1)));
   }
 
   function test_ShouldReturnCorrectDelegatedAmount_WhenNoGoldIsLocked_WhenNoVoteSigners() public {
@@ -1466,7 +1470,9 @@ contract LockedGoldTest_delegateGovernanceVotes is LockedGoldTest {
 
     assertDelegatorDelegateeAmounts(delegator, delegatee1, percentToDelegate, 0);
     assertEq(
-      FixidityLib.wrap(lockedGold.getAccountTotalDelegatedFraction(delegator) * 100).fromFixed(),
+      FixidityLib.fromFixed(
+        FixidityLib.wrap(lockedGold.getAccountTotalDelegatedFraction(delegator) * 100)
+      ),
       percentToDelegate
     );
   }
@@ -1476,7 +1482,7 @@ contract LockedGoldTest_delegateGovernanceVotes is LockedGoldTest {
     emit CeloDelegated(
       delegator,
       delegatee1,
-      FixidityLib.newFixedFraction(percentToDelegate, 100).unwrap(),
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(percentToDelegate, 100)),
       0
     );
     delegateCelo(delegator, delegatee1, percentToDelegate);
@@ -1559,7 +1565,7 @@ contract LockedGoldTest_delegateGovernanceVotes is LockedGoldTest {
     emit CeloDelegated(
       delegator,
       delegatee1,
-      FixidityLib.newFixedFraction(percentToDelegate, 100).unwrap(),
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(percentToDelegate, 100)),
       delegatedAmount
     );
 
@@ -1607,7 +1613,7 @@ contract LockedGoldTest_delegateGovernanceVotes is LockedGoldTest {
     emit CeloDelegated(
       delegator,
       delegatee1,
-      FixidityLib.newFixedFraction(percentToDelegate, 100).unwrap(),
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(percentToDelegate, 100)),
       delegatedAmount * 2
     );
 
@@ -1691,7 +1697,7 @@ contract LockedGoldTest_delegateGovernanceVotes is LockedGoldTest {
     emit CeloDelegated(
       delegator,
       delegatee1,
-      FixidityLib.newFixedFraction(percentToDelegate, 100).unwrap(),
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(percentToDelegate, 100)),
       delegatedAmount
     );
 
@@ -1743,7 +1749,7 @@ contract LockedGoldTest_delegateGovernanceVotes is LockedGoldTest {
     emit CeloDelegated(
       delegator,
       delegatee1,
-      FixidityLib.newFixedFraction(percentToDelegate1, 100).unwrap(),
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(percentToDelegate1, 100)),
       delegatedAmount1 * 2
     );
     delegateCelo(delegatorSigner, delegatee1, percentToDelegate1);
@@ -1785,7 +1791,7 @@ contract LockedGoldTest_delegateGovernanceVotes is LockedGoldTest {
     assertEq(delegateesOfDelegator[1], delegatee2);
     lockedGold.setMaxDelegateesCount(3);
     vm.prank(_delegatorSigner);
-    lockedGold.delegateGovernanceVotes(delegatee3, FixidityLib.newFixedFraction(10, 100).unwrap());
+    lockedGold.delegateGovernanceVotes(delegatee3, FixidityLib.unwrap(FixidityLib.newFixedFraction(10, 100)));
   }
 
   function test_ShouldAllowToAddExtraDelegatee_WhenLimitIsIncreased() public {
@@ -1807,7 +1813,7 @@ contract LockedGoldTest_revokeDelegatedGovernanceVotes is LockedGoldTest {
   uint256 votingWeight = 100;
   uint256 votingAmount = (delegatedAmount * 2 - amountToRevoke);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     vm.prank(delegatee1);
@@ -1986,7 +1992,7 @@ contract LockedGoldTest_revokeDelegatedGovernanceVotes is LockedGoldTest {
     vm.expectRevert("Revoke fraction must be less than or equal to 1");
     lockedGold.revokeDelegatedGovernanceVotes(
       address(0),
-      FixidityLib.newFixedFraction(101, 100).unwrap()
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(101, 100))
     );
   }
 
@@ -1994,7 +2000,7 @@ contract LockedGoldTest_revokeDelegatedGovernanceVotes is LockedGoldTest {
     vm.expectRevert("Not enough total delegated percents");
     lockedGold.revokeDelegatedGovernanceVotes(
       address(0),
-      FixidityLib.newFixedFraction(1, 1).unwrap()
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(1, 1))
     );
   }
 
@@ -2033,7 +2039,7 @@ contract LockedGoldTest_revokeDelegatedGovernanceVotes is LockedGoldTest {
     emit DelegatedCeloRevoked(
       delegator,
       delegatee1,
-      FixidityLib.newFixedFraction(percentageToRevoke, 100).unwrap(),
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(percentageToRevoke, 100)),
       amountToRevoke
     );
     revokeDelegatedVotes(delegator, delegatee1, percentageToRevoke);
@@ -2103,7 +2109,7 @@ contract LockedGoldTest_revokeDelegatedGovernanceVotes is LockedGoldTest {
     emit DelegatedCeloRevoked(
       delegator,
       delegatee1,
-      FixidityLib.newFixedFraction(percentageToRevoke, 100).unwrap(),
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(percentageToRevoke, 100)),
       amountToRevoke
     );
     revokeDelegatedVotes(delegatorSigner, delegatee1, percentageToRevoke);
@@ -2153,14 +2159,13 @@ contract LockedGoldTest_revokeDelegatedGovernanceVotes is LockedGoldTest {
 }
 
 contract LockedGoldTest_getAccountTotalGovernanceVotingPower is LockedGoldTest {
-  address delegator = actor("delegator");
   address delegatee = actor("delegatee");
   uint256 value = 1000;
 
   uint256 delegatedPercent = 70;
   uint256 delegatedAmount = (value / 100) * delegatedPercent;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     vm.deal(delegator, 10 ether);
@@ -2172,7 +2177,7 @@ contract LockedGoldTest_getAccountTotalGovernanceVotingPower is LockedGoldTest {
     accounts.createAccount();
 
     vm.prank(delegator);
-    lockedGold.lock.value(value)();
+    lockedGold.lock{value: value}();
   }
 
   function test_ShouldReturn0WhenNothingLockedNorAccount() public {
@@ -2200,13 +2205,12 @@ contract LockedGoldTest_getAccountTotalGovernanceVotingPower is LockedGoldTest {
 }
 
 contract LockedGoldTest_getDelegatorDelegateeInfo is LockedGoldTest {
-  address delegator = actor("delegator");
   address delegatee = actor("delegatee");
   uint256 value = 1000;
   uint256 percent = 70;
   uint256 amount = (value / 100) * percent;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     vm.prank(delegator);
@@ -2223,7 +2227,7 @@ contract LockedGoldTest_getDelegatorDelegateeInfo is LockedGoldTest {
       delegator,
       delegatee
     );
-    assertEq(FixidityLib.wrap(fraction * 100).fromFixed(), 0);
+    assertEq(FixidityLib.fromFixed(FixidityLib.wrap(fraction * 100)), 0);
     assertEq(currentAmount, 0);
   }
 
@@ -2236,23 +2240,20 @@ contract LockedGoldTest_getDelegatorDelegateeInfo is LockedGoldTest {
       delegator,
       delegatee
     );
-    assertEq(FixidityLib.wrap(fraction * 100).fromFixed(), percent);
+    assertEq(FixidityLib.fromFixed(FixidityLib.wrap(fraction * 100)), percent);
     assertEq(currentAmount, amount);
   }
 }
 
 contract LockedGoldTest_getDelegatorDelegateeExpectedAndRealAmount is LockedGoldTest {
-  address delegator = actor("delegator");
   address delegatee = actor("delegatee");
-  address delegatorSigner;
-  uint256 delegatorSignerPK;
   address delegateeSigner;
   uint256 delegateeSignerPK;
   uint256 value = 1000;
   uint256 percent = 70;
   uint256 amount = (value / 100) * percent;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     vm.prank(delegator);
@@ -2264,9 +2265,9 @@ contract LockedGoldTest_getDelegatorDelegateeExpectedAndRealAmount is LockedGold
     vm.deal(delegatee, 10 ether);
 
     vm.prank(delegator);
-    lockedGold.lock.value(value)();
+    lockedGold.lock{value: value}();
     vm.prank(delegatee);
-    lockedGold.lock.value(value)();
+    lockedGold.lock{value: value}();
 
     (delegatorSigner, delegatorSignerPK) = actorWithPK("delegatorSigner");
     (delegateeSigner, delegateeSignerPK) = actorWithPK("delegateeSigner");
@@ -2343,7 +2344,7 @@ contract LockedGoldTest_getDelegatorDelegateeExpectedAndRealAmount is LockedGold
     vm.prank(delegatorSigner);
     lockedGold.delegateGovernanceVotes(
       delegatee,
-      FixidityLib.newFixedFraction(percent, 100).unwrap()
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(percent, 100))
     );
 
     assertDelegatorDelegateeExpectedAndRealAmount(delegator, delegatee, amount, amount);
@@ -2358,10 +2359,7 @@ contract LockedGoldTest_getDelegatorDelegateeExpectedAndRealAmount is LockedGold
 }
 
 contract LockedGoldTest_updateDelegatedAmount is LockedGoldTest {
-  address delegator = actor("delegator");
   address delegatee = actor("delegatee");
-  address delegatorSigner;
-  uint256 delegatorSignerPK;
   address delegateeSigner;
   uint256 delegateeSignerPK;
   uint256 value = 1000;
@@ -2384,7 +2382,7 @@ contract LockedGoldTest_updateDelegatedAmount is LockedGoldTest {
     );
   }
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     vm.prank(delegator);
@@ -2396,7 +2394,7 @@ contract LockedGoldTest_updateDelegatedAmount is LockedGoldTest {
     vm.deal(delegatee, 10 ether);
 
     vm.prank(delegator);
-    lockedGold.lock.value(value)();
+    lockedGold.lock{value: value}();
 
     (delegatorSigner, delegatorSignerPK) = actorWithPK("delegatorSigner");
     (delegateeSigner, delegateeSignerPK) = actorWithPK("delegateeSigner");
@@ -2438,7 +2436,7 @@ contract LockedGoldTest_getTotalPendingWithdrawalsCount is LockedGoldTest {
   uint256 value = 1000;
   address account = actor("account");
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     vm.deal(account, 10 ether);
@@ -2451,7 +2449,7 @@ contract LockedGoldTest_getTotalPendingWithdrawalsCount is LockedGoldTest {
   function test_ShouldReturnCorrectValue_WhenAccountHasPendingWithdrawals() public {
     vm.startPrank(account);
     accounts.createAccount();
-    lockedGold.lock.value(value)();
+    lockedGold.lock{value: value}();
 
     lockedGold.unlock(value / 2);
     lockedGold.unlock(value / 2);
@@ -2467,7 +2465,7 @@ contract LockedGoldTest_getTotalPendingWithdrawalsCount is LockedGoldTest {
 contract LockedGoldTestGetPendingWithdrawalsInBatch is LockedGoldTest {
   uint256 value = 1000;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -2479,7 +2477,7 @@ contract LockedGoldTestGetPendingWithdrawalsInBatch is LockedGoldTest {
   }
 
   function test_ShouldReturnCorrectValue_WhenAccountHasPendingWithdrawals() public {
-    lockedGold.lock.value(value)();
+    lockedGold.lock{value: value}();
 
     lockedGold.unlock(value / 2);
     lockedGold.unlock(value / 2);
@@ -2493,7 +2491,7 @@ contract LockedGoldTestGetPendingWithdrawalsInBatch is LockedGoldTest {
   }
 
   function test_ShouldReturnCorrectValue_WhenAccountHasFourPendingWithdrawals() public {
-    lockedGold.lock.value(value)();
+    lockedGold.lock{value: value}();
 
     lockedGold.unlock(value / 4 - 1);
     lockedGold.unlock(value / 4 + 1);
@@ -2516,7 +2514,7 @@ contract LockedGoldTestGetPendingWithdrawalsInBatch is LockedGoldTest {
   function test_ShouldReturnAsMuchAsPossible_WhenOverflowRangeProvided_WhenAccountHasPendingWithdrawals()
     public
   {
-    lockedGold.lock.value(value)();
+    lockedGold.lock{value: value}();
 
     lockedGold.unlock(value / 2);
     lockedGold.unlock(value / 2);
@@ -2530,7 +2528,7 @@ contract LockedGoldTestGetPendingWithdrawalsInBatch is LockedGoldTest {
   }
 
   function test_Revert_WhenFromIsBiggerThanTo_WhenAccountHasPendingWithdrawals() public {
-    lockedGold.lock.value(value)();
+    lockedGold.lock{value: value}();
 
     lockedGold.unlock(value / 2);
     lockedGold.unlock(value / 2);

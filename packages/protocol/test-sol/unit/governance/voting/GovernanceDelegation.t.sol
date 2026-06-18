@@ -1,23 +1,63 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IAccountsTest.sol";
 import { ILockedGoldTest } from "@test-sol/unit/governance/voting/interfaces/ILockedGoldTest.sol";
-import { IGovernanceTest } from "@test-sol/unit/governance/network/interfaces/IGovernanceTest.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
+import { MockValidators08 } from "@test-sol/unit/governance/voting/mocks/MockValidators08.sol";
+import { LockedGoldCompile } from "@test-sol/unit/governance/voting/mocks/LockedGoldCompile.sol";
 
-contract GovernanceDelegationTest is TestWithUtils {
+// Minimal governance interface for GovernanceDelegation tests — avoids importing
+// Proposals.sol (^0.5.13) which would conflict with the 0.8 compiler.
+interface IGovernanceDelegationTest {
+  function initialize(
+    address registryAddress,
+    address _approver,
+    uint256 _concurrentProposals,
+    uint256 _minDeposit,
+    uint256 _queueExpiry,
+    uint256 _dequeueFrequency,
+    uint256 referendumStageDuration,
+    uint256 executionStageDuration,
+    uint256 participationBaseline,
+    uint256 participationFloor,
+    uint256 baselineUpdateFactor,
+    uint256 baselineQuorumFactor
+  ) external;
+  function addValidator(address validator) external;
+  function propose(
+    uint256[] calldata values,
+    address[] calldata destinations,
+    bytes calldata data,
+    uint256[] calldata dataLengths,
+    string calldata descriptionUrl
+  ) external payable returns (uint256);
+  function upvote(uint256 proposalId, uint256 lesser, uint256 greater) external returns (bool);
+  function approve(uint256 proposalId, uint256 index) external returns (bool);
+  function votePartially(
+    uint256 proposalId,
+    uint256 index,
+    uint256 yesVotes,
+    uint256 noVotes,
+    uint256 abstainVotes
+  ) external returns (bool);
+  function dequeueProposalsIfReady() external;
+  function getVoteTotals(uint256 proposalId) external view returns (uint256, uint256, uint256);
+  function getDequeue() external view returns (uint256[] memory);
+  function getAmountOfGoldUsedForVoting(address account) external view returns (uint256);
+}
+
+contract GovernanceDelegationTest is TestWithUtils08 {
   using FixidityLib for FixidityLib.Fraction;
 
   IAccountsTest accounts;
   ILockedGoldTest lockedGold;
-  IGovernanceTest governance;
+  IGovernanceDelegationTest governance;
   MockElection election;
-  MockValidators validators;
+  MockValidators08 validators;
 
   address delegator = actor("delegator");
   address delegatee1 = actor("delegatee1");
@@ -32,16 +72,22 @@ contract GovernanceDelegationTest is TestWithUtils {
   uint256 constant REFERENDUM_DURATION = 3 days;
   uint256 constant EXECUTION_DURATION = 3 days;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     address accountsAddress = actor("Accounts");
     deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
     accounts = IAccountsTest(accountsAddress);
-    { address _lg = actor("LockedGold"); deployCodeTo("LockedGoldCompile", _lg); lockedGold = ILockedGoldTest(_lg); }
-    { address _g = actor("Governance"); deployCodeTo("GovernanceMock08", _g); governance = IGovernanceTest(_g); }
+
+    LockedGoldCompile lockedGoldImpl = new LockedGoldCompile();
+    lockedGold = ILockedGoldTest(address(lockedGoldImpl));
+
+    address governanceAddress = actor("Governance");
+    deployCodeTo("GovernanceMock08", governanceAddress);
+    governance = IGovernanceDelegationTest(governanceAddress);
+
     election = new MockElection();
-    validators = new MockValidators();
+    validators = new MockValidators08();
 
     registry.setAddressFor(AccountsContract, address(accounts));
     registry.setAddressFor(LockedGoldContract, address(lockedGold));
@@ -81,9 +127,9 @@ contract GovernanceDelegationTest is TestWithUtils {
     accounts.createAccount();
 
     vm.prank(delegator);
-    lockedGold.lock.value(LOCKED_AMOUNT)();
+    lockedGold.lock{value: LOCKED_AMOUNT}();
     vm.prank(delegatee1);
-    lockedGold.lock.value(SMALL_LOCK)();
+    lockedGold.lock{value: SMALL_LOCK}();
   }
 
   function test_ShouldReturnCorrectVotingAmount_WhenBothQueueAndReferendumActive() public {
@@ -191,7 +237,7 @@ contract GovernanceDelegationTest is TestWithUtils {
     bytes memory data = "";
     uint256[] memory lens = new uint256[](0);
     vm.prank(proposer);
-    return governance.propose.value(MIN_DEPOSIT)(vals, dests, data, lens, "url");
+    return governance.propose{value: MIN_DEPOSIT}(vals, dests, data, lens, "url");
   }
 
   function _getDequeuedIndex(uint256 propId) private view returns (uint256) {

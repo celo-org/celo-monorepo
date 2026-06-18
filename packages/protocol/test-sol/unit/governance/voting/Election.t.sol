@@ -1,30 +1,37 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+pragma solidity >=0.8.7 <0.8.20;
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
+import { PrecompileHandler } from "@test-sol/utils/PrecompileHandler.sol";
+import { ElectionCompile } from "@test-sol/unit/governance/voting/mocks/ElectionCompile.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/common/interfaces/IAccountsTest.sol";
-import "@celo-contracts/common/linkedlists/AddressSortedLinkedList.sol";
+import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
 import "@celo-contracts/identity/interfaces/IRandomMock.sol";
 import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
 import { IElectionTest } from "@test-sol/unit/governance/voting/interfaces/IElectionTest.sol";
+import { MockLockedGold08 } from "@test-sol/unit/governance/voting/mocks/MockLockedGold08.sol";
+import { MockValidators08 } from "@test-sol/unit/governance/voting/mocks/MockValidators08.sol";
+import { MockEpochManager } from "@test-sol/unit/common/mocks/MockEpochManager.sol";
 
 import { TestBlocker } from "@test-sol/unit/common/mocks/TestBlocker.sol";
 
-contract ElectionTest is TestWithUtils {
+// Force compilation of artifacts needed for deployCodeTo calls in preElectionSetup.
+import "@test-sol/unit/common/mocks/FreezerMocks08.sol";
+import "@test-sol/unit/identity/mocks/RandomMocks08.sol";
+
+contract ElectionTest is TestWithUtils08 {
   using FixidityLib for FixidityLib.Fraction;
 
   IAccountsTest accounts;
   IElectionTest election;
   IFreezer freezer;
-  MockLockedGold lockedGold;
-  MockValidators validators;
+  MockLockedGold08 lockedGold;
+  MockValidators08 validators;
   IRandomMock random;
+  MockEpochManager mockEpochManager;
 
   address nonOwner = actor("nonOwner");
   address owner = address(this);
@@ -94,7 +101,7 @@ contract ElectionTest is TestWithUtils {
     }
   }
 
-  function setUp() public {
+  function setUp() public virtual override {
     preElectionSetup();
 
     election.initialize(
@@ -108,16 +115,29 @@ contract ElectionTest is TestWithUtils {
     blocker = new TestBlocker();
     election.setBlockedByContract(address(blocker));
     whenL2WithEpochManagerInitialization();
+
+    // Replace the real EpochManager with a mock after L2 initialization so tests
+    // can use setter methods (setCurrentEpochNumber, setElectedAccounts, etc.).
+    mockEpochManager = new MockEpochManager();
+    registry.setAddressFor(EpochManagerContract, address(mockEpochManager));
+    // Start at epoch 1 so pendingVote.epoch defaults (0) satisfy the epoch-passed check.
+    mockEpochManager.setCurrentEpochNumber(1);
   }
 
+
   function preElectionSetup() public {
+    ph = new PrecompileHandler();
     ph.setEpochSize(DAY / 5);
     setupRegistry();
+    setupCeloToken();
+    setupEpochManagerEnabler();
     setupEpochManager();
+    setupCeloUnreleasedTreasury();
 
     address accountsAddress = actor("Accounts");
     deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
     accounts = IAccountsTest(accountsAddress);
+    accountsContract = IAccounts(accountsAddress);
 
     accountsArray.push(account1);
     accountsArray.push(account2);
@@ -143,8 +163,8 @@ contract ElectionTest is TestWithUtils {
     deployCodeTo("FreezerCompile", freezerAddress);
     freezer = IFreezer(freezerAddress);
     IFreezerInitializer(freezerAddress).initialize();
-    lockedGold = new MockLockedGold();
-    validators = new MockValidators();
+    lockedGold = new MockLockedGold08();
+    validators = new MockValidators08();
     address randomAddress = actor("random");
     deployCodeTo("MockRandom08", randomAddress);
     random = IRandomMock(randomAddress);
@@ -155,10 +175,70 @@ contract ElectionTest is TestWithUtils {
     registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("Random", address(random));
   }
+
+  function assertAlmostEqual(uint256 actual, uint256 expected, uint256 margin) public {
+    uint256 diff = actual > expected ? actual - expected : expected - actual;
+    assertTrue(diff <= margin, string(abi.encodePacked("Difference is ", uintToStr(diff))));
+  }
+
+  function uintToStr(uint256 _i) internal pure returns (string memory _uintAsString) {
+    uint256 number = _i;
+    if (number == 0) {
+      return "0";
+    }
+    uint256 j = number;
+    uint256 len;
+    while (j != 0) {
+      len++;
+      j /= 10;
+    }
+    bytes memory bstr = new bytes(len);
+    uint256 k = len - 1;
+    while (number != 0) {
+      bstr[k] = bytes1(uint8(48 + (number % 10)));
+      number /= 10;
+      unchecked {
+        k--;
+      }
+    }
+    return string(bstr);
+  }
+
+  function arraysEqual(address[] memory arr1, address[] memory arr2) public pure returns (bool) {
+    if (arr1.length != arr2.length) {
+      return false;
+    }
+    for (uint256 i = 0; i < arr1.length; i++) {
+      bool found = false;
+      for (uint256 j = 0; j < arr2.length; j++) {
+        if (arr1[i] == arr2[j]) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) return false;
+    }
+    return true;
+  }
+
+  function generatePRN(uint256 min, uint256 max, uint256 salt) public view returns (uint256) {
+    return
+      (uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender, salt))) %
+        (max - min + 1)) + min;
+  }
+
+  // In L2 mode the parent's travelNL2Epoch only advances blocks/time, not the epoch counter.
+  // This wrapper also bumps mockEpochManager so Election's epoch checks work correctly.
+  function travelNEpochWithMockEpochManager(uint256 n) public {
+    super.travelNEpoch(n);
+    if (address(mockEpochManager) != address(0)) {
+      mockEpochManager.setCurrentEpochNumber(mockEpochManager.getCurrentEpochNumber() + n);
+    }
+  }
 }
 
 contract ElectionTest_Initialize is ElectionTest {
-  function setUp() public {
+  function setUp() public override {
     preElectionSetup();
 
     election.initialize(
@@ -205,14 +285,14 @@ contract ElectionTest_Initialize is ElectionTest {
 
 contract ElectionTest_SetElectabilityThreshold is ElectionTest {
   function test_shouldSetElectabilityThreshold() public {
-    uint256 newElectabilityThreshold = FixidityLib.newFixedFraction(1, 200).unwrap();
+    uint256 newElectabilityThreshold = FixidityLib.unwrap(FixidityLib.newFixedFraction(1, 200));
     election.setElectabilityThreshold(newElectabilityThreshold);
     assertEq(election.electabilityThreshold(), newElectabilityThreshold);
   }
 
   function test_ShouldRevertWhenThresholdLargerThan100Percent() public {
     vm.expectRevert("Electability threshold must be lower than 100%");
-    election.setElectabilityThreshold(FixidityLib.fixed1().unwrap() + 1);
+    election.setElectabilityThreshold(FixidityLib.unwrap(FixidityLib.fixed1()) + 1);
   }
 }
 
@@ -322,7 +402,7 @@ contract ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
 }
 
 contract ElectionTest_MarkGroupEligible is ElectionTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     registry.setAddressFor("Validators", address(address(this)));
@@ -358,7 +438,7 @@ contract ElectionTest_MarkGroupEligible is ElectionTest {
 }
 
 contract ElectionTest_MarkGroupInEligible is ElectionTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     registry.setAddressFor("Validators", address(address(this)));
@@ -402,7 +482,7 @@ contract ElectionTest_Vote_WhenGroupEligible is ElectionTest {
   uint256 voterFirstGroupVote = value - maxNumGroupsVotedFor - originallyNotVotedWithAmount;
   uint256 rewardValue = 1000000;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     address[] memory members = new address[](1);
@@ -415,7 +495,7 @@ contract ElectionTest_Vote_WhenGroupEligible is ElectionTest {
 
   function test_ShouldRevert_WhenTheVoterDoesNotHaveSufficientNonVotingBalance() public {
     lockedGold.incrementNonvotingAccountBalance(voter, value - 1);
-    vm.expectRevert("SafeMath: subtraction overflow");
+    vm.expectRevert(abi.encodeWithSignature("Panic(uint256)", 0x11));
     election.vote(group, value, address(0), address(0));
   }
 
@@ -518,7 +598,7 @@ contract ElectionTest_Vote_WhenGroupEligible is ElectionTest {
   function WhenVotesAreBeingActivated() public returns (address newGroup) {
     newGroup = WhenVotedForMoreThanMaxNumberOfGroups();
 
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
     election.activateForAccount(group, voter);
   }
 
@@ -604,7 +684,7 @@ contract ElectionTest_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes is Electio
   uint256 voterFirstGroupVote = value - maxNumGroupsVotedFor - originallyNotVotedWithAmount;
   uint256 rewardValue = 1000000;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     address[] memory members = new address[](1);
@@ -758,7 +838,7 @@ contract ElectionTest_Vote_GroupNotEligible is ElectionTest {
   uint256 voterFirstGroupVote = value - maxNumGroupsVotedFor - originallyNotVotedWithAmount;
   uint256 rewardValue = 1000000;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     address[] memory members = new address[](1);
@@ -780,7 +860,7 @@ contract ElectionTest_Activate is ElectionTest {
   address voter2 = account2;
   uint256 value2 = 573;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     address[] memory members = new address[](1);
@@ -802,7 +882,7 @@ contract ElectionTest_Activate is ElectionTest {
 
   function WhenEpochBoundaryHasPassed() public {
     WhenVoterHasPendingVotes();
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
     election.activate(group);
   }
 
@@ -844,7 +924,7 @@ contract ElectionTest_Activate is ElectionTest {
 
   function test_ShouldEmitValidatorGroupVoteActivatedEvent_WhenEpochBoundaryHasPassed() public {
     WhenVoterHasPendingVotes();
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
     vm.expectEmit(true, true, true, false);
     emit ValidatorGroupVoteActivated(voter, group, value, value * 100000000000000000000);
     election.activate(group);
@@ -852,7 +932,7 @@ contract ElectionTest_Activate is ElectionTest {
 
   function test_Reverts_WhenBlocked() public {
     WhenVoterHasPendingVotes();
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
 
     blocker.mockSetBlocked(true);
     vm.expectRevert("Contract is blocked from performing this action");
@@ -864,7 +944,7 @@ contract ElectionTest_Activate is ElectionTest {
     lockedGold.incrementNonvotingAccountBalance(voter2, value2);
     vm.prank(voter2);
     election.vote(group, value2, address(0), address(0));
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
     vm.prank(voter2);
     election.activate(group);
   }
@@ -944,7 +1024,7 @@ contract ElectionTest_ActivateForAccount is ElectionTest {
   address voter2 = account2;
   uint256 value2 = 573;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     address[] memory members = new address[](1);
@@ -966,7 +1046,7 @@ contract ElectionTest_ActivateForAccount is ElectionTest {
 
   function WhenEpochBoundaryHasPassed() public {
     WhenVoterHasPendingVotes();
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
     election.activateForAccount(group, voter);
   }
 
@@ -1008,7 +1088,7 @@ contract ElectionTest_ActivateForAccount is ElectionTest {
 
   function test_ShouldEmitValidatorGroupVoteActivatedEvent_WhenEpochBoundaryHasPassed() public {
     WhenVoterHasPendingVotes();
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
     vm.expectEmit(true, true, true, false);
     emit ValidatorGroupVoteActivated(voter, group, value, value * 100000000000000000000);
     election.activate(group);
@@ -1019,7 +1099,7 @@ contract ElectionTest_ActivateForAccount is ElectionTest {
     lockedGold.incrementNonvotingAccountBalance(voter2, value2);
     vm.prank(voter2);
     election.vote(group, value2, address(0), address(0));
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
     election.activateForAccount(group, voter2);
   }
 
@@ -1099,7 +1179,7 @@ contract ElectionTest_RevokePending is ElectionTest {
   uint256 revokedValue = value - 1;
   uint256 remaining = value - revokedValue;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     address[] memory members = new address[](1);
@@ -1269,7 +1349,7 @@ contract ElectionTest_RevokeActive is ElectionTest {
     assertEq(election.getTotalVotes(), totalGroup);
   }
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     address[] memory members = new address[](1);
@@ -1287,7 +1367,7 @@ contract ElectionTest_RevokeActive is ElectionTest {
     // Gives 1000 units to voter 0
     election.vote(group, voteValue0, address(0), address(0));
     assertConsistentSums();
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
     election.activate(group);
     assertConsistentSums();
 
@@ -1299,7 +1379,7 @@ contract ElectionTest_RevokeActive is ElectionTest {
     vm.prank(voter1);
     election.vote(group, voteValue1, address(0), address(0));
     assertConsistentSums();
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
     vm.prank(voter1);
     election.activate(group);
     assertConsistentSums();
@@ -1567,7 +1647,7 @@ contract ElectionTest_ElectValidatorsAbstract is ElectionTest {
 
   MemberWithVotes[] membersWithVotes;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     group1Members[0] = validator1;
@@ -1899,9 +1979,9 @@ contract ElectionTest_GetCurrentValidatorSigners is ElectionTest_ElectValidators
   function test_ShouldReturnValidatorSigners() public {
     WhenThereIsALargeNumberOfGroups();
     address[] memory elected = election.electValidatorAccounts();
-    epochManager.setElectedAccounts(elected);
-    epochManager.setElectedSigners(elected);
-    epochManager.setNumberOfElectedInCurrentSet(epochManager.getElectedAccounts().length);
+    mockEpochManager.setElectedAccounts(elected);
+    mockEpochManager.setElectedSigners(elected);
+    mockEpochManager.setNumberOfElectedInCurrentSet(mockEpochManager.getElectedAccounts().length);
     address[] memory electedInCurrentSet = election.getCurrentValidatorSigners();
 
     assertEq(elected, electedInCurrentSet);
@@ -1920,12 +2000,12 @@ contract ElectionTest_DistributeEpochRewards is ElectionTest {
 
   uint256 expectedGroupTotalActiveVotes = voteValue + voteValue2 / 2 + rewardValue;
   uint256 expectedVoterActiveVotesForGroup =
-    FixidityLib.newFixedFraction(expectedGroupTotalActiveVotes * 2, 3).fromFixed();
+    FixidityLib.fromFixed(FixidityLib.newFixedFraction(expectedGroupTotalActiveVotes * 2, 3));
   uint256 expectedVoter2ActiveVotesForGroup =
-    FixidityLib.newFixedFraction(expectedGroupTotalActiveVotes, 3).fromFixed();
+    FixidityLib.fromFixed(FixidityLib.newFixedFraction(expectedGroupTotalActiveVotes, 3));
   uint256 expectedVoter2ActiveVotesForGroup2 = voteValue / 2 + rewardValue2;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     vm.prank(address(validators));
@@ -1941,7 +2021,7 @@ contract ElectionTest_DistributeEpochRewards is ElectionTest {
     lockedGold.incrementNonvotingAccountBalance(voter, voteValue);
     election.vote(group, voteValue, address(0), address(0));
 
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
     election.activate(group);
   }
 
@@ -1986,7 +2066,7 @@ contract ElectionTest_DistributeEpochRewards is ElectionTest {
     // Split voter2's vote between the two groups.
     election.vote(group, voteValue2 / 2, group2, address(0));
     election.vote(group2, voteValue2 / 2, address(0), group);
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
     election.activate(group);
     election.activate(group2);
     vm.stopPrank();
@@ -2149,7 +2229,7 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
 
   function WhenAccountHasOnlyActiveVotes() public {
     WhenAccountHasVotedForOneGroup();
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
     election.activate(group);
     vm.prank(account2);
 
@@ -2280,9 +2360,9 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
     public
   {
     WhenAccountHasVotedForMoreThanOneGroupInequally();
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
     election.activate(group);
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
     election.activate(group2);
 
     election.vote(group2, value2 / 2, group, address(0));
@@ -2384,9 +2464,9 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
     group1RemainingActiveVotes = value - slashedValue;
 
     election.vote(group, value / 2, group2, address(0));
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
     election.activate(group);
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
     election.activate(group2);
 
     (initialOrdering, ) = election.getTotalVotesForEligibleValidatorGroups();
@@ -2512,7 +2592,7 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
 
   AccountStruct[] _accounts;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     // 50M gives us 500M total locked gold
@@ -2618,7 +2698,7 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
         checkVoterInvariants(_accounts[j], 0);
         checkGroupInvariants(0);
 
-        epochManager.setCurrentEpochNumber(i + 1);
+        mockEpochManager.setCurrentEpochNumber(i + 1);
       }
     }
     revokeAllAndCheckInvariants(0);
@@ -2649,20 +2729,20 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
     for (uint256 i = 0; i < 30; i++) {
       for (uint256 j = 0; j < _accounts.length; j++) {
         makeRandomAction(_accounts[j], j);
-        checkVoterInvariants(_accounts[j], 100);
-        checkGroupInvariants(100);
+        checkVoterInvariants(_accounts[j], 200);
+        checkGroupInvariants(200);
       }
 
       distributeEpochRewards(i);
 
-      epochManager.setCurrentEpochNumber(i + 1);
+      mockEpochManager.setCurrentEpochNumber(i + 1);
 
       for (uint256 j = 0; j < _accounts.length; j++) {
-        checkVoterInvariants(_accounts[j], 100);
-        checkGroupInvariants(100);
+        checkVoterInvariants(_accounts[j], 200);
+        checkGroupInvariants(200);
       }
     }
-    revokeAllAndCheckInvariants(100);
+    revokeAllAndCheckInvariants(200);
   }
 
   function makeRandomAction(AccountStruct storage account, uint256 salt) internal {
@@ -2683,12 +2763,12 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
       actions[actionCount++] = VoteActionType.RevokeActive;
     }
 
-    VoteActionType action = actions[generatePRN(0, actionCount - 1, uint256(account.account))];
+    VoteActionType action = actions[generatePRN(0, actionCount - 1, uint256(uint160(account.account)))];
     uint256 value;
 
     vm.startPrank(account.account);
     if (action == VoteActionType.Vote) {
-      value = generatePRN(0, account.nonVoting, uint256(account.account) + salt);
+      value = generatePRN(0, account.nonVoting, uint256(uint160(account.account)) + salt);
       election.vote(group, value, address(0), address(0));
       account.nonVoting -= value;
       account.pending += value;
@@ -2698,12 +2778,12 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
       account.pending -= value;
       account.active += value;
     } else if (action == VoteActionType.RevokePending) {
-      value = generatePRN(0, account.pending, uint256(account.account) + salt);
+      value = generatePRN(0, account.pending, uint256(uint160(account.account)) + salt);
       election.revokePending(group, value, address(0), address(0), 0);
       account.pending -= value;
       account.nonVoting += value;
     } else if (action == VoteActionType.RevokeActive) {
-      value = generatePRN(0, account.active, uint256(account.account) + salt);
+      value = generatePRN(0, account.active, uint256(uint160(account.account)) + salt);
       election.revokeActive(group, value, address(0), address(0), 0);
       account.active -= value;
       account.nonVoting += value;
@@ -2717,7 +2797,7 @@ contract ElectionTest_HasActivatablePendingVotes is ElectionTest {
   address group = account1;
   uint256 value = 1000;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     address[] memory members = new address[](1);
     members[0] = account9;
@@ -2732,7 +2812,7 @@ contract ElectionTest_HasActivatablePendingVotes is ElectionTest {
 
     lockedGold.incrementNonvotingAccountBalance(voter, value);
     election.vote(group, value, address(0), address(0));
-    travelNEpoch(1);
+    travelNEpochWithMockEpochManager(1);
   }
 
   function test_ReturnsTrue_WhenUserHasVoted() public {
