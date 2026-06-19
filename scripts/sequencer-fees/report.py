@@ -566,6 +566,31 @@ def cast_cmd(args: list[str], timeout: int = 15) -> str:
     return result.stdout.strip() if result.returncode == 0 else ""
 
 
+class CastError(Exception):
+    """A required on-chain read failed after retries (must not be silently 0)."""
+
+
+def cast_strict(args: list[str], timeout: int = 25, attempts: int = 4) -> str:
+    """cast read that RETRIES and RAISES on persistent failure.
+
+    Use for accrual-critical reads (balances, find-block). A transient RPC hiccup
+    that returned "" would otherwise be silently coerced to 0 by the caller and
+    corrupt the accrual by the missed amount — with no error shown.
+    """
+    last = ""
+    for i in range(attempts):
+        try:
+            r = subprocess.run(args, capture_output=True, text=True, timeout=timeout)
+            if r.returncode == 0 and r.stdout.strip():
+                return r.stdout.strip()
+            last = (r.stderr or r.stdout or "").strip() or f"rc={r.returncode}"
+        except subprocess.TimeoutExpired:
+            last = "timeout"
+        if i < attempts - 1:
+            time.sleep(1.5)
+    raise CastError(f"cast read failed after {attempts} attempts: {' '.join(args[:3])} … ({last[:120]})")
+
+
 # Uniswap V3 on Celo: QuoterV2, CELO/WETH 0.3% pool
 UNI_QUOTER = "0x82825d0554fA07f7FC52Ab63c961F330fdEFa8E8"
 CELO_TOKEN = "0x471EcE3750Da237f93B8E339c536989b8978a438"
@@ -762,8 +787,8 @@ FEE_TOKENS = [
 def block_at_date(date_str: str, rpc: str) -> int:
     """Block number at 00:00 UTC of date_str (the window start boundary)."""
     ts = int(dt.datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=dt.timezone.utc).timestamp())
-    out = cast_cmd(["cast", "find-block", str(ts), "--rpc-url", rpc], timeout=30)
-    return int(out.split()[0]) if out else 0
+    out = cast_strict(["cast", "find-block", str(ts), "--rpc-url", rpc], timeout=30)
+    return int(out.split()[0])
 
 
 def dune_withdrawn_to_safe(api_key: str, date_from: str, date_to: str) -> dict:
@@ -813,13 +838,18 @@ def dune_withdrawn_to_safe(api_key: str, date_from: str, date_to: str) -> dict:
 
 
 def _balance_at(token_addr: str, decimals: int, holder: str, block: str, rpc: str, native: bool) -> float:
-    """Token (or native CELO) balance of `holder` at a given block (or 'latest')."""
+    """Token (or native CELO) balance of `holder` at a given block (or 'latest').
+
+    Uses cast_strict: a transient read failure RAISES rather than returning 0,
+    which would silently corrupt the accrual. A genuine zero balance returns the
+    string "0.000…" (non-empty) and is handled normally.
+    """
     blk = ["--block", str(block)] if block != "latest" else []
     if native:
-        out = cast_cmd(["cast", "balance", holder, "--rpc-url", rpc] + blk)
-        return float(out) / 1e18 if out else 0.0
-    out = cast_cmd(["cast", "call", token_addr, "balanceOf(address)(uint256)", holder, "--rpc-url", rpc] + blk)
-    return int(out.split()[0]) / (10 ** decimals) if out else 0.0
+        out = cast_strict(["cast", "balance", holder, "--rpc-url", rpc] + blk)
+        return float(out) / 1e18
+    out = cast_strict(["cast", "call", token_addr, "balanceOf(address)(uint256)", holder, "--rpc-url", rpc] + blk)
+    return int(out.split()[0]) / (10 ** decimals)
 
 
 def compute_token_accruals(api_key: str, rpc: str, date_from: str, date_to: str, clabs_frac: float) -> tuple:
@@ -833,8 +863,10 @@ def compute_token_accruals(api_key: str, rpc: str, date_from: str, date_to: str,
     end_date = (dt.datetime.strptime(date_to, "%Y-%m-%d") + dt.timedelta(days=1)).strftime("%Y-%m-%d")
     block_B = block_at_date(end_date, rpc)
     # Cap at chain head if the window end is in the future (date_to = today/yesterday).
-    head = cast_cmd(["cast", "block-number", "--rpc-url", rpc])
-    block_B_str = str(min(block_B, int(head))) if head and block_B else "latest"
+    # Never fall back to "latest" on a read failure — that would silently change the
+    # window boundary; cast_strict raises instead.
+    head = int(cast_strict(["cast", "block-number", "--rpc-url", rpc]))
+    block_B_str = str(min(block_B, head))
 
     withdrawn = dune_withdrawn_to_safe(api_key, date_from, date_to)
 
@@ -1219,9 +1251,9 @@ def main():
     window_settled = last_wd != "" and last_wd >= args.date_to
 
     # Current on-chain balances for the surplus calculation + steps [1]/[2] flush.
+    # Strict: a transient failure here would skew the surplus, so it raises.
     def _celo_bal(a):
-        out = cast_cmd(["cast", "balance", a, "--rpc-url", rpc, "--ether"])
-        return float(out) if out else 0.0
+        return float(cast_strict(["cast", "balance", a, "--rpc-url", rpc, "--ether"]))
     safe_now = _celo_bal(SAFE_ADDR)
     vault_now = sum(_celo_bal(v) for v in FEE_VAULTS)
     fh_now = _celo_bal(FEE_HANDLER)
@@ -1277,4 +1309,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except CastError as e:
+        print(f"\nError: {e}", file=sys.stderr)
+        print("A required on-chain read failed repeatedly — NOT emitting a possibly-wrong "
+              "number. Re-run, or point RPC_URL at a more reliable archive node.", file=sys.stderr)
+        sys.exit(2)
