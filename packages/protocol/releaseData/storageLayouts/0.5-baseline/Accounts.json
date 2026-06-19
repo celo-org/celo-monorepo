@@ -1,0 +1,90 @@
+[
+  {
+    "encoding": "inplace",
+    "label": "_owner",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "0",
+    "type": "address"
+  },
+  {
+    "encoding": "inplace",
+    "label": "_guardCounter",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "1",
+    "type": "uint256"
+  },
+  {
+    "encoding": "inplace",
+    "label": "initialized",
+    "numberOfBytes": "1",
+    "offset": 0,
+    "slot": "2",
+    "type": "bool"
+  },
+  {
+    "encoding": "inplace",
+    "label": "registry",
+    "numberOfBytes": "20",
+    "offset": 1,
+    "slot": "2",
+    "type": "contract IRegistry"
+  },
+  {
+    "encoding": "mapping",
+    "label": "accounts",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "3",
+    "type": "mapping(address => struct Accounts.Account)"
+  },
+  {
+    "encoding": "mapping",
+    "label": "authorizedBy",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "4",
+    "type": "mapping(address => address)"
+  },
+  {
+    "encoding": "mapping",
+    "label": "defaultSigners",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "5",
+    "type": "mapping(address => mapping(bytes32 => address))"
+  },
+  {
+    "encoding": "mapping",
+    "label": "signerAuthorizations",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "6",
+    "type": "mapping(address => mapping(bytes32 => mapping(address => struct Accounts.SignerAuthorization)))"
+  },
+  {
+    "encoding": "inplace",
+    "label": "eip712DomainSeparator",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "7",
+    "type": "bytes32"
+  },
+  {
+    "encoding": "mapping",
+    "label": "offchainStorageRoots",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "8",
+    "type": "mapping(address => bytes[])"
+  },
+  {
+    "encoding": "mapping",
+    "label": "paymentDelegations",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "9",
+    "type": "mapping(address => struct Accounts.PaymentDelegation)"
+  }
+]

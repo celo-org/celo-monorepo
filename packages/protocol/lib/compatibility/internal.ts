@@ -24,9 +24,21 @@ export const getContractName = (artifact: Artifact): string => {
 }
 
 export const getArtifactByName = (contractName: string, artifacts: BuildArtifacts): Artifact => {
-  return artifacts.listArtifacts().find(artifact =>
+  const matches = artifacts.listArtifacts().filter(artifact =>
     getContractName(artifact) === contractName
   )
+  if (matches.length <= 1) {
+    return matches[0]
+  }
+  // Multiple contracts share this name (e.g. Celo's ReentrancyGuard in contracts/ vs
+  // OpenZeppelin's ReentrancyGuard under lib/). Prefer the project contract so name
+  // resolution is deterministic across the baseline and new builds; otherwise the
+  // first-match ordering can differ between builds and produce phantom storage diffs.
+  const projectMatch = matches.find(artifact => {
+    const sourcePath = (artifact.ast && artifact.ast.absolutePath) || ''
+    return /(^|\/)contracts(-0\.8)?\//.test(sourcePath) && !/(^|\/)lib\//.test(sourcePath)
+  })
+  return projectMatch || matches[0]
 }
 
 export const getBytecode = (artifact: Artifact): string => {

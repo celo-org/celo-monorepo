@@ -664,9 +664,22 @@ const deployImplementation = async (
       (item: any) => item.type === 'function' && item.name === 'getVersionNumber'
     )
     if (!getVersionNumberAbiEntry) {
-      throw new Error(
-        `Contract ${contractName} has changes but does not specify a version number in its ABI`
-      )
+      // Registry and Freezer are foundational contracts that historically shipped without
+      // a getVersionNumber (older release tags, e.g. core-contracts.v17, have no version in
+      // their ABI). The 0.5 -> 0.8 migration newly versions them, which makes the diff report
+      // flag them as changed; when this tooling re-deploys the older baseline build it would
+      // otherwise hard-fail. Version compatibility for the new release is enforced separately
+      // by check-versions, so warn instead of throwing for these.
+      if (UNVERSIONED_BASELINE_CONTRACTS.has(contractName)) {
+        console.warn(
+          `Contract ${contractName} has changes but does not specify a version number in its ABI ` +
+            `(known unversioned baseline contract); continuing.`
+        )
+      } else {
+        throw new Error(
+          `Contract ${contractName} has changes but does not specify a version number in its ABI`
+        )
+      }
     }
   }
 
@@ -951,15 +964,32 @@ const loadContractArtifact = (contractName: string, artifactPath: string): ViemC
 
 const contracts08Set = new Set(SOLIDITY_08_PACKAGE.contracts)
 
+// Contracts that historically shipped without a getVersionNumber in older release tags.
+// The 0.5 -> 0.8 migration newly versions them, so when this tooling re-deploys an older
+// baseline build (which lacks the version) the deploy-time version assertion must not
+// hard-fail; check-versions still enforces version compatibility for the new release.
+const UNVERSIONED_BASELINE_CONTRACTS = new Set(['Registry', 'Freezer'])
+
 const getContractBuildDir = (
   contractName: string,
   buildDir05: string,
   buildDir08: string
 ): string => {
-  if (contracts08Set.has(contractName)) {
-    return buildDir08
+  const preferred = contracts08Set.has(contractName) ? buildDir08 : buildDir05
+  const other = contracts08Set.has(contractName) ? buildDir05 : buildDir08
+  // A contract's Solidity version can differ between the baseline release and the
+  // new branch (e.g. contracts migrated 0.5 -> 0.8). contracts08Set reflects the new
+  // branch, so for the baseline fall back to whichever output dir actually has the
+  // artifact.
+  const preferredPath = join(preferred, `${contractName}.sol`, `${contractName}.json`)
+  if (existsSync(preferredPath)) {
+    return preferred
   }
-  return buildDir05
+  const otherPath = join(other, `${contractName}.sol`, `${contractName}.json`)
+  if (existsSync(otherPath)) {
+    return other
+  }
+  return preferred
 }
 
 const getContractArtifactPath = (

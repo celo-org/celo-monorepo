@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // solhint-disable func-name-mixedcase, var-name-mixedcase, state-visibility
 // solhint-disable const-name-snakecase, max-states-count, contract-name-camelcase
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 pragma experimental ABIEncoderV2;
 
-import { console2 as console } from "celo-foundry/Test.sol";
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-
-import { SortedLinkedListWithMedian } from "contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
+import { SortedOracles } from "@celo-contracts-8/stability/SortedOracles.sol";
+import { SortedLinkedListWithMedian } from "@celo-contracts-8/common/linkedlists/SortedLinkedListWithMedian.sol";
 import { FixidityLib } from "contracts/common/FixidityLib.sol";
+import { Vm } from "forge-std-8/Vm.sol";
 
 import { IBreakerBox } from "@celo-contracts/stability/interfaces/IBreakerBox.sol";
-import { SortedOracles } from "@celo-contracts/stability/SortedOracles.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 
 contract MockBreakerBox is IBreakerBox {
   uint256 public tradingMode;
@@ -35,7 +35,7 @@ contract MockBreakerBox is IBreakerBox {
   function checkAndSetBreakers(address) external {}
 }
 
-contract SortedOraclesTest is TestWithUtils {
+contract SortedOraclesTest is TestWithUtils08 {
   // Declare SortedOracles events for matching
   event ReportExpirySet(uint256 reportExpiry);
   event TokenReportExpirySet(address token, uint256 reportExpiry);
@@ -65,7 +65,10 @@ contract SortedOraclesTest is TestWithUtils {
 
   MockBreakerBox mockBreakerBox;
 
-  function setUp() public {
+  address currentPrank;
+
+  function setUp() public virtual override {
+    super.setUp();
     sortedOracles = new SortedOracles(true);
     sortedOracles.initialize(aReportExpiry);
 
@@ -76,9 +79,14 @@ contract SortedOraclesTest is TestWithUtils {
     oracle = address(4);
 
     mockBreakerBox = new MockBreakerBox();
-    sortedOracles.setBreakerBox(IBreakerBox(mockBreakerBox));
+    sortedOracles.setBreakerBox(IBreakerBox(address(mockBreakerBox)));
     vm.startPrank(owner);
     currentPrank = owner;
+  }
+
+  function changePrank(address who) internal virtual override {
+    currentPrank = who;
+    super.changePrank(who);
   }
 
   /**
@@ -90,13 +98,38 @@ contract SortedOraclesTest is TestWithUtils {
     changePrank(oracle);
     sortedOracles.report(token, fixed1 * 10, address(0), address(0));
     for (uint256 i = 5; i < 5 + n - 1; i++) {
-      address anotherOracle = address(i);
+      address anotherOracle = address(uint160(i));
       changePrank(owner);
       sortedOracles.addOracle(token, anotherOracle);
-      changePrank(address(i));
+      changePrank(address(uint160(i)));
       sortedOracles.report(token, fixed1 * 10, oracle, address(0));
     }
     changePrank(owner);
+  }
+
+  function containsLog(
+    Vm.Log[] memory logs,
+    string memory signatureString
+  ) private pure returns (bool) {
+    bytes32 signature = keccak256(abi.encodePacked(signatureString));
+    for (uint256 i = 0; i < logs.length; i++) {
+      bytes32 logSignature = logs[i].topics[0];
+      if (logSignature == signature) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function emitsLog(function() action, string memory signatureString) private returns (bool) {
+    vm.recordLogs();
+    action();
+    Vm.Log[] memory entries = vm.getRecordedLogs();
+    return containsLog(entries, signatureString);
+  }
+
+  function assertDoesNotEmit(function() action, string memory signatureString) internal {
+    assertFalse(emitsLog(action, signatureString));
   }
 }
 
@@ -105,7 +138,7 @@ contract SortedOraclesTest is TestWithUtils {
  */
 contract SortedOracles_initialize is SortedOraclesTest {
   function test_initialize_shouldHaveSetTheOwner() public {
-    assertEq(sortedOracles.owner(), owner);
+    assertEq(IOwnable(address(sortedOracles)).owner(), owner);
   }
 
   function test_initialize_shouldHaveSetReportExpiryToAReportExpiry() public {
@@ -218,22 +251,23 @@ contract SortedOracles_breakerBox is SortedOraclesTest {
   function test_setBreakerBox_whenCalledByNonOwner_shouldRevert() public {
     changePrank(notOwner);
     vm.expectRevert("Ownable: caller is not the owner");
-    sortedOracles.setBreakerBox(MockBreakerBox(address(0)));
+    sortedOracles.setBreakerBox(IBreakerBox(address(0)));
   }
 
   function test_setBreakerBox_whenGivenAddressIsNull_shouldRevert() public {
     vm.expectRevert("BreakerBox address must be set");
-    sortedOracles.setBreakerBox(MockBreakerBox(address(0)));
+    sortedOracles.setBreakerBox(IBreakerBox(address(0)));
   }
 
   function test_setBreakerBox_shouldUpdateAndEmit() public {
-    sortedOracles = new SortedOracles(true);
-    assertEq(address(sortedOracles.breakerBox()), address(0));
+    SortedOracles freshSortedOracles = new SortedOracles(true);
+    freshSortedOracles.initialize(aReportExpiry);
+    assertEq(address(freshSortedOracles.breakerBox()), address(0));
     vm.expectEmit(true, true, true, true);
     emit BreakerBoxUpdated(address(mockBreakerBox));
 
-    sortedOracles.setBreakerBox(mockBreakerBox);
-    assertEq(address(sortedOracles.breakerBox()), address(mockBreakerBox));
+    freshSortedOracles.setBreakerBox(IBreakerBox(address(mockBreakerBox)));
+    assertEq(address(freshSortedOracles.breakerBox()), address(mockBreakerBox));
   }
 }
 
@@ -409,7 +443,7 @@ contract SortedOracles_removeExpiredReports is SortedOraclesTest {
     sortedOracles.addOracle(token, address(6));
     changePrank(address(6));
 
-    vm.warp(now + aReportExpiry);
+    vm.warp(block.timestamp + aReportExpiry);
     sortedOracles.report(token, fixed1 * 12, oracle, address(0));
 
     vm.expectEmit(false, false, false, false, address(sortedOracles));
@@ -501,8 +535,14 @@ contract SortedOracles_isOldestReportExpired is SortedOraclesTest {
 }
 
 contract SortedOracles_report is SortedOraclesTest {
-  address oracleB = actor("oracleB");
-  address oracleC = actor("oracleC");
+  address oracleB;
+  address oracleC;
+
+  function setUp() public override {
+    super.setUp();
+    oracleB = actor("oracleB");
+    oracleC = actor("oracleC");
+  }
 
   function test_report_shouldIncreaseTheNumberOfRates() public {
     assertEq(sortedOracles.numRates(token), 0);
@@ -646,7 +686,7 @@ contract SortedOracles_report is SortedOraclesTest {
   function test_report_shouldCallBreakerBoxWithRateFeedID() public {
     // token is a legacy reference of rateFeedID
     sortedOracles.addOracle(token, oracle);
-    sortedOracles.setBreakerBox(mockBreakerBox);
+    sortedOracles.setBreakerBox(IBreakerBox(address(mockBreakerBox)));
 
     vm.expectCall(
       address(mockBreakerBox),

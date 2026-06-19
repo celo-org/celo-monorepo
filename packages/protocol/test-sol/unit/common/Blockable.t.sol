@@ -1,26 +1,16 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
 
-import "@celo-contracts/common/Blockable.sol";
+import "@celo-contracts-8/common/Blockable.sol";
 import "@celo-contracts/common/interfaces/IBlockable.sol";
 import "@celo-contracts/common/interfaces/IBlocker.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-
-contract TestBlocker is IBlocker {
-  bool public blocked;
-
-  function mockSetBlocked(bool _blocked) public {
-    blocked = _blocked;
-  }
-
-  function isBlocked() external view returns (bool) {
-    return blocked;
-  }
-}
+import { TestBlocker } from "@test-sol/unit/common/mocks/TestBlocker.sol";
+import { Ownable } from "@openzeppelin/contracts8/access/Ownable.sol";
 
 contract BlockableMock is Blockable, Ownable {
-  function setBlockedByContract(address _blockedBy) public onlyOwner {
+  function setBlockedByContract(address _blockedBy) public override onlyOwner {
     _setBlockedBy(_blockedBy);
   }
 }
@@ -38,7 +28,7 @@ contract BlockableTest is Test {
 
   event BlockedBySet(address indexed _blockedBy);
 
-  function setUp() public {
+  function setUp() public virtual {
     blockable = new BlockableMock();
     blocker = new TestBlocker();
     notOwner = actor("notOwner");
@@ -80,7 +70,7 @@ contract BlockableTest_isBlocked is BlockableTest {
 contract BlockableTest_onlyWhenNotBlocked is BlockableTest {
   TestBlockable blockableWithFunction;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     blockableWithFunction = new TestBlockable();
     blockableWithFunction.setBlockedByContract(address(blocker));

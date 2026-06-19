@@ -1,0 +1,50 @@
+[
+  {
+    "encoding": "inplace",
+    "label": "_owner",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "0",
+    "type": "address"
+  },
+  {
+    "encoding": "inplace",
+    "label": "initialized",
+    "numberOfBytes": "1",
+    "offset": 20,
+    "slot": "0",
+    "type": "bool"
+  },
+  {
+    "encoding": "mapping",
+    "label": "identifierToAttestations",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "1",
+    "type": "mapping(bytes32 => mapping(address => struct FederatedAttestations.OwnershipAttestation[]))"
+  },
+  {
+    "encoding": "mapping",
+    "label": "addressToIdentifiers",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "2",
+    "type": "mapping(address => mapping(address => bytes32[]))"
+  },
+  {
+    "encoding": "mapping",
+    "label": "revokedAttestations",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "3",
+    "type": "mapping(bytes32 => bool)"
+  },
+  {
+    "encoding": "inplace",
+    "label": "eip712DomainSeparator",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "4",
+    "type": "bytes32"
+  }
+]

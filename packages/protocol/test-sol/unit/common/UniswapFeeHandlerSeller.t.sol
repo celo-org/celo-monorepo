@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+pragma solidity >=0.8.7 <0.8.20;
 
 // Helper contracts
-import { Test } from "celo-foundry/Test.sol";
+import { Test } from "celo-foundry-8/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
-import { UniswapFeeHandlerSeller } from "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
+import { UniswapFeeHandlerSeller } from "@celo-contracts-8/common/UniswapFeeHandlerSeller.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 
 contract UniswapFeeHandlerSellerTest is Test, TestConstants {
   // Actors
@@ -24,7 +24,7 @@ contract UniswapFeeHandlerSellerTest is Test, TestConstants {
 
   function setUp() public {
     uniswapFeeHandlerSeller = new UniswapFeeHandlerSeller(true);
-    UNISWAP_FEE_HANDLER_SELLER_OWNER_ADDRESS = uniswapFeeHandlerSeller.owner();
+    UNISWAP_FEE_HANDLER_SELLER_OWNER_ADDRESS = IOwnable(address(uniswapFeeHandlerSeller)).owner();
   }
 }
 

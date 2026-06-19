@@ -1,19 +1,22 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
-import "@celo-contracts/identity/Random.sol";
-import "@celo-contracts/identity/test/RandomTest.sol";
+import { RandomTest08 } from "@test-sol/unit/identity/mocks/RandomMocks08.sol";
 
-contract RandomTest_ is TestWithUtils {
-  RandomTest random;
+// Random was migrated to contracts-0.8; the deployable test helper (RandomTest08)
+// lives in test-sol/unit/identity/mocks/RandomMocks08.sol and is now instantiated
+// directly as a concrete 0.8 type.
+
+contract RandomTest_ is TestWithUtils08 {
+  RandomTest08 random;
 
   event RandomnessBlockRetentionWindowSet(uint256 value);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
-    random = new RandomTest();
+    random = new RandomTest08();
     random.initialize(256);
     whenL2WithEpochManagerInitialization();
   }
@@ -46,7 +49,7 @@ contract RandomTest_RevealAndCommit is RandomTest_ {
   function test_Reverts_WhenCalledOnL2() public {
     vm.expectRevert("This method is no longer supported in L2.");
     blockTravel(2);
-    random.testRevealAndCommit(RANDONMESS, commitmentFor(0x01), ACCOUNT);
+    random.revealAndCommitForTest(RANDONMESS, commitmentFor(0x01), ACCOUNT);
   }
 }
 

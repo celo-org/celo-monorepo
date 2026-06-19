@@ -1,0 +1,82 @@
+[
+  {
+    "encoding": "inplace",
+    "label": "_owner",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "0",
+    "type": "address"
+  },
+  {
+    "encoding": "inplace",
+    "label": "initialized",
+    "numberOfBytes": "1",
+    "offset": 20,
+    "slot": "0",
+    "type": "bool"
+  },
+  {
+    "encoding": "mapping",
+    "label": "rates",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "1",
+    "type": "mapping(address => struct SortedLinkedListWithMedian.List)"
+  },
+  {
+    "encoding": "mapping",
+    "label": "timestamps",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "2",
+    "type": "mapping(address => struct SortedLinkedListWithMedian.List)"
+  },
+  {
+    "encoding": "mapping",
+    "label": "isOracle",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "3",
+    "type": "mapping(address => mapping(address => bool))"
+  },
+  {
+    "encoding": "mapping",
+    "label": "oracles",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "4",
+    "type": "mapping(address => address[])"
+  },
+  {
+    "encoding": "inplace",
+    "label": "reportExpirySeconds",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "5",
+    "type": "uint256"
+  },
+  {
+    "encoding": "mapping",
+    "label": "tokenReportExpirySeconds",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "6",
+    "type": "mapping(address => uint256)"
+  },
+  {
+    "encoding": "inplace",
+    "label": "breakerBox",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "7",
+    "type": "contract IBreakerBox"
+  },
+  {
+    "encoding": "mapping",
+    "label": "equivalentTokens",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "8",
+    "type": "mapping(address => struct SortedOracles.EquivalentToken)"
+  }
+]

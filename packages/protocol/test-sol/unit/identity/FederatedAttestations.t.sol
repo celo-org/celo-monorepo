@@ -1,19 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
-import "@celo-contracts/identity/test/AttestationsTest.sol";
-import "@celo-contracts/identity/FederatedAttestations.sol";
-import "@celo-contracts/identity/test/MockERC20Token.sol";
-import "@celo-contracts/identity/test/MockRandom.sol";
+import { AttestationsTestMock08 } from "@test-sol/unit/identity/mocks/AttestationsMocks08.sol";
+import { FederatedAttestations } from "@celo-contracts-8/identity/FederatedAttestations.sol";
+import { MockERC20Token08, MockValidators08 } from "@test-sol/unit/identity/mocks/EscrowMocks08.sol";
+import { MockRandom08 } from "@test-sol/unit/identity/mocks/RandomMocks08.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
-import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
-import "@celo-contracts/common/Registry.sol";
-import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts/common/interfaces/IAccountsTest.sol";
 
 contract FederatedAttestationsFoundryTest is Test, TestConstants {
   enum KeyOffsets {
@@ -24,16 +22,21 @@ contract FederatedAttestationsFoundryTest is Test, TestConstants {
     VOTING_KEY_OFFSET
   }
 
-  AttestationsTest attestationsTest;
-  MockERC20Token mockERC20Token;
-  MockERC20Token otherMockERC20Token;
+  // Attestations and FederatedAttestations migrated to contracts-0.8 and are
+  // instantiated directly as concrete 0.8 types. MockElection is dual-pragma.
+  // MockLockedGold/MockValidators (0.5) are replaced/dropped: the 0.8
+  // FederatedAttestations never reads them.
+  AttestationsTestMock08 attestationsTest;
+  address attestationsTestAddress;
+  MockERC20Token08 mockERC20Token;
+  MockERC20Token08 otherMockERC20Token;
   MockElection mockElection;
-  MockLockedGold mockLockedGold;
-  MockValidators mockValidators;
-  MockRandom random;
-  Registry registry;
-  Accounts accounts;
+  MockRandom08 random;
+  address randomAddress;
+  IRegistry registry;
+  IAccountsTest accounts;
   FederatedAttestations federatedAttestations;
+  address federatedAttestationsAddress;
 
   address caller;
   uint256 callerPK;
@@ -324,26 +327,31 @@ contract FederatedAttestationsFoundryTest is Test, TestConstants {
     accounts.createAccount();
   }
 
-  function setUp() public {
+  function setUp() public virtual {
     phoneHash = keccak256(abi.encodePacked(phoneNumber));
     phoneHash2 = keccak256(abi.encodePacked(phoneNumber2));
 
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
-    attestationsTest = new AttestationsTest();
-    mockERC20Token = new MockERC20Token();
-    otherMockERC20Token = new MockERC20Token();
+    attestationsTest = new AttestationsTestMock08();
+    attestationsTestAddress = address(attestationsTest);
+    mockERC20Token = new MockERC20Token08();
+    otherMockERC20Token = new MockERC20Token08();
     mockElection = new MockElection();
-    mockLockedGold = new MockLockedGold();
-    mockValidators = new MockValidators();
-    random = new MockRandom();
-    registry = Registry(REGISTRY_ADDRESS);
-    accounts = new Accounts(true);
+    random = new MockRandom08();
+    randomAddress = address(random);
+    registry = IRegistry(REGISTRY_ADDRESS);
+    address accountsAddress = actor("Accounts");
+    deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
+    accounts = IAccountsTest(accountsAddress);
     federatedAttestations = new FederatedAttestations(true);
+    federatedAttestationsAddress = address(federatedAttestations);
     random.initialize(256);
     random.addTestRandomness(0, bytes32(0));
     accounts.initialize(address(registry));
-    registry.setAddressFor("Validators", address(mockValidators));
+    // Accounts.authorizeValidatorSigner reads Validators.isValidator(); register a
+    // minimal 0.8 mock that returns false.
+    registry.setAddressFor("Validators", address(new MockValidators08()));
 
     callerPK = 0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d;
     caller = getAddressFromPrivateKey(callerPK);
@@ -375,7 +383,6 @@ contract FederatedAttestationsFoundryTest is Test, TestConstants {
     mockERC20Token.mint(address(this), 10 ether);
 
     registry.setAddressFor("Election", address(mockElection));
-    registry.setAddressFor("LockedGold", address(mockLockedGold));
     registry.setAddressFor("Random", address(random));
     registry.setAddressFor("Accounts", address(accounts));
 
@@ -421,7 +428,7 @@ contract FederatedAttestationsFoundryTest is Test, TestConstants {
 contract FederatedAttestations_EIP712_Ownership_Attestation_Typehash is
   FederatedAttestationsFoundryTest
 {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -436,14 +443,14 @@ contract FederatedAttestations_EIP712_Ownership_Attestation_Typehash is
 }
 
 contract FederatedAttestations_Initialize is FederatedAttestationsFoundryTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
   function test_ShouldHaveSetOwner() public {
     vm.prank(caller);
     federatedAttestations.initialize();
-    assertEq(federatedAttestations.owner(), caller);
+    assertEq(IOwnable(federatedAttestationsAddress).owner(), caller);
   }
 
   function test_ShouldHaveSetTheEIP712DomainSeparator() public {
@@ -492,7 +499,7 @@ contract FederatedAttestations_Initialize is FederatedAttestationsFoundryTest {
 contract FederatedAttestations_LookupAttestations is FederatedAttestationsFoundryTest {
   uint256 HOURS_10 = 10 * 60 * 60;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     federatedAttestations.initialize();
   }
@@ -731,7 +738,7 @@ contract FederatedAttestations_LookupAttestations is FederatedAttestationsFoundr
 contract FederatedAttestations_LookupIdentifiers is FederatedAttestationsFoundryTest {
   uint256 HOURS_10 = 10 * 60 * 60;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     federatedAttestations.initialize();
   }
@@ -883,7 +890,7 @@ contract FederatedAttestations_ValidateAttestation is FederatedAttestationsFound
   bytes32 r;
   bytes32 s;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     federatedAttestations.initialize();
   }
@@ -1076,7 +1083,7 @@ contract FederatedAttestations_RegisterAttestation is FederatedAttestationsFound
   bytes32 r;
   bytes32 s;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     federatedAttestations.initialize();
 
@@ -1428,7 +1435,7 @@ contract FederatedAttestations_RevokeAttestation is FederatedAttestationsFoundry
   bytes32 r;
   bytes32 s;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     federatedAttestations.initialize();
 
@@ -1631,7 +1638,7 @@ contract FederatedAttestations_RevokeAttestation is FederatedAttestationsFoundry
 }
 
 contract FederatedAttestations_BatchRevokeAttestations is FederatedAttestationsFoundryTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     federatedAttestations.initialize();
 

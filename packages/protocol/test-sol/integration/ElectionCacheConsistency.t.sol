@@ -1,36 +1,40 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 pragma experimental ABIEncoderV2;
 
 import { FixidityLib } from "@celo-contracts/common/FixidityLib.sol";
-import { Accounts } from "@celo-contracts/common/Accounts.sol";
-import { Freezer } from "@celo-contracts/common/Freezer.sol";
-// Imported so its bytecode lands in the artifacts; TestWithUtils.setupRegistry
-// uses deployCodeTo("Registry.sol", ...).
-import { Registry } from "@celo-contracts/common/Registry.sol";
+import { IAccountsTest } from "@celo-contracts/common/interfaces/IAccountsTest.sol";
+import { IFreezer } from "@celo-contracts/common/interfaces/IFreezer.sol";
+import { IFreezerInitializer } from "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
 
-import { Election } from "@celo-contracts/governance/Election.sol";
-import { LockedGold } from "@celo-contracts/governance/LockedGold.sol";
-import { Governance } from "@celo-contracts/governance/Governance.sol";
-import { Proposals } from "@celo-contracts/governance/Proposals.sol";
-import { MockValidators } from "@celo-contracts/governance/test/MockValidators.sol";
-import { MockRandom } from "@celo-contracts/identity/test/MockRandom.sol";
+import { IElectionTest } from "@test-sol/unit/governance/voting/interfaces/IElectionTest.sol";
+import { ILockedGoldTest } from "@test-sol/unit/governance/voting/interfaces/ILockedGoldTest.sol";
+import { Proposals } from "@celo-contracts-8/governance/Proposals.sol";
+import { MockValidators08 } from "@test-sol/unit/governance/voting/mocks/MockValidators08.sol";
+import { IRandomMock } from "@celo-contracts/identity/interfaces/IRandomMock.sol";
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
-contract ElectionCacheConsistencyTest is TestWithUtils {
+// Force compilation of artifacts resolved by deployCodeTo calls in setUp.
+import "@test-sol/unit/governance/voting/mocks/ElectionCompile.sol";
+import "@test-sol/unit/governance/voting/mocks/LockedGoldCompile.sol";
+import "@test-sol/unit/common/mocks/FreezerMocks08.sol";
+import "@test-sol/unit/identity/mocks/RandomMocks08.sol";
+import "@celo-contracts-8/governance/test/GovernanceMock08.sol";
+
+contract ElectionCacheConsistencyTest is TestWithUtils08 {
   using FixidityLib for FixidityLib.Fraction;
 
-  Accounts accounts;
-  Election election;
-  Freezer freezer;
-  LockedGold lockedGold;
-  MockValidators validators;
-  MockRandom random;
-  Governance governance;
+  IAccountsTest accounts;
+  IElectionTest election;
+  IFreezer freezer;
+  ILockedGoldTest lockedGold;
+  MockValidators08 validators;
+  IRandomMock random;
+  GovernanceMock08 governance;
 
-  address voter = actor("voter");
-  address approver = actor("approver");
+  address voter;
+  address approver;
 
   uint256 constant ELECTABLE_MIN = 1;
   uint256 constant ELECTABLE_MAX = 1;
@@ -56,19 +60,43 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
   address[] internal firstVoteGroups;
   address[] internal overMaxGroups;
 
-  function setUp() public {
-    setupRegistry();
-    setupEpochManager();
+  function assertAlmostEqual(uint256 actual, uint256 expected, uint256 margin) public pure {
+    uint256 diff = actual > expected ? actual - expected : expected - actual;
+    require(diff <= margin, "values not almost equal");
+  }
 
-    // constructor(true) bypasses the proxy initializer guard so initialize()
-    // can be called directly on the impl.
-    accounts = new Accounts(true);
-    election = new Election(true);
-    freezer = new Freezer(true);
-    lockedGold = new LockedGold(true);
-    validators = new MockValidators();
-    random = new MockRandom();
-    governance = new Governance(true);
+  function setUp() public override {
+    super.setUp();
+
+    voter = actor("voter");
+    approver = actor("approver");
+
+    address accountsAddress = actor("Accounts");
+    deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
+    accounts = IAccountsTest(accountsAddress);
+
+    address electionAddress = actor("election");
+    deployCodeTo("ElectionCompile", electionAddress);
+    election = IElectionTest(electionAddress);
+
+    address freezerAddress = actor("freezer");
+    deployCodeTo("FreezerCompile", freezerAddress);
+    freezer = IFreezer(freezerAddress);
+    IFreezerInitializer(freezerAddress).initialize();
+
+    address _lg = actor("LockedGold");
+    deployCodeTo("LockedGoldCompile", _lg);
+    lockedGold = ILockedGoldTest(_lg);
+
+    validators = new MockValidators08();
+
+    address randomAddress = actor("random");
+    deployCodeTo("MockRandom08", randomAddress);
+    random = IRandomMock(randomAddress);
+
+    address _g = actor("Governance");
+    deployCodeTo("GovernanceMock08", _g);
+    governance = GovernanceMock08(payable(_g));
 
     registry.setAddressFor("Accounts", address(accounts));
     registry.setAddressFor("Election", address(election));
@@ -192,7 +220,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
     }
 
     vm.prank(voter);
-    lockedGold.lock.value(SMALL_LOCK)();
+    lockedGold.lock{ value: SMALL_LOCK }();
     vm.prank(voter);
     election.setAllowedToVoteOverMaxNumberOfGroups(true);
 
@@ -240,7 +268,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
     }
 
     vm.prank(voter);
-    lockedGold.lock.value(mainnetSmallLock)();
+    lockedGold.lock{ value: mainnetSmallLock }();
     vm.prank(voter);
     election.setAllowedToVoteOverMaxNumberOfGroups(true);
 
@@ -269,7 +297,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
 
     vm.deal(voter, totalLock + 1 ether);
     vm.prank(voter);
-    lockedGold.lock.value(totalLock)();
+    lockedGold.lock{ value: totalLock }();
 
     vm.prank(voter);
     election.setAllowedToVoteOverMaxNumberOfGroups(true);
@@ -306,7 +334,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
 
     vm.deal(voter, totalLock + 1 ether);
     vm.prank(voter);
-    lockedGold.lock.value(totalLock)();
+    lockedGold.lock{ value: totalLock }();
 
     for (uint256 i = 0; i < MAX_NUM_GROUPS; i++) {
       assertEq(election.allowedToVoteOverMaxNumberOfGroups(voter), false);
@@ -327,7 +355,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
 
   function _runLockVoteRevokeCycle(uint256 lockAmount, address group) internal {
     vm.prank(voter);
-    lockedGold.lock.value(lockAmount)();
+    lockedGold.lock{ value: lockAmount }();
 
     (address lesser, address greater) = _neighbors(group, lockAmount);
     vm.prank(voter);
@@ -363,7 +391,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
     vm.deal(voter, BIG_LOCK + SMALL_LOCK + 1 ether);
 
     vm.prank(voter);
-    lockedGold.lock.value(BIG_LOCK)();
+    lockedGold.lock{ value: BIG_LOCK }();
 
     for (uint256 i = 0; i < firstVoteGroups.length; i++) {
       (address lesser, address greater) = _neighbors(firstVoteGroups[i], BIG_VOTE_PER_GROUP);
@@ -415,7 +443,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
 
   function _relockTinyAndVoteOverMaxGroups() internal {
     vm.prank(voter);
-    lockedGold.lock.value(SMALL_LOCK)();
+    lockedGold.lock{ value: SMALL_LOCK }();
 
     // groupsVotedFor.length == 0 here, so the flag flip is allowed.
     vm.prank(voter);
@@ -448,7 +476,7 @@ contract ElectionCacheConsistencyTest is TestWithUtils {
     uint256[] memory dataLengths = new uint256[](1);
     dataLengths[0] = data.length;
 
-    return governance.propose.value(MIN_DEPOSIT)(values, destinations, data, dataLengths, "url");
+    return governance.propose{ value: MIN_DEPOSIT }(values, destinations, data, dataLengths, "url");
   }
 
   function _neighbors(

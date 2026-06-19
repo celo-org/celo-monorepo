@@ -1,0 +1,98 @@
+[
+  {
+    "encoding": "inplace",
+    "label": "_guardCounter",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "0",
+    "type": "uint256"
+  },
+  {
+    "encoding": "inplace",
+    "label": "initialized",
+    "numberOfBytes": "1",
+    "offset": 0,
+    "slot": "1",
+    "type": "bool"
+  },
+  {
+    "encoding": "inplace",
+    "label": "_owner",
+    "numberOfBytes": "20",
+    "offset": 1,
+    "slot": "1",
+    "type": "address"
+  },
+  {
+    "encoding": "inplace",
+    "label": "registry",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "2",
+    "type": "contract IRegistry"
+  },
+  {
+    "encoding": "mapping",
+    "label": "balances",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "3",
+    "type": "mapping(address => struct LockedGold.Balances)"
+  },
+  {
+    "encoding": "mapping",
+    "label": "slashingMap",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "4",
+    "type": "mapping(bytes32 => bool)"
+  },
+  {
+    "encoding": "dynamic_array",
+    "label": "slashingWhitelist",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "5",
+    "type": "bytes32[]"
+  },
+  {
+    "encoding": "inplace",
+    "label": "totalNonvoting",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "6",
+    "type": "uint256"
+  },
+  {
+    "encoding": "inplace",
+    "label": "unlockingPeriod",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "7",
+    "type": "uint256"
+  },
+  {
+    "encoding": "mapping",
+    "label": "delegatorInfo",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "8",
+    "type": "mapping(address => struct LockedGold.Delegated)"
+  },
+  {
+    "encoding": "mapping",
+    "label": "totalDelegatedCelo",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "9",
+    "type": "mapping(address => uint256)"
+  },
+  {
+    "encoding": "inplace",
+    "label": "maxDelegateesCount",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "10",
+    "type": "uint256"
+  }
+]

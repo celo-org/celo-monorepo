@@ -1,0 +1,186 @@
+[
+  {
+    "encoding": "inplace",
+    "label": "_owner",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "0",
+    "type": "address"
+  },
+  {
+    "encoding": "inplace",
+    "label": "initialized",
+    "numberOfBytes": "1",
+    "offset": 20,
+    "slot": "0",
+    "type": "bool"
+  },
+  {
+    "encoding": "inplace",
+    "label": "_guardCounter",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "1",
+    "type": "uint256"
+  },
+  {
+    "encoding": "inplace",
+    "label": "registry",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "2",
+    "type": "contract IRegistry"
+  },
+  {
+    "encoding": "inplace",
+    "label": "stageDurations",
+    "numberOfBytes": "96",
+    "offset": 0,
+    "slot": "3",
+    "type": "struct Proposals.StageDurations"
+  },
+  {
+    "encoding": "inplace",
+    "label": "queueExpiry",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "6",
+    "type": "uint256"
+  },
+  {
+    "encoding": "inplace",
+    "label": "dequeueFrequency",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "7",
+    "type": "uint256"
+  },
+  {
+    "encoding": "inplace",
+    "label": "approver",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "8",
+    "type": "address"
+  },
+  {
+    "encoding": "inplace",
+    "label": "lastDequeue",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "9",
+    "type": "uint256"
+  },
+  {
+    "encoding": "inplace",
+    "label": "concurrentProposals",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "10",
+    "type": "uint256"
+  },
+  {
+    "encoding": "inplace",
+    "label": "proposalCount",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "11",
+    "type": "uint256"
+  },
+  {
+    "encoding": "inplace",
+    "label": "minDeposit",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "12",
+    "type": "uint256"
+  },
+  {
+    "encoding": "mapping",
+    "label": "refundedDeposits",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "13",
+    "type": "mapping(address => uint256)"
+  },
+  {
+    "encoding": "mapping",
+    "label": "constitution",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "14",
+    "type": "mapping(address => struct Governance.ContractConstitution)"
+  },
+  {
+    "encoding": "mapping",
+    "label": "proposals",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "15",
+    "type": "mapping(uint256 => struct Proposals.Proposal)"
+  },
+  {
+    "encoding": "mapping",
+    "label": "voters",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "16",
+    "type": "mapping(address => struct Governance.Voter)"
+  },
+  {
+    "encoding": "mapping",
+    "label": "hotfixes",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "17",
+    "type": "mapping(bytes32 => struct Governance.HotfixRecord)"
+  },
+  {
+    "encoding": "inplace",
+    "label": "queue",
+    "numberOfBytes": "160",
+    "offset": 0,
+    "slot": "18",
+    "type": "struct SortedLinkedList.List"
+  },
+  {
+    "encoding": "dynamic_array",
+    "label": "dequeued",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "23",
+    "type": "uint256[]"
+  },
+  {
+    "encoding": "dynamic_array",
+    "label": "emptyIndices",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "24",
+    "type": "uint256[]"
+  },
+  {
+    "encoding": "inplace",
+    "label": "participationParameters",
+    "numberOfBytes": "128",
+    "offset": 0,
+    "slot": "25",
+    "type": "struct Governance.ParticipationParameters"
+  },
+  {
+    "encoding": "inplace",
+    "label": "securityCouncil",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "29",
+    "type": "address"
+  },
+  {
+    "encoding": "inplace",
+    "label": "hotfixExecutionTimeWindow",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "30",
+    "type": "uint256"
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "encoding": "inplace",
+    "label": "_owner",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "0",
+    "type": "address"
+  },
+  {
+    "encoding": "inplace",
+    "label": "initialized",
+    "numberOfBytes": "1",
+    "offset": 20,
+    "slot": "0",
+    "type": "bool"
+  },
+  {
+    "encoding": "inplace",
+    "label": "registry",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "1",
+    "type": "contract IRegistry"
+  },
+  {
+    "encoding": "mapping",
+    "label": "slashed",
+    "numberOfBytes": "32",
+    "offset": 0,
+    "slot": "2",
+    "type": "mapping(address => uint256)"
+  },
+  {
+    "encoding": "inplace",
+    "label": "slasherExecuter",
+    "numberOfBytes": "20",
+    "offset": 0,
+    "slot": "3",
+    "type": "address"
+  }
+]

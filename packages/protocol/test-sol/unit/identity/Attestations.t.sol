@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
-import "@celo-contracts/identity/test/AttestationsTest.sol";
-import "@celo-contracts/identity/test/MockERC20Token.sol";
-import "@celo-contracts/identity/test/MockRandom.sol";
+import "celo-foundry-8/Test.sol";
+import { AttestationsTestMock08 } from "@test-sol/unit/identity/mocks/AttestationsMocks08.sol";
+import { MockERC20Token08, MockValidators08 } from "@test-sol/unit/identity/mocks/EscrowMocks08.sol";
+import { MockRandom08 } from "@test-sol/unit/identity/mocks/RandomMocks08.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
-import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
-import "@celo-contracts/common/Registry.sol";
-import "@celo-contracts/common/Accounts.sol";
+import "@openzeppelin/contracts8/utils/cryptography/ECDSA.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts/common/interfaces/IAccountsTest.sol";
 
 contract AttestationsFoundryTest is Test {
   enum KeyOffsets {
@@ -20,15 +19,18 @@ contract AttestationsFoundryTest is Test {
     VOTING_KEY_OFFSET
   }
 
-  AttestationsTest attestationsTest;
-  MockERC20Token mockERC20Token;
-  MockERC20Token otherMockERC20Token;
+  // Attestations migrated to contracts-0.8; the deployable test mock and the Random
+  // mock are now instantiated directly as concrete 0.8 types. MockElection is
+  // dual-pragma. MockLockedGold/MockValidators were never read by the 0.8
+  // Attestations contract, so they are dropped.
+  AttestationsTestMock08 attestationsTest;
+  address attestationsTestAddress;
+  MockERC20Token08 mockERC20Token;
+  MockERC20Token08 otherMockERC20Token;
   MockElection mockElection;
-  MockLockedGold mockLockedGold;
-  MockValidators mockValidators;
-  MockRandom random;
-  Registry registry;
-  Accounts accounts;
+  MockRandom08 random;
+  IRegistry registry;
+  IAccountsTest accounts;
 
   address caller;
   uint256 callerPK;
@@ -268,22 +270,28 @@ contract AttestationsFoundryTest is Test {
     return validatingAddress;
   }
 
-  function setUp() public {
+  function setUp() public virtual {
     phoneHash = keccak256(abi.encodePacked(phoneNumber));
 
-    attestationsTest = new AttestationsTest();
-    mockERC20Token = new MockERC20Token();
-    otherMockERC20Token = new MockERC20Token();
+    attestationsTest = new AttestationsTestMock08();
+    attestationsTestAddress = address(attestationsTest);
+    mockERC20Token = new MockERC20Token08();
+    otherMockERC20Token = new MockERC20Token08();
     mockElection = new MockElection();
-    mockLockedGold = new MockLockedGold();
-    mockValidators = new MockValidators();
-    random = new MockRandom();
-    registry = new Registry(true);
-    accounts = new Accounts(true);
+    random = new MockRandom08();
+    address registryAddress = actor("registry");
+    deployCodeTo("Registry.sol", abi.encode(true), registryAddress);
+    registry = IRegistry(registryAddress);
+    address accountsAddress = actor("Accounts");
+    deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
+    accounts = IAccountsTest(accountsAddress);
     random.initialize(256);
     random.addTestRandomness(0, bytes32(0));
     accounts.initialize(address(registry));
-    registry.setAddressFor("Validators", address(mockValidators));
+
+    // Accounts.authorizeValidatorSigner reads Validators.isValidator(); register a
+    // minimal 0.8 mock that returns false.
+    registry.setAddressFor("Validators", address(new MockValidators08()));
 
     (caller, callerPK) = actorWithPK("caller");
     (caller2, callerPK2) = actorWithPK("caller2");
@@ -324,7 +332,6 @@ contract AttestationsFoundryTest is Test {
     mockElection.setElectedValidators(electedValidators);
 
     registry.setAddressFor("Election", address(mockElection));
-    registry.setAddressFor("LockedGold", address(mockLockedGold));
     registry.setAddressFor("Random", address(random));
     registry.setAddressFor("Accounts", address(accounts));
 
@@ -348,14 +355,14 @@ contract AttestationsFoundryTest is Test {
     attestationsTest.__setValidators(electedValidators);
   }
 
-  function setAccountWalletAddress(address account) public {
+  function setAccountWalletAddress(address account) public virtual {
     vm.prank(account);
     accounts.setWalletAddress(account, 0, bytes32(0), bytes32(0));
   }
 }
 
 contract AttestationsInitialize is AttestationsFoundryTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -384,7 +391,7 @@ contract AttestationsInitialize is AttestationsFoundryTest {
 contract AttestationsSetAttestationsExpirySeconds is AttestationsFoundryTest {
   uint256 newMaxNumBlocksPerAttestation = attestationExpiryBlocks + 1;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -409,7 +416,7 @@ contract AttestationsSetAttestationsExpirySeconds is AttestationsFoundryTest {
 contract AttestationsSetAttestationsRequestFee is AttestationsFoundryTest {
   uint256 newAttestationFee = attestationExpiryBlocks + 1;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -439,7 +446,7 @@ contract AttestationsSetAttestationsRequestFee is AttestationsFoundryTest {
 contract AttestationsSetSelectedIssuersWaitBlock is AttestationsFoundryTest {
   uint256 newSelectIssuersWaitBlocks = selectIssuersWaitBlocks + 1;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -464,7 +471,7 @@ contract AttestationsSetSelectedIssuersWaitBlock is AttestationsFoundryTest {
 contract AttestationsSetMaxAttestations is AttestationsFoundryTest {
   uint256 newMaxAttestations = maxAttestations + 1;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -489,7 +496,7 @@ contract AttestationsSetMaxAttestations is AttestationsFoundryTest {
 contract AttestationsWithdraw is AttestationsFoundryTest {
   address issuer;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     requestAndCompleteAttestations(caller);
     issuer = getIssuer(caller, phoneHash);
@@ -533,12 +540,12 @@ contract AttestationsWithdraw is AttestationsFoundryTest {
 }
 
 contract AttestationsLookupAccountsForIdentifier is AttestationsFoundryTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     requestAttestations(caller);
   }
 
-  function setAccountWalletAddress(address account) public {
+  function setAccountWalletAddress(address account) public override {
     vm.prank(account);
     accounts.setWalletAddress(account, 0, bytes32(0), bytes32(0));
   }
@@ -584,7 +591,7 @@ contract AttestationsLookupAccountsForIdentifier is AttestationsFoundryTest {
 }
 
 contract AttestationsBatchGetAttestationStats is AttestationsFoundryTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -721,7 +728,7 @@ contract AttestationsBatchGetAttestationStats is AttestationsFoundryTest {
 }
 
 contract AttestationsRevoke is AttestationsFoundryTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     requestAndCompleteAttestations(caller);
   }
@@ -751,7 +758,7 @@ contract AttestationsRevoke is AttestationsFoundryTest {
 }
 
 contract AttestationsRequireNAttestationRequests is AttestationsFoundryTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
