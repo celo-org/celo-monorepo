@@ -14,19 +14,28 @@ produces the operator action plan.
 
 | Name | Address | Role |
 |------|---------|------|
-| SequencerFeeVault | `0x4200…0011` | Collects tip + L1 data fee (native CELO + ERC-20) |
-| FeeHandler | `0xcD43…8778` | Collects base fee; distributes per beneficiary fractions |
-| Operations Safe (multisig) | `0x7A1E…FE19` | 2-of-5 beneficiary; receives withdrawals |
+| SequencerFeeVault | `0x4200…0011` | Collects the priority tip; `withdraw()` → Safe |
+| BaseFeeVault | `0x4200…0019` | Collects the base fee; `withdraw()` → Safe |
+| L1FeeVault | `0x4200…001A` | Collects the L1 data fee; `withdraw()` → Safe |
+| FeeHandler | `0xcD43…8778` | Stablecoin fee-abstraction + CELO; distributes per beneficiary fractions |
+| Operations Safe (multisig) | `0x7A1E…FE19` | 2-of-5 beneficiary; receives all withdrawals |
 | Governance / Community Fund | `0xD533…7972` | Final CELO destination |
 | CELO token | `0x471E…a438` | Native + ERC-20 unified |
 | Uniswap V3 QuoterV2 | `0x8282…a8E8` | Live CELO→WETH quote for OP share |
 
+> **All three OP-stack fee vaults route to the Safe.** An earlier version tracked
+> only SequencerFeeVault + FeeHandler and silently missed the base/L1 fee CELO.
+> Protocol-burned base fee never enters any vault and is correctly excluded — it
+> never had a chance to reach the Safe.
+
 ## Reporting Period
 
 - **Auto-detect:** `--from` = day after the last vault withdrawal; `--to` = yesterday.
-- **CGP-287 cutoff (`2026-04-08`):** the period is forced to start strictly after
-  the cutoff. Revenue on/before the cutoff was settled by CGP-287 and is handled
-  separately (pre-cutoff window, see below).
+- **Any window works.** The distributable is a flow reconciliation between the
+  window's boundary blocks (see below), so picking an arbitrary `[A, B]` —
+  including one that straddles past withdrawals/distributes — yields the correct
+  in-window amount. No special pre-cutoff handling is needed: funds that accrued
+  before `A` are removed by the `−balance_at(A)` term.
 
 ## Pricing Strategy
 
@@ -51,76 +60,80 @@ OP_share      = max(2.5% × revenue_celo, 15% × op_profit)   # whichever is hig
 net_profit    = revenue_celo − carbon − L1_costs − OP_share
 ```
 
-## Pre-Cutoff Window (CGP-287)
+## Distributable: Per-Token Accrual (flow reconciliation)
 
-Revenue that accrued **before** the cutoff but was **never withdrawn** still sits
-in the Vault/FeeHandler. The window is:
+The distributable for a window `[A, B]` is **everything that would land in the
+Safe if you flushed the contracts the day before A** (so pre-window funds don't
+count) **and flushed again at B** — regardless of whether it is still sitting in
+the contracts or was already withdrawn/distributed mid-window. Equivalently, a
+per-token flow reconciliation:
 
 ```
-sweep_from = (last vault withdrawal on/before cutoff) + 1 day
-sweep_to   = CGP-287 cutoff (2026-04-08)
+accrued[tok] = (sink balance at end of B) − (sink balance at block(A)) + withdrawn_to_Safe[A,B]
 ```
 
-`sweep_celo` = native CELO that landed in Vault + FeeHandler during that window
-(queried from Dune; 100% of native CELO fees route to those two contracts).
+- **CELO sink** = the three OP fee vaults (native) + `clabs%`·FeeHandler (native).
+- **stablecoin sink** = the FeeHandler only (vault ERC-20s are stuck — no
+  `sweepERC20()` — and never reach the Safe).
+- `withdrawn_to_Safe[A,B]` = vault `Withdrawal` event amounts (CELO) +
+  FeeHandler→Safe `Transfer` amounts (every token), summed from Dune. The
+  FeeHandler→Safe leg already nets out the carbon fraction.
 
-CGP-287 already paid Governance for the pre-cutoff value, so this CELO is **not**
-paid to Gov again. Instead it lands in the Safe after withdrawal and is **reused**
-to fund the stablecoin exchange (step [3]).
+Why this shape:
+- `− balance_at(A)` is the "flush the day before" term: if a mid-window withdrawal
+  swept funds that accrued **before** A, this cancels them out (you only get the
+  in-window portion).
+- `+ withdrawn_to_Safe[A,B]` adds back fees that already left the contracts during
+  the window.
+- Both balances are read at fixed boundary blocks, so a past window is
+  **reproducible** and post-window fees do not leak in.
+
+Burned base fee never enters a sink, so it is excluded automatically.
 
 ## Distribution Model
 
 **Invariants:**
 - Stablecoins **never** leave the Safe (retained permanently).
 - Governance is paid **only in CELO**.
-- The Safe's **pre-existing** CELO is **not touched** — only newly-withdrawn fees
-  (Vault + FeeHandler) plus the cold-wallet top-up are distributed.
+- The Safe's pre-existing CELO is not part of the window's accrual.
 
 **Governance receives (all CELO):**
 
 ```
-Gov = CELO_fees + stables_CELO_equivalent − OP_share − L1_costs
+revenue_celo = accrued[CELO] + stables_CELO_equivalent
+OP_share     = max(2.5% · revenue_celo, 15% · (revenue_celo − L1_costs))   # on the accrual basis
+Gov          = revenue_celo − OP_share − L1_costs
 ```
 
-The stablecoins stay in the Safe, so their CELO-equivalent must be supplied from
-elsewhere. Sources, in order:
-
-1. **Pre-cutoff CELO** already in the Safe (operator funds) — used first.
-2. **Cold wallet** — sends only the remaining gap.
+The retained stablecoins' CELO-equivalent is supplied by a **cold wallet** so Gov
+is paid entirely in CELO (the operator may offset it with pre-window CELO already
+in the Safe):
 
 ```
-stables_equiv   = stablecoin_fees_usd / celo_price       # report period
-precutoff_used  = min(sweep_celo, stables_equiv)
-cold_send       = stables_equiv − precutoff_used          # cold wallet outflow
-precutoff_left  = sweep_celo − precutoff_used             # stays in multisig if any
-```
-
-**Step [4] totals:**
-
-```
-distributable = (Vault + clabs_fraction × FeeHandler) + cold_send
-Gov           = distributable − precutoff_left − L1_costs − OP_share
+stables_usd        = Σ accrued[stable] × price        # USD pegs + EURm/BRLm FX
+stables_celo_equiv = stables_usd / celo_price          # window-average CELO price
 ```
 
 ## OP Superchain Share
 
-`OP_share` CELO is swapped to WETH on Uniswap V3 (CELO/WETH 0.3% pool) and sent
-to the OP recipient. The report shows a **live** quote from the QuoterV2 at the
-current rate. If `OP_SHARE_RECIPIENT` is the Safe placeholder, the swap is shown
-but not executed (recipient TBD).
+`OP_share` is recomputed on the **accrual** revenue (not gross fees — burned base
+fee isn't revenue). The CELO is swapped to WETH on Uniswap V3 (CELO/WETH 0.3%
+pool) and sent to the OP recipient; the report shows a **live** QuoterV2 quote at
+the current rate. If `OP_SHARE_RECIPIENT` is the Safe placeholder, the swap is
+shown but not executed (recipient TBD).
 
 ## Operator Action Plan (report output)
 
 | Step | Action | Permission |
 |------|--------|------------|
-| `[0]` | Pre-cutoff funds note (informational) | — |
-| `[1]` | `vault.withdraw()` → Safe | permissionless |
+| `[1]` | `withdraw()` on each of the 3 fee vaults → Safe | permissionless |
 | `[2]` | `feeHandler.handleAll()` + `distribute(token)` per stablecoin | permissionless |
-| `[3]` | Cold wallet sends `cold_send` CELO → Safe | operator cold wallet |
+| `[3]` | Cold wallet sends the stables CELO-equivalent → Safe | operator cold wallet |
 | `[4]` | Safe batch: CELO → Gov, OP share → WETH swap → OP recipient | 2-of-5 multisig |
 
-Steps `[1]`–`[2]` drain the contracts into the Safe. Step `[3]` tops up the
-stables CELO-equivalent. Step `[4]` distributes.
+Steps `[1]`–`[2]` flush the contracts into the Safe at window end (the accrual
+already counts anything flushed earlier in the window). Step `[3]` tops up the
+retained-stables CELO-equivalent. Step `[4]` distributes CELO to Governance.
 
 ## Reconciliation (—detail only)
 

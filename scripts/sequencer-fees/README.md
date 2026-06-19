@@ -22,15 +22,20 @@ The Celo L2 sequencer collects transaction fees in two on-chain contracts:
 
 ## Distribution Model (important)
 
-- **Governance is paid only in CELO** — `CELO fees + stables CELO-equiv − OP − L1`.
-- **Stablecoins never leave the Safe** — retained permanently.
-- The stables' CELO-equivalent is funded by:
-  1. **Pre-cutoff CELO** already in the Safe (CGP-287, un-withdrawn) — used first.
-  2. **Cold wallet** — sends only the remaining gap.
-- The Safe's **pre-existing** CELO is **not touched** — only newly-withdrawn fees
-  (Vault + FeeHandler) plus the cold-wallet top-up are distributed.
-- **OP share** CELO is swapped to WETH (Uniswap V3, live quote) and sent to the OP
-  recipient.
+- **Distributable = per-token accrual** (flow reconciliation), not a balance
+  snapshot. For a window `[A, B]` it counts every token that would land in the
+  Safe if you flushed the contracts the day before `A` and again at `B` — so it
+  correctly includes fees that were already withdrawn/distributed mid-window and
+  excludes pre-window funds and burned base fee. Works for any window.
+- **All three OP fee vaults** (SequencerFeeVault, BaseFeeVault, L1FeeVault) +
+  FeeHandler route CELO to the Safe and are all counted.
+- **Governance is paid only in CELO** — `accrued CELO + stables CELO-equiv − OP − L1`.
+- **Stablecoins never leave the Safe** — retained permanently; a **cold wallet**
+  supplies their CELO-equivalent (operator may offset with pre-window Safe CELO).
+- **OP share** is recomputed on the accrual revenue, swapped to WETH (Uniswap V3,
+  live quote), and sent to the OP recipient.
+
+See **[ALGORITHM.md](./ALGORITHM.md)** for the exact formula.
 
 ## Files
 
