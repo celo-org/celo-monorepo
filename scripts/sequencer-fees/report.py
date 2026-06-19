@@ -857,6 +857,44 @@ def compute_token_accruals(api_key: str, rpc: str, date_from: str, date_to: str,
     return accr, block_A
 
 
+def build_distribution(fee_celo: float, stables_usd: float, stables_celo_equiv: float,
+                       l1_cost: float, safe_now: float, vault_now: float, fh_now: float,
+                       clabs_frac: float, window_settled: bool) -> dict:
+    """Pure distribution math (no I/O) — the single source of truth for every
+    figure shown in steps [3]/[4]. Kept separate so it can be unit-tested.
+
+    Identities the result always satisfies (checked by the test harness):
+      revenue   = fee_celo + stables_celo_equiv
+      OP        = max(2.5%·revenue, 15%·(revenue − L1))
+      gov       = revenue − OP − L1
+      surplus   = max(0, projected_safe − fee_celo)         # Safe CELO beyond the window accrual
+      cold_send = max(0, stables_celo_equiv − min(surplus, stables_celo_equiv))
+      conservation: projected_safe + cold_send − (L1 + OP + gov) = leftover_surplus ≥ 0
+    """
+    revenue_celo = fee_celo + stables_celo_equiv
+    op_share = max(0.025 * revenue_celo, 0.15 * (revenue_celo - l1_cost))
+    op_method = "15% of profit" if 0.15 * (revenue_celo - l1_cost) >= 0.025 * revenue_celo else "2.5% of revenue"
+    gov_celo = revenue_celo - op_share - l1_cost
+
+    # After steps [1]/[2] the Safe will hold its current CELO plus the window-end
+    # flush (unless the window was already settled). Everything above the window
+    # accrual is surplus the operator already controls.
+    projected_safe = safe_now + (0.0 if window_settled else (vault_now + clabs_frac * fh_now))
+    surplus = max(0.0, projected_safe - fee_celo)
+    surplus_used = min(surplus, stables_celo_equiv)
+    cold_send = max(0.0, stables_celo_equiv - surplus_used)
+    leftover_surplus = surplus - surplus_used
+
+    return {
+        "fee_celo": fee_celo, "stables_usd": stables_usd, "stables_celo_equiv": stables_celo_equiv,
+        "revenue_celo": revenue_celo, "l1_cost": l1_cost, "op_share": op_share,
+        "op_method": op_method, "gov_celo": gov_celo,
+        "safe_now": safe_now, "vault_now": vault_now, "fh_now": fh_now,
+        "projected_safe": projected_safe, "surplus": surplus, "surplus_used": surplus_used,
+        "cold_send": cold_send, "leftover_surplus": leftover_surplus,
+    }
+
+
 def count_withdrawals_via_dune(api_key: str, date_from: str, date_to: str) -> tuple:
     """Count vault Withdrawal events in [date_from, date_to] via Dune (no block limit).
 
@@ -903,12 +941,13 @@ def check_operations_during_period(date_from: str, date_to: str, rpc: str, dist:
             if accr.get(sym, 0) >= 0.01:
                 print(f"    {sym}: {accr[sym]:,.2f}")
 
-    # Current contract balances to flush at window end (steps [1]/[2]).
+    # Balances already read in main() and folded into `dist`.
+    vault_now = dist["vault_now"]
+    fh_now = dist["fh_now"]
+
     def bal(addr_):
         out = cast_cmd(["cast", "balance", addr_, "--rpc-url", rpc, "--ether"])
         return float(out) if out else 0.0
-    vault_now = sum(bal(v) for v in FEE_VAULTS)
-    fh_now = bal(FEE_HANDLER)
 
     print("")
     print(hdr("NEXT STEPS"))
@@ -970,23 +1009,26 @@ def check_operations_during_period(date_from: str, date_to: str, rpc: str, dist:
     op_recipient = os.environ.get("OP_SHARE_RECIPIENT", OP_SHARE_RECIPIENT_DEFAULT)
     op_is_placeholder = op_recipient.lower() == SAFE_ADDR.lower()
 
-    # Pre-window CELO already in the Safe (operator funds) that MAY offset the
-    # cold-wallet top-up. Read the Safe's CELO balance at the window-start block.
-    safe_pre = _balance_at("", 18, SAFE_ADDR, str(dist["block_A"]), rpc, native=True)
-    cold_send = stables_equiv  # default: cold wallet covers the full stables equiv
+    # Surplus / cold-wallet figures (computed in build_distribution).
+    projected_safe = dist["projected_safe"]
+    surplus_used = dist["surplus_used"]
+    cold_send = dist["cold_send"]
 
     # ---- Step 3: Cold-wallet exchange for retained stablecoins ----
     print(f"  {BOLD}{YELLOW}[3]{RESET} {BOLD}COLD-WALLET EXCHANGE FOR RETAINED STABLES{RESET}")
-    print(f"      {GREY}Stablecoins STAY in the Safe (never sent to Gov). The cold wallet")
-    print(f"      provides their CELO-equivalent so Gov is paid entirely in CELO.{RESET}")
+    print(f"      {GREY}Stablecoins STAY in the Safe (never sent to Gov). Surplus CELO already")
+    print(f"      in the Safe is used first; the cold wallet sends only the remainder.{RESET}")
     print(f"      Stables retained:           {usd(stables_usd)}  {DIM}(stay in Safe){RESET}")
-    print(f"      Stables CELO-equivalent:    {num(stables_equiv, 14)}  {DIM}(at current CELO price){RESET}")
+    print(f"      Stables CELO-equivalent:    {num(stables_equiv, 14)}  {DIM}(at avg CELO price){RESET}")
+    if surplus_used > 1:
+        print(f"        {GREY}- Safe surplus CELO:{RESET}      {num(surplus_used, 14)}  {DIM}(Safe holds {projected_safe:,.0f}, window accrual {fee_celo:,.0f}){RESET}")
     print(f"        {BOLD}= Cold wallet provides:   {RED}{cold_send:>14,.2f}{RESET} {DIM}CELO{RESET}")
-    if safe_pre > 1:
-        print(f"      {DIM}(Safe held {safe_pre:,.0f} pre-window CELO you may use to offset this){RESET}")
-    print(f"      {CYAN}cast send {CELO_TOKEN} 'transfer(address,uint256)' \\")
-    print(f"        {SAFE_ADDR} $(cast --to-wei {cold_send:.6f} ether) \\")
-    print(f"        --rpc-url https://forno.celo.org --private-key $COLD_PK{RESET}")
+    if cold_send > 1:
+        print(f"      {CYAN}cast send {CELO_TOKEN} 'transfer(address,uint256)' \\")
+        print(f"        {SAFE_ADDR} $(cast --to-wei {cold_send:.6f} ether) \\")
+        print(f"        --rpc-url https://forno.celo.org --private-key $COLD_PK{RESET}")
+    else:
+        print(f"      {GREEN}Safe surplus fully covers the stables equivalent — no cold-wallet send needed.{RESET}")
     print("")
 
     # ---- Step 4: Distribute CELO to Governance via the Safe batch ----
@@ -995,7 +1037,7 @@ def check_operations_during_period(date_from: str, date_to: str, rpc: str, dist:
     print(f"      Stables stay in the Safe. Run AFTER [1]-[3].{RESET}")
     print("")
     print(f"        {GREY}CELO accrued to Safe:{RESET} {num(fee_celo, 14)}  {DIM}(this window, incl. mid-window withdrawals){RESET}")
-    print(f"        {GREY}+ stables equiv:{RESET}      {num(stables_equiv, 14)}  {DIM}(cold wallet){RESET}")
+    print(f"        {GREY}+ stables equiv:{RESET}      {num(stables_equiv, 14)}  {DIM}(Safe surplus + cold wallet){RESET}")
     print(f"        {GREY}= revenue:{RESET}            {num(revenue_celo, 14)}")
     print(f"        {RED}- L1 costs:{RESET}           {RED}{l1_cost:>14,.0f}{RESET}  {DIM}->{RESET} {addr(L1_COST_RECIPIENT_DEFAULT)}")
     print(f"        {RED}- OP share:{RESET}           {RED}{op_share:>14,.0f}{RESET}  {DIM}({op_method_str}){RESET}")
@@ -1159,13 +1201,8 @@ def main():
     stables_usd = (accr["USDT"] + accr["USDC"] + accr["USDm"]) * 1.0 + accr["EURm"] * eurm_price + accr["BRLm"] * 0.18
     stables_celo_equiv = stables_usd / celo_price if celo_price > 0 else 0.0
 
-    # Recompute OP share + Gov on the accrual basis (burned base fee excluded).
     fee_celo = accr["CELO"]
-    revenue_celo = fee_celo + stables_celo_equiv
     l1_cost = sum(r.get("total_l1_cost_celo", 0) for r in computed)
-    op_share = max(0.025 * revenue_celo, 0.15 * (revenue_celo - l1_cost))
-    op_method = "15% of profit" if 0.15 * (revenue_celo - l1_cost) >= 0.025 * revenue_celo else "2.5% of revenue"
-    gov_celo = revenue_celo - op_share - l1_cost
 
     # Was the window already flushed? If the last fee-vault withdrawal is on/after
     # the window end, the accrual is settled in the Safe and whatever is in the
@@ -1181,13 +1218,21 @@ def main():
         last_wd = ""
     window_settled = last_wd != "" and last_wd >= args.date_to
 
-    dist = {
+    # Current on-chain balances for the surplus calculation + steps [1]/[2] flush.
+    def _celo_bal(a):
+        out = cast_cmd(["cast", "balance", a, "--rpc-url", rpc, "--ether"])
+        return float(out) if out else 0.0
+    safe_now = _celo_bal(SAFE_ADDR)
+    vault_now = sum(_celo_bal(v) for v in FEE_VAULTS)
+    fh_now = _celo_bal(FEE_HANDLER)
+
+    # All distribution figures via the single pure function (testable).
+    dist = build_distribution(fee_celo, stables_usd, stables_celo_equiv, l1_cost,
+                              safe_now, vault_now, fh_now, clabs_frac, window_settled)
+    dist.update({
         "accr": accr, "block_A": block_A, "clabs_frac": clabs_frac,
-        "stables_usd": stables_usd, "stables_celo_equiv": stables_celo_equiv,
-        "fee_celo": fee_celo, "revenue_celo": revenue_celo, "l1_cost": l1_cost,
-        "op_share": op_share, "op_method": op_method, "gov_celo": gov_celo,
         "celo_price": celo_price, "window_settled": window_settled, "last_wd": last_wd,
-    }
+    })
 
     # Output
     if args.detail:
