@@ -914,36 +914,48 @@ def check_operations_during_period(date_from: str, date_to: str, rpc: str, dist:
     print(hdr("NEXT STEPS"))
     print("")
 
-    # Step 1: Withdraw from the fee vaults (flush window-end balance)
-    if vault_now > 1:
-        print(f"  {BOLD}{YELLOW}[1]{RESET} {BOLD}WITHDRAW FROM FEE VAULTS{RESET}")
-        print(f"      {celo(vault_now)} currently in the 3 OP fee vaults  {DIM}(permissionless){RESET}")
-        for v in FEE_VAULTS:
-            if bal(v) > 1:
-                print(f"      {CYAN}cast send {v} 'withdraw()' --rpc-url https://forno.celo.org --private-key $PK{RESET}")
+    if dist.get("window_settled"):
+        # A withdrawal on/after the window end already flushed this window into the
+        # Safe; the accrual below is settled. Anything in the contracts now is
+        # post-window and must NOT be re-flushed for this distribution.
+        print(f"  {BOLD}{GREEN}[1]+[2]{RESET} {BOLD}ALREADY FLUSHED{RESET}")
+        print(f"      {GREY}A fee-vault withdrawal on {dist.get('last_wd','?')} (on/after the window")
+        print(f"      end {date_to}) already moved this window's fees to the Safe.")
+        print(f"      The accrual below is settled — do NOT run withdraw()/handleAll()")
+        print(f"      for this window. Current contract balance ({vault_now + fh_now:,.0f} CELO)")
+        print(f"      is post-window revenue, part of a later window.{RESET}")
+        print("")
     else:
-        print(f"  {BOLD}{GREEN}[1]{RESET} {BOLD}WITHDRAW FROM FEE VAULTS{RESET} {GREEN}- already empty{RESET}")
-    print("")
+        # Step 1: Withdraw from the fee vaults (flush window-end balance)
+        if vault_now > 1:
+            print(f"  {BOLD}{YELLOW}[1]{RESET} {BOLD}WITHDRAW FROM FEE VAULTS{RESET}")
+            print(f"      {celo(vault_now)} currently in the 3 OP fee vaults  {DIM}(permissionless){RESET}")
+            for v in FEE_VAULTS:
+                if bal(v) > 1:
+                    print(f"      {CYAN}cast send {v} 'withdraw()' --rpc-url https://forno.celo.org --private-key $PK{RESET}")
+        else:
+            print(f"  {BOLD}{GREEN}[1]{RESET} {BOLD}WITHDRAW FROM FEE VAULTS{RESET} {GREEN}- already empty{RESET}")
+        print("")
 
-    # Step 2: Process FeeHandler (CELO + each stablecoin)
-    print(f"  {BOLD}{YELLOW}[2]{RESET} {BOLD}PROCESS FEEHANDLER{RESET}")
-    print(f"      {celo(fh_now)} + stablecoins currently in FeeHandler")
-    print(f"      handleAll() distributes: {GREEN}{clabs_frac*100:.0f}%{RESET} to Operations Safe, {ORANGE}{(1-clabs_frac)*100:.0f}%{RESET} Carbon Fund")
-    print(f"      {CYAN}cast send {FEE_HANDLER} 'handleAll()' --rpc-url https://forno.celo.org --private-key $PK{RESET}")
-    fh_with_balance = []
-    for sym, taddr, dec in FEE_TOKENS:
-        if sym == "CELO":
-            continue
-        raw = cast_cmd(["cast", "call", taddr, "balanceOf(address)(uint256)", FEE_HANDLER, "--rpc-url", rpc])
-        b = int(raw.split()[0]) / (10 ** dec) if raw else 0
-        if b >= 1:
-            fh_with_balance.append((sym, taddr, b))
-    if fh_with_balance:
-        print(f"      {GREY}Stablecoins in FeeHandler — distribute(token) each:{RESET}")
-        for sym, taddr, b in fh_with_balance:
-            print(f"        {WHITE}{sym}{RESET}  {num(b)}")
-            print(f"        {CYAN}cast send {FEE_HANDLER} 'distribute(address)' {taddr} --rpc-url https://forno.celo.org --private-key $PK{RESET}")
-    print("")
+        # Step 2: Process FeeHandler (CELO + each stablecoin)
+        print(f"  {BOLD}{YELLOW}[2]{RESET} {BOLD}PROCESS FEEHANDLER{RESET}")
+        print(f"      {celo(fh_now)} + stablecoins currently in FeeHandler")
+        print(f"      handleAll() distributes: {GREEN}{clabs_frac*100:.0f}%{RESET} to Operations Safe, {ORANGE}{(1-clabs_frac)*100:.0f}%{RESET} Carbon Fund")
+        print(f"      {CYAN}cast send {FEE_HANDLER} 'handleAll()' --rpc-url https://forno.celo.org --private-key $PK{RESET}")
+        fh_with_balance = []
+        for sym, taddr, dec in FEE_TOKENS:
+            if sym == "CELO":
+                continue
+            raw = cast_cmd(["cast", "call", taddr, "balanceOf(address)(uint256)", FEE_HANDLER, "--rpc-url", rpc])
+            b = int(raw.split()[0]) / (10 ** dec) if raw else 0
+            if b >= 1:
+                fh_with_balance.append((sym, taddr, b))
+        if fh_with_balance:
+            print(f"      {GREY}Stablecoins in FeeHandler — distribute(token) each:{RESET}")
+            for sym, taddr, b in fh_with_balance:
+                print(f"        {WHITE}{sym}{RESET}  {num(b)}")
+                print(f"        {CYAN}cast send {FEE_HANDLER} 'distribute(address)' {taddr} --rpc-url https://forno.celo.org --private-key $PK{RESET}")
+        print("")
 
     # Distribution figures (from the accrual bundle).
     fee_celo = dist["fee_celo"]
@@ -1054,14 +1066,6 @@ def main():
             vlog(f"Auto-detected --to:   {args.date_to} (yesterday)")
         print("", file=sys.stderr)
 
-    # Enforce CGP-287 cutoff: report covers strictly AFTER cutoff
-    min_from = (dt.datetime.strptime(CGP_287_CUTOFF_DATE, "%Y-%m-%d") + dt.timedelta(days=1)).strftime("%Y-%m-%d")
-    if args.date_from < min_from:
-        vlog(f"NOTE: --from {args.date_from} is on/before CGP-287 cutoff ({CGP_287_CUTOFF_DATE}).")
-        vlog(f"      Bumping --from to {min_from} (pre-cutoff revenue handled by sweep batch).")
-        args.date_from = min_from
-        print("", file=sys.stderr)
-
     # Validate dates
     try:
         dt.datetime.strptime(args.date_from, "%Y-%m-%d")
@@ -1071,8 +1075,13 @@ def main():
         sys.exit(1)
 
     if args.date_from > args.date_to:
-        print("Error: --from must be before --to", file=sys.stderr)
-        sys.exit(1)
+        # Common when auto-detecting right after a withdrawal: the next period
+        # starts the day after the last withdrawal, which can be after "yesterday".
+        last_day = (dt.datetime.strptime(args.date_from, "%Y-%m-%d") - dt.timedelta(days=1)).strftime("%Y-%m-%d")
+        print(f"{GREEN}No new revenue to distribute.{RESET} The last withdrawal was on "
+              f"{last_day}; nothing has accrued since. Pass an explicit --from/--to "
+              f"to report a past window.")
+        sys.exit(0)
 
     # Check freshness and optionally refresh
     if args.refresh:
@@ -1133,12 +1142,26 @@ def main():
     op_method = "15% of profit" if 0.15 * (revenue_celo - l1_cost) >= 0.025 * revenue_celo else "2.5% of revenue"
     gov_celo = revenue_celo - op_share - l1_cost
 
+    # Was the window already flushed? If the last fee-vault withdrawal is on/after
+    # the window end, the accrual is settled in the Safe and whatever is in the
+    # contracts NOW is post-window — steps [1]/[2] should not re-flush it.
+    try:
+        wd_rows = dune_run_sql(args.api_key, (
+            "SELECT max(block_time) AS t FROM celo.logs "
+            f"WHERE contract_address IN ({','.join(v.lower() for v in FEE_VAULTS)}) "
+            f"AND topic0 = {WITHDRAWAL_TOPIC0}"
+        ), "tmp_last_any_vault_withdrawal")
+        last_wd = (wd_rows[0].get("t") or "")[:10] if wd_rows else ""
+    except DuneRunError:
+        last_wd = ""
+    window_settled = last_wd != "" and last_wd >= args.date_to
+
     dist = {
         "accr": accr, "block_A": block_A, "clabs_frac": clabs_frac,
         "stables_usd": stables_usd, "stables_celo_equiv": stables_celo_equiv,
         "fee_celo": fee_celo, "revenue_celo": revenue_celo, "l1_cost": l1_cost,
         "op_share": op_share, "op_method": op_method, "gov_celo": gov_celo,
-        "celo_price": celo_price,
+        "celo_price": celo_price, "window_settled": window_settled, "last_wd": last_wd,
     }
 
     # Output
