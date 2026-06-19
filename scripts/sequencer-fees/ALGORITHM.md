@@ -34,8 +34,14 @@ produces the operator action plan.
 - **Any window works.** The distributable is a flow reconciliation between the
   window's boundary blocks (see below), so picking an arbitrary `[A, B]` —
   including one that straddles past withdrawals/distributes — yields the correct
-  in-window amount. No special pre-cutoff handling is needed: funds that accrued
-  before `A` are removed by the `−balance_at(A)` term.
+  in-window amount. Funds that accrued before `A` are removed by the
+  `−balance_at(A)` term. Adjacent windows compose additively.
+- **CGP-287 cutoff clamp (default).** Revenue on/before `2026-04-08` was already
+  settled by CGP-287. If the requested window starts before the cutoff, the
+  effective start is clamped to the day after it, and the output states the
+  excluded pre-cutoff amount (CELO + each stablecoin). Set `INCLUDE_PRE_CUTOFF=1`
+  to report the raw accrual instead — the output then shows the included
+  pre-cutoff amount and warns it double-counts what CGP-287 already paid.
 
 ## Pricing Strategy
 

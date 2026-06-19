@@ -1074,6 +1074,19 @@ def main():
         print("Error: dates must be YYYY-MM-DD format", file=sys.stderr)
         sys.exit(1)
 
+    # CGP-287 settled all revenue on/before the cutoff. By default, ignore any
+    # pre-cutoff portion: clamp the effective window start to the day after the
+    # cutoff. This is shown visibly (not silently). Override with
+    # INCLUDE_PRE_CUTOFF=1 to report the raw accrual including pre-cutoff.
+    cutoff_next = (dt.datetime.strptime(CGP_287_CUTOFF_DATE, "%Y-%m-%d") + dt.timedelta(days=1)).strftime("%Y-%m-%d")
+    requested_from = args.date_from
+    include_pre_cutoff = bool(os.environ.get("INCLUDE_PRE_CUTOFF"))
+    spans_pre_cutoff = args.date_from < cutoff_next
+    cutoff_clamped = False
+    if spans_pre_cutoff and not include_pre_cutoff:
+        cutoff_clamped = (args.date_from, args.date_to)
+        args.date_from = cutoff_next
+
     if args.date_from > args.date_to:
         # Common when auto-detecting right after a withdrawal: the next period
         # starts the day after the last withdrawal, which can be after "yesterday".
@@ -1124,6 +1137,18 @@ def main():
     vlog("Computing per-token accruals (flow reconciliation)...")
     accr, block_A = compute_token_accruals(args.api_key, rpc, args.date_from, args.date_to, clabs_frac)
 
+    # If the REQUESTED window reached before the CGP-287 cutoff, quantify that
+    # pre-cutoff portion separately so the output can say exactly how much was
+    # excluded (default) or how much extra is included (INCLUDE_PRE_CUTOFF=1).
+    pre_cutoff = None
+    if spans_pre_cutoff:
+        vlog("Computing pre-cutoff portion...")
+        try:
+            pc_accr, _ = compute_token_accruals(args.api_key, rpc, requested_from, CGP_287_CUTOFF_DATE, clabs_frac)
+            pre_cutoff = pc_accr
+        except Exception:
+            pre_cutoff = None
+
     # Value retained stablecoins -> USD -> CELO-equivalent (cold-wallet top-up).
     # Use the window-AVERAGE CELO price (a single Dune day can be noisy/incomplete);
     # eurm_price is the last day with EURm volume.
@@ -1172,6 +1197,29 @@ def main():
         print(f"  {BOLD}{WHITE}CELO L2 SEQUENCER FEE REPORT{RESET}  {DIM}|{RESET}  {CYAN}{totals['day']}{RESET} {DIM}({totals['num_days']} days){RESET}")
         print(f"  {DIM}run with --detail for full P&L and daily breakdown{RESET}")
         print(f"{BOLD}{CYAN}{'=' * 80}{RESET}")
+
+    def _fmt_pre(pc):
+        if not pc:
+            return "could not compute"
+        parts = [f"{GREEN}{pc.get('CELO', 0):,.0f} CELO{RESET}"]
+        for s in ("USDT", "USDC", "USDm", "EURm", "BRLm"):
+            if pc.get(s, 0) >= 0.01:
+                parts.append(f"{WHITE}{pc[s]:,.0f} {s}{RESET}")
+        return ", ".join(parts)
+
+    if cutoff_clamped:
+        req_from, req_to = cutoff_clamped
+        print(f"  {YELLOW}NOTE:{RESET} requested {req_from} -> {req_to}, but revenue on/before the "
+              f"CGP-287 cutoff ({CGP_287_CUTOFF_DATE}) was already settled by CGP-287.")
+        print(f"  {DIM}Window clamped to {args.date_from}.{RESET}")
+        if pre_cutoff is not None:
+            print(f"  {DIM}Pre-cutoff portion EXCLUDED ({requested_from} -> {CGP_287_CUTOFF_DATE}):{RESET} {_fmt_pre(pre_cutoff)}")
+        print(f"  {DIM}Set INCLUDE_PRE_CUTOFF=1 to include it.{RESET}")
+    elif include_pre_cutoff and spans_pre_cutoff:
+        print(f"  {YELLOW}NOTE:{RESET} INCLUDE_PRE_CUTOFF=1 — pre-cutoff revenue is INCLUDED below.")
+        print(f"  {DIM}It would normally be EXCLUDED: CGP-287 already settled revenue on/before")
+        print(f"  the cutoff ({CGP_287_CUTOFF_DATE}), so including it double-counts that portion.{RESET}")
+        print(f"  {DIM}Pre-cutoff portion INCLUDED ({requested_from} -> {CGP_287_CUTOFF_DATE}):{RESET} {_fmt_pre(pre_cutoff)}")
 
     # Distribution: steps [1]-[4] from the accrual basis
     check_operations_during_period(args.date_from, args.date_to, rpc, dist, args.api_key, args.detail)

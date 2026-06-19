@@ -176,7 +176,8 @@ Profit  = revenue − Carbon − L1 − OP
 | `--csv` / `--json` | Export |
 | `L1_COST_RECIPIENT` | L1 reimbursement address |
 | `OP_SHARE_RECIPIENT` | OP treasury (enables real WETH swap; default = Safe placeholder) |
-| `RPC_URL` | Celo RPC (default forno) |
+| `INCLUDE_PRE_CUTOFF` | `1` reports the raw accrual including pre-CGP-287 revenue (default clamps the window start to the cutoff and prints the excluded amount) |
+| `RPC_URL` | Celo RPC (default forno; archive node needed for very old window starts) |
 | `NO_COLOR` | Disable ANSI colors (also off when piped) |
 
 ## Anvil Fork Testing
