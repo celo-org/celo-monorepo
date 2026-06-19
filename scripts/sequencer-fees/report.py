@@ -174,21 +174,47 @@ CARBON_FRACTION = 0.0
 # Dune API
 # ---------------------------------------------------------------------------
 
-def dune_request(path: str, api_key: str, method: str = "GET", body: dict = None) -> dict:
+class DuneRunError(Exception):
+    """A Dune request/execution failed (HTTP error, rate limit, or timeout).
+
+    RAISED (catchable) — never sys.exit — so callers can retry or report a clean
+    error instead of the process dying mid-run with no output.
+    """
+
+
+def dune_request(path: str, api_key: str, method: str = "GET", body: dict = None, retries: int = 5) -> dict:
     from urllib.request import Request, urlopen
-    from urllib.error import HTTPError
+    from urllib.error import HTTPError, URLError
 
     url = f"{DUNE_API}{path}"
     headers = {"X-Dune-API-Key": api_key, "Content-Type": "application/json"}
     data = json.dumps(body).encode() if body else None
-    req = Request(url, data=data, headers=headers, method=method)
-    try:
-        with urlopen(req) as resp:
-            return json.loads(resp.read())
-    except HTTPError as e:
-        error_body = e.read().decode()
-        print(f"Dune API error {e.code}: {error_body}", file=sys.stderr)
-        sys.exit(1)
+    last = ""
+    for attempt in range(retries):
+        try:
+            req = Request(url, data=data, headers=headers, method=method)
+            with urlopen(req) as resp:
+                return json.loads(resp.read())
+        except HTTPError as e:
+            body_txt = ""
+            try:
+                body_txt = e.read().decode()[:200]
+            except Exception:
+                pass
+            last = f"HTTP {e.code}: {body_txt}"
+            # 429 (rate limit) and 5xx are transient — back off and retry.
+            if e.code == 429 or 500 <= e.code < 600:
+                if attempt < retries - 1:
+                    time.sleep(8 * (attempt + 1))
+                    continue
+            raise DuneRunError(f"Dune API error — {last}")
+        except (URLError, TimeoutError, json.JSONDecodeError) as e:
+            last = str(e)[:200]
+            if attempt < retries - 1:
+                time.sleep(4 * (attempt + 1))
+                continue
+            raise DuneRunError(f"Dune request failed — {last}")
+    raise DuneRunError(f"Dune request failed after {retries} attempts — {last}")
 
 
 def trigger_execution(api_key: str) -> str:
@@ -614,11 +640,6 @@ def quote_celo_to_weth(celo_amount: float, rpc: str) -> float:
 
 def timestamp_to_block(ts: int, rpc: str) -> str:
     return cast_cmd(["cast", "find-block", "--rpc-url", rpc, str(ts)])
-
-
-class DuneRunError(Exception):
-    """Raised when a one-shot Dune SQL run fails or times out (as opposed to
-    completing successfully with zero rows)."""
 
 
 def dune_run_sql(api_key: str, sql: str, name: str, poll_secs: int = 3, max_polls: int = 60) -> list:
@@ -1316,3 +1337,8 @@ if __name__ == "__main__":
         print("A required on-chain read failed repeatedly — NOT emitting a possibly-wrong "
               "number. Re-run, or point RPC_URL at a more reliable archive node.", file=sys.stderr)
         sys.exit(2)
+    except DuneRunError as e:
+        print(f"\nError: {e}", file=sys.stderr)
+        print("Dune is unavailable or rate-limited (HTTP 429 = quota). Wait for the limit "
+              "to reset or use a higher-tier key; NOT emitting a possibly-wrong number.", file=sys.stderr)
+        sys.exit(3)
