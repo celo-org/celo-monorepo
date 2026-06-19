@@ -200,7 +200,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     epochManagerContract.initializeSystem(100, block.number, firstElected);
   }
 
-  function test_Reverts_whenTransferingCeloToUnreleasedTreasury() public {
+  function test_Reverts_whenTransferringCeloToUnreleasedTreasury() public {
     _setValidatorScore();
 
     blockTravel(43200);

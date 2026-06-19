@@ -143,14 +143,14 @@ contract ProxyTest_transferOwnership is ProxyTest {
     proxy._transferOwnership(newOwner);
   }
 
-  function test_ShouldAllowTheNewOwnerToPerformOwneronlyActions_AfterTransferingOwnership() public {
+  function test_ShouldAllowTheNewOwnerToPerformOwneronlyActions_AfterTransferringOwnership() public {
     GetSetV1 getSet1 = new GetSetV1();
     proxy._transferOwnership(newOwner);
     vm.prank(newOwner);
     proxy._setImplementation(address(getSet1));
   }
 
-  function test_Reverts_OldOwnerPerformsOwnerOnlyActions_AfterTransferingOwnership() public {
+  function test_Reverts_OldOwnerPerformsOwnerOnlyActions_AfterTransferringOwnership() public {
     GetSetV1 getSet1 = new GetSetV1();
     proxy._transferOwnership(newOwner);
     vm.expectRevert("sender was not owner");
