@@ -296,14 +296,12 @@ export function reportASTIncompatibilities(
       // Compare contracts from same compiler version
       const reports = newArtifacts.listArtifacts()
         .filter((newArtifact) => {
-          // Matches all Truffle project artifacts (core contracts and test resource contracts)
-          const truffleProjectContractPathPattern = /^project:/
           // Matches Foundry core contracts
           const foundryCoreContractPathPattern = /^contracts(-0\.8)?\//
           // Matches Foundry test resource contracts
           const foundryTestContractPathPattern = /^test-ts/
           const path = newArtifact.ast.absolutePath
-          return truffleProjectContractPathPattern.test(path) || foundryCoreContractPathPattern.test(path) || foundryTestContractPathPattern.test(path)
+          return foundryCoreContractPathPattern.test(path) || foundryTestContractPathPattern.test(path)
         })
         .map((newArtifact) => {
           const newContractName = getContractName(newArtifact)

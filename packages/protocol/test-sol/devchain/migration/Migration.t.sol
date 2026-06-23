@@ -10,7 +10,6 @@ import "@celo-contracts/common/interfaces/IProxy.sol";
 import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts/common/interfaces/IAccounts.sol";
 import "@celo-contracts/common/interfaces/IEpochManager.sol";
-import "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
 import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasury.sol";
 import "@celo-contracts/governance/interfaces/IElection.sol";
 import "@celo-contracts/governance/interfaces/IValidators.sol";
@@ -19,7 +18,7 @@ import { FeeCurrencyDirectory } from "@celo-contracts-8/common/FeeCurrencyDirect
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 import "@celo-contracts-8/common/interfaces/IScoreManager.sol";
 
-import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
+import { Ownable } from "@openzeppelin/contracts8/access/Ownable.sol";
 
 import { console2 } from "forge-std-8/console2.sol";
 
@@ -78,7 +77,7 @@ contract RegistryIntegrationTest is IntegrationTest, MigrationsConstants {
     bytes32 hashLockedCelo = keccak256(abi.encodePacked("LockedCelo"));
     bytes32 hashEpochManager = keccak256(abi.encodePacked("EpochManager"));
 
-    for (uint256 i = 0; i < contractsInRegistryPath.length; i++) {
+    for (uint256 i = 0; i < contractsInRegistry.length; i++) {
       // Read name from list of core contracts
       string memory contractName = contractsInRegistry[i];
       console2.log("Checking bytecode of:", contractName);
@@ -116,7 +115,7 @@ contract RegistryIntegrationTest is IntegrationTest, MigrationsConstants {
         // Get bytecode from build artifacts
         // this has to be built twice like we do when migrating
         bytes memory expectedBytecodeWithMetadataFromArtifacts = vm.getDeployedCode(
-          contractsInRegistryPath[i]
+          getContractArtifactPath(contractName)
         );
         bytes memory expectedBytecodeFromArtifacts = removeMetadataFromBytecode(
           expectedBytecodeWithMetadataFromArtifacts
@@ -146,7 +145,6 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   ICeloToken celoTokenContract;
   IValidators validatorsContract;
   IEpochManager epochManagerContract;
-  IEpochManagerEnabler epochManagerEnablerContract;
   IScoreManager scoreManager;
   IElection election;
   ICeloUnreleasedTreasury celoUnreleasedTreasuryContract;
@@ -184,18 +182,17 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     vm.deal(address(0), CELO_SUPPLY_CAP);
 
     epochManagerContract = IEpochManager(registry.getAddressForStringOrDie("EpochManager"));
-    epochManagerEnablerContract = IEpochManagerEnabler(
-      registry.getAddressForStringOrDie("EpochManagerEnabler")
-    );
   }
 
   function test_Reverts_WhenEndOfEpochHasNotBeenReached() public {
+    // Skip this test if epoch is already ready on the forked chain
+    vm.skip(epochManagerContract.isTimeForNextEpoch());
     vm.expectRevert("Epoch is not ready to start");
     epochManagerContract.startNextEpochProcess();
   }
 
   function test_Reverts_whenAlreadyInitialized() public {
-    vm.prank(address(epochManagerEnablerContract));
+    vm.prank(Ownable(address(epochManagerContract)).owner());
     vm.expectRevert("Epoch system already initialized");
     epochManagerContract.initializeSystem(100, block.number, firstElected);
   }

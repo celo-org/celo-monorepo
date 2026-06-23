@@ -65,7 +65,7 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm, IFeeCurrencyAdapter {
    * @param value Debited value in the adapted digits.
    */
   function debitGasFees(address from, uint256 value) external onlyVm {
-    uint256 valueScaled = downscale(value);
+    uint256 valueScaled = downscaleCeil(value);
     require(valueScaled > 0, "Scaled debit value must be > 0.");
     debited = valueScaled;
     adaptedToken.debitGasFees(from, valueScaled);
@@ -97,9 +97,9 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm, IFeeCurrencyAdapter {
       return;
     }
 
-    uint256 refundScaled = downscale(refundAmount);
-    uint256 tipTxFeeScaled = downscale(tipAmount);
-    uint256 baseTxFeeScaled = downscale(baseFeeAmount);
+    uint256 refundScaled = downscaleFloor(refundAmount);
+    uint256 tipTxFeeScaled = downscaleFloor(tipAmount);
+    uint256 baseTxFeeScaled = downscaleFloor(baseFeeAmount);
 
     require(
       refundScaled + tipTxFeeScaled + baseTxFeeScaled <= debited,
@@ -167,16 +167,24 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm, IFeeCurrencyAdapter {
   }
 
   /**
-   * @notice Downscales value to the adapted token's native digits.
-   * @dev Downscale is rounding up in favour of protocol. User possibly can pay a bit more than expected (up to 1 unit of a token).
-   * Example:
-   * USDC has 6 decimals and in such case user can pay up to 0.000001 USDC more than expected.
-   * WBTC (currently not supported by Celo chain as fee currency) has 8 decimals and in such case user can pay up to 0.00000001 WBTC more than expected.
-   * Considering the current price of WBTC, it's less than 0.0005 USD. Even when WBTC price would be 1 mil USD, it's still would be only 0.01 USD.
-   * In general it is a very small amount and it is acceptable to round up in favor of the protocol.
+   * @notice Downscales value to the adapted token's native digits using ceiling division.
+   * @dev Used for debiting: ensures any non-zero fee always collects at least 1 native
+   * unit, protecting the protocol from sub-unit fees being rounded to zero.
    * @param value The value to downscale.
    */
-  function downscale(uint256 value) internal view returns (uint256) {
+  function downscaleCeil(uint256 value) internal view returns (uint256) {
     return (value + digitDifference - 1) / digitDifference;
+  }
+
+  /**
+   * @notice Downscales value to the adapted token's native digits using floor division.
+   * @dev Used for crediting: floor division guarantees
+   * floor(a/d) + floor(b/d) + floor(c/d) <= floor((a+b+c)/d), so the sum of credited
+   * components never exceeds debited. Any undershoot is absorbed by the roundingError
+   * correction in creditGasFees.
+   * @param value The value to downscale.
+   */
+  function downscaleFloor(uint256 value) internal view returns (uint256) {
+    return value / digitDifference;
   }
 }

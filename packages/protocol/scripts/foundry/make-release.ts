@@ -1,15 +1,15 @@
 /* eslint-disable no-console */
+import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
-import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { ForgeArtifact } from '@celo/protocol/scripts/foundry/ForgeArtifact'
 import { NULL_ADDRESS, eqAddress } from '@celo/utils/lib/address'
 import { exec } from 'child_process'
-import { createInterface } from 'readline'
 import { existsSync, readJsonSync, readdirSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
+import { createInterface } from 'readline'
 import { TextEncoder, promisify } from 'util'
 import {
   Abi,
@@ -80,7 +80,6 @@ interface MakeReleaseArgv {
   rpcUrl?: string
   skipVerification?: boolean
   celoscanApiKey?: string
-  extraTxs?: string
 }
 
 // Track linked library for verification
@@ -1223,10 +1222,6 @@ async function main() {
         description:
           'Celoscan API key for contract verification (can also be set via CELOSCAN_API_KEY env var or .env.json).',
       })
-      .option('extraTxs', {
-        type: 'string',
-        description: 'Path to a JSON file with extra transactions to append to the proposal.',
-      })
       .check((currentArgs) => {
         if (!currentArgs.privateKey && !currentArgs.mnemonic) {
           throw new Error('Either --privateKey or --mnemonic must be provided.')
@@ -1375,15 +1370,6 @@ async function main() {
           publicClient
         )
       }
-    }
-
-    if (argv.extraTxs) {
-      const extraTransactions: ProposalTx[] = readJsonSync(argv.extraTxs)
-      if (!Array.isArray(extraTransactions)) {
-        throw new Error(`Extra transactions file must contain a JSON array`)
-      }
-      proposal.push(...extraTransactions)
-      console.log(`Appended ${extraTransactions.length} extra transaction(s) from ${argv.extraTxs}`)
     }
 
     writeJsonSync(argv.proposal, proposal, { spaces: 2 })

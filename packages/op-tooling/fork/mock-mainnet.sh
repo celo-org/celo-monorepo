@@ -33,6 +33,11 @@ if [ -n "$GRAND_CHILD_MULTISIG" ] && [ "$EXTERNAL_TEAM" != "council" ]; then
   echo "Grand Child multisig is not supported for other team than council" && exit 1
 fi
 
+# helper: strip 0x prefix and lowercase an address
+to_lower() {
+  echo "${1#0x}" | tr '[:upper:]' '[:lower:]'
+}
+
 # signers
 [ "$USE_INTERNAL_CLABS" = "true" ] && [ -z "${MOCKED_SIGNER_1:-}" ] && echo "Need to set the MOCKED_SIGNER_1 via env" && exit 1
 [ "$USE_INTERNAL_CLABS" = "false" ] && MOCKED_SIGNER_1=$EXTERNAL_ACCOUNT
@@ -42,10 +47,10 @@ fi
 [ -z "${MOCKED_SIGNER_4:-}" ] && echo "Need to set the MOCKED_SIGNER_4 via env" && exit 1
 
 # validate signer ordering
-if [ "$USE_INTERNAL_CLABS" = "true" ] && [[ ${MOCKED_SIGNER_1:2,,} > ${MOCKED_SIGNER_2:2,,} ]]; then
+if [ "$USE_INTERNAL_CLABS" = "true" ] && [[ $(to_lower "$MOCKED_SIGNER_1") > $(to_lower "$MOCKED_SIGNER_2") ]]; then
   echo "Error: MOCKED_SIGNER_1 must be < MOCKED_SIGNER_2 (addresses must be in ascending order)" && exit 1
 fi
-if [ "$USE_INTERNAL_COUNCIL" = "true" ] && [[ ${MOCKED_SIGNER_3:2,,} > ${MOCKED_SIGNER_4:2,,} ]]; then
+if [ "$USE_INTERNAL_COUNCIL" = "true" ] && [[ $(to_lower "$MOCKED_SIGNER_3") > $(to_lower "$MOCKED_SIGNER_4") ]]; then
   echo "Error: MOCKED_SIGNER_3 must be < MOCKED_SIGNER_4 (addresses must be in ascending order)" && exit 1
 fi
 
@@ -53,7 +58,7 @@ fi
 SENTINEL_ADDRESS=0x0000000000000000000000000000000000000001
 
 # rpc
-RPC_URL=http://127.0.0.1:8545
+RPC_URL="${RPC_URL:-http://127.0.0.1:8545}"
 
 # set 10_000 ETH on mocked owner
 echo "Mock accounts balance"
@@ -64,7 +69,7 @@ cast rpc anvil_setBalance $MOCKED_SIGNER_3 0x21e19e0c9bab2400000 -r $RPC_URL
 cast rpc anvil_setBalance $MOCKED_SIGNER_4 0x21e19e0c9bab2400000 -r $RPC_URL
 
 # change threshold of signers to 2 for each multisig
-echo "Change treshold for multisigs"
+echo "Change threshold for multisigs"
 cast rpc anvil_setStorageAt $PARENT_MULTISIG 0x0000000000000000000000000000000000000000000000000000000000000004 0x0000000000000000000000000000000000000000000000000000000000000002 -r $RPC_URL
 cast rpc anvil_setStorageAt $CLABS_MULTISIG 0x0000000000000000000000000000000000000000000000000000000000000004 0x0000000000000000000000000000000000000000000000000000000000000002 -r $RPC_URL
 cast rpc anvil_setStorageAt $COUNCIL_MULTISIG 0x0000000000000000000000000000000000000000000000000000000000000004 0x0000000000000000000000000000000000000000000000000000000000000002 -r $RPC_URL
@@ -117,7 +122,7 @@ if [ -z "$GRAND_CHILD_MULTISIG" ]; then
   SIGNER_4_SLOT=$(cast index address $MOCKED_SIGNER_4 2)
   cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SIGNER_4_SLOT 0x000000000000000000000000${SENTINEL_ADDRESS:2} -r $RPC_URL
 else
-  if [[ ${GRAND_CHILD_MULTISIG:2,,} < ${MOCKED_SIGNER_4:2,,} ]]; then
+  if [[ $(to_lower "$GRAND_CHILD_MULTISIG") < $(to_lower "$MOCKED_SIGNER_4") ]]; then
     # Sentinel -> Grand Child
     cast rpc anvil_setStorageAt $COUNCIL_MULTISIG $SENTINEL_SLOT 0x000000000000000000000000${GRAND_CHILD_MULTISIG:2} -r $RPC_URL
     # Grand Child -> Signer #4
