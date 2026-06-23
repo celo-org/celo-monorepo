@@ -3,7 +3,7 @@ import * as child_process from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
 import { sync as rmrfSync } from 'rimraf'
-import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
+import { SOLIDITY_05_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 import {
   ABIS_BUILD_DIR,
   ABIS_DIST_DIR,
@@ -11,9 +11,9 @@ import {
   AliasedContracts,
   BUILD_EXECUTABLE,
   BuildTarget,
-  CONTRACTS_08_PACKAGE_DESTINATION_DIR,
   CONTRACTS_08_SOURCE_DIR,
   CONTRACTS_PACKAGE_SRC_DIR,
+  CONTRACTS_PACKAGE_STAGING_DIR,
   PublishContracts,
   TSCONFIG_PATH,
 } from './consts'
@@ -30,7 +30,7 @@ try {
   fs.writeFileSync(TSCONFIG_PATH, JSON.stringify(tsconfig, null, 4))
 
   // Start from scratch
-  rmrfSync([ABIS_BUILD_DIR, ABIS_DIST_DIR, CONTRACTS_08_PACKAGE_DESTINATION_DIR])
+  rmrfSync([ABIS_BUILD_DIR, ABIS_DIST_DIR, CONTRACTS_PACKAGE_STAGING_DIR])
   fs.mkdirSync(ABIS_BUILD_DIR, { recursive: true })
   fs.mkdirSync(ABIS_DIST_DIR, { recursive: true })
 
@@ -40,10 +40,10 @@ try {
   // Generate web3 typings
   build(`--web3Types ${path.join(ABIS_BUILD_DIR, 'web3')}`)
 
-  // Merge contracts-0.8, contracts-mento, etc.. at the root of the build dir
+  // Merge per-package subfolders at the root of the build dir
   log('Merging files at the root of the build dir')
   mergeFromFolder(
-    ['contracts', `contracts-${MENTO_PACKAGE.name}`, `contracts-${SOLIDITY_08_PACKAGE.name}`],
+    [SOLIDITY_05_PACKAGE.destDir, SOLIDITY_08_PACKAGE.destDir],
     path.join(ABIS_BUILD_DIR)
   )
 
@@ -103,7 +103,6 @@ try {
   // Cleanup
   log('Cleaning up folders and checking out dirty git files')
   rmrfSync(`rm -rf ${ABIS_BUILD_DIR}/contracts*`)
-  rmrfSync(`rm -rf ${ABIS_BUILD_DIR}/truffle*`)
   child_process.execSync(`git checkout ${TSCONFIG_PATH}`, { stdio: 'inherit' })
 }
 
@@ -264,34 +263,35 @@ function prepareAbisPackageJson(exports: Exports) {
   log('Preparing @celo/abis package.json')
   const packageJsonPath = path.join(ABIS_PACKAGE_SRC_DIR, 'package.json')
 
-  if (process.env.RELEASE_VERSION) {
-    log('Replacing @celo/abis version with RELEASE_VERSION)')
-
-    replacePackageVersionAndMakePublic(packageJsonPath, (json) => {
-      log('Setting @celo/abis exports')
-      json.exports = exports
-    })
-
-    return
-  }
-
-  log('Skipping @celo/abis package.json preparation (no RELEASE_VERSION provided)')
+  // Always prepare the manifest; replacePackageVersionAndMakePublic sets the real
+  // RELEASE_VERSION or a dry-run placeholder so `npm publish --dry-run` stays valid.
+  replacePackageVersionAndMakePublic(packageJsonPath, (json) => {
+    log('Setting @celo/abis exports')
+    json.exports = exports
+  })
 }
 
 function prepareContractsPackage() {
-  const contracts08CpCommand = `cp -r ${CONTRACTS_08_SOURCE_DIR} ${CONTRACTS_08_PACKAGE_DESTINATION_DIR}`
-  log(contracts08CpCommand)
-  child_process.execSync(contracts08CpCommand)
-
-  if (process.env.RELEASE_VERSION) {
-    log('Replacing @celo/contracts version with RELEASE_VERSION)')
-    const packageJsonPath = path.join(CONTRACTS_PACKAGE_SRC_DIR, 'package.json')
-    replacePackageVersionAndMakePublic(packageJsonPath)
-
-    return
+  // Assemble the staging dir from the source trees. We never mutate
+  // CONTRACTS_PACKAGE_SRC_DIR or CONTRACTS_08_SOURCE_DIR — the published
+  // tarball is built entirely under CONTRACTS_PACKAGE_STAGING_DIR.
+  fs.mkdirSync(CONTRACTS_PACKAGE_STAGING_DIR, { recursive: true })
+  const copies = [
+    // 0.5 contents land at the staging root (matches existing npm layout)
+    { src: `${CONTRACTS_PACKAGE_SRC_DIR}/.`, dest: `${CONTRACTS_PACKAGE_STAGING_DIR}/` },
+    // 0.8 contracts land under staging/0.8/
+    { src: CONTRACTS_08_SOURCE_DIR, dest: path.join(CONTRACTS_PACKAGE_STAGING_DIR, '0.8') },
+  ]
+  for (const { src, dest } of copies) {
+    const cmd = `cp -R ${src} ${dest}`
+    log(cmd)
+    child_process.execSync(cmd)
   }
 
-  log('Skipping @celo/contracts package.json preparation (no RELEASE_VERSION provided)')
+  // Always prepare the manifest; replacePackageVersionAndMakePublic sets the real
+  // RELEASE_VERSION or a dry-run placeholder so `npm publish --dry-run` stays valid.
+  const packageJsonPath = path.join(CONTRACTS_PACKAGE_STAGING_DIR, 'package.json')
+  replacePackageVersionAndMakePublic(packageJsonPath)
 }
 
 function lsRecursive(dir: string): string[] {
@@ -307,7 +307,9 @@ function lsRecursive(dir: string): string[] {
 
 function build(cmd: string) {
   log(`Running build for ${cmd}`)
-  child_process.execSync(`BUILD_DIR=./build ts-node ${BUILD_EXECUTABLE} ${cmd}`, {
+  // --preferTsExts: stale compiled .js files live alongside .ts in scripts/.
+  // Without this flag ts-node resolves `./consts` to the stale consts.js.
+  child_process.execSync(`BUILD_DIR=./build ts-node --preferTsExts ${BUILD_EXECUTABLE} ${cmd}`, {
     stdio: 'inherit',
   })
 }

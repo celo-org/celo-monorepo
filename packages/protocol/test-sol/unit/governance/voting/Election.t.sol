@@ -481,9 +481,12 @@ contract ElectionTest_Vote_WhenGroupEligible is ElectionTest {
     election.setAllowedToVoteOverMaxNumberOfGroups(false);
   }
 
-  function test_ShouldReturnOnlyLastVotedWith_WhenVotesWereNotManuallyCounted() public {
+  function test_ShouldReturnAccurateSum_WithoutManualCounting() public {
+    // incrementTotalVotes now refreshes the per-group cache on every vote,
+    // so getTotalVotesByAccount returns the true live total even when no
+    // updateTotalVotesByAccountForGroup call was made.
     WhenVotedForMoreThanMaxNumberOfGroups();
-    assertEq(election.getTotalVotesByAccount(voter), voterFirstGroupVote);
+    assertEq(election.getTotalVotesByAccount(voter), value - originallyNotVotedWithAmount);
   }
 
   function manuallyUpdateTotalVotesForAllGroups(address _voter) public {

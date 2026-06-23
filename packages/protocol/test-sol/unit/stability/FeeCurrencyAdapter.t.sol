@@ -72,8 +72,12 @@ contract CeloFeeCurrencyAdapterTestContract is CeloFeeCurrencyAdapterOwnable {
     return upscale(value);
   }
 
-  function downscaleVisible(uint256 value) external view returns (uint256) {
-    return downscale(value);
+  function downscaleCeilVisible(uint256 value) external view returns (uint256) {
+    return downscaleCeil(value);
+  }
+
+  function downscaleFloorVisible(uint256 value) external view returns (uint256) {
+    return downscaleFloor(value);
   }
 }
 
@@ -179,6 +183,15 @@ contract FeeCurrencyAdapter_DebitGasFees is FeeCurrencyAdapterTest {
     feeCurrencyAdapter.debitGasFees(address(this), 0);
   }
 
+  function test_ShouldDebitOneNativeUnit_WhenValueLessThanDigitDifference() public {
+    // Debit uses ceiling division: any non-zero value below digitDifference debits 1 native unit.
+    uint256 subUnitValue = 1e12 - 1;
+    vm.prank(address(0));
+    feeCurrencyAdapter.debitGasFees(address(this), subUnitValue);
+    assertEq(feeCurrencyAdapter.debited(), 1);
+    assertEq(feeCurrency.balanceOf(address(this)), initialSupply - 1);
+  }
+
   function test_ShouldDebitCorrectAmount_WhenExpectedDigitsOnlyOneBigger() public {
     debitFuzzyHelper(7, 1e1);
   }
@@ -229,6 +242,49 @@ contract FeeCurrencyAdapter_CreditGasFees is FeeCurrencyAdapterTest {
     );
     assertEq(feeCurrency.balanceOf(address(this)), initialSupply);
     assertEq(feeCurrencyAdapter.balanceOf(address(this)), initialSupply * 1e12);
+  }
+
+  /**
+   * @notice Regression test: ceiling division caused refundScaled + tipScaled + baseFeeScaled
+   * to exceed debited whenever two or more components had non-zero remainders mod digitDifference.
+   * With floor division the sum is always <= debited and the rounding error is absorbed by baseFee.
+   *
+   * Example: debit 2e12 (debited=2), split as refund=5e11, tip=5e11, baseFee=1e12.
+   *   ceil: 1+1+1=3 > 2 → would revert
+   *   floor: 0+0+1=1 <= 2 → roundingError=1 added to baseFee → baseFee credited as 2 ✓
+   */
+  function test_shouldCreditGasFees_WhenComponentsHaveNonZeroRemainders() public {
+    // debit 2 native units (2e12 in 18-dec)
+    uint256 debitAmount = 2 * 1e12;
+    vm.prank(address(0));
+    feeCurrencyAdapter.debitGasFees(address(this), debitAmount);
+    assertEq(feeCurrencyAdapter.debited(), 2);
+
+    address tipRecipient = actor("tipRecipient");
+    address baseFeeRecipient = actor("baseFeeRecipient");
+
+    // split: refund=5e11, tip=5e11, baseFee=1e12 (sums to 2e12 = debitAmount)
+    // floor: 0 + 0 + 1 = 1; roundingError = 1 → baseFee credited as 2
+    vm.prank(address(0));
+    feeCurrencyAdapter.creditGasFees(
+      address(this),
+      tipRecipient,
+      address(0),
+      baseFeeRecipient,
+      5e11, // refund — floors to 0
+      5e11, // tip   — floors to 0
+      0,
+      1e12 // baseFee — floors to 1, roundingError adds 1 → credited as 2
+    );
+
+    // refund recipient gets 0 native units (sub-unit refund lost to rounding)
+    assertEq(feeCurrency.balanceOf(address(this)), initialSupply - 2);
+    // tip recipient gets 0
+    assertEq(feeCurrency.balanceOf(tipRecipient), 0);
+    // baseFee recipient gets all 2 native units (1 direct + 1 roundingError)
+    assertEq(feeCurrency.balanceOf(baseFeeRecipient), 2);
+    // debited cleared
+    assertEq(feeCurrencyAdapter.debited(), 0);
   }
 
   function test_shouldRevert_WhenTryingToCreditMoreThanBurned() public {
@@ -358,16 +414,29 @@ contract FeeCurrencyAdapter_UpscaleAndDownScaleTests is FeeCurrencyAdapterTest {
     feeCurrencyAdapter.upscaleVisible(boundaryValue);
   }
 
-  function test_shouldDownscale() public {
-    assertEq(feeCurrencyAdapter.downscaleVisible(1e12), 1);
-    assertEq(feeCurrencyAdapter.downscaleVisible(1e18), 1e6);
-    assertEq(feeCurrencyAdapter.downscaleVisible(1e24), 1e12);
+  function test_shouldDownscaleFloor() public {
+    assertEq(feeCurrencyAdapter.downscaleFloorVisible(1e12), 1);
+    assertEq(feeCurrencyAdapter.downscaleFloorVisible(1e18), 1e6);
+    assertEq(feeCurrencyAdapter.downscaleFloorVisible(1e24), 1e12);
   }
 
-  function test_ShouldReturn1_WhenSmallEnoughAndRoundingUp() public {
-    assertEq(feeCurrencyAdapter.downscaleVisible(1), 1);
-    assertEq(feeCurrencyAdapter.downscaleVisible(1e6 - 1), 1);
-    assertEq(feeCurrencyAdapter.downscaleVisible(1e12 - 1), 1);
+  function test_shouldDownscaleCeil() public {
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1e12), 1);
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1e18), 1e6);
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1e24), 1e12);
+  }
+
+  function test_downscaleFloor_ShouldReturnZero_WhenValueLessThanDigitDifference() public {
+    assertEq(feeCurrencyAdapter.downscaleFloorVisible(0), 0);
+    assertEq(feeCurrencyAdapter.downscaleFloorVisible(1), 0);
+    assertEq(feeCurrencyAdapter.downscaleFloorVisible(1e6 - 1), 0);
+    assertEq(feeCurrencyAdapter.downscaleFloorVisible(1e12 - 1), 0);
+  }
+
+  function test_downscaleCeil_ShouldReturnOne_WhenValueLessThanDigitDifference() public {
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1), 1);
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1e6 - 1), 1);
+    assertEq(feeCurrencyAdapter.downscaleCeilVisible(1e12 - 1), 1);
   }
 }
 

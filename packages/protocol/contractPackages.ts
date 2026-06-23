@@ -5,9 +5,14 @@ export interface ContractPackage {
   contracts: string[]
   contractsFolder?: string
   proxyContracts?: string[]
-  truffleConfig?: string
+  truffleConfig?: string // TODO renaame to env config
   solidityVersion?: string
   proxiesPath?: string
+  // Foundry artifact directory (relative to packages/protocol) where `forge build`
+  // writes JSONs for this package, in the form `<forgeOutDir>/<Name>.sol/<Name>.json`.
+  forgeOutDir?: string
+  // Subfolder under the publishing build dir to write truffle-style flat artifacts to.
+  destDir?: string
 }
 
 export const SOLIDITY_05_PACKAGE = {
@@ -17,37 +22,8 @@ export const SOLIDITY_05_PACKAGE = {
   name: '0.5',
   contracts: [] as string[], // catch-all
   truffleConfig: 'truffle-config.js',
-} satisfies ContractPackage
-
-export const MENTO_PACKAGE = {
-  path: 'mento-core',
-  contractsFolder: 'contracts',
-  folderPath: 'lib',
-  name: 'mento',
-  contracts: [
-    'Exchange',
-    'ExchangeEUR',
-    'ExchangeBRL',
-    'GrandaMento',
-    'Reserve',
-    'ReserveSpenderMultiSig',
-    'StableToken',
-    'StableTokenEUR',
-    'StableTokenBRL',
-    'AddressLinkedList', // FIXME: https://github.com/celo-org/celo-monorepo/issues/11684
-  ],
-  proxyContracts: [
-    'ExchangeBRLProxy',
-    'ExchangeEURProxy',
-    'ExchangeProxy',
-    'GrandaMentoProxy',
-    'ReserveProxy',
-    'ReserveSpenderMultiSigProxy',
-    'StableTokenBRLProxy',
-    'StableTokenEURProxy',
-    'StableTokenProxy',
-  ],
-  truffleConfig: 'truffle-config.js',
+  forgeOutDir: 'out-truffle-compat',
+  destDir: 'contracts',
 } satisfies ContractPackage
 
 export const SOLIDITY_08_PACKAGE = {
@@ -79,4 +55,6 @@ export const SOLIDITY_08_PACKAGE = {
     'ScoreManagerProxy',
   ],
   truffleConfig: 'truffle-config0.8.js',
+  forgeOutDir: 'out-truffle-compat-0.8',
+  destDir: 'contracts-0.8',
 } satisfies ContractPackage

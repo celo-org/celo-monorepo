@@ -10,7 +10,6 @@ import { ICeloUnreleasedTreasury } from "@celo-contracts/common/interfaces/ICelo
 import { ICeloToken } from "@celo-contracts/common/interfaces/ICeloToken.sol";
 import { IElection } from "@celo-contracts/governance/interfaces/IElection.sol";
 import { IEpochRewards } from "@celo-contracts/governance/interfaces/IEpochRewards.sol";
-import { IEpochManagerEnabler } from "@celo-contracts/common/interfaces/IEpochManagerEnabler.sol";
 import { IEpochManager } from "@celo-contracts/common/interfaces/IEpochManager.sol";
 import { IEscrow } from "@celo-contracts/identity/interfaces/IEscrow.sol";
 import { IFederatedAttestations } from "@celo-contracts/identity/interfaces/IFederatedAttestations.sol";
@@ -20,7 +19,6 @@ import { IFreezer } from "@celo-contracts/common/interfaces/IFreezer.sol";
 import { IGovernance } from "@celo-contracts/governance/interfaces/IGovernance.sol";
 import { ILockedGold } from "@celo-contracts/governance/interfaces/ILockedGold.sol";
 import { IOdisPayments } from "@celo-contracts/identity/interfaces/IOdisPayments.sol";
-import { IRandom } from "@celo-contracts/identity/interfaces/IRandom.sol";
 import { IScoreManager } from "@celo-contracts-8/common/interfaces/IScoreManager.sol";
 import { ISortedOracles } from "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import { IValidators } from "@celo-contracts/governance/interfaces/IValidators.sol";
@@ -33,7 +31,6 @@ contract Devchain is TestWithUtils08 {
   ICeloToken celoTokenContract;
   IElection election;
   IEpochRewards epochRewards;
-  IEpochManagerEnabler epochManagerEnablerContract;
   IEpochManager epochManagerContract;
   IEscrow escrow;
   IFederatedAttestations federatedAttestations;
@@ -43,13 +40,13 @@ contract Devchain is TestWithUtils08 {
   IGovernance governance;
   ILockedGold lockedCelo;
   IOdisPayments odisPayments;
-  IRandom randomContract;
   IScoreManager scoreManager;
   ISortedOracles sortedOracles;
   IValidators validators;
 
   constructor() {
     // Fetch all core contracts that are expected to be in the Registry on the devchain
+    // TODO: Ensure all contracts have getters in UsingRegistry
     sortedOracles = getSortedOracles();
     feeCurrencyDirectory = FeeCurrencyDirectory(
       registryContract.getAddressForStringOrDie("FeeCurrencyDirectory")
@@ -63,7 +60,6 @@ contract Devchain is TestWithUtils08 {
     celoTokenContract = ICeloToken(registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
     election = getElection();
     epochRewards = getEpochRewards();
-    epochManagerEnablerContract = getEpochManagerEnabler();
     epochManagerContract = getEpochManager();
     escrow = getEscrow();
     federatedAttestations = getFederatedAttestations();
@@ -75,7 +71,6 @@ contract Devchain is TestWithUtils08 {
     governance = getGovernance();
     lockedCelo = getLockedGold();
     odisPayments = getOdisPayments();
-    randomContract = getRandom();
     scoreManager = IScoreManager(address(getScoreReader()));
     sortedOracles = getSortedOracles();
     validators = getValidators();

@@ -1,14 +1,13 @@
-import { assert } from 'chai'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
-import { AbiFunction, Abi, encodeFunctionData, GetProofReturnType } from 'viem'
+import { assert } from 'chai'
 import { readJsonSync } from 'fs-extra'
+import { Abi, AbiFunction, encodeFunctionData, GetProofReturnType } from 'viem'
 
-import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import {
   ArtifactLibraryLinking,
-  LibraryLinks,
-  LibraryLinkingInfo,
   getPlaceholderHash,
+  LibraryLinkingInfo,
+  LibraryLinks,
   linkLibraries,
 } from '@celo/protocol/lib/bytecode-foundry'
 import {
@@ -18,10 +17,10 @@ import {
   getSourceFile,
 } from '@celo/protocol/lib/compatibility/internal'
 import {
-  verifyBytecodes,
   ChainLookup,
-  RegistryLookup,
   ProxyLookup,
+  RegistryLookup,
+  verifyBytecodes,
 } from '@celo/protocol/lib/compatibility/verify-bytecode-foundry'
 import { assertThrowsAsync } from '@celo/protocol/lib/test-utils'
 import { startNetwork } from '@celo/protocol/test-ts/util/anvil'
@@ -33,6 +32,15 @@ const registryBytecode = readJsonSync(`./out/Registry.sol/Registry.json`).byteco
 
 const proxyAbi = readJsonSync(`./out/Proxy.sol/Proxy.json`).abi as Abi
 const proxyBytecode = readJsonSync(`./out/Proxy.sol/Proxy.json`).bytecode.object as string
+
+// TODO remove this duplicate
+export interface ProposalTx {
+  contract: string
+  function: string
+  args: string[]
+  value: string
+  description?: string
+}
 
 const deployContractWithLinking = async (
   contract: string,
