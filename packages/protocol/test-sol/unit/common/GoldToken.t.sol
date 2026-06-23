@@ -125,7 +125,7 @@ contract CeloTokenTest_transfer is CeloTokenTest {
     celoToken.transfer(address(0), ONE_CELOTOKEN);
   }
 
-  function test_Succeeds_whenTransferingToCeloUnreleasedTreasury() public {
+  function test_Succeeds_whenTransferringToCeloUnreleasedTreasury() public {
     vm.prank(sender);
     uint256 balanceBefore = celoToken.balanceOf(celoUnreleasedTreasuryAddress);
 
@@ -134,7 +134,7 @@ contract CeloTokenTest_transfer is CeloTokenTest {
     assertGt(balanceAfter, balanceBefore);
   }
 
-  function test_FailsWhenNativeTransferingToCeloUnreleasedTreasury() public payable {
+  function test_FailsWhenNativeTransferringToCeloUnreleasedTreasury() public payable {
     (bool success, ) = address(uint160(celoUnreleasedTreasuryAddress)).call.value(ONE_CELOTOKEN)(
       ""
     );
@@ -168,7 +168,7 @@ contract CeloTokenTest_transferFrom is CeloTokenTest {
     celoToken.transferFrom(sender, address(0), ONE_CELOTOKEN);
   }
 
-  function test_Succeeds_whenTransferingToCeloUnreleasedTreasury() public {
+  function test_Succeeds_whenTransferringToCeloUnreleasedTreasury() public {
     uint256 balanceBefore = celoToken.balanceOf(celoUnreleasedTreasuryAddress);
     vm.prank(receiver);
     celoToken.transferFrom(sender, celoUnreleasedTreasuryAddress, ONE_CELOTOKEN);
