@@ -19,12 +19,12 @@ yarn add @celo/contracts
 ### In your Solidity contracts
 
 ```solidity
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import '@celo/contracts/common/UsingRegistryV2.sol';
+import '@celo/contracts/0.8/common/UsingRegistry.sol';
 
-contract Example is UsingRegistryV2 {
-  constructor() public {
+contract Example is UsingRegistry {
+  constructor() {
     require(getAccounts().createAccount());
   }
 }
