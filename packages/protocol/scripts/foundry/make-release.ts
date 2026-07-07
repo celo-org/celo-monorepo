@@ -759,11 +759,33 @@ const deployProxy = async (
   return deployedProxyContract
 }
 
-const shouldDeployProxy = (report: ASTDetailedVersionedReport, contractName: string) => {
+const shouldDeployProxy = (
+  report: ASTDetailedVersionedReport,
+  contractName: string,
+  buildDir05: string,
+  buildDir08: string
+) => {
   const hasStorageChanges = report.contracts[contractName].changes.storage.length > 0
   const isNewContract = report.contracts[contractName].changes.major.find(
     (change: any) => change.type === 'NewContract'
   )
+  if (!hasStorageChanges && isNewContract) {
+    // The AST code comparison buckets artifacts by compiler version, so a contract
+    // migrated 0.5 -> 0.8 is reported as NewContract (it is absent from the old build's
+    // 0.8 bucket) even though it exists at the baseline and keeps its storage layout.
+    // Such contracts are in-place upgrades: keep the existing proxy. Only contracts
+    // absent from the baseline build under BOTH compilers are genuinely new.
+    const existsAtBaseline =
+      existsSync(join(buildDir05, `${contractName}.sol`, `${contractName}.json`)) ||
+      existsSync(join(buildDir08, `${contractName}.sol`, `${contractName}.json`))
+    if (existsAtBaseline) {
+      console.log(
+        `${contractName} is reported as NewContract but exists in the baseline build ` +
+          `(compiler migration); upgrading in place instead of deploying a new proxy.`
+      )
+      return false
+    }
+  }
   return hasStorageChanges || isNewContract
 }
 
@@ -798,7 +820,7 @@ const deployCoreContract = async (
     value: '0',
   }
 
-  if (!shouldDeployProxy(report, contractName)) {
+  if (!shouldDeployProxy(report, contractName, buildDir05, buildDir08)) {
     proposal.push(setImplementationTx)
   } else {
     const proxyArtifactName = `${contractName}Proxy`
