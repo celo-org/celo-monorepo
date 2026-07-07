@@ -54,13 +54,15 @@ function build_tag_foundry() {
     cp "$CONFIG" foundry.toml
   fi
 
-  if [ ! -d $BUILD_DIR ]; then
-    echo " - Build contract artifacts at $BUILD_DIR"
-    export FOUNDRY_PROFILE=$PROFILE
-    forge build --out $BUILD_DIR --ast >> $LOG_FILE
-  else
-    echo " - Contract artifacts already built at $BUILD_DIR"
-  fi
+  # Always rebuild from scratch. On reused (self-hosted) runners a previously-built
+  # $BUILD_DIR for the same tag persists across runs; reusing it can compare against a
+  # stale baseline and produce phantom storage diffs (e.g. a spurious change attributed
+  # to Governance, which then trips the no-new-proxy guard). Removing it forces a fresh,
+  # deterministic build of the checked-out sources.
+  echo " - Build contract artifacts at $BUILD_DIR (fresh)"
+  rm -rf $BUILD_DIR
+  export FOUNDRY_PROFILE=$PROFILE
+  forge build --out $BUILD_DIR --ast >> $LOG_FILE
 
   checkout_build_sources $CURRENT_HASH $LOG_FILE -s
 }
