@@ -48,6 +48,16 @@ jobs:
     name: Compile contracts
     runs-on: ubuntu-latest
     steps:
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
       - name: Set Swap Space
         uses: pierotofy/set-swap-space@0404882bc4666c0ff2f6fd8b3d32af69a730183c
         with:
@@ -170,6 +180,16 @@ jobs:
     name: Devchain tests
     runs-on: ubuntu-latest
     steps:
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
       - name: Set Swap Space
         uses: pierotofy/set-swap-space@0404882bc4666c0ff2f6fd8b3d32af69a730183c
         with:
