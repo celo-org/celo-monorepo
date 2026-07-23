@@ -20,7 +20,8 @@ Branch: `feat/migrate-contracts-0.8` off `master`. Delivery: phased per-domain c
   - `solidity-bytes-utils/` → `solidity-bytes-utils-8/`
   - `address(uint160(x))` casts → `payable(address(uint160(x)))` where payable needed
   - pragma → `pragma solidity >=0.8.7 <0.8.20;`
-  - add to `SOLIDITY_08_PACKAGE.contracts` / `.proxyContracts` in `contractPackages.ts`
+  - no package-list wiring needed: release and devchain tooling resolve each artifact by
+    checking which build tree contains it, so migrated contracts are picked up automatically
 
 ---
 
@@ -187,21 +188,39 @@ Sub-order: libs → slashers → locked-gold → election/rewards → governance
 
 ## PHASE 7 — Release Tooling Simplification (dual-tree → single)
 
-Only after `contracts/` has no remaining impls.
+Status after the migration landed: the per-contract bookkeeping is gone, but the dual
+build-profile machinery must stay for now. Two hard constraints discovered while getting
+the release test green:
 
-| ID | Task | File | Detail |
-|----|------|------|--------|
-| P7.1 | Drop `SOLIDITY_05_PACKAGE`; flatten `SOLIDITY_08_PACKAGE` (remove explicit contract list — now all) | `contractPackages.ts` | |
-| P7.2 | Remove `contracts08Set`, `getContractBuildDir`, `buildDir05/08` split, profile auto-detect | `scripts/foundry/make-release.ts` (~920-972) | |
-| P7.3 | Collapse dual-profile build loops | `scripts/bash/release-lib.sh`, `verify-deployed-forge.sh`, `check-versions-foundry.sh`, `scripts/foundry/make-release-foundry.sh`, `lib/build.ts` (~87-91) | one profile |
-| P7.4 | Single artifact-folder logic | `check-backward.ts` (getForge/getTruffle ArtifactsFolders) | |
-| P7.5 | **Preserve** `ALLOWED_LEGACY_LIBRARIES` (mainnet 0.5 `AddressLinkedList` stays) | `lib/compatibility/verify-bytecode-foundry.ts` (~125-150) | must NOT be deleted |
-| P7.6 | Retire `truffle-compat` profile; keep one 0.8 profile; collapse `out*` dirs | `foundry.toml` | |
-| P7.7 | CI path watches + devchain build scripts | `publish-contracts-abi-release.yml`, `create_and_migrate_anvil_devchain.sh` | drop `contracts/**` 0.5 builds |
-| P7.8 | Bump `NODE_MODULE_CACHE_VERSION` if deps changed | `.github/workflows/celo-monorepo.yml` | per node-cache skill |
-| P7.9 | Update release skill doc | `.cursor/skills/celo-release/SKILL.md` | remove 0.5 profile steps |
+1. **Old tags build with the CURRENT branch's foundry.toml.** `make-release-foundry.sh`
+   and `verify-deployed-forge.sh` copy the current `foundry.toml` over the checked-out
+   tag before building (`release-lib.sh` CONFIG arg), so the current config must keep a
+   working `truffle-compat` (0.5.14) profile as long as the tooling re-deploys or
+   verifies any pre-migration tag.
+2. **Proxies are still Solidity 0.5.** All `*Proxy` sources, `Proxy.sol`,
+   `ProxyFactory.sol`, `IdentityProxy*`, and `Migrations.sol` are strictly `^0.5.13`;
+   they are built by `truffle-compat`, consumed by the devchain migration and published
+   in `@celo/contracts`. Retiring the 0.5 profile requires migrating the proxies first,
+   which changes bytecode for newly deployed proxies and the published package.
 
-**Gate:** full release dry-run (`release:verify-deployed:foundry`, `release:check-versions:foundry`) passes against a fork; `verify-bytecode` still honors legacy library allowlist.
+| ID | Task | Status |
+|----|------|--------|
+| P7.1 | Flatten `SOLIDITY_08_PACKAGE.contracts` (no per-contract list) | DONE — list removed; artifact location is resolved from the build trees. `SOLIDITY_05_PACKAGE` itself stays: it still describes the real `contracts/` dir for the published-package layout (0.5 sources at the package root, 0.8 under `0.8/`), which must not change for consumers. |
+| P7.2 | Remove `contracts08Set` | DONE — `getContractBuildDir` is now a plain 0.5-first lookup with a missing-file fallback, which is what keeps old-tag deploys on the artifacts matching what is on chain. The `buildDir05/08` pair and the source-path profile auto-detect survive deliberately: both serve old-tag builds. |
+| P7.3 | Collapse dual-profile build loops | BLOCKED by constraints 1 and 2 above (publish pipeline, devchain, and old-tag builds all need both profiles). |
+| P7.4 | Single artifact-folder logic in `check-backward.ts` | DONE — the Truffle dual-folder path is deleted (forge-only; one out dir per side, split by compiler version internally). The dead `release:check-versions` legacy script went with it. |
+| P7.5 | **Preserve** `ALLOWED_LEGACY_LIBRARIES` (mainnet 0.5 `AddressLinkedList`) | PRESERVED — untouched in `lib/compatibility/verify-bytecode-foundry.ts`. |
+| P7.6 | Retire `truffle-compat` profile; collapse `out*` dirs | BLOCKED by constraints 1 and 2 above. |
+| P7.7 | CI path watches + devchain build scripts | MOSTLY BLOCKED — `contracts/**` still ships real sources (proxies, interfaces, dual-pragma bases), so the publish path filters and devchain 0.5 build stay. The devchain migration no longer needs a per-contract version list: `migrations_sol/constants.sol` resolves each artifact by checking the filesystem. |
+| P7.8 | Bump `NODE_MODULE_CACHE_VERSION` | DONE (10 → 11; this branch changed package.json/yarn.lock). |
+| P7.9 | Update release skill doc | The skill lives at `.agent/skills/celo-release/` (not `.cursor/`); its foundry-based flow is already accurate. |
+
+Remaining exit criteria for full single-tree: migrate the proxy sources to 0.8 (bytecode
+change for new proxies + published package), stop supporting pre-migration tags in the
+release tooling (or build them with their own foundry.toml), then retire `truffle-compat`,
+merge the out dirs, and drop `SOLIDITY_05_PACKAGE`.
+
+**Gate (unchanged):** full release dry-run (`release:verify-deployed:foundry`, `release:check-versions:foundry`) passes; `verify-bytecode` still honors the legacy library allowlist.
 
 ---
 

@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
@@ -988,8 +987,6 @@ const loadContractArtifact = (contractName: string, artifactPath: string): ViemC
   }
 }
 
-const contracts08Set = new Set(SOLIDITY_08_PACKAGE.contracts)
-
 // Contracts that historically shipped without a getVersionNumber in older release tags.
 // The 0.5 -> 0.8 migration newly versions them, so when this tooling re-deploys an older
 // baseline build (which lacks the version) the deploy-time version assertion must not
@@ -1007,21 +1004,20 @@ const getContractBuildDir = (
   buildDir05: string,
   buildDir08: string
 ): string => {
-  const preferred = contracts08Set.has(contractName) ? buildDir08 : buildDir05
-  const other = contracts08Set.has(contractName) ? buildDir05 : buildDir08
-  // A contract's Solidity version can differ between the baseline release and the
-  // new branch (e.g. contracts migrated 0.5 -> 0.8). contracts08Set reflects the new
-  // branch, so for the baseline fall back to whichever output dir actually has the
-  // artifact.
-  const preferredPath = join(preferred, `${contractName}.sol`, `${contractName}.json`)
-  if (existsSync(preferredPath)) {
-    return preferred
+  // A contract lives in exactly one compiler tree per branch, and the tooling builds
+  // both old release tags and the current branch. Preferring the 0.5 dir keeps old-tag
+  // deploys on the artifacts that match what is on chain (a tag can have the same
+  // library in both trees), while anything that only compiles as 0.8 — every current
+  // implementation — is found by the fallback. No per-contract list needed.
+  const path05 = join(buildDir05, `${contractName}.sol`, `${contractName}.json`)
+  if (existsSync(path05)) {
+    return buildDir05
   }
-  const otherPath = join(other, `${contractName}.sol`, `${contractName}.json`)
-  if (existsSync(otherPath)) {
-    return other
+  const path08 = join(buildDir08, `${contractName}.sol`, `${contractName}.json`)
+  if (existsSync(path08)) {
+    return buildDir08
   }
-  return preferred
+  return buildDir08
 }
 
 const getContractArtifactPath = (

@@ -32,60 +32,11 @@ export const SOLIDITY_08_PACKAGE = {
   folderPath: '',
   name: '0.8',
   proxiesPath: '/', // Proxies are still with 0.5 contracts
-  // Proxies shouldn't have to be added to a list manually
-  // https://github.com/celo-org/celo-monorepo/issues/10555
-  contracts: [
-    'GasPriceMinimum',
-    'FeeCurrencyDirectory',
-    'CeloUnreleasedTreasury',
-    'Validators',
-    'EpochManager',
-    'EpochManagerEnabler',
-    'ScoreManager',
-    'AddressLinkedList', // FIXME: https://github.com/celo-org/celo-monorepo/issues/11684
-    // Proposals, IntegerSortedLinkedList, and AddressSortedLinkedListWithMedian are
-    // deliberately NOT listed: release tooling also builds old tags where these libraries
-    // exist in both compiler trees, and listing them here would resolve the 0.8 artifact
-    // for a 0.5-era release. The 0.5-first lookup with a missing-file fallback picks the
-    // right artifact for every branch.
-    'FeeCurrencyWhitelist',
-    'OdisPayments',
-    'GovernanceSlasher',
-    'DowntimeSlasher',
-    'FederatedAttestations',
-    'DoubleSigningSlasher',
-    'BlockchainParameters',
-    'Escrow',
-    'Random',
-    'SortedOracles',
-    'MultiSig',
-    'GovernanceApproverMultiSig',
-    'ReleaseGoldMultiSig',
-    'FeeHandler',
-    'FeeHandlerSeller',
-    'MentoFeeHandlerSeller',
-    'UniswapFeeHandlerSeller',
-    'Freezer',
-    'Registry',
-    'GoldToken',
-    'EpochRewards',
-    'Attestations',
-    'LockedGold',
-    'ReleaseGold',
-    'Accounts',
-    'Election',
-    'Governance',
-  ],
-  proxyContracts: [
-    'GasPriceMinimumProxy',
-    'FeeCurrencyDirectoryProxy',
-    'MentoFeeCurrencyAdapterV1',
-    'CeloUnreleasedTreasuryProxy',
-    'ValidatorsProxy',
-    'EpochManagerProxy',
-    'EpochManagerEnablerProxy',
-    'ScoreManagerProxy',
-  ],
+  // Catch-all: every implementation now compiles as 0.8, so no per-contract list is
+  // maintained. Release tooling resolves each artifact by checking which build tree
+  // actually contains it (0.5-first with a fallback), which also stays correct when
+  // building old release tags.
+  contracts: [] as string[],
   truffleConfig: 'truffle-config0.8.js',
   forgeOutDir: 'out-truffle-compat-0.8',
   destDir: 'contracts-0.8',
