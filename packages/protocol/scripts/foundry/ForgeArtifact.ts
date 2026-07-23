@@ -6,7 +6,7 @@ export interface ForgeArtifact {
     object: Hex
     linkReferences?: {
       [sourcePath: string]: {
-        [libraryName: string]: Array<{ start: number; length: number }>
+        [libraryName: string]: { start: number; length: number }[]
       }
     }
   }
