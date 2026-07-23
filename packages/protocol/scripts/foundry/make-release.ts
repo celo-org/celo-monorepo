@@ -492,6 +492,7 @@ interface ViemContract {
   optimizerRuns: number
   evmVersion: string
   foundryProfile?: string // Foundry compilation profile for verification
+  linkedLibraryNames: string[] // library names the bytecode has link placeholders for
 }
 
 const proxiedCoreContracts = new Set<string>([
@@ -981,6 +982,9 @@ const loadContractArtifact = (contractName: string, artifactPath: string): ViemC
     optimizerRuns: optimizer.runs ?? 200,
     evmVersion: settings.evmVersion || 'paris',
     foundryProfile,
+    linkedLibraryNames: Object.values(artifact.bytecode.linkReferences ?? {}).flatMap((libs) =>
+      Object.keys(libs)
+    ),
   }
 }
 
@@ -1156,7 +1160,14 @@ const performRelease = async (
   }
 
   if (shouldDeployContract) {
-    const contractDependencies = dependencies.get(contractName) || []
+    // The static dependency map spans compiler eras: old release tags still link libraries
+    // (e.g. Signatures) that the 0.8 contracts replaced with internal code. Only keep the
+    // dependencies this artifact's bytecode actually has link placeholders for, so baseline
+    // re-deploys still link them while current builds don't prompt for unused libraries.
+    const linkedLibraryNames = new Set(contractViemArtifact.linkedLibraryNames)
+    const contractDependencies = (dependencies.get(contractName) || []).filter((dep) =>
+      linkedLibraryNames.has(dep)
+    )
     for (const dependency of contractDependencies) {
       if (!released.has(dependency)) {
         await performRelease(
