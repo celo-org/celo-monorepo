@@ -992,7 +992,11 @@ const contracts08Set = new Set(SOLIDITY_08_PACKAGE.contracts)
 // hard-fail; check-versions still enforces version compatibility for the new release.
 // GovernanceApproverMultiSig is a proxied core contract whose implementation has never
 // been versioned (in either compiler tree), so it stays exempt on the new-release path too.
-const UNVERSIONED_BASELINE_CONTRACTS = new Set(['Registry', 'Freezer', 'GovernanceApproverMultiSig'])
+const UNVERSIONED_BASELINE_CONTRACTS = new Set([
+  'Registry',
+  'Freezer',
+  'GovernanceApproverMultiSig',
+])
 
 const getContractBuildDir = (
   contractName: string,
