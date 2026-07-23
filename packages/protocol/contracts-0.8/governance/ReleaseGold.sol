@@ -217,7 +217,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
     InitParams2 calldata params2
   ) external initializer {
     _transferOwnership(msg.sender);
-    _initSchedule(params, params2.canValidate);
+    _initSchedule(params);
     _initOwnership(params, params2);
     _initDistribution(params2.initialDistributionRatio, params2.subjectToLiquidityProvision);
     canValidate = params2.canValidate;
@@ -228,16 +228,17 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
   /**
    * @dev Sets up the release schedule fields and validates timing/beneficiary params.
    */
-  function _initSchedule(InitParams calldata params, bool _canValidate) private {
+  function _initSchedule(InitParams calldata params) private {
     releaseSchedule.numReleasePeriods = params.numReleasePeriods;
     releaseSchedule.amountReleasedPerPeriod = params.amountReleasedPerPeriod;
     releaseSchedule.releasePeriod = params.releasePeriod;
     releaseSchedule.releaseCliff = params.releaseStartTime.add(params.releaseCliffTime);
     releaseSchedule.releaseStartTime = params.releaseStartTime;
-    // Expiry is opt-in for folks who can validate, opt-out for folks who cannot.
-    // This is because folks who are running Validators or Groups are likely to want to keep
-    // CELO in the ReleaseGold contract even after it becomes withdrawable.
-    revocationInfo.canExpire = !_canValidate;
+    // The 0.5 initializer intended expiry to be opt-in for validating grants
+    // (`!canValidate`), but it read the state variable before it was assigned, so every
+    // deployed grant started with canExpire = true regardless of canValidate. Keep that
+    // observable behavior; beneficiaries opt out later via setCanExpire.
+    revocationInfo.canExpire = true;
     require(releaseSchedule.numReleasePeriods >= 1, "There must be at least one releasing period");
     require(
       releaseSchedule.amountReleasedPerPeriod > 0,
