@@ -43,9 +43,11 @@ export const SOLIDITY_08_PACKAGE = {
     'EpochManagerEnabler',
     'ScoreManager',
     'AddressLinkedList', // FIXME: https://github.com/celo-org/celo-monorepo/issues/11684
-    'Proposals',
-    'IntegerSortedLinkedList',
-    'AddressSortedLinkedListWithMedian',
+    // Proposals, IntegerSortedLinkedList, and AddressSortedLinkedListWithMedian are
+    // deliberately NOT listed: release tooling also builds old tags where these libraries
+    // exist in both compiler trees, and listing them here would resolve the 0.8 artifact
+    // for a 0.5-era release. The 0.5-first lookup with a missing-file fallback picks the
+    // right artifact for every branch.
     'FeeCurrencyWhitelist',
     'OdisPayments',
     'GovernanceSlasher',
