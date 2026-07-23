@@ -104,8 +104,16 @@ const publicClient = createPublicClient({
 const version = getReleaseVersion(branch)
 
 const registryAddress = '0x000000000000000000000000000000000000ce10'
-const registryAbi = readJsonSync(`${buildDir05}/Registry.sol/Registry.json`).abi
-const proxyAbi = readJsonSync(`${buildDir05}/Proxy.sol/Proxy.json`).abi
+
+// Registry moved to the 0.8 tree, so its artifact lives in the 0.8 build dir; prefer it
+// and fall back to the 0.5 dir so the script still works on pre-migration branches.
+const readAbiWithFallback = (artifactRelPath: string) => {
+  const path08 = `${buildDir08}/${artifactRelPath}`
+  return readJsonSync(existsSync(path08) ? path08 : `${buildDir05}/${artifactRelPath}`).abi
+}
+
+const registryAbi = readAbiWithFallback('Registry.sol/Registry.json')
+const proxyAbi = readAbiWithFallback('Proxy.sol/Proxy.json')
 
 const getAddressForString = async (contract: string): Promise<string> => {
   const result = await publicClient.readContract({

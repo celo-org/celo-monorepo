@@ -90,6 +90,7 @@ $FORGE script \
   $SKIP_SIMULATION \
   $NON_INTERACTIVE \
   $LIBRARY_FLAGS \
+  $LIBRARY_FLAGS_08 \
   --rpc-url $ANVIL_RPC_URL || { echo "Migration script (part 2) failed"; exit 1; }
 
 

@@ -990,7 +990,9 @@ const contracts08Set = new Set(SOLIDITY_08_PACKAGE.contracts)
 // The 0.5 -> 0.8 migration newly versions them, so when this tooling re-deploys an older
 // baseline build (which lacks the version) the deploy-time version assertion must not
 // hard-fail; check-versions still enforces version compatibility for the new release.
-const UNVERSIONED_BASELINE_CONTRACTS = new Set(['Registry', 'Freezer'])
+// GovernanceApproverMultiSig is a proxied core contract whose implementation has never
+// been versioned (in either compiler tree), so it stays exempt on the new-release path too.
+const UNVERSIONED_BASELINE_CONTRACTS = new Set(['Registry', 'Freezer', 'GovernanceApproverMultiSig'])
 
 const getContractBuildDir = (
   contractName: string,
