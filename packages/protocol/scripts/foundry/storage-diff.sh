@@ -27,19 +27,45 @@ BASELINE_DIR="releaseData/storageLayouts/0.5-baseline"
 
 # Normalize a forge artifact's storageLayout: keep only the physically meaningful
 # fields (slot, offset, variable label, and the human-readable type label +
-# encoding + byte size). Compiler-internal astId numbers embedded in type ids are
-# stripped so two builds of the same layout compare equal.
+# encoding + byte size), recursing into struct members, array base types, and
+# mapping value types. Nested member layouts matter: two structs can occupy the
+# same top-level slot and byte size while ordering their members differently
+# (e.g. the OZ 2.5 vs 4.x EnumerableSet.AddressSet), which corrupts proxy
+# storage even though the flat layout looks identical. Compiler-internal astId
+# numbers embedded in type ids are stripped so two builds of the same layout
+# compare equal; recursion carries a visited list so recursive types (a struct
+# reachable from its own mapping values) terminate with a reference marker.
 normalize() {
   local artifact="$1"
   jq -S '
     (.storageLayout // {storage: [], types: {}}) as $sl
-    | [ $sl.storage[]? | {
+    | def shape($t; $seen):
+        ($sl.types[$t] // {}) as $ty
+        | if ($seen | index($t)) != null then
+            { ref: ($ty.label // $t) }
+          else
+            { label: $ty.label,
+              encoding: $ty.encoding,
+              numberOfBytes: $ty.numberOfBytes }
+            + (if $ty.base? then { base: shape($ty.base; $seen + [$t]) } else {} end)
+            + (if $ty.value? then
+                { key: ($sl.types[$ty.key].label // $ty.key),
+                  value: shape($ty.value; $seen + [$t]) }
+              else {} end)
+            + (if $ty.members? then
+                { members: [ $ty.members[] | {
+                    slot: .slot,
+                    offset: .offset,
+                    label: .label,
+                    type: shape(.type; $seen + [$t])
+                  } ] }
+              else {} end)
+          end;
+      [ $sl.storage[]? | {
         slot: .slot,
         offset: .offset,
         label: .label,
-        type: ( $sl.types[.type].label ),
-        encoding: ( $sl.types[.type].encoding ),
-        numberOfBytes: ( $sl.types[.type].numberOfBytes )
+        type: shape(.type; [])
       } ]
     | sort_by([(.slot|tonumber), .offset, .label])
   ' "$artifact"

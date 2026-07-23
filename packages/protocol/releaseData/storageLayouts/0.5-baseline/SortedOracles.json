@@ -1,82 +1,453 @@
 [
   {
-    "encoding": "inplace",
     "label": "_owner",
-    "numberOfBytes": "20",
     "offset": 0,
     "slot": "0",
-    "type": "address"
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "initialized",
-    "numberOfBytes": "1",
     "offset": 20,
     "slot": "0",
-    "type": "bool"
+    "type": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    }
   },
   {
-    "encoding": "mapping",
     "label": "rates",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "1",
-    "type": "mapping(address => struct SortedLinkedListWithMedian.List)"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => struct SortedLinkedListWithMedian.List)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct SortedLinkedListWithMedian.List",
+        "members": [
+          {
+            "label": "list",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "encoding": "inplace",
+              "label": "struct SortedLinkedList.List",
+              "members": [
+                {
+                  "label": "list",
+                  "offset": 0,
+                  "slot": "0",
+                  "type": {
+                    "encoding": "inplace",
+                    "label": "struct LinkedList.List",
+                    "members": [
+                      {
+                        "label": "head",
+                        "offset": 0,
+                        "slot": "0",
+                        "type": {
+                          "encoding": "inplace",
+                          "label": "bytes32",
+                          "numberOfBytes": "32"
+                        }
+                      },
+                      {
+                        "label": "tail",
+                        "offset": 0,
+                        "slot": "1",
+                        "type": {
+                          "encoding": "inplace",
+                          "label": "bytes32",
+                          "numberOfBytes": "32"
+                        }
+                      },
+                      {
+                        "label": "numElements",
+                        "offset": 0,
+                        "slot": "2",
+                        "type": {
+                          "encoding": "inplace",
+                          "label": "uint256",
+                          "numberOfBytes": "32"
+                        }
+                      },
+                      {
+                        "label": "elements",
+                        "offset": 0,
+                        "slot": "3",
+                        "type": {
+                          "encoding": "mapping",
+                          "key": "bytes32",
+                          "label": "mapping(bytes32 => struct LinkedList.Element)",
+                          "numberOfBytes": "32",
+                          "value": {
+                            "encoding": "inplace",
+                            "label": "struct LinkedList.Element",
+                            "members": [
+                              {
+                                "label": "previousKey",
+                                "offset": 0,
+                                "slot": "0",
+                                "type": {
+                                  "encoding": "inplace",
+                                  "label": "bytes32",
+                                  "numberOfBytes": "32"
+                                }
+                              },
+                              {
+                                "label": "nextKey",
+                                "offset": 0,
+                                "slot": "1",
+                                "type": {
+                                  "encoding": "inplace",
+                                  "label": "bytes32",
+                                  "numberOfBytes": "32"
+                                }
+                              },
+                              {
+                                "label": "exists",
+                                "offset": 0,
+                                "slot": "2",
+                                "type": {
+                                  "encoding": "inplace",
+                                  "label": "bool",
+                                  "numberOfBytes": "1"
+                                }
+                              }
+                            ],
+                            "numberOfBytes": "96"
+                          }
+                        }
+                      }
+                    ],
+                    "numberOfBytes": "128"
+                  }
+                },
+                {
+                  "label": "values",
+                  "offset": 0,
+                  "slot": "4",
+                  "type": {
+                    "encoding": "mapping",
+                    "key": "bytes32",
+                    "label": "mapping(bytes32 => uint256)",
+                    "numberOfBytes": "32",
+                    "value": {
+                      "encoding": "inplace",
+                      "label": "uint256",
+                      "numberOfBytes": "32"
+                    }
+                  }
+                }
+              ],
+              "numberOfBytes": "160"
+            }
+          },
+          {
+            "label": "median",
+            "offset": 0,
+            "slot": "5",
+            "type": {
+              "encoding": "inplace",
+              "label": "bytes32",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "relation",
+            "offset": 0,
+            "slot": "6",
+            "type": {
+              "encoding": "mapping",
+              "key": "bytes32",
+              "label": "mapping(bytes32 => enum SortedLinkedListWithMedian.MedianRelation)",
+              "numberOfBytes": "32",
+              "value": {
+                "encoding": "inplace",
+                "label": "enum SortedLinkedListWithMedian.MedianRelation",
+                "numberOfBytes": "1"
+              }
+            }
+          }
+        ],
+        "numberOfBytes": "224"
+      }
+    }
   },
   {
-    "encoding": "mapping",
     "label": "timestamps",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "2",
-    "type": "mapping(address => struct SortedLinkedListWithMedian.List)"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => struct SortedLinkedListWithMedian.List)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct SortedLinkedListWithMedian.List",
+        "members": [
+          {
+            "label": "list",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "encoding": "inplace",
+              "label": "struct SortedLinkedList.List",
+              "members": [
+                {
+                  "label": "list",
+                  "offset": 0,
+                  "slot": "0",
+                  "type": {
+                    "encoding": "inplace",
+                    "label": "struct LinkedList.List",
+                    "members": [
+                      {
+                        "label": "head",
+                        "offset": 0,
+                        "slot": "0",
+                        "type": {
+                          "encoding": "inplace",
+                          "label": "bytes32",
+                          "numberOfBytes": "32"
+                        }
+                      },
+                      {
+                        "label": "tail",
+                        "offset": 0,
+                        "slot": "1",
+                        "type": {
+                          "encoding": "inplace",
+                          "label": "bytes32",
+                          "numberOfBytes": "32"
+                        }
+                      },
+                      {
+                        "label": "numElements",
+                        "offset": 0,
+                        "slot": "2",
+                        "type": {
+                          "encoding": "inplace",
+                          "label": "uint256",
+                          "numberOfBytes": "32"
+                        }
+                      },
+                      {
+                        "label": "elements",
+                        "offset": 0,
+                        "slot": "3",
+                        "type": {
+                          "encoding": "mapping",
+                          "key": "bytes32",
+                          "label": "mapping(bytes32 => struct LinkedList.Element)",
+                          "numberOfBytes": "32",
+                          "value": {
+                            "encoding": "inplace",
+                            "label": "struct LinkedList.Element",
+                            "members": [
+                              {
+                                "label": "previousKey",
+                                "offset": 0,
+                                "slot": "0",
+                                "type": {
+                                  "encoding": "inplace",
+                                  "label": "bytes32",
+                                  "numberOfBytes": "32"
+                                }
+                              },
+                              {
+                                "label": "nextKey",
+                                "offset": 0,
+                                "slot": "1",
+                                "type": {
+                                  "encoding": "inplace",
+                                  "label": "bytes32",
+                                  "numberOfBytes": "32"
+                                }
+                              },
+                              {
+                                "label": "exists",
+                                "offset": 0,
+                                "slot": "2",
+                                "type": {
+                                  "encoding": "inplace",
+                                  "label": "bool",
+                                  "numberOfBytes": "1"
+                                }
+                              }
+                            ],
+                            "numberOfBytes": "96"
+                          }
+                        }
+                      }
+                    ],
+                    "numberOfBytes": "128"
+                  }
+                },
+                {
+                  "label": "values",
+                  "offset": 0,
+                  "slot": "4",
+                  "type": {
+                    "encoding": "mapping",
+                    "key": "bytes32",
+                    "label": "mapping(bytes32 => uint256)",
+                    "numberOfBytes": "32",
+                    "value": {
+                      "encoding": "inplace",
+                      "label": "uint256",
+                      "numberOfBytes": "32"
+                    }
+                  }
+                }
+              ],
+              "numberOfBytes": "160"
+            }
+          },
+          {
+            "label": "median",
+            "offset": 0,
+            "slot": "5",
+            "type": {
+              "encoding": "inplace",
+              "label": "bytes32",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "relation",
+            "offset": 0,
+            "slot": "6",
+            "type": {
+              "encoding": "mapping",
+              "key": "bytes32",
+              "label": "mapping(bytes32 => enum SortedLinkedListWithMedian.MedianRelation)",
+              "numberOfBytes": "32",
+              "value": {
+                "encoding": "inplace",
+                "label": "enum SortedLinkedListWithMedian.MedianRelation",
+                "numberOfBytes": "1"
+              }
+            }
+          }
+        ],
+        "numberOfBytes": "224"
+      }
+    }
   },
   {
-    "encoding": "mapping",
     "label": "isOracle",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "3",
-    "type": "mapping(address => mapping(address => bool))"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => mapping(address => bool))",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "mapping",
+        "key": "address",
+        "label": "mapping(address => bool)",
+        "numberOfBytes": "32",
+        "value": {
+          "encoding": "inplace",
+          "label": "bool",
+          "numberOfBytes": "1"
+        }
+      }
+    }
   },
   {
-    "encoding": "mapping",
     "label": "oracles",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "4",
-    "type": "mapping(address => address[])"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => address[])",
+      "numberOfBytes": "32",
+      "value": {
+        "base": {
+          "encoding": "inplace",
+          "label": "address",
+          "numberOfBytes": "20"
+        },
+        "encoding": "dynamic_array",
+        "label": "address[]",
+        "numberOfBytes": "32"
+      }
+    }
   },
   {
-    "encoding": "inplace",
     "label": "reportExpirySeconds",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "5",
-    "type": "uint256"
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
   },
   {
-    "encoding": "mapping",
     "label": "tokenReportExpirySeconds",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "6",
-    "type": "mapping(address => uint256)"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => uint256)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
   },
   {
-    "encoding": "inplace",
     "label": "breakerBox",
-    "numberOfBytes": "20",
     "offset": 0,
     "slot": "7",
-    "type": "contract IBreakerBox"
+    "type": {
+      "encoding": "inplace",
+      "label": "contract IBreakerBox",
+      "numberOfBytes": "20"
+    }
   },
   {
-    "encoding": "mapping",
     "label": "equivalentTokens",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "8",
-    "type": "mapping(address => struct SortedOracles.EquivalentToken)"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => struct SortedOracles.EquivalentToken)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct SortedOracles.EquivalentToken",
+        "members": [
+          {
+            "label": "token",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "encoding": "inplace",
+              "label": "address",
+              "numberOfBytes": "20"
+            }
+          }
+        ],
+        "numberOfBytes": "32"
+      }
+    }
   }
 ]

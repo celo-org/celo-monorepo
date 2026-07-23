@@ -1,34 +1,48 @@
 [
   {
-    "encoding": "inplace",
     "label": "_guardCounter",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "0",
-    "type": "uint256"
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "_owner",
-    "numberOfBytes": "20",
     "offset": 0,
     "slot": "1",
-    "type": "address"
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "initialized",
-    "numberOfBytes": "1",
     "offset": 20,
     "slot": "1",
-    "type": "bool"
+    "type": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    }
   },
   {
-    "encoding": "mapping",
     "label": "totalPaidCUSD",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "2",
-    "type": "mapping(address => uint256)"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => uint256)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
   }
 ]

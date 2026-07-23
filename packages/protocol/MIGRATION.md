@@ -42,6 +42,7 @@ Branch: `feat/migrate-contracts-0.8` off `master`. Delivery: phased per-domain c
 | `Initializable` (`contracts/common/Initializable.sol`) | same file (pragma `>=0.5.13 <0.9.0`) | MATCH — `bool initialized` slot 0 | **reuse same file**, no copy |
 | `Ownable` OZ v2.5 | OZ v4.9 `@openzeppelin/contracts8/access/Ownable` | MATCH — `address _owner` slot 0 in both | use OZ8; **verify init path** (v4.9 ctor sets owner — proxies must `initialize`+`_transferOwnership`, no behavior reliance on ctor) |
 | `ReentrancyGuard` (`contracts/common/libraries/ReentrancyGuard.sol`, pragma `<0.8.20`) | **keep 0.5-style file** (compiles under 0.8.19) | DIFFERS name-only (`_guardCounter` vs `ReentrancyGuard08._status`); same 1-slot footprint | **DO NOT switch to ReentrancyGuard08** — migrated `Validators` already inherits the 0.5 file; keep it to guarantee identical layout |
+| `EnumerableSet` OZ v2.5 (`utils/EnumerableSet.sol`) | 0.8 port keeping the 2.5 layout: `contracts-0.8/common/libraries/EnumerableSet.sol` | DIFFERS — OZ v4.9 reverses the struct member order (`Set { bytes32[] _values; mapping _indexes; }` vs 2.5 `{ mapping index; address[] values; }`), so every persisted `AddressSet` (FeeHandler active tokens/beneficiaries, LockedGold delegatees, UniswapFeeHandlerSeller routers) reads as empty through an upgraded proxy | **DO NOT use OZ v4.9 EnumerableSet** in migrated contracts; use the layout-compatible port (same member names, 4.x-style API, `getValues` instead of `values` because the member shadows it) |
 | `UsingRegistry` | `contracts-0.8/common/UsingRegistry` | MATCH — `_owner` slot0, `registry` slot1 (Mento refs removed but no storage delta) | reuse 0.8 version |
 | `UsingRegistryV2` | `UsingRegistryV2NoMento` | MATCH — both **zero storage** (all consts) | reuse NoMento variant |
 | `UsingPrecompiles` | `contracts-0.8/.../UsingPrecompiles` | MATCH — zero storage | reuse |
@@ -298,6 +299,10 @@ forge test --match-path "test-sol/integration/*"
 All 27 upgradeable implementation contracts migrated from Solidity 0.5.x to 0.8.19
 (`contracts/` → `contracts-0.8/`). Verified end-to-end:
 - **Storage:** all 27 pass `storage-diff.sh --all` — byte-identical to the 0.5 baselines (ZERO drift).
+  The gate compares nested type layouts (struct members, array bases, mapping values), not just
+  top-level slots — a flat comparison misses member reordering inside a same-sized struct, which is
+  exactly how the OZ 2.5 → 4.9 `EnumerableSet` incompatibility hid. Baselines are captured with the
+  same normalization from a 0.5 build on master.
 - **Tests:** `forge test --match-path "test-sol/unit/*"` → **2227 passed, 0 failed**; `test-sol/integration/*` → **18 passed, 0 failed**. (Run with foundry v1.0.0 to match CI; the catch-all/common jobs must NOT pass `--block-gas-limit 50000000`.)
 - **Build:** both `forge build` (default) and `FOUNDRY_PROFILE=truffle-compat8 forge build` green.
 - **Wiring:** all 27 added to `SOLIDITY_08_PACKAGE.contracts` in `contractPackages.ts`.

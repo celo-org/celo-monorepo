@@ -1,26 +1,37 @@
 [
   {
-    "encoding": "inplace",
     "label": "_owner",
-    "numberOfBytes": "20",
     "offset": 0,
     "slot": "0",
-    "type": "address"
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "initialized",
-    "numberOfBytes": "1",
     "offset": 20,
     "slot": "0",
-    "type": "bool"
+    "type": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    }
   },
   {
-    "encoding": "dynamic_array",
     "label": "deprecated_whitelist",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "1",
-    "type": "address[]"
+    "type": {
+      "base": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "encoding": "dynamic_array",
+      "label": "address[]",
+      "numberOfBytes": "32"
+    }
   }
 ]

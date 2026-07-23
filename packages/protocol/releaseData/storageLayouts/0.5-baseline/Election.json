@@ -1,82 +1,493 @@
 [
   {
-    "encoding": "inplace",
     "label": "_owner",
-    "numberOfBytes": "20",
     "offset": 0,
     "slot": "0",
-    "type": "address"
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "_guardCounter",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "1",
-    "type": "uint256"
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "initialized",
-    "numberOfBytes": "1",
     "offset": 0,
     "slot": "2",
-    "type": "bool"
+    "type": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "registry",
-    "numberOfBytes": "20",
     "offset": 1,
     "slot": "2",
-    "type": "contract IRegistry"
+    "type": {
+      "encoding": "inplace",
+      "label": "contract IRegistry",
+      "numberOfBytes": "20"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "votes",
-    "numberOfBytes": "320",
     "offset": 0,
     "slot": "3",
-    "type": "struct Election.Votes"
+    "type": {
+      "encoding": "inplace",
+      "label": "struct Election.Votes",
+      "members": [
+        {
+          "label": "pending",
+          "offset": 0,
+          "slot": "0",
+          "type": {
+            "encoding": "inplace",
+            "label": "struct Election.PendingVotes",
+            "members": [
+              {
+                "label": "total",
+                "offset": 0,
+                "slot": "0",
+                "type": {
+                  "encoding": "inplace",
+                  "label": "uint256",
+                  "numberOfBytes": "32"
+                }
+              },
+              {
+                "label": "forGroup",
+                "offset": 0,
+                "slot": "1",
+                "type": {
+                  "encoding": "mapping",
+                  "key": "address",
+                  "label": "mapping(address => struct Election.GroupPendingVotes)",
+                  "numberOfBytes": "32",
+                  "value": {
+                    "encoding": "inplace",
+                    "label": "struct Election.GroupPendingVotes",
+                    "members": [
+                      {
+                        "label": "total",
+                        "offset": 0,
+                        "slot": "0",
+                        "type": {
+                          "encoding": "inplace",
+                          "label": "uint256",
+                          "numberOfBytes": "32"
+                        }
+                      },
+                      {
+                        "label": "byAccount",
+                        "offset": 0,
+                        "slot": "1",
+                        "type": {
+                          "encoding": "mapping",
+                          "key": "address",
+                          "label": "mapping(address => struct Election.PendingVote)",
+                          "numberOfBytes": "32",
+                          "value": {
+                            "encoding": "inplace",
+                            "label": "struct Election.PendingVote",
+                            "members": [
+                              {
+                                "label": "value",
+                                "offset": 0,
+                                "slot": "0",
+                                "type": {
+                                  "encoding": "inplace",
+                                  "label": "uint256",
+                                  "numberOfBytes": "32"
+                                }
+                              },
+                              {
+                                "label": "epoch",
+                                "offset": 0,
+                                "slot": "1",
+                                "type": {
+                                  "encoding": "inplace",
+                                  "label": "uint256",
+                                  "numberOfBytes": "32"
+                                }
+                              }
+                            ],
+                            "numberOfBytes": "64"
+                          }
+                        }
+                      }
+                    ],
+                    "numberOfBytes": "64"
+                  }
+                }
+              }
+            ],
+            "numberOfBytes": "64"
+          }
+        },
+        {
+          "label": "active",
+          "offset": 0,
+          "slot": "2",
+          "type": {
+            "encoding": "inplace",
+            "label": "struct Election.ActiveVotes",
+            "members": [
+              {
+                "label": "total",
+                "offset": 0,
+                "slot": "0",
+                "type": {
+                  "encoding": "inplace",
+                  "label": "uint256",
+                  "numberOfBytes": "32"
+                }
+              },
+              {
+                "label": "forGroup",
+                "offset": 0,
+                "slot": "1",
+                "type": {
+                  "encoding": "mapping",
+                  "key": "address",
+                  "label": "mapping(address => struct Election.GroupActiveVotes)",
+                  "numberOfBytes": "32",
+                  "value": {
+                    "encoding": "inplace",
+                    "label": "struct Election.GroupActiveVotes",
+                    "members": [
+                      {
+                        "label": "total",
+                        "offset": 0,
+                        "slot": "0",
+                        "type": {
+                          "encoding": "inplace",
+                          "label": "uint256",
+                          "numberOfBytes": "32"
+                        }
+                      },
+                      {
+                        "label": "totalUnits",
+                        "offset": 0,
+                        "slot": "1",
+                        "type": {
+                          "encoding": "inplace",
+                          "label": "uint256",
+                          "numberOfBytes": "32"
+                        }
+                      },
+                      {
+                        "label": "unitsByAccount",
+                        "offset": 0,
+                        "slot": "2",
+                        "type": {
+                          "encoding": "mapping",
+                          "key": "address",
+                          "label": "mapping(address => uint256)",
+                          "numberOfBytes": "32",
+                          "value": {
+                            "encoding": "inplace",
+                            "label": "uint256",
+                            "numberOfBytes": "32"
+                          }
+                        }
+                      }
+                    ],
+                    "numberOfBytes": "96"
+                  }
+                }
+              }
+            ],
+            "numberOfBytes": "64"
+          }
+        },
+        {
+          "label": "total",
+          "offset": 0,
+          "slot": "4",
+          "type": {
+            "encoding": "inplace",
+            "label": "struct Election.TotalVotes",
+            "members": [
+              {
+                "label": "eligible",
+                "offset": 0,
+                "slot": "0",
+                "type": {
+                  "encoding": "inplace",
+                  "label": "struct SortedLinkedList.List",
+                  "members": [
+                    {
+                      "label": "list",
+                      "offset": 0,
+                      "slot": "0",
+                      "type": {
+                        "encoding": "inplace",
+                        "label": "struct LinkedList.List",
+                        "members": [
+                          {
+                            "label": "head",
+                            "offset": 0,
+                            "slot": "0",
+                            "type": {
+                              "encoding": "inplace",
+                              "label": "bytes32",
+                              "numberOfBytes": "32"
+                            }
+                          },
+                          {
+                            "label": "tail",
+                            "offset": 0,
+                            "slot": "1",
+                            "type": {
+                              "encoding": "inplace",
+                              "label": "bytes32",
+                              "numberOfBytes": "32"
+                            }
+                          },
+                          {
+                            "label": "numElements",
+                            "offset": 0,
+                            "slot": "2",
+                            "type": {
+                              "encoding": "inplace",
+                              "label": "uint256",
+                              "numberOfBytes": "32"
+                            }
+                          },
+                          {
+                            "label": "elements",
+                            "offset": 0,
+                            "slot": "3",
+                            "type": {
+                              "encoding": "mapping",
+                              "key": "bytes32",
+                              "label": "mapping(bytes32 => struct LinkedList.Element)",
+                              "numberOfBytes": "32",
+                              "value": {
+                                "encoding": "inplace",
+                                "label": "struct LinkedList.Element",
+                                "members": [
+                                  {
+                                    "label": "previousKey",
+                                    "offset": 0,
+                                    "slot": "0",
+                                    "type": {
+                                      "encoding": "inplace",
+                                      "label": "bytes32",
+                                      "numberOfBytes": "32"
+                                    }
+                                  },
+                                  {
+                                    "label": "nextKey",
+                                    "offset": 0,
+                                    "slot": "1",
+                                    "type": {
+                                      "encoding": "inplace",
+                                      "label": "bytes32",
+                                      "numberOfBytes": "32"
+                                    }
+                                  },
+                                  {
+                                    "label": "exists",
+                                    "offset": 0,
+                                    "slot": "2",
+                                    "type": {
+                                      "encoding": "inplace",
+                                      "label": "bool",
+                                      "numberOfBytes": "1"
+                                    }
+                                  }
+                                ],
+                                "numberOfBytes": "96"
+                              }
+                            }
+                          }
+                        ],
+                        "numberOfBytes": "128"
+                      }
+                    },
+                    {
+                      "label": "values",
+                      "offset": 0,
+                      "slot": "4",
+                      "type": {
+                        "encoding": "mapping",
+                        "key": "bytes32",
+                        "label": "mapping(bytes32 => uint256)",
+                        "numberOfBytes": "32",
+                        "value": {
+                          "encoding": "inplace",
+                          "label": "uint256",
+                          "numberOfBytes": "32"
+                        }
+                      }
+                    }
+                  ],
+                  "numberOfBytes": "160"
+                }
+              }
+            ],
+            "numberOfBytes": "160"
+          }
+        },
+        {
+          "label": "groupsVotedFor",
+          "offset": 0,
+          "slot": "9",
+          "type": {
+            "encoding": "mapping",
+            "key": "address",
+            "label": "mapping(address => address[])",
+            "numberOfBytes": "32",
+            "value": {
+              "base": {
+                "encoding": "inplace",
+                "label": "address",
+                "numberOfBytes": "20"
+              },
+              "encoding": "dynamic_array",
+              "label": "address[]",
+              "numberOfBytes": "32"
+            }
+          }
+        }
+      ],
+      "numberOfBytes": "320"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "electableValidators",
-    "numberOfBytes": "64",
     "offset": 0,
     "slot": "13",
-    "type": "struct Election.ElectableValidators"
+    "type": {
+      "encoding": "inplace",
+      "label": "struct Election.ElectableValidators",
+      "members": [
+        {
+          "label": "min",
+          "offset": 0,
+          "slot": "0",
+          "type": {
+            "encoding": "inplace",
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        },
+        {
+          "label": "max",
+          "offset": 0,
+          "slot": "1",
+          "type": {
+            "encoding": "inplace",
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      ],
+      "numberOfBytes": "64"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "maxNumGroupsVotedFor",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "15",
-    "type": "uint256"
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "electabilityThreshold",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "16",
-    "type": "struct FixidityLib.Fraction"
+    "type": {
+      "encoding": "inplace",
+      "label": "struct FixidityLib.Fraction",
+      "members": [
+        {
+          "label": "value",
+          "offset": 0,
+          "slot": "0",
+          "type": {
+            "encoding": "inplace",
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      ],
+      "numberOfBytes": "32"
+    }
   },
   {
-    "encoding": "mapping",
     "label": "allowedToVoteOverMaxNumberOfGroups",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "17",
-    "type": "mapping(address => bool)"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => bool)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      }
+    }
   },
   {
-    "encoding": "mapping",
     "label": "cachedVotesByAccount",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "18",
-    "type": "mapping(address => struct Election.CachedVotes)"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => struct Election.CachedVotes)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct Election.CachedVotes",
+        "members": [
+          {
+            "label": "cachedVotesPerGroup",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "encoding": "mapping",
+              "key": "address",
+              "label": "mapping(address => uint256)",
+              "numberOfBytes": "32",
+              "value": {
+                "encoding": "inplace",
+                "label": "uint256",
+                "numberOfBytes": "32"
+              }
+            }
+          },
+          {
+            "label": "totalVotes",
+            "offset": 0,
+            "slot": "1",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          }
+        ],
+        "numberOfBytes": "64"
+      }
+    }
   }
 ]

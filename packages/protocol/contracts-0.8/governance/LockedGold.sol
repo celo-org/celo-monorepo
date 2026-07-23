@@ -4,7 +4,7 @@ pragma solidity >=0.8.7 <0.8.20;
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/utils/Address.sol";
-import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
+import "../common/libraries/EnumerableSet.sol";
 
 import "../../contracts/governance/interfaces/ILockedGold.sol";
 import "../../contracts/governance/interfaces/ILockedGoldInitializer.sol";
@@ -722,7 +722,7 @@ contract LockedGold is
    * @param delegator The delegator address.
    */
   function getDelegateesOfDelegator(address delegator) public view returns (address[] memory) {
-    address[] memory values = delegatorInfo[delegator].delegatees.values();
+    address[] memory values = delegatorInfo[delegator].delegatees.getValues();
     return values;
   }
 

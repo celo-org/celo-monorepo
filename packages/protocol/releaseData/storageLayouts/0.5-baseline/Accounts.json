@@ -1,90 +1,321 @@
 [
   {
-    "encoding": "inplace",
     "label": "_owner",
-    "numberOfBytes": "20",
     "offset": 0,
     "slot": "0",
-    "type": "address"
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "_guardCounter",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "1",
-    "type": "uint256"
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "initialized",
-    "numberOfBytes": "1",
     "offset": 0,
     "slot": "2",
-    "type": "bool"
+    "type": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "registry",
-    "numberOfBytes": "20",
     "offset": 1,
     "slot": "2",
-    "type": "contract IRegistry"
+    "type": {
+      "encoding": "inplace",
+      "label": "contract IRegistry",
+      "numberOfBytes": "20"
+    }
   },
   {
-    "encoding": "mapping",
     "label": "accounts",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "3",
-    "type": "mapping(address => struct Accounts.Account)"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => struct Accounts.Account)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct Accounts.Account",
+        "members": [
+          {
+            "label": "exists",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "encoding": "inplace",
+              "label": "bool",
+              "numberOfBytes": "1"
+            }
+          },
+          {
+            "label": "signers",
+            "offset": 0,
+            "slot": "1",
+            "type": {
+              "encoding": "inplace",
+              "label": "struct Accounts.Signers",
+              "members": [
+                {
+                  "label": "vote",
+                  "offset": 0,
+                  "slot": "0",
+                  "type": {
+                    "encoding": "inplace",
+                    "label": "address",
+                    "numberOfBytes": "20"
+                  }
+                },
+                {
+                  "label": "validator",
+                  "offset": 0,
+                  "slot": "1",
+                  "type": {
+                    "encoding": "inplace",
+                    "label": "address",
+                    "numberOfBytes": "20"
+                  }
+                },
+                {
+                  "label": "attestation",
+                  "offset": 0,
+                  "slot": "2",
+                  "type": {
+                    "encoding": "inplace",
+                    "label": "address",
+                    "numberOfBytes": "20"
+                  }
+                }
+              ],
+              "numberOfBytes": "96"
+            }
+          },
+          {
+            "label": "walletAddress",
+            "offset": 0,
+            "slot": "4",
+            "type": {
+              "encoding": "inplace",
+              "label": "address",
+              "numberOfBytes": "20"
+            }
+          },
+          {
+            "label": "name",
+            "offset": 0,
+            "slot": "5",
+            "type": {
+              "encoding": "bytes",
+              "label": "string",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "dataEncryptionKey",
+            "offset": 0,
+            "slot": "6",
+            "type": {
+              "encoding": "bytes",
+              "label": "bytes",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "metadataURL",
+            "offset": 0,
+            "slot": "7",
+            "type": {
+              "encoding": "bytes",
+              "label": "string",
+              "numberOfBytes": "32"
+            }
+          }
+        ],
+        "numberOfBytes": "256"
+      }
+    }
   },
   {
-    "encoding": "mapping",
     "label": "authorizedBy",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "4",
-    "type": "mapping(address => address)"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => address)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      }
+    }
   },
   {
-    "encoding": "mapping",
     "label": "defaultSigners",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "5",
-    "type": "mapping(address => mapping(bytes32 => address))"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => mapping(bytes32 => address))",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "mapping",
+        "key": "bytes32",
+        "label": "mapping(bytes32 => address)",
+        "numberOfBytes": "32",
+        "value": {
+          "encoding": "inplace",
+          "label": "address",
+          "numberOfBytes": "20"
+        }
+      }
+    }
   },
   {
-    "encoding": "mapping",
     "label": "signerAuthorizations",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "6",
-    "type": "mapping(address => mapping(bytes32 => mapping(address => struct Accounts.SignerAuthorization)))"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => mapping(bytes32 => mapping(address => struct Accounts.SignerAuthorization)))",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "mapping",
+        "key": "bytes32",
+        "label": "mapping(bytes32 => mapping(address => struct Accounts.SignerAuthorization))",
+        "numberOfBytes": "32",
+        "value": {
+          "encoding": "mapping",
+          "key": "address",
+          "label": "mapping(address => struct Accounts.SignerAuthorization)",
+          "numberOfBytes": "32",
+          "value": {
+            "encoding": "inplace",
+            "label": "struct Accounts.SignerAuthorization",
+            "members": [
+              {
+                "label": "started",
+                "offset": 0,
+                "slot": "0",
+                "type": {
+                  "encoding": "inplace",
+                  "label": "bool",
+                  "numberOfBytes": "1"
+                }
+              },
+              {
+                "label": "completed",
+                "offset": 1,
+                "slot": "0",
+                "type": {
+                  "encoding": "inplace",
+                  "label": "bool",
+                  "numberOfBytes": "1"
+                }
+              }
+            ],
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    }
   },
   {
-    "encoding": "inplace",
     "label": "eip712DomainSeparator",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "7",
-    "type": "bytes32"
+    "type": {
+      "encoding": "inplace",
+      "label": "bytes32",
+      "numberOfBytes": "32"
+    }
   },
   {
-    "encoding": "mapping",
     "label": "offchainStorageRoots",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "8",
-    "type": "mapping(address => bytes[])"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => bytes[])",
+      "numberOfBytes": "32",
+      "value": {
+        "base": {
+          "encoding": "bytes",
+          "label": "bytes",
+          "numberOfBytes": "32"
+        },
+        "encoding": "dynamic_array",
+        "label": "bytes[]",
+        "numberOfBytes": "32"
+      }
+    }
   },
   {
-    "encoding": "mapping",
     "label": "paymentDelegations",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "9",
-    "type": "mapping(address => struct Accounts.PaymentDelegation)"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => struct Accounts.PaymentDelegation)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct Accounts.PaymentDelegation",
+        "members": [
+          {
+            "label": "beneficiary",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "encoding": "inplace",
+              "label": "address",
+              "numberOfBytes": "20"
+            }
+          },
+          {
+            "label": "fraction",
+            "offset": 0,
+            "slot": "1",
+            "type": {
+              "encoding": "inplace",
+              "label": "struct FixidityLib.Fraction",
+              "members": [
+                {
+                  "label": "value",
+                  "offset": 0,
+                  "slot": "0",
+                  "type": {
+                    "encoding": "inplace",
+                    "label": "uint256",
+                    "numberOfBytes": "32"
+                  }
+                }
+              ],
+              "numberOfBytes": "32"
+            }
+          }
+        ],
+        "numberOfBytes": "64"
+      }
+    }
   }
 ]

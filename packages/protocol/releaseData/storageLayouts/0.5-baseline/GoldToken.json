@@ -1,42 +1,64 @@
 [
   {
-    "encoding": "inplace",
     "label": "initialized",
-    "numberOfBytes": "1",
     "offset": 0,
     "slot": "0",
-    "type": "bool"
+    "type": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "_owner",
-    "numberOfBytes": "20",
     "offset": 1,
     "slot": "0",
-    "type": "address"
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "registry",
-    "numberOfBytes": "20",
     "offset": 0,
     "slot": "1",
-    "type": "contract IRegistry"
+    "type": {
+      "encoding": "inplace",
+      "label": "contract IRegistry",
+      "numberOfBytes": "20"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "deprecated_totalSupply_",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "2",
-    "type": "uint256"
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
   },
   {
-    "encoding": "mapping",
     "label": "allowed",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "3",
-    "type": "mapping(address => mapping(address => uint256))"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => mapping(address => uint256))",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "mapping",
+        "key": "address",
+        "label": "mapping(address => uint256)",
+        "numberOfBytes": "32",
+        "value": {
+          "encoding": "inplace",
+          "label": "uint256",
+          "numberOfBytes": "32"
+        }
+      }
+    }
   }
 ]

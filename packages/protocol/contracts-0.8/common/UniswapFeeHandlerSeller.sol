@@ -3,7 +3,7 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import { SafeMath } from "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
+import "./libraries/EnumerableSet.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 import "./UsingRegistry.sol";
@@ -134,7 +134,7 @@ contract UniswapFeeHandlerSeller is FeeHandlerSeller {
    * @return An array of all the allowed router.
    */
   function getRoutersForToken(address token) external view returns (address[] memory) {
-    return routerAddresses[token].values();
+    return routerAddresses[token].getValues();
   }
 
   /**

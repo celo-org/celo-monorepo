@@ -1,42 +1,86 @@
 [
   {
-    "encoding": "inplace",
     "label": "_owner",
-    "numberOfBytes": "20",
     "offset": 0,
     "slot": "0",
-    "type": "address"
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "initialized",
-    "numberOfBytes": "1",
     "offset": 20,
     "slot": "0",
-    "type": "bool"
+    "type": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "registry",
-    "numberOfBytes": "20",
     "offset": 0,
     "slot": "1",
-    "type": "contract IRegistry"
+    "type": {
+      "encoding": "inplace",
+      "label": "contract IRegistry",
+      "numberOfBytes": "20"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "slashingIncentives",
-    "numberOfBytes": "64",
     "offset": 0,
     "slot": "2",
-    "type": "struct SlasherUtil.SlashingIncentives"
+    "type": {
+      "encoding": "inplace",
+      "label": "struct SlasherUtil.SlashingIncentives",
+      "members": [
+        {
+          "label": "penalty",
+          "offset": 0,
+          "slot": "0",
+          "type": {
+            "encoding": "inplace",
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        },
+        {
+          "label": "reward",
+          "offset": 0,
+          "slot": "1",
+          "type": {
+            "encoding": "inplace",
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      ],
+      "numberOfBytes": "64"
+    }
   },
   {
-    "encoding": "mapping",
     "label": "isSlashed",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "4",
-    "type": "mapping(address => mapping(bytes32 => bool))"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => mapping(bytes32 => bool))",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "mapping",
+        "key": "bytes32",
+        "label": "mapping(bytes32 => bool)",
+        "numberOfBytes": "32",
+        "value": {
+          "encoding": "inplace",
+          "label": "bool",
+          "numberOfBytes": "1"
+        }
+      }
+    }
   }
 ]

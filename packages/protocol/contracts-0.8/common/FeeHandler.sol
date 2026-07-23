@@ -5,7 +5,7 @@ import { SafeMath } from "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
+import "./libraries/EnumerableSet.sol";
 
 import "./UsingRegistry.sol";
 import "../../contracts/common/FixidityLib.sol";
@@ -423,7 +423,7 @@ contract FeeHandler is
   }
 
   function getOtherBeneficiariesAddresses() external view returns (address[] memory) {
-    return otherBeneficiariesAddresses.values();
+    return otherBeneficiariesAddresses.getValues();
   }
 
   /**
@@ -461,7 +461,7 @@ contract FeeHandler is
   }
 
   function getActiveTokens() public view returns (address[] memory) {
-    return activeTokens.values();
+    return activeTokens.getValues();
   }
 
   function _getBurnFraction() internal view returns (uint256) {
@@ -765,7 +765,7 @@ contract FeeHandler is
   }
 
   function _handleAll() private {
-    _handle(activeTokens.values());
+    _handle(activeTokens.getValues());
   }
 
   function _handleCelo() private {

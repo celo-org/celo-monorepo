@@ -1,50 +1,144 @@
 [
   {
-    "encoding": "inplace",
     "label": "_owner",
-    "numberOfBytes": "20",
     "offset": 0,
     "slot": "0",
-    "type": "address"
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
   },
   {
-    "encoding": "inplace",
     "label": "initialized",
-    "numberOfBytes": "1",
     "offset": 20,
     "slot": "0",
-    "type": "bool"
+    "type": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    }
   },
   {
-    "encoding": "mapping",
     "label": "identifierToAttestations",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "1",
-    "type": "mapping(bytes32 => mapping(address => struct FederatedAttestations.OwnershipAttestation[]))"
+    "type": {
+      "encoding": "mapping",
+      "key": "bytes32",
+      "label": "mapping(bytes32 => mapping(address => struct FederatedAttestations.OwnershipAttestation[]))",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "mapping",
+        "key": "address",
+        "label": "mapping(address => struct FederatedAttestations.OwnershipAttestation[])",
+        "numberOfBytes": "32",
+        "value": {
+          "base": {
+            "encoding": "inplace",
+            "label": "struct FederatedAttestations.OwnershipAttestation",
+            "members": [
+              {
+                "label": "account",
+                "offset": 0,
+                "slot": "0",
+                "type": {
+                  "encoding": "inplace",
+                  "label": "address",
+                  "numberOfBytes": "20"
+                }
+              },
+              {
+                "label": "signer",
+                "offset": 0,
+                "slot": "1",
+                "type": {
+                  "encoding": "inplace",
+                  "label": "address",
+                  "numberOfBytes": "20"
+                }
+              },
+              {
+                "label": "issuedOn",
+                "offset": 20,
+                "slot": "1",
+                "type": {
+                  "encoding": "inplace",
+                  "label": "uint64",
+                  "numberOfBytes": "8"
+                }
+              },
+              {
+                "label": "publishedOn",
+                "offset": 0,
+                "slot": "2",
+                "type": {
+                  "encoding": "inplace",
+                  "label": "uint64",
+                  "numberOfBytes": "8"
+                }
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "encoding": "dynamic_array",
+          "label": "struct FederatedAttestations.OwnershipAttestation[]",
+          "numberOfBytes": "32"
+        }
+      }
+    }
   },
   {
-    "encoding": "mapping",
     "label": "addressToIdentifiers",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "2",
-    "type": "mapping(address => mapping(address => bytes32[]))"
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => mapping(address => bytes32[]))",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "mapping",
+        "key": "address",
+        "label": "mapping(address => bytes32[])",
+        "numberOfBytes": "32",
+        "value": {
+          "base": {
+            "encoding": "inplace",
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "encoding": "dynamic_array",
+          "label": "bytes32[]",
+          "numberOfBytes": "32"
+        }
+      }
+    }
   },
   {
-    "encoding": "mapping",
     "label": "revokedAttestations",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "3",
-    "type": "mapping(bytes32 => bool)"
+    "type": {
+      "encoding": "mapping",
+      "key": "bytes32",
+      "label": "mapping(bytes32 => bool)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      }
+    }
   },
   {
-    "encoding": "inplace",
     "label": "eip712DomainSeparator",
-    "numberOfBytes": "32",
     "offset": 0,
     "slot": "4",
-    "type": "bytes32"
+    "type": {
+      "encoding": "inplace",
+      "label": "bytes32",
+      "numberOfBytes": "32"
+    }
   }
 ]
