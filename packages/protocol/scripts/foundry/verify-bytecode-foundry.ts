@@ -8,7 +8,7 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 
 import { instantiateArtifactsFromForge } from '@celo/protocol/lib/compatibility/utils'
 import { existsSync, readJsonSync, writeJsonSync } from 'fs-extra'
-import { Chain, createPublicClient, defineChain, encodeFunctionData, http } from 'viem'
+import { Abi, Chain, createPublicClient, defineChain, encodeFunctionData, http } from 'viem'
 import * as viemChains from 'viem/chains'
 
 /*
@@ -107,9 +107,10 @@ const registryAddress = '0x000000000000000000000000000000000000ce10'
 
 // Registry moved to the 0.8 tree, so its artifact lives in the 0.8 build dir; prefer it
 // and fall back to the 0.5 dir so the script still works on pre-migration branches.
-const readAbiWithFallback = (artifactRelPath: string) => {
+const readAbiWithFallback = (artifactRelPath: string): Abi => {
   const path08 = `${buildDir08}/${artifactRelPath}`
-  return readJsonSync(existsSync(path08) ? path08 : `${buildDir05}/${artifactRelPath}`).abi
+  const artifactPath = existsSync(path08) ? path08 : `${buildDir05}/${artifactRelPath}`
+  return (readJsonSync(artifactPath) as { abi: Abi }).abi
 }
 
 const registryAbi = readAbiWithFallback('Registry.sol/Registry.json')
