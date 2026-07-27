@@ -78,7 +78,10 @@ chain_revenue AS (
         SUM(CASE WHEN symbol = 'USDm'  THEN tx_fee_token * 1.00 ELSE 0 END) AS fee_USDm_usd,
         SUM(CASE WHEN symbol = 'EURm'  THEN tx_fee_token * token_price_USD ELSE 0 END) AS fee_EURm_usd,
         SUM(CASE WHEN symbol = 'USDC'  THEN tx_fee_token * 1.00 ELSE 0 END) AS fee_USDC_usd,
-        SUM(CASE WHEN symbol NOT IN ('CELO', 'USD₮', 'USDm', 'EURm', 'USDC')
+        -- COPm excluded: the Dune price feed for it is wrong by ~3 orders of magnitude
+        -- (~$0.90 per COPm vs the real Colombian-peso peg of ~$0.00024), which inflated
+        -- others_usd by thousands of dollars. Real COPm fee revenue is well under $1/day.
+        SUM(CASE WHEN symbol NOT IN ('CELO', 'USD₮', 'USDm', 'EURm', 'USDC', 'COPm')
                  THEN tx_fee_token * token_price_USD ELSE 0 END) AS others_usd
     FROM daily_fee_priced
     GROUP BY day
