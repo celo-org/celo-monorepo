@@ -14,6 +14,44 @@ pragma solidity >=0.8.7 <0.8.20;
  *
  * `getValues` is deliberately not named `values` because the struct member of
  * that name (required for layout compatibility) would shadow the function.
+ *
+ * Why the sets would read as empty, concretely: a mapping stores nothing at its
+ * own slot, so under the 2.5 layout the struct's first slot holds zero. Point
+ * the 4.x layout at that same slot and it is interpreted as `_values.length`,
+ * i.e. an empty array. The real entries are not corrupted, they are orphaned:
+ * the old array data sits at keccak(slot+1) while the new code reads
+ * keccak(slot), and old index entries live at keccak(address . slot) while new
+ * lookups go to keccak(bytes32 . slot+1). Nothing lines up, and the stranded
+ * data is unreachable through the new ABI.
+ *
+ * Alternative considered and rejected (for now): keep the 4.x library and
+ * migrate the persisted data into the new layout with a storage setter. That is
+ * workable for the bounded sets -- FeeHandler's two singletons (`activeTokens`,
+ * `otherBeneficiariesAddresses`) and UniswapFeeHandlerSeller's per-token
+ * `routerAddresses` are small and reconstructible from config and events. It
+ * breaks down on LockedGold: `delegatees` is nested per delegator inside the
+ * `delegatorInfo` mapping, so there is one set per delegating account and no
+ * on-chain way to enumerate them (Solidity mappings are not enumerable). A
+ * migration would therefore need an off-chain indexer to reconstruct the full
+ * delegator list, a permissioned batched entrypoint, raw-assembly reads of the
+ * stranded slots, and unbounded gas -- with every missed delegator silently
+ * losing their delegation, and an inconsistent window while the batches run.
+ *
+ * The failure mode is also partial rather than clean, which makes it worse:
+ * sibling fields are laid out separately and survive the change, so a broken
+ * upgrade leaves self-contradicting state -- LockedGold would report a non-zero
+ * `totalDelegatedCeloFraction` alongside an empty delegatee set, and FeeHandler
+ * would keep `totalFractionOfOtherBeneficiaries` while the beneficiary set
+ * reads empty, skewing the burn/distribute split.
+ *
+ * Porting the 2.5 layout is one file with no migration, no off-chain
+ * dependency and no state risk, so it is the chosen trade-off. Revisit only if
+ * the sets ever need to be rebuilt anyway, or if a future change already
+ * requires a full delegator enumeration.
+ *
+ * INVARIANT FOR MAINTAINERS: the member order below (`index` first, `values`
+ * second) is load-bearing and must not be "tidied" to match upstream
+ * OpenZeppelin 4.x/5.x. Reordering them silently detaches every deployed set.
  */
 library EnumerableSet {
   struct AddressSet {
