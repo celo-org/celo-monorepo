@@ -49,6 +49,15 @@ pragma solidity >=0.8.7 <0.8.20;
  * the sets ever need to be rebuilt anyway, or if a future change already
  * requires a full delegator enumeration.
  *
+ * TODO: migrate the persisted sets to the upstream OpenZeppelin 4.x+ layout and
+ * retire this port. Prerequisites, per the analysis above: an off-chain indexer
+ * to reconstruct the complete delegator list for LockedGold's per-delegator
+ * `delegatees` sets (stored at keccak(delegator . delegatorInfo slot) with no
+ * on-chain enumeration), a permissioned batched migration entrypoint with
+ * assembly reads of the stranded 2.5-layout slots, and a completeness proof --
+ * any missed delegator's delegation is silently orphaned. Until all of that
+ * exists, this vendored port is the intended long-lived solution, not a shim.
+ *
  * INVARIANT FOR MAINTAINERS: the member order below (`index` first, `values`
  * second) is load-bearing and must not be "tidied" to match upstream
  * OpenZeppelin 4.x/5.x. Reordering them silently detaches every deployed set.
