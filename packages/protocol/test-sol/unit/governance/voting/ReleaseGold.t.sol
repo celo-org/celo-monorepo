@@ -255,6 +255,77 @@ contract ReleaseGoldTest_Initialize is ReleaseGoldTest {
   }
 }
 
+contract ReleaseGoldTest_InitializeLegacyAbi is ReleaseGoldTest {
+  // Selector of the original flat 14-argument initialize, routed via the fallback.
+  bytes4 constant LEGACY_SELECTOR =
+    bytes4(
+      keccak256(
+        "initialize(uint256,uint256,uint256,uint256,uint256,bool,address,address,address,bool,uint256,bool,bool,address)"
+      )
+    );
+
+  function encodeLegacyInitialize() internal view returns (bytes memory) {
+    // Encoded in two halves so the test itself stays within the stack limit; the
+    // arguments are all static types, so concatenation matches single-call encoding.
+    bytes memory firstHalf = abi.encode(
+      initParams.releaseStartTime,
+      initParams.releaseCliffTime,
+      initParams.numReleasePeriods,
+      initParams.releasePeriod,
+      initParams.amountReleasedPerPeriod,
+      initParams.revocable,
+      initParams.beneficiary
+    );
+    bytes memory secondHalf = abi.encode(
+      initParams2.releaseOwner,
+      initParams2.refundAddress,
+      initParams2.subjectToLiquidityProvision,
+      initParams2.initialDistributionRatio,
+      initParams2.canValidate,
+      initParams2.canVote,
+      initParams2.registryAddress
+    );
+    return abi.encodePacked(LEGACY_SELECTOR, firstHalf, secondHalf);
+  }
+
+  function test_ShouldInitializeThroughTheLegacyFlatArgumentAbi() public {
+    releaseGold = _deployReleaseGold();
+    vm.prank(owner);
+    (bool success, ) = address(releaseGold).call(encodeLegacyInitialize());
+    assertTrue(success, "legacy initialize call failed");
+
+    assertEq(releaseGold.beneficiary(), beneficiary);
+    (
+      uint256 releaseStartTime,
+      ,
+      uint256 numReleasePeriods,
+      ,
+      uint256 amountReleasedPerPeriod
+    ) = releaseGold.releaseSchedule();
+    assertEq(releaseStartTime, initParams.releaseStartTime);
+    assertEq(numReleasePeriods, initParams.numReleasePeriods);
+    assertEq(amountReleasedPerPeriod, initParams.amountReleasedPerPeriod);
+  }
+
+  function test_Reverts_WhenLegacyAbiInitializeIsCalledTwice() public {
+    releaseGold = _deployReleaseGold();
+    vm.prank(owner);
+    (bool success, ) = address(releaseGold).call(encodeLegacyInitialize());
+    assertTrue(success, "legacy initialize call failed");
+
+    vm.prank(owner);
+    (bool secondSuccess, ) = address(releaseGold).call(encodeLegacyInitialize());
+    assertFalse(secondSuccess, "second legacy initialize should revert");
+  }
+
+  function test_Reverts_WhenLegacyAbiIsUsedAfterStructInitialize() public {
+    newReleaseGold(true, false);
+    vm.prank(owner);
+    (bool success, ) = address(releaseGold).call(encodeLegacyInitialize());
+    assertFalse(success, "legacy initialize after struct initialize should revert");
+  }
+}
+
 contract ReleaseGoldTest_Payable is ReleaseGoldTest {
   function test_ShouldAcceptGoldTransferByDefaultFromAnyone() public {
     newReleaseGold(true, false);

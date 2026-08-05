@@ -216,6 +216,27 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
     InitParams calldata params,
     InitParams2 calldata params2
   ) external initializer {
+    _initialize(params, params2);
+  }
+
+  /**
+   * @notice Handles the legacy pre-struct `initialize(...)` ABI, for deployment
+   * tooling that still encodes the original flat 14-argument call.
+   * @dev Declaring the 14-argument overload directly is impossible: solc's calldata
+   * decoder for that many parameters exceeds the non-IR compiler's stack limit,
+   * which is why the struct-based initializer exists in the first place. The
+   * InitParams/InitParams2 fields mirror the legacy argument order exactly, so the
+   * flat arguments decode directly into the two structs.
+   */
+  function _initializeLegacy() private initializer {
+    (InitParams memory params, InitParams2 memory params2) = abi.decode(
+      msg.data[4:],
+      (InitParams, InitParams2)
+    );
+    _initialize(params, params2);
+  }
+
+  function _initialize(InitParams memory params, InitParams2 memory params2) private {
     _transferOwnership(msg.sender);
     _initSchedule(params);
     _initOwnership(params, params2);
@@ -228,7 +249,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
   /**
    * @dev Sets up the release schedule fields and validates timing/beneficiary params.
    */
-  function _initSchedule(InitParams calldata params) private {
+  function _initSchedule(InitParams memory params) private {
     releaseSchedule.numReleasePeriods = params.numReleasePeriods;
     releaseSchedule.amountReleasedPerPeriod = params.amountReleasedPerPeriod;
     releaseSchedule.releasePeriod = params.releasePeriod;
@@ -253,7 +274,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
   /**
    * @dev Sets up ownership, registry, revocation, and permission fields.
    */
-  function _initOwnership(InitParams calldata params, InitParams2 calldata params2) private {
+  function _initOwnership(InitParams memory params, InitParams2 memory params2) private {
     require(
       params2.registryAddress != address(0),
       "The registry address cannot be the zero address"
@@ -292,7 +313,17 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
     liquidityProvisionMet = subjectToLiquidityProvision ? false : true;
   }
 
-  fallback() external payable {}
+  // Selector of the legacy flat-argument initializer:
+  // initialize(uint256,uint256,uint256,uint256,uint256,bool,address,address,address,bool,uint256,bool,bool,address)
+  bytes4 private constant LEGACY_INITIALIZE_SELECTOR = 0x064a2e68;
+
+  fallback() external payable {
+    // Route the legacy initializer ABI; see _initializeLegacy for why it cannot be
+    // declared as a regular overload.
+    if (msg.sig == LEGACY_INITIALIZE_SELECTOR) {
+      _initializeLegacy();
+    }
+  }
 
   /**
    * @notice Wrapper function for stable token transfer function.
