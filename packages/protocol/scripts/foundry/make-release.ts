@@ -762,8 +762,7 @@ const deployProxy = async (
 const shouldDeployProxy = (
   report: ASTDetailedVersionedReport,
   contractName: string,
-  buildDir05: string,
-  buildDir08: string
+  addresses: ContractAddresses
 ) => {
   const hasStorageChanges = report.contracts[contractName].changes.storage.length > 0
   const isNewContract = report.contracts[contractName].changes.major.find(
@@ -772,15 +771,17 @@ const shouldDeployProxy = (
   if (!hasStorageChanges && isNewContract) {
     // The AST code comparison buckets artifacts by compiler version, so a contract
     // migrated 0.5 -> 0.8 is reported as NewContract (it is absent from the old build's
-    // 0.8 bucket) even though it exists at the baseline and keeps its storage layout.
-    // Such contracts are in-place upgrades: keep the existing proxy. Only contracts
-    // absent from the baseline build under BOTH compilers are genuinely new.
-    const existsAtBaseline =
-      existsSync(join(buildDir05, `${contractName}.sol`, `${contractName}.json`)) ||
-      existsSync(join(buildDir08, `${contractName}.sol`, `${contractName}.json`))
-    if (existsAtBaseline) {
+    // 0.8 bucket) even though its proxy is live with a preserved storage layout. Such
+    // contracts are in-place upgrades: keep the existing proxy. Presence in the
+    // on-chain Registry is the authoritative signal (the build trees cannot be used --
+    // for a real release they contain the new branch, where every contract exists).
+    // Registry itself is special-cased: its proxy is the protocol-constant registry
+    // address and is never redeployed, but mainnet does not register "Registry" as an
+    // entry in itself.
+    const hasExistingProxy = addresses.addresses.has(contractName) || contractName === 'Registry'
+    if (hasExistingProxy) {
       console.log(
-        `${contractName} is reported as NewContract but exists in the baseline build ` +
+        `${contractName} is reported as NewContract but its proxy is already live ` +
           `(compiler migration); upgrading in place instead of deploying a new proxy.`
       )
       return false
@@ -820,7 +821,7 @@ const deployCoreContract = async (
     value: '0',
   }
 
-  if (!shouldDeployProxy(report, contractName, buildDir05, buildDir08)) {
+  if (!shouldDeployProxy(report, contractName, addresses)) {
     proposal.push(setImplementationTx)
   } else {
     const proxyArtifactName = `${contractName}Proxy`
