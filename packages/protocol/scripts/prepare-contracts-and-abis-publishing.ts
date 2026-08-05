@@ -288,10 +288,30 @@ function prepareContractsPackage() {
     child_process.execSync(cmd)
   }
 
+  // In the source tree the 0.8 contracts reach the shared 0.5 sources via
+  // `../../contracts/...` (repo root -> contracts/). In the published package the
+  // 0.5 contents sit at the package root and the 0.8 tree under `0.8/`, so the same
+  // `../` chain lands on the package root directly — the `contracts/` path segment
+  // must be dropped or every such import in the tarball is dangling.
+  rewriteRelativeContractsImports(path.join(CONTRACTS_PACKAGE_STAGING_DIR, '0.8'))
+
   // Always prepare the manifest; replacePackageVersionAndMakePublic sets the real
   // RELEASE_VERSION or a dry-run placeholder so `npm publish --dry-run` stays valid.
   const packageJsonPath = path.join(CONTRACTS_PACKAGE_STAGING_DIR, 'package.json')
   replacePackageVersionAndMakePublic(packageJsonPath)
+}
+
+function rewriteRelativeContractsImports(dir: string) {
+  for (const filePath of lsRecursive(dir)) {
+    if (!filePath.endsWith('.sol')) {
+      continue
+    }
+    const source = fs.readFileSync(filePath, 'utf8')
+    const rewritten = source.replace(/((?:\.\.\/)+)contracts\//g, '$1')
+    if (rewritten !== source) {
+      fs.writeFileSync(filePath, rewritten)
+    }
+  }
 }
 
 function lsRecursive(dir: string): string[] {
