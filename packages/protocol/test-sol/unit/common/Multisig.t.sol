@@ -78,13 +78,12 @@ contract MultiSigTest_fallbackFunction is MultiSigTest {
     uncheckedSendViaCall(payable(address(multiSig)), amount);
   }
 
-  // TODO: Implement after pragma ^0.8
-  function SKIP_test_doesNotEmitEvent_whenReceivingZeroValue() public {
+  function test_doesNotEmitEvent_whenReceivingZeroValue() public {
     vm.prank(sender);
     vm.recordLogs();
     uncheckedSendViaCall(payable(address(multiSig)), 0);
-    // Vm.Log[] memory entries = vm.getRecordedLogs();
-    // assertEq(entries.length, 0);
+    Vm.Log[] memory entries = vm.getRecordedLogs();
+    assertEq(entries.length, 0);
   }
 }
 

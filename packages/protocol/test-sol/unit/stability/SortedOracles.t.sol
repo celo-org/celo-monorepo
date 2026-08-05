@@ -3,6 +3,7 @@ pragma solidity >=0.8.7 <0.8.20;
 pragma experimental ABIEncoderV2;
 
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
+import { Vm } from "forge-std-8/Vm.sol";
 import { SortedOracles } from "@celo-contracts-8/stability/SortedOracles.sol";
 import { SortedLinkedListWithMedian } from "@celo-contracts-8/common/linkedlists/SortedLinkedListWithMedian.sol";
 import { AddressSortedLinkedListWithMedian } from "@celo-contracts-8/common/linkedlists/AddressSortedLinkedListWithMedian.sol";
@@ -519,6 +520,29 @@ contract RemoveOracle is SortedOraclesTest {
     sortedOracle.removeOracle(aToken, oracleAccount, 0);
     uint256 newMedianTimestamp = sortedOracle.medianTimestamp(aToken);
     assertEq(originalMedianTimestamp, newMedianTimestamp);
+  }
+
+  function test_ShouldNotEmitTheOracleReportRemovedAndMedianUpdatedEvents_WhenThereIsASingleReportLeft()
+    public
+  {
+    vm.prank(oracleAccount);
+    sortedOracle.report(
+      aToken,
+      FixidityLib.unwrap(FixidityLib.newFixedFraction(10, 1)),
+      address(0),
+      address(0)
+    );
+
+    vm.recordLogs();
+    sortedOracle.removeOracle(aToken, oracleAccount, 0);
+    Vm.Log[] memory logs = vm.getRecordedLogs();
+
+    bytes32 reportRemovedTopic = keccak256("OracleReportRemoved(address,address)");
+    bytes32 medianUpdatedTopic = keccak256("MedianUpdated(address,uint256)");
+    for (uint256 i = 0; i < logs.length; i++) {
+      assertTrue(logs[i].topics[0] != reportRemovedTopic, "unexpected OracleReportRemoved");
+      assertTrue(logs[i].topics[0] != medianUpdatedTopic, "unexpected MedianUpdated");
+    }
   }
 
   function test_Emits_OracleRemovedEvent() public {

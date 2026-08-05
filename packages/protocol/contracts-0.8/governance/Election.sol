@@ -933,6 +933,7 @@ contract Election is
     address greater,
     uint256 index
   ) internal onlyWhenNotBlocked returns (bool) {
+    // TODO(asa): Dedup with revokePending.
     require(group != address(0), "Group address zero");
     address account = getAccounts().voteSignerToAccount(msg.sender);
     require(0 < value, "Vote value cannot be zero");
