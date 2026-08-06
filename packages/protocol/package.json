@@ -72,7 +72,7 @@
     "solidity-bytes-utils": "0.0.7",
     "solidity-bytes-utils-8": "npm:solidity-bytes-utils@^0.8.2",
     "viem": "2.29.4",
-    "web3": "1.10.0",
+    "web3": "1.10.4",
     "web3-core": "1.10.0",
     "web3-core-helpers": "1.10.0",
     "web3-provider-engine": "^16.0.5",
