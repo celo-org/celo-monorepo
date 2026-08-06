@@ -67,6 +67,7 @@ PK=0x... RPC_URL=... ./exec-upgrade.sh <network> <version>
 | mainnet | succ-v2 | 2-tier | `0x95ffac…` | `secrets/.env.signers.succinct200` |
 | mainnet | succ-v201 | 2-tier | `0x95ffac…` | `secrets/.env.signers.succinct201` |
 | mainnet | succ-v210 | 2-tier | `0x95ffac…` | `secrets/.env.signers.succinct210` |
+| mainnet | eigenda-cert-v3 | 2-tier | `0x95ffac…` | `secrets/.env.signers.eigendacertv3` |
 | sepolia | v4 | 2-tier (1-of-2 children) | `0x5e60d…` | inline |
 | sepolia | v5 | 2-tier (1-of-2 children) | `0x5e60d…` | inline |
 | sepolia | succ-v2 | 2-tier (1-of-2 children) | `0x5e60d…` | inline |
