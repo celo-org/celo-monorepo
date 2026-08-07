@@ -242,7 +242,7 @@ contract Election is
   /**
    * @notice Converts `account`'s pending votes for `group` to active votes.
    * @param group The validator group to vote for.
-   * @param account The validateor group account's pending votes to active votes
+   * @param account The validator group account's pending votes to active votes
    * @return True upon success.
    * @dev Pending votes cannot be activated until an election has been held.
    */
@@ -382,7 +382,7 @@ contract Election is
    * @param value Maximum amount of votes to revoke.
    * @param lessers The groups receiving fewer votes than the i'th `group`, or 0 if
    *                the i'th `group` has the fewest votes of any validator group.
-   * @param greaters The groups receivier more votes than the i'th `group`, or 0 if
+   * @param greaters The groups receiving more votes than the i'th `group`, or 0 if
    *                the i'th `group` has the most votes of any validator group.
    * @param indices The indices of the i'th group in the account's voting list.
    * @return Number of votes successfully decremented.
@@ -403,7 +403,7 @@ contract Election is
       "Input lengths must be correspond."
     );
     // Iterate in reverse order to hopefully optimize removing pending votes before active votes
-    // And to attempt to preserve `account`'s earliest votes (assuming earliest = prefered)
+    // And to attempt to preserve `account`'s earliest votes (assuming earliest = preferred)
     for (uint256 i = info.groups.length; i > 0; i = i.sub(1)) {
       info.remainingValue = info.remainingValue.sub(
         _decrementVotes(
