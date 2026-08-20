@@ -53,7 +53,16 @@ ERC20_ABI = json.loads(
 )
 LEDGER_OBJECT = "paid-ledger.json"
 LOCK_OBJECT = "run-lock.json"
+PENDING_OBJECT = "pending-execution.json"
 LOCK_STALE_SECONDS = 3600
+
+
+class DuneStillRunning(Exception):
+    """Dune execution outlived our poll budget; a later trigger resumes it."""
+
+    def __init__(self, execution_id: str):
+        super().__init__(execution_id)
+        self.execution_id = execution_id
 
 
 # ---------------------------------------------------------------- state store
@@ -67,13 +76,24 @@ class GcsStore:
         self.bucket = storage.Client().bucket(bucket_name)
 
     def load_ledger(self) -> dict:
-        blob = self.bucket.blob(LEDGER_OBJECT)
-        if not blob.exists():
-            return {}
-        return json.loads(blob.download_as_bytes())
+        return self.get_json(LEDGER_OBJECT) or {}
 
     def save_ledger(self, ledger: dict) -> None:
-        self.bucket.blob(LEDGER_OBJECT).upload_from_string(json.dumps(ledger, indent=2))
+        self.put_json(LEDGER_OBJECT, ledger)
+
+    def get_json(self, name: str) -> dict | None:
+        blob = self.bucket.blob(name)
+        if not blob.exists():
+            return None
+        return json.loads(blob.download_as_bytes())
+
+    def put_json(self, name: str, data: dict) -> None:
+        self.bucket.blob(name).upload_from_string(json.dumps(data, indent=2))
+
+    def delete(self, name: str) -> None:
+        blob = self.bucket.blob(name)
+        if blob.exists():
+            blob.delete()
 
     def acquire_lock(self) -> bool:
         from google.api_core import exceptions
@@ -104,15 +124,26 @@ class LocalStore:
         os.makedirs(dirpath, exist_ok=True)
 
     def load_ledger(self) -> dict:
-        path = os.path.join(self.dir, LEDGER_OBJECT)
+        return self.get_json(LEDGER_OBJECT) or {}
+
+    def save_ledger(self, ledger: dict) -> None:
+        self.put_json(LEDGER_OBJECT, ledger)
+
+    def get_json(self, name: str) -> dict | None:
+        path = os.path.join(self.dir, name)
         if not os.path.exists(path):
-            return {}
+            return None
         with open(path) as f:
             return json.load(f)
 
-    def save_ledger(self, ledger: dict) -> None:
-        with open(os.path.join(self.dir, LEDGER_OBJECT), "w") as f:
-            json.dump(ledger, f, indent=2)
+    def put_json(self, name: str, data: dict) -> None:
+        with open(os.path.join(self.dir, name), "w") as f:
+            json.dump(data, f, indent=2)
+
+    def delete(self, name: str) -> None:
+        path = os.path.join(self.dir, name)
+        if os.path.exists(path):
+            os.remove(path)
 
     def acquire_lock(self) -> bool:
         path = os.path.join(self.dir, LOCK_OBJECT)
@@ -148,20 +179,38 @@ def dune_api(path: str, key: str, body: dict | None = None) -> dict:
         return json.load(resp)
 
 
-def fetch_dune_rows(key: str, distributor: str) -> list[dict]:
-    execution = dune_api(
-        f"/query/{DUNE_QUERY_ID}/execute",
-        key,
-        {"query_parameters": {"distributor_address": distributor}},
-    )
-    execution_id = execution["execution_id"]
+def fetch_dune_rows(key: str, distributor: str, store) -> list[dict]:
+    # Reuse an execution a previous invocation left running: Dune executions
+    # survive our process, so a slow query converges across scheduled retries
+    # instead of restarting from zero each time.
+    pending = store.get_json(PENDING_OBJECT)
+    execution_id = pending.get("execution_id") if pending else None
+
+    if not execution_id:
+        # No performance tier requested: Dune picks the largest tier the API
+        # plan allows, and deduplicates into an already-running identical query.
+        execution = dune_api(
+            f"/query/{DUNE_QUERY_ID}/execute",
+            key,
+            {"query_parameters": {"distributor_address": distributor}},
+        )
+        execution_id = execution["execution_id"]
+        store.put_json(PENDING_OBJECT, {"execution_id": execution_id})
+
+    poll_budget = int(os.environ.get("DUNE_POLL_SECONDS", "1200"))
+    deadline = time.time() + poll_budget
     while True:
         state = dune_api(f"/execution/{execution_id}/status", key)["state"]
         if state == "QUERY_STATE_COMPLETED":
             break
         if state in ("QUERY_STATE_FAILED", "QUERY_STATE_CANCELLED", "QUERY_STATE_EXPIRED"):
-            raise RuntimeError(f"Dune execution ended in {state}")
+            store.delete(PENDING_OBJECT)
+            raise RuntimeError(f"Dune execution {execution_id} ended in {state}")
+        if time.time() > deadline:
+            # Leave the pending marker in place; the next trigger resumes it.
+            raise DuneStillRunning(execution_id)
         time.sleep(5)
+    store.delete(PENDING_OBJECT)
     return dune_api(f"/execution/{execution_id}/results?limit=32000", key)["result"]["rows"]
 
 
@@ -224,7 +273,17 @@ def distribute(request):
         return ({"error": "another run holds the lock"}, 423)
 
     try:
-        rows = fetch_dune_rows(dune_key, hot_wallet)
+        try:
+            rows = fetch_dune_rows(dune_key, hot_wallet, store)
+        except DuneStillRunning as pending:
+            return (
+                {
+                    "result": "dune execution still running - next trigger resumes it",
+                    "execution_id": pending.execution_id,
+                    "dry_run": dry_run,
+                },
+                202,
+            )
         ledger = store.load_ledger()
         owed, ledger = reconcile(rows, ledger)
         if not dry_run:
