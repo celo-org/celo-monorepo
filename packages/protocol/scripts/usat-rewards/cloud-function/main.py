@@ -88,7 +88,17 @@ class GcsStore:
         return json.loads(blob.download_as_bytes())
 
     def put_json(self, name: str, data: dict) -> None:
-        self.bucket.blob(name).upload_from_string(json.dumps(data, indent=2))
+        # The ledger write is the payment memory — a transient GCS hiccup must
+        # not kill a payout run, so retry with backoff before giving up.
+        last_error = None
+        for attempt in range(5):
+            try:
+                self.bucket.blob(name).upload_from_string(json.dumps(data, indent=2))
+                return
+            except Exception as error:  # noqa: BLE001 - retry any transport error
+                last_error = error
+                time.sleep(2 ** attempt)
+        raise last_error
 
     def delete(self, name: str) -> None:
         blob = self.bucket.blob(name)
@@ -345,7 +355,7 @@ def distribute(request):
                 )
             # Record every confirmed payment immediately so a crash mid-run
             # never loses payment memory.
-            ledger = ledger_add(ledger, wallet, amount, tx_hash.hex())
+            ledger = ledger_add(ledger, wallet, amount, Web3.to_hex(tx_hash))
             store.save_ledger(ledger)
             nonce += 1
             paid_count += 1
