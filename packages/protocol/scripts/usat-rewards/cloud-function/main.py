@@ -249,13 +249,17 @@ def distribute(request):
         token_balance = token.functions.balanceOf(hot_wallet).call()
         gas_balance = w3.eth.get_balance(hot_wallet)
         summary["token_balance_usat"] = token_balance / 1e6
-        if token_balance < total:
-            return ({**summary, "error": "hot wallet token balance below total"}, 500)
-        if gas_balance < 10 ** 16:  # 0.01 CELO floor
-            return ({**summary, "error": "hot wallet gas balance below 0.01 CELO"}, 500)
+        summary["gas_balance_celo"] = gas_balance / 1e18
+        funded = token_balance >= total and gas_balance >= 10 ** 16  # 0.01 CELO floor
 
         if dry_run:
-            return ({**summary, "result": "dry run - nothing sent"}, 200)
+            # Dry run reports what a real run would do, funded or not.
+            return ({**summary, "result": "dry run - nothing sent", "funded": funded}, 200)
+
+        if token_balance < total:
+            return ({**summary, "error": "hot wallet token balance below total"}, 500)
+        if gas_balance < 10 ** 16:
+            return ({**summary, "error": "hot wallet gas balance below 0.01 CELO"}, 500)
 
         nonce = w3.eth.get_transaction_count(hot_wallet, "pending")
         gas_price = w3.eth.gas_price

@@ -45,7 +45,7 @@ gcloud scheduler jobs run usat-rewards-distributor --project $PROJECT --location
 # logs
 gcloud functions logs read usat-rewards-distributor --project $PROJECT --region $REGION --gen2
 # state
-gsutil cat gs://$PROJECT-usat-rewards/paid-ledger.json
+gcloud storage cat gs://$PROJECT-usat-rewards/paid-ledger.json
 ```
 
 Keep the hot wallet funded with USA₮ + a little CELO; a run with insufficient

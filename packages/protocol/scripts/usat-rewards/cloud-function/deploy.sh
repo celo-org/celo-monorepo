@@ -32,8 +32,8 @@ gcloud services enable cloudfunctions.googleapis.com run.googleapis.com \
     storage.googleapis.com --project "$PROJECT"
 
 # State bucket (ledger + run lock)
-if ! gsutil ls -b "gs://$BUCKET" > /dev/null 2>&1; then
-    gsutil mb -p "$PROJECT" -l "$REGION" "gs://$BUCKET"
+if ! gcloud storage buckets describe "gs://$BUCKET" --project "$PROJECT" > /dev/null 2>&1; then
+    gcloud storage buckets create "gs://$BUCKET" --project "$PROJECT" --location "$REGION"
 fi
 
 # Secrets — created only if the corresponding env var is provided
