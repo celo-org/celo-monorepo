@@ -61,3 +61,4 @@ opencode.json
 
 # usat-rewards hot wallet env
 scripts/usat-rewards/.env
+scripts/usat-rewards/.env.topoff
