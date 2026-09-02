@@ -42,8 +42,9 @@ interface IERC20 {
  *   PAID_LEDGER_FILE  local payout history (default: scripts/usat-rewards/paid-ledger.json;
  *                     a missing file means "trust Dune alone")
  *   USAT_ADDRESS      token address (default: canonical USA₮ on Celo mainnet)
- *   MAX_PER_WALLET    per-wallet cap in micro-USA₮ (default: 1000000 = 1 USA₮, the
- *                     campaign maximum); any larger owed entry aborts the run
+ *   MAX_PER_WALLET    per-wallet cap in micro-USA₮ (default: 5000000 = 5 USA₮, the
+ *                     campaign maximum after the 10x bump of 2026-09-02: P2P 2.00
+ *                     + hold 3.00); any larger owed entry aborts the run
  *   PRIVATE_KEY       hot wallet key; if unset, supply a signer on the command line
  *
  * Always simulate first (run without --broadcast) and check the logged totals.
@@ -61,7 +62,7 @@ contract DistributeUsatRewards is Script {
       string("scripts/usat-rewards/paid-ledger.json")
     );
     IERC20 usat = IERC20(vm.envOr("USAT_ADDRESS", USAT_MAINNET));
-    uint256 maxPerWallet = vm.envOr("MAX_PER_WALLET", uint256(1_000_000));
+    uint256 maxPerWallet = vm.envOr("MAX_PER_WALLET", uint256(5_000_000));
 
     string memory json = vm.readFile(recipientsPath);
     (address[] memory recipients, uint256[] memory owed) = parseEntries(json);

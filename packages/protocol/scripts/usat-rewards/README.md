@@ -1,7 +1,16 @@
 # USA₮ Launch Rewards Distribution
 
-Tooling to pay out the USA₮ launch-campaign rewards (verify 0.50 + P2P 0.20 +
-hold 0.30, max 1.00 USA₮ per wallet) computed by the Dune queries:
+Tooling to pay out the USA₮ launch-campaign rewards, computed by the Dune
+queries below. Rates were bumped 10x effective 2026-09-02, forward-only — a
+milestone's reward is decided by its completion date:
+
+| Milestone | before 2026-09-02 | from 2026-09-02 |
+|---|---|---|
+| Base drip (separate drip system) | 0.50 | 5.00 |
+| P2P transfer to an EOA | 0.20 | 2.00 |
+| Hold for ≥10 consecutive days | 0.30 (> $5) | 3.00 (> $50) |
+
+This tooling pays the P2P + hold portion (max 5.00 USA₮ per wallet).
 
 - [7505627 — Verified-User Reward Funnel](https://dune.com/queries/7505627)
 - [7506058 — Per-Account Rewards Ledger (Earned / Paid / Owed)](https://dune.com/queries/7506058)
