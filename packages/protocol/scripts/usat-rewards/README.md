@@ -1,16 +1,17 @@
 # USA₮ Launch Rewards Distribution
 
 Tooling to pay out the USA₮ launch-campaign rewards, computed by the Dune
-queries below. Rates were bumped 10x effective 2026-09-02, forward-only — a
-milestone's reward is decided by its completion date:
+queries below. A wallet's reward tier is fixed by the amount of its first
+faucet drip (the faucet enforces Self verification, 18+, and OFAC screening):
 
-| Milestone | before 2026-09-02 | from 2026-09-02 |
-|---|---|---|
-| Base drip (separate drip system) | 0.50 | 5.00 |
-| P2P transfer to an EOA | 0.20 | 2.00 |
-| Hold for ≥10 consecutive days | 0.30 (> $5) | 3.00 (> $50) |
+| First faucet drip | P2P send to an EOA | Hold ≥10 consecutive days | Max |
+|---|---|---|---|
+| $5 | 2.00 | 3.00 (> $50) | 5.00 |
+| $1 | 0.40 | 0.60 (> $10) | 1.00 |
+| $0.50 (legacy) or SBT-only | 0.20 | 0.30 (> $5) | 0.50 |
+| $0.05 | none (unspecified) | none | 0 |
 
-This tooling pays the P2P + hold portion (max 5.00 USA₮ per wallet). All
+This tooling pays the P2P + hold portion only (max 5.00 USA₮ per wallet). All
 milestone activity is measured on USA₮ only. A wallet counts as verified when
 it holds the Self SBT or has received a faucet drip (the faucet only pays
 Self-verified humans). The drip itself is the faucet's job and is not part of
