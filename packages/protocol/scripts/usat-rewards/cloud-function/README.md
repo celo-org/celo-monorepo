@@ -37,6 +37,23 @@ response in the logs, then redeploy with `DRY_RUN=0`.
 - Failed/reverted transfer stops the run; everything confirmed is already in
   the ledger, so the next scheduled run pays only the remainder
 
+## Emergency stop (kill switch)
+
+Redeploying or deleting the function does **not** stop a payout already in
+progress — Cloud Run keeps the in-flight request alive until it finishes or
+hits its timeout. The only reliable halt is the `HALT` flag, which the
+function checks before every single transfer:
+
+```bash
+# stop within one transfer
+echo halt | gcloud storage cp - gs://$PROJECT-usat-rewards/HALT
+# allow runs again
+gcloud storage rm gs://$PROJECT-usat-rewards/HALT
+```
+
+While the flag exists every run (scheduled or manual) exits immediately with
+HTTP 423 and sends nothing.
+
 ## Operations
 
 ```bash

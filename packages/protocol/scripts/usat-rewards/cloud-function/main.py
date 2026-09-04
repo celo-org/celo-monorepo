@@ -54,6 +54,11 @@ ERC20_ABI = json.loads(
 LEDGER_OBJECT = "paid-ledger.json"
 LOCK_OBJECT = "run-lock.json"
 PENDING_OBJECT = "pending-execution.json"
+# Kill switch: while this object exists in the bucket no transfer is sent.
+# Create it to stop a running payout within one transfer; delete it to allow
+# runs again. Redeploying or deleting the function does NOT stop an in-flight
+# request — Cloud Run keeps it alive — so this flag is the only reliable halt.
+HALT_OBJECT = "HALT"
 LOCK_STALE_SECONDS = 3600
 
 
@@ -105,6 +110,9 @@ class GcsStore:
         if blob.exists():
             blob.delete()
 
+    def exists(self, name: str) -> bool:
+        return self.bucket.blob(name).exists()
+
     def acquire_lock(self) -> bool:
         from google.api_core import exceptions
 
@@ -154,6 +162,9 @@ class LocalStore:
         path = os.path.join(self.dir, name)
         if os.path.exists(path):
             os.remove(path)
+
+    def exists(self, name: str) -> bool:
+        return os.path.exists(os.path.join(self.dir, name))
 
     def acquire_lock(self) -> bool:
         path = os.path.join(self.dir, LOCK_OBJECT)
@@ -279,6 +290,9 @@ def distribute(request):
     hot_wallet = account.address
     token = w3.eth.contract(address=Web3.to_checksum_address(usat_address), abi=ERC20_ABI)
 
+    if store.exists(HALT_OBJECT):
+        return ({"result": "HALT flag present - nothing done", "hot_wallet": hot_wallet}, 423)
+
     if not store.acquire_lock():
         return ({"error": "another run holds the lock"}, 423)
 
@@ -330,10 +344,18 @@ def distribute(request):
         if gas_balance < 10 ** 16:
             return ({**summary, "error": "hot wallet gas balance below 0.01 CELO"}, 500)
 
+        if store.exists(HALT_OBJECT):
+            return ({**summary, "result": "HALT flag present - nothing sent"}, 423)
+
         nonce = w3.eth.get_transaction_count(hot_wallet, "pending")
         gas_price = w3.eth.gas_price
         paid_count = 0
         for wallet, amount in sorted(owed.items()):
+            if store.exists(HALT_OBJECT):
+                return (
+                    {**summary, "paid": paid_count, "result": "HALT flag raised mid-run - stopped"},
+                    423,
+                )
             tx = token.functions.transfer(
                 Web3.to_checksum_address(wallet), amount
             ).build_transaction(

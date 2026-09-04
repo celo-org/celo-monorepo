@@ -10,7 +10,11 @@ milestone's reward is decided by its completion date:
 | P2P transfer to an EOA | 0.20 | 2.00 |
 | Hold for ≥10 consecutive days | 0.30 (> $5) | 3.00 (> $50) |
 
-This tooling pays the P2P + hold portion (max 5.00 USA₮ per wallet).
+This tooling pays the P2P + hold portion (max 5.00 USA₮ per wallet). All
+milestone activity is measured on USA₮ only. A wallet counts as verified when
+it holds the Self SBT or has received a faucet drip (the faucet only pays
+Self-verified humans). The drip itself is the faucet's job and is not part of
+this tooling.
 
 - [7505627 — Verified-User Reward Funnel](https://dune.com/queries/7505627)
 - [7506058 — Per-Account Rewards Ledger (Earned / Paid / Owed)](https://dune.com/queries/7506058)

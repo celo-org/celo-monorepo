@@ -61,8 +61,8 @@ gcloud functions deploy "$FUNCTION_NAME" \
     --project "$PROJECT" --region "$REGION" --gen2 \
     --runtime python312 --entry-point distribute --source . \
     --trigger-http --no-allow-unauthenticated \
-    --max-instances 1 --concurrency 1 --timeout 1800s --memory 512Mi \
-    --set-env-vars "GCS_BUCKET=$BUCKET,DRY_RUN=$DRY_RUN,MAX_PER_WALLET=${MAX_PER_WALLET:-5000000},MAX_TOTAL_PER_RUN=${MAX_TOTAL_PER_RUN:-500000000}" \
+    --max-instances 1 --concurrency 1 --timeout 3600s --memory 512Mi \
+    --set-env-vars "GCS_BUCKET=$BUCKET,DRY_RUN=$DRY_RUN,MAX_PER_WALLET=${MAX_PER_WALLET:-5000000},MAX_TOTAL_PER_RUN=${MAX_TOTAL_PER_RUN:-5000000000},DUNE_POLL_SECONDS=${DUNE_POLL_SECONDS:-1500}" \
     --set-secrets "PRIVATE_KEY=usat-rewards-private-key:latest,DUNE_API_KEY=usat-rewards-dune-api-key:latest"
 
 FUNCTION_URL=$(gcloud functions describe "$FUNCTION_NAME" \
