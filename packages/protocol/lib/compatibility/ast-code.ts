@@ -5,7 +5,7 @@ import {
   MethodMutabilityChange, MethodRemovedChange, MethodReturnChange,
   MethodVisibilityChange, NewContractChange
 } from '@celo/protocol/lib/compatibility/change'
-import { Artifact, getArtifactByName, getContractName, makeZContract } from '@celo/protocol/lib/compatibility/internal'
+import { Artifact, getArtifactByName, getContractName, getDeployedLinkReferences, makeZContract, normalizeLinkPlaceholders } from '@celo/protocol/lib/compatibility/internal'
 import {
   BuildArtifacts,
   Contract as ZContract
@@ -238,8 +238,12 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
 
   const report = doASTCompatibilityReport(contractName, oldAST, newAST)
   // Check deployed byte code change
-  const oldBytecodeStripped = stripMetadata(oldContract.schema.deployedBytecode)
-  const newBytecodeStripped = stripMetadata(newContract.schema.deployedBytecode)
+  const oldBytecodeStripped = stripMetadata(
+    normalizeLinkPlaceholders(oldContract.schema.deployedBytecode, getDeployedLinkReferences(oldContract))
+  )
+  const newBytecodeStripped = stripMetadata(
+    normalizeLinkPlaceholders(newContract.schema.deployedBytecode, getDeployedLinkReferences(newContract))
+  )
 
   if (oldBytecodeStripped !== newBytecodeStripped) {
     report.push(new DeployedBytecodeChange(contractName))

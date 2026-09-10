@@ -327,5 +327,15 @@
       }
     },
     "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts-0.5/common/proxies/GasPriceMinimumProxy.sol",
+    "nodes": [
+      {
+        "nodeType": "ContractDefinition",
+        "name": "GasPriceMinimumProxy",
+        "contractKind": "contract"
+      }
+    ]
   }
 }

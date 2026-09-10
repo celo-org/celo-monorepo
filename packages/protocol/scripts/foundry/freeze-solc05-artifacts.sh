@@ -28,14 +28,20 @@ FOUNDRY_PROFILE=solc05 forge build
 
 frozen_artifact() {
   # Keep what the tooling reads and leave out what changes between environments
-  # (ast, source maps, storage layout, build ids).
+  # (source maps, storage layout, build ids). The artifact loaders index artifacts by
+  # ast.absolutePath, so a minimal ast naming the source and the contract is kept in
+  # place of the full syntax tree.
   jq --arg name "$2" '{
     contractName: $name,
     abi: .abi,
     bytecode: { object: .bytecode.object, linkReferences: .bytecode.linkReferences },
     deployedBytecode: { object: .deployedBytecode.object, linkReferences: .deployedBytecode.linkReferences },
     methodIdentifiers: .methodIdentifiers,
-    metadata: .metadata
+    metadata: .metadata,
+    ast: {
+      absolutePath: (.metadata.settings.compilationTarget | keys[0]),
+      nodes: [ { nodeType: "ContractDefinition", name: $name, contractKind: "contract" } ]
+    }
   }' "$1"
 }
 

@@ -327,5 +327,15 @@
       }
     },
     "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts-0.5/common/proxies/EpochManagerProxy.sol",
+    "nodes": [
+      {
+        "nodeType": "ContractDefinition",
+        "name": "EpochManagerProxy",
+        "contractKind": "contract"
+      }
+    ]
   }
 }

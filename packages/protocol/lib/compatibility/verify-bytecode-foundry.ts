@@ -167,7 +167,13 @@ const verifyLiveProxyCode = async (contract: string, context: VerificationContex
     console.log(`  ⏭️  no Proxy artifact in this build, skipping the ${contract}Proxy code check`)
     return
   }
-  const onchainProxyBytecode = await getOnchainBytecode(proxyAddress, context)
+  let onchainProxyBytecode: string
+  try {
+    onchainProxyBytecode = await getOnchainBytecode(proxyAddress, context)
+  } catch (e) {
+    // code with no Solidity metadata trailer, or no code at all, is not the Proxy either
+    onchainProxyBytecode = ''
+  }
   const proxyBytecode = getSourceBytecode('Proxy', context)
   if (onchainProxyBytecode === proxyBytecode) {
     console.log(`  ✅ ${contract}Proxy runs the Proxy bytecode (at ${proxyAddress})`)

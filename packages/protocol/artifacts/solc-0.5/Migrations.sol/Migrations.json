@@ -189,5 +189,15 @@
       }
     },
     "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts-0.5/Migrations.sol",
+    "nodes": [
+      {
+        "nodeType": "ContractDefinition",
+        "name": "Migrations",
+        "contractKind": "contract"
+      }
+    ]
   }
 }

@@ -327,5 +327,15 @@
       }
     },
     "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts-0.5/governance/proxies/LockedGoldProxy.sol",
+    "nodes": [
+      {
+        "nodeType": "ContractDefinition",
+        "name": "LockedGoldProxy",
+        "contractKind": "contract"
+      }
+    ]
   }
 }

@@ -327,5 +327,15 @@
       }
     },
     "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts-0.5/governance/proxies/ReleaseGoldProxy.sol",
+    "nodes": [
+      {
+        "nodeType": "ContractDefinition",
+        "name": "ReleaseGoldProxy",
+        "contractKind": "contract"
+      }
+    ]
   }
 }

@@ -22,6 +22,8 @@ const testCases = {
   big_original_modified: getTestArtifacts('big_original_modified'),
   // a linkable library with its callers, compiled by solc 0.5
   linked_library: getTestArtifacts('linked_library'),
+  // the same sources under another directory, so every link placeholder differs
+  linked_library_copy: getTestArtifacts('linked_library_copy'),
   // the same sources ported to solc 0.8, plus a standalone contract
   linked_library_08: getTestArtifacts('linked_library_08'),
   // the 0.8 port with the library's function made internal, so it is inlined
@@ -141,6 +143,16 @@ describe('#reportASTIncompatibilities()', () => {
       const changes = report.getChanges()
       changes.sort(comp)
       assert.deepEqual(changes, expected)
+    })
+  })
+
+  describe('when a linked library only changed its path', () => {
+    it('reports no changes', () => {
+      const report = reportASTIncompatibilities(
+        testCases.linked_library,
+        testCases.linked_library_copy
+      )
+      assert.isEmpty(report.getChanges())
     })
   })
 

@@ -327,5 +327,15 @@
       }
     },
     "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts-0.5/common/proxies/CeloUnreleasedTreasuryProxy.sol",
+    "nodes": [
+      {
+        "nodeType": "ContractDefinition",
+        "name": "CeloUnreleasedTreasuryProxy",
+        "contractKind": "contract"
+      }
+    ]
   }
 }

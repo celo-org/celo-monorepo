@@ -180,5 +180,15 @@
       }
     },
     "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts-0.5/common/ProxyFactory.sol",
+    "nodes": [
+      {
+        "nodeType": "ContractDefinition",
+        "name": "ProxyFactory",
+        "contractKind": "contract"
+      }
+    ]
   }
 }

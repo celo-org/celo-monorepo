@@ -327,5 +327,15 @@
       }
     },
     "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts-0.5/governance/proxies/GovernanceProxy.sol",
+    "nodes": [
+      {
+        "nodeType": "ContractDefinition",
+        "name": "GovernanceProxy",
+        "contractKind": "contract"
+      }
+    ]
   }
 }

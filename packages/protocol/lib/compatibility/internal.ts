@@ -85,8 +85,41 @@ export function makeZContract(artifact: Artifact): ZContract {
     contract.schema.deployedBytecode = artifact.deployedBytecode
   } else {
     contract.schema.deployedBytecode = artifact.deployedBytecode.object
+    contract.schema.deployedLinkReferences = artifact.deployedBytecode.linkReferences
   }
   return contract
+}
+
+// The schema is a plain object (see makeZContract); the field is ours, not oz-sdk's.
+export const getDeployedLinkReferences = (contract: ZContract): LinkReferences | undefined =>
+  (contract.schema as any).deployedLinkReferences
+
+/**
+ * Replaces every unlinked-library placeholder in a bytecode with a token derived from
+ * the library's name alone.
+ *
+ * solc derives the placeholder from the fully qualified name (source path and library
+ * name), so moving a library file, as the single-tree layout did, changes the bytecode
+ * of every contract linking it although nothing compiled differently. Two builds that
+ * link the same library names then compare equal; a contract switching to another
+ * library still shows up.
+ */
+export const normalizeLinkPlaceholders = (bytecode: string, linkReferences: LinkReferences | undefined): string => {
+  if (!linkReferences) {
+    return bytecode
+  }
+  let normalized = bytecode
+  Object.values(linkReferences).forEach((libraries) => {
+    Object.entries(libraries).forEach(([library, references]) => {
+      const token = `__$${library.padEnd(34, '_').slice(0, 34)}$__`
+      references.forEach(({ start, length }) => {
+        // offsets are bytes into the code; the string carries a 0x prefix
+        const from = 2 + start * 2
+        normalized = normalized.slice(0, from) + token + normalized.slice(from + length * 2)
+      })
+    })
+  })
+  return normalized
 }
 
 export interface LinkReference {

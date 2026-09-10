@@ -376,5 +376,15 @@
       }
     },
     "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts-0.5/common/InitializableProxy.sol",
+    "nodes": [
+      {
+        "nodeType": "ContractDefinition",
+        "name": "InitializableProxy",
+        "contractKind": "contract"
+      }
+    ]
   }
 }

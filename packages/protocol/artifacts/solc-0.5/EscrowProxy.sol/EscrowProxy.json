@@ -327,5 +327,15 @@
       }
     },
     "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts-0.5/identity/proxies/EscrowProxy.sol",
+    "nodes": [
+      {
+        "nodeType": "ContractDefinition",
+        "name": "EscrowProxy",
+        "contractKind": "contract"
+      }
+    ]
   }
 }

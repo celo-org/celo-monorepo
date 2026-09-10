@@ -308,6 +308,12 @@ const verifyContractOnCeloscan = async (
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
 
 const promptUserConfirmation = (message: string): Promise<boolean> => {
+  if (!process.stdin.isTTY) {
+    // Without a terminal the question can never be answered; readline would wait for
+    // input that never comes and the process would end without a result.
+    console.warn(`${message} -- no terminal to confirm on, treating as no`)
+    return Promise.resolve(false)
+  }
   const rl = createInterface({ input: process.stdin, output: process.stdout })
   return new Promise((resolve) => {
     rl.question(`${message} (y/N): `, (answer) => {
