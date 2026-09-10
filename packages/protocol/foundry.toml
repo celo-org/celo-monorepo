@@ -26,7 +26,8 @@ fs_permissions = [
   { access = "read", path = "./migrations_sol/"},
   { access = "read", path = "./governanceConstitution.json"},
   { access = "read", path = "./artifacts/"},
-  { access = "read", path = "./.tmp/selectors" }
+  { access = "read", path = "./.tmp/selectors" },
+  { access = "read", path = "./scripts/usat-rewards/" }
 ]
 
 
