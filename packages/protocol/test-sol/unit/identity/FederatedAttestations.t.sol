@@ -22,7 +22,7 @@ contract FederatedAttestationsFoundryTest is Test, TestConstants {
     VOTING_KEY_OFFSET
   }
 
-  // Attestations and FederatedAttestations migrated to contracts-0.8 and are
+  // Attestations and FederatedAttestations migrated to Solidity 0.8 and are
   // instantiated directly as concrete 0.8 types. MockElection is dual-pragma.
   // MockLockedGold/MockValidators (0.5) are replaced/dropped: the 0.8
   // FederatedAttestations never reads them.

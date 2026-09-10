@@ -1,8 +1,7 @@
 pragma solidity ^0.5.13;
 
-// this file only exists so that foundry compiles this contracts
-import { Proxy } from "@celo-contracts/common/Proxy.sol";
-import { ProxyFactory } from "@celo-contracts/common/ProxyFactory.sol";
+// This file only exists so that foundry compiles the vendored Mento contracts the devchain
+// migration deploys; it is copied into contracts-0.5 for the solc-0.5 build.
 import { ReserveSpenderMultiSig } from "@mento-core/contracts/ReserveSpenderMultiSig.sol";
 import { Reserve } from "@mento-core/contracts/Reserve.sol";
 import { StableToken } from "@mento-core/contracts/StableToken.sol";

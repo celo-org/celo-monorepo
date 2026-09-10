@@ -13,8 +13,10 @@
 #
 # Layouts are read straight from the forge artifacts (built with
 # FOUNDRY_EXTRA_OUTPUT='["storageLayout"]'), so build the relevant profile first:
-#   FOUNDRY_PROFILE=truffle-compat   FOUNDRY_EXTRA_OUTPUT='["storageLayout"]' forge build   # 0.5
 #   FOUNDRY_PROFILE=truffle-compat8  FOUNDRY_EXTRA_OUTPUT='["storageLayout"]' forge build   # 0.8
+# The committed 0.5 baselines are frozen. Capturing one again (--baseline) needs the 0.5
+# implementations, which only a pre-migration checkout (core-contracts.v17) builds with
+#   FOUNDRY_PROFILE=truffle-compat   FOUNDRY_EXTRA_OUTPUT='["storageLayout"]' forge build   # 0.5
 
 set -euo pipefail
 

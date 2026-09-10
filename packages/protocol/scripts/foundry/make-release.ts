@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
+import { deployedLibraryMatchesArtifact } from '@celo/protocol/lib/bytecode-foundry'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
@@ -32,7 +33,11 @@ import { mnemonicToAccount, privateKeyToAccount } from 'viem/accounts'
 import * as viemChains from 'viem/chains'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
-import { getReleaseVersion, ignoredContractsV9 } from '../../lib/compatibility/ignored-contracts-v9'
+import {
+  getReleaseVersion,
+  ignoredContractsV18,
+  ignoredContractsV9,
+} from '../../lib/compatibility/ignored-contracts-v9'
 
 const execAsync = promisify(exec)
 
@@ -40,7 +45,7 @@ const execAsync = promisify(exec)
 // This maintains compatibility with viem's complex generics
 type PublicClientMethods = Pick<
   PublicClient<Transport, Chain>,
-  'call' | 'waitForTransactionReceipt'
+  'call' | 'getCode' | 'waitForTransactionReceipt'
 >
 
 type WalletClientMethods = Pick<
@@ -462,6 +467,9 @@ class ContractAddresses {
     Object.entries(libraryAddresses).forEach(([library, address]) =>
       addresses.set(library, address as string)
     )
+    // The Registry proxy lives at the protocol-constant address and is not an entry in
+    // itself, so seed it explicitly for the release loop.
+    addresses.set('Registry', registryAddress)
     return new ContractAddresses(addresses)
   }
 
@@ -494,7 +502,11 @@ interface ViemContract {
   linkedLibraryNames: string[] // library names the bytecode has link placeholders for
 }
 
+// Frozen build of contracts-0.5 (see scripts/foundry/freeze-solc05-artifacts.sh).
+const FROZEN_SOLC05_ARTIFACTS = './artifacts/solc-0.5'
+
 const proxiedCoreContracts = new Set<string>([
+  'Registry',
   CeloContractName.Accounts,
   CeloContractName.Attestations,
   CeloContractName.BlockchainParameters,
@@ -541,8 +553,10 @@ const isProxiedContract = (
   )
 }
 
+// Registry does not register itself, so it has no entry in CeloContractName; its
+// implementation is still released through RegistryProxy like every other core contract.
 const isCoreContract = (contractName: string) =>
-  [...Object.keys(CeloContractName)].includes(contractName)
+  contractName === 'Registry' || [...Object.keys(CeloContractName)].includes(contractName)
 
 type ViemAbiConstructor = Extract<Abi[number], { type: 'constructor' }>
 
@@ -775,10 +789,8 @@ const shouldDeployProxy = (
     // contracts are in-place upgrades: keep the existing proxy. Presence in the
     // on-chain Registry is the authoritative signal (the build trees cannot be used --
     // for a real release they contain the new branch, where every contract exists).
-    // Registry itself is special-cased: its proxy is the protocol-constant registry
-    // address and is never redeployed, but mainnet does not register "Registry" as an
-    // entry in itself.
-    const hasExistingProxy = addresses.addresses.has(contractName) || contractName === 'Registry'
+    // Registry itself is seeded into the addresses at the protocol-constant address.
+    const hasExistingProxy = addresses.addresses.has(contractName)
     if (hasExistingProxy) {
       console.log(
         `${contractName} is reported as NewContract but its proxy is already live ` +
@@ -957,17 +969,19 @@ const loadContractArtifact = (contractName: string, artifactPath: string): ViemC
   // Etherscan may require the full version to properly verify
   const fullVersion = compiler.version || '0.8.19'
 
-  // Determine foundry profile based on source file paths
-  // contracts/ = truffle-compat (Solidity 0.5.x)
-  // contracts-0.8/ = truffle-compat8 (Solidity 0.8.x)
+  // Determine the foundry profile that reproduces this artifact, for verification:
+  // the frozen 0.5 sources build with solc05, a pre-migration tag's 0.5 tree with
+  // truffle-compat, and every 0.8 source with truffle-compat8.
   let foundryProfile: string | undefined
   const mainSourceFile =
     sourceFiles.find((f) => f.includes(`${contractName}.sol`)) || sourceFiles[0]
   if (mainSourceFile) {
-    if (mainSourceFile.startsWith('contracts-0.8/')) {
-      foundryProfile = 'truffle-compat8'
-    } else if (mainSourceFile.startsWith('contracts/')) {
+    if (mainSourceFile.startsWith('contracts-0.5/')) {
+      foundryProfile = 'solc05'
+    } else if (fullVersion.startsWith('0.5')) {
       foundryProfile = 'truffle-compat'
+    } else {
+      foundryProfile = 'truffle-compat8'
     }
   }
 
@@ -1048,6 +1062,56 @@ const listContractNames = (baseDir: string): string[] => {
     }
   }
   return names
+}
+
+// Library addresses seeded from the libraries file are only known to hold code, not the
+// code this build links against. When a library moved compilers, or changed without the
+// compatibility report noticing, its name still resolves to the stale deployment and the
+// new implementation would be bound to code compiled from different source. Every
+// pre-existing library is therefore checked against its artifact before linking; a
+// library deployed in this run is trusted.
+const verifiedLibraries = new Set<string>()
+
+const assertLinkedLibrariesMatchArtifacts = async (
+  contractName: string,
+  contractDependencies: string[],
+  released: Set<string>,
+  addresses: ContractAddresses,
+  buildDir05: string,
+  buildDir08: string,
+  publicClient: PublicClientMethods
+): Promise<void> => {
+  for (const dep of contractDependencies) {
+    if (released.has(dep) || !addresses.addresses.has(dep)) {
+      continue
+    }
+    const address = `0x${addresses.get(dep).replace(/^0x/, '')}` as ViemAddress
+    if (verifiedLibraries.has(`${dep}@${address}`)) {
+      continue
+    }
+    const artifactPath = getContractArtifactPath(dep, buildDir05, buildDir08)
+    if (!existsSync(artifactPath)) {
+      throw new Error(`Artifact for library ${dep} not found at ${artifactPath}.`)
+    }
+    const expected = (readJsonSync(artifactPath) as ForgeArtifact).deployedBytecode?.object
+    if (!expected) {
+      throw new Error(`Artifact for library ${dep} at ${artifactPath} has no deployedBytecode.`)
+    }
+    const onchain = await publicClient.getCode({ address })
+    if (!onchain || onchain === '0x') {
+      throw new Error(`Library ${dep} at ${address} has no code on chain.`)
+    }
+    if (!deployedLibraryMatchesArtifact(onchain, expected, address)) {
+      throw new Error(
+        `Library ${dep} at ${address} was not compiled from ${artifactPath}, so ${contractName} ` +
+          `cannot be linked against it. Either the compatibility report must list ${dep} as ` +
+          `changed so a fresh deployment is linked, or remove ${dep} from the libraries file ` +
+          `to deploy it anew.`
+      )
+    }
+    verifiedLibraries.add(`${dep}@${address}`)
+    console.log(`Library ${dep} at ${address} matches the compiled artifact`)
+  }
 }
 
 const linkLibraries = (
@@ -1213,6 +1277,16 @@ const performRelease = async (
       }
     }
 
+    await assertLinkedLibrariesMatchArtifacts(
+      contractName,
+      contractDependencies,
+      released,
+      addresses,
+      buildDir05,
+      buildDir08,
+      publicClient
+    )
+
     const linkedLibraries = linkLibraries(contractViemArtifact, contractDependencies, addresses)
 
     await deployCoreContract(
@@ -1297,11 +1371,12 @@ async function main() {
 
     const networkName = argv.network!
     const buildDirBase = argv.buildDirectory
-    const buildDir05 = `${buildDirBase}-truffle-compat`
+    // Pre-migration tags build their Solidity 0.5 implementations into the truffle-compat
+    // dir; the single-tree layout has no 0.5 build, its proxies are the frozen artifacts.
+    const buildDir05 = existsSync(`${buildDirBase}-truffle-compat`)
+      ? `${buildDirBase}-truffle-compat`
+      : FROZEN_SOLC05_ARTIFACTS
     const buildDir08 = `${buildDirBase}-truffle-compat8`
-    if (!existsSync(buildDir05)) {
-      throw new Error(`${buildDir05} directory not found. Make sure to run foundry build first`)
-    }
     if (!existsSync(buildDir08)) {
       throw new Error(`${buildDir08} directory not found. Make sure to run foundry build first`)
     }
@@ -1389,6 +1464,9 @@ async function main() {
     if (version >= 9) {
       ignoredContractsSet = new Set(ignoredContractsV9)
     }
+    if (version >= 18) {
+      ignoredContractsSet = new Set([...ignoredContractsV9, ...ignoredContractsV18])
+    }
 
     const names05 = listContractNames(buildDir05)
     const names08 = listContractNames(buildDir08)
@@ -1468,6 +1546,8 @@ async function main() {
     }
   } catch (error) {
     console.error('Error during script execution:', error)
+    // rethrow so the process exits non-zero; the shell wrappers rely on the exit code
+    throw error
   }
 }
 

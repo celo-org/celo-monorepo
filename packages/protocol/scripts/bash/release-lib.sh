@@ -2,7 +2,10 @@
 
 
 function checkout_build_sources() {
-  local BUILD_SOURCES="contracts contracts-0.8 test-sol migrations_sol foundry.toml remappings.txt"
+  # Every source tree any supported ref may carry: pre-migration tags have contracts
+  # (0.5) and contracts-0.8, the single-tree layout has contracts (0.8) and
+  # contracts-0.5. Only the paths present in the ref are restored; the rest are removed.
+  local BUILD_SOURCES="contracts contracts-0.8 contracts-0.5 test-sol migrations_sol foundry.toml remappings.txt"
   local FROM=$1
   local LOG_FILE=$2
   # The third argument is optional. We temporarily allow unset variables.
@@ -15,8 +18,23 @@ function checkout_build_sources() {
     FLAGS="--staged --worktree"
   fi
 
+  local PREFIX=$(git rev-parse --show-prefix)
+  local PRESENT=""
+  for SOURCE in $BUILD_SOURCES; do
+    if git cat-file -e "$FROM:$PREFIX$SOURCE" 2>/dev/null; then
+      PRESENT="$PRESENT $SOURCE"
+    fi
+  done
+
   rm -rf $BUILD_SOURCES
-  git restore --source $FROM $FLAGS $BUILD_SOURCES 2>>$LOG_FILE >> $LOG_FILE
+  git restore --source $FROM $FLAGS $PRESENT 2>>$LOG_FILE >> $LOG_FILE
+}
+
+# Whether the checked-out foundry.toml defines the given profile. The single-tree
+# layout has no Solidity 0.5 profile any more (the proxies are frozen artifacts), while
+# pre-migration tags still build their 0.5 implementations with one.
+function has_foundry_profile() {
+  grep -q "^\[profile\.$1\]" foundry.toml
 }
 
 # USAGE: build_tag_foundry <branch> <log file>
@@ -54,6 +72,13 @@ function build_tag_foundry() {
     cp "$CONFIG" foundry.toml
   fi
 
+  if [[ -n "$PROFILE" ]] && ! has_foundry_profile "$PROFILE"; then
+    echo " - $BRANCH defines no $PROFILE profile, nothing to build for it"
+    BUILD_DIR=""
+    checkout_build_sources $CURRENT_HASH $LOG_FILE -s
+    return 0
+  fi
+
   # Always rebuild from scratch. On reused (self-hosted) runners a previously-built
   # $BUILD_DIR for the same tag persists across runs; reusing it can compare against a
   # stale baseline and produce phantom storage diffs (e.g. a spurious change attributed
@@ -62,7 +87,13 @@ function build_tag_foundry() {
   echo " - Build contract artifacts at $BUILD_DIR (fresh)"
   rm -rf $BUILD_DIR
   export FOUNDRY_PROFILE=$PROFILE
-  forge build --out $BUILD_DIR --ast >> $LOG_FILE
+  # Put the working tree back even when the build fails; otherwise the caller (and a
+  # reused CI runner) is left with the tag's sources checked out over the branch.
+  if ! forge build --out $BUILD_DIR --ast >> $LOG_FILE; then
+    echo " - Build of $BRANCH failed, restoring sources at $CURRENT_HASH (see $LOG_FILE)" >&2
+    checkout_build_sources $CURRENT_HASH $LOG_FILE -s
+    return 1
+  fi
 
   checkout_build_sources $CURRENT_HASH $LOG_FILE -s
 }

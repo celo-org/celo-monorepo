@@ -19,7 +19,7 @@ contract AttestationsFoundryTest is Test {
     VOTING_KEY_OFFSET
   }
 
-  // Attestations migrated to contracts-0.8; the deployable test mock and the Random
+  // Attestations migrated to Solidity 0.8; the deployable test mock and the Random
   // mock are now instantiated directly as concrete 0.8 types. MockElection is
   // dual-pragma. MockLockedGold/MockValidators were never read by the 0.8
   // Attestations contract, so they are dropped.

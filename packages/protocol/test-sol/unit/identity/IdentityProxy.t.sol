@@ -4,7 +4,7 @@ pragma solidity >=0.8.7 <0.8.20;
 import "celo-foundry-8/Test.sol";
 import { IdentityProxyTest } from "@test-sol/unit/identity/mocks/IdentityProxyMocks08.sol";
 
-// IdentityProxy stays at Solidity 0.5; deployed via deployCodeTo (its constructor
+// IdentityProxy is frozen Solidity 0.5 bytecode (artifacts/solc-0.5); deployed via deployCodeTo (its constructor
 // runs through deployCodeTo's self-call, so the deployer is this test contract).
 interface IIdentityProxy {
   function makeCall(address destination, bytes calldata encodedFunctionCall) external payable;
@@ -19,7 +19,7 @@ contract IdentityProxyTestFoundry is Test {
 
   function setUp() public virtual {
     identityProxyAddress = actor("identityProxy");
-    deployCodeTo("IdentityProxy.sol", identityProxyAddress);
+    deployCodeTo("artifacts/solc-0.5/IdentityProxy.sol/IdentityProxy.json", identityProxyAddress);
     identityProxy = IIdentityProxy(identityProxyAddress);
     identityProxyTest = new IdentityProxyTest();
   }

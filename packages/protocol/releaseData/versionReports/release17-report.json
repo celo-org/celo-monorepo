@@ -1,0 +1,114 @@
+{
+  "oldArtifactsFolder": [
+    "out-core-contracts.v16"
+  ],
+  "newArtifactsFolder": [
+    "out-core-contracts.v17"
+  ],
+  "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles|CeloFeeCurrencyAdapterOwnable|FeeCurrencyAdapter|FeeCurrencyAdapterOwnable|IsL2Check|Blockable|PrecompilesOverride|CompileExchange|PrecompilesOverrideV2|UsingRegistryV2NoMento|GasSponsoredOFTBridge|^UsingRegistry|^Ownable|Initializable|BLS12_377Passthrough|BLS12_381Passthrough]UniswapV2ERC20|ReentrancyGuard|MockElection|\\bFeeHandlerSeller\\b/",
+  "report": {
+    "contracts": {
+      "Election": {
+        "changes": {
+          "storage": [],
+          "major": [],
+          "minor": [],
+          "patch": [
+            {
+              "contract": "Election",
+              "type": "DeployedBytecode"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "=",
+          "minor": "=",
+          "patch": "+1"
+        }
+      },
+      "EpochManager": {
+        "changes": {
+          "storage": [],
+          "major": [
+            {
+              "contract": "EpochManager",
+              "signature": "initialize(address,uint256)",
+              "type": "MethodRemoved"
+            }
+          ],
+          "minor": [
+            {
+              "contract": "EpochManager",
+              "signature": "initialize(address,uint256,address)",
+              "type": "MethodAdded"
+            }
+          ],
+          "patch": [
+            {
+              "contract": "EpochManager",
+              "type": "DeployedBytecode"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "+1",
+          "minor": "0",
+          "patch": "0"
+        }
+      },
+      "Validators": {
+        "changes": {
+          "storage": [],
+          "major": [],
+          "minor": [
+            {
+              "contract": "Validators",
+              "signature": "updateVoterRewardCommission()",
+              "type": "MethodAdded"
+            },
+            {
+              "contract": "Validators",
+              "signature": "setNextVoterRewardCommissionUpdate(uint256)",
+              "type": "MethodAdded"
+            },
+            {
+              "contract": "Validators",
+              "signature": "setMaxVoterRewardCommission(uint256)",
+              "type": "MethodAdded"
+            },
+            {
+              "contract": "Validators",
+              "signature": "getVoterRewardCommission(address)",
+              "type": "MethodAdded"
+            },
+            {
+              "contract": "Validators",
+              "signature": "maxVoterRewardCommission()",
+              "type": "MethodAdded"
+            },
+            {
+              "contract": "Validators",
+              "signature": "maxVoterRewardCommissionLastReducedBlock()",
+              "type": "MethodAdded"
+            }
+          ],
+          "patch": [
+            {
+              "contract": "Validators",
+              "type": "DeployedBytecode"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "=",
+          "minor": "+1",
+          "patch": "0"
+        }
+      }
+    },
+    "libraries": {}
+  }
+}

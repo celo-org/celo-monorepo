@@ -105,6 +105,36 @@ jobs:
           path: packages/protocol
           retention-days: 1
 
+  storage-layout:
+    defaults:
+      run:
+        working-directory: packages/protocol
+    name: Storage layout gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install Foundry
+        # foundry-toolchain v1.7.0 https://github.com/foundry-rs/foundry-toolchain/releases/tag/v1.7.0
+        uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
+        with:
+          version: 'v1.5.0'
+      - name: Install forge dependencies
+        run: forge install
+      # Every proxied implementation must keep the storage layout of the 0.5 version whose
+      # state still lives behind the mainnet proxies. The committed baselines under
+      # releaseData/storageLayouts are those deployed layouts; any drift corrupts storage
+      # on the next upgrade, so it fails the build here rather than surfacing on chain.
+      - name: Build 0.8 implementations with storage layouts
+        run: FOUNDRY_PROFILE=truffle-compat8 FOUNDRY_EXTRA_OUTPUT='["storageLayout"]' forge build
+      - name: Diff storage layouts against the 0.5 baselines
+        run: ./scripts/foundry/storage-diff.sh --all
+      # The proxies are immutable Solidity 0.5 contracts kept as frozen artifacts; the
+      # sources under contracts-0.5 and artifacts/solc-0.5 must never drift apart.
+      - name: Check the frozen 0.5 artifacts match their sources
+        run: ./scripts/foundry/freeze-solc05-artifacts.sh --check
+
   unit-tests:
     needs: compile
     defaults:

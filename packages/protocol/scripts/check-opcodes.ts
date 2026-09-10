@@ -37,5 +37,5 @@ const handleGrepOutput = (err: ExecException, grepOutput: string, stderr: string
 const cmd = `egrep -r "(${UNSAFE_OPCODES.join('|')})\\(" ${path.join(
   __dirname,
   '../contracts'
-)} ${path.join(__dirname, '../contracts-0.8')}`
+)} ${path.join(__dirname, '../contracts-0.5')}`
 exec(cmd, handleGrepOutput)

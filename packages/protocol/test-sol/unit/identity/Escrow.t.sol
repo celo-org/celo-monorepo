@@ -15,7 +15,7 @@ import "@celo-contracts/common/interfaces/IOwnable.sol";
 contract EscrowTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
-  // Escrow and FederatedAttestations now live in contracts-0.8 and are
+  // Escrow and FederatedAttestations are now Solidity 0.8 and are
   // instantiated directly as concrete 0.8 types.
   Escrow escrowContract;
   address escrowContractAddress;

@@ -3,10 +3,12 @@ import path from 'path'
 import { SOLIDITY_05_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 
 export const ROOT_DIR = path.join(__dirname, '../')
-export const CONTRACTS_PACKAGE_SRC_DIR = path.join(ROOT_DIR, SOLIDITY_05_PACKAGE.path)
-export const CONTRACTS_08_SOURCE_DIR = path.join(ROOT_DIR, SOLIDITY_08_PACKAGE.path)
+// The single tree is the root of the published @celo/contracts package; the frozen
+// 0.5 sources ship under 0.5/.
+export const CONTRACTS_PACKAGE_SRC_DIR = path.join(ROOT_DIR, SOLIDITY_08_PACKAGE.path)
+export const CONTRACTS_05_SOURCE_DIR = path.join(ROOT_DIR, SOLIDITY_05_PACKAGE.path)
 // Staging dir that the publishing pipeline assembles from contracts/ and
-// contracts-0.8/. `npm publish` runs from here, so the source trees are never
+// contracts-0.5/. `npm publish` runs from here, so the source trees are never
 // mutated by a publish run.
 export const CONTRACTS_PACKAGE_STAGING_DIR = path.join(ROOT_DIR, 'contracts-package-abi')
 export const ABIS_PACKAGE_SRC_DIR = path.join(__dirname, '../abis')

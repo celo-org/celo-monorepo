@@ -207,18 +207,23 @@ the release test green:
 |----|------|--------|
 | P7.1 | Flatten `SOLIDITY_08_PACKAGE.contracts` (no per-contract list) | DONE — list removed; artifact location is resolved from the build trees. `SOLIDITY_05_PACKAGE` itself stays: it still describes the real `contracts/` dir for the published-package layout (0.5 sources at the package root, 0.8 under `0.8/`), which must not change for consumers. |
 | P7.2 | Remove `contracts08Set` | DONE — `getContractBuildDir` is now a plain 0.5-first lookup with a missing-file fallback, which is what keeps old-tag deploys on the artifacts matching what is on chain. The `buildDir05/08` pair and the source-path profile auto-detect survive deliberately: both serve old-tag builds. |
-| P7.3 | Collapse dual-profile build loops | BLOCKED by constraints 1 and 2 above (publish pipeline, devchain, and old-tag builds all need both profiles). |
+| P7.3 | Collapse dual-profile build loops | DONE — the release scripts build only the profiles a ref defines (`has_foundry_profile`), each ref with its own `foundry.toml`; HEAD builds `truffle-compat8` only and its 0.5 side is `artifacts/solc-0.5`. |
 | P7.4 | Single artifact-folder logic in `check-backward.ts` | DONE — the Truffle dual-folder path is deleted (forge-only; one out dir per side, split by compiler version internally). The dead `release:check-versions` legacy script went with it. |
 | P7.5 | **Preserve** `ALLOWED_LEGACY_LIBRARIES` (mainnet 0.5 `AddressLinkedList`) | PRESERVED — untouched in `lib/compatibility/verify-bytecode-foundry.ts`. |
-| P7.6 | Retire `truffle-compat` profile; collapse `out*` dirs | BLOCKED by constraints 1 and 2 above. |
-| P7.7 | CI path watches + devchain build scripts | MOSTLY BLOCKED — `contracts/**` still ships real sources (proxies, interfaces, dual-pragma bases), so the publish path filters and devchain 0.5 build stay. The devchain migration no longer needs a per-contract version list: `migrations_sol/constants.sol` resolves each artifact by checking the filesystem. |
+| P7.6 | Retire `truffle-compat` profile; collapse `out*` dirs | DONE — `truffle-compat` is gone from HEAD's `foundry.toml`; `solc05` (src `contracts-0.5`) exists only to regenerate the frozen proxy artifacts and to build the vendored Mento contracts for the devchain. |
+| P7.7 | CI path watches + devchain build scripts | DONE — single tree `contracts/`; devchain deploys the proxies from the frozen artifacts and builds only the 0.8 libraries; publish path filters watch `contracts/**` and `contracts-0.5/**`. |
 | P7.8 | Bump `NODE_MODULE_CACHE_VERSION` | DONE (10 → 11; this branch changed package.json/yarn.lock). |
 | P7.9 | Update release skill doc | The skill lives at `.agent/skills/celo-release/` (not `.cursor/`); its foundry-based flow is already accurate. |
 
-Remaining exit criteria for full single-tree: migrate the proxy sources to 0.8 (bytecode
-change for new proxies + published package), stop supporting pre-migration tags in the
-release tooling (or build them with their own foundry.toml), then retire `truffle-compat`,
-merge the out dirs, and drop `SOLIDITY_05_PACKAGE`.
+Single tree reached: `contracts-0.8/` became `contracts/` (implementations, interfaces,
+shared bases), the proxies and their helpers moved to `contracts-0.5/` as frozen sources
+whose artifacts are committed under `artifacts/solc-0.5/` (the `solc05` profile, Solidity
+0.5.14 / istanbul / optimizer off, reproduces the mainnet proxy bytecode exactly; CI checks
+the frozen artifacts against the sources). Proxies are never upgraded: `verify-deployed`
+now also compares every live proxy's runtime code with the frozen `Proxy` bytecode. The
+published `@celo/contracts` package has the single tree at its root and the frozen sources
+under `0.5/`, with stub files keeping the earlier `0.8/...` and root proxy paths importable.
+Pre-migration tags still build their own 0.5 implementations with their own `foundry.toml`.
 
 **Gate (unchanged):** full release dry-run (`release:verify-deployed:foundry`, `release:check-versions:foundry`) passes; `verify-bytecode` still honors the legacy library allowlist.
 

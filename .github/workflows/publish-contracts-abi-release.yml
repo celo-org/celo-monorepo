@@ -9,7 +9,7 @@ on:
     paths:
       - 'packages/protocol/abis/**'
       - 'packages/protocol/contracts/**'
-      - 'packages/protocol/contracts-0.8/**'
+      - 'packages/protocol/contracts-0.5/**'
       - 'packages/protocol/lib/**'
       - 'packages/protocol/scripts/**'
       - '!packages/protocol/scripts/foundry/**'
@@ -21,7 +21,7 @@ on:
     paths:
       - 'packages/protocol/abis/**'
       - 'packages/protocol/contracts/**'
-      - 'packages/protocol/contracts-0.8/**'
+      - 'packages/protocol/contracts-0.5/**'
       - 'packages/protocol/lib/**'
       - 'packages/protocol/scripts/**'
       - '!packages/protocol/scripts/foundry/**'

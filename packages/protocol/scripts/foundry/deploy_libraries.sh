@@ -65,14 +65,7 @@ cp $SOURCE_DIR/remappings.txt $DEST_DIR/remappings.txt
 # Move into the temporary directory
 pushd $TEMP_DIR
 
-# Build libraries
-echo "Building with 0.5 libraries..."
-time FOUNDRY_PROFILE=truffle-compat $FORGE build
-
-# Deploy libraries and building library flag
-export LIBRARY_FLAGS=""
-deploy_libraries LIBRARIES_PATH "truffle-compat" "LIBRARY_FLAGS" "0.5"
-
+# Deploy libraries and build the library flag
 export LIBRARY_FLAGS_08=""
 deploy_libraries LIBRARIES_PATH_08 "truffle-compat8" "LIBRARY_FLAGS_08" "0.8"
 

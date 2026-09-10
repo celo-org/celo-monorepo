@@ -6,7 +6,7 @@ import { IdentityProxyTest, MockAttestations } from "@test-sol/unit/identity/moc
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IRegistryInitializer.sol";
 
-// IdentityProxy / IdentityProxyHub stay at Solidity 0.5; deployed via deployCodeTo
+// IdentityProxy / IdentityProxyHub are frozen Solidity 0.5 bytecode (artifacts/solc-0.5); deployed via deployCodeTo
 // and used through minimal local interfaces.
 interface IIdentityProxyHub {
   function makeCall(
@@ -35,7 +35,10 @@ contract IdentityProxyHubTest is Test {
     identityProxyTest = new IdentityProxyTest();
     mockAttestations = new MockAttestations();
     identityProxyHubAddress = actor("identityProxyHub");
-    deployCodeTo("IdentityProxyHub.sol", identityProxyHubAddress);
+    deployCodeTo(
+      "artifacts/solc-0.5/IdentityProxyHub.sol/IdentityProxyHub.json",
+      identityProxyHubAddress
+    );
     identityProxyHub = IIdentityProxyHub(identityProxyHubAddress);
     address registryAddress = actor("registry");
     deployCodeTo("Registry.sol", abi.encode(true), registryAddress);
@@ -86,7 +89,7 @@ contract IdentityProxyTestGetIdenityProxy is IdentityProxyHubTest {
   }
 
   function test_ReturnsTheCorrectCREATE2Address() public {
-    bytes memory bytecode = vm.getCode("IdentityProxy.sol:IdentityProxy");
+    bytes memory bytecode = vm.getCode("artifacts/solc-0.5/IdentityProxy.sol/IdentityProxy.json");
     address expectedAddress = computeCreate2Address(identifier, identityProxyHubAddress, bytecode);
     address identityProxyReturned = identityProxyHub.getOrDeployIdentityProxy(identifier);
     assertEq(expectedAddress, identityProxyReturned);
@@ -96,7 +99,9 @@ contract IdentityProxyTestGetIdenityProxy is IdentityProxyHubTest {
     address identityProxyReturned = identityProxyHub.getOrDeployIdentityProxy(identifier);
     identityProxyHub.getOrDeployIdentityProxy(identifier);
 
-    bytes memory deployedCode = vm.getDeployedCode("IdentityProxy.sol:IdentityProxy");
+    bytes memory deployedCode = vm.getDeployedCode(
+      "artifacts/solc-0.5/IdentityProxy.sol/IdentityProxy.json"
+    );
     assertEq(deployedCode, at(identityProxyReturned));
   }
 }

@@ -9,8 +9,9 @@ import {
 } from '@celo/protocol/lib/bytecode-foundry'
 import { getArtifactByName, getContractName, getDeployedBytecode } from '@celo/protocol/lib/compatibility/internal'
 import { verifyProxyStorageProofFoundry } from '@celo/protocol/lib/proxy-utils'
+import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
-import { ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9'
+import { ignoredContractsV18, ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9'
 
 // TODO remove this duplicate
 export interface ProposalTx {
@@ -150,6 +151,33 @@ const isAllowedLegacyLibrary = (contract: string, address: string, network: stri
   return allowed !== undefined && allowed.toLowerCase() === address.toLowerCase()
 }
 
+// The Registry is not an entry in itself; its proxy is the protocol-constant address.
+const liveProxyAddress = async (contract: string, context: VerificationContext): Promise<string> =>
+  contract === 'Registry' ? celoRegistryAddress : await context.registry.getAddressForString(contract)
+
+// The proxies deployed on mainnet are immutable Solidity 0.5 contracts; every live proxy
+// must still run the runtime bytecode of the Proxy artifact (frozen, or built from a
+// pre-migration tag), so a registry entry pointing at anything else is caught here.
+const verifyLiveProxyCode = async (contract: string, context: VerificationContext, errors: string[]) => {
+  const proxyAddress = await liveProxyAddress(contract, context)
+  if (proxyAddress === ZERO_ADDRESS) {
+    return
+  }
+  if (!context.artifacts.some((artifacts) => getArtifactByName('Proxy', artifacts))) {
+    console.log(`  ⏭️  no Proxy artifact in this build, skipping the ${contract}Proxy code check`)
+    return
+  }
+  const onchainProxyBytecode = await getOnchainBytecode(proxyAddress, context)
+  const proxyBytecode = getSourceBytecode('Proxy', context)
+  if (onchainProxyBytecode === proxyBytecode) {
+    console.log(`  ✅ ${contract}Proxy runs the Proxy bytecode (at ${proxyAddress})`)
+  } else {
+    const msg = `${contract}Proxy (at ${proxyAddress}) does not run the Proxy bytecode`
+    console.log(`  ❌ ${msg}`)
+    errors.push(msg)
+  }
+}
+
 const isLibrary = (contract: string, context: VerificationContext) => {
   const answer = Object.keys(context.libraryLinkingInfo.info).includes(contract)
   return answer
@@ -206,17 +234,19 @@ const dfsStep = async (queue: QueueEntry[], visited: Set<string>, context: Verif
     let implementationAddress: string
     if (isImplementationChanged(contract, context.proposal)) {
       implementationAddress = getProposedImplementationAddress(contract, context.proposal)
+      await verifyLiveProxyCode(contract, context, errors)
     } else if (isProxyChanged(contract, context.proposal)) {
       const proxyAddress = getProposedProxyAddress(contract, context.proposal)
       implementationAddress = await context.proxyLookup.getImplementation(proxyAddress)
     } else if (isLib) {
       implementationAddress = ensureLeading0x(context.libraryLinkingInfo.info[contract].address)
     } else {
-      const proxyAddress = await context.registry.getAddressForString(contract)
+      const proxyAddress = await liveProxyAddress(contract, context)
       if (proxyAddress === ZERO_ADDRESS) {
         console.log(`  ⏭️  ${contract} is not in registry - skipping`)
         return
       }
+      await verifyLiveProxyCode(contract, context, errors)
       implementationAddress = await context.proxyLookup.getImplementation(proxyAddress)
     }
 
@@ -352,7 +382,9 @@ export const verifyBytecodes = async (
 
   const compiledContracts = Array.prototype.concat.apply([], artifacts.map(a => a.listArtifacts())).map((a) => getContractName(a))
 
-  if (version > 9) {
+  if (version >= 18) {
+    ignoredContracts = [...ignoredContracts, ...ignoredContractsV9, ...ignoredContractsV18]
+  } else if (version > 9) {
     ignoredContracts = [...ignoredContracts, ...ignoredContractsV9]
   } else if (version == 9) {
     ignoredContracts = [...ignoredContracts, ...ignoredContractsV9, ...ignoredContractsV9Only]

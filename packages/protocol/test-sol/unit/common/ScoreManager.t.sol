@@ -46,19 +46,19 @@ contract ScoreManagerTest is TestWithUtils08 {
 
 contract ScoreManagerTest_setGroupScore is ScoreManagerTest {
   function test_setGroupScore() public {
-    scoreManager.setGroupScore(owner, 42);
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(owner, 42);
     assertEq(scoreManager.getGroupScore(owner), 42);
   }
 
   function test_Reverts_WhenNotCalledByOwner() public {
     vm.prank(nonOwner);
     vm.expectRevert("Sender not authorized to update score");
-    scoreManager.setGroupScore(owner, 42);
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(owner, 42);
   }
 
   function test_Reverts_WhenSetToMoreThan1e24Plus1() public {
     vm.expectRevert("Score must be less than or equal to 1e24.");
-    scoreManager.setGroupScore(owner, 1e24 + 1);
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(owner, 1e24 + 1);
   }
 
   function test_Returns1FixidityWhenGroupScoreDoesNotExist() public {
@@ -66,51 +66,51 @@ contract ScoreManagerTest_setGroupScore is ScoreManagerTest {
   }
 
   function test_Returns0WhenGroupScoreIsZERO_SCORE() public {
-    scoreManager.setGroupScore(owner, 0);
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(owner, 0);
     assert(scoreManager.getGroupScore(owner) == 0);
   }
 
   function test_EmitsGroupScoreSet() public {
     vm.expectEmit(false, false, false, true);
     emit GroupScoreSet(owner, 42);
-    scoreManager.setGroupScore(owner, 42);
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(owner, 42);
   }
 
   function test_WhenCalledByScoreManager() public {
     scoreManager.setScoreManagerSetter(scoreManagerSetter);
 
     vm.prank(scoreManagerSetter);
-    scoreManager.setGroupScore(owner, 42);
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(owner, 42);
     assertEq(scoreManager.getGroupScore(owner), 42);
   }
 }
 
 contract ScoreManagerTest_setValidatorScore is ScoreManagerTest {
   function test_setValidatorScore() public {
-    scoreManager.setValidatorScore(owner, 42);
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(owner, 42);
     assertEq(scoreManager.getValidatorScore(owner), 42);
   }
 
   function test_Reverts_WhenNotCalledByOwner() public {
     vm.prank(nonOwner);
     vm.expectRevert("Sender not authorized to update score");
-    scoreManager.setValidatorScore(owner, 42);
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(owner, 42);
   }
 
   function test_Reverts_WhenSetToMoreThan1e24() public {
     vm.expectRevert("Score must be less than or equal to 1e24.");
-    scoreManager.setValidatorScore(owner, 1e24 + 1);
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(owner, 1e24 + 1);
   }
 
   function test_Returns0WhenValidatorScoreIsZero() public {
-    scoreManager.setValidatorScore(owner, 0);
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(owner, 0);
     assert(scoreManager.getValidatorScore(owner) == 0);
   }
 
   function test_EmitsValidatorScoreSet() public {
     vm.expectEmit(false, false, false, true);
     emit ValidatorScoreSet(owner, 42);
-    scoreManager.setValidatorScore(owner, 42);
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(owner, 42);
   }
 
   function test_Returns1FixidityWhenValidatorScoreDoesNotExist() public {
@@ -121,7 +121,7 @@ contract ScoreManagerTest_setValidatorScore is ScoreManagerTest {
     scoreManager.setScoreManagerSetter(scoreManagerSetter);
 
     vm.prank(scoreManagerSetter);
-    scoreManager.setValidatorScore(owner, 42);
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(owner, 42);
     assertEq(scoreManager.getValidatorScore(owner), 42);
   }
 }

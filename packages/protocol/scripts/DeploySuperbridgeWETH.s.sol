@@ -2,7 +2,7 @@
 pragma solidity ^0.8.15;
 
 import "forge-std/Script.sol";
-import "../contracts-0.8/common/SuperBridgeETHWrapper.sol";
+import "../contracts/common/SuperBridgeETHWrapper.sol";
 
 contract DeploySuperBridgeWETH is Script {
   function run() external {

@@ -17,6 +17,7 @@ import "@celo-contracts/governance/interfaces/IValidators.sol";
 import { FeeCurrencyDirectory } from "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 import "@celo-contracts-8/common/interfaces/IScoreManager.sol";
+import "@celo-contracts-8/common/interfaces/IScoreManagerGovernance.sol";
 
 import { Ownable } from "@openzeppelin/contracts8/access/Ownable.sol";
 
@@ -224,18 +225,19 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
   }
 
   function _setValidatorScore() internal {
-    address scoreManagerOwner = scoreManager.owner();
+    address scoreManagerOwner = Ownable(address(scoreManager)).owner();
+    IScoreManagerGovernance scoreManagerSetter = IScoreManagerGovernance(address(scoreManager));
     vm.startPrank(scoreManagerOwner);
-    scoreManager.setGroupScore(groupList[0], groupScore[0]);
-    scoreManager.setGroupScore(groupList[1], groupScore[1]);
-    scoreManager.setGroupScore(groupList[2], groupScore[2]);
+    scoreManagerSetter.setGroupScore(groupList[0], groupScore[0]);
+    scoreManagerSetter.setGroupScore(groupList[1], groupScore[1]);
+    scoreManagerSetter.setGroupScore(groupList[2], groupScore[2]);
 
-    scoreManager.setValidatorScore(validatorsList[0], validatorScore[0]);
-    scoreManager.setValidatorScore(validatorsList[1], validatorScore[1]);
-    scoreManager.setValidatorScore(validatorsList[2], validatorScore[2]);
-    scoreManager.setValidatorScore(validatorsList[3], validatorScore[3]);
-    scoreManager.setValidatorScore(validatorsList[4], validatorScore[4]);
-    scoreManager.setValidatorScore(validatorsList[5], validatorScore[5]);
+    scoreManagerSetter.setValidatorScore(validatorsList[0], validatorScore[0]);
+    scoreManagerSetter.setValidatorScore(validatorsList[1], validatorScore[1]);
+    scoreManagerSetter.setValidatorScore(validatorsList[2], validatorScore[2]);
+    scoreManagerSetter.setValidatorScore(validatorsList[3], validatorScore[3]);
+    scoreManagerSetter.setValidatorScore(validatorsList[4], validatorScore[4]);
+    scoreManagerSetter.setValidatorScore(validatorsList[5], validatorScore[5]);
 
     vm.stopPrank();
   }

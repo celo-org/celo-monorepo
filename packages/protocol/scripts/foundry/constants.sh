@@ -60,22 +60,18 @@ GOLD_TOKEN_TOTAL_SUPPLY=700000000 # Arbitrary amount chosen to be approximately 
 export CELO_UNRELEASED_TREASURY_INITIAL_BALANCE="$(($GOLD_TOKEN_CELO_SUPPLY_CAP - $GOLD_TOKEN_TOTAL_SUPPLY))" # During the real L2 genesis, the VM will calculate and set an appropriate balance.
 export RESERVE_INITIAL_BALANCE="5000000" # setting this here because it gets overwritten in the L2 migration script
 
-# Contract libraries
-# All core implementations are now Solidity 0.8, so there are no 0.5 linked libraries
-# left to deploy; the 0.8 libraries are in LIBRARIES_PATH_08.
-export LIBRARIES_PATH=()
-
-export LIBRARIES_PATH_08=("contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
-                "contracts-0.8/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
-                "contracts-0.8/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"
-                "contracts-0.8/governance/Proposals.sol:Proposals"
+# Contract libraries (all Solidity 0.8; the frozen 0.5 proxies link none)
+export LIBRARIES_PATH_08=("contracts/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
+                "contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
+                "contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"
+                "contracts/governance/Proposals.sol:Proposals"
 )
 
 export LIBRARY_DEPENDENCIES_PATH=(
   "contracts/common/FixidityLib.sol"
-  "contracts-0.8/common/linkedlists/LinkedList.sol"
-  "contracts-0.8/common/linkedlists/SortedLinkedList.sol"
-  "contracts-0.8/common/linkedlists/SortedLinkedListWithMedian.sol"
+  "contracts/common/linkedlists/LinkedList.sol"
+  "contracts/common/linkedlists/SortedLinkedList.sol"
+  "contracts/common/linkedlists/SortedLinkedListWithMedian.sol"
   "lib/openzeppelin-contracts/contracts/math/SafeMath.sol"
   "lib/openzeppelin-contracts8/contracts/utils/math/SafeMath.sol"
   "lib/openzeppelin-contracts/contracts/math/Math.sol"

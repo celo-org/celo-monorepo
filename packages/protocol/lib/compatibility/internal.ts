@@ -1,3 +1,4 @@
+import { artifactSourcePath } from '@celo/protocol/lib/compatibility/utils'
 import { BuildArtifacts, Contract as ZContract } from '@openzeppelin/upgrades'
 const Web3 = require('web3')
 const web3 = new Web3(null)
@@ -35,8 +36,8 @@ export const getArtifactByName = (contractName: string, artifacts: BuildArtifact
   // resolution is deterministic across the baseline and new builds; otherwise the
   // first-match ordering can differ between builds and produce phantom storage diffs.
   const projectMatch = matches.find(artifact => {
-    const sourcePath = (artifact.ast && artifact.ast.absolutePath) || ''
-    return /(^|\/)contracts(-0\.8)?\//.test(sourcePath) && !/(^|\/)lib\//.test(sourcePath)
+    const sourcePath = artifactSourcePath(artifact)
+    return /(^|\/)contracts(-0\.[58])?\//.test(sourcePath) && !/(^|\/)lib\//.test(sourcePath)
   })
   return projectMatch || matches[0]
 }

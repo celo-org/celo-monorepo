@@ -69,12 +69,11 @@ validate_libraries_bytecode "$LIBRARIES" "$VALIDATION_RPC_URL"
 
 source scripts/bash/release-lib.sh
 
-cp foundry.toml foundry.toml.bak
-
-build_tag_foundry "$BRANCH" /dev/stdout truffle-compat foundry.toml.bak
-build_tag_foundry "$BRANCH" /dev/stdout truffle-compat8 foundry.toml.bak
-
-mv foundry.toml.bak foundry.toml
+# Each ref builds with its own foundry.toml. Pre-migration tags still define the
+# truffle-compat (Solidity 0.5) profile for their implementations; the single-tree layout
+# does not, and its 0.5 artifacts (the proxies) are the frozen ones under artifacts/solc-0.5.
+build_tag_foundry "$BRANCH" /dev/stdout truffle-compat
+build_tag_foundry "$BRANCH" /dev/stdout truffle-compat8
 
 BUILD_DIR="./out-${BRANCH}"
 
