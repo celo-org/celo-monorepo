@@ -11,9 +11,9 @@ Deploy and test Celo core contract releases using Foundry-based tooling.
 
 | Step | Command | Output |
 |------|---------|--------|
-| 1. Generate libraries.json | `verify-deployed:foundry -b <PREVIOUS_TAG>` | `libraries.json` |
-| 2. Generate report | `check-versions:foundry -a <PREVIOUS_TAG> -b <NEW_BRANCH>` | `releaseData/versionReports/releaseN-report.json` |
-| 3. Deploy & create proposal | `make-release:foundry -b <NEW_BRANCH>` | `proposal.json` + deployed contracts |
+| 1. Generate the libraries file | `verify-deployed:foundry -b <PREVIOUS_TAG> -n <NETWORK>` | `<NETWORK>-<PREVIOUS_TAG>-libraries.json` |
+| 2. Generate report | `check-versions:foundry -a <PREVIOUS_TAG> -b <NEW_BRANCH>` | `report-<PREVIOUS_TAG>-<NEW_BRANCH>.json` |
+| 3. Deploy & create proposal | `make-release:foundry -b <NEW_BRANCH>` | `proposal-<NETWORK>-<NEW_BRANCH>.json` + deployed contracts |
 
 ## Networks
 
@@ -132,7 +132,7 @@ yarn release:verify-deployed:foundry -b core-contracts.v${PREVIOUS} -n celo-sepo
 yarn release:verify-deployed:foundry -b core-contracts.v${PREVIOUS} -n celo
 ```
 
-**Output**: `libraries.json` in `packages/protocol/`
+**Output**: `<network>-core-contracts.v${PREVIOUS}-libraries.json` in `packages/protocol/` (make-release requires exactly this name for the previous release)
 
 ### Step 2: Generate Compatibility Report
 
@@ -141,11 +141,10 @@ Compare previous release to new release branch:
 ```bash
 yarn release:check-versions:foundry \
   -a core-contracts.v${PREVIOUS} \
-  -b release/core-contracts/${NEW} \
-  -r ./releaseData/versionReports/release${NEW}-report.json
+  -b release/core-contracts/${NEW}
 ```
 
-**Output**: `releaseData/versionReports/release${NEW}-report.json`
+**Output**: `report-core-contracts.v${PREVIOUS}-release_core-contracts_${NEW}.json` (the name is derived from the two refs; `-r` is no longer accepted)
 
 ### Step 3: Prepare Initialization Data
 
@@ -168,10 +167,9 @@ yarn release:make:foundry \
   -b release/core-contracts/${NEW} \
   -k $DEPLOYER_PRIVATE_KEY \
   -i ./releaseData/initializationData/release${NEW}.json \
-  -l ./libraries.json \
+  -l ./celo-sepolia-core-contracts.v${PREVIOUS}-libraries.json \
   -n celo-sepolia \
-  -p ./proposal-fork.json \
-  -r ./releaseData/versionReports/release${NEW}-report.json \
+  -r ./report-core-contracts.v${PREVIOUS}-release_core-contracts_${NEW}.json \
   -u http://127.0.0.1:8545
 ```
 
@@ -182,10 +180,9 @@ yarn release:make:foundry \
   -b release/core-contracts/${NEW} \
   -k $CELO_SEPOLIA_DEPLOYER_KEY \
   -i ./releaseData/initializationData/release${NEW}.json \
-  -l ./libraries.json \
+  -l ./celo-sepolia-core-contracts.v${PREVIOUS}-libraries.json \
   -n celo-sepolia \
-  -p ./proposal-celo-sepolia.json \
-  -r ./releaseData/versionReports/release${NEW}-report.json
+  -r ./report-core-contracts.v${PREVIOUS}-release_core-contracts_${NEW}.json
 ```
 
 #### On Mainnet
@@ -198,10 +195,9 @@ yarn release:make:foundry \
   -b release/core-contracts/${NEW} \
   -k $MAINNET_DEPLOYER_KEY \
   -i ./releaseData/initializationData/release${NEW}.json \
-  -l ./libraries.json \
+  -l ./celo-core-contracts.v${PREVIOUS}-libraries.json \
   -n celo \
-  -p ./proposal-mainnet.json \
-  -r ./releaseData/versionReports/release${NEW}-report.json
+  -r ./report-core-contracts.v${PREVIOUS}-release_core-contracts_${NEW}.json
 ```
 
 ## Release Artifacts

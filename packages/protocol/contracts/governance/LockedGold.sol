@@ -746,6 +746,11 @@ contract LockedGold is
     }
     require(from <= to, "Invalid range");
     uint256 _to = Math.min(to, pendingWithdrawalsLength - 1);
+    if (from > _to) {
+      // A range starting past the last withdrawal is empty; Solidity 0.5 wrapped the length
+      // to zero here and checked arithmetic would revert instead.
+      return (new uint256[](0), new uint256[](0));
+    }
     uint256 length = _to - from + 1;
     uint256[] memory values = new uint256[](length);
     uint256[] memory timestamps = new uint256[](length);

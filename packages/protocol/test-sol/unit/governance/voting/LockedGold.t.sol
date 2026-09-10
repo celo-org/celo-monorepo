@@ -2509,6 +2509,19 @@ contract LockedGoldTestGetPendingWithdrawalsInBatch is LockedGoldTest {
     assertEq(pendingWithdrawals[1], value / 2);
   }
 
+  function test_ShouldReturnEmpty_WhenRangeStartsPastTheLastPendingWithdrawal() public {
+    lockedGold.lock{ value: value }();
+
+    lockedGold.unlock(value / 2);
+    lockedGold.unlock(value / 2);
+
+    // a pagination that walks past the end must end with an empty page, as in Solidity 0.5
+    (uint256[] memory pendingWithdrawals, uint256[] memory timestamps) = lockedGold
+      .getPendingWithdrawalsInBatch(caller, 2, 2);
+    assertEq(pendingWithdrawals.length, 0);
+    assertEq(timestamps.length, 0);
+  }
+
   function test_ShouldReturnCorrectValue_WhenAccountHasFourPendingWithdrawals() public {
     lockedGold.lock{ value: value }();
 
