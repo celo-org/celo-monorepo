@@ -2,6 +2,7 @@
 import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
 import { deployedLibraryMatchesArtifact } from '@celo/protocol/lib/bytecode-foundry'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
+import { isAllowedLegacyLibrary } from '@celo/protocol/lib/compatibility/verify-bytecode-foundry'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { ForgeArtifact } from '@celo/protocol/scripts/foundry/ForgeArtifact'
@@ -1075,8 +1076,12 @@ const listContractNames = (baseDir: string): string[] => {
 // compatibility report noticing, its name still resolves to the stale deployment and the
 // new implementation would be bound to code compiled from different source. Every
 // pre-existing library is therefore checked against its artifact before linking; a
-// library deployed in this run is trusted.
+// library deployed in this run is trusted, and so is a deployment verify-deployed
+// accepts as a known legacy library (the original 0.5 AddressLinkedList on mainnet,
+// which the live Validators links and which is not worth relinking).
 const verifiedLibraries = new Set<string>()
+// Set once in main(); the network decides which legacy library deployments are accepted.
+let releaseNetworkName = ''
 
 const assertLinkedLibrariesMatchArtifacts = async (
   contractName: string,
@@ -1106,6 +1111,14 @@ const assertLinkedLibrariesMatchArtifacts = async (
     const onchain = await publicClient.getCode({ address })
     if (!onchain || onchain === '0x') {
       throw new Error(`Library ${dep} at ${address} has no code on chain.`)
+    }
+    if (isAllowedLegacyLibrary(dep, address, releaseNetworkName)) {
+      console.warn(
+        `Library ${dep} at ${address} is the known legacy deployment on ${releaseNetworkName}; ` +
+          `linking ${contractName} against it as verify-deployed does`
+      )
+      verifiedLibraries.add(`${dep}@${address}`)
+      continue
     }
     if (!deployedLibraryMatchesArtifact(onchain, expected, address)) {
       throw new Error(
@@ -1376,6 +1389,7 @@ async function main() {
       }).argv
 
     const networkName = argv.network!
+    releaseNetworkName = networkName
     const buildDirBase = argv.buildDirectory
     // Pre-migration tags build their Solidity 0.5 implementations into the truffle-compat
     // dir; the single-tree layout has no 0.5 build, its proxies are the frozen artifacts.

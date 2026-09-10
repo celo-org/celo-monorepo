@@ -142,7 +142,7 @@ const ALLOWED_LEGACY_LIBRARIES: { [network: string]: { [library: string]: string
   },
 }
 
-const isAllowedLegacyLibrary = (contract: string, address: string, network: string): boolean => {
+export const isAllowedLegacyLibrary = (contract: string, address: string, network: string): boolean => {
   // Normalize the mainnet aliases used across the tooling.
   const normalized = ['celo', 'rc1'].includes(network.toLowerCase())
     ? 'mainnet'
