@@ -59,20 +59,28 @@ def reconcile(
     ledger:    {"recipients": [...], "amounts": [...], "recorded_tx_hashes": [...]}.
     """
     local_paid = dict(zip((w.lower() for w in ledger.get("recipients", [])), ledger.get("amounts", [])))
+    dune_paid_by_wallet = {
+        row["wallet"].lower(): round(float(row.get("paid_out_usat") or 0) * 1_000_000)
+        for row in dune_rows
+    }
     owed_out: dict[str, int] = {}
     for row in dune_rows:
         wallet = row["wallet"].lower()
         owed = round(float(row["owed_usat"]) * 1_000_000)
-        dune_paid = round(float(row.get("paid_out_usat") or 0) * 1_000_000)
-        surplus = max(0, local_paid.get(wallet, 0) - dune_paid)
+        surplus = max(0, local_paid.get(wallet, 0) - dune_paid_by_wallet[wallet])
         remaining = owed - surplus
         if remaining > 0:
             owed_out[wallet] = remaining
-    # The surplus is now baked into the owed amounts; clearing the ledger keeps
-    # the invariant "ledger holds only payments made after this fetch".
+    # Keep only the surplus Dune has not indexed yet, so a payment stays
+    # protected for as many runs as it takes Dune to index it.
+    kept = {
+        w: a - dune_paid_by_wallet.get(w, 0)
+        for w, a in local_paid.items()
+        if a - dune_paid_by_wallet.get(w, 0) > 0
+    }
     new_ledger = {
-        "recipients": [],
-        "amounts": [],
+        "recipients": sorted(kept),
+        "amounts": [kept[w] for w in sorted(kept)],
         "recorded_tx_hashes": sorted(ledger.get("recorded_tx_hashes", [])),
     }
     return owed_out, new_ledger

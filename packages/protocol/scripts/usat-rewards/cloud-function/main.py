@@ -243,18 +243,29 @@ def reconcile(dune_rows: list[dict], ledger: dict) -> tuple[dict[str, int], dict
     local_paid = dict(
         zip((w.lower() for w in ledger.get("recipients", [])), ledger.get("amounts", []))
     )
+    dune_paid_by_wallet = {
+        row["wallet"].lower(): round(float(row.get("paid_out_usat") or 0) * 1_000_000)
+        for row in dune_rows
+    }
     owed_out: dict[str, int] = {}
     for row in dune_rows:
         wallet = row["wallet"].lower()
         owed = round(float(row["owed_usat"]) * 1_000_000)
-        dune_paid = round(float(row.get("paid_out_usat") or 0) * 1_000_000)
-        surplus = max(0, local_paid.get(wallet, 0) - dune_paid)
+        surplus = max(0, local_paid.get(wallet, 0) - dune_paid_by_wallet[wallet])
         remaining = owed - surplus
         if remaining > 0:
             owed_out[wallet] = remaining
+    # Keep only the surplus Dune has not indexed yet. A payment therefore stays
+    # protected for as many runs as it takes Dune to index it (not just one),
+    # and the ledger still shrinks to empty once Dune has caught up.
+    kept = {
+        w: a - dune_paid_by_wallet.get(w, 0)
+        for w, a in local_paid.items()
+        if a - dune_paid_by_wallet.get(w, 0) > 0
+    }
     new_ledger = {
-        "recipients": [],
-        "amounts": [],
+        "recipients": sorted(kept),
+        "amounts": [kept[w] for w in sorted(kept)],
         "recorded_tx_hashes": sorted(ledger.get("recorded_tx_hashes", [])),
     }
     return owed_out, new_ledger
@@ -339,10 +350,14 @@ def distribute(request):
             # Dry run reports what a real run would do, funded or not.
             return ({**summary, "result": "dry run - nothing sent", "funded": funded}, 200)
 
-        if token_balance < total:
-            return ({**summary, "error": "hot wallet token balance below total"}, 500)
         if gas_balance < 10 ** 16:
             return ({**summary, "error": "hot wallet gas balance below 0.01 CELO"}, 500)
+        if token_balance < total:
+            # Partial mode: pay as many wallets as the balance covers. Whatever is
+            # skipped stays "owed" in the ledger and is paid by a later run once
+            # the wallet is topped up — nothing is lost, only delayed.
+            summary["partial"] = True
+            summary["shortfall_usat"] = (total - token_balance) / 1e6
 
         if store.exists(HALT_OBJECT):
             return ({**summary, "result": "HALT flag present - nothing sent"}, 423)
@@ -350,12 +365,17 @@ def distribute(request):
         nonce = w3.eth.get_transaction_count(hot_wallet, "pending")
         gas_price = w3.eth.gas_price
         paid_count = 0
+        skipped_unfunded = 0
+        remaining_balance = token_balance
         for wallet, amount in sorted(owed.items()):
             if store.exists(HALT_OBJECT):
                 return (
                     {**summary, "paid": paid_count, "result": "HALT flag raised mid-run - stopped"},
                     423,
                 )
+            if amount > remaining_balance:
+                skipped_unfunded += 1
+                continue
             tx = token.functions.transfer(
                 Web3.to_checksum_address(wallet), amount
             ).build_transaction(
@@ -381,7 +401,16 @@ def distribute(request):
             store.save_ledger(ledger)
             nonce += 1
             paid_count += 1
+            remaining_balance -= amount
 
-        return ({**summary, "result": "paid", "paid": paid_count}, 200)
+        return (
+            {
+                **summary,
+                "result": "paid" if skipped_unfunded == 0 else "paid partially - wallet underfunded",
+                "paid": paid_count,
+                "skipped_unfunded": skipped_unfunded,
+            },
+            200,
+        )
     finally:
         store.release_lock()
