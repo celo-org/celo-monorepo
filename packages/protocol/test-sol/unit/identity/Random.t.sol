@@ -5,7 +5,7 @@ import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
 import { RandomTest08 } from "@test-sol/unit/identity/mocks/RandomMocks08.sol";
 
-// Random was migrated to contracts-0.8; the deployable test helper (RandomTest08)
+// Random was migrated to Solidity 0.8; the deployable test helper (RandomTest08)
 // lives in test-sol/unit/identity/mocks/RandomMocks08.sol and is now instantiated
 // directly as a concrete 0.8 type.
 
