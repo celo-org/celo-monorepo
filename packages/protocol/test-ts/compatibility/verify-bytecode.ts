@@ -30,8 +30,9 @@ import { deployViemContract } from '@celo/protocol/test-ts/util/viem'
 const registryAbi = readJsonSync(`./out/Registry.sol/Registry.json`).abi as Abi
 const registryBytecode = readJsonSync(`./out/Registry.sol/Registry.json`).bytecode.object as string
 
-const proxyAbi = readJsonSync(`./out/Proxy.sol/Proxy.json`).abi as Abi
-const proxyBytecode = readJsonSync(`./out/Proxy.sol/Proxy.json`).bytecode.object as string
+const proxyAbi = readJsonSync(`./artifacts/solc-0.5/Proxy.sol/Proxy.json`).abi as Abi
+const proxyBytecode = readJsonSync(`./artifacts/solc-0.5/Proxy.sol/Proxy.json`).bytecode
+  .object as string
 
 // TODO remove this duplicate
 export interface ProposalTx {
