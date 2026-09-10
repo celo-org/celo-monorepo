@@ -11,6 +11,8 @@ import { getArtifactByName, getContractName, getDeployedBytecode } from '@celo/p
 import { verifyProxyStorageProofFoundry } from '@celo/protocol/lib/proxy-utils'
 import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
+import { existsSync, readJsonSync } from 'fs-extra'
+import path from 'path'
 import { ignoredContractsV18, ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9'
 
 // TODO remove this duplicate
@@ -155,9 +157,25 @@ export const isAllowedLegacyLibrary = (contract: string, address: string, networ
 const liveProxyAddress = async (contract: string, context: VerificationContext): Promise<string> =>
   contract === 'Registry' ? celoRegistryAddress : await context.registry.getAddressForString(contract)
 
+// Proxy runtimes other than the one built from the sources: a genesis can place proxies
+// compiled elsewhere (the published devchain does). Keyed by a name used in the log.
+const PROXY_RUNTIME_VARIANTS_FILE = path.join(__dirname, '..', '..', 'artifacts', 'proxy-runtime-variants.json')
+
+const knownProxyRuntimes = (context: VerificationContext): { [name: string]: string } => {
+  const runtimes: { [name: string]: string } = { Proxy: getSourceBytecode('Proxy', context) }
+  if (existsSync(PROXY_RUNTIME_VARIANTS_FILE)) {
+    const variants: { [name: string]: { deployedBytecode: string } } = readJsonSync(PROXY_RUNTIME_VARIANTS_FILE)
+    Object.entries(variants).forEach(([name, variant]) => {
+      runtimes[name] = stripMetadata(variant.deployedBytecode)
+    })
+  }
+  return runtimes
+}
+
 // The proxies deployed on mainnet are immutable Solidity 0.5 contracts; every live proxy
 // must still run the runtime bytecode of the Proxy artifact (frozen, or built from a
-// pre-migration tag), so a registry entry pointing at anything else is caught here.
+// pre-migration tag) or one of the known variants, so a registry entry pointing at
+// anything else is caught here.
 const verifyLiveProxyCode = async (contract: string, context: VerificationContext, errors: string[]) => {
   const proxyAddress = await liveProxyAddress(contract, context)
   if (proxyAddress === ZERO_ADDRESS) {
@@ -174,9 +192,11 @@ const verifyLiveProxyCode = async (contract: string, context: VerificationContex
     // code with no Solidity metadata trailer, or no code at all, is not the Proxy either
     onchainProxyBytecode = ''
   }
-  const proxyBytecode = getSourceBytecode('Proxy', context)
-  if (onchainProxyBytecode === proxyBytecode) {
-    console.log(`  ✅ ${contract}Proxy runs the Proxy bytecode (at ${proxyAddress})`)
+  const match = Object.entries(knownProxyRuntimes(context)).find(
+    ([, runtime]) => runtime === onchainProxyBytecode
+  )
+  if (match) {
+    console.log(`  ✅ ${contract}Proxy runs the ${match[0]} bytecode (at ${proxyAddress})`)
   } else {
     const msg = `${contract}Proxy (at ${proxyAddress}) does not run the Proxy bytecode`
     console.log(`  ❌ ${msg}`)

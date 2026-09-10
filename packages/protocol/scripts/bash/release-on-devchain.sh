@@ -47,7 +47,7 @@ cleanup() {
   fi
   git tag -d "$NEXT_BRANCH" >/dev/null 2>&1 || true
 }
-trap cleanup EXIT
+trap cleanup EXIT INT TERM
 
 # Reused runners keep files from earlier runs. Start clean so verify-deployed never
 # hits its interactive "libraries file exists" prompt and no stale report is reused.
