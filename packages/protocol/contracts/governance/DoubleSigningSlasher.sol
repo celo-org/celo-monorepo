@@ -168,4 +168,13 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
     }
     return res;
   }
+
+  /**
+   * @notice Whether the sender is the owner.
+   * @dev Kept from the Solidity 0.5 implementation: OpenZeppelin 2.5's Ownable exposed it
+   * and 4.9's does not, and the ABI behind the upgraded proxy must not lose a function.
+   */
+  function isOwner() external view returns (bool) {
+    return msg.sender == owner();
+  }
 }

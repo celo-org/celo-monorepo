@@ -74,6 +74,9 @@ function build_tag_foundry() {
 
   if [[ -n "$PROFILE" ]] && ! has_foundry_profile "$PROFILE"; then
     echo " - $BRANCH defines no $PROFILE profile, nothing to build for it"
+    # A build of the same ref name from before the profile was removed must not linger:
+    # the release tooling picks its artifact directories by existence.
+    rm -rf $BUILD_DIR
     BUILD_DIR=""
     checkout_build_sources $CURRENT_HASH $LOG_FILE -s
     return 0
