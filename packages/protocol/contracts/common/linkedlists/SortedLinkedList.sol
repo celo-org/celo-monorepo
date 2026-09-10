@@ -1,6 +1,7 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.0 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "./LinkedList.sol";
 
 /**
@@ -173,7 +174,7 @@ library SortedLinkedList {
   }
 
   /**
-   * @notice Returns the keys of the elements greaterKey than and less than the provided value.
+   * @notice Returns the keys of the elements greater than and less than the provided value.
    * @param list A storage pointer to the underlying list.
    * @param value The element value.
    * @param lesserKey The key of the element which could be just left of the new value.

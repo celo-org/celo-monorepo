@@ -1,14 +1,80 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
 
-import "@celo-contracts/common/test/AddressSortedLinkedListWithMedianMock.sol";
+import "@celo-contracts-8/common/linkedlists/SortedLinkedListWithMedian.sol";
+
+// The 0.5 AddressSortedLinkedListWithMedian library has no 0.8 counterpart, so
+// the address<->bytes32 indirection it provided is ported inline into this mock.
+contract AddressSortedLinkedListWithMedianMock {
+  using SortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
+
+  SortedLinkedListWithMedian.List private list;
+
+  function toBytes(address a) public pure returns (bytes32) {
+    return bytes32(uint256(uint160(a)) << 96);
+  }
+
+  function toAddress(bytes32 b) public pure returns (address) {
+    return address(uint160(uint256(b) >> 96));
+  }
+
+  function insert(address key, uint256 numerator, address lesserKey, address greaterKey) external {
+    list.insert(toBytes(key), numerator, toBytes(lesserKey), toBytes(greaterKey));
+  }
+
+  function update(address key, uint256 numerator, address lesserKey, address greaterKey) external {
+    list.update(toBytes(key), numerator, toBytes(lesserKey), toBytes(greaterKey));
+  }
+
+  function remove(address key) external {
+    list.remove(toBytes(key));
+  }
+
+  function contains(address key) external view returns (bool) {
+    return list.contains(toBytes(key));
+  }
+
+  function getNumElements() external view returns (uint256) {
+    return list.getNumElements();
+  }
+
+  function getElements()
+    external
+    view
+    returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
+  {
+    bytes32[] memory byteKeys = list.getKeys();
+    address[] memory keys = new address[](byteKeys.length);
+    uint256[] memory values = new uint256[](byteKeys.length);
+    SortedLinkedListWithMedian.MedianRelation[]
+      memory relations = new SortedLinkedListWithMedian.MedianRelation[](byteKeys.length);
+    for (uint256 i = 0; i < byteKeys.length; i++) {
+      keys[i] = toAddress(byteKeys[i]);
+      values[i] = list.getValue(byteKeys[i]);
+      relations[i] = list.relation[byteKeys[i]];
+    }
+    return (keys, values, relations);
+  }
+
+  function head() external view returns (address) {
+    return toAddress(list.getHead());
+  }
+
+  function tail() external view returns (address) {
+    return toAddress(list.getTail());
+  }
+
+  function medianKey() external view returns (address) {
+    return toAddress(list.getMedian());
+  }
+}
 
 contract AddressSortedLinkedListWithMedianTest is Test {
   AddressSortedLinkedListWithMedianMock sortedList;
 
-  function setUp() public {
+  function setUp() public virtual {
     sortedList = new AddressSortedLinkedListWithMedianMock();
   }
 }
@@ -76,7 +142,7 @@ contract AddressSortedLinkedListWithMedianTest_update is AddressSortedLinkedList
   uint256 numerator = 2;
   uint256 newNumerator = 3;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     sortedList.insert(key, numerator, address(0), address(0));
   }
@@ -112,7 +178,7 @@ contract AddressSortedLinkedListWithMedianTest_remove is AddressSortedLinkedList
   address key2 = actor("key2");
   uint256 numerator = 2;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     sortedList.insert(key, numerator, address(0), address(0));
   }

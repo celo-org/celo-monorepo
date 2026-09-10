@@ -1,0 +1,113 @@
+[
+  {
+    "label": "_owner",
+    "offset": 0,
+    "slot": "0",
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
+  },
+  {
+    "label": "initialized",
+    "offset": 20,
+    "slot": "0",
+    "type": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    }
+  },
+  {
+    "label": "registry",
+    "offset": 0,
+    "slot": "1",
+    "type": {
+      "encoding": "inplace",
+      "label": "contract IRegistry",
+      "numberOfBytes": "20"
+    }
+  },
+  {
+    "label": "minimumReports",
+    "offset": 0,
+    "slot": "2",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => uint256)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  },
+  {
+    "label": "oracleAddresses",
+    "offset": 0,
+    "slot": "3",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => address)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      }
+    }
+  },
+  {
+    "label": "routerAddresses",
+    "offset": 0,
+    "slot": "4",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => struct EnumerableSet.AddressSet)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct EnumerableSet.AddressSet",
+        "members": [
+          {
+            "label": "index",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "encoding": "mapping",
+              "key": "address",
+              "label": "mapping(address => uint256)",
+              "numberOfBytes": "32",
+              "value": {
+                "encoding": "inplace",
+                "label": "uint256",
+                "numberOfBytes": "32"
+              }
+            }
+          },
+          {
+            "label": "values",
+            "offset": 0,
+            "slot": "1",
+            "type": {
+              "base": {
+                "encoding": "inplace",
+                "label": "address",
+                "numberOfBytes": "20"
+              },
+              "encoding": "dynamic_array",
+              "label": "address[]",
+              "numberOfBytes": "32"
+            }
+          }
+        ],
+        "numberOfBytes": "64"
+      }
+    }
+  }
+]

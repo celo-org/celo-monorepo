@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-import "@celo-contracts/common/FeeCurrencyWhitelist.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
+import { FeeCurrencyWhitelist } from "@celo-contracts-8/common/FeeCurrencyWhitelist.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 
-contract FeeCurrencyWhitelistTest is TestWithUtils {
+contract FeeCurrencyWhitelistTest is TestWithUtils08 {
   FeeCurrencyWhitelist feeCurrencyWhitelist;
   address nonOwner;
   address owner;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     whenL2WithEpochManagerInitialization();
     owner = address(this);
@@ -22,8 +23,7 @@ contract FeeCurrencyWhitelistTest is TestWithUtils {
 
 contract FeeCurrencyWhitelistInitialize is FeeCurrencyWhitelistTest {
   function test_InitializeOwner() public {
-    assertTrue(feeCurrencyWhitelist.isOwner());
-    assertEq(feeCurrencyWhitelist.owner(), address(this));
+    assertEq(IOwnable(address(feeCurrencyWhitelist)).owner(), address(this));
   }
 
   function test_ShouldNotBeCallableAgain() public {

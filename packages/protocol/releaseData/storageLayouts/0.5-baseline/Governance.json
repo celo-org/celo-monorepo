@@ -1,0 +1,895 @@
+[
+  {
+    "label": "_owner",
+    "offset": 0,
+    "slot": "0",
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
+  },
+  {
+    "label": "initialized",
+    "offset": 20,
+    "slot": "0",
+    "type": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    }
+  },
+  {
+    "label": "_guardCounter",
+    "offset": 0,
+    "slot": "1",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "registry",
+    "offset": 0,
+    "slot": "2",
+    "type": {
+      "encoding": "inplace",
+      "label": "contract IRegistry",
+      "numberOfBytes": "20"
+    }
+  },
+  {
+    "label": "stageDurations",
+    "offset": 0,
+    "slot": "3",
+    "type": {
+      "encoding": "inplace",
+      "label": "struct Proposals.StageDurations",
+      "members": [
+        {
+          "label": "approval",
+          "offset": 0,
+          "slot": "0",
+          "type": {
+            "encoding": "inplace",
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        },
+        {
+          "label": "referendum",
+          "offset": 0,
+          "slot": "1",
+          "type": {
+            "encoding": "inplace",
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        },
+        {
+          "label": "execution",
+          "offset": 0,
+          "slot": "2",
+          "type": {
+            "encoding": "inplace",
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      ],
+      "numberOfBytes": "96"
+    }
+  },
+  {
+    "label": "queueExpiry",
+    "offset": 0,
+    "slot": "6",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "dequeueFrequency",
+    "offset": 0,
+    "slot": "7",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "approver",
+    "offset": 0,
+    "slot": "8",
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
+  },
+  {
+    "label": "lastDequeue",
+    "offset": 0,
+    "slot": "9",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "concurrentProposals",
+    "offset": 0,
+    "slot": "10",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "proposalCount",
+    "offset": 0,
+    "slot": "11",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "minDeposit",
+    "offset": 0,
+    "slot": "12",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "refundedDeposits",
+    "offset": 0,
+    "slot": "13",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => uint256)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  },
+  {
+    "label": "constitution",
+    "offset": 0,
+    "slot": "14",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => struct Governance.ContractConstitution)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct Governance.ContractConstitution",
+        "members": [
+          {
+            "label": "defaultThreshold",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "encoding": "inplace",
+              "label": "struct FixidityLib.Fraction",
+              "members": [
+                {
+                  "label": "value",
+                  "offset": 0,
+                  "slot": "0",
+                  "type": {
+                    "encoding": "inplace",
+                    "label": "uint256",
+                    "numberOfBytes": "32"
+                  }
+                }
+              ],
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "functionThresholds",
+            "offset": 0,
+            "slot": "1",
+            "type": {
+              "encoding": "mapping",
+              "key": "bytes4",
+              "label": "mapping(bytes4 => struct FixidityLib.Fraction)",
+              "numberOfBytes": "32",
+              "value": {
+                "encoding": "inplace",
+                "label": "struct FixidityLib.Fraction",
+                "members": [
+                  {
+                    "label": "value",
+                    "offset": 0,
+                    "slot": "0",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "uint256",
+                      "numberOfBytes": "32"
+                    }
+                  }
+                ],
+                "numberOfBytes": "32"
+              }
+            }
+          }
+        ],
+        "numberOfBytes": "64"
+      }
+    }
+  },
+  {
+    "label": "proposals",
+    "offset": 0,
+    "slot": "15",
+    "type": {
+      "encoding": "mapping",
+      "key": "uint256",
+      "label": "mapping(uint256 => struct Proposals.Proposal)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct Proposals.Proposal",
+        "members": [
+          {
+            "label": "proposer",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "encoding": "inplace",
+              "label": "address",
+              "numberOfBytes": "20"
+            }
+          },
+          {
+            "label": "deposit",
+            "offset": 0,
+            "slot": "1",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "timestamp",
+            "offset": 0,
+            "slot": "2",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "votes",
+            "offset": 0,
+            "slot": "3",
+            "type": {
+              "encoding": "inplace",
+              "label": "struct Proposals.VoteTotals",
+              "members": [
+                {
+                  "label": "yes",
+                  "offset": 0,
+                  "slot": "0",
+                  "type": {
+                    "encoding": "inplace",
+                    "label": "uint256",
+                    "numberOfBytes": "32"
+                  }
+                },
+                {
+                  "label": "no",
+                  "offset": 0,
+                  "slot": "1",
+                  "type": {
+                    "encoding": "inplace",
+                    "label": "uint256",
+                    "numberOfBytes": "32"
+                  }
+                },
+                {
+                  "label": "abstain",
+                  "offset": 0,
+                  "slot": "2",
+                  "type": {
+                    "encoding": "inplace",
+                    "label": "uint256",
+                    "numberOfBytes": "32"
+                  }
+                }
+              ],
+              "numberOfBytes": "96"
+            }
+          },
+          {
+            "label": "transactions",
+            "offset": 0,
+            "slot": "6",
+            "type": {
+              "base": {
+                "encoding": "inplace",
+                "label": "struct Proposals.Transaction",
+                "members": [
+                  {
+                    "label": "value",
+                    "offset": 0,
+                    "slot": "0",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "uint256",
+                      "numberOfBytes": "32"
+                    }
+                  },
+                  {
+                    "label": "destination",
+                    "offset": 0,
+                    "slot": "1",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "address",
+                      "numberOfBytes": "20"
+                    }
+                  },
+                  {
+                    "label": "data",
+                    "offset": 0,
+                    "slot": "2",
+                    "type": {
+                      "encoding": "bytes",
+                      "label": "bytes",
+                      "numberOfBytes": "32"
+                    }
+                  }
+                ],
+                "numberOfBytes": "96"
+              },
+              "encoding": "dynamic_array",
+              "label": "struct Proposals.Transaction[]",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "approved",
+            "offset": 0,
+            "slot": "7",
+            "type": {
+              "encoding": "inplace",
+              "label": "bool",
+              "numberOfBytes": "1"
+            }
+          },
+          {
+            "label": "networkWeight",
+            "offset": 0,
+            "slot": "8",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "descriptionUrl",
+            "offset": 0,
+            "slot": "9",
+            "type": {
+              "encoding": "bytes",
+              "label": "string",
+              "numberOfBytes": "32"
+            }
+          }
+        ],
+        "numberOfBytes": "320"
+      }
+    }
+  },
+  {
+    "label": "voters",
+    "offset": 0,
+    "slot": "16",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => struct Governance.Voter)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct Governance.Voter",
+        "members": [
+          {
+            "label": "upvote",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "encoding": "inplace",
+              "label": "struct Governance.UpvoteRecord",
+              "members": [
+                {
+                  "label": "proposalId",
+                  "offset": 0,
+                  "slot": "0",
+                  "type": {
+                    "encoding": "inplace",
+                    "label": "uint256",
+                    "numberOfBytes": "32"
+                  }
+                },
+                {
+                  "label": "weight",
+                  "offset": 0,
+                  "slot": "1",
+                  "type": {
+                    "encoding": "inplace",
+                    "label": "uint256",
+                    "numberOfBytes": "32"
+                  }
+                }
+              ],
+              "numberOfBytes": "64"
+            }
+          },
+          {
+            "label": "mostRecentReferendumProposal",
+            "offset": 0,
+            "slot": "2",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "referendumVotes",
+            "offset": 0,
+            "slot": "3",
+            "type": {
+              "encoding": "mapping",
+              "key": "uint256",
+              "label": "mapping(uint256 => struct Governance.VoteRecord)",
+              "numberOfBytes": "32",
+              "value": {
+                "encoding": "inplace",
+                "label": "struct Governance.VoteRecord",
+                "members": [
+                  {
+                    "label": "deprecated_value",
+                    "offset": 0,
+                    "slot": "0",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "enum Proposals.VoteValue",
+                      "numberOfBytes": "1"
+                    }
+                  },
+                  {
+                    "label": "proposalId",
+                    "offset": 0,
+                    "slot": "1",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "uint256",
+                      "numberOfBytes": "32"
+                    }
+                  },
+                  {
+                    "label": "deprecated_weight",
+                    "offset": 0,
+                    "slot": "2",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "uint256",
+                      "numberOfBytes": "32"
+                    }
+                  },
+                  {
+                    "label": "yesVotes",
+                    "offset": 0,
+                    "slot": "3",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "uint256",
+                      "numberOfBytes": "32"
+                    }
+                  },
+                  {
+                    "label": "noVotes",
+                    "offset": 0,
+                    "slot": "4",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "uint256",
+                      "numberOfBytes": "32"
+                    }
+                  },
+                  {
+                    "label": "abstainVotes",
+                    "offset": 0,
+                    "slot": "5",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "uint256",
+                      "numberOfBytes": "32"
+                    }
+                  }
+                ],
+                "numberOfBytes": "192"
+              }
+            }
+          }
+        ],
+        "numberOfBytes": "128"
+      }
+    }
+  },
+  {
+    "label": "hotfixes",
+    "offset": 0,
+    "slot": "17",
+    "type": {
+      "encoding": "mapping",
+      "key": "bytes32",
+      "label": "mapping(bytes32 => struct Governance.HotfixRecord)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct Governance.HotfixRecord",
+        "members": [
+          {
+            "label": "executed",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "encoding": "inplace",
+              "label": "bool",
+              "numberOfBytes": "1"
+            }
+          },
+          {
+            "label": "approved",
+            "offset": 1,
+            "slot": "0",
+            "type": {
+              "encoding": "inplace",
+              "label": "bool",
+              "numberOfBytes": "1"
+            }
+          },
+          {
+            "label": "deprecated_preparedEpoch",
+            "offset": 0,
+            "slot": "1",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "deprecated_whitelisted",
+            "offset": 0,
+            "slot": "2",
+            "type": {
+              "encoding": "mapping",
+              "key": "address",
+              "label": "mapping(address => bool)",
+              "numberOfBytes": "32",
+              "value": {
+                "encoding": "inplace",
+                "label": "bool",
+                "numberOfBytes": "1"
+              }
+            }
+          },
+          {
+            "label": "councilApproved",
+            "offset": 0,
+            "slot": "3",
+            "type": {
+              "encoding": "inplace",
+              "label": "bool",
+              "numberOfBytes": "1"
+            }
+          },
+          {
+            "label": "executionTimeLimit",
+            "offset": 0,
+            "slot": "4",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          }
+        ],
+        "numberOfBytes": "160"
+      }
+    }
+  },
+  {
+    "label": "queue",
+    "offset": 0,
+    "slot": "18",
+    "type": {
+      "encoding": "inplace",
+      "label": "struct SortedLinkedList.List",
+      "members": [
+        {
+          "label": "list",
+          "offset": 0,
+          "slot": "0",
+          "type": {
+            "encoding": "inplace",
+            "label": "struct LinkedList.List",
+            "members": [
+              {
+                "label": "head",
+                "offset": 0,
+                "slot": "0",
+                "type": {
+                  "encoding": "inplace",
+                  "label": "bytes32",
+                  "numberOfBytes": "32"
+                }
+              },
+              {
+                "label": "tail",
+                "offset": 0,
+                "slot": "1",
+                "type": {
+                  "encoding": "inplace",
+                  "label": "bytes32",
+                  "numberOfBytes": "32"
+                }
+              },
+              {
+                "label": "numElements",
+                "offset": 0,
+                "slot": "2",
+                "type": {
+                  "encoding": "inplace",
+                  "label": "uint256",
+                  "numberOfBytes": "32"
+                }
+              },
+              {
+                "label": "elements",
+                "offset": 0,
+                "slot": "3",
+                "type": {
+                  "encoding": "mapping",
+                  "key": "bytes32",
+                  "label": "mapping(bytes32 => struct LinkedList.Element)",
+                  "numberOfBytes": "32",
+                  "value": {
+                    "encoding": "inplace",
+                    "label": "struct LinkedList.Element",
+                    "members": [
+                      {
+                        "label": "previousKey",
+                        "offset": 0,
+                        "slot": "0",
+                        "type": {
+                          "encoding": "inplace",
+                          "label": "bytes32",
+                          "numberOfBytes": "32"
+                        }
+                      },
+                      {
+                        "label": "nextKey",
+                        "offset": 0,
+                        "slot": "1",
+                        "type": {
+                          "encoding": "inplace",
+                          "label": "bytes32",
+                          "numberOfBytes": "32"
+                        }
+                      },
+                      {
+                        "label": "exists",
+                        "offset": 0,
+                        "slot": "2",
+                        "type": {
+                          "encoding": "inplace",
+                          "label": "bool",
+                          "numberOfBytes": "1"
+                        }
+                      }
+                    ],
+                    "numberOfBytes": "96"
+                  }
+                }
+              }
+            ],
+            "numberOfBytes": "128"
+          }
+        },
+        {
+          "label": "values",
+          "offset": 0,
+          "slot": "4",
+          "type": {
+            "encoding": "mapping",
+            "key": "bytes32",
+            "label": "mapping(bytes32 => uint256)",
+            "numberOfBytes": "32",
+            "value": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          }
+        }
+      ],
+      "numberOfBytes": "160"
+    }
+  },
+  {
+    "label": "dequeued",
+    "offset": 0,
+    "slot": "23",
+    "type": {
+      "base": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      },
+      "encoding": "dynamic_array",
+      "label": "uint256[]",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "emptyIndices",
+    "offset": 0,
+    "slot": "24",
+    "type": {
+      "base": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      },
+      "encoding": "dynamic_array",
+      "label": "uint256[]",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "participationParameters",
+    "offset": 0,
+    "slot": "25",
+    "type": {
+      "encoding": "inplace",
+      "label": "struct Governance.ParticipationParameters",
+      "members": [
+        {
+          "label": "baseline",
+          "offset": 0,
+          "slot": "0",
+          "type": {
+            "encoding": "inplace",
+            "label": "struct FixidityLib.Fraction",
+            "members": [
+              {
+                "label": "value",
+                "offset": 0,
+                "slot": "0",
+                "type": {
+                  "encoding": "inplace",
+                  "label": "uint256",
+                  "numberOfBytes": "32"
+                }
+              }
+            ],
+            "numberOfBytes": "32"
+          }
+        },
+        {
+          "label": "baselineFloor",
+          "offset": 0,
+          "slot": "1",
+          "type": {
+            "encoding": "inplace",
+            "label": "struct FixidityLib.Fraction",
+            "members": [
+              {
+                "label": "value",
+                "offset": 0,
+                "slot": "0",
+                "type": {
+                  "encoding": "inplace",
+                  "label": "uint256",
+                  "numberOfBytes": "32"
+                }
+              }
+            ],
+            "numberOfBytes": "32"
+          }
+        },
+        {
+          "label": "baselineUpdateFactor",
+          "offset": 0,
+          "slot": "2",
+          "type": {
+            "encoding": "inplace",
+            "label": "struct FixidityLib.Fraction",
+            "members": [
+              {
+                "label": "value",
+                "offset": 0,
+                "slot": "0",
+                "type": {
+                  "encoding": "inplace",
+                  "label": "uint256",
+                  "numberOfBytes": "32"
+                }
+              }
+            ],
+            "numberOfBytes": "32"
+          }
+        },
+        {
+          "label": "baselineQuorumFactor",
+          "offset": 0,
+          "slot": "3",
+          "type": {
+            "encoding": "inplace",
+            "label": "struct FixidityLib.Fraction",
+            "members": [
+              {
+                "label": "value",
+                "offset": 0,
+                "slot": "0",
+                "type": {
+                  "encoding": "inplace",
+                  "label": "uint256",
+                  "numberOfBytes": "32"
+                }
+              }
+            ],
+            "numberOfBytes": "32"
+          }
+        }
+      ],
+      "numberOfBytes": "128"
+    }
+  },
+  {
+    "label": "securityCouncil",
+    "offset": 0,
+    "slot": "29",
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
+  },
+  {
+    "label": "hotfixExecutionTimeWindow",
+    "offset": 0,
+    "slot": "30",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  }
+]

@@ -80,9 +80,19 @@ export function instantiateArtifacts(buildDirectory: string): BuildArtifacts {
   }
 }
 
+// Frozen artifacts (artifacts/solc-0.5) carry no AST; their source path is the
+// compilation target recorded in the metadata.
+export function artifactSourcePath(artifact: any): string {
+  if (artifact.ast && artifact.ast.absolutePath) {
+    return artifact.ast.absolutePath
+  }
+  const target = artifact.metadata && artifact.metadata.settings && artifact.metadata.settings.compilationTarget
+  return target ? Object.keys(target)[0] : ''
+}
+
 function listForgeBuildArtifacts(buildDirectory: string): string[] {
   const buildInfoPathPattern = /build-info/
-  const coreContractPathPattern = /contracts(-0\.8)?\//
+  const coreContractPathPattern = /contracts(-0\.[58])?\//
   const nonFoundryDependencyPathPattern = /lib\/(?!celo)/
   const foundryTestContractPathPattern = /test-ts\//
   const pathPatterns = [ coreContractPathPattern, nonFoundryDependencyPathPattern, foundryTestContractPathPattern ]
@@ -93,7 +103,7 @@ function listForgeBuildArtifacts(buildDirectory: string): string[] {
       return false
     }
     const artifact = readJsonSync(artifactPath)
-    const sourcePath = artifact.ast.absolutePath
+    const sourcePath = artifactSourcePath(artifact)
     return pathPatterns.some((pattern: RegExp) => sourcePath.match(pattern))
   })
 

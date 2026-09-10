@@ -1,37 +1,36 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
-import "@celo-contracts/identity/OdisPayments.sol";
-import { StableToken } from "@mento-core/contracts/StableToken.sol";
-import "@celo-contracts/common/Registry.sol";
-import "@celo-contracts/common/Freezer.sol";
+import { OdisPayments } from "@celo-contracts-8/identity/OdisPayments.sol";
+import { MockERC20 } from "@test-sol/unit/common/mocks/MockERC20.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
 
 contract OdisPaymentsFoundryTest is Test, TestConstants {
-  uint256 FIXED1 = 1000000000000000000000000;
-  uint256 SECONDS_IN_A_DAY = 60 * 60 * 24;
   uint256 startingBalanceCUSD = 1000;
 
-  Registry registry;
-  Freezer freezer;
+  IRegistry registry;
   OdisPayments odisPayments;
-  StableToken stableToken;
+  address odisPaymentsAddress;
+  // cUSD is exercised purely as an ERC-20 by OdisPayments; the allowance-aware
+  // MockERC20 replaces the mento StableToken (0.5 submodule, not importable by 0.8).
+  MockERC20 stableToken;
 
   address sender;
   address receiver;
 
   event PaymentMade(address indexed account, uint256 valueInCUSD);
 
-  function setUp() public {
+  function setUp() public virtual {
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
-    registry = Registry(REGISTRY_ADDRESS);
-    freezer = new Freezer(true);
+    registry = IRegistry(REGISTRY_ADDRESS);
     odisPayments = new OdisPayments(true);
-    stableToken = new StableToken(true);
+    odisPaymentsAddress = address(odisPayments);
+    stableToken = new MockERC20("Celo Dollar", "cUSD", 18);
 
     sender = actor("sender");
     receiver = actor("receiver");
@@ -39,39 +38,19 @@ contract OdisPaymentsFoundryTest is Test, TestConstants {
     odisPayments.initialize();
     registry.setAddressFor("StableToken", address(stableToken));
 
-    address[] memory addresses = new address[](2);
-    addresses[0] = address(this);
-    addresses[1] = sender;
-
-    uint256[] memory initBalances = new uint256[](2);
-    initBalances[0] = startingBalanceCUSD;
-    initBalances[1] = startingBalanceCUSD;
-
-    stableToken.initialize(
-      "Celo Dollar",
-      "cUSD",
-      18,
-      address(registry),
-      FIXED1,
-      SECONDS_IN_A_DAY,
-      // Initialize owner and sender with balances
-      addresses,
-      initBalances,
-      "Exchange" // USD
-    );
-
-    freezer.initialize();
-    registry.setAddressFor("Freezer", address(freezer));
+    // Initialize owner and sender with balances
+    stableToken.mint(address(this), startingBalanceCUSD);
+    stableToken.mint(sender, startingBalanceCUSD);
   }
 }
 
 contract OdisPaymentsFoundryTest_Initialize is OdisPaymentsFoundryTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
   function test_ShouldHaveSetOwner() public {
-    assertEq(odisPayments.owner(), address(this));
+    assertEq(IOwnable(odisPaymentsAddress).owner(), address(this));
   }
 
   function test_ShouldNotBeCallableAgain() public {
@@ -83,7 +62,7 @@ contract OdisPaymentsFoundryTest_Initialize is OdisPaymentsFoundryTest {
 contract OdisPaymentsFoundryTest_PayInCUSD is OdisPaymentsFoundryTest {
   uint256 valueApprovedForTransfer = 10;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     vm.prank(sender);
@@ -136,7 +115,10 @@ contract OdisPaymentsFoundryTest_PayInCUSD is OdisPaymentsFoundryTest {
   }
 
   function test_ShouldRevertIfTransferFails() public {
-    vm.expectRevert("SafeERC20: low-level call failed");
+    // OZ v4.x SafeERC20 bubbles up the token's own revert reason. The MockERC20
+    // checks balance before allowance, so transferring more than the approved
+    // amount (while the sender still has the funds) reverts on the allowance check.
+    vm.expectRevert("MockERC20: insufficient allowance");
     vm.prank(sender);
     odisPayments.payInCUSD(sender, valueApprovedForTransfer + 1);
 

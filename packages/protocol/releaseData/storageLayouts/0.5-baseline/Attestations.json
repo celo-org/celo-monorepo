@@ -1,0 +1,314 @@
+[
+  {
+    "label": "_owner",
+    "offset": 0,
+    "slot": "0",
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
+  },
+  {
+    "label": "initialized",
+    "offset": 20,
+    "slot": "0",
+    "type": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    }
+  },
+  {
+    "label": "registry",
+    "offset": 0,
+    "slot": "1",
+    "type": {
+      "encoding": "inplace",
+      "label": "contract IRegistry",
+      "numberOfBytes": "20"
+    }
+  },
+  {
+    "label": "_guardCounter",
+    "offset": 0,
+    "slot": "2",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "identifiers",
+    "offset": 0,
+    "slot": "3",
+    "type": {
+      "encoding": "mapping",
+      "key": "bytes32",
+      "label": "mapping(bytes32 => struct Attestations.IdentifierState)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct Attestations.IdentifierState",
+        "members": [
+          {
+            "label": "accounts",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "base": {
+                "encoding": "inplace",
+                "label": "address",
+                "numberOfBytes": "20"
+              },
+              "encoding": "dynamic_array",
+              "label": "address[]",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "attestations",
+            "offset": 0,
+            "slot": "1",
+            "type": {
+              "encoding": "mapping",
+              "key": "address",
+              "label": "mapping(address => struct Attestations.AttestedAddress)",
+              "numberOfBytes": "32",
+              "value": {
+                "encoding": "inplace",
+                "label": "struct Attestations.AttestedAddress",
+                "members": [
+                  {
+                    "label": "requested",
+                    "offset": 0,
+                    "slot": "0",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "uint32",
+                      "numberOfBytes": "4"
+                    }
+                  },
+                  {
+                    "label": "completed",
+                    "offset": 4,
+                    "slot": "0",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "uint32",
+                      "numberOfBytes": "4"
+                    }
+                  },
+                  {
+                    "label": "selectedIssuers",
+                    "offset": 0,
+                    "slot": "1",
+                    "type": {
+                      "base": {
+                        "encoding": "inplace",
+                        "label": "address",
+                        "numberOfBytes": "20"
+                      },
+                      "encoding": "dynamic_array",
+                      "label": "address[]",
+                      "numberOfBytes": "32"
+                    }
+                  },
+                  {
+                    "label": "issuedAttestations",
+                    "offset": 0,
+                    "slot": "2",
+                    "type": {
+                      "encoding": "mapping",
+                      "key": "address",
+                      "label": "mapping(address => struct Attestations.Attestation)",
+                      "numberOfBytes": "32",
+                      "value": {
+                        "encoding": "inplace",
+                        "label": "struct Attestations.Attestation",
+                        "members": [
+                          {
+                            "label": "status",
+                            "offset": 0,
+                            "slot": "0",
+                            "type": {
+                              "encoding": "inplace",
+                              "label": "enum Attestations.AttestationStatus",
+                              "numberOfBytes": "1"
+                            }
+                          },
+                          {
+                            "label": "blockNumber",
+                            "offset": 1,
+                            "slot": "0",
+                            "type": {
+                              "encoding": "inplace",
+                              "label": "uint32",
+                              "numberOfBytes": "4"
+                            }
+                          },
+                          {
+                            "label": "attestationRequestFeeToken",
+                            "offset": 5,
+                            "slot": "0",
+                            "type": {
+                              "encoding": "inplace",
+                              "label": "address",
+                              "numberOfBytes": "20"
+                            }
+                          }
+                        ],
+                        "numberOfBytes": "32"
+                      }
+                    }
+                  }
+                ],
+                "numberOfBytes": "96"
+              }
+            }
+          },
+          {
+            "label": "unselectedRequests",
+            "offset": 0,
+            "slot": "2",
+            "type": {
+              "encoding": "mapping",
+              "key": "address",
+              "label": "mapping(address => struct Attestations.UnselectedRequest)",
+              "numberOfBytes": "32",
+              "value": {
+                "encoding": "inplace",
+                "label": "struct Attestations.UnselectedRequest",
+                "members": [
+                  {
+                    "label": "blockNumber",
+                    "offset": 0,
+                    "slot": "0",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "uint32",
+                      "numberOfBytes": "4"
+                    }
+                  },
+                  {
+                    "label": "attestationsRequested",
+                    "offset": 4,
+                    "slot": "0",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "uint32",
+                      "numberOfBytes": "4"
+                    }
+                  },
+                  {
+                    "label": "attestationRequestFeeToken",
+                    "offset": 8,
+                    "slot": "0",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "address",
+                      "numberOfBytes": "20"
+                    }
+                  }
+                ],
+                "numberOfBytes": "32"
+              }
+            }
+          }
+        ],
+        "numberOfBytes": "96"
+      }
+    }
+  },
+  {
+    "label": "attestationExpiryBlocks",
+    "offset": 0,
+    "slot": "4",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "selectIssuersWaitBlocks",
+    "offset": 0,
+    "slot": "5",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "maxAttestations",
+    "offset": 0,
+    "slot": "6",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "attestationRequestFees",
+    "offset": 0,
+    "slot": "7",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => uint256)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  },
+  {
+    "label": "pendingWithdrawals",
+    "offset": 0,
+    "slot": "8",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => mapping(address => uint256))",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "mapping",
+        "key": "address",
+        "label": "mapping(address => uint256)",
+        "numberOfBytes": "32",
+        "value": {
+          "encoding": "inplace",
+          "label": "uint256",
+          "numberOfBytes": "32"
+        }
+      }
+    }
+  },
+  {
+    "label": "transferApprovals",
+    "offset": 0,
+    "slot": "9",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => mapping(bytes32 => bool))",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "mapping",
+        "key": "bytes32",
+        "label": "mapping(bytes32 => bool)",
+        "numberOfBytes": "32",
+        "value": {
+          "encoding": "inplace",
+          "label": "bool",
+          "numberOfBytes": "1"
+        }
+      }
+    }
+  }
+]

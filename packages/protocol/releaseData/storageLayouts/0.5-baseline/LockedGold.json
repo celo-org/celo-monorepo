@@ -1,0 +1,317 @@
+[
+  {
+    "label": "_guardCounter",
+    "offset": 0,
+    "slot": "0",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "initialized",
+    "offset": 0,
+    "slot": "1",
+    "type": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    }
+  },
+  {
+    "label": "_owner",
+    "offset": 1,
+    "slot": "1",
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
+  },
+  {
+    "label": "registry",
+    "offset": 0,
+    "slot": "2",
+    "type": {
+      "encoding": "inplace",
+      "label": "contract IRegistry",
+      "numberOfBytes": "20"
+    }
+  },
+  {
+    "label": "balances",
+    "offset": 0,
+    "slot": "3",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => struct LockedGold.Balances)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct LockedGold.Balances",
+        "members": [
+          {
+            "label": "nonvoting",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "pendingWithdrawals",
+            "offset": 0,
+            "slot": "1",
+            "type": {
+              "base": {
+                "encoding": "inplace",
+                "label": "struct LockedGold.PendingWithdrawal",
+                "members": [
+                  {
+                    "label": "value",
+                    "offset": 0,
+                    "slot": "0",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "uint256",
+                      "numberOfBytes": "32"
+                    }
+                  },
+                  {
+                    "label": "timestamp",
+                    "offset": 0,
+                    "slot": "1",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "uint256",
+                      "numberOfBytes": "32"
+                    }
+                  }
+                ],
+                "numberOfBytes": "64"
+              },
+              "encoding": "dynamic_array",
+              "label": "struct LockedGold.PendingWithdrawal[]",
+              "numberOfBytes": "32"
+            }
+          }
+        ],
+        "numberOfBytes": "64"
+      }
+    }
+  },
+  {
+    "label": "slashingMap",
+    "offset": 0,
+    "slot": "4",
+    "type": {
+      "encoding": "mapping",
+      "key": "bytes32",
+      "label": "mapping(bytes32 => bool)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      }
+    }
+  },
+  {
+    "label": "slashingWhitelist",
+    "offset": 0,
+    "slot": "5",
+    "type": {
+      "base": {
+        "encoding": "inplace",
+        "label": "bytes32",
+        "numberOfBytes": "32"
+      },
+      "encoding": "dynamic_array",
+      "label": "bytes32[]",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "totalNonvoting",
+    "offset": 0,
+    "slot": "6",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "unlockingPeriod",
+    "offset": 0,
+    "slot": "7",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "delegatorInfo",
+    "offset": 0,
+    "slot": "8",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => struct LockedGold.Delegated)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct LockedGold.Delegated",
+        "members": [
+          {
+            "label": "delegatees",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "encoding": "inplace",
+              "label": "struct EnumerableSet.AddressSet",
+              "members": [
+                {
+                  "label": "index",
+                  "offset": 0,
+                  "slot": "0",
+                  "type": {
+                    "encoding": "mapping",
+                    "key": "address",
+                    "label": "mapping(address => uint256)",
+                    "numberOfBytes": "32",
+                    "value": {
+                      "encoding": "inplace",
+                      "label": "uint256",
+                      "numberOfBytes": "32"
+                    }
+                  }
+                },
+                {
+                  "label": "values",
+                  "offset": 0,
+                  "slot": "1",
+                  "type": {
+                    "base": {
+                      "encoding": "inplace",
+                      "label": "address",
+                      "numberOfBytes": "20"
+                    },
+                    "encoding": "dynamic_array",
+                    "label": "address[]",
+                    "numberOfBytes": "32"
+                  }
+                }
+              ],
+              "numberOfBytes": "64"
+            }
+          },
+          {
+            "label": "delegateesWithPercentagesAndAmount",
+            "offset": 0,
+            "slot": "2",
+            "type": {
+              "encoding": "mapping",
+              "key": "address",
+              "label": "mapping(address => struct LockedGold.DelegatedInfo)",
+              "numberOfBytes": "32",
+              "value": {
+                "encoding": "inplace",
+                "label": "struct LockedGold.DelegatedInfo",
+                "members": [
+                  {
+                    "label": "percentage",
+                    "offset": 0,
+                    "slot": "0",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "struct FixidityLib.Fraction",
+                      "members": [
+                        {
+                          "label": "value",
+                          "offset": 0,
+                          "slot": "0",
+                          "type": {
+                            "encoding": "inplace",
+                            "label": "uint256",
+                            "numberOfBytes": "32"
+                          }
+                        }
+                      ],
+                      "numberOfBytes": "32"
+                    }
+                  },
+                  {
+                    "label": "currentAmount",
+                    "offset": 0,
+                    "slot": "1",
+                    "type": {
+                      "encoding": "inplace",
+                      "label": "uint256",
+                      "numberOfBytes": "32"
+                    }
+                  }
+                ],
+                "numberOfBytes": "64"
+              }
+            }
+          },
+          {
+            "label": "totalDelegatedCeloFraction",
+            "offset": 0,
+            "slot": "3",
+            "type": {
+              "encoding": "inplace",
+              "label": "struct FixidityLib.Fraction",
+              "members": [
+                {
+                  "label": "value",
+                  "offset": 0,
+                  "slot": "0",
+                  "type": {
+                    "encoding": "inplace",
+                    "label": "uint256",
+                    "numberOfBytes": "32"
+                  }
+                }
+              ],
+              "numberOfBytes": "32"
+            }
+          }
+        ],
+        "numberOfBytes": "128"
+      }
+    }
+  },
+  {
+    "label": "totalDelegatedCelo",
+    "offset": 0,
+    "slot": "9",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => uint256)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  },
+  {
+    "label": "maxDelegateesCount",
+    "offset": 0,
+    "slot": "10",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  }
+]

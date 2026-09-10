@@ -1,11 +1,12 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "./interfaces/IFeeCurrencyWhitelist.sol";
-import "../common/Initializable.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
+import "./Initializable.sol";
+import "./interfaces/ICeloVersionedContract.sol";
+import "./IsL2Check.sol";
 
 /**
  * @title Holds a whitelist of the ERC20+ tokens that can be used to pay for gas
@@ -29,7 +30,7 @@ contract FeeCurrencyWhitelist is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -74,7 +75,7 @@ contract FeeCurrencyWhitelist is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 0);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -89,5 +90,14 @@ contract FeeCurrencyWhitelist is
     deprecated_whitelist[index] = deprecated_whitelist[length - 1];
     deprecated_whitelist.pop();
     emit FeeCurrencyWhitelistRemoved(tokenAddress);
+  }
+
+  /**
+   * @notice Whether the sender is the owner.
+   * @dev Kept from the Solidity 0.5 implementation: OpenZeppelin 2.5's Ownable exposed it
+   * and 4.9's does not, and the ABI behind the upgraded proxy must not lose a function.
+   */
+  function isOwner() external view returns (bool) {
+    return msg.sender == owner();
   }
 }

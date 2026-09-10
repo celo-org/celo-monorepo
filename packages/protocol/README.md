@@ -92,11 +92,11 @@ Truffle tests have been deprecated.
 
 Use the appropriate profile to match Truffle compilation settings:
 ```bash
-# Solidity 0.5 contracts
-FOUNDRY_PROFILE=truffle-compat forge build contracts/.../[CONTRACT].sol
+# All contracts (Solidity 0.8)
+FOUNDRY_PROFILE=truffle-compat8 forge build contracts/.../[CONTRACT].sol
 
-# Solidity 0.8 contracts  
-FOUNDRY_PROFILE=truffle-compat8 forge build contracts-0.8/.../[CONTRACT].sol
+# The proxies (contracts-0.5/) are immutable on chain and are not rebuilt: their frozen
+# artifacts live in artifacts/solc-0.5 (regenerate with scripts/foundry/freeze-solc05-artifacts.sh)
 ```
 
 ### 2. Verify with Foundry

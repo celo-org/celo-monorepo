@@ -1,17 +1,18 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/utils/SafeCast.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts8/utils/math/SafeCast.sol";
+import "@openzeppelin/contracts8/utils/cryptography/ECDSA.sol";
 
 import "./interfaces/IFederatedAttestations.sol";
 import "../common/interfaces/IAccounts.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "../common/Initializable.sol";
-import "../common/UsingRegistryV2.sol";
-import "../common/Signatures.sol";
+import "../common/UsingRegistryV2NoMento.sol";
 
 /**
  * @title Contract mapping identifiers to accounts
@@ -21,7 +22,7 @@ contract FederatedAttestations is
   ICeloVersionedContract,
   Ownable,
   Initializable,
-  UsingRegistryV2
+  UsingRegistryV2NoMento
 {
   using SafeMath for uint256;
   using SafeCast for uint256;
@@ -84,7 +85,7 @@ contract FederatedAttestations is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -268,7 +269,7 @@ contract FederatedAttestations is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -300,13 +301,8 @@ contract FederatedAttestations is
       "Signer is not a currently authorized AttestationSigner for the issuer"
     );
     bytes32 structHash = getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn);
-    address guessedSigner = Signatures.getSignerOfTypedDataHash(
-      eip712DomainSeparator,
-      structHash,
-      v,
-      r,
-      s
-    );
+    bytes32 typedDataHash = ECDSA.toTypedDataHash(eip712DomainSeparator, structHash);
+    address guessedSigner = ECDSA.recover(typedDataHash, v, r, s);
     require(guessedSigner == signer, "Signature is invalid");
   }
 
@@ -336,7 +332,7 @@ contract FederatedAttestations is
   function setEip712DomainSeparator() internal {
     uint256 chainId;
     assembly {
-      chainId := chainid
+      chainId := chainid()
     }
 
     eip712DomainSeparator = keccak256(
@@ -516,5 +512,14 @@ contract FederatedAttestations is
       return;
     }
     revert("Attestation to be revoked does not exist");
+  }
+
+  /**
+   * @notice Whether the sender is the owner.
+   * @dev Kept from the Solidity 0.5 implementation: OpenZeppelin 2.5's Ownable exposed it
+   * and 4.9's does not, and the ABI behind the upgraded proxy must not lose a function.
+   */
+  function isOwner() external view returns (bool) {
+    return msg.sender == owner();
   }
 }

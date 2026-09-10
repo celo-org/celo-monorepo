@@ -42,4 +42,12 @@ if [ $VERSION_NUMBER -gt 11 ]
   CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|MockElection|\\bFeeHandlerSeller\\b"
 fi
 
+# SortedOracles is owned and upgraded by Mento, and AddressSortedLinkedListWithMedian is
+# the library only it links. Reports against CR17 or later (the CR18 release onwards)
+# leave both out, matching the release and verification tooling.
+if [ $VERSION_NUMBER -ge 17 ]
+  then
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|SortedOracles|AddressSortedLinkedListWithMedian"
+fi
+
 echo "FULL CONTRACT_EXCLUSION_REGEX: $CONTRACT_EXCLUSION_REGEX"

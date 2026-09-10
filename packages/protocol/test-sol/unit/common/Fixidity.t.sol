@@ -1,9 +1,58 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
 
-import "@celo-contracts/common/test/FixidityWrapper.sol";
+import "@celo-contracts/common/FixidityLib.sol";
+
+// Fixidity needs a wrapper as it is a library.
+contract FixidityWrapper {
+  using FixidityLib for FixidityLib.Fraction;
+
+  function newFixed(uint256 a) external pure returns (uint256) {
+    return FixidityLib.newFixed(a).unwrap();
+  }
+
+  function newFixedFraction(uint256 a, uint256 b) external pure returns (uint256) {
+    return FixidityLib.newFixedFraction(a, b).unwrap();
+  }
+
+  function add(uint256 a, uint256 b) external pure returns (uint256) {
+    return FixidityLib.wrap(a).add(FixidityLib.wrap(b)).unwrap();
+  }
+
+  function subtract(uint256 a, uint256 b) external pure returns (uint256) {
+    return FixidityLib.wrap(a).subtract(FixidityLib.wrap(b)).unwrap();
+  }
+
+  function multiply(uint256 a, uint256 b) external pure returns (uint256) {
+    return FixidityLib.wrap(a).multiply(FixidityLib.wrap(b)).unwrap();
+  }
+
+  function reciprocal(uint256 a) external pure returns (uint256) {
+    return FixidityLib.wrap(a).reciprocal().unwrap();
+  }
+
+  function divide(uint256 a, uint256 b) external pure returns (uint256) {
+    return FixidityLib.wrap(a).divide(FixidityLib.wrap(b)).unwrap();
+  }
+
+  function gt(uint256 a, uint256 b) external pure returns (bool) {
+    return FixidityLib.wrap(a).gt(FixidityLib.wrap(b));
+  }
+
+  function gte(uint256 a, uint256 b) external pure returns (bool) {
+    return FixidityLib.wrap(a).gte(FixidityLib.wrap(b));
+  }
+
+  function lt(uint256 a, uint256 b) external pure returns (bool) {
+    return FixidityLib.wrap(a).lt(FixidityLib.wrap(b));
+  }
+
+  function lte(uint256 a, uint256 b) external pure returns (bool) {
+    return FixidityLib.wrap(a).lte(FixidityLib.wrap(b));
+  }
+}
 
 contract FixidityTest is Test {
   uint256 private constant FIXED1_UINT = 1000000000000000000000000;
@@ -82,12 +131,14 @@ contract FixidityTest is Test {
   function test_no_maxFixed_add() public {
     uint256 fixedAdd1 = MAX_NEW_FIXED_ADD + 1;
 
-    vm.expectRevert("add overflow detected");
+    // Under 0.8 native overflow checks fire before FixidityLib's require.
+    vm.expectRevert(abi.encodeWithSignature("Panic(uint256)", 0x11));
     fixidity.add(fixedAdd1, fixedAdd1);
   }
 
   function test_no_add_maxUint256() public {
-    vm.expectRevert("add overflow detected");
+    // Under 0.8 native overflow checks fire before FixidityLib's require.
+    vm.expectRevert(abi.encodeWithSignature("Panic(uint256)", 0x11));
     fixidity.add(MAX_UINT256, 1);
   }
 
@@ -157,7 +208,8 @@ contract FixidityTest is Test {
   function test_multiply_fails_larger_than_maxFixedMul() public {
     uint256 a = MAX_FIXED_MUL + 1;
 
-    vm.expectRevert("add overflow detected");
+    // Under 0.8 native overflow checks fire before FixidityLib's require.
+    vm.expectRevert(abi.encodeWithSignature("Panic(uint256)", 0x11));
 
     fixidity.multiply(a, a);
   }
@@ -189,7 +241,8 @@ contract FixidityTest is Test {
   }
 
   function test_divide_fail_more_than_max_div() public {
-    vm.expectRevert("overflow at divide");
+    // Under 0.8 native overflow checks fire before FixidityLib's require.
+    vm.expectRevert(abi.encodeWithSignature("Panic(uint256)", 0x11));
     fixidity.divide(MAX_FIXED_DIV + 1, 1);
   }
 

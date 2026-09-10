@@ -1,18 +1,43 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 pragma experimental ABIEncoderV2;
 
+import "@openzeppelin/contracts8/utils/cryptography/ECDSA.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Accounts.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
+import "@celo-contracts/common/interfaces/IAccountsTest.sol";
+import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
-contract AccountsTest is TestWithUtils {
+/**
+ * @dev Minimal 0.8-native mock for the Validators registry entry.
+ *      Only implements the two selectors called by Accounts.sol:
+ *      - isValidator() returns false so test accounts are never treated as validators
+ *      - updateEcdsaPublicKey() returns true so authorizeValidatorSigner succeeds
+ */
+contract MockValidators08 {
+  function isValidator(address) external pure returns (bool) {
+    return false;
+  }
+
+  function isValidatorGroup(address) external pure returns (bool) {
+    return false;
+  }
+
+  function updateEcdsaPublicKey(address, address, bytes calldata) external pure returns (bool) {
+    return true;
+  }
+
+  function meetsAccountLockedGoldRequirements(address) external pure returns (bool) {
+    return true;
+  }
+}
+
+contract AccountsTest is TestWithUtils08 {
   using FixidityLib for FixidityLib.Fraction;
 
-  Accounts accounts;
-  MockValidators validators;
+  IAccountsTest accounts;
+  MockValidators08 validators;
 
   string constant name = "Account";
   string constant metadataURL = "https://www.celo.org";
@@ -76,14 +101,22 @@ contract AccountsTest is TestWithUtils {
   event OffchainStorageRootRemoved(address indexed account, bytes url, uint256 index);
   event PaymentDelegationSet(address indexed beneficiary, uint256 fraction);
 
-  function setUp() public {
+  function setUp() public virtual override {
     super.setUp();
 
-    accounts = new Accounts(true);
-    validators = new MockValidators();
+    // The harness deploys Accounts with testingDeployment=false (initialized=true in storage).
+    // Reset initialized slot (slot 2) so we can call initialize() on it.
+    vm.store(accountsAddress, bytes32(uint256(2)), bytes32(0));
+    // Redeploy at same address with testingDeployment=true bytecode.
+    deployCodeTo("Accounts.sol", abi.encode(true), accountsAddress);
+    accounts = IAccountsTest(accountsAddress);
+    // Update the harness reference so whenL2 uses the same initialized contract.
+    accountsContract = IAccounts(accountsAddress);
+
+    validators = new MockValidators08();
 
     registry.setAddressFor("Validators", address(validators));
-    registry.setAddressFor("Accounts", address(accounts));
+    // Registry["Accounts"] already points to accountsAddress from setupAccounts(); keep it.
 
     accounts.initialize(address(registry));
     accounts.setEip712DomainSeparator();
@@ -547,6 +580,8 @@ contract AccountsTest_removeStorageRoot is AccountsTest {
 }
 
 contract AccountsTest_setPaymentDelegation is AccountsTest {
+  using FixidityLib for FixidityLib.Fraction;
+
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
   uint256 badFraction = FixidityLib.newFixedFraction(12, 10).unwrap();
@@ -585,10 +620,12 @@ contract AccountsTest_setPaymentDelegation is AccountsTest {
 }
 
 contract AccountsTest_deletePaymentDelegation is AccountsTest {
+  using FixidityLib for FixidityLib.Fraction;
+
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     accounts.createAccount();
     accounts.setPaymentDelegation(beneficiary, fraction);
@@ -647,7 +684,7 @@ contract AccountsTest_GenericAuthorization is AccountsTest {
   bytes32 r;
   bytes32 s;
 
-  function setUp() public {
+  function setUp() public virtual override {
     super.setUp();
     (signer, signerPK) = actorWithPK("signer");
     (signer2, signer2PK) = actorWithPK("signer2");
@@ -833,7 +870,7 @@ contract AccountsTest_BackwardCompatibility is AccountsTest {
     Validator
   }
 
-  function setUp() public {
+  function setUp() public virtual override {
     super.setUp();
 
     (signer, signerPK) = actorWithPK("signer");

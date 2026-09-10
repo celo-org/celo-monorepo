@@ -1,5 +1,6 @@
 @celo-contracts=contracts/
-@celo-contracts-8=contracts-0.8/
+@celo-contracts-8=contracts/
+@celo-contracts-0.5=contracts-0.5/
 @test-sol=test-sol
 @migrations-sol/=migrations_sol/
 

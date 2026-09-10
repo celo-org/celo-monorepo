@@ -1,0 +1,153 @@
+[
+  {
+    "label": "initialized",
+    "offset": 0,
+    "slot": "0",
+    "type": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    }
+  },
+  {
+    "label": "transactions",
+    "offset": 0,
+    "slot": "1",
+    "type": {
+      "encoding": "mapping",
+      "key": "uint256",
+      "label": "mapping(uint256 => struct MultiSig.Transaction)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct MultiSig.Transaction",
+        "members": [
+          {
+            "label": "destination",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "encoding": "inplace",
+              "label": "address",
+              "numberOfBytes": "20"
+            }
+          },
+          {
+            "label": "value",
+            "offset": 0,
+            "slot": "1",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "data",
+            "offset": 0,
+            "slot": "2",
+            "type": {
+              "encoding": "bytes",
+              "label": "bytes",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "executed",
+            "offset": 0,
+            "slot": "3",
+            "type": {
+              "encoding": "inplace",
+              "label": "bool",
+              "numberOfBytes": "1"
+            }
+          }
+        ],
+        "numberOfBytes": "128"
+      }
+    }
+  },
+  {
+    "label": "confirmations",
+    "offset": 0,
+    "slot": "2",
+    "type": {
+      "encoding": "mapping",
+      "key": "uint256",
+      "label": "mapping(uint256 => mapping(address => bool))",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "mapping",
+        "key": "address",
+        "label": "mapping(address => bool)",
+        "numberOfBytes": "32",
+        "value": {
+          "encoding": "inplace",
+          "label": "bool",
+          "numberOfBytes": "1"
+        }
+      }
+    }
+  },
+  {
+    "label": "isOwner",
+    "offset": 0,
+    "slot": "3",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => bool)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      }
+    }
+  },
+  {
+    "label": "owners",
+    "offset": 0,
+    "slot": "4",
+    "type": {
+      "base": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "encoding": "dynamic_array",
+      "label": "address[]",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "required",
+    "offset": 0,
+    "slot": "5",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "internalRequired",
+    "offset": 0,
+    "slot": "6",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "transactionCount",
+    "offset": 0,
+    "slot": "7",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  }
+]

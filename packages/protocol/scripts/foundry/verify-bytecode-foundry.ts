@@ -8,7 +8,7 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 
 import { instantiateArtifactsFromForge } from '@celo/protocol/lib/compatibility/utils'
 import { existsSync, readJsonSync, writeJsonSync } from 'fs-extra'
-import { Chain, createPublicClient, defineChain, encodeFunctionData, http } from 'viem'
+import { Abi, Chain, createPublicClient, defineChain, encodeFunctionData, http } from 'viem'
 import * as viemChains from 'viem/chains'
 
 /*
@@ -43,7 +43,11 @@ const argv = require('minimist')(process.argv.slice(2), {
 })
 
 const branch = (argv.branch ? argv.branch : '') as string
-const buildDir05 = `./out-${branch}-truffle-compat`
+// Pre-migration tags build their 0.5 implementations; the single-tree layout only has the
+// frozen 0.5 artifacts (the proxies).
+const buildDir05 = existsSync(`./out-${branch}-truffle-compat`)
+  ? `./out-${branch}-truffle-compat`
+  : './artifacts/solc-0.5'
 const buildDir08 = `./out-${branch}-truffle-compat8`
 const network: string = argv.network ?? 'development'
 const proposal: ProposalTx[] = argv.proposal ? readJsonSync(argv.proposal) : []
@@ -51,10 +55,6 @@ const initializationData: InitializationData = argv.initialize_data
   ? readJsonSync(argv.initialize_data)
   : {}
 const librariesFile = argv.librariesFile ?? 'libraries.json'
-
-if (!existsSync(buildDir05)) {
-  throw new Error(`${buildDir05} directory not found. Make sure to run foundry build first`)
-}
 
 if (!existsSync(buildDir08)) {
   throw new Error(`${buildDir08} directory not found. Make sure to run foundry build first`)
@@ -104,8 +104,17 @@ const publicClient = createPublicClient({
 const version = getReleaseVersion(branch)
 
 const registryAddress = '0x000000000000000000000000000000000000ce10'
-const registryAbi = readJsonSync(`${buildDir05}/Registry.sol/Registry.json`).abi
-const proxyAbi = readJsonSync(`${buildDir05}/Proxy.sol/Proxy.json`).abi
+
+// Registry moved to the 0.8 tree, so its artifact lives in the 0.8 build dir; prefer it
+// and fall back to the 0.5 dir so the script still works on pre-migration branches.
+const readAbiWithFallback = (artifactRelPath: string): Abi => {
+  const path08 = `${buildDir08}/${artifactRelPath}`
+  const artifactPath = existsSync(path08) ? path08 : `${buildDir05}/${artifactRelPath}`
+  return (readJsonSync(artifactPath) as { abi: Abi }).abi
+}
+
+const registryAbi = readAbiWithFallback('Registry.sol/Registry.json')
+const proxyAbi = readAbiWithFallback('Proxy.sol/Proxy.json')
 
 const getAddressForString = async (contract: string): Promise<string> => {
   const result = await publicClient.readContract({
@@ -151,7 +160,8 @@ const chainLookup = {
 const [artifacts05] = instantiateArtifactsFromForge(buildDir05)
 const [artifacts08] = instantiateArtifactsFromForge(buildDir08)
 verifyBytecodes(
-  Object.keys(CeloContractName),
+  // Registry does not register itself; verify its implementation alongside the rest.
+  [...Object.keys(CeloContractName), 'Registry'],
   [artifacts05, artifacts08],
   registryLookup,
   proposal,

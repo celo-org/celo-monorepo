@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
 
-import "@celo-contracts/common/ExtractFunctionSignature.sol";
+import "@celo-contracts-8/common/ExtractFunctionSignature.sol";
 
 contract ExtractFunctionSignatureWrapper {
   function extractFunctionSignature(bytes memory input) public pure returns (bytes4) {

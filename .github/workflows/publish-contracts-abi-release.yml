@@ -9,7 +9,7 @@ on:
     paths:
       - 'packages/protocol/abis/**'
       - 'packages/protocol/contracts/**'
-      - 'packages/protocol/contracts-0.8/**'
+      - 'packages/protocol/contracts-0.5/**'
       - 'packages/protocol/lib/**'
       - 'packages/protocol/scripts/**'
       - '!packages/protocol/scripts/foundry/**'
@@ -21,7 +21,7 @@ on:
     paths:
       - 'packages/protocol/abis/**'
       - 'packages/protocol/contracts/**'
-      - 'packages/protocol/contracts-0.8/**'
+      - 'packages/protocol/contracts-0.5/**'
       - 'packages/protocol/lib/**'
       - 'packages/protocol/scripts/**'
       - '!packages/protocol/scripts/foundry/**'
@@ -61,7 +61,9 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Update npm for OIDC trusted publishing
-        run: npm install -g npm@latest
+        # npm 11 is the newest major that still supports the node 20 pinned above;
+        # npm@latest (12+) requires node >= 22 and makes this step fail.
+        run: npm install -g npm@11
 
       - name: 'Setup yarn'
         shell: bash

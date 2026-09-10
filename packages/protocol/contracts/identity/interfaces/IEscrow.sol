@@ -26,6 +26,22 @@ interface IEscrow {
   function removeDefaultTrustedIssuer(address trustedIssuer, uint256 index) external;
 
   // view functions
+  function escrowedPayments(
+    address paymentId
+  )
+    external
+    view
+    returns (
+      bytes32 recipientIdentifier,
+      address sender,
+      address token,
+      uint256 value,
+      uint256 sentIndex,
+      uint256 receivedIndex,
+      uint256 timestamp,
+      uint256 expirySeconds,
+      uint256 minAttestations
+    );
   function getReceivedPaymentIds(bytes32 identifier) external view returns (address[] memory);
   function getSentPaymentIds(address sender) external view returns (address[] memory);
   function getTrustedIssuersPerPayment(address paymentId) external view returns (address[] memory);

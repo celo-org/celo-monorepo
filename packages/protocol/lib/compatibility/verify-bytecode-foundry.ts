@@ -9,8 +9,11 @@ import {
 } from '@celo/protocol/lib/bytecode-foundry'
 import { getArtifactByName, getContractName, getDeployedBytecode } from '@celo/protocol/lib/compatibility/internal'
 import { verifyProxyStorageProofFoundry } from '@celo/protocol/lib/proxy-utils'
+import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
-import { ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9'
+import { existsSync, readJsonSync } from 'fs-extra'
+import path from 'path'
+import { ignoredContractsV18, ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9'
 
 // TODO remove this duplicate
 export interface ProposalTx {
@@ -141,13 +144,64 @@ const ALLOWED_LEGACY_LIBRARIES: { [network: string]: { [library: string]: string
   },
 }
 
-const isAllowedLegacyLibrary = (contract: string, address: string, network: string): boolean => {
+export const isAllowedLegacyLibrary = (contract: string, address: string, network: string): boolean => {
   // Normalize the mainnet aliases used across the tooling.
   const normalized = ['celo', 'rc1'].includes(network.toLowerCase())
     ? 'mainnet'
     : network.toLowerCase()
   const allowed = ALLOWED_LEGACY_LIBRARIES[normalized]?.[contract]
   return allowed !== undefined && allowed.toLowerCase() === address.toLowerCase()
+}
+
+// The Registry is not an entry in itself; its proxy is the protocol-constant address.
+const liveProxyAddress = async (contract: string, context: VerificationContext): Promise<string> =>
+  contract === 'Registry' ? celoRegistryAddress : await context.registry.getAddressForString(contract)
+
+// Proxy runtimes other than the one built from the sources: a genesis can place proxies
+// compiled elsewhere (the published devchain does). Keyed by a name used in the log.
+const PROXY_RUNTIME_VARIANTS_FILE = path.join(__dirname, '..', '..', 'artifacts', 'proxy-runtime-variants.json')
+
+const knownProxyRuntimes = (context: VerificationContext): { [name: string]: string } => {
+  const runtimes: { [name: string]: string } = { Proxy: getSourceBytecode('Proxy', context) }
+  if (existsSync(PROXY_RUNTIME_VARIANTS_FILE)) {
+    const variants: { [name: string]: { deployedBytecode: string } } = readJsonSync(PROXY_RUNTIME_VARIANTS_FILE)
+    Object.entries(variants).forEach(([name, variant]) => {
+      runtimes[name] = stripMetadata(variant.deployedBytecode)
+    })
+  }
+  return runtimes
+}
+
+// The proxies deployed on mainnet are immutable Solidity 0.5 contracts; every live proxy
+// must still run the runtime bytecode of the Proxy artifact (frozen, or built from a
+// pre-migration tag) or one of the known variants, so a registry entry pointing at
+// anything else is caught here.
+const verifyLiveProxyCode = async (contract: string, context: VerificationContext, errors: string[]) => {
+  const proxyAddress = await liveProxyAddress(contract, context)
+  if (proxyAddress === ZERO_ADDRESS) {
+    return
+  }
+  if (!context.artifacts.some((artifacts) => getArtifactByName('Proxy', artifacts))) {
+    console.log(`  ⏭️  no Proxy artifact in this build, skipping the ${contract}Proxy code check`)
+    return
+  }
+  let onchainProxyBytecode: string
+  try {
+    onchainProxyBytecode = await getOnchainBytecode(proxyAddress, context)
+  } catch (e) {
+    // code with no Solidity metadata trailer, or no code at all, is not the Proxy either
+    onchainProxyBytecode = ''
+  }
+  const match = Object.entries(knownProxyRuntimes(context)).find(
+    ([, runtime]) => runtime === onchainProxyBytecode
+  )
+  if (match) {
+    console.log(`  ✅ ${contract}Proxy runs the ${match[0]} bytecode (at ${proxyAddress})`)
+  } else {
+    const msg = `${contract}Proxy (at ${proxyAddress}) does not run the Proxy bytecode`
+    console.log(`  ❌ ${msg}`)
+    errors.push(msg)
+  }
 }
 
 const isLibrary = (contract: string, context: VerificationContext) => {
@@ -206,17 +260,19 @@ const dfsStep = async (queue: QueueEntry[], visited: Set<string>, context: Verif
     let implementationAddress: string
     if (isImplementationChanged(contract, context.proposal)) {
       implementationAddress = getProposedImplementationAddress(contract, context.proposal)
+      await verifyLiveProxyCode(contract, context, errors)
     } else if (isProxyChanged(contract, context.proposal)) {
       const proxyAddress = getProposedProxyAddress(contract, context.proposal)
       implementationAddress = await context.proxyLookup.getImplementation(proxyAddress)
     } else if (isLib) {
       implementationAddress = ensureLeading0x(context.libraryLinkingInfo.info[contract].address)
     } else {
-      const proxyAddress = await context.registry.getAddressForString(contract)
+      const proxyAddress = await liveProxyAddress(contract, context)
       if (proxyAddress === ZERO_ADDRESS) {
         console.log(`  ⏭️  ${contract} is not in registry - skipping`)
         return
       }
+      await verifyLiveProxyCode(contract, context, errors)
       implementationAddress = await context.proxyLookup.getImplementation(proxyAddress)
     }
 
@@ -352,7 +408,9 @@ export const verifyBytecodes = async (
 
   const compiledContracts = Array.prototype.concat.apply([], artifacts.map(a => a.listArtifacts())).map((a) => getContractName(a))
 
-  if (version > 9) {
+  if (version >= 18) {
+    ignoredContracts = [...ignoredContracts, ...ignoredContractsV9, ...ignoredContractsV18]
+  } else if (version > 9) {
     ignoredContracts = [...ignoredContracts, ...ignoredContractsV9]
   } else if (version == 9) {
     ignoredContracts = [...ignoredContracts, ...ignoredContractsV9, ...ignoredContractsV9Only]

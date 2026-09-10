@@ -1,14 +1,52 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
 
-import "@celo-contracts/common/test/SortedLinkedListMock.sol";
+import "@celo-contracts-8/common/linkedlists/SortedLinkedList.sol";
+
+contract SortedLinkedListMock {
+  using SortedLinkedList for SortedLinkedList.List;
+
+  SortedLinkedList.List private list;
+
+  function insert(bytes32 key, uint256 numerator, bytes32 lesserKey, bytes32 greaterKey) external {
+    list.insert(key, numerator, lesserKey, greaterKey);
+  }
+
+  function update(bytes32 key, uint256 numerator, bytes32 lesserKey, bytes32 greaterKey) external {
+    list.update(key, numerator, lesserKey, greaterKey);
+  }
+
+  function remove(bytes32 key) external {
+    list.remove(key);
+  }
+
+  function contains(bytes32 key) external view returns (bool) {
+    return list.contains(key);
+  }
+
+  function getNumElements() external view returns (uint256) {
+    return list.list.numElements;
+  }
+
+  function getElements() external view returns (bytes32[] memory, uint256[] memory) {
+    return list.getElements();
+  }
+
+  function head() external view returns (bytes32) {
+    return list.list.head;
+  }
+
+  function tail() external view returns (bytes32) {
+    return list.list.tail;
+  }
+}
 
 contract SortedLinkedListTest is Test {
   SortedLinkedListMock sortedList;
 
-  function setUp() public {
+  function setUp() public virtual {
     sortedList = new SortedLinkedListMock();
   }
 }
@@ -78,7 +116,7 @@ contract SortedLinkedListTest_update is SortedLinkedListTest {
   uint256 largerValue = 4;
   uint256 largestValue = 6;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     sortedList.insert(key0, value0, bytes32(0), bytes32(0));
     sortedList.insert(key1, value1, key0, bytes32(0));
@@ -160,7 +198,7 @@ contract SortedLinkedListTest_remove is SortedLinkedListTest {
   bytes32 key2 = keccak256("key2");
   uint256 numerator = 2;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     sortedList.insert(key, numerator, bytes32(0), bytes32(0));
   }

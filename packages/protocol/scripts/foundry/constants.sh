@@ -60,20 +60,16 @@ GOLD_TOKEN_TOTAL_SUPPLY=700000000 # Arbitrary amount chosen to be approximately 
 export CELO_UNRELEASED_TREASURY_INITIAL_BALANCE="$(($GOLD_TOKEN_CELO_SUPPLY_CAP - $GOLD_TOKEN_TOTAL_SUPPLY))" # During the real L2 genesis, the VM will calculate and set an appropriate balance.
 export RESERVE_INITIAL_BALANCE="5000000" # setting this here because it gets overwritten in the L2 migration script
 
-# Contract libraries
-export LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
-                "contracts/common/Signatures.sol:Signatures"
-                "contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList"
+# Contract libraries (all Solidity 0.8; the frozen 0.5 proxies link none)
+export LIBRARIES_PATH_08=("contracts/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
+                "contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
                 "contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"
                 "contracts/governance/Proposals.sol:Proposals"
 )
 
-export LIBRARIES_PATH_08=("contracts-0.8/common/linkedlists/AddressLinkedList.sol:AddressLinkedList")
-
 export LIBRARY_DEPENDENCIES_PATH=(
   "contracts/common/FixidityLib.sol"
   "contracts/common/linkedlists/LinkedList.sol"
-  "contracts-0.8/common/linkedlists/LinkedList.sol"
   "contracts/common/linkedlists/SortedLinkedList.sol"
   "contracts/common/linkedlists/SortedLinkedListWithMedian.sol"
   "lib/openzeppelin-contracts/contracts/math/SafeMath.sol"
@@ -81,6 +77,8 @@ export LIBRARY_DEPENDENCIES_PATH=(
   "lib/openzeppelin-contracts/contracts/math/Math.sol"
   "lib/openzeppelin-contracts/contracts/cryptography/ECDSA.sol"
   "lib/openzeppelin-contracts/contracts/utils/Address.sol"
+  "lib/openzeppelin-contracts8/contracts/utils/Address.sol"
   "lib/solidity-bytes-utils/contracts/BytesLib.sol"
+  "lib/solidity-bytes-utils-8/contracts/BytesLib.sol"
   "lib/celo-foundry/lib/forge-std/src/console.sol"
 )

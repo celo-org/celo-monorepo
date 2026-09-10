@@ -42,11 +42,10 @@ source scripts/bash/validate-libraries-filename.sh
 LIBRARIES_FILE=$(get_libraries_filename "$NETWORK" "$BRANCH")
 warn_if_libraries_exist "$LIBRARIES_FILE"
 
-cp foundry.toml foundry.toml.bak
-
-build_tag_foundry $BRANCH $LOG_FILE truffle-compat foundry.toml.bak
-build_tag_foundry $BRANCH $LOG_FILE truffle-compat8 foundry.toml.bak
-
-mv foundry.toml.bak foundry.toml
+# Each ref builds with its own foundry.toml. Pre-migration tags still define the
+# truffle-compat (Solidity 0.5) profile for their implementations; the single-tree layout
+# does not, and its 0.5 artifacts (the proxies) are the frozen ones under artifacts/solc-0.5.
+build_tag_foundry $BRANCH $LOG_FILE truffle-compat
+build_tag_foundry $BRANCH $LOG_FILE truffle-compat8
 
 yarn ts-node ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "$LIBRARIES_FILE" $FORNO $PROPOSAL $INITIALIZE_DATA

@@ -1,23 +1,19 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+pragma solidity >=0.8.7 <0.8.20;
 
-// Helper contracts
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
-import { CeloTokenMock } from "@test-sol/unit/common/CeloTokenMock.sol";
-import { FeeHandlerSeller } from "@celo-contracts/common/FeeHandlerSeller.sol";
-import { MentoFeeHandlerSeller } from "@celo-contracts/common/MentoFeeHandlerSeller.sol";
-import { UniswapFeeHandlerSeller } from "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
+import { FeeHandlerSeller } from "@celo-contracts-8/common/FeeHandlerSeller.sol";
+import { MentoFeeHandlerSeller } from "@celo-contracts-8/common/MentoFeeHandlerSeller.sol";
+import { UniswapFeeHandlerSeller } from "@celo-contracts-8/common/UniswapFeeHandlerSeller.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-
-contract FeeHandlerSellerTest is TestWithUtils {
+contract FeeHandlerSellerTest is TestWithUtils08 {
   // Actors
   address RECEIVER_ADDRESS = actor("Arbitrary Receiver");
   address NON_OWNER_ADDRESS = actor("Arbitrary Non-Owner");
 
-  // Contract instances
-  CeloTokenMock celoToken; // Using mock token to work around missing transfer precompile
+  // Contract instances (celoToken is provided by TestWithUtils08)
   FeeHandlerSeller mentoFeeHandlerSeller;
   FeeHandlerSeller uniswapFeeHandlerSeller;
 
@@ -29,10 +25,9 @@ contract FeeHandlerSellerTest is TestWithUtils {
 
   event OracleAddressSet(address _token, address _oracle);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
-    celoToken = new CeloTokenMock();
     oracle = actor("oracle");
     sortedOracles = actor("sortedOracles");
 
@@ -66,7 +61,7 @@ contract FeeHandlerSellerTest_Transfer is FeeHandlerSellerTest {
         "Balance of contract should be 1 at start"
       );
 
-      vm.prank(feeHandlerSellerInstances[i].owner());
+      vm.prank(IOwnable(address(feeHandlerSellerInstances[i])).owner());
       feeHandlerSellerInstances[i].transfer(address(celoToken), ONE_CELOTOKEN, RECEIVER_ADDRESS);
 
       assertEq(
@@ -98,7 +93,7 @@ contract FeeHandlerSellerTest_SetMinimumReports is FeeHandlerSellerTest {
 
   function test_SetMinimumReports_ShouldSucceedWhen_CalledByOwner() public {
     for (uint256 i = 0; i < feeHandlerSellerInstances.length; i++) {
-      vm.prank(feeHandlerSellerInstances[i].owner());
+      vm.prank(IOwnable(address(feeHandlerSellerInstances[i])).owner());
 
       feeHandlerSellerInstances[i].setMinimumReports(
         ARBITRARY_TOKEN_ADDRESS,

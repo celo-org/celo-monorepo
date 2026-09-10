@@ -1,25 +1,30 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
 import "./SlasherUtil.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
+// Storage layout (must match 0.5 baseline):
+//   slot 0: _owner (address, 20 bytes) + initialized (bool, 1 byte) — packed
+//   slot 1: registry (address, 20 bytes)
+//   slot 2-3: slashingIncentives (inherited from SlasherUtil)
+//   slot 4: isSlashed
 contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
   using SafeMath for uint256;
 
   // For each signer address, check if a block header has already been slashed
   mapping(address => mapping(bytes32 => bool)) isSlashed;
 
-  event SlashingIncentivesSet(uint256 penalty, uint256 reward);
+  // SlashingIncentivesSet is inherited from SlasherUtil.
   event DoubleSigningSlashPerformed(address indexed validator, uint256 indexed blockNumber);
 
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public SlasherUtil(test) {}
+  constructor(bool test) SlasherUtil(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -45,7 +50,7 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 1);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -162,5 +167,14 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
       acc = acc >> 1;
     }
     return res;
+  }
+
+  /**
+   * @notice Whether the sender is the owner.
+   * @dev Kept from the Solidity 0.5 implementation: OpenZeppelin 2.5's Ownable exposed it
+   * and 4.9's does not, and the ABI behind the upgraded proxy must not lose a function.
+   */
+  function isOwner() external view returns (bool) {
+    return msg.sender == owner();
   }
 }

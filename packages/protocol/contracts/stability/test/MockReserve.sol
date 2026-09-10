@@ -1,18 +1,20 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.8.7 <0.8.20;
+
 // solhint-disable no-unused-vars
 
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
 /**
  * @title A mock Reserve for testing.
  */
-contract MockReserve {
+contract MockReserve08 {
   mapping(address => bool) public tokens;
 
   IERC20 public goldToken;
 
   // solhint-disable-next-line no-empty-blocks
-  function() external payable {}
+  receive() external payable {}
 
   function setGoldToken(address goldTokenAddress) external {
     goldToken = IERC20(goldTokenAddress);
@@ -39,5 +41,9 @@ contract MockReserve {
 
   function burnToken(address) external pure returns (bool) {
     return true;
+  }
+
+  function getReserveGoldBalance() public view returns (uint256) {
+    return address(this).balance;
   }
 }

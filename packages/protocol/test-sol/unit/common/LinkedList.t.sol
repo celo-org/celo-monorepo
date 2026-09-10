@@ -1,9 +1,47 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
 
-import "@celo-contracts/common/test/LinkedListWrapper.sol";
+import "@celo-contracts-8/common/linkedlists/LinkedList.sol";
+
+contract LinkedListWrapper {
+  using LinkedList for LinkedList.List;
+
+  LinkedList.List private list;
+
+  function insert(bytes32 key, bytes32 previousKey, bytes32 nextKey) external {
+    list.insert(key, previousKey, nextKey);
+  }
+
+  function update(bytes32 key, bytes32 previousKey, bytes32 nextKey) external {
+    list.update(key, previousKey, nextKey);
+  }
+
+  function remove(bytes32 key) external {
+    list.remove(key);
+  }
+
+  function contains(bytes32 key) external view returns (bool) {
+    return list.contains(key);
+  }
+
+  function getNumElements() external view returns (uint256) {
+    return list.numElements;
+  }
+
+  function getKeys() external view returns (bytes32[] memory) {
+    return list.getKeys();
+  }
+
+  function head() external view returns (bytes32) {
+    return list.head;
+  }
+
+  function tail() external view returns (bytes32) {
+    return list.tail;
+  }
+}
 
 contract LinkedListTest is Test {
   LinkedListWrapper linkedList;

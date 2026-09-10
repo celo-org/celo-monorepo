@@ -6,11 +6,8 @@ import { IProxy } from "@celo-contracts/common/interfaces/IProxy.sol";
 
 // Test imports
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
-import { StringUtils } from "@test-sol/utils/StringUtils.sol";
 
 contract ProxyFactoryTest is TestWithUtils08 {
-  using StringUtils for string;
-
   ProxyFactory08 proxyFactory08;
   bytes proxyInitCode;
   address constant owner = address(0xAA963FC97281d9632d96700aB62A4D1340F9a28a);
@@ -18,7 +15,7 @@ contract ProxyFactoryTest is TestWithUtils08 {
   function setUp() public override {
     super.setUp();
     proxyFactory08 = new ProxyFactory08();
-    proxyInitCode = vm.getCode("Proxy.sol");
+    proxyInitCode = vm.getCode("artifacts/solc-0.5/Proxy.sol/Proxy.json");
   }
 
   function test_deployProxy() public {
@@ -42,31 +39,13 @@ contract ProxyFactoryTest is TestWithUtils08 {
     assertFalse(deployedAddress == deployedAddress2);
   }
 
-  function test_verifyArtifacts() public {
-    string memory compiler = "0.5.17+commit.d19bba13";
-
-    checkbytecode(compiler, proxyInitCode, "./artifacts/Proxy/proxyInitCode");
+  function test_deployedProxyMatchesFrozenArtifact() public {
+    // The frozen artifact carries the runtime bytecode of the proxies deployed on mainnet;
+    // a proxy created from its init code must have exactly that code.
     address deployedAddress = proxyFactory08.deployArbitraryByteCode(0, owner, 0, proxyInitCode);
-    checkbytecode(compiler, deployedAddress.code, "./artifacts/Proxy/proxyBytecode");
-  }
-
-  function checkbytecode(
-    string memory compiler,
-    bytes memory bytecode,
-    string memory artifactPath
-  ) public view {
-    string memory bytecodeBackUp = vm.readFile(string.concat(artifactPath, compiler, ".hex"));
-    string memory bytecodeString = vm.toString(bytecode);
-
-    // Calculate the length of the bytecode to compare (ignoring the last 43 bytes for Swarm hash)
-    uint compareLength = bytes(bytecodeBackUp).length - 86; // 43 bytes in hex is 86 characters
-
-    // Slice the strings to exclude the Swarm hash
-    string memory bytecodeBackUpToCompare = substring(bytecodeBackUp, 0, compareLength);
-    string memory bytecodeToCompare = substring(bytecodeString, 0, compareLength);
-
-    // Assert that the truncated bytecode matches
-    assert(bytecodeBackUpToCompare.equals(bytecodeToCompare));
+    string memory artifact = vm.readFile("./artifacts/solc-0.5/Proxy.sol/Proxy.json");
+    bytes memory frozenRuntime = vm.parseJsonBytes(artifact, ".deployedBytecode.object");
+    assertEq(deployedAddress.code, frozenRuntime);
   }
 
   function substring(
