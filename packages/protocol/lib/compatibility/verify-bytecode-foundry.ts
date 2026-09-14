@@ -147,21 +147,36 @@ const ALLOWED_LEGACY_LIBRARIES: { [network: string]: { [library: string]: string
 // Implementations deployed before release verification covered them and built with other
 // settings than the release profile of their tag. The Celo Sepolia Registry
 // implementation is the old default-profile build (solc 0.5.17, optimizer on) of the
-// same source; CR18 replaces it. As with the libraries above, only that exact address is
-// accepted.
-const ALLOWED_LEGACY_IMPLEMENTATIONS: { [network: string]: { [contract: string]: string } } = {
+// same source. The exception only holds while a pre-migration release is verified
+// (up to and including untilRelease): CR18 replaces the implementation, and a CR18
+// verification that still finds the legacy one must fail.
+const ALLOWED_LEGACY_IMPLEMENTATIONS: {
+  [network: string]: { [contract: string]: { address: string; untilRelease: number } }
+} = {
   'celo-sepolia': {
-    Registry: '0x37882eB8997d7928eCe5Ebf590B307e291484881',
+    Registry: { address: '0x37882eB8997d7928eCe5Ebf590B307e291484881', untilRelease: 17 },
   },
 }
 
 const normalizeNetwork = (network: string): string =>
   ['celo', 'rc1'].includes(network.toLowerCase()) ? 'mainnet' : network.toLowerCase()
 
-export const isAllowedLegacyImplementation = (contract: string, address: string, network: string): boolean => {
+export const isAllowedLegacyImplementation = (
+  contract: string,
+  address: string,
+  network: string,
+  release: number
+): boolean => {
   const allowed = ALLOWED_LEGACY_IMPLEMENTATIONS[normalizeNetwork(network)]?.[contract]
-  return allowed !== undefined && allowed.toLowerCase() === address.toLowerCase()
+  return (
+    allowed !== undefined &&
+    release <= allowed.untilRelease &&
+    allowed.address.toLowerCase() === address.toLowerCase()
+  )
 }
+
+// The release being verified; set by verifyBytecodes, read where legacy exceptions apply.
+let verifiedRelease = 0
 
 export const isAllowedLegacyLibrary = (contract: string, address: string, network: string): boolean => {
   // Normalize the mainnet aliases used across the tooling.
@@ -319,7 +334,10 @@ const dfsStep = async (queue: QueueEntry[], visited: Set<string>, context: Verif
             `current build but matches a known legacy pre-0.8-migration deployment; treating as verified`
         )
         verifiedLibraries.add(contract)
-      } else if (!isLib && isAllowedLegacyImplementation(contract, implementationAddress, context.network)) {
+      } else if (
+        !isLib &&
+        isAllowedLegacyImplementation(contract, implementationAddress, context.network, verifiedRelease)
+      ) {
         console.log(
           `  ⚠️  ${kind} ${contract} (at ${implementationAddress}): on-chain bytecode is a known legacy ` +
             `build of this release on ${context.network}; treating as verified`
@@ -432,6 +450,7 @@ export const verifyBytecodes = async (
 
   const compiledContracts = Array.prototype.concat.apply([], artifacts.map(a => a.listArtifacts())).map((a) => getContractName(a))
 
+  verifiedRelease = version ?? 0
   if (version >= 18) {
     ignoredContracts = [...ignoredContracts, ...ignoredContractsV9, ...ignoredContractsV18]
   } else if (version > 9) {
