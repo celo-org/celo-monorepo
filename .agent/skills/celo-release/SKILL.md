@@ -162,6 +162,28 @@ echo "{}" > ./releaseData/initializationData/release${NEW}.json
 
 #### On Local Fork (Testing)
 
+Rehearse the whole release on an anvil fork before touching a network. The tooling derives the
+release number from the ref it builds, so tag HEAD locally with a name that parses as the next
+release and cannot collide with a real tag, and name the libraries file for the release before it:
+
+```bash
+anvil --celo --fork-url https://forno.celo-sepolia.celo-testnet.org --port 8545   # or forno.celo.org
+git tag core-contracts.v${NEW}-head HEAD                                          # delete it afterwards
+yarn release:verify-deployed:foundry -n celo-sepolia -b core-contracts.v${PREVIOUS}
+mv celo-sepolia-core-contracts.v${PREVIOUS}-libraries.json celo-sepolia-core-contracts.v${PREVIOUS}-head-libraries.json
+yarn release:check-versions:foundry -a core-contracts.v${PREVIOUS} -b core-contracts.v${NEW}-head
+yarn release:make:foundry -b core-contracts.v${NEW}-head -k <anvil key> -i ./releaseData/initializationData/release${NEW}.json \
+  -l celo-sepolia-core-contracts.v${PREVIOUS}-head-libraries.json -n celo-sepolia \
+  -r report-core-contracts.v${PREVIOUS}-core-contracts.v${NEW}-head.json -u http://127.0.0.1:8545 -s
+yarn release:verify-deployed:foundry -n celo-sepolia -b core-contracts.v${NEW}-head \
+  -p proposal-celo-sepolia-core-contracts.v${NEW}-head.json -u http://127.0.0.1:8545
+```
+
+`anvil --celo` is required (CELO token operations silently fail without it). On a Mac, export
+`NODE_OPTIONS=--dns-result-order=ipv4first` so Node reaches the IPv4-only anvil through `localhost`.
+Two rehearsals in worktrees of one repository must use different local tag names: tags are shared.
+
+
 ```bash
 yarn release:make:foundry \
   -b release/core-contracts/${NEW} \
