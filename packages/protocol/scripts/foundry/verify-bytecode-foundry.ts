@@ -39,7 +39,15 @@ export interface ProposalTx {
 }
 
 const argv = require('minimist')(process.argv.slice(2), {
-  string: ['build_artifacts', 'proposal', 'initialize_data', 'network', 'librariesFile', 'branch'],
+  string: [
+    'build_artifacts',
+    'proposal',
+    'initialize_data',
+    'network',
+    'librariesFile',
+    'branch',
+    'rpcUrl',
+  ],
 })
 
 const branch = (argv.branch ? argv.branch : '') as string
@@ -95,7 +103,8 @@ const getViemChain = (networkName: string): Chain => {
   }
 }
 const viemChain = getViemChain(network)
-const transportUrl = viemChain.rpcUrls.default.http[0]
+// A custom RPC (a local fork of the network) keeps the network's chain definition.
+const transportUrl: string = argv.rpcUrl || viemChain.rpcUrls.default.http[0]
 const publicClient = createPublicClient({
   chain: viemChain,
   transport: http(transportUrl),
