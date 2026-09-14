@@ -60,6 +60,11 @@ PENDING_OBJECT = "pending-execution.json"
 # request — Cloud Run keeps it alive — so this flag is the only reliable halt.
 HALT_OBJECT = "HALT"
 LOCK_STALE_SECONDS = 3600
+# Celo fee abstraction: when the wallet has no CELO, transfers are sent as
+# CIP-64 transactions that pay gas in USA₮ through its fee-currency adapter.
+CIP64_TX_TYPE = b"\x7b"
+FEE_CURRENCY_ADAPTER_DEFAULT = "0x0357EE22278c922e1D36cFe6b899269b161880C4"
+FEE_CURRENCY_GAS_LIMIT = 200_000  # ERC-20 transfer + the adapter's 85k intrinsic gas
 
 
 class DuneStillRunning(Exception):
@@ -282,6 +287,31 @@ def ledger_add(ledger: dict, wallet: str, amount: int, tx_hash: str) -> dict:
     }
 
 
+# ------------------------------------------------------- fee-currency send
+def fee_currency_gas_quote(w3, fee_currency: str) -> tuple[int, int]:
+    """(max_fee_per_gas, max_priority_fee_per_gas) denominated in the fee currency."""
+    gas_price = int(w3.provider.make_request("eth_gasPrice", [fee_currency])["result"], 16)
+    priority = int(w3.provider.make_request("eth_maxPriorityFeePerGas", [fee_currency])["result"], 16)
+    return gas_price * 2 + priority, priority
+
+
+def send_cip64_transfer(w3, account, chain_id: int, nonce: int, token: str, data: bytes,
+                        fee_currency: str, max_fee: int, max_priority: int):
+    """Send an ERC-20 transfer as a Celo CIP-64 tx (type 0x7b) with gas paid in
+    `fee_currency`. web3.py cannot sign this type, so the RLP payload is built
+    and signed by hand: 0x7b || rlp([chainId, nonce, maxPriorityFee, maxFee,
+    gasLimit, to, value, data, accessList, feeCurrency, yParity, r, s])."""
+    import rlp
+    from eth_keys import keys
+    from eth_utils import keccak, to_canonical_address
+
+    fields = [chain_id, nonce, max_priority, max_fee, FEE_CURRENCY_GAS_LIMIT,
+              to_canonical_address(token), 0, data, [], to_canonical_address(fee_currency)]
+    signature = keys.PrivateKey(bytes(account.key)).sign_msg_hash(keccak(CIP64_TX_TYPE + rlp.encode(fields)))
+    raw = CIP64_TX_TYPE + rlp.encode(fields + [signature.v, signature.r, signature.s])
+    return w3.eth.send_raw_transaction(raw)
+
+
 # ------------------------------------------------------------------ entry
 @functions_framework.http
 def distribute(request):
@@ -351,8 +381,22 @@ def distribute(request):
             # Dry run reports what a real run would do, funded or not.
             return ({**summary, "result": "dry run - nothing sent", "funded": funded}, 200)
 
-        if gas_balance < min_gas_wei:
-            return ({**summary, "error": f"hot wallet gas balance {gas_balance / 1e18:.4f} CELO below MIN_GAS_CELO - top up CELO"}, 500)
+        # Gas mode: CELO when there is enough of it, otherwise pay gas in USA₮
+        # via the fee-currency adapter and reserve that gas out of the token balance.
+        fee_currency = os.environ.get("FEE_CURRENCY_ADAPTER", FEE_CURRENCY_ADAPTER_DEFAULT)
+        gas_in_usat = gas_balance < min_gas_wei and bool(fee_currency)
+        gas_reserve = 0
+        if gas_in_usat:
+            fc_max_fee, fc_priority = fee_currency_gas_quote(w3, fee_currency)
+            # adapter quotes are 18-decimal; USA₮ balances here are 6-decimal
+            gas_reserve = len(owed) * FEE_CURRENCY_GAS_LIMIT * fc_max_fee // 10 ** 12
+            summary["gas_mode"] = "USAT via fee currency"
+            summary["gas_reserve_usat"] = gas_reserve / 1e6
+            if token_balance <= gas_reserve:
+                return ({**summary, "error": "no CELO and not enough USAT to even cover gas"}, 500)
+            token_balance -= gas_reserve
+        else:
+            summary["gas_mode"] = "CELO"
         if token_balance < total:
             # Partial mode: pay as many wallets as the balance covers. Whatever is
             # skipped stays "owed" in the ledger and is paid by a later run once
@@ -365,6 +409,7 @@ def distribute(request):
 
         nonce = w3.eth.get_transaction_count(hot_wallet, "pending")
         gas_price = w3.eth.gas_price
+        chain_id = w3.eth.chain_id
         paid_count = 0
         skipped_unfunded = 0
         remaining_balance = token_balance
@@ -377,20 +422,19 @@ def distribute(request):
             if amount > remaining_balance:
                 skipped_unfunded += 1
                 continue
-            tx = token.functions.transfer(
-                Web3.to_checksum_address(wallet), amount
-            ).build_transaction(
-                {
-                    "from": hot_wallet,
-                    "nonce": nonce,
-                    "gas": 100_000,
-                    "gasPrice": gas_price,
-                    "chainId": w3.eth.chain_id,
-                }
-            )
-            signed = account.sign_transaction(tx)
             try:
-                tx_hash = w3.eth.send_raw_transaction(signed.raw_transaction)
+                if gas_in_usat:
+                    data = token.encode_abi(abi_element_identifier="transfer",
+                                            args=[Web3.to_checksum_address(wallet), amount])
+                    tx_hash = send_cip64_transfer(w3, account, chain_id, nonce, usat_address, bytes.fromhex(data[2:]),
+                                                  fee_currency, fc_max_fee, fc_priority)
+                else:
+                    tx = token.functions.transfer(
+                        Web3.to_checksum_address(wallet), amount
+                    ).build_transaction(
+                        {"from": hot_wallet, "nonce": nonce, "gas": 100_000, "gasPrice": gas_price, "chainId": chain_id}
+                    )
+                    tx_hash = w3.eth.send_raw_transaction(account.sign_transaction(tx).raw_transaction)
                 receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
             except Exception as error:  # noqa: BLE001 - surface the RPC reason, keep the ledger intact
                 return (
