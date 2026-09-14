@@ -21,9 +21,10 @@ yarn add @celo/contracts
 ```solidity
 pragma solidity >=0.8.7 <0.8.20;
 
-import '@celo/contracts/0.8/common/UsingRegistry.sol';
+import '@celo/contracts/common/UsingRegistryV2NoMento.sol';
 
-contract Example is UsingRegistry {
+// UsingRegistryV2NoMento reads the Registry at its fixed address, so no initialization is needed.
+contract Example is UsingRegistryV2NoMento {
   constructor() {
     require(getAccounts().createAccount());
   }

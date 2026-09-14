@@ -1,48 +1,45 @@
 #!/usr/bin/env bash
-# Utilities for libraries file naming convention: $NETWORK-$BRANCH-libraries.json
+# Utilities for the libraries file naming convention: $NETWORK-$REF-libraries.json, where
+# $REF is the ref the file was produced for with slashes replaced by underscores.
+#
+# make-release links the libraries of the release before the one it builds, and that
+# release is always a tag, so the file it expects is the one verify-deployed writes for
+# core-contracts.v(N-1) whatever form the new ref takes (core-contracts.vN,
+# core-contracts.vN-<suffix> for a rehearsal, or release/core-contracts/N).
+
+source "$(dirname "${BASH_SOURCE[0]}")/extract-release-version.sh"
 
 get_libraries_filename() {
   local NETWORK="$1"
-  local BRANCH="$2"
-  echo "$NETWORK-$BRANCH-libraries.json"
+  local REF="$2"
+  echo "$NETWORK-$(echo "$REF" | sed -e 's#/#_#g')-libraries.json"
 }
 
 get_previous_libraries_filename() {
   local NETWORK="$1"
-  local BRANCH="$2"
-  local VERSION_NUMBER
-  VERSION_NUMBER=$(echo "$BRANCH" | grep -o 'v[0-9]\+' | tr -dc '0-9')
-
-  if [ -z "$VERSION_NUMBER" ] || [ "$VERSION_NUMBER" -lt 1 ]; then
-    echo "Error: Could not extract a valid version number from branch '$BRANCH'." >&2
-    echo "Branch must match the pattern *vN (e.g., core-contracts.v15)." >&2
+  local REF="$2"
+  extract_release_version "$REF"
+  if [ "$RELEASE_VERSION" -lt 2 ]; then
+    echo "Error: no release precedes '$REF'." >&2
     return 1
   fi
-
-  local PREVIOUS_VERSION=$((VERSION_NUMBER - 1))
-  local PREVIOUS_BRANCH
-  PREVIOUS_BRANCH=$(echo "$BRANCH" | sed "s/v${VERSION_NUMBER}/v${PREVIOUS_VERSION}/")
-
-  get_libraries_filename "$NETWORK" "$PREVIOUS_BRANCH"
+  get_libraries_filename "$NETWORK" "core-contracts.v$((RELEASE_VERSION - 1))"
 }
 
 validate_libraries_filename() {
   local LIBRARIES="$1"
   local NETWORK="$2"
-  local BRANCH="$3"
+  local REF="$3"
 
   local EXPECTED
-  EXPECTED=$(get_previous_libraries_filename "$NETWORK" "$BRANCH") || exit 1
+  EXPECTED=$(get_previous_libraries_filename "$NETWORK" "$REF") || exit 1
 
   local ACTUAL
   ACTUAL=$(basename "$LIBRARIES")
 
   if [ "$ACTUAL" != "$EXPECTED" ]; then
-    local VERSION_NUMBER
-    VERSION_NUMBER=$(echo "$BRANCH" | grep -o 'v[0-9]\+' | tr -dc '0-9')
-    local PREVIOUS_VERSION=$((VERSION_NUMBER - 1))
     echo "Error: Libraries file name '$ACTUAL' does not match expected format '$EXPECTED'." >&2
-    echo "The libraries file must be from the previous release (v$PREVIOUS_VERSION), not the current one (v$VERSION_NUMBER)." >&2
+    echo "The libraries file must be the one verify-deployed produced for the previous release." >&2
     exit 1
   fi
 }

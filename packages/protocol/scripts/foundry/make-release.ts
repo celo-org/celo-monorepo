@@ -434,6 +434,9 @@ function bigIntReplacer(_key: string, value: any): unknown {
 
 let ignoredContractsSet = new Set()
 
+const REGISTRY_LOOKUP_ATTEMPTS = 3
+const REGISTRY_LOOKUP_RETRY_DELAY_MS = 2000
+
 class ContractAddresses {
   static async create(
     contracts: string[],
@@ -443,31 +446,40 @@ class ContractAddresses {
     libraryAddresses: LibraryAddresses['addresses']
   ) {
     const addresses = new Map<string, string>()
+    // The registry answers the zero address for an unregistered name; a failed lookup is
+    // something else (an RPC timeout or rate limit) and must not be mistaken for it,
+    // since a contract missing from this map is later treated as having no proxy.
+    const lookup = async (contract: string, attempt = 1): Promise<string> => {
+      try {
+        // Use low-level call to avoid viem's strict readContract typing
+        const callData = encodeFunctionData({
+          abi: registryGetAddressAbi,
+          functionName: 'getAddressForString',
+          args: [contract],
+        })
+        const result = await publicClient.call({ to: registryAddress, data: callData })
+        return result.data
+          ? (decodeFunctionResult({
+              abi: registryGetAddressAbi,
+              functionName: 'getAddressForString',
+              data: result.data,
+            }) as string)
+          : NULL_ADDRESS
+      } catch (error) {
+        if (attempt < REGISTRY_LOOKUP_ATTEMPTS) {
+          await new Promise((resolve) => setTimeout(resolve, REGISTRY_LOOKUP_RETRY_DELAY_MS))
+          return lookup(contract, attempt + 1)
+        }
+        throw new Error(
+          `Registry lookup of ${contract} failed ${attempt} times; refusing to guess whether it is registered: ${error}`
+        )
+      }
+    }
     await Promise.all(
       contracts.map(async (contract: string) => {
-        try {
-          // Use low-level call to avoid viem's strict readContract typing
-          const callData = encodeFunctionData({
-            abi: registryGetAddressAbi,
-            functionName: 'getAddressForString',
-            args: [contract],
-          })
-          const result = await publicClient.call({
-            to: registryAddress,
-            data: callData,
-          })
-          const registeredAddress = result.data
-            ? decodeFunctionResult({
-                abi: registryGetAddressAbi,
-                functionName: 'getAddressForString',
-                data: result.data,
-              })
-            : NULL_ADDRESS
-          if (registeredAddress && !eqAddress(registeredAddress, NULL_ADDRESS)) {
-            addresses.set(contract, registeredAddress)
-          }
-        } catch (error) {
-          /* Ignore error if contract not in registry */
+        const registeredAddress = await lookup(contract)
+        if (!eqAddress(registeredAddress, NULL_ADDRESS)) {
+          addresses.set(contract, registeredAddress)
         }
       })
     )
@@ -776,7 +788,10 @@ const deployProxy = async (
     account: walletClient.account!,
     chain: walletClient.chain!,
   })
-  await publicClient.waitForTransactionReceipt({ hash: transferHash })
+  const transferReceipt = await publicClient.waitForTransactionReceipt({ hash: transferHash })
+  if (transferReceipt.status !== 'success') {
+    throw new Error(`Transferring ${proxyContractName} to Governance failed: ${transferHash}`)
+  }
   return deployedProxyContract
 }
 
@@ -1103,7 +1118,9 @@ const warnAboutProxiesGovernanceCannotUpgrade = async (
   }
   const governance = `0x${addresses.get('Governance').replace(/^0x/, '')}`
   for (const tx of proposal) {
-    if (tx.function !== '_setImplementation' || !tx.contract.endsWith('Proxy')) {
+    const repointsProxy =
+      tx.function === '_setImplementation' || tx.function === '_setAndInitializeImplementation'
+    if (!repointsProxy || !tx.contract.endsWith('Proxy')) {
       continue
     }
     const contractName = tx.contract.slice(0, -'Proxy'.length)

@@ -58,7 +58,7 @@ if [ -n "$PROPOSAL" ]; then
   echo "See: https://github.com/celo-org/celo-monorepo/pull/11662" >&2
   exit 1
 fi
-PROPOSAL="proposal-$NETWORK-$BRANCH.json"
+PROPOSAL="proposal-$NETWORK-$(echo "$BRANCH" | sed -e 's#/#_#g').json"
 
 source scripts/bash/validate-libraries-filename.sh
 validate_libraries_filename "$LIBRARIES" "$NETWORK" "$BRANCH"

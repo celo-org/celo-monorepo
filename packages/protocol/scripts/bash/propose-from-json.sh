@@ -3,8 +3,8 @@
 #
 # celocli's governance:propose builds the transactions from its bundled ABIs and fails on
 # core contracts it does not know (e.g. BlockchainParametersProxy). This script encodes
-# the two calls a release proposal contains (XProxy._setImplementation and
-# Registry.setAddressFor) itself. Destinations: Registry/RegistryProxy is the registry
+# the calls a release proposal contains (XProxy._setImplementation,
+# XProxy._setAndInitializeImplementation for a new contract, Registry.setAddressFor) itself. Destinations: Registry/RegistryProxy is the registry
 # address; XProxy is the registry address of X, or, when X is registered by this very
 # proposal, the address its setAddressFor entry carries.
 #
@@ -73,6 +73,7 @@ for i in $(seq 0 $((COUNT - 1))); do
   case "$FUNCTION" in
     _setImplementation) CALLDATA=$(cast calldata "_setImplementation(address)" "$(jq -r ".[$i].args[0]" "$PROPOSAL")") ;;
     setAddressFor) CALLDATA=$(cast calldata "setAddressFor(string,address)" "$(jq -r ".[$i].args[0]" "$PROPOSAL")" "$(jq -r ".[$i].args[1]" "$PROPOSAL")") ;;
+    _setAndInitializeImplementation) CALLDATA=$(cast calldata "_setAndInitializeImplementation(address,bytes)" "$(jq -r ".[$i].args[0]" "$PROPOSAL")" "$(jq -r ".[$i].args[1]" "$PROPOSAL")") ;;
     *) echo "Entry $i calls $FUNCTION, which this script does not encode" >&2; exit 1 ;;
   esac
 

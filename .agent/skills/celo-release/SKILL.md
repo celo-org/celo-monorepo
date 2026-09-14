@@ -170,10 +170,9 @@ release and cannot collide with a real tag, and name the libraries file for the 
 anvil --celo --fork-url https://forno.celo-sepolia.celo-testnet.org --port 8545   # or forno.celo.org
 git tag core-contracts.v${NEW}-head HEAD                                          # delete it afterwards
 yarn release:verify-deployed:foundry -n celo-sepolia -b core-contracts.v${PREVIOUS}
-mv celo-sepolia-core-contracts.v${PREVIOUS}-libraries.json celo-sepolia-core-contracts.v${PREVIOUS}-head-libraries.json
 yarn release:check-versions:foundry -a core-contracts.v${PREVIOUS} -b core-contracts.v${NEW}-head
 yarn release:make:foundry -b core-contracts.v${NEW}-head -k <anvil key> -i ./releaseData/initializationData/release${NEW}.json \
-  -l celo-sepolia-core-contracts.v${PREVIOUS}-head-libraries.json -n celo-sepolia \
+  -l celo-sepolia-core-contracts.v${PREVIOUS}-libraries.json -n celo-sepolia \
   -r report-core-contracts.v${PREVIOUS}-core-contracts.v${NEW}-head.json -u http://127.0.0.1:8545 -s
 yarn release:verify-deployed:foundry -n celo-sepolia -b core-contracts.v${NEW}-head \
   -p proposal-celo-sepolia-core-contracts.v${NEW}-head.json -u http://127.0.0.1:8545

@@ -34,8 +34,8 @@ done
 extract_release_version "$BRANCH"
 NEXT_BRANCH="core-contracts.v$((RELEASE_VERSION + 1))-head"
 BASELINE_LIBRARIES=$(get_libraries_filename "anvil" "$BRANCH")
-# make-release expects the libraries file to be named for the release before the one
-# it builds, which for the -head tag differs from the name verify-deployed produces.
+# make-release expects the libraries file of the release before the one it builds, which
+# is the file verify-deployed writes for the baseline tag.
 RELEASE_LIBRARIES=$(get_previous_libraries_filename "anvil" "$NEXT_BRANCH")
 REPORT="report-$BRANCH-$NEXT_BRANCH.json"
 PROPOSAL="proposal-anvil-$NEXT_BRANCH.json"
@@ -64,7 +64,9 @@ fi
 
 echo "- Verify bytecode of the network against $BRANCH"
 yarn release:verify-deployed:foundry -n anvil -b $BRANCH
-mv "$BASELINE_LIBRARIES" "$RELEASE_LIBRARIES"
+if [[ "$BASELINE_LIBRARIES" != "$RELEASE_LIBRARIES" ]]; then
+  mv "$BASELINE_LIBRARIES" "$RELEASE_LIBRARIES"
+fi
 
 echo "- Check versions of HEAD ($NEXT_BRANCH) against $BRANCH"
 yarn release:check-versions:foundry -a $BRANCH -b $NEXT_BRANCH

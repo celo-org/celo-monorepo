@@ -103,6 +103,8 @@ export const Interfaces = [
   'IERC20',
   'IERC20CeloTokens',
   'ICeloVersionedContract',
+  // the flat ReleaseGold initializer ABI, answered through the contract's fallback
+  'IReleaseGoldInitializer',
 ] as const
 
 export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreContracts)
