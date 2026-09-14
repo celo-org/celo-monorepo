@@ -185,6 +185,15 @@ a fork that aged past that window rejects every transaction. On a Mac, export
 `NODE_OPTIONS=--dns-result-order=ipv4first` so Node reaches the IPv4-only anvil through `localhost`.
 Two rehearsals in worktrees of one repository must use different local tag names: tags are shared.
 
+To run the generated proposal through governance on the fork, submit it with
+`scripts/bash/propose-from-json.sh -p <proposal.json> -u http://127.0.0.1:8545 -k <key> -d <CGP url>`:
+celocli's `governance:propose` cannot build it (its bundled ABIs miss some core contracts), while
+`governance:dequeue`, `governance:approve` (from the impersonated approver), `governance:vote` and
+`governance:execute` work against the fork. A proposal that registers new contracts must keep each
+`setAddressFor` before the matching `_setImplementation`; the script resolves those proxies from the
+`setAddressFor` entries because they are not in the registry until the proposal executes. After
+execution, run `verify-deployed` without `-p` to check the live proxies.
+
 
 ```bash
 yarn release:make:foundry \

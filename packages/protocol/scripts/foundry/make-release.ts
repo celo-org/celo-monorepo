@@ -1107,10 +1107,18 @@ const warnAboutProxiesGovernanceCannotUpgrade = async (
       continue
     }
     const contractName = tx.contract.slice(0, -'Proxy'.length)
-    if (!addresses.addresses.has(contractName)) {
+    // A proxy this proposal registers itself is not in the registry yet; its address is
+    // the one the setAddressFor entry carries.
+    const registeredHere = proposal.find(
+      (other) => other.function === 'setAddressFor' && other.args[0] === contractName
+    )
+    const knownAddress = addresses.addresses.has(contractName)
+      ? addresses.get(contractName)
+      : registeredHere?.args[1]
+    if (!knownAddress) {
       continue
     }
-    const proxyAddress = `0x${addresses.get(contractName).replace(/^0x/, '')}` as ViemAddress
+    const proxyAddress = `0x${knownAddress.replace(/^0x/, '')}` as ViemAddress
     const result = await publicClient.call({
       to: proxyAddress,
       data: encodeFunctionData({ abi: proxyGetOwnerAbi, functionName: '_getOwner' }),
