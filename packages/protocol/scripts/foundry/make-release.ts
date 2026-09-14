@@ -1079,6 +1079,58 @@ const listContractNames = (baseDir: string): string[] => {
 // library deployed in this run is trusted, and so is a deployment verify-deployed
 // accepts as a known legacy library (the original 0.5 AddressLinkedList on mainnet,
 // which the live Validators links and which is not worth relinking).
+const proxyGetOwnerAbi = [
+  {
+    type: 'function',
+    name: '_getOwner',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+  },
+] as const
+
+// A proposal is executed by Governance, so every proxy it repoints must be owned by the
+// Governance proxy. A proxy owned by someone else (Mento's SortedOracles on mainnet, an
+// EOA on a testnet) makes that entry revert at execution time; say so when the proposal
+// is generated instead.
+const warnAboutProxiesGovernanceCannotUpgrade = async (
+  proposal: ProposalTx[],
+  addresses: ContractAddresses,
+  publicClient: PublicClientMethods
+): Promise<void> => {
+  if (!addresses.addresses.has('Governance')) {
+    return
+  }
+  const governance = `0x${addresses.get('Governance').replace(/^0x/, '')}`
+  for (const tx of proposal) {
+    if (tx.function !== '_setImplementation' || !tx.contract.endsWith('Proxy')) {
+      continue
+    }
+    const contractName = tx.contract.slice(0, -'Proxy'.length)
+    if (!addresses.addresses.has(contractName)) {
+      continue
+    }
+    const proxyAddress = `0x${addresses.get(contractName).replace(/^0x/, '')}` as ViemAddress
+    const result = await publicClient.call({
+      to: proxyAddress,
+      data: encodeFunctionData({ abi: proxyGetOwnerAbi, functionName: '_getOwner' }),
+    })
+    const owner = result.data
+      ? (decodeFunctionResult({
+          abi: proxyGetOwnerAbi,
+          functionName: '_getOwner',
+          data: result.data,
+        }) as string)
+      : NULL_ADDRESS
+    if (!eqAddress(owner, governance)) {
+      console.warn(
+        `WARNING: ${tx.contract} at ${proxyAddress} is owned by ${owner}, not by Governance ` +
+          `(${governance}); Governance cannot execute its _setImplementation`
+      )
+    }
+  }
+}
+
 const verifiedLibraries = new Set<string>()
 // Set once in main(); the network decides which legacy library deployments are accepted.
 let releaseNetworkName = ''
@@ -1536,6 +1588,7 @@ async function main() {
       }
     }
 
+    await warnAboutProxiesGovernanceCannotUpgrade(proposal, addresses, publicClient)
     writeJsonSync(argv.proposal, proposal, { spaces: 2 })
     console.log(`Proposal successfully written to ${argv.proposal}`)
 

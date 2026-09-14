@@ -179,7 +179,9 @@ yarn release:verify-deployed:foundry -n celo-sepolia -b core-contracts.v${NEW}-h
   -p proposal-celo-sepolia-core-contracts.v${NEW}-head.json -u http://127.0.0.1:8545
 ```
 
-`anvil --celo` is required (CELO token operations silently fail without it). On a Mac, export
+`anvil --celo` is required (CELO token operations silently fail without it). Forno serves fork state
+for roughly the last 10,000 blocks only, so start (or restart) the fork right before `make-release`:
+a fork that aged past that window rejects every transaction. On a Mac, export
 `NODE_OPTIONS=--dns-result-order=ipv4first` so Node reaches the IPv4-only anvil through `localhost`.
 Two rehearsals in worktrees of one repository must use different local tag names: tags are shared.
 
