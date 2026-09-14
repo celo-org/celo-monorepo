@@ -344,14 +344,15 @@ def distribute(request):
         gas_balance = w3.eth.get_balance(hot_wallet)
         summary["token_balance_usat"] = token_balance / 1e6
         summary["gas_balance_celo"] = gas_balance / 1e18
-        funded = token_balance >= total and gas_balance >= 10 ** 16  # 0.01 CELO floor
+        min_gas_wei = int(float(os.environ.get("MIN_GAS_CELO", "1")) * 10 ** 18)
+        funded = token_balance >= total and gas_balance >= min_gas_wei
 
         if dry_run:
             # Dry run reports what a real run would do, funded or not.
             return ({**summary, "result": "dry run - nothing sent", "funded": funded}, 200)
 
-        if gas_balance < 10 ** 16:
-            return ({**summary, "error": "hot wallet gas balance below 0.01 CELO"}, 500)
+        if gas_balance < min_gas_wei:
+            return ({**summary, "error": f"hot wallet gas balance {gas_balance / 1e18:.4f} CELO below MIN_GAS_CELO - top up CELO"}, 500)
         if token_balance < total:
             # Partial mode: pay as many wallets as the balance covers. Whatever is
             # skipped stays "owed" in the ledger and is paid by a later run once
@@ -388,8 +389,14 @@ def distribute(request):
                 }
             )
             signed = account.sign_transaction(tx)
-            tx_hash = w3.eth.send_raw_transaction(signed.raw_transaction)
-            receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
+            try:
+                tx_hash = w3.eth.send_raw_transaction(signed.raw_transaction)
+                receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
+            except Exception as error:  # noqa: BLE001 - surface the RPC reason, keep the ledger intact
+                return (
+                    {**summary, "paid": paid_count, "error": f"send to {wallet} failed: {error}"[:500]},
+                    500,
+                )
             if receipt.status != 1:
                 return (
                     {**summary, "paid": paid_count, "error": f"transfer to {wallet} reverted"},
