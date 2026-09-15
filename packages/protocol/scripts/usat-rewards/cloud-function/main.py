@@ -715,36 +715,38 @@ def distribute(request):
         fee_currency = os.environ.get("FEE_CURRENCY_ADAPTER", FEE_CURRENCY_ADAPTER_DEFAULT)
         short_on_celo = gas_balance < required_gas_wei
         gas_in_usat = short_on_celo and bool(fee_currency)
-        gas_reserve = 0
         fc_max_fee = fc_priority = 0
-        payable_balance = token_balance
+        per_transfer_usat = 0
         if gas_in_usat:
             fc_max_fee, fc_priority = fee_currency_gas_quote(w3, fee_currency)
             # Adapter quotes are 18-decimal while USA₮ balances here are
             # 6-decimal, and debitGasFees rounds every transaction's debit up
             # on its own — so reserve the sum of per-transaction ceilings
             # instead of flooring the combined estimate once.
-            per_transfer = -(-(FEE_CURRENCY_GAS_LIMIT * fc_max_fee) // 10 ** 12)
-            # Reserve gas only for the transfers this run can actually send. The
-            # loop below walks the same order and skips whatever the balance does
-            # not cover, so reserving for every owed wallet would let a large
-            # under-funded set abort instead of paying the prefix it can afford.
-            affordable = 0
-            committed = 0
-            for _, amount in sorted(owed.items()):
-                if committed + amount + per_transfer > token_balance:
-                    continue
-                committed += amount + per_transfer
-                affordable += 1
-            gas_reserve = affordable * per_transfer
-            payable_balance = token_balance - gas_reserve
+            per_transfer_usat = -(-(FEE_CURRENCY_GAS_LIMIT * fc_max_fee) // 10 ** 12)
+
+        # Pick the exact transfers this run can afford, each payout together with
+        # its own gas, and pay that set and nothing else. A reserve sized for one
+        # subset while the loop walks a larger one is how a run pays a prefix and
+        # then dies debiting gas for a transfer nothing was reserved for.
+        selected: dict[str, int] = {}
+        committed = 0
+        for wallet, amount in sorted(owed.items()):
+            if committed + amount + per_transfer_usat > token_balance:
+                continue
+            committed += amount + per_transfer_usat
+            selected[wallet] = amount
+        gas_reserve = len(selected) * per_transfer_usat
+        selected_total = sum(selected.values())
+
+        if gas_in_usat:
             summary["gas_mode"] = "USAT via fee currency"
             summary["gas_reserve_usat"] = gas_reserve / 1e6
         elif short_on_celo:
             summary["gas_mode"] = "none - short on CELO with no FEE_CURRENCY_ADAPTER"
         else:
             summary["gas_mode"] = "CELO"
-        funded = (not short_on_celo or gas_in_usat) and payable_balance >= total
+        funded = (not short_on_celo or gas_in_usat) and len(selected) == len(owed)
 
         if dry_run:
             # Dry run reports what a real run would do, funded or not.
@@ -761,34 +763,35 @@ def distribute(request):
                 },
                 500,
             )
-        if gas_in_usat and gas_reserve == 0:
+        if not selected:
             return (
-                {**summary, "error": "no CELO and not enough USAT to cover even one transfer "
-                                     "plus its gas"},
+                {**summary, "error": "the USAT balance covers no owed transfer"
+                                     + (" plus its gas" if gas_in_usat else "")},
                 500,
             )
-        token_balance = payable_balance
-        if token_balance < total:
+        if len(selected) < len(owed):
             # Partial mode: pay as many wallets as the balance covers. Whatever is
             # skipped stays "owed" in the ledger and is paid by a later run once
             # the wallet is topped up — nothing is lost, only delayed.
             summary["partial"] = True
-            summary["shortfall_usat"] = (total - token_balance) / 1e6
+            summary["shortfall_usat"] = (total - selected_total) / 1e6
 
         if store.exists(HALT_OBJECT):
             return ({**summary, "result": "HALT flag present - nothing sent"}, 423)
 
         nonce = w3.eth.get_transaction_count(hot_wallet, "pending")
         paid_count = 0
-        skipped_unfunded = 0
+        skipped_unfunded = len(owed) - len(selected)
         remaining_balance = token_balance
-        for wallet, amount in sorted(owed.items()):
+        for wallet, amount in sorted(selected.items()):
             if store.exists(HALT_OBJECT):
                 return (
                     {**summary, "paid": paid_count, "result": "HALT flag raised mid-run - stopped"},
                     423,
                 )
-            if amount > remaining_balance:
+            # The selection above already proved the balance covers this payout
+            # and its gas; this only guards against the two drifting apart.
+            if amount + per_transfer_usat > remaining_balance:
                 skipped_unfunded += 1
                 continue
             try:
@@ -846,7 +849,7 @@ def distribute(request):
             store.delete(PENDING_TRANSFER_OBJECT)
             nonce += 1
             paid_count += 1
-            remaining_balance -= amount
+            remaining_balance -= amount + per_transfer_usat
 
         return (
             {

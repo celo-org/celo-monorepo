@@ -62,8 +62,10 @@ passes the post-bump campaign values, so these are what is actually enforced:
 - Gas is checked for the whole run (`len(owed) × 100k × gas price`, floored by
   the small `MIN_GAS_CELO`, default 0.05 CELO), not a flat minimum, so a run
   cannot pay a prefix and then run dry. Without CELO, gas is paid in USA₮ and
-  reserved out of the balance — for the transfers the balance can actually fund,
-  so an under-funded wallet pays the prefix it can afford rather than aborting.
+  reserved out of the balance for exactly the transfers the run then sends: the
+  affordable set is selected up front, payout plus that transfer's own gas, and
+  the send loop pays that set and nothing else, so an under-funded wallet pays
+  the prefix it can afford instead of aborting or dying on the last debit.
   With `FEE_CURRENCY_ADAPTER` empty there is no such fallback and too little
   CELO aborts before the first transfer. The gas mode is decided before the
   dry-run report, so `funded`/`gas_mode` describe what a real run would do.
