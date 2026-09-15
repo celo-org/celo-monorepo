@@ -554,5 +554,6 @@
     4500000
   ],
   "generated_at": "2026-09-02T12:11:31.237030+00:00",
-  "purpose": "one-time +4.50 USAT top-off for wallets that claimed the 0.50 drip before the 10x bump"
+  "purpose": "one-time +4.50 USAT top-off for wallets that claimed the 0.50 drip before the 10x bump",
+  "completed": true
 }
