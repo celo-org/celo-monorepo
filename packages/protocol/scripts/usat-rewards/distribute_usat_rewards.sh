@@ -87,73 +87,107 @@ fi
 
 # One run at a time: two overlapping runs would both fetch the same pre-payment
 # snapshot and could pay the same wallets twice at different nonces.
-LOCK_DIR="scripts/usat-rewards/.run-lock"
-# A run killed at the wrong moment used to leave this directory behind forever,
-# and every later run then refused to start, so a lock older than any plausible
-# run may be taken over. Age comes from the directory's own mtime via `find
-# -mmin` (portable, and set atomically by mkdir) rather than a file written just
-# after the claim, which a second run could read before it exists and mistake a
-# one-second-old lock for an abandoned one.
+#
+# The lock is a symlink at a fixed path pointing at a directory named after the
+# run that owns it. That indirection is what makes a takeover safe: the thing
+# renamed away is the specific stale directory that was inspected, a name no
+# other run shares, so a contender that judged the same directory stale finds it
+# gone and loses, and one that arrives later judges a different directory and
+# cannot touch this claim. Renaming the shared path itself — as this did before
+# — bound the rename to nothing: a delayed contender could move the live lock a
+# new owner had just created and both would believe they held it.
+LOCK_LINK="scripts/usat-rewards/.run-lock"
 LOCK_STALE_SECONDS="${LOCK_STALE_SECONDS:-7200}"
 LOCK_STALE_MINUTES=$((LOCK_STALE_SECONDS / 60))
 if [ "$LOCK_STALE_MINUTES" -lt 1 ]; then
     LOCK_STALE_MINUTES=1
 fi
 LOCK_TOKEN="$$-$(date +%s)-${RANDOM}"
-LOCK_TOMBSTONE="${LOCK_DIR}.stale.${LOCK_TOKEN}"
+LOCK_TARGET_NAME="$(basename "$LOCK_LINK").$LOCK_TOKEN"
+LOCK_TARGET="$(dirname "$LOCK_LINK")/$LOCK_TARGET_NAME"
 
+# Age comes from the directory's own mtime, set atomically by mkdir, read with
+# `find -mmin` (portable, and nothing written after the claim that a contender
+# could read before it exists and mistake a new lock for an abandoned one).
 lock_is_stale() {
-    [ -n "$(find "$LOCK_DIR" -maxdepth 0 -mmin "+$LOCK_STALE_MINUTES" 2> /dev/null)" ]
+    [ -n "$(find "$1" -maxdepth 0 -mmin "+$LOCK_STALE_MINUTES" 2> /dev/null)" ]
 }
 
-# Claim the lock, or fail. `mkdir` is the only thing that ever creates the lock
-# path, so it alone decides the owner. Taking over a stale lock goes through
-# renaming it away first: a rename can succeed for exactly one process — every
-# other one finds the source already gone — so only that winner is allowed to
-# create the replacement. The previous remove-then-recreate sequence let two
-# runs both see the stale lock, and the second one's remove deleted the first
-# one's fresh lock, leaving both convinced they owned it.
-claim_lock() {
-    if mkdir "$LOCK_DIR" 2> /dev/null; then
-        printf '%s\n' "$LOCK_TOKEN" > "$LOCK_DIR/owner"
+lock_owner_name() {
+    readlink "$LOCK_LINK" 2> /dev/null || true
+}
+
+_claim_lock() {
+    mkdir -p "$(dirname "$LOCK_LINK")"
+    mkdir "$LOCK_TARGET" || return 1
+
+    # A plain directory at the lock path is a lock from the older layout, and it
+    # has to be ruled out before `ln` is asked anything: given a directory, ln
+    # creates a file inside it and reports success instead of refusing. Taking
+    # such a lock over could only work by renaming the shared path, which is the
+    # one thing that cannot be done safely, so it is left for a human to clear.
+    if [ -e "$LOCK_LINK" ] && [ ! -L "$LOCK_LINK" ]; then
+        echo "$LOCK_LINK is a lock from the older directory layout, not the expected" >&2
+        echo "symlink. If no payout run is in progress, remove it and re-run:" >&2
+        echo "  rm -rf $LOCK_LINK" >&2
+        return 1
+    fi
+
+    # `ln -sn` is the atomic exclusive claim: -n keeps it from following an
+    # existing link, so it fails outright instead of quietly creating a file
+    # inside whatever the lock points at.
+    if ln -sn "$LOCK_TARGET_NAME" "$LOCK_LINK" 2> /dev/null; then
         return 0
     fi
-    if ! lock_is_stale; then
-        echo "another payout run holds $LOCK_DIR — wait for it to finish, or remove that" >&2
-        echo "directory if you are certain no run is in progress." >&2
+
+    local held held_dir
+    held=$(lock_owner_name)
+    held_dir="$(dirname "$LOCK_LINK")/$held"
+    if [ -z "$held" ] || [ ! -d "$held_dir" ]; then
+        echo "$LOCK_LINK points at no lock directory — another run is claiming it right" >&2
+        echo "now, or one died mid-takeover. Re-run; if it persists, remove $LOCK_LINK." >&2
         return 1
     fi
-    echo "warning: $LOCK_DIR has been held for over ${LOCK_STALE_MINUTES}m — assuming the run" >&2
+    if ! lock_is_stale "$held_dir"; then
+        echo "another payout run holds $LOCK_LINK — wait for it to finish, or remove that" >&2
+        echo "link if you are certain no run is in progress." >&2
+        return 1
+    fi
+    echo "warning: $LOCK_LINK has been held for over ${LOCK_STALE_MINUTES}m — assuming the run" >&2
     echo "that created it died, and taking it over." >&2
-    # The tombstone name is unique to this process, so clearing it first cannot
-    # disturb anyone else and guarantees the rename has a free destination.
-    rm -rf "$LOCK_TOMBSTONE"
-    if ! mv "$LOCK_DIR" "$LOCK_TOMBSTONE" 2> /dev/null; then
-        echo "another run took over $LOCK_DIR first — aborting." >&2
+    # Exactly one contender can rename this particular directory away.
+    if ! mv "$held_dir" "$held_dir.stale.$LOCK_TOKEN" 2> /dev/null; then
+        echo "another run took over $LOCK_LINK first — aborting." >&2
         return 1
     fi
-    rm -rf "$LOCK_TOMBSTONE"
-    if ! mkdir "$LOCK_DIR" 2> /dev/null; then
-        echo "another run claimed $LOCK_DIR first — aborting." >&2
-        return 1
-    fi
-    printf '%s\n' "$LOCK_TOKEN" > "$LOCK_DIR/owner"
-    # Re-read what is actually in the lock before paying anyone: the owner token
-    # is the thing that has to be ours, not the fact that some mkdir succeeded.
-    if [ "$(cat "$LOCK_DIR/owner" 2> /dev/null)" != "$LOCK_TOKEN" ]; then
-        echo "lost $LOCK_DIR to another run after claiming it — aborting." >&2
+    rm -rf "$held_dir.stale.$LOCK_TOKEN"
+    # Only that winner gets here, and the link now dangles, so repointing it is
+    # uncontended: a fresh contender's `ln -sn` still fails on the existing link
+    # and every other takeover lost the rename above. `-f -n` replaces the link
+    # itself rather than following it.
+    ln -sfn "$LOCK_TARGET_NAME" "$LOCK_LINK" || return 1
+    if [ "$(lock_owner_name)" != "$LOCK_TARGET_NAME" ]; then
+        echo "lost $LOCK_LINK to another run after claiming it — aborting." >&2
         return 1
     fi
     return 0
 }
 
-release_lock() {
-    # Only the owner may release: a run whose stale lock was taken over must not
-    # delete the lock the new owner is holding.
-    if [ "$(cat "$LOCK_DIR/owner" 2> /dev/null)" = "$LOCK_TOKEN" ]; then
-        rm -f "$LOCK_DIR/owner"
-        rmdir "$LOCK_DIR" 2> /dev/null || true
+claim_lock() {
+    if _claim_lock; then
+        return 0
     fi
+    rmdir "$LOCK_TARGET" 2> /dev/null || true
+    return 1
+}
+
+release_lock() {
+    # Only the owner clears the shared link; a run whose stale lock was taken
+    # over still cleans up its own directory, never the new owner's lock.
+    if [ "$(lock_owner_name)" = "$LOCK_TARGET_NAME" ]; then
+        rm -f "$LOCK_LINK"
+    fi
+    rm -rf "$LOCK_TARGET"
 }
 
 claim_lock || exit 1

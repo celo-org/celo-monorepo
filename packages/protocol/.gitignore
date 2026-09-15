@@ -68,4 +68,4 @@ scripts/usat-rewards/.env.topoff
 # round's ledger is the opposite — it is the record that keeps that round from
 # being paid twice, so it stays tracked (topoff-paid-ledger.json).
 scripts/usat-rewards/paid-ledger.json
-scripts/usat-rewards/.run-lock/
+scripts/usat-rewards/.run-lock*

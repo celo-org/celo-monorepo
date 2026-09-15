@@ -90,13 +90,16 @@ In the wrapper:
   safety branches that key off it.
 - One run at a time: the wrapper holds `.run-lock` for the whole
   fetch → forge → record sequence, so two overlapping runs cannot pay the same
-  wallets from the same pre-payment snapshot. A lock older than
-  `LOCK_STALE_SECONDS` (default 2h, measured from the lock directory's own
-  mtime) is taken over, so a killed run does not block every later one. The
-  takeover goes through a rename, which can succeed for exactly one process, and
-  the winner writes an owner token it re-reads before paying anything; only that
-  owner ever releases the lock. Two runs finding the same stale lock therefore
-  end with exactly one of them paying.
+  wallets from the same pre-payment snapshot. `.run-lock` is a symlink to a
+  directory named after the run that owns it, and a lock older than
+  `LOCK_STALE_SECONDS` (default 2h, from that directory's own mtime) may be
+  taken over, so a killed run does not block every later one. The indirection is
+  what makes the takeover safe: what gets renamed away is the specific stale
+  directory that was inspected, a name no other run shares, so a contender that
+  judged the same directory loses the rename and one that arrives later judges a
+  different directory and cannot disturb the winner. The winner then repoints the
+  link and re-reads it before paying anything, and only the owner clears it.
+  However many runs find the same stale lock, exactly one of them pays.
 - `DISTRIBUTOR_ADDRESS` must match the signing wallet (see step 3).
 - Confirmed transfers are recorded on every exit path — forge failure, Ctrl-C,
   SIGTERM — not only on a clean finish, and a recording failure is fatal: the
