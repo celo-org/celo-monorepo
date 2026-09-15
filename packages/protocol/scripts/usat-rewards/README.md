@@ -84,10 +84,22 @@ In the wrapper:
   safety branches that key off it.
 - One run at a time: the wrapper holds `.run-lock` for the whole
   fetch → forge → record sequence, so two overlapping runs cannot pay the same
-  wallets from the same pre-payment snapshot.
+  wallets from the same pre-payment snapshot. A lock held for longer than
+  `LOCK_STALE_SECONDS` (default 2h) is taken over, so a killed run does not
+  block every later one.
 - `DISTRIBUTOR_ADDRESS` must match the signing wallet (see step 3).
 - Confirmed transfers are recorded on every exit path — forge failure, Ctrl-C,
-  SIGTERM — not only on a clean finish.
+  SIGTERM — not only on a clean finish, and a recording failure is fatal: the
+  wrapper exits non-zero and says how to record by hand, because payments that
+  are on chain but missing from the ledger are exactly what a later run pays
+  again. A broadcast file left unrecorded is replayed at the start of the next
+  run, before the Dune fetch reads the ledger.
+- The expected chain is pinned (`EXPECTED_CHAIN_ID`, default 42220) and the RPC
+  is checked against it, never the other way round. An `anvil --celo` fork
+  reports mainnet's chain id and serves the real USA₮ address, so any endpoint
+  other than `https://forno.celo.org` additionally needs its own
+  `PAID_LEDGER_FILE` (or an explicit `ALLOW_PRODUCTION_LEDGER=1`) before the
+  wrapper will run.
 
 ## Double-payment protection (idempotency)
 
