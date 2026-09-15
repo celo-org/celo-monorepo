@@ -74,15 +74,24 @@ RECIPIENTS_FILE="${RECIPIENTS_FILE:-scripts/usat-rewards/recipients.json}"
 export RECIPIENTS_FILE
 
 # A round marked "completed" is a record of what was already paid, not work to
-# do. Its paid ledger nets it out, but this refuses outright rather than trust
-# that the ledger is still there — and it refuses before the Dune refresh, which
-# would otherwise overwrite the archived recipients with a fresh snapshot.
-if [ "$BROADCAST" = "1" ] && [ -f "$RECIPIENTS_FILE" ] && [ "$(python3 -c \
+# do. This runs in every mode and before anything else touches those files,
+# because the Dune refresh does not care which mode it was asked for: a plain
+# simulation with credentials in the environment would rewrite the archived
+# recipients — dropping the very marker that protects them — and rewrite the
+# round's historical ledger with it, after which a later broadcast no longer
+# sees a completed round at all.
+if [ -f "$RECIPIENTS_FILE" ] && [ "$(python3 -c \
     "import json,sys;print(int(bool(json.load(open(sys.argv[1])).get('completed'))))" \
     "$RECIPIENTS_FILE")" = "1" ]; then
-    echo "$RECIPIENTS_FILE is marked completed: that round has already been paid in full and is" >&2
-    echo "kept only as a record. Remove the marker only to deliberately re-open the round." >&2
-    exit 1
+    if [ "$BROADCAST" = "1" ]; then
+        echo "$RECIPIENTS_FILE is marked completed: that round has already been paid in full" >&2
+        echo "and is kept only as a record. Remove the marker only to deliberately re-open the" >&2
+        echo "round." >&2
+        exit 1
+    fi
+    echo "note: $RECIPIENTS_FILE is marked completed — simulating from the archive as it"
+    echo "stands, with no Dune refresh, so that record is left exactly as it is."
+    SKIP_FETCH=1
 fi
 
 # One run at a time, enforced by a kernel advisory lock rather than by anything

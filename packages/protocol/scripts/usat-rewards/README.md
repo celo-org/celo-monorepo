@@ -191,5 +191,8 @@ fetch — in that window it is the only payment memory. It is gitignored so a
 on purpose. The ledger is what nets that round out, so a checkout carrying the
 recipients without it would treat all 275 wallets as unpaid and could pay the
 whole round again. The recipients file is additionally marked `"completed":
-true`, which the wrapper refuses to broadcast against — before the Dune refresh,
-so the archived files are not overwritten either.
+true`, which the wrapper refuses to broadcast against. That check runs in every
+mode and before anything reads or refreshes those files: a simulation with Dune
+credentials in the environment would otherwise rewrite the archived recipients,
+dropping the marker, and rewrite the round's ledger with it. A completed round
+can still be simulated — from the archive as it stands, with no refresh.
