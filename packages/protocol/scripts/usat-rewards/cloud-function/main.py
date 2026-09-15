@@ -53,6 +53,7 @@ Secrets (mount via Secret Manager):
 Response: JSON summary {paid, skipped, total_usat, tx, dry_run, ...}.
 """
 
+import fcntl
 import json
 import os
 import time
@@ -224,6 +225,7 @@ class LocalStore:
     def __init__(self, dirpath: str):
         self.dir = dirpath
         self.lock_token = uuid.uuid4().hex
+        self._lock_fd = None
         os.makedirs(dirpath, exist_ok=True)
 
     def load_ledger(self) -> dict:
@@ -257,117 +259,35 @@ class LocalStore:
     def exists(self, name: str) -> bool:
         return os.path.exists(os.path.join(self.dir, name))
 
-    def _owner_path(self, token: str) -> str:
-        """Each run's lock is a file of its own, named after its token. Nothing
-        ever renames the shared name — a takeover renames the one unique file it
-        judged stale, which is what makes the claim a compare-and-swap rather
-        than a guess about what is there now."""
-        return os.path.join(self.dir, f"{LOCK_OBJECT}.{token}")
+    def acquire_lock(self) -> bool:
+        """A kernel advisory lock, held for the lifetime of this run.
 
-    def _read_json(self, path: str) -> dict | None:
+        Every lock this store built out of files had the same residual hole:
+        judging a lock abandoned and acting on that judgement are two steps, and
+        POSIX has no way to replace a name conditionally on what it held when it
+        was inspected — so a delayed contender could always end up displacing a
+        live claim. flock has no such gap, and the kernel drops the lock when the
+        process is gone, which removes the staleness heuristic, the takeover and
+        the cleanup race in one go. GcsStore keeps its generation-conditional
+        upload: that one really is a compare-and-swap.
+        """
+        fd = os.open(os.path.join(self.dir, LOCK_OBJECT), os.O_CREAT | os.O_RDWR, 0o644)
         try:
-            with open(path) as f:
-                return json.load(f)
-        except (OSError, ValueError):
-            return None
-
-    def _claim_pointer(self) -> bool:
-        """O_EXCL on the shared name is the only thing that ever creates it, so
-        it alone decides the first owner."""
-        try:
-            fd = os.open(os.path.join(self.dir, LOCK_OBJECT),
-                         os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-        except FileExistsError:
-            return False
-        try:
-            os.write(fd, json.dumps({"owner": self.lock_token}).encode())
-        finally:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
             os.close(fd)
+            return False
+        # Diagnostics only: the kernel owns the lock, not this content.
+        os.ftruncate(fd, 0)
+        os.write(fd, json.dumps({"owner": self.lock_token, "pid": os.getpid(),
+                                 "acquired_at": time.time()}).encode())
+        self._lock_fd = fd
         return True
 
-    def _discard(self, path: str) -> None:
-        try:
-            os.remove(path)
-        except OSError:
-            pass
-
-    def _point_at_me(self) -> None:
-        """Repoint the shared name in one atomic step."""
-        pointer = os.path.join(self.dir, LOCK_OBJECT)
-        staging = f"{pointer}.pointing.{self.lock_token}"
-        with open(staging, "w") as f:
-            json.dump({"owner": self.lock_token}, f)
-        os.replace(staging, pointer)
-
-    def acquire_lock(self) -> bool:
-        pointer = os.path.join(self.dir, LOCK_OBJECT)
-        mine = self._owner_path(self.lock_token)
-        with open(mine, "w") as f:
-            json.dump({"owner": self.lock_token, "acquired_at": time.time()}, f)
-        if self._claim_pointer():
-            return True
-
-        held_by = (self._read_json(pointer) or {}).get("owner")
-        held = self._read_json(self._owner_path(held_by)) if held_by else None
-        if held is None:
-            # The shared name points at a lock that is not there. Either a run is
-            # mid-takeover right now, which must be left alone, or one died
-            # between renaming the stale lock away and repointing — and the
-            # pointer's own age is what tells those apart.
-            try:
-                pointer_age = time.time() - os.path.getmtime(pointer)
-            except OSError:
-                os.remove(mine)
-                return False
-            if pointer_age <= LOCK_STALE_SECONDS:
-                os.remove(mine)
-                return False
-            # Nothing but the pointer left to claim, so this once it is the thing
-            # renamed away; the replacement still goes through O_EXCL, so a
-            # contender that got in first keeps it and this run loses.
-            try:
-                os.rename(pointer, f"{pointer}.stale.{self.lock_token}")
-            except OSError:
-                os.remove(mine)
-                return False
-            self._discard(f"{pointer}.stale.{self.lock_token}")
-            if not self._claim_pointer():
-                os.remove(mine)
-                return False
-            return True
-        if time.time() - held.get("acquired_at", 0) <= LOCK_STALE_SECONDS:
-            os.remove(mine)
-            return False
-
-        # Rename the very file judged stale. Only one contender can win that —
-        # a second one finds it gone — and a contender that judged some later
-        # lock stale renames that one instead and so can never disturb this
-        # claim. The shared name itself is never renamed, only repointed.
-        holder = self._owner_path(held_by)
-        tombstone = f"{holder}.stale.{self.lock_token}"
-        try:
-            os.rename(holder, tombstone)
-        except OSError:
-            os.remove(mine)
-            return False
-        self._discard(tombstone)
-        self._point_at_me()
-        # The token under the shared name has to be ours before anything is paid.
-        return (self._read_json(pointer) or {}).get("owner") == self.lock_token
-
     def release_lock(self) -> None:
-        pointer = os.path.join(self.dir, LOCK_OBJECT)
-        # Only the owner may release: a run whose stale lock was taken over must
-        # not clear the pointer the new owner is holding.
-        if (self._read_json(pointer) or {}).get("owner") == self.lock_token:
-            try:
-                os.remove(pointer)
-            except OSError:
-                pass
-        try:
-            os.remove(self._owner_path(self.lock_token))
-        except OSError:
-            pass
+        if self._lock_fd is not None:
+            os.close(self._lock_fd)  # closing the descriptor releases the lock
+            self._lock_fd = None
 
 
 # ---------------------------------------------------------------------- dune

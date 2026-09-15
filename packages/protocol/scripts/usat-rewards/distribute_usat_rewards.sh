@@ -85,112 +85,45 @@ if [ "$BROADCAST" = "1" ] && [ -f "$RECIPIENTS_FILE" ] && [ "$(python3 -c \
     exit 1
 fi
 
-# One run at a time: two overlapping runs would both fetch the same pre-payment
-# snapshot and could pay the same wallets twice at different nonces.
+# One run at a time, enforced by a kernel advisory lock rather than by anything
+# this script has to reason about. Every lock built out of files here — a
+# directory, a symlink, a pointer — had the same residual hole: judging a lock
+# abandoned and acting on that judgement are two steps, and POSIX offers no way
+# to replace a name conditionally on what it held when it was inspected. flock
+# has no such gap. There is no staleness window to guess at, no tombstone and
+# nothing to take over, because the kernel drops the lock when the holder is
+# gone.
 #
-# The lock is a symlink at a fixed path pointing at a directory named after the
-# run that owns it. That indirection is what makes a takeover safe: the thing
-# renamed away is the specific stale directory that was inspected, a name no
-# other run shares, so a contender that judged the same directory stale finds it
-# gone and loses, and one that arrives later judges a different directory and
-# cannot touch this claim. Renaming the shared path itself — as this did before
-# — bound the rename to nothing: a delayed contender could move the live lock a
-# new owner had just created and both would believe they held it.
-LOCK_LINK="scripts/usat-rewards/.run-lock"
-LOCK_STALE_SECONDS="${LOCK_STALE_SECONDS:-7200}"
-LOCK_STALE_MINUTES=$((LOCK_STALE_SECONDS / 60))
-if [ "$LOCK_STALE_MINUTES" -lt 1 ]; then
-    LOCK_STALE_MINUTES=1
+# The lock belongs to the open file description behind fd 9, not to a process:
+# the python child takes it on the descriptor it inherits, and it stays held
+# after that child exits for as long as this shell keeps fd 9 open. A child that
+# inherits fd 9 keeps it too — deliberately, since a forge broadcast still in
+# flight after this wrapper is killed is exactly when a second run must not
+# start.
+LOCK_FILE="scripts/usat-rewards/.payout-lock"
+LOCK_OWNER_FILE="$LOCK_FILE.owner"
+mkdir -p "$(dirname "$LOCK_FILE")"
+
+# Diagnostics only. Nothing ever decides anything from this file — the kernel
+# owns the lock — so it cannot go stale in a way that matters.
+write_lock_owner() {
+    printf 'pid %s\nstarted %s\ndistributor %s\n' \
+        "$$" "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "${DISTRIBUTOR_ADDRESS:-unset}" \
+        > "$LOCK_OWNER_FILE"
+}
+
+exec 9>> "$LOCK_FILE"
+if ! python3 -c 'import fcntl; fcntl.flock(9, fcntl.LOCK_EX | fcntl.LOCK_NB)' 2> /dev/null; then
+    echo "another payout run holds $LOCK_FILE:" >&2
+    if [ -s "$LOCK_OWNER_FILE" ]; then
+        sed 's/^/  /' "$LOCK_OWNER_FILE" >&2
+    else
+        echo "  (no owner details recorded)" >&2
+    fi
+    echo "wait for it to finish — the lock is released as soon as that run exits." >&2
+    exit 1
 fi
-LOCK_TOKEN="$$-$(date +%s)-${RANDOM}"
-LOCK_TARGET_NAME="$(basename "$LOCK_LINK").$LOCK_TOKEN"
-LOCK_TARGET="$(dirname "$LOCK_LINK")/$LOCK_TARGET_NAME"
-
-# Age comes from the directory's own mtime, set atomically by mkdir, read with
-# `find -mmin` (portable, and nothing written after the claim that a contender
-# could read before it exists and mistake a new lock for an abandoned one).
-lock_is_stale() {
-    [ -n "$(find "$1" -maxdepth 0 -mmin "+$LOCK_STALE_MINUTES" 2> /dev/null)" ]
-}
-
-lock_owner_name() {
-    readlink "$LOCK_LINK" 2> /dev/null || true
-}
-
-_claim_lock() {
-    mkdir -p "$(dirname "$LOCK_LINK")"
-    mkdir "$LOCK_TARGET" || return 1
-
-    # A plain directory at the lock path is a lock from the older layout, and it
-    # has to be ruled out before `ln` is asked anything: given a directory, ln
-    # creates a file inside it and reports success instead of refusing. Taking
-    # such a lock over could only work by renaming the shared path, which is the
-    # one thing that cannot be done safely, so it is left for a human to clear.
-    if [ -e "$LOCK_LINK" ] && [ ! -L "$LOCK_LINK" ]; then
-        echo "$LOCK_LINK is a lock from the older directory layout, not the expected" >&2
-        echo "symlink. If no payout run is in progress, remove it and re-run:" >&2
-        echo "  rm -rf $LOCK_LINK" >&2
-        return 1
-    fi
-
-    # `ln -sn` is the atomic exclusive claim: -n keeps it from following an
-    # existing link, so it fails outright instead of quietly creating a file
-    # inside whatever the lock points at.
-    if ln -sn "$LOCK_TARGET_NAME" "$LOCK_LINK" 2> /dev/null; then
-        return 0
-    fi
-
-    local held held_dir
-    held=$(lock_owner_name)
-    held_dir="$(dirname "$LOCK_LINK")/$held"
-    if [ -z "$held" ] || [ ! -d "$held_dir" ]; then
-        echo "$LOCK_LINK points at no lock directory — another run is claiming it right" >&2
-        echo "now, or one died mid-takeover. Re-run; if it persists, remove $LOCK_LINK." >&2
-        return 1
-    fi
-    if ! lock_is_stale "$held_dir"; then
-        echo "another payout run holds $LOCK_LINK — wait for it to finish, or remove that" >&2
-        echo "link if you are certain no run is in progress." >&2
-        return 1
-    fi
-    echo "warning: $LOCK_LINK has been held for over ${LOCK_STALE_MINUTES}m — assuming the run" >&2
-    echo "that created it died, and taking it over." >&2
-    # Exactly one contender can rename this particular directory away.
-    if ! mv "$held_dir" "$held_dir.stale.$LOCK_TOKEN" 2> /dev/null; then
-        echo "another run took over $LOCK_LINK first — aborting." >&2
-        return 1
-    fi
-    rm -rf "$held_dir.stale.$LOCK_TOKEN"
-    # Only that winner gets here, and the link now dangles, so repointing it is
-    # uncontended: a fresh contender's `ln -sn` still fails on the existing link
-    # and every other takeover lost the rename above. `-f -n` replaces the link
-    # itself rather than following it.
-    ln -sfn "$LOCK_TARGET_NAME" "$LOCK_LINK" || return 1
-    if [ "$(lock_owner_name)" != "$LOCK_TARGET_NAME" ]; then
-        echo "lost $LOCK_LINK to another run after claiming it — aborting." >&2
-        return 1
-    fi
-    return 0
-}
-
-claim_lock() {
-    if _claim_lock; then
-        return 0
-    fi
-    rmdir "$LOCK_TARGET" 2> /dev/null || true
-    return 1
-}
-
-release_lock() {
-    # Only the owner clears the shared link; a run whose stale lock was taken
-    # over still cleans up its own directory, never the new owner's lock.
-    if [ "$(lock_owner_name)" = "$LOCK_TARGET_NAME" ]; then
-        rm -f "$LOCK_LINK"
-    fi
-    rm -rf "$LOCK_TARGET"
-}
-
-claim_lock || exit 1
+write_lock_owner
 
 # Pinned, never read back from the endpoint under test: deriving the expected
 # chain from the RPC being validated makes the guard unfalsifiable.
@@ -301,7 +234,7 @@ cleanup() {
             fi
         fi
     fi
-    release_lock
+    rm -f "$LOCK_OWNER_FILE"
     exit "$status"
 }
 trap cleanup EXIT
@@ -331,6 +264,8 @@ elif [ "$BROADCAST" = "1" ]; then
     echo "(${DISTRIBUTOR_ADDRESS:-unset}) cannot be verified against the signer — make sure" >&2
     echo "it is the address that will actually send the transfers." >&2
 fi
+
+write_lock_owner
 
 # Replay whatever the previous run left behind BEFORE the Dune fetch reads the
 # ledger: if recording failed last time, those payments are missing from the
