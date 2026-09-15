@@ -133,7 +133,13 @@ the window Dune has not indexed yet. Every payment is counted exactly once:
    forge receipts (`record-payments.py`, tx-hash deduped). The forge script
    subtracts the ledger in full, so a no-fetch re-run (e.g. right after a crash)
    sends only the outstanding remainder. Only transfers of the expected token on
-   the expected chain are recorded.
+   the expected chain are recorded. A transaction the broadcast file holds no
+   receipt for — what a run interrupted between submitting a transfer and
+   writing the artifact leaves behind — is **not** taken for a failure: it is
+   settled against the RPC instead, recorded if it is mined and matches, skipped
+   only if provably dropped (its nonce consumed and no node knowing the hash),
+   and otherwise left unresolved, which exits non-zero and stops the next payout
+   until a later block settles it.
 4. **The ledger is scoped to token, chain and distributor.** It carries all
    three, `fetch-recipients.py` refuses to reconcile a ledger from another scope
    *before* subtracting anything, and `record-payments.py` refuses to append a

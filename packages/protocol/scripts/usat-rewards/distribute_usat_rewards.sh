@@ -124,7 +124,7 @@ record_payments() {
     file=$(broadcast_file)
     if [ -f "$file" ]; then
         ./scripts/usat-rewards/record-payments.py --broadcast "$file" \
-            --ledger "$PAID_LEDGER_FILE" --chain-id "$CHAIN_ID"
+            --ledger "$PAID_LEDGER_FILE" --chain-id "$CHAIN_ID" --rpc-url "$RPC_URL"
     else
         echo "warning: no broadcast file at $file — paid ledger NOT updated." >&2
     fi
@@ -140,12 +140,13 @@ cleanup() {
     if [ "$BROADCAST" = "1" ]; then
         if ! record_payments; then
             echo >&2
-            echo "FATAL: the paid ledger could NOT be recorded after broadcasting." >&2
-            echo "confirmed transfers are missing from $PAID_LEDGER_FILE, so the next run would" >&2
-            echo "pay them a second time. Fix the cause (token/chain stamp mismatch, wrong chain," >&2
-            echo "corrupt ledger JSON) and record them before re-running:" >&2
+            echo "FATAL: the paid ledger could NOT be fully recorded after broadcasting." >&2
+            echo "transfers are missing from $PAID_LEDGER_FILE, so the next run would pay them a" >&2
+            echo "second time. Fix the cause (a transfer that is neither mined nor dropped yet, a" >&2
+            echo "token/chain/distributor stamp mismatch, a corrupt ledger) and record them" >&2
+            echo "before re-running:" >&2
             echo "  ./scripts/usat-rewards/record-payments.py --broadcast $(broadcast_file) \\" >&2
-            echo "      --ledger $PAID_LEDGER_FILE --chain-id $CHAIN_ID" >&2
+            echo "      --ledger $PAID_LEDGER_FILE --chain-id $CHAIN_ID --rpc-url $RPC_URL" >&2
             if [ "$status" -eq 0 ]; then
                 status=1
             fi

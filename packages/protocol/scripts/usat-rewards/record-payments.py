@@ -16,6 +16,13 @@ mainnet payment record, and one wallet's payments can never be subtracted from
 another wallet's obligation, either of which would suppress rewards that were
 never really paid.
 
+A transaction the broadcast file has no receipt for is NOT treated as failed: a
+forge run interrupted between submitting a transfer and serializing its receipt
+leaves exactly that, and the transfer may well be on chain. Those are resolved
+against the RPC instead — recorded if mined, skipped only if provably dropped,
+and otherwise left unresolved with a non-zero exit, which stops the next payout
+until a human or a later confirmation settles it.
+
 Safe to run repeatedly on DIFFERENT broadcast files; running it twice on the
 same file would double-count, so it refuses hashes it has already recorded.
 """
@@ -24,10 +31,94 @@ import argparse
 import json
 import os
 import sys
+import urllib.request
 
 TRANSFER_SELECTOR = "0xa9059cbb"
+TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
 USAT_MAINNET = "0xd2ab3c9a02dbbab236bfec45d1d755df4267f771"
 CELO_MAINNET_CHAIN_ID = 42220
+RPC_TIMEOUT = 30
+
+
+def rpc(url: str, method: str, params: list) -> object:
+    request = urllib.request.Request(
+        url,
+        data=json.dumps({"jsonrpc": "2.0", "id": 1, "method": method, "params": params}).encode(),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=RPC_TIMEOUT) as response:
+        payload = json.load(response)
+    if payload.get("error"):
+        raise RuntimeError(f"{method} failed: {payload['error']}")
+    return payload.get("result")
+
+
+def to_int(value) -> int | None:
+    """Broadcast artifacts and RPC results mix hex strings and plain numbers."""
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str) and value:
+        return int(value, 16 if value.startswith("0x") else 10)
+    return None
+
+
+def transfer_in_receipt(receipt: dict, token: str, sender: str, recipient: str, amount: int) -> bool:
+    """Did this receipt really move `amount` of `token` to `recipient`?
+
+    A status-1 receipt is not proof: a token can return false from transfer
+    without reverting, so the Transfer log decides — same rule the cloud
+    function applies to its own receipts.
+    """
+    for log in receipt.get("logs") or []:
+        topics = [topic.lower() for topic in log.get("topics") or []]
+        if len(topics) < 3 or topics[0] != TRANSFER_TOPIC:
+            continue
+        if (log.get("address") or "").lower() != token:
+            continue
+        if sender and topics[1][-40:] != sender.lower()[-40:]:
+            continue
+        if topics[2][-40:] != recipient.lower()[-40:]:
+            continue
+        if to_int(log.get("data")) == amount:
+            return True
+    return False
+
+
+def resolve_missing_receipt(url: str, tx_hash: str, call: dict, token: str,
+                            recipient: str, amount: int) -> str:
+    """Classify a transfer the broadcast file holds no receipt for.
+
+    "mined"      — the transfer is on chain and matches; record it.
+    "reverted"   — mined but reverted; nothing moved.
+    "dropped"    — it provably can never be mined; nothing moved.
+    "unresolved" — unknown, so nothing may be assumed either way.
+
+    Everything inconclusive, the RPC being unreachable included, ends up
+    "unresolved" on purpose: guessing "failed" is what lets a later Dune refresh
+    pay a recipient who was in fact already paid.
+    """
+    sender = (call.get("from") or "").lower()
+    try:
+        receipt = rpc(url, "eth_getTransactionReceipt", [tx_hash])
+        if receipt:
+            if to_int(receipt.get("status")) != 1:
+                return "reverted"
+            return ("mined" if transfer_in_receipt(receipt, token, sender, recipient, amount)
+                    else "unresolved")
+        # No receipt anywhere. A transaction the node still knows is pending, so
+        # it can yet be mined; only a consumed nonce with an unknown hash proves
+        # this one is dead, and even then a lagging node could be answering.
+        if rpc(url, "eth_getTransactionByHash", [tx_hash]) is not None:
+            return "unresolved"
+        nonce = to_int(call.get("nonce"))
+        if nonce is None or not sender:
+            return "unresolved"
+        used = to_int(rpc(url, "eth_getTransactionCount", [sender, "latest"]))
+        return "dropped" if used is not None and used > nonce else "unresolved"
+    except Exception as error:  # noqa: BLE001 - any doubt means unresolved
+        print(f"could not resolve {tx_hash} against {url}: {error}", file=sys.stderr)
+        return "unresolved"
 
 
 def write_json(path: str, payload: dict) -> None:
@@ -89,6 +180,8 @@ def main() -> int:
     parser.add_argument("--chain-id", type=int,
                         default=int(os.environ.get("EXPECTED_CHAIN_ID", CELO_MAINNET_CHAIN_ID)),
                         help="chain the broadcast must come from")
+    parser.add_argument("--rpc-url", default=os.environ.get("RPC_URL", "https://forno.celo.org"),
+                        help="RPC used to settle transactions the broadcast has no receipt for")
     args = parser.parse_args()
     token = args.token.lower()
 
@@ -104,7 +197,8 @@ def main() -> int:
     statuses = {r["transactionHash"].lower(): r.get("status") for r in run.get("receipts", [])}
     ledger, paid, seen_hashes = load_ledger(args.ledger, token, args.chain_id)
 
-    recorded = skipped_failed = skipped_seen = skipped_other_token = 0
+    recorded = skipped_failed = skipped_seen = skipped_other_token = skipped_dropped = 0
+    unresolved: list[str] = []
     senders: set[str] = set()
     for tx in run.get("transactions", []):
         tx_hash = (tx.get("hash") or "").lower()
@@ -121,11 +215,27 @@ def main() -> int:
         if tx_hash in seen_hashes:
             skipped_seen += 1
             continue
-        if statuses.get(tx_hash) not in ("0x1", 1):
-            skipped_failed += 1
-            continue
         recipient = "0x" + data[10 + 24 : 10 + 64]
         amount = int(data[10 + 64 : 10 + 128], 16)
+        status = statuses.get(tx_hash)
+        if status is None:
+            # Forge never wrote a receipt for this transaction — an interrupted
+            # run looks exactly like this — so the transfer may be on chain.
+            # Calling that "failed" is what makes the next refresh pay again.
+            outcome = resolve_missing_receipt(args.rpc_url, tx_hash, call, token,
+                                              recipient, amount)
+            if outcome == "reverted":
+                skipped_failed += 1
+                continue
+            if outcome == "dropped":
+                skipped_dropped += 1
+                continue
+            if outcome != "mined":
+                unresolved.append(tx_hash)
+                continue
+        elif to_int(status) != 1:
+            skipped_failed += 1
+            continue
         paid[recipient] = paid.get(recipient, 0) + amount
         seen_hashes.add(tx_hash)
         recorded += 1
@@ -157,9 +267,24 @@ def main() -> int:
     total = sum(paid.values())
     print(
         f"recorded {recorded} transfers ({skipped_failed} failed, {skipped_seen} already recorded, "
-        f"{skipped_other_token} other token); "
+        f"{skipped_other_token} other token, {skipped_dropped} dropped before mining); "
         f"ledger now {len(wallets)} wallets, {total / 1_000_000:.2f} USAT -> {args.ledger}"
     )
+
+    if unresolved:
+        # Everything confirmed is already persisted above; this exit is what
+        # stops the next payout from running while a submitted transfer is
+        # neither mined nor provably dead, because a refresh would see it as
+        # unpaid and send it again.
+        print(
+            f"{len(unresolved)} transfer(s) were submitted but are neither mined nor dropped: "
+            + ", ".join(unresolved)
+            + f". They are NOT in the ledger. Re-run this command once {args.rpc_url} can settle "
+            "them (a later block confirms or drops them); until then a payout run would pay "
+            "those recipients a second time.",
+            file=sys.stderr,
+        )
+        return 1
     return 0
 
 
