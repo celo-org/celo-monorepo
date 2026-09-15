@@ -40,7 +40,9 @@ Environment (plain env vars):
   ALLOW_DISTRIBUTOR_CHANGE  "1" = accept a hot wallet different from the pinned
                       one (only after migrating the payment history)
   DRY_RUN             "1" = report what would be paid, send nothing and write
-                      nothing
+                      nothing at all to the bucket — the pending Dune execution
+                      marker included, so a dry run cannot change which
+                      snapshot a later real run reconciles against
   FUNCTION_TIMEOUT_SECONDS  the Cloud Run request timeout deploy.sh sets,
                       default 3600; the run-lock staleness window derives from it
 
@@ -347,7 +349,15 @@ def dune_all_rows(execution_id: str, key: str) -> list[dict]:
         offset = next_offset
 
 
-def fetch_dune_rows(key: str, distributor: str, store) -> list[dict]:
+def fetch_dune_rows(key: str, distributor: str, store, dry_run: bool) -> list[dict]:
+    """Rows for this distributor, resuming a previous invocation's execution.
+
+    A dry run reads the bucket but writes nothing to it, this marker included.
+    Persisting a dry run's execution would have a later real run resume that
+    query instead of starting a fresh one, so it would reconcile against a
+    snapshot taken before whatever Dune indexed in between — a report-only mode
+    that changes what a real payout sees is not report-only.
+    """
     # Reuse an execution a previous invocation left running: Dune executions
     # survive our process, so a slow query converges across scheduled retries
     # instead of restarting from zero each time. The distributor is stored with
@@ -357,7 +367,7 @@ def fetch_dune_rows(key: str, distributor: str, store) -> list[dict]:
     if pending:
         if (pending.get("distributor") or "").lower() == distributor.lower():
             execution_id = pending.get("execution_id")
-        else:
+        elif not dry_run:
             store.delete(PENDING_OBJECT)
 
     if not execution_id:
@@ -369,7 +379,9 @@ def fetch_dune_rows(key: str, distributor: str, store) -> list[dict]:
             {"query_parameters": {"distributor_address": distributor}},
         )
         execution_id = execution["execution_id"]
-        store.put_json(PENDING_OBJECT, {"execution_id": execution_id, "distributor": distributor})
+        if not dry_run:
+            store.put_json(PENDING_OBJECT,
+                           {"execution_id": execution_id, "distributor": distributor})
 
     poll_budget = int(os.environ.get("DUNE_POLL_SECONDS", "1200"))
     deadline = time.time() + poll_budget
@@ -378,13 +390,16 @@ def fetch_dune_rows(key: str, distributor: str, store) -> list[dict]:
         if state == "QUERY_STATE_COMPLETED":
             break
         if state in ("QUERY_STATE_FAILED", "QUERY_STATE_CANCELLED", "QUERY_STATE_EXPIRED"):
-            store.delete(PENDING_OBJECT)
+            if not dry_run:
+                store.delete(PENDING_OBJECT)
             raise RuntimeError(f"Dune execution {execution_id} ended in {state}")
         if time.time() > deadline:
-            # Leave the pending marker in place; the next trigger resumes it.
+            # A real run leaves the marker in place and the next trigger resumes
+            # it; a dry run only reports the id in its response.
             raise DuneStillRunning(execution_id)
         time.sleep(5)
-    store.delete(PENDING_OBJECT)
+    if not dry_run:
+        store.delete(PENDING_OBJECT)
     return dune_all_rows(execution_id, key)
 
 
@@ -725,7 +740,7 @@ def distribute(request):
             )
 
         try:
-            rows = fetch_dune_rows(dune_key, hot_wallet, store)
+            rows = fetch_dune_rows(dune_key, hot_wallet, store, dry_run)
         except DuneStillRunning as pending:
             # Retryable on purpose: the schedule may be a week away, and a 2xx
             # would make Cloud Scheduler consider this run done.
