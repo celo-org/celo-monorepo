@@ -104,6 +104,15 @@ HALT_OBJECT = "HALT"
 FUNCTION_TIMEOUT_SECONDS = int(os.environ.get("FUNCTION_TIMEOUT_SECONDS", "3600"))
 LOCK_STALE_SECONDS = FUNCTION_TIMEOUT_SECONDS + 1800
 CELO_GAS_LIMIT = 100_000
+# Declaring a broadcast transaction dead needs more than one endpoint saying it
+# has never heard of the hash: forno load-balances, so a lagging node answers
+# "unknown" for a transaction a current node has already mined. Ask several
+# times, and only trust a consumed nonce that is already this many blocks deep —
+# a node behind by that much cannot serve the historical query at all, so it
+# raises instead of misleading us. record-payments.py applies the same rule.
+DROP_RECHECKS = int(os.environ.get("DROP_RECHECKS", "3"))
+DROP_RECHECK_SECONDS = float(os.environ.get("DROP_RECHECK_SECONDS", "2"))
+DROP_CONFIRMATIONS = int(os.environ.get("DROP_CONFIRMATIONS", "32"))
 # Celo fee abstraction: when the wallet has no CELO, transfers are sent as
 # CIP-64 transactions that pay gas in USA₮ through its fee-currency adapter.
 CIP64_TX_TYPE = b"\x7b"
@@ -444,27 +453,38 @@ def ledger_add(ledger: dict, wallet: str, amount: int, tx_hash: str) -> dict:
 def transfer_is_dropped(w3, pending: dict) -> bool:
     """Is a broadcast transfer definitively gone?
 
-    A consumed nonce alone does not prove it: forno load-balances across nodes,
-    so a node lagging behind can answer "no receipt" for a transaction that is
-    already mined, and discarding the intent then pays the reward a second time.
-    Require both a nonce that moved past this transaction and a node that knows
-    nothing at all about the hash — anything inconclusive keeps the intent.
+    Neither half of the obvious test proves it on a load-balanced endpoint. A
+    node lagging behind answers "unknown" for a transaction a current node has
+    already mined, and the nonce query may well be served by that current node —
+    so "nonce consumed plus one hash miss" is exactly the combination that
+    discards a live payment and pays the reward twice.
+
+    Dead therefore requires two independent things: the hash unknown on every
+    one of several separate look-ups, and the nonce already consumed as of a
+    block deep enough that a node still serving that query cannot be the lagging
+    one. Anything inconclusive keeps the intent.
     """
     try:
-        if w3.eth.get_transaction_count(pending["from"], "latest") <= pending["nonce"]:
+        for attempt in range(max(1, DROP_RECHECKS)):
+            if attempt:
+                time.sleep(DROP_RECHECK_SECONDS)
+            try:
+                # A known transaction is either mined (blockNumber set) or still
+                # queued; neither is dead.
+                w3.eth.get_transaction(pending["tx_hash"])
+                return False
+            except TransactionNotFound:
+                pass
+            try:
+                # Second opinion from the pool: another node may hold the receipt.
+                w3.eth.get_transaction_receipt(pending["tx_hash"])
+                return False
+            except TransactionNotFound:
+                pass
+        confirmed = w3.eth.block_number - DROP_CONFIRMATIONS
+        if confirmed <= 0:
             return False
-        try:
-            # A known transaction is either mined (blockNumber set) or still
-            # queued; neither is dead.
-            w3.eth.get_transaction(pending["tx_hash"])
-            return False
-        except TransactionNotFound:
-            pass
-        # Second opinion from the pool: another node may hold the receipt.
-        w3.eth.get_transaction_receipt(pending["tx_hash"])
-        return False
-    except TransactionNotFound:
-        return True
+        return w3.eth.get_transaction_count(pending["from"], confirmed) > pending["nonce"]
     except Exception:  # noqa: BLE001 - an RPC hiccup is not proof of anything
         return False
 

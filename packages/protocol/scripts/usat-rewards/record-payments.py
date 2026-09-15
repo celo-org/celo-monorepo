@@ -38,6 +38,15 @@ TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523
 USAT_MAINNET = "0xd2ab3c9a02dbbab236bfec45d1d755df4267f771"
 CELO_MAINNET_CHAIN_ID = 42220
 RPC_TIMEOUT = 30
+# Declaring a submitted transaction dead needs more than one endpoint saying it
+# has never heard of the hash: forno load-balances, so a lagging node answers
+# "unknown" for a transaction a current node has already mined. Ask several
+# times, and only trust a consumed nonce that is already this many blocks deep —
+# a node behind by that much cannot serve the historical query at all, so it
+# errors out instead of misleading us.
+DROP_RECHECKS = int(os.environ.get("DROP_RECHECKS", "3"))
+DROP_RECHECK_SECONDS = float(os.environ.get("DROP_RECHECK_SECONDS", "2"))
+DROP_CONFIRMATIONS = int(os.environ.get("DROP_CONFIRMATIONS", "32"))
 
 
 def rpc(url: str, method: str, params: list) -> object:
@@ -100,22 +109,38 @@ def resolve_missing_receipt(url: str, tx_hash: str, call: dict, token: str,
     """
     sender = (call.get("from") or "").lower()
     try:
-        receipt = rpc(url, "eth_getTransactionReceipt", [tx_hash])
-        if receipt:
-            if to_int(receipt.get("status")) != 1:
-                return "reverted"
-            return ("mined" if transfer_in_receipt(receipt, token, sender, recipient, amount)
-                    else "unresolved")
-        # No receipt anywhere. A transaction the node still knows is pending, so
-        # it can yet be mined; only a consumed nonce with an unknown hash proves
-        # this one is dead, and even then a lagging node could be answering.
-        if rpc(url, "eth_getTransactionByHash", [tx_hash]) is not None:
-            return "unresolved"
+        # Several separate look-ups, so a load balancer is likely to hand at
+        # least one of them to a node that is caught up. Any hit at all settles
+        # the transfer; only a miss on every single attempt is evidence.
+        for attempt in range(max(1, DROP_RECHECKS)):
+            if attempt:
+                time.sleep(DROP_RECHECK_SECONDS)
+            receipt = rpc(url, "eth_getTransactionReceipt", [tx_hash])
+            if receipt:
+                if to_int(receipt.get("status")) != 1:
+                    return "reverted"
+                return ("mined" if transfer_in_receipt(receipt, token, sender, recipient, amount)
+                        else "unresolved")
+            if rpc(url, "eth_getTransactionByHash", [tx_hash]) is not None:
+                # Some node still holds it, pending or mining: not dead.
+                return "unresolved"
+
+        # Every look-up missed the hash, which on its own proves nothing. A
+        # consumed nonce only means something if it was already consumed at a
+        # depth no lagging node can explain: asking "latest" of a current node
+        # while the receipt queries went to a stale one is exactly how a mined
+        # transfer gets mistaken for a dropped one.
         nonce = to_int(call.get("nonce"))
         if nonce is None or not sender:
             return "unresolved"
-        used = to_int(rpc(url, "eth_getTransactionCount", [sender, "latest"]))
-        return "dropped" if used is not None and used > nonce else "unresolved"
+        latest = to_int(rpc(url, "eth_blockNumber", []))
+        if latest is None or latest <= DROP_CONFIRMATIONS:
+            return "unresolved"
+        confirmed = latest - DROP_CONFIRMATIONS
+        used = to_int(rpc(url, "eth_getTransactionCount", [sender, hex(confirmed)]))
+        if used is None or used <= nonce:
+            return "unresolved"
+        return "dropped"
     except Exception as error:  # noqa: BLE001 - any doubt means unresolved
         print(f"could not resolve {tx_hash} against {url}: {error}", file=sys.stderr)
         return "unresolved"

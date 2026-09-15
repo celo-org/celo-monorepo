@@ -77,9 +77,12 @@ passes the post-bump campaign values, so these are what is actually enforced:
   payment is recorded, so a lost receipt is reconciled on the next run instead
   of paid twice. A transfer that is neither mined nor dead blocks further
   sending (HTTP 503) until it resolves; `gcloud storage rm
-  gs://$PROJECT-usat-rewards/pending-transfer.json` clears it by hand. An intent
-  is only discarded once the nonce has moved on *and* no node knows the hash —
-  a lagging load-balanced RPC must not make a mined transfer look dropped.
+  gs://$PROJECT-usat-rewards/pending-transfer.json` clears it by hand. Discarding
+  an intent is deliberately hard, since it is what allows a re-send: the hash has
+  to be unknown on every one of several re-checks *and* the nonce consumed as of
+  a block deep enough that a lagging node could not have served that query — a
+  load-balanced RPC must never make a mined transfer look dropped. The CLI
+  recorder applies the same rule.
 - A status-1 receipt is not enough: a matching `Transfer` event is required
   before a payment is recorded. A transfer that moved a different amount than
   intended keeps its pending intent and stops the run for a human — discarding
