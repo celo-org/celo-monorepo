@@ -14,6 +14,9 @@
 # Expects two secrets to exist in Secret Manager (created on first run if the
 # env vars USAT_PRIVATE_KEY / DUNE_API_KEY are set):
 #   usat-rewards-private-key, usat-rewards-dune-api-key
+#
+# Creates and uses a dedicated runtime service account (usat-rewards-runtime)
+# with object access to the state bucket and read access to both secrets.
 set -euo pipefail
 
 PROJECT="${PROJECT:?set PROJECT to the GCP project id}"
@@ -24,6 +27,8 @@ DRY_RUN="${DRY_RUN:-0}"
 FUNCTION_NAME="usat-rewards-distributor"
 SA_NAME="usat-rewards-invoker"
 SA_EMAIL="${SA_NAME}@${PROJECT}.iam.gserviceaccount.com"
+RUNTIME_SA_NAME="usat-rewards-runtime"
+RUNTIME_SA_EMAIL="${RUNTIME_SA_NAME}@${PROJECT}.iam.gserviceaccount.com"
 
 cd "$(dirname "$0")"
 
@@ -57,10 +62,29 @@ if ! gcloud iam service-accounts describe "$SA_EMAIL" --project "$PROJECT" > /de
         --display-name "USA₮ rewards scheduler invoker"
 fi
 
+# Runtime service account. An explicit identity with exactly the two grants the
+# function needs — object access to the state bucket and read access to both
+# secret payloads — because the default runtime account has neither in a project
+# without broad legacy roles, and the function would fail on its first lock
+# upload or secret resolution.
+if ! gcloud iam service-accounts describe "$RUNTIME_SA_EMAIL" --project "$PROJECT" > /dev/null 2>&1; then
+    gcloud iam service-accounts create "$RUNTIME_SA_NAME" --project "$PROJECT" \
+        --display-name "USA₮ rewards distributor runtime"
+fi
+
+gcloud storage buckets add-iam-policy-binding "gs://$BUCKET" --project "$PROJECT" \
+    --member "serviceAccount:$RUNTIME_SA_EMAIL" --role roles/storage.objectUser
+
+for secret in usat-rewards-private-key usat-rewards-dune-api-key; do
+    gcloud secrets add-iam-policy-binding "$secret" --project "$PROJECT" \
+        --member "serviceAccount:$RUNTIME_SA_EMAIL" --role roles/secretmanager.secretAccessor
+done
+
 gcloud functions deploy "$FUNCTION_NAME" \
     --project "$PROJECT" --region "$REGION" --gen2 \
     --runtime python312 --entry-point distribute --source . \
     --trigger-http --no-allow-unauthenticated \
+    --service-account "$RUNTIME_SA_EMAIL" \
     --max-instances 1 --concurrency 1 --timeout 3600s --memory 512Mi \
     --set-env-vars "GCS_BUCKET=$BUCKET,DRY_RUN=$DRY_RUN,MAX_PER_WALLET=${MAX_PER_WALLET:-5000000},MAX_TOTAL_PER_RUN=${MAX_TOTAL_PER_RUN:-5000000000},DUNE_POLL_SECONDS=${DUNE_POLL_SECONDS:-1500}" \
     --set-secrets "PRIVATE_KEY=usat-rewards-private-key:latest,DUNE_API_KEY=usat-rewards-dune-api-key:latest"
