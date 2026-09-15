@@ -74,7 +74,10 @@ passes the post-bump campaign values, so these are what is actually enforced:
   of it is decided before the dry-run report — `funded`/`gas_mode` describe what
   a real run would do.
 - GCS generation-guarded run lock (takeover also generation-guarded) +
-  `--max-instances 1`. It goes stale 30 minutes after the function's own request
+  `--max-instances 1`. The `LOCAL_STATE_DIR` store used for testing claims its
+  lock the same way a filesystem allows: an exclusive create, and a takeover
+  that renames the stale lock away — which only one process can do — before
+  creating the replacement. It goes stale 30 minutes after the function's own request
   timeout, which deploy.sh passes in as `FUNCTION_TIMEOUT_SECONDS`: a run still
   confirming its last transfer at the timeout edge must not have its lock stolen.
 - Each transfer's intent is stored before broadcasting and cleared after the

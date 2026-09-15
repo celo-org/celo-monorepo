@@ -255,22 +255,58 @@ class LocalStore:
     def exists(self, name: str) -> bool:
         return os.path.exists(os.path.join(self.dir, name))
 
-    def acquire_lock(self) -> bool:
-        path = os.path.join(self.dir, LOCK_OBJECT)
-        payload = {"acquired_at": time.time(), "owner": self.lock_token}
+    def _read_lock(self, path: str) -> dict | None:
+        try:
+            with open(path) as f:
+                return json.load(f)
+        except (OSError, ValueError):
+            return None
+
+    def _create_lock(self, path: str) -> bool:
+        """O_EXCL is the only thing that ever creates the lock, so it alone
+        decides the owner."""
         try:
             fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-            os.write(fd, json.dumps(payload).encode())
-            os.close(fd)
-            return True
         except FileExistsError:
-            with open(path) as f:
-                existing = json.load(f)
-            if time.time() - existing.get("acquired_at", 0) > LOCK_STALE_SECONDS:
-                with open(path, "w") as f:
-                    json.dump(payload, f)
-                return True
             return False
+        try:
+            os.write(fd, json.dumps({"acquired_at": time.time(),
+                                     "owner": self.lock_token}).encode())
+        finally:
+            os.close(fd)
+        return True
+
+    def acquire_lock(self) -> bool:
+        path = os.path.join(self.dir, LOCK_OBJECT)
+        if self._create_lock(path):
+            return True
+        stale = self._read_lock(path)
+        if stale is None or time.time() - stale.get("acquired_at", 0) <= LOCK_STALE_SECONDS:
+            return False
+        # Taking over used to be read-then-truncate-and-write, which two runs
+        # could both complete and both call a win. Renaming the lock away can
+        # succeed for only one process — every other one finds the source gone —
+        # and only that winner may create the replacement, still under O_EXCL.
+        # A filesystem has no rename conditional on content the way GCS
+        # generations do, so the moved file is checked afterwards: if it turns
+        # out to be a live lock rather than the stale one the decision was based
+        # on, it goes straight back and this run gives up.
+        tombstone = f"{path}.stale.{self.lock_token}"
+        try:
+            os.rename(path, tombstone)
+        except OSError:
+            return False
+        if self._read_lock(tombstone) != stale:
+            try:
+                os.rename(tombstone, path)
+            except OSError:
+                pass
+            return False
+        os.remove(tombstone)
+        if not self._create_lock(path):
+            return False
+        # The token in the lock has to be ours before anything is paid.
+        return (self._read_lock(path) or {}).get("owner") == self.lock_token
 
     def release_lock(self) -> None:
         path = os.path.join(self.dir, LOCK_OBJECT)
