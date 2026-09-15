@@ -73,7 +73,11 @@ ERC20_ABI = json.loads(
     '{"name":"balanceOf","type":"function","stateMutability":"view",'
     '"inputs":[{"name":"owner","type":"address"}],'
     '"outputs":[{"name":"","type":"uint256"}]},'
-    '{"name":"Transfer","type":"event","inputs":['
+    # "anonymous" is not decoration: web3 subscripts event_abi["anonymous"] when
+    # decoding a receipt, and the KeyError from leaving it out is not one of the
+    # exceptions process_receipt(errors=DISCARD) swallows — every transfer would
+    # fail to confirm.
+    '{"name":"Transfer","type":"event","anonymous":false,"inputs":['
     '{"name":"from","type":"address","indexed":true},'
     '{"name":"to","type":"address","indexed":true},'
     '{"name":"value","type":"uint256","indexed":false}]}]'
