@@ -24,6 +24,8 @@ DEFAULT_PAID_LEDGER_FILE="scripts/usat-rewards/paid-ledger.json"
 
 RPC_URL="${RPC_URL:-$MAINNET_RPC_URL}"
 EXPECTED_CHAIN_ID="${EXPECTED_CHAIN_ID:-42220}"
+USAT_MAINNET="0xd2ab3c9a02dbbab236bfec45d1d755df4267f771"
+TOKEN_ADDRESS="${USAT_ADDRESS:-$USAT_MAINNET}"
 PAID_LEDGER_FILE="${PAID_LEDGER_FILE:-$DEFAULT_PAID_LEDGER_FILE}"
 export PAID_LEDGER_FILE
 
@@ -164,6 +166,61 @@ broadcast_file() {
     echo "broadcast/DistributeUsatRewards.s.sol/${CHAIN_ID}/run-latest.json"
 }
 
+# forge names its artifact after the script and the chain, so every round in a
+# checkout writes the SAME run-latest.json. A sidecar therefore records which
+# round produced it — replaying the top-off round's artifact into the campaign
+# ledger stamps that ledger for the wrong wallet and then every fetch aborts.
+round_marker_file() {
+    echo "broadcast/DistributeUsatRewards.s.sol/${CHAIN_ID}/usat-round.json"
+}
+
+write_round_marker() {
+    mkdir -p "$(dirname "$(round_marker_file)")"
+    python3 -c "
+import json, sys
+ledger, recipients, distributor, chain_id, token, out = sys.argv[1:7]
+json.dump({'ledger': ledger, 'recipients': recipients,
+           'distributor': distributor.lower(), 'chain_id': int(chain_id),
+           'token': token.lower()}, open(out, 'w'), indent=2)
+" "$PAID_LEDGER_FILE" "$RECIPIENTS_FILE" "${DISTRIBUTOR_ADDRESS:-}" "$CHAIN_ID" \
+        "$TOKEN_ADDRESS" "$(round_marker_file)"
+}
+
+# match | foreign | unmarked
+round_marker_state() {
+    python3 -c "
+import json, os, sys
+path, ledger, distributor, chain_id, token = sys.argv[1:6]
+if not os.path.exists(path):
+    print('unmarked')
+    raise SystemExit(0)
+try:
+    marker = json.load(open(path))
+except Exception:
+    print('foreign')
+    raise SystemExit(0)
+same = (marker.get('ledger') == ledger
+        and str(marker.get('chain_id')) == chain_id
+        and (marker.get('token') or '').lower() == token.lower())
+# The distributor only decides when both sides know it; signing through forge
+# flags leaves it unset, and that must not make an own artifact look foreign.
+if same and distributor and marker.get('distributor'):
+    same = marker['distributor'].lower() == distributor.lower()
+print('match' if same else 'foreign')
+" "$(round_marker_file)" "$PAID_LEDGER_FILE" "${DISTRIBUTOR_ADDRESS:-}" "$CHAIN_ID" \
+        "$TOKEN_ADDRESS"
+}
+
+archive_foreign_broadcast() {
+    local archive
+    archive="$(broadcast_file).foreign-$(date +%Y%m%dT%H%M%S)"
+    mv "$(broadcast_file)" "$archive"
+    if [ -f "$(round_marker_file)" ]; then
+        mv "$(round_marker_file)" "$archive.round.json"
+    fi
+    echo "$archive"
+}
+
 record_payments() {
     local file
     file=$(broadcast_file)
@@ -204,19 +261,6 @@ trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
-# Replay whatever the previous run left behind BEFORE the Dune fetch reads the
-# ledger: if recording failed last time, those payments are missing from the
-# payment memory and this run would send them again. record-payments.py is
-# deduped by transaction hash, so replaying an already-recorded file is a no-op.
-if [ "$BROADCAST" = "1" ] && [ -f "$(broadcast_file)" ]; then
-    echo "=== Replaying the previous broadcast file into the paid ledger ==="
-    if ! record_payments; then
-        echo "refusing to run: $(broadcast_file) could not be recorded into" >&2
-        echo "$PAID_LEDGER_FILE, and its payments would be sent a second time." >&2
-        exit 1
-    fi
-fi
-
 # The Dune snapshot nets out payments made by DISTRIBUTOR_ADDRESS while forge
 # signs with PRIVATE_KEY; if they differ the snapshot describes another wallet's
 # history and rewards this wallet already paid look unpaid again.
@@ -239,6 +283,40 @@ elif [ "$BROADCAST" = "1" ]; then
     echo "note: signing through forge signer flags, so DISTRIBUTOR_ADDRESS" >&2
     echo "(${DISTRIBUTOR_ADDRESS:-unset}) cannot be verified against the signer — make sure" >&2
     echo "it is the address that will actually send the transfers." >&2
+fi
+
+# Replay whatever the previous run left behind BEFORE the Dune fetch reads the
+# ledger: if recording failed last time, those payments are missing from the
+# payment memory and this run would send them again. record-payments.py is
+# deduped by transaction hash, so replaying an already-recorded file is a no-op.
+# This sits after the signer is known, because whether the artifact belongs to
+# this round is partly a question about the distributor.
+if [ "$BROADCAST" = "1" ] && [ -f "$(broadcast_file)" ]; then
+    MARKER_STATE=$(round_marker_state)
+    if [ "${ARCHIVE_FOREIGN_BROADCAST:-0}" = "1" ] || [ "$MARKER_STATE" = "foreign" ]; then
+        # Another round's artifact. Recording it here would write that round's
+        # payments into this ledger and stamp it for the wrong wallet, and
+        # refusing to run would block this round indefinitely — so set it aside,
+        # say so, and continue. It must not stay in place either: this run's own
+        # recording step would pick it up if forge failed before writing a new one.
+        ARCHIVED=$(archive_foreign_broadcast)
+        echo "warning: the broadcast artifact in this checkout belongs to a different payout" >&2
+        echo "round, so it was NOT recorded into $PAID_LEDGER_FILE. It is archived as" >&2
+        echo "  $ARCHIVED" >&2
+        echo "along with the sidecar naming its round. If its payments are still missing from" >&2
+        echo "that round's ledger, record it there by hand:" >&2
+        echo "  ./scripts/usat-rewards/record-payments.py --broadcast $ARCHIVED \\" >&2
+        echo "      --ledger <that round's ledger> --chain-id $CHAIN_ID --rpc-url $RPC_URL" >&2
+    else
+        echo "=== Replaying the previous broadcast file into the paid ledger ==="
+        if ! record_payments; then
+            echo "refusing to run: $(broadcast_file) could not be recorded into" >&2
+            echo "$PAID_LEDGER_FILE, and its payments would be sent a second time." >&2
+            echo "if that artifact belongs to another round, re-run with" >&2
+            echo "ARCHIVE_FOREIGN_BROADCAST=1 to set it aside instead." >&2
+            exit 1
+        fi
+    fi
 fi
 
 # Always distribute from a FRESH Dune snapshot: re-run the ledger query before
@@ -279,6 +357,12 @@ if [ "$RPC_CHAIN_ID" != "$EXPECTED_CHAIN_ID" ]; then
     echo "the RPC at $RPC_URL serves chain $RPC_CHAIN_ID, expected $EXPECTED_CHAIN_ID." >&2
     echo "set EXPECTED_CHAIN_ID, with a PAID_LEDGER_FILE of its own, to run on another chain." >&2
     exit 1
+fi
+
+# Stamp the round before forge can write anything, so even a crashed run leaves
+# an artifact whose provenance is known.
+if [ "$BROADCAST" = "1" ]; then
+    write_round_marker
 fi
 
 FORGE_STATUS=0

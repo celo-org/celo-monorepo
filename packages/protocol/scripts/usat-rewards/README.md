@@ -102,8 +102,17 @@ In the wrapper:
   SIGTERM — not only on a clean finish, and a recording failure is fatal: the
   wrapper exits non-zero and says how to record by hand, because payments that
   are on chain but missing from the ledger are exactly what a later run pays
-  again. A broadcast file left unrecorded is replayed at the start of the next
-  run, before the Dune fetch reads the ledger.
+  again. A broadcast file the same round left unrecorded is replayed at the start
+  of the next run, before the Dune fetch reads the ledger.
+- Each broadcast stamps the round it belongs to beside forge's artifact: ledger,
+  recipients file, distributor, chain and token. forge names that artifact after
+  the script and the chain, so every round in one checkout shares a single path,
+  and the stamp is what stops the top-off round's leftover from being recorded
+  into the campaign ledger — which would credit payments the campaign never made
+  and stamp that ledger for the wrong wallet. A leftover from another round is
+  archived next to its stamp and reported, never replayed into the wrong ledger
+  and never a reason to block the round in hand; `ARCHIVE_FOREIGN_BROADCAST=1`
+  does the same for an artifact that carries no stamp at all.
 - The expected chain is pinned (`EXPECTED_CHAIN_ID`, default 42220) and the RPC
   is checked against it, never the other way round. An `anvil --celo` fork
   reports mainnet's chain id and serves the real USA₮ address, so any endpoint
