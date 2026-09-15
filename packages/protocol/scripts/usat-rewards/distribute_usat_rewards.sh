@@ -87,29 +87,74 @@ fi
 # snapshot and could pay the same wallets twice at different nonces.
 LOCK_DIR="scripts/usat-rewards/.run-lock"
 # A run killed at the wrong moment used to leave this directory behind forever,
-# and every later run then refused to start. The lock carries its own start time
-# so it can be taken over once it is older than any plausible run.
+# and every later run then refused to start, so a lock older than any plausible
+# run may be taken over. Age comes from the directory's own mtime via `find
+# -mmin` (portable, and set atomically by mkdir) rather than a file written just
+# after the claim, which a second run could read before it exists and mistake a
+# one-second-old lock for an abandoned one.
 LOCK_STALE_SECONDS="${LOCK_STALE_SECONDS:-7200}"
-if ! mkdir "$LOCK_DIR" 2> /dev/null; then
-    lock_started_at=$(cat "$LOCK_DIR/started-at" 2> /dev/null || echo 0)
-    case "$lock_started_at" in
-        '' | *[!0-9]*) lock_started_at=0 ;;
-    esac
-    if [ "$(($(date +%s) - lock_started_at))" -le "$LOCK_STALE_SECONDS" ]; then
+LOCK_STALE_MINUTES=$((LOCK_STALE_SECONDS / 60))
+if [ "$LOCK_STALE_MINUTES" -lt 1 ]; then
+    LOCK_STALE_MINUTES=1
+fi
+LOCK_TOKEN="$$-$(date +%s)-${RANDOM}"
+LOCK_TOMBSTONE="${LOCK_DIR}.stale.${LOCK_TOKEN}"
+
+lock_is_stale() {
+    [ -n "$(find "$LOCK_DIR" -maxdepth 0 -mmin "+$LOCK_STALE_MINUTES" 2> /dev/null)" ]
+}
+
+# Claim the lock, or fail. `mkdir` is the only thing that ever creates the lock
+# path, so it alone decides the owner. Taking over a stale lock goes through
+# renaming it away first: a rename can succeed for exactly one process — every
+# other one finds the source already gone — so only that winner is allowed to
+# create the replacement. The previous remove-then-recreate sequence let two
+# runs both see the stale lock, and the second one's remove deleted the first
+# one's fresh lock, leaving both convinced they owned it.
+claim_lock() {
+    if mkdir "$LOCK_DIR" 2> /dev/null; then
+        printf '%s\n' "$LOCK_TOKEN" > "$LOCK_DIR/owner"
+        return 0
+    fi
+    if ! lock_is_stale; then
         echo "another payout run holds $LOCK_DIR — wait for it to finish, or remove that" >&2
         echo "directory if you are certain no run is in progress." >&2
-        exit 1
+        return 1
     fi
-    echo "warning: $LOCK_DIR has been held for over ${LOCK_STALE_SECONDS}s — assuming the run" >&2
+    echo "warning: $LOCK_DIR has been held for over ${LOCK_STALE_MINUTES}m — assuming the run" >&2
     echo "that created it died, and taking it over." >&2
-    rm -f "$LOCK_DIR/started-at"
-    rmdir "$LOCK_DIR" 2> /dev/null || true
+    # The tombstone name is unique to this process, so clearing it first cannot
+    # disturb anyone else and guarantees the rename has a free destination.
+    rm -rf "$LOCK_TOMBSTONE"
+    if ! mv "$LOCK_DIR" "$LOCK_TOMBSTONE" 2> /dev/null; then
+        echo "another run took over $LOCK_DIR first — aborting." >&2
+        return 1
+    fi
+    rm -rf "$LOCK_TOMBSTONE"
     if ! mkdir "$LOCK_DIR" 2> /dev/null; then
         echo "another run claimed $LOCK_DIR first — aborting." >&2
-        exit 1
+        return 1
     fi
-fi
-date +%s > "$LOCK_DIR/started-at"
+    printf '%s\n' "$LOCK_TOKEN" > "$LOCK_DIR/owner"
+    # Re-read what is actually in the lock before paying anyone: the owner token
+    # is the thing that has to be ours, not the fact that some mkdir succeeded.
+    if [ "$(cat "$LOCK_DIR/owner" 2> /dev/null)" != "$LOCK_TOKEN" ]; then
+        echo "lost $LOCK_DIR to another run after claiming it — aborting." >&2
+        return 1
+    fi
+    return 0
+}
+
+release_lock() {
+    # Only the owner may release: a run whose stale lock was taken over must not
+    # delete the lock the new owner is holding.
+    if [ "$(cat "$LOCK_DIR/owner" 2> /dev/null)" = "$LOCK_TOKEN" ]; then
+        rm -f "$LOCK_DIR/owner"
+        rmdir "$LOCK_DIR" 2> /dev/null || true
+    fi
+}
+
+claim_lock || exit 1
 
 # Pinned, never read back from the endpoint under test: deriving the expected
 # chain from the RPC being validated makes the guard unfalsifiable.
@@ -152,8 +197,7 @@ cleanup() {
             fi
         fi
     fi
-    rm -f "$LOCK_DIR/started-at"
-    rmdir "$LOCK_DIR" 2> /dev/null || true
+    release_lock
     exit "$status"
 }
 trap cleanup EXIT
