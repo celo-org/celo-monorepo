@@ -21,6 +21,10 @@ Reconciliation contract with the forge script:
         unindexed' = max(0, unindexed + paid_since_fetch − newly_indexed)
     and that is what gets subtracted from Dune's owed here. A payment is counted
     exactly once however many fetches Dune takes to index it.
+  * The ledger is scoped: it carries the token, chain and distributor it
+    describes, and a ledger from another scope is refused before anything is
+    reconciled. Subtracting another wallet's, chain's or token's payments would
+    suppress rewards that were never actually paid.
   * The forge-visible "recipients"/"amounts" pair is emptied afterwards:
     recipients.json already has the surplus subtracted, so the forge script must
     not subtract it a second time. It refills from the next broadcast receipts.
@@ -45,6 +49,8 @@ import urllib.request
 QUERY_ID = 7506058
 API = "https://api.dune.com/api/v1"
 ZERO = "0x0000000000000000000000000000000000000000"
+USAT_MAINNET = "0xd2ab3c9a02dbbab236bfec45d1d755df4267f771"
+CELO_MAINNET_CHAIN_ID = 42220
 PAGE_LIMIT = 32000
 REQUEST_TIMEOUT = 60
 # How long to wait for one execution. Without a budget a hung Dune execution
@@ -132,11 +138,47 @@ def reconcile(dune_rows: list[dict], ledger: dict) -> tuple[dict[str, int], dict
         "dune_paid_baseline": {w: new_baseline[w] for w in sorted(new_baseline) if new_baseline[w] > 0},
         "recorded_tx_hashes": sorted(ledger.get("recorded_tx_hashes", [])),
     }
-    # Keep the chain/token the recorder stamped, so the scoping survives a fetch.
-    for field in ("token", "chain_id"):
+    # Keep the scope stamps, so they survive a fetch.
+    for field in ("token", "chain_id", "distributor"):
         if ledger.get(field) is not None:
             new_ledger[field] = ledger[field]
     return owed_out, new_ledger
+
+
+def ledger_scope_error(ledger: dict, token: str, chain_id: int, distributor: str) -> str | None:
+    """Reject payment memory that belongs to another token, chain or wallet.
+
+    What the ledger holds is subtracted from Dune's owed, so a ledger from a
+    different scope suppresses rewards nobody was ever paid: another chain's or
+    another token's transfers are not these rewards at all, and another wallet's
+    unindexed payments are not this wallet's obligation. record-payments.py only
+    checks this when appending, which is after the money has moved.
+    """
+    for field, expected in (("token", token), ("chain_id", chain_id)):
+        actual = ledger.get(field)
+        if actual is not None and str(actual).lower() != str(expected).lower():
+            return (f"ledger is scoped to {field}={actual}, refusing to reconcile {expected}. "
+                    "Use a separate --ledger for another chain or token.")
+    stamped = (ledger.get("distributor") or "").lower()
+    if stamped and distributor.lower() not in (stamped, ZERO) and stamped != ZERO:
+        if os.environ.get("ALLOW_DISTRIBUTOR_CHANGE") == "1":
+            print(f"warning: ledger was written for distributor {stamped}, now distributing from "
+                  f"{distributor} — ALLOW_DISTRIBUTOR_CHANGE=1 accepts it.", file=sys.stderr)
+            return None
+        return (f"ledger holds payments made by {stamped} but this run distributes from "
+                f"{distributor}. Dune nets payments per distributor, so the other wallet's "
+                "unindexed payments would be subtracted from this wallet's obligation for "
+                "good. Use a separate --ledger, or set ALLOW_DISTRIBUTOR_CHANGE=1 once the "
+                "payment history has been migrated.")
+    return None
+
+
+def stamp_ledger(ledger: dict, token: str, chain_id: int, distributor: str) -> dict:
+    """Scope the ledger to what it describes, so a later run can refuse it."""
+    stamped = {**ledger, "token": token, "chain_id": chain_id}
+    if distributor and distributor.lower() != ZERO:
+        stamped["distributor"] = distributor.lower()
+    return stamped
 
 
 def main() -> int:
@@ -146,6 +188,11 @@ def main() -> int:
                         help="permit running without --distributor (first round only)")
     parser.add_argument("--out", default=os.path.join(os.path.dirname(__file__), "recipients.json"))
     parser.add_argument("--ledger", default=os.path.join(os.path.dirname(__file__), "paid-ledger.json"))
+    parser.add_argument("--token", default=os.environ.get("USAT_ADDRESS", USAT_MAINNET),
+                        help="token the ledger's payments are denominated in")
+    parser.add_argument("--chain-id", type=int,
+                        default=int(os.environ.get("EXPECTED_CHAIN_ID", CELO_MAINNET_CHAIN_ID)),
+                        help="chain the ledger's payments were made on")
     args = parser.parse_args()
 
     if not args.distributor:
@@ -191,7 +238,13 @@ def main() -> int:
         with open(args.ledger) as f:
             ledger = json.load(f)
 
+    scope_error = ledger_scope_error(ledger, args.token.lower(), args.chain_id, args.distributor)
+    if scope_error:
+        print(scope_error, file=sys.stderr)
+        return 1
+
     owed, new_ledger = reconcile(rows, ledger)
+    new_ledger = stamp_ledger(new_ledger, args.token.lower(), args.chain_id, args.distributor)
 
     recipients = sorted(owed)
     payload = {

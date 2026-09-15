@@ -10,9 +10,11 @@ Usage:
                        [--token 0x...] [--chain-id 42220]
 
 Only transfers of the expected token on the expected chain are recorded, and the
-ledger is stamped with that pair: a fork or mock-token rehearsal can therefore
-never write into — or be mistaken for — the mainnet payment record, which would
-suppress rewards that were never really paid.
+ledger is stamped with that pair plus the wallet that sent them: a fork or
+mock-token rehearsal can therefore never write into — or be mistaken for — the
+mainnet payment record, and one wallet's payments can never be subtracted from
+another wallet's obligation, either of which would suppress rewards that were
+never really paid.
 
 Safe to run repeatedly on DIFFERENT broadcast files; running it twice on the
 same file would double-count, so it refuses hashes it has already recorded.
@@ -55,6 +57,29 @@ def load_ledger(path: str, token: str, chain_id: int) -> tuple[dict, dict[str, i
     return data, paid, set(data.get("recorded_tx_hashes", []))
 
 
+def distributor_error(stamped: str | None, senders: set[str]) -> str | None:
+    """Refuse a broadcast sent by a wallet other than the ledger's own.
+
+    Dune nets payments per distributor, so two wallets sharing one ledger means
+    one wallet's payments are subtracted from the other's obligation — the
+    rewards it never received then look paid for good.
+    """
+    if not stamped:
+        return None
+    foreign = sorted(sender for sender in senders if sender and sender != stamped.lower())
+    if not foreign:
+        return None
+    if os.environ.get("ALLOW_DISTRIBUTOR_CHANGE") == "1":
+        print(f"warning: ledger is scoped to distributor {stamped} but this broadcast was sent "
+              f"by {', '.join(foreign)} — ALLOW_DISTRIBUTOR_CHANGE=1 accepts it.",
+              file=sys.stderr)
+        return None
+    return (f"ledger holds payments made by {stamped} but this broadcast was sent by "
+            f"{', '.join(foreign)}; recording both in one ledger subtracts one wallet's "
+            "payments from the other's obligation. Use a separate --ledger, or set "
+            "ALLOW_DISTRIBUTOR_CHANGE=1 once the payment history has been migrated.")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--broadcast", required=True, help="forge broadcast run-latest.json")
@@ -80,6 +105,7 @@ def main() -> int:
     ledger, paid, seen_hashes = load_ledger(args.ledger, token, args.chain_id)
 
     recorded = skipped_failed = skipped_seen = skipped_other_token = 0
+    senders: set[str] = set()
     for tx in run.get("transactions", []):
         tx_hash = (tx.get("hash") or "").lower()
         call = tx.get("transaction", {})
@@ -89,6 +115,9 @@ def main() -> int:
         if (call.get("to") or "").lower() != token:
             skipped_other_token += 1
             continue
+        # Who sent it decides which ledger it belongs in, whether or not this
+        # particular transfer ends up being appended below.
+        senders.add((call.get("from") or "").lower())
         if tx_hash in seen_hashes:
             skipped_seen += 1
             continue
@@ -101,18 +130,29 @@ def main() -> int:
         seen_hashes.add(tx_hash)
         recorded += 1
 
+    scope_error = distributor_error(ledger.get("distributor"), senders)
+    if scope_error:
+        raise SystemExit(scope_error)
+
+    # Stamp the wallet that sent these transfers when the ledger does not name
+    # one yet, or when the operator has explicitly accepted a rotation.
+    distributor = ledger.get("distributor")
+    if len(senders) == 1 and (not distributor
+                              or os.environ.get("ALLOW_DISTRIBUTOR_CHANGE") == "1"):
+        distributor = next(iter(senders)) or distributor
+
     wallets = sorted(paid)
-    write_json(
-        args.ledger,
-        {
-            **ledger,
-            "recipients": wallets,
-            "amounts": [paid[w] for w in wallets],
-            "recorded_tx_hashes": sorted(seen_hashes),
-            "token": token,
-            "chain_id": args.chain_id,
-        },
-    )
+    payload = {
+        **ledger,
+        "recipients": wallets,
+        "amounts": [paid[w] for w in wallets],
+        "recorded_tx_hashes": sorted(seen_hashes),
+        "token": token,
+        "chain_id": args.chain_id,
+    }
+    if distributor:
+        payload["distributor"] = distributor
+    write_json(args.ledger, payload)
 
     total = sum(paid.values())
     print(
