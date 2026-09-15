@@ -71,6 +71,18 @@ done
 RECIPIENTS_FILE="${RECIPIENTS_FILE:-scripts/usat-rewards/recipients.json}"
 export RECIPIENTS_FILE
 
+# A round marked "completed" is a record of what was already paid, not work to
+# do. Its paid ledger nets it out, but this refuses outright rather than trust
+# that the ledger is still there — and it refuses before the Dune refresh, which
+# would otherwise overwrite the archived recipients with a fresh snapshot.
+if [ "$BROADCAST" = "1" ] && [ -f "$RECIPIENTS_FILE" ] && [ "$(python3 -c \
+    "import json,sys;print(int(bool(json.load(open(sys.argv[1])).get('completed'))))" \
+    "$RECIPIENTS_FILE")" = "1" ]; then
+    echo "$RECIPIENTS_FILE is marked completed: that round has already been paid in full and is" >&2
+    echo "kept only as a record. Remove the marker only to deliberately re-open the round." >&2
+    exit 1
+fi
+
 # One run at a time: two overlapping runs would both fetch the same pre-payment
 # snapshot and could pay the same wallets twice at different nonces.
 LOCK_DIR="scripts/usat-rewards/.run-lock"
@@ -189,7 +201,7 @@ fi
 if [ "${SKIP_FETCH:-0}" != "1" ] && [ -n "${DUNE_API_KEY:-}" ] && [ -n "${DISTRIBUTOR_ADDRESS:-}" ]; then
     echo "=== Refreshing recipients from Dune (query 7506058) ==="
     ./scripts/usat-rewards/fetch-recipients.py --distributor "$DISTRIBUTOR_ADDRESS" \
-        --out "$RECIPIENTS_FILE" --ledger "$PAID_LEDGER_FILE"
+        --out "$RECIPIENTS_FILE" --ledger "$PAID_LEDGER_FILE" --chain-id "$CHAIN_ID"
 elif [ "$BROADCAST" = "1" ] && [ "${ALLOW_STALE:-0}" != "1" ]; then
     echo "refusing to broadcast without a fresh Dune fetch." >&2
     echo "set DUNE_API_KEY and DISTRIBUTOR_ADDRESS to auto-refresh, or ALLOW_STALE=1 to override." >&2

@@ -36,13 +36,19 @@ Token: USA₮ ("Tether America USD", 6 decimals) at
    wallet, so re-running after a payout only lists the remainder. Omitting it
    treats every reward as unpaid — only safe for the very first round.
 
-2. **Simulate** (no transactions sent):
+2. **Simulate** (no transactions sent). Pass the same Dune credentials as the
+   broadcast below, so the simulation refreshes the snapshot and reviews the
+   numbers a real run would send — without them it simulates whatever
+   `recipients.json` happens to hold, which is not what the broadcast sends:
 
    ```bash
-   PRIVATE_KEY=... ./distribute_usat_rewards.sh
+   DUNE_API_KEY=... PRIVATE_KEY=... ./distribute_usat_rewards.sh
    ```
 
-   Review the logged recipient count, total payout, and hot wallet balance.
+   Review the logged recipient count, total payout, and hot wallet balance. The
+   broadcast refreshes again, so a wallet that qualifies in between is included
+   there and not here; that is safe, because owed is always net of what has
+   already been paid.
 
 3. **Broadcast**. The wrapper refuses to broadcast without the credentials for
    its own fresh Dune fetch, so pass them here too (or keep them in a `.env`
@@ -127,9 +133,18 @@ the window Dune has not indexed yet. Every payment is counted exactly once:
    forge receipts (`record-payments.py`, tx-hash deduped). The forge script
    subtracts the ledger in full, so a no-fetch re-run (e.g. right after a crash)
    sends only the outstanding remainder. Only transfers of the expected token on
-   the expected chain are recorded and the ledger is stamped with that pair, so
-   a fork rehearsal can never write into the mainnet payment record.
-4. If reconciliation leaves nobody owed, the wrapper skips the forge run
+   the expected chain are recorded.
+4. **The ledger is scoped to token, chain and distributor.** It carries all
+   three, `fetch-recipients.py` refuses to reconcile a ledger from another scope
+   *before* subtracting anything, and `record-payments.py` refuses to append a
+   broadcast sent by a different wallet. A fork or mock-token rehearsal can
+   therefore never write into — or be mistaken for — the mainnet payment record,
+   and rotating the hot wallet cannot subtract the old wallet's unindexed
+   payments from the new wallet's obligation. After genuinely migrating the
+   payment history, `ALLOW_DISTRIBUTOR_CHANGE=1` accepts the new wallet and
+   re-stamps the ledger; a token or chain mismatch is never overridable — use a
+   separate `PAID_LEDGER_FILE`.
+5. If reconciliation leaves nobody owed, the wrapper skips the forge run
    entirely ("Nothing owed").
 
 Verified end-to-end on anvil: past-payment netting (0.30 paid → only 0.20
@@ -140,3 +155,14 @@ aware), crash mid-broadcast + recovery, stale-Dune refetch after full payout
 Never delete `paid-ledger.json` between a broadcast and the next successful
 fetch — in that window it is the only payment memory. It is gitignored so a
 `git clean -fd` leaves it alone, but `-x` would still remove it.
+
+## Completed rounds
+
+`topoff-recipients.json` / `topoff-paid-ledger.json` are the record of a
+**finished** one-time round: +4.50 USA₮ for the 275 wallets that claimed the
+0.50 drip before the 10× bump, 1,237.5 USA₮ paid in full. Both files are tracked
+on purpose. The ledger is what nets that round out, so a checkout carrying the
+recipients without it would treat all 275 wallets as unpaid and could pay the
+whole round again. The recipients file is additionally marked `"completed":
+true`, which the wrapper refuses to broadcast against — before the Dune refresh,
+so the archived files are not overwritten either.
