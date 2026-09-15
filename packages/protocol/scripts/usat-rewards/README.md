@@ -137,12 +137,19 @@ the window Dune has not indexed yet. Every payment is counted exactly once:
    forge receipts (`record-payments.py`, tx-hash deduped). The forge script
    subtracts the ledger in full, so a no-fetch re-run (e.g. right after a crash)
    sends only the outstanding remainder. Only transfers of the expected token on
-   the expected chain are recorded. A transaction the broadcast file holds no
-   receipt for — what a run interrupted between submitting a transfer and
-   writing the artifact leaves behind — is **not** taken for a failure: it is
-   settled against the RPC instead, recorded if it is mined and matches, skipped
-   only if provably dropped (its nonce consumed and no node knowing the hash),
-   and otherwise left unresolved, which exits non-zero and stops the next payout
+   the expected chain are recorded, and only where a matching `Transfer` log
+   proves the tokens moved: a status-1 receipt is not enough, because a token can
+   return false without reverting, and a ledger entry for a payment that never
+   happened would suppress that recipient's reward for good. A transaction the
+   broadcast file holds no receipt for — what a run interrupted between
+   submitting a transfer and writing the artifact leaves behind — is **not**
+   taken for a failure either; it is settled against the RPC instead. "Dropped"
+   is the hardest verdict to reach, because it is the only one that lets a
+   reward be sent again: it needs the hash to be unknown on every one of several
+   re-checks *and* the sender's nonce to have been consumed as of a block deep
+   enough that a lagging load-balanced node could not have served the query at
+   all. Everything else — still pending, moved a different amount, RPC
+   unreachable — is unresolved, which exits non-zero and stops the next payout
    until a later block settles it.
 4. **The ledger is scoped to token, chain and distributor.** It carries all
    three, `fetch-recipients.py` refuses to reconcile a ledger from another scope

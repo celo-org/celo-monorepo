@@ -16,12 +16,14 @@ mainnet payment record, and one wallet's payments can never be subtracted from
 another wallet's obligation, either of which would suppress rewards that were
 never really paid.
 
-A transaction the broadcast file has no receipt for is NOT treated as failed: a
-forge run interrupted between submitting a transfer and serializing its receipt
-leaves exactly that, and the transfer may well be on chain. Those are resolved
-against the RPC instead — recorded if mined, skipped only if provably dropped,
-and otherwise left unresolved with a non-zero exit, which stops the next payout
-until a human or a later confirmation settles it.
+A payment is only recorded when a Transfer log proves the tokens moved — a
+status-1 receipt is not enough, since a token can return false without
+reverting. And a transaction the broadcast file has no receipt for is NOT
+treated as failed: a forge run interrupted between submitting a transfer and
+serializing its receipt leaves exactly that, and the transfer may well be on
+chain. Those are resolved against the RPC instead — recorded if mined, skipped
+only if provably dropped, and otherwise left unresolved with a non-zero exit,
+which stops the next payout until a human or a later confirmation settles it.
 
 Safe to run repeatedly on DIFFERENT broadcast files; running it twice on the
 same file would double-count, so it refuses hashes it has already recorded.
@@ -31,6 +33,7 @@ import argparse
 import json
 import os
 import sys
+import time
 import urllib.request
 
 TRANSFER_SELECTOR = "0xa9059cbb"
@@ -219,7 +222,7 @@ def main() -> int:
               "not recording (pass --chain-id to record another chain).", file=sys.stderr)
         return 1
 
-    statuses = {r["transactionHash"].lower(): r.get("status") for r in run.get("receipts", [])}
+    receipts = {r["transactionHash"].lower(): r for r in run.get("receipts", [])}
     ledger, paid, seen_hashes = load_ledger(args.ledger, token, args.chain_id)
 
     recorded = skipped_failed = skipped_seen = skipped_other_token = skipped_dropped = 0
@@ -242,24 +245,37 @@ def main() -> int:
             continue
         recipient = "0x" + data[10 + 24 : 10 + 64]
         amount = int(data[10 + 64 : 10 + 128], 16)
-        status = statuses.get(tx_hash)
-        if status is None:
+        sender = (call.get("from") or "").lower()
+        receipt = receipts.get(tx_hash)
+        if receipt is None:
             # Forge never wrote a receipt for this transaction — an interrupted
             # run looks exactly like this — so the transfer may be on chain.
             # Calling that "failed" is what makes the next refresh pay again.
             outcome = resolve_missing_receipt(args.rpc_url, tx_hash, call, token,
                                               recipient, amount)
-            if outcome == "reverted":
-                skipped_failed += 1
-                continue
-            if outcome == "dropped":
-                skipped_dropped += 1
-                continue
-            if outcome != "mined":
-                unresolved.append(tx_hash)
-                continue
-        elif to_int(status) != 1:
+        elif to_int(receipt.get("status")) != 1:
+            outcome = "reverted"
+        elif transfer_in_receipt(receipt, token, sender, recipient, amount):
+            outcome = "mined"
+        elif receipt.get("logs"):
+            # The receipt succeeded and carries logs, but none of them is this
+            # transfer: a token that returns false instead of reverting looks
+            # exactly like that, and recording it would invent a payment that
+            # suppresses the recipient's reward for good.
+            outcome = "unresolved"
+        else:
+            # A stored receipt with no logs at all cannot answer the question —
+            # the artifact may simply not carry them — so ask the chain.
+            outcome = resolve_missing_receipt(args.rpc_url, tx_hash, call, token,
+                                              recipient, amount)
+        if outcome == "reverted":
             skipped_failed += 1
+            continue
+        if outcome == "dropped":
+            skipped_dropped += 1
+            continue
+        if outcome != "mined":
+            unresolved.append(tx_hash)
             continue
         paid[recipient] = paid.get(recipient, 0) + amount
         seen_hashes.add(tx_hash)
