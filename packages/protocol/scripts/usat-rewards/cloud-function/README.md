@@ -59,16 +59,20 @@ passes the post-bump campaign values, so these are what is actually enforced:
 - The ledger is stamped with the token and chain it belongs to, and a ledger
   carrying a different stamp is refused: a single run pointed at a test token
   cannot poison the mainnet payment memory
-- Gas is checked for the whole run (`len(owed) × 100k × gas price`, floored by
-  the small `MIN_GAS_CELO`, default 0.05 CELO), not a flat minimum, so a run
-  cannot pay a prefix and then run dry. Without CELO, gas is paid in USA₮ and
-  reserved out of the balance for exactly the transfers the run then sends: the
-  affordable set is selected up front, payout plus that transfer's own gas, and
-  the send loop pays that set and nothing else, so an under-funded wallet pays
-  the prefix it can afford instead of aborting or dying on the last debit.
-  With `FEE_CURRENCY_ADAPTER` empty there is no such fallback and too little
-  CELO aborts before the first transfer. The gas mode is decided before the
-  dry-run report, so `funded`/`gas_mode` describe what a real run would do.
+- Gas is priced for the transfers the run actually sends, not for every wallet
+  owed: the set the USA₮ balance funds is selected first and the CELO estimate
+  (`selected × 100k × gas price`, floored by the small `MIN_GAS_CELO`, default
+  0.05 CELO) covers exactly those. A wallet whose USA₮ reaches two of three
+  payouts needs gas for two, not three.
+- The gas mode follows from that estimate. Enough CELO → `CELO`. Otherwise
+  `FEE_CURRENCY_ADAPTER` pays gas in USA₮ out of the same balance as the
+  payouts, so the affordable set is chosen again with each transfer's own gas
+  included. With no adapter configured the run sends what the gas tank does
+  cover (`CELO - capped by the gas balance`) rather than refusing outright, and
+  only a tank below the minimum stops it. The send loop pays exactly the
+  selected set and nothing else, so preflight and send cannot disagree, and all
+  of it is decided before the dry-run report — `funded`/`gas_mode` describe what
+  a real run would do.
 - GCS generation-guarded run lock (takeover also generation-guarded) +
   `--max-instances 1`. It goes stale 30 minutes after the function's own request
   timeout, which deploy.sh passes in as `FUNCTION_TIMEOUT_SECONDS`: a run still
@@ -121,7 +125,7 @@ gcloud storage cat gs://$PROJECT-usat-rewards/paid-ledger.json
 Keep the hot wallet funded with USA₮ + a little CELO. An underfunded wallet does
 **not** make the run a no-op: it pays as many wallets as the balance covers and
 reports `partial` with the shortfall, leaving the rest owed for a later run.
-Only gas stops a run before the first transfer: too little CELO with no USA₮
-left to cover even one transfer plus its fee-currency gas, or too little CELO
-with no adapter configured at all. Use the `HALT` flag, not underfunding, to
-stop a payout.
+Only gas stops a run before the first transfer: no USA₮ left to cover even one
+transfer plus its fee-currency gas, or a gas tank below the minimum with no
+adapter configured. Anything in between pays what it can and reports the
+shortfall. Use the `HALT` flag, not underfunding, to stop a payout.

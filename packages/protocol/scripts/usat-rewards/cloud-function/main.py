@@ -450,6 +450,24 @@ def ledger_add(ledger: dict, wallet: str, amount: int, tx_hash: str) -> dict:
     }
 
 
+def select_affordable(owed: dict[str, int], balance: int, per_transfer_cost: int) -> dict[str, int]:
+    """The transfers a balance can fund — each payout plus that transfer's own
+    gas — in the order the send loop walks them.
+
+    Preflight and the send loop must agree on exactly this set: a reserve sized
+    for one subset while the loop pays a larger one is how a run pays a prefix
+    and then dies debiting gas nothing was reserved for.
+    """
+    selected: dict[str, int] = {}
+    committed = 0
+    for wallet, amount in sorted(owed.items()):
+        if committed + amount + per_transfer_cost > balance:
+            continue
+        committed += amount + per_transfer_cost
+        selected[wallet] = amount
+    return selected
+
+
 def transfer_is_dropped(w3, pending: dict) -> bool:
     """Is a broadcast transfer definitively gone?
 
@@ -723,74 +741,69 @@ def distribute(request):
         gas_price = w3.eth.gas_price
         summary["token_balance_usat"] = token_balance / 1e6
         summary["gas_balance_celo"] = gas_balance / 1e18
-        # Gas for the WHOLE run, not a flat floor: a prefix of the payouts must
-        # never succeed only for the rest to die of an empty gas tank. The floor
-        # is deliberately small — it only rules out a dust balance — so that the
-        # per-run estimate is what actually decides.
+        # The floor is deliberately small — it only rules out a dust balance — so
+        # that the per-run estimate is what actually decides.
         min_gas_wei = int(float(os.environ.get("MIN_GAS_CELO", "0.05")) * 10 ** 18)
-        required_gas_wei = max(min_gas_wei, len(owed) * CELO_GAS_LIMIT * gas_price)
-        summary["gas_required_celo"] = required_gas_wei / 1e18
+        per_transfer_gas_wei = CELO_GAS_LIMIT * gas_price
 
-        # Gas mode: CELO when there is enough of it for every transfer in this
-        # run, otherwise pay gas in USA₮ via the fee-currency adapter and reserve
-        # that gas out of the token balance. Decided before the dry-run report,
-        # so the report describes the mode a real run would actually pick — with
-        # no CELO but enough USA₮ for payouts plus gas, that run pays in full.
+        # Which transfers this run can afford and what gas they need are one
+        # question, so the token-funded set is chosen FIRST and the CELO estimate
+        # priced for exactly those transfers. Estimating for every owed wallet
+        # instead made a wallet whose USA₮ covers two of three payouts, with
+        # CELO enough for two, either abort or move to fee-currency gas and pay
+        # less than it could. Gas is needed per transfer sent, not per wallet
+        # owed. All of it is decided before the dry-run report, so the report
+        # describes the mode and the set a real run would actually pick.
         fee_currency = os.environ.get("FEE_CURRENCY_ADAPTER", FEE_CURRENCY_ADAPTER_DEFAULT)
-        short_on_celo = gas_balance < required_gas_wei
-        gas_in_usat = short_on_celo and bool(fee_currency)
+        selected = select_affordable(owed, token_balance, 0)
+        required_gas_wei = max(min_gas_wei, len(selected) * per_transfer_gas_wei)
+        gas_in_usat = False
         fc_max_fee = fc_priority = 0
         per_transfer_usat = 0
-        if gas_in_usat:
+        blocked = None
+        if gas_balance >= required_gas_wei:
+            summary["gas_mode"] = "CELO"
+        elif fee_currency:
+            # Not enough CELO for the set the tokens fund, so pay gas in USA₮
+            # through the adapter. That gas now comes out of the same balance as
+            # the payouts, so the affordable set shrinks: choose it again with
+            # the per-transfer cost included.
+            gas_in_usat = True
             fc_max_fee, fc_priority = fee_currency_gas_quote(w3, fee_currency)
             # Adapter quotes are 18-decimal while USA₮ balances here are
             # 6-decimal, and debitGasFees rounds every transaction's debit up
             # on its own — so reserve the sum of per-transaction ceilings
             # instead of flooring the combined estimate once.
             per_transfer_usat = -(-(FEE_CURRENCY_GAS_LIMIT * fc_max_fee) // 10 ** 12)
-
-        # Pick the exact transfers this run can afford, each payout together with
-        # its own gas, and pay that set and nothing else. A reserve sized for one
-        # subset while the loop walks a larger one is how a run pays a prefix and
-        # then dies debiting gas for a transfer nothing was reserved for.
-        selected: dict[str, int] = {}
-        committed = 0
-        for wallet, amount in sorted(owed.items()):
-            if committed + amount + per_transfer_usat > token_balance:
-                continue
-            committed += amount + per_transfer_usat
-            selected[wallet] = amount
+            selected = select_affordable(owed, token_balance, per_transfer_usat)
+            summary["gas_mode"] = "USAT via fee currency"
+        else:
+            # Nothing to fall back on. Send what the gas tank really covers
+            # rather than refusing the whole run; the rest stays owed.
+            covered = gas_balance // per_transfer_gas_wei if gas_balance >= min_gas_wei else 0
+            selected = dict(sorted(selected.items())[:covered])
+            required_gas_wei = max(min_gas_wei, len(selected) * per_transfer_gas_wei)
+            if selected:
+                summary["gas_mode"] = "CELO - capped by the gas balance"
+            else:
+                summary["gas_mode"] = "none - short on CELO with no FEE_CURRENCY_ADAPTER"
+                blocked = ("gas balance below the minimum and no FEE_CURRENCY_ADAPTER "
+                           "configured - nothing sent")
         gas_reserve = len(selected) * per_transfer_usat
         selected_total = sum(selected.values())
-
+        summary["gas_required_celo"] = required_gas_wei / 1e18
         if gas_in_usat:
-            summary["gas_mode"] = "USAT via fee currency"
             summary["gas_reserve_usat"] = gas_reserve / 1e6
-        elif short_on_celo:
-            summary["gas_mode"] = "none - short on CELO with no FEE_CURRENCY_ADAPTER"
-        else:
-            summary["gas_mode"] = "CELO"
-        funded = (not short_on_celo or gas_in_usat) and len(selected) == len(owed)
+        funded = len(selected) == len(owed)
 
         if dry_run:
             # Dry run reports what a real run would do, funded or not.
             return ({**summary, "result": "dry run - nothing sent", "funded": funded}, 200)
 
-        if short_on_celo and not fee_currency:
-            # Neither enough CELO for the whole run nor a fee currency to fall
-            # back on: starting would pay a prefix and then die mid-run.
-            return (
-                {
-                    **summary,
-                    "error": "gas balance below the whole-run estimate and no "
-                             "FEE_CURRENCY_ADAPTER configured - nothing sent",
-                },
-                500,
-            )
         if not selected:
             return (
-                {**summary, "error": "the USAT balance covers no owed transfer"
-                                     + (" plus its gas" if gas_in_usat else "")},
+                {**summary, "error": blocked or ("the USAT balance covers no owed transfer"
+                                                 + (" plus its gas" if gas_in_usat else ""))},
                 500,
             )
         if len(selected) < len(owed):
