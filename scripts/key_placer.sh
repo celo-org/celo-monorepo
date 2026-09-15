@@ -17,6 +17,7 @@ files=(
   "secrets/.env.signers.succinct201:celo-testnet-production"
   "secrets/.env.signers.basefee:celo-testnet-production"
   "secrets/.env.signers.succinct210:celo-testnet-production"
+  "secrets/.env.signers.eigendacertv3:celo-testnet-production"
 )
 
 if [[ -z "$1" ]]; then
