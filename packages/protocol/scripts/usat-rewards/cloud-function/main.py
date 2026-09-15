@@ -257,68 +257,117 @@ class LocalStore:
     def exists(self, name: str) -> bool:
         return os.path.exists(os.path.join(self.dir, name))
 
-    def _read_lock(self, path: str) -> dict | None:
+    def _owner_path(self, token: str) -> str:
+        """Each run's lock is a file of its own, named after its token. Nothing
+        ever renames the shared name — a takeover renames the one unique file it
+        judged stale, which is what makes the claim a compare-and-swap rather
+        than a guess about what is there now."""
+        return os.path.join(self.dir, f"{LOCK_OBJECT}.{token}")
+
+    def _read_json(self, path: str) -> dict | None:
         try:
             with open(path) as f:
                 return json.load(f)
         except (OSError, ValueError):
             return None
 
-    def _create_lock(self, path: str) -> bool:
-        """O_EXCL is the only thing that ever creates the lock, so it alone
-        decides the owner."""
+    def _claim_pointer(self) -> bool:
+        """O_EXCL on the shared name is the only thing that ever creates it, so
+        it alone decides the first owner."""
         try:
-            fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            fd = os.open(os.path.join(self.dir, LOCK_OBJECT),
+                         os.O_CREAT | os.O_EXCL | os.O_WRONLY)
         except FileExistsError:
             return False
         try:
-            os.write(fd, json.dumps({"acquired_at": time.time(),
-                                     "owner": self.lock_token}).encode())
+            os.write(fd, json.dumps({"owner": self.lock_token}).encode())
         finally:
             os.close(fd)
         return True
 
-    def acquire_lock(self) -> bool:
-        path = os.path.join(self.dir, LOCK_OBJECT)
-        if self._create_lock(path):
-            return True
-        stale = self._read_lock(path)
-        if stale is None or time.time() - stale.get("acquired_at", 0) <= LOCK_STALE_SECONDS:
-            return False
-        # Taking over used to be read-then-truncate-and-write, which two runs
-        # could both complete and both call a win. Renaming the lock away can
-        # succeed for only one process — every other one finds the source gone —
-        # and only that winner may create the replacement, still under O_EXCL.
-        # A filesystem has no rename conditional on content the way GCS
-        # generations do, so the moved file is checked afterwards: if it turns
-        # out to be a live lock rather than the stale one the decision was based
-        # on, it goes straight back and this run gives up.
-        tombstone = f"{path}.stale.{self.lock_token}"
+    def _discard(self, path: str) -> None:
         try:
-            os.rename(path, tombstone)
+            os.remove(path)
         except OSError:
-            return False
-        if self._read_lock(tombstone) != stale:
+            pass
+
+    def _point_at_me(self) -> None:
+        """Repoint the shared name in one atomic step."""
+        pointer = os.path.join(self.dir, LOCK_OBJECT)
+        staging = f"{pointer}.pointing.{self.lock_token}"
+        with open(staging, "w") as f:
+            json.dump({"owner": self.lock_token}, f)
+        os.replace(staging, pointer)
+
+    def acquire_lock(self) -> bool:
+        pointer = os.path.join(self.dir, LOCK_OBJECT)
+        mine = self._owner_path(self.lock_token)
+        with open(mine, "w") as f:
+            json.dump({"owner": self.lock_token, "acquired_at": time.time()}, f)
+        if self._claim_pointer():
+            return True
+
+        held_by = (self._read_json(pointer) or {}).get("owner")
+        held = self._read_json(self._owner_path(held_by)) if held_by else None
+        if held is None:
+            # The shared name points at a lock that is not there. Either a run is
+            # mid-takeover right now, which must be left alone, or one died
+            # between renaming the stale lock away and repointing — and the
+            # pointer's own age is what tells those apart.
             try:
-                os.rename(tombstone, path)
+                pointer_age = time.time() - os.path.getmtime(pointer)
             except OSError:
-                pass
+                os.remove(mine)
+                return False
+            if pointer_age <= LOCK_STALE_SECONDS:
+                os.remove(mine)
+                return False
+            # Nothing but the pointer left to claim, so this once it is the thing
+            # renamed away; the replacement still goes through O_EXCL, so a
+            # contender that got in first keeps it and this run loses.
+            try:
+                os.rename(pointer, f"{pointer}.stale.{self.lock_token}")
+            except OSError:
+                os.remove(mine)
+                return False
+            self._discard(f"{pointer}.stale.{self.lock_token}")
+            if not self._claim_pointer():
+                os.remove(mine)
+                return False
+            return True
+        if time.time() - held.get("acquired_at", 0) <= LOCK_STALE_SECONDS:
+            os.remove(mine)
             return False
-        os.remove(tombstone)
-        if not self._create_lock(path):
+
+        # Rename the very file judged stale. Only one contender can win that —
+        # a second one finds it gone — and a contender that judged some later
+        # lock stale renames that one instead and so can never disturb this
+        # claim. The shared name itself is never renamed, only repointed.
+        holder = self._owner_path(held_by)
+        tombstone = f"{holder}.stale.{self.lock_token}"
+        try:
+            os.rename(holder, tombstone)
+        except OSError:
+            os.remove(mine)
             return False
-        # The token in the lock has to be ours before anything is paid.
-        return (self._read_lock(path) or {}).get("owner") == self.lock_token
+        self._discard(tombstone)
+        self._point_at_me()
+        # The token under the shared name has to be ours before anything is paid.
+        return (self._read_json(pointer) or {}).get("owner") == self.lock_token
 
     def release_lock(self) -> None:
-        path = os.path.join(self.dir, LOCK_OBJECT)
-        if not os.path.exists(path):
-            return
-        with open(path) as f:
-            owner = json.load(f).get("owner")
-        if owner is not None and owner != self.lock_token:
-            return
-        os.remove(path)
+        pointer = os.path.join(self.dir, LOCK_OBJECT)
+        # Only the owner may release: a run whose stale lock was taken over must
+        # not clear the pointer the new owner is holding.
+        if (self._read_json(pointer) or {}).get("owner") == self.lock_token:
+            try:
+                os.remove(pointer)
+            except OSError:
+                pass
+        try:
+            os.remove(self._owner_path(self.lock_token))
+        except OSError:
+            pass
 
 
 # ---------------------------------------------------------------------- dune
