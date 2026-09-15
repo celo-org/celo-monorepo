@@ -28,6 +28,17 @@ USAT_MAINNET = "0xd2ab3c9a02dbbab236bfec45d1d755df4267f771"
 CELO_MAINNET_CHAIN_ID = 42220
 
 
+def write_json(path: str, payload: dict) -> None:
+    """Temp file + rename: a crash mid-write would truncate the ledger, which is
+    the only record of the payments Dune has not indexed yet."""
+    tmp = f"{path}.tmp"
+    with open(tmp, "w") as f:
+        json.dump(payload, f, indent=2)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, path)
+
+
 def load_ledger(path: str, token: str, chain_id: int) -> tuple[dict, dict[str, int], set[str]]:
     if not os.path.exists(path):
         return {}, {}, set()
@@ -91,19 +102,17 @@ def main() -> int:
         recorded += 1
 
     wallets = sorted(paid)
-    with open(args.ledger, "w") as f:
-        json.dump(
-            {
-                **ledger,
-                "recipients": wallets,
-                "amounts": [paid[w] for w in wallets],
-                "recorded_tx_hashes": sorted(seen_hashes),
-                "token": token,
-                "chain_id": args.chain_id,
-            },
-            f,
-            indent=2,
-        )
+    write_json(
+        args.ledger,
+        {
+            **ledger,
+            "recipients": wallets,
+            "amounts": [paid[w] for w in wallets],
+            "recorded_tx_hashes": sorted(seen_hashes),
+            "token": token,
+            "chain_id": args.chain_id,
+        },
+    )
 
     total = sum(paid.values())
     print(

@@ -46,6 +46,10 @@ QUERY_ID = 7506058
 API = "https://api.dune.com/api/v1"
 ZERO = "0x0000000000000000000000000000000000000000"
 PAGE_LIMIT = 32000
+REQUEST_TIMEOUT = 60
+# How long to wait for one execution. Without a budget a hung Dune execution
+# keeps this process — and the payout run lock it is holding — alive forever.
+POLL_SECONDS_DEFAULT = 1200
 
 
 def api(path: str, key: str, body: dict | None = None) -> dict:
@@ -55,8 +59,19 @@ def api(path: str, key: str, body: dict | None = None) -> dict:
         data=json.dumps(body).encode() if body is not None else None,
         method="POST" if body is not None else "GET",
     )
-    with urllib.request.urlopen(req) as resp:
+    with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT) as resp:
         return json.load(resp)
+
+
+def write_json(path: str, payload: dict) -> None:
+    """Temp file + rename: a crash mid-write would truncate the ledger, which is
+    the only record of the payments Dune has not indexed yet."""
+    tmp = f"{path}.tmp"
+    with open(tmp, "w") as f:
+        json.dump(payload, f, indent=2)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, path)
 
 
 def fetch_all_rows(execution_id: str, key: str) -> list[dict]:
@@ -153,6 +168,7 @@ def main() -> int:
     execution_id = execution["execution_id"]
     print(f"fresh execution {execution_id} started (distributor {args.distributor})", file=sys.stderr)
 
+    deadline = time.time() + int(os.environ.get("DUNE_POLL_SECONDS", POLL_SECONDS_DEFAULT))
     while True:
         status = api(f"/execution/{execution_id}/status", key)
         state = status["state"]
@@ -160,6 +176,11 @@ def main() -> int:
             break
         if state in ("QUERY_STATE_FAILED", "QUERY_STATE_CANCELLED", "QUERY_STATE_EXPIRED"):
             print(f"execution ended in {state}", file=sys.stderr)
+            return 1
+        if time.time() > deadline:
+            print(f"execution {execution_id} still {state} after the poll budget; giving up so "
+                  "the run lock is released. Re-run once Dune is responsive "
+                  "(raise DUNE_POLL_SECONDS for a slower query).", file=sys.stderr)
             return 1
         time.sleep(5)
 
@@ -178,10 +199,13 @@ def main() -> int:
         "amounts": [owed[w] for w in recipients],
         "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }
-    with open(args.out, "w") as f:
-        json.dump(payload, f, indent=2)
-    with open(args.ledger, "w") as f:
-        json.dump(new_ledger, f, indent=2)
+    # Recipients first, ledger second: should the process die between the two,
+    # the fresh recipients are paired with a ledger that still holds the old
+    # since-fetch amounts, and the forge script subtracts them once more — it
+    # under-pays, which a later run fixes. The opposite order would pair a
+    # cleared ledger with a stale recipients list and over-pay.
+    write_json(args.out, payload)
+    write_json(args.ledger, new_ledger)
 
     total = sum(payload["amounts"])
     carried = sum(new_ledger["unindexed"].values())
