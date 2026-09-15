@@ -1,67 +1,95 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 pragma experimental ABIEncoderV2;
 
-// Refactor this test, make it easy to generate
-// will have to support more fees
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
+import { Vm } from "forge-std-8/Vm.sol";
 
-import "@celo-contracts/common/FeeHandler.sol";
-
-import "@test-sol/TestWithUtils.sol";
-
-import { Exchange } from "@mento-core/contracts/Exchange.sol";
-import { StableToken } from "@mento-core/contracts/StableToken.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Freezer.sol";
-import "@celo-contracts/common/GoldToken.sol";
-import "@celo-contracts/common/FeeCurrencyWhitelist.sol";
-import "@celo-contracts/common/MentoFeeHandlerSeller.sol";
-import "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
-import "@celo-contracts/uniswap/test/MockUniswapV2Router02.sol";
-import "@celo-contracts/uniswap/test/MockUniswapV2Factory.sol";
-import "@celo-contracts/uniswap/test/MockERC20.sol";
+import "@celo-contracts/common/interfaces/IFreezer.sol";
+import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
+import { IGoldTokenTest } from "@test-sol/unit/common/interfaces/IGoldTokenTest.sol";
+import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import "@celo-contracts/stability/test/MockSortedOracles.sol";
-import "@mento-core/test/mocks/MockReserve.sol";
-import "@celo-contracts/common/ProxyFactory.sol";
-import "@celo-contracts/governance/GovernanceApproverMultiSig.sol";
+import "@celo-contracts-8/stability/test/MockReserve.sol";
+import "@test-sol/unit/common/mocks/MockExchange08.sol";
+import "@test-sol/unit/common/mocks/MockERC20.sol";
+import "@test-sol/unit/common/mocks/MockStableTokenFull.sol";
+import "@test-sol/unit/common/mocks/FeeHandlerFamilyMocks08.sol";
+import "@test-sol/unit/common/mocks/FreezerMocks08.sol";
+import "@test-sol/unit/common/mocks/FeeCurrencyWhitelistCompile.sol";
+import "@test-sol/unit/common/interfaces/IFeeHandlerTest.sol";
+import "@test-sol/unit/common/interfaces/IFeeHandlerSellerTest.sol";
+import "@test-sol/unit/common/mocks/MockUniswapV2_08.sol";
 
-contract FeeHandlerTest is TestWithUtils {
+interface IUniswapV2FactoryTest {
+  function INIT_CODE_PAIR_HASH() external view returns (bytes32);
+}
+
+interface IUniswapV2RouterTest {
+  function addLiquidity(
+    address tokenA,
+    address tokenB,
+    uint256 amountADesired,
+    uint256 amountBDesired,
+    uint256 amountAMin,
+    uint256 amountBMin,
+    address to,
+    uint256 deadline
+  ) external returns (uint256 amountA, uint256 amountB, uint256 liquidity);
+  function swapExactTokensForTokens(
+    uint256 amountIn,
+    uint256 amountOutMin,
+    address[] calldata path,
+    address to,
+    uint256 deadline
+  ) external returns (uint256[] memory amounts);
+  function getAmountsOut(
+    uint256 amountIn,
+    address[] calldata path
+  ) external view returns (uint256[] memory amounts);
+}
+
+contract FeeHandlerTest is TestWithUtils08 {
   using FixidityLib for FixidityLib.Fraction;
 
   event BeneficiaryAdded(address beneficiary);
   event BeneficiaryFractionSet(address beneficiary, uint256 fraction);
   event BeneficiaryNameSet(address beneficiary, string name);
 
-  FeeHandler feeHandler;
+  IFeeHandlerTest feeHandler;
 
-  GoldToken celoToken;
+  // Deployed via deployCodeTo; different name avoids shadowing inherited celoToken from TestWithUtils08.
+  IGoldTokenTest goldToken;
   MockSortedOracles mockSortedOracles;
-  MockReserve mockReserve;
+  MockReserve08 mockReserve;
 
-  Freezer freezer;
+  IFreezer freezer;
   MockERC20 tokenA;
 
-  MockUniswapV2Router02 uniswapRouter;
-  MockUniswapV2Router02 uniswapRouter2;
-  MockUniswapV2Factory uniswapFactory;
-  MockUniswapV2Factory uniswapFactory2;
+  IUniswapV2RouterTest uniswapRouter;
+  IUniswapV2RouterTest uniswapRouter2;
+  IUniswapV2FactoryTest uniswapFactory;
+  IUniswapV2FactoryTest uniswapFactory2;
 
-  FeeCurrencyWhitelist feeCurrencyWhitelist;
+  IFeeCurrencyWhitelist feeCurrencyWhitelist;
 
-  MentoFeeHandlerSeller mentoSeller;
-  UniswapFeeHandlerSeller uniswapFeeHandlerSeller;
+  IFeeHandlerSellerTest mentoSeller;
+  IFeeHandlerSellerTest uniswapFeeHandlerSeller;
 
-  Exchange exchangeUSD;
-  Exchange exchangeEUR;
-  StableToken stableToken;
-  StableToken stableTokenEUR;
+  // 0.8-native mocks; deployed directly with new.
+  MockExchange08 exchangeUSD;
+  MockExchange08 exchangeEUR;
+  MockStableTokenFull stableToken;
+  MockStableTokenFull stableTokenEUR;
 
   address EXAMPLE_BENEFICIARY_ADDRESS = 0x2A486910DBC72cACcbb8d0e1439C96b03B2A4699;
   address OTHER_BENEFICIARY_ADDRESS = 0x2A486910dBc72CACCBB8D0E1439c96B03b2A4610;
 
   address owner = address(this);
   address user = actor("user");
-  address celoUnreleasedTreasury = actor("CeloUnreleasedTreasury");
+  // Different name to avoid shadowing inherited celoUnreleasedTreasury from TestWithUtils08.
+  address celoUnreleasedTreasuryAddr = actor("CeloUnreleasedTreasury");
 
   uint256 celoAmountForRate = 1e24;
   uint256 stableAmountForRate = 2 * celoAmountForRate;
@@ -85,37 +113,58 @@ contract FeeHandlerTest is TestWithUtils {
   event TokenAdded(address tokenAddress, address handlerAddress);
   event TokenRemoved(address tokenAddress);
 
-  function setUp() public {
+  function setUp() public virtual override {
     super.setUp();
-    vm.warp(YEAR); // foundry starts block.timestamp at 0, which leads to underflow errors in Uniswap contracts
+    vm.warp(YEAR);
     op = actor("op");
 
-    spread = FixidityLib.newFixedFraction(3, 1000).unwrap();
-    reserveFraction = FixidityLib.newFixedFraction(5, 100).unwrap();
-    maxSlippage = FixidityLib.newFixedFraction(1, 100).unwrap();
+    spread = FixidityLib.newFixedFraction(3, 1000).value;
+    reserveFraction = FixidityLib.newFixedFraction(5, 100).value;
+    maxSlippage = FixidityLib.newFixedFraction(1, 100).value;
 
-    celoToken = new GoldToken(true);
-    mockReserve = new MockReserve();
-    stableToken = new StableToken(true);
-    stableTokenEUR = new StableToken(true);
-    registry = IRegistry(REGISTRY_ADDRESS);
-    feeHandler = new FeeHandler(true);
-    freezer = new Freezer(true);
-    feeCurrencyWhitelist = new FeeCurrencyWhitelist(true);
-    mentoSeller = new MentoFeeHandlerSeller(true);
-    uniswapFeeHandlerSeller = new UniswapFeeHandlerSeller(true);
+    address goldTokenAddress = actor("goldToken");
+    deployCodeTo("GoldToken.sol", abi.encode(true), goldTokenAddress);
+    goldToken = IGoldTokenTest(goldTokenAddress);
 
-    tokenA = new MockERC20();
+    mockReserve = new MockReserve08();
+
+    // Deploy 0.8-native stable token mocks. Pass the exchange registry id so
+    // MentoFeeHandlerSeller can look up the correct exchange for each stable token.
+    stableToken = new MockStableTokenFull(keccak256(abi.encodePacked("Exchange")));
+    stableTokenEUR = new MockStableTokenFull(keccak256(abi.encodePacked("ExchangeEUR")));
+
+    address feeHandlerAddress = actor("feeHandler");
+    deployCodeTo("FeeHandlerCompile", feeHandlerAddress);
+    feeHandler = IFeeHandlerTest(feeHandlerAddress);
+
+    address freezerAddress = actor("freezer");
+    deployCodeTo("FreezerCompile", freezerAddress);
+    freezer = IFreezer(freezerAddress);
+    IFreezerInitializer(freezerAddress).initialize();
+
+    address feeCurrencyWhitelistAddress = actor("feeCurrencyWhitelist");
+    deployCodeTo("FeeCurrencyWhitelistCompile", feeCurrencyWhitelistAddress);
+    feeCurrencyWhitelist = IFeeCurrencyWhitelist(feeCurrencyWhitelistAddress);
+
+    address mentoSellerAddress = actor("mentoSeller");
+    deployCodeTo("MentoFeeHandlerSellerCompile", mentoSellerAddress);
+    mentoSeller = IFeeHandlerSellerTest(mentoSellerAddress);
+
+    address uniswapSellerAddress = actor("uniswapFeeHandlerSeller");
+    deployCodeTo("UniswapFeeHandlerSellerCompile", uniswapSellerAddress);
+    uniswapFeeHandlerSeller = IFeeHandlerSellerTest(uniswapSellerAddress);
+
+    tokenA = new MockERC20("Token A", "TKA", 18);
 
     feeCurrencyWhitelist.initialize();
     registry.setAddressFor("FeeCurrencyWhitelist", address(feeCurrencyWhitelist));
     registry.setAddressFor("Freezer", address(freezer));
-    registry.setAddressFor("GoldToken", address(celoToken));
-    registry.setAddressFor("CeloToken", address(celoToken));
+    registry.setAddressFor("GoldToken", address(goldToken));
+    registry.setAddressFor("CeloToken", address(goldToken));
     registry.setAddressFor("Reserve", address(mockReserve));
-    registry.setAddressFor("CeloUnreleasedTreasury", celoUnreleasedTreasury);
+    registry.setAddressFor("CeloUnreleasedTreasury", celoUnreleasedTreasuryAddr);
 
-    mockReserve.setGoldToken(address(celoToken));
+    mockReserve.setGoldToken(address(goldToken));
     mockReserve.addToken(address(stableToken));
     mockReserve.addToken(address(stableTokenEUR));
 
@@ -123,30 +172,7 @@ contract FeeHandlerTest is TestWithUtils {
     uint256[] memory newMinimumReports;
 
     mentoSeller.initialize(address(registry), tokenAddresses, newMinimumReports);
-    celoToken.initialize(address(registry));
-    stableToken.initialize(
-      "Celo Dollar",
-      "cUSD",
-      decimals,
-      address(registry),
-      FIXED1,
-      WEEK,
-      new address[](0),
-      new uint256[](0),
-      "Exchange"
-    );
-
-    stableTokenEUR.initialize(
-      "Celo Euro",
-      "cEUR",
-      decimals,
-      address(registry),
-      FIXED1,
-      WEEK,
-      new address[](0),
-      new uint256[](0),
-      "ExchangeEUR"
-    );
+    goldToken.initialize(address(registry));
 
     mockSortedOracles = new MockSortedOracles();
     registry.setAddressFor("SortedOracles", address(mockSortedOracles));
@@ -161,7 +187,13 @@ contract FeeHandlerTest is TestWithUtils {
 
     fundReserve();
 
-    exchangeUSD = new Exchange(true);
+    // Deploy 0.8-native MockExchange contracts.
+    exchangeUSD = new MockExchange08(true);
+    exchangeEUR = new MockExchange08(true);
+
+    registry.setAddressFor("StableToken", address(stableToken));
+    registry.setAddressFor("StableTokenEUR", address(stableTokenEUR));
+
     exchangeUSD.initialize(
       address(registry),
       "StableToken",
@@ -171,7 +203,6 @@ contract FeeHandlerTest is TestWithUtils {
       minimumReports
     );
 
-    exchangeEUR = new Exchange(true);
     exchangeEUR.initialize(
       address(registry),
       "StableTokenEUR",
@@ -181,9 +212,7 @@ contract FeeHandlerTest is TestWithUtils {
       minimumReports
     );
 
-    registry.setAddressFor("StableToken", address(stableToken));
     registry.setAddressFor("Exchange", address(exchangeUSD));
-    registry.setAddressFor("StableTokenEUR", address(stableTokenEUR));
     registry.setAddressFor("ExchangeEUR", address(exchangeEUR));
 
     exchangeUSD.activateStable();
@@ -202,7 +231,7 @@ contract FeeHandlerTest is TestWithUtils {
   }
 
   function fundReserve() public {
-    celoToken.transfer(address(mockReserve), initialReserveBalance);
+    goldToken.transfer(address(mockReserve), initialReserveBalance);
   }
 }
 
@@ -240,44 +269,34 @@ contract FeeHandlerTest_SetCarbonFraction is FeeHandlerTest {
 
   function test_Reverts_WhenFractionsGreaterThanOne() public {
     vm.expectRevert("New carbon fraction can't be greater than 1");
-    feeHandler.setCarbonFraction(FixidityLib.newFixedFraction(3, 2).unwrap());
+    feeHandler.setCarbonFraction(FixidityLib.newFixedFraction(3, 2).value);
   }
 
   function test_WhenOtherBeneficiaryWouldAddToOne() public {
-    feeHandler.addOtherBeneficiary(
-      op,
-      (20 * 1e24) / 100, // TODO use fixidity
-      "OP revenue share"
-    );
-
-    feeHandler.setCarbonFraction(FixidityLib.newFixedFraction(8, 10).unwrap());
+    feeHandler.addOtherBeneficiary(op, (20 * 1e24) / 100, "OP revenue share");
+    feeHandler.setCarbonFraction(FixidityLib.newFixedFraction(8, 10).value);
   }
 
   function test_setsCarbonFraction() public {
-    feeHandler.setCarbonFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
+    feeHandler.setCarbonFraction(FixidityLib.newFixedFraction(80, 100).value);
     assertEq(
       feeHandler.getCarbonFraction(),
-      FixidityLib.newFixedFraction(80, 100).unwrap(),
+      FixidityLib.newFixedFraction(80, 100).value,
       "Burn fraction should be set"
     );
   }
 
   function test_ShouldEmitBurnFractionSet() public {
     vm.expectEmit(true, true, true, true);
-    emit CarbonFractionSet(FixidityLib.newFixedFraction(80, 100).unwrap());
-    feeHandler.setCarbonFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
+    emit CarbonFractionSet(FixidityLib.newFixedFraction(80, 100).value);
+    feeHandler.setCarbonFraction(FixidityLib.newFixedFraction(80, 100).value);
   }
 }
 
-// TODO change beneficiary allocation
 contract FeeHandlerTest_changeOtherBeneficiaryAllocation is FeeHandlerTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
-    feeHandler.addOtherBeneficiary(
-      op,
-      (20 * 1e24) / 100, // TODO use fixidity
-      "OP revenue share"
-    );
+    feeHandler.addOtherBeneficiary(op, (20 * 1e24) / 100, "OP revenue share");
   }
 
   function test_changedSucsesfully() public {
@@ -419,7 +438,7 @@ contract FeeHandlerTestAbstract is FeeHandlerTest {
   }
 
   function setCarbonFraction(uint256 numerator, uint256 denominator) internal {
-    feeHandler.setCarbonFraction(FixidityLib.newFixedFraction(numerator, denominator).unwrap());
+    feeHandler.setCarbonFraction(FixidityLib.newFixedFraction(numerator, denominator).value);
   }
 
   function fundFeeHandlerStable(
@@ -428,7 +447,7 @@ contract FeeHandlerTestAbstract is FeeHandlerTest {
     address exchangeAddress
   ) internal {
     vm.prank(address(exchangeAddress));
-    StableToken(stableTokenAddress).mint(address(feeHandler), stableAmount);
+    MockStableTokenFull(stableTokenAddress).mint(address(feeHandler), stableAmount);
   }
 
   function setMaxSlippage(address stableTokenAddress, uint256 slippage) internal {
@@ -437,18 +456,13 @@ contract FeeHandlerTestAbstract is FeeHandlerTest {
 
   function fundFeeHandlerWithCelo() public {
     uint256 celoAmount = 1e18;
-    celoToken.transfer(address(feeHandler), celoAmount);
+    goldToken.transfer(address(feeHandler), celoAmount);
   }
 }
 
 contract FeeHandlerTest_AddOtherBeneficiary is FeeHandlerTestAbstract {
-  // TODO only owner
   function test_addsSucsesfully() public {
-    feeHandler.addOtherBeneficiary(
-      op,
-      (20 * 1e24) / 100, // TODO use fixidity
-      "OP revenue share"
-    );
+    feeHandler.addOtherBeneficiary(op, (20 * 1e24) / 100, "OP revenue share");
 
     assertEq(feeHandler.getOtherBeneficiariesAddresses().length, 1);
     (uint256 fraction, string memory name, ) = feeHandler.getOtherBeneficiariesInfo(op);
@@ -458,37 +472,20 @@ contract FeeHandlerTest_AddOtherBeneficiary is FeeHandlerTestAbstract {
 
   function test_SetsWhenBurningFractionWouldBeZero() public {
     setCarbonFraction(20, 100);
-    feeHandler.addOtherBeneficiary(
-      op,
-      (80 * 1e24) / 100, // TODO use fixidity
-      "OP revenue share"
-    );
-
+    feeHandler.addOtherBeneficiary(op, (80 * 1e24) / 100, "OP revenue share");
     assertFalse(feeHandler.shouldBurn());
   }
 
   function test_Reverts_WhenaddingSameTokenTwice() public {
-    feeHandler.addOtherBeneficiary(
-      op,
-      (80 * 1e24) / 100, // TODO use fixidity
-      "OP revenue share"
-    );
+    feeHandler.addOtherBeneficiary(op, (80 * 1e24) / 100, "OP revenue share");
     vm.expectRevert("Beneficiary already exists");
-    feeHandler.addOtherBeneficiary(
-      op,
-      (80 * 1e24) / 100, // TODO use fixidity
-      "OP revenue share"
-    );
+    feeHandler.addOtherBeneficiary(op, (80 * 1e24) / 100, "OP revenue share");
   }
 
   function test_Reverts_WhenCallerNotOwner() public {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
-    feeHandler.addOtherBeneficiary(
-      op,
-      (80 * 1e24) / 100, // TODO use fixidity
-      "OP revenue share"
-    );
+    feeHandler.addOtherBeneficiary(op, (80 * 1e24) / 100, "OP revenue share");
   }
 
   function test_Emmit() public {
@@ -498,16 +495,12 @@ contract FeeHandlerTest_AddOtherBeneficiary is FeeHandlerTestAbstract {
     emit BeneficiaryNameSet(op, "OP revenue share");
     vm.expectEmit(true, true, true, true);
     emit BeneficiaryAdded(op);
-    feeHandler.addOtherBeneficiary(
-      op,
-      (80 * 1e24) / 100, // TODO use fixidity
-      "OP revenue share"
-    );
+    feeHandler.addOtherBeneficiary(op, (80 * 1e24) / 100, "OP revenue share");
   }
 }
 
 contract FeeHandlerTest_Distribute is FeeHandlerTestAbstract {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     setCarbonFraction(20, 100);
     setMaxSlippage(address(stableToken), FIXED1);
@@ -528,8 +521,6 @@ contract FeeHandlerTest_Distribute is FeeHandlerTestAbstract {
   function test_DoesntDistributeWhenToDistributeIsZero() public {
     fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
     addAndActivateToken(address(stableToken), address(mentoSeller));
-    // If we uncomment this the test should fail
-    // feeHandler.sell(address(stableToken));
     vm.recordLogs();
     feeHandler.distribute(address(stableToken));
     Vm.Log[] memory entries = vm.getRecordedLogs();
@@ -541,16 +532,14 @@ contract FeeHandlerTest_Distribute is FeeHandlerTestAbstract {
     vm.recordLogs();
     feeHandler.distribute(address(stableToken));
     Vm.Log[] memory entries = vm.getRecordedLogs();
-    assertEq(entries.length, 1); // TODO figure out why this is 1 and the above is 2
+    assertEq(entries.length, 1);
   }
 
   function test_Distribute() public {
     fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
     addAndActivateToken(address(stableToken), address(mentoSeller));
     feeHandler.sell(address(stableToken));
-
     feeHandler.distribute(address(stableToken));
-
     assertEq(stableToken.balanceOf(address(feeHandler)), 0);
     assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
   }
@@ -558,9 +547,7 @@ contract FeeHandlerTest_Distribute is FeeHandlerTestAbstract {
   function test_distributesWithoutBurn() public {
     fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
     addAndActivateToken(address(stableToken), address(mentoSeller));
-
     feeHandler.distribute(address(stableToken));
-
     assertEq(stableToken.balanceOf(address(feeHandler)), 8e17);
     assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
   }
@@ -569,33 +556,25 @@ contract FeeHandlerTest_Distribute is FeeHandlerTestAbstract {
     setCarbonFraction(100, 100);
     fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
     addAndActivateToken(address(stableToken), address(mentoSeller));
-
     feeHandler.distribute(address(stableToken));
     assertEq(stableToken.balanceOf(address(feeHandler)), 0);
   }
 }
 
 contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstract {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     setCarbonFraction(20, 100);
     setMaxSlippage(address(stableToken), FIXED1);
     fundFeeHandlerStable(1e18, address(stableToken), address(exchangeUSD));
     addAndActivateToken(address(stableToken), address(mentoSeller));
-
-    feeHandler.addOtherBeneficiary(
-      op,
-      (20 * 1e24) / 100, // TODO use fixidity
-      "OP revenue share"
-    );
+    feeHandler.addOtherBeneficiary(op, (20 * 1e24) / 100, "OP revenue share");
   }
 
   function test_DistributeOP() public {
     feeHandler.sell(address(stableToken));
-
-    assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 0); // Make sure the balance is zero at the beginning
+    assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 0);
     feeHandler.distribute(address(stableToken));
-
     assertEq(stableToken.balanceOf(address(feeHandler)), 0);
     assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
     assertEq(stableToken.balanceOf(op), 2e17);
@@ -603,19 +582,12 @@ contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstr
 
   function test_DistributeOP_WhenOneMoreBeneficiary() public {
     address otherBeneficiary = actor("otherBeneficiary");
-    feeHandler.addOtherBeneficiary(
-      otherBeneficiary,
-      (30 * 1e24) / 100, // TODO use fixidity
-      "otherBeneficiary "
-    );
-
+    feeHandler.addOtherBeneficiary(otherBeneficiary, (30 * 1e24) / 100, "otherBeneficiary ");
     feeHandler.sell(address(stableToken));
-    assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 0); // Make sure the balance is zero at the beginning
+    assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 0);
     feeHandler.distribute(address(stableToken));
-
     assertEq(feeHandler.getTotalFractionOfOtherBeneficiariesAndCarbon(), 7e23);
     assertEq(feeHandler.getBurnFraction(), 3e23);
-
     assertApproxEqAbs(stableToken.balanceOf(address(feeHandler)), 0, 10);
     assertApproxEqAbs(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17, 1);
     assertApproxEqAbs(stableToken.balanceOf(op), 2e17, 1);
@@ -624,7 +596,7 @@ contract FeeHandlerTest_Distribute_WhenOtherBeneficiaries is FeeHandlerTestAbstr
 }
 
 contract FeeHandlerTest_BurnCelo is FeeHandlerTestAbstract {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     setCarbonFraction(20, 100);
     addAndActivateToken(address(stableToken), address(mentoSeller));
@@ -633,34 +605,30 @@ contract FeeHandlerTest_BurnCelo is FeeHandlerTestAbstract {
 
   function test_BurnsCorrectly() public {
     feeHandler.burnCelo();
-    assertEq(celoToken.balanceOf(address(feeHandler)), 2e17);
-    assertEq(celoToken.getBurnedAmount(), 8e17);
+    assertEq(goldToken.balanceOf(address(feeHandler)), 2e17);
+    assertEq(goldToken.getBurnedAmount(), 8e17);
   }
 
   function test_DoesntBurnPendingDistribution() public {
     feeHandler.burnCelo();
-    assertEq(celoToken.getBurnedAmount(), 8e17);
-    // this is the amount pending distribution
-    assertEq(celoToken.balanceOf(address(feeHandler)), 2e17);
-
+    assertEq(goldToken.getBurnedAmount(), 8e17);
+    assertEq(goldToken.balanceOf(address(feeHandler)), 2e17);
     feeHandler.burnCelo();
-    assertEq(celoToken.getBurnedAmount(), 8e17);
-    // amount pending distribution should not be changed by second burn
-    assertEq(celoToken.balanceOf(address(feeHandler)), 2e17);
+    assertEq(goldToken.getBurnedAmount(), 8e17);
+    assertEq(goldToken.balanceOf(address(feeHandler)), 2e17);
   }
 
   function test_DistributesCorrectlyAfterBurn() public {
     feeHandler.burnCelo();
-    assertEq(celoToken.balanceOf(address(feeHandler)), 2e17);
-
-    feeHandler.distribute(address(celoToken));
-    assertEq(celoToken.balanceOf(address(feeHandler)), 0);
-    assertEq(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
+    assertEq(goldToken.balanceOf(address(feeHandler)), 2e17);
+    feeHandler.distribute(address(goldToken));
+    assertEq(goldToken.balanceOf(address(feeHandler)), 0);
+    assertEq(goldToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
   }
 }
 
 contract FeeHandlerTest_SellMentoTokensAbstract is FeeHandlerTestAbstract {
-  function setUp() public {
+  function setUp() public virtual override {
     super.setUp();
     setCarbonFraction(20, 100);
     setMaxSlippage(address(stableToken), FIXED1);
@@ -668,7 +636,7 @@ contract FeeHandlerTest_SellMentoTokensAbstract is FeeHandlerTestAbstract {
 }
 
 contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellMentoTokensAbstract {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     addAndActivateToken(address(stableToken), address(mentoSeller));
   }
@@ -687,12 +655,11 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellM
   }
 
   function resetLimit() internal {
-    skip(DAY);
+    skip(DAY_IN_SECONDS);
   }
 
   function test_ResetSellLimitDaily() public {
     fundFeeHandlerStable(3000, address(stableToken), address(exchangeUSD));
-
     feeHandler.setDailySellLimit(address(stableToken), 1000);
     feeHandler.sell(address(stableToken));
     assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
@@ -706,7 +673,6 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellM
     feeHandler.setDailySellLimit(address(stableToken), 1000);
     feeHandler.sell(address(stableToken));
     assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
-    // selling again shouldn't do anything
     feeHandler.sell(address(stableToken));
     assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
   }
@@ -714,20 +680,14 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellM
   function test_HitLimitDoesntAffectAccounting() public {
     fundFeeHandlerStable(3000, address(stableToken), address(exchangeUSD));
     feeHandler.setDailySellLimit(address(stableToken), 1000);
-
     feeHandler.sell(address(stableToken));
     assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
-
     assertEq(feeHandler.getTokenToDistribute(address(stableToken)), 600);
-
     resetLimit();
-
     feeHandler.sell(address(stableToken));
     assertEq(feeHandler.getTokenToDistribute(address(stableToken)), 600);
     assertEq(stableToken.balanceOf(address(feeHandler)), 1000);
-
     resetLimit();
-
     feeHandler.sell(address(stableToken));
     assertEq(feeHandler.getTokenToDistribute(address(stableToken)), 600);
     assertEq(stableToken.balanceOf(address(feeHandler)), 600);
@@ -736,10 +696,8 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellM
   function test_setDistributionAndBurnAmountsDoesntAffectBurn() public {
     fundFeeHandlerStable(3000, address(stableToken), address(exchangeUSD));
     feeHandler.setDailySellLimit(address(stableToken), 1000);
-
     feeHandler.setDistributionAndBurnAmounts(address(stableToken));
     feeHandler.sell(address(stableToken));
-
     assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
     assertEq(feeHandler.getTokenToDistribute(address(stableToken)), 600);
   }
@@ -749,14 +707,11 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellM
     feeHandler.setDailySellLimit(address(stableToken), 1000);
     feeHandler.sell(address(stableToken));
     assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
-    // selling again shouldn't do anything
     feeHandler.sell(address(stableToken));
     assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
 
-    // check that the daily limit of one
-    // doesn't influence the other
     uint256 celoAmount = 1e18;
-    celoToken.approve(address(exchangeEUR), celoAmount);
+    goldToken.approve(address(exchangeEUR), celoAmount);
     exchangeEUR.sell(celoAmount, 0, true);
     uint256 stableAmount = 3000;
     feeHandler.setMaxSplippage(address(stableTokenEUR), FIXED1);
@@ -765,7 +720,6 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellM
     feeHandler.activateToken(address(stableTokenEUR));
     feeHandler.setDailySellLimit(address(stableTokenEUR), 1000);
     feeHandler.sell(address(stableTokenEUR));
-
     assertEq(stableTokenEUR.balanceOf(address(feeHandler)), 2000);
   }
 
@@ -773,7 +727,6 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellM
     setCarbonFraction(100, 100);
     fundFeeHandlerStable(3000, address(stableToken), address(exchangeUSD));
     feeHandler.sell(address(stableToken));
-
     assertEq(stableToken.balanceOf(address(feeHandler)), 3000);
   }
 
@@ -817,31 +770,38 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenNotEnabled is
 contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
   uint256 deadline;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     setCarbonFraction(20, 100);
     setMaxSlippage(address(stableToken), FIXED1);
-    setMaxSlippage(address(tokenA), FixidityLib.newFixedFraction(99, 100).unwrap());
+    setMaxSlippage(address(tokenA), FixidityLib.newFixedFraction(99, 100).value);
     addAndActivateToken(address(tokenA), address(uniswapFeeHandlerSeller));
     setUpUniswap();
     setUpOracles();
   }
 
   function setUpUniswap() public {
-    uniswapFactory = new MockUniswapV2Factory(address(0));
+    MockUniswapV2Factory08 factory1 = new MockUniswapV2Factory08(address(0));
+    uniswapFactory = IUniswapV2FactoryTest(address(factory1));
     bytes32 initCodePairHash = uniswapFactory.INIT_CODE_PAIR_HASH();
-    uniswapRouter = new MockUniswapV2Router02(
-      address(uniswapFactory),
-      address(0),
-      initCodePairHash
-    );
 
-    uniswapFactory2 = new MockUniswapV2Factory(address(0));
-    uniswapRouter2 = new MockUniswapV2Router02(
-      address(uniswapFactory2),
+    MockUniswapV2Router0208 router1 = new MockUniswapV2Router0208(
+      address(factory1),
       address(0),
       initCodePairHash
     );
+    uniswapRouter = IUniswapV2RouterTest(address(router1));
+
+    MockUniswapV2Factory08 factory2 = new MockUniswapV2Factory08(address(0));
+    uniswapFactory2 = IUniswapV2FactoryTest(address(factory2));
+
+    MockUniswapV2Router0208 router2 = new MockUniswapV2Router0208(
+      address(factory2),
+      address(0),
+      factory2.INIT_CODE_PAIR_HASH()
+    );
+    uniswapRouter2 = IUniswapV2RouterTest(address(router2));
+
     uniswapFeeHandlerSeller.initialize(address(registry), new address[](0), new uint256[](0));
     uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswapRouter));
   }
@@ -850,14 +810,14 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
     deadline = block.timestamp + 100;
     tokenA.mint(address(feeHandler), toMint);
     tokenA.mint(user, toMint);
-    celoToken.transfer(user, toMint);
+    goldToken.transfer(user, toMint);
 
     vm.startPrank(user);
     tokenA.approve(address(uniswapRouter), toTransfer);
-    celoToken.approve(address(uniswapRouter), toTransfer);
+    goldToken.approve(address(uniswapRouter), toTransfer);
     uniswapRouter.addLiquidity(
       address(tokenA),
-      address(celoToken),
+      address(goldToken),
       toTransfer,
       toTransfer,
       toTransfer,
@@ -889,27 +849,22 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
 
   function test_Reverts_WhenOracleSlippageIsHigh() public setUpLiquidity(1e19, 5e18) {
     mockSortedOracles.setMedianRate(address(tokenA), 300 * celoAmountForRate);
-
     vm.expectRevert("UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT");
     feeHandler.sell(address(tokenA));
   }
 
   function test_UniswapTrade() public setUpLiquidity(1e19, 5e18) {
-    // Make sure our uniswap mock works
     uint256 balanceBeforeA = tokenA.balanceOf(user);
-    uint256 balanceBeforeCelo = celoToken.balanceOf(user);
-
+    uint256 balanceBeforeCelo = goldToken.balanceOf(user);
     vm.startPrank(user);
     tokenA.approve(address(uniswapRouter), 1e18);
     address[] memory tokenAddresses = new address[](2);
     tokenAddresses[0] = address(tokenA);
-    tokenAddresses[1] = address(celoToken);
+    tokenAddresses[1] = address(goldToken);
     uniswapRouter.swapExactTokensForTokens(1e18, 0, tokenAddresses, user, deadline);
     vm.stopPrank();
-
-    // simple directional check
     assertGt(balanceBeforeA, tokenA.balanceOf(user));
-    assertGt(celoToken.balanceOf(user), balanceBeforeCelo);
+    assertGt(goldToken.balanceOf(user), balanceBeforeCelo);
   }
 
   function test_SellsNonMentoTokens() public setUpLiquidity(1e19, 5e18) {
@@ -926,15 +881,14 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
   }
 
   function test_TriesToGetBestRateWithManyExchanges() public setUpLiquidity(2e19, 5e18) {
-    // Setup second uniswap exchange
     uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswapRouter2));
-    uint256 toTransfer2 = 1e19; // this is higher than toTransfer1 (5e18) set in modifier
+    uint256 toTransfer2 = 1e19;
     vm.startPrank(user);
     tokenA.approve(address(uniswapRouter2), toTransfer2);
-    celoToken.approve(address(uniswapRouter2), toTransfer2);
+    goldToken.approve(address(uniswapRouter2), toTransfer2);
     uniswapRouter2.addLiquidity(
       address(tokenA),
-      address(celoToken),
+      address(goldToken),
       toTransfer2,
       toTransfer2,
       toTransfer2,
@@ -946,79 +900,59 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
 
     address[] memory tokenAddresses = new address[](2);
     tokenAddresses[0] = address(tokenA);
-    tokenAddresses[1] = address(celoToken);
+    tokenAddresses[1] = address(goldToken);
 
     uint256 quote1before = uniswapRouter.getAmountsOut(1e18, tokenAddresses)[1];
     uint256 quote2before = uniswapRouter2.getAmountsOut(1e18, tokenAddresses)[1];
 
-    // safety check
     assertEq(tokenA.balanceOf(address(feeHandler)), 2e19);
-
     feeHandler.sell(address(tokenA));
 
-    // Exchange should have occurred on uniswap2 because it has more liquidity.
-    // After the exchange, uniswap2 has less Celo liquidity than it did before,
-    // so the quote for tokenA (denominated in Celo) is lower.
     uint256 quote1after = uniswapRouter.getAmountsOut(1e18, tokenAddresses)[1];
     uint256 quote2after = uniswapRouter.getAmountsOut(1e18, tokenAddresses)[1];
-    assertEq(quote1before, quote1after); // uniswap1 quote should be untouched, since liquidity hasn't changed
-    assertGt(quote2before, quote2after); // uniswap2 quoute should be lower, since it now has more tokenA per Celo
-    assertEq(tokenA.balanceOf(address(feeHandler)), 4e18); // check that it burned
+    assertEq(quote1before, quote1after);
+    assertGt(quote2before, quote2after);
+    assertEq(tokenA.balanceOf(address(feeHandler)), 4e18);
   }
 }
 
 contract FeeHandlerTest_HandleCelo is FeeHandlerTestAbstract {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     setCarbonFraction(20, 100);
     fundFeeHandlerWithCelo();
   }
 
   function test_HandleCelo() public {
-    feeHandler.handle(address(celoToken));
-    assertEq(celoToken.getBurnedAmount(), 8e17);
-    assertEq(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
+    feeHandler.handle(address(goldToken));
+    assertEq(goldToken.getBurnedAmount(), 8e17);
+    assertEq(goldToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
   }
 
   function test_HandleCelo_WhenThereAreMoreBeneficiaries() public {
-    feeHandler.addOtherBeneficiary(
-      op,
-      (20 * 1e24) / 100, // TODO use fixidity
-      "OP revenue share"
-    );
-
-    feeHandler.handle(address(celoToken));
-    assertEq(celoToken.getBurnedAmount(), 6e17);
-    assertEq(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
-    assertEq(celoToken.balanceOf(op), 2e17);
+    feeHandler.addOtherBeneficiary(op, (20 * 1e24) / 100, "OP revenue share");
+    feeHandler.handle(address(goldToken));
+    assertEq(goldToken.getBurnedAmount(), 6e17);
+    assertEq(goldToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
+    assertEq(goldToken.balanceOf(op), 2e17);
   }
 
   function test_HandleCelo_WhenThereAreMoreTwoOtherBeneficiaries() public {
-    feeHandler.addOtherBeneficiary(
-      op,
-      (20 * 1e24) / 100, // TODO use fixidity
-      "OP revenue share"
-    );
+    feeHandler.addOtherBeneficiary(op, (20 * 1e24) / 100, "OP revenue share");
     address otherBeneficiary = actor("otherBeneficiary");
-    feeHandler.addOtherBeneficiary(
-      otherBeneficiary,
-      (30 * 1e24) / 100, // TODO use fixidity
-      "otherBeneficiary "
-    );
-
+    feeHandler.addOtherBeneficiary(otherBeneficiary, (30 * 1e24) / 100, "otherBeneficiary ");
     assertEq(feeHandler.getTotalFractionOfOtherBeneficiariesAndCarbon(), 7e23);
     assertEq(feeHandler.getBurnFraction(), 3e23);
-
-    feeHandler.handle(address(celoToken));
-    assertEq(celoToken.getBurnedAmount(), 3e17);
-    assertApproxEqAbs(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17, 1);
-    assertApproxEqAbs(celoToken.balanceOf(op), 2e17, 1);
-    assertApproxEqAbs(celoToken.balanceOf(otherBeneficiary), 3e17, 1);
+    feeHandler.handle(address(goldToken));
+    assertEq(goldToken.getBurnedAmount(), 3e17);
+    assertApproxEqAbs(goldToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17, 1);
+    assertApproxEqAbs(goldToken.balanceOf(op), 2e17, 1);
+    assertApproxEqAbs(goldToken.balanceOf(otherBeneficiary), 3e17, 1);
   }
 }
 
 contract FeeHandlerTest_HandleMentoTokens is FeeHandlerTestAbstract {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     setCarbonFraction(20, 100);
     setMaxSlippage(address(stableToken), FIXED1);
@@ -1037,16 +971,15 @@ contract FeeHandlerTest_HandleMentoTokens is FeeHandlerTestAbstract {
     assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
     // Number is not exactly 0.8/2 because of slippage in the Mento exchange
     assertEq(
-      celoToken.balanceOf(address(0x000000000000000000000000000000000000dEaD)),
+      goldToken.balanceOf(address(0x000000000000000000000000000000000000dEaD)),
       398482170620712919
     );
-
     assertEq(stableToken.balanceOf(address(feeHandler)), 0);
   }
 }
 
 contract FeeHandlerTest_HandleAll is FeeHandlerTestAbstract {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     setCarbonFraction(20, 100);
     setMaxSlippage(address(stableToken), FIXED1);
@@ -1058,23 +991,17 @@ contract FeeHandlerTest_HandleAll is FeeHandlerTestAbstract {
   }
 
   function test_BurnsWithMento() public {
-    uint256 previousCeloBurn = celoToken.getBurnedAmount();
+    uint256 previousCeloBurn = goldToken.getBurnedAmount();
     assertEq(feeHandler.getPastBurnForToken(address(stableToken)), 0);
     assertEq(feeHandler.getPastBurnForToken(address(stableTokenEUR)), 0);
-
     feeHandler.handleAll();
-
     assertEq(feeHandler.getPastBurnForToken(address(stableToken)), 8e17);
     assertEq(feeHandler.getPastBurnForToken(address(stableTokenEUR)), 8e17);
     assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
     assertEq(stableTokenEUR.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
-
-    // everything should have been burned or distributed
     assertEq(feeHandler.getTokenToDistribute(address(stableToken)), 0);
     assertEq(feeHandler.getTokenToDistribute(address(stableTokenEUR)), 0);
-
-    // celo burn is non zero
-    assertTrue(celoToken.getBurnedAmount() > previousCeloBurn);
+    assertTrue(goldToken.getBurnedAmount() > previousCeloBurn);
   }
 }
 
@@ -1099,7 +1026,7 @@ contract FeeHandlerTest_Transfer is FeeHandlerTest {
 contract FeeHandlerTest_SetDailySellLimit is FeeHandlerTest {
   uint256 newCeloAmountForRate;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newCeloAmountForRate = celoAmountForRate * 2;
   }
@@ -1125,7 +1052,7 @@ contract FeeHandlerTest_SetDailySellLimit is FeeHandlerTest {
 contract FeeHandlerTest_SetMaxSlippage is FeeHandlerTest {
   uint256 newMaxSlipapge;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newMaxSlipapge = maxSlippage * 2;
   }
@@ -1150,13 +1077,10 @@ contract FeeHandlerTest_SetMaxSlippage is FeeHandlerTest {
 
 contract FeeHandlerTest_RemoveOtherBeneficiary is FeeHandlerTestAbstract {
   event BeneficiaryRemoved(address beneficiary);
-  function setUp() public {
+
+  function setUp() public override {
     super.setUp();
-    feeHandler.addOtherBeneficiary(
-      op,
-      (20 * 1e24) / 100, // TODO use fixidity
-      "OP revenue share"
-    );
+    feeHandler.addOtherBeneficiary(op, (20 * 1e24) / 100, "OP revenue share");
   }
 
   function test_removedSucsesfully() public {
@@ -1164,7 +1088,6 @@ contract FeeHandlerTest_RemoveOtherBeneficiary is FeeHandlerTestAbstract {
     assertEq(feeHandler.getOtherBeneficiariesAddresses().length, 0);
     vm.expectRevert("Beneficiary not found");
     feeHandler.getOtherBeneficiariesInfo(op);
-
     setCarbonFraction(20, 100);
     assertEq(
       feeHandler.getTotalFractionOfOtherBeneficiariesAndCarbon(),
@@ -1187,13 +1110,9 @@ contract FeeHandlerTest_RemoveOtherBeneficiary is FeeHandlerTestAbstract {
 }
 
 contract FeeHandlerTest_SetBeneficiaryFraction is FeeHandlerTestAbstract {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
-    feeHandler.addOtherBeneficiary(
-      op,
-      (20 * 1e24) / 100, // TODO use fixidity
-      "OP revenue share"
-    );
+    feeHandler.addOtherBeneficiary(op, (20 * 1e24) / 100, "OP revenue share");
   }
 
   function test_setFractionSucsesfully() public {
@@ -1220,13 +1139,9 @@ contract FeeHandlerTest_SetBeneficiaryFraction is FeeHandlerTestAbstract {
 }
 
 contract FeeHandlerTest_SetBeneficiaryName is FeeHandlerTestAbstract {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
-    feeHandler.addOtherBeneficiary(
-      op,
-      (20 * 1e24) / 100, // TODO use fixidity
-      "OP revenue share"
-    );
+    feeHandler.addOtherBeneficiary(op, (20 * 1e24) / 100, "OP revenue share");
   }
 
   function test_setNameSucsesfully() public {

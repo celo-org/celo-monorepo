@@ -184,7 +184,7 @@ Verification Summary:
 ```
 
 Key verification features:
-- **Foundry profile**: Automatically detected from source path (`contracts/` → `truffle-compat`, `contracts-0.8/` → `truffle-compat8`)
+- **Foundry profile**: Automatically detected from the artifact (`contracts-0.5/` → `solc05`, a 0.5 compiler → `truffle-compat`, otherwise `truffle-compat8`; was: `contracts/` → `truffle-compat`, `contracts-0.8/` → `truffle-compat8`)
 - **Linked libraries**: Automatically detected and passed to verifier for contracts that use libraries
 - **Full compiler version**: Uses version with commit hash for accurate bytecode matching
 

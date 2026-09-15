@@ -1,0 +1,406 @@
+{
+  "contractName": "ProxyCloneFactory",
+  "abi": [
+    {
+      "type": "function",
+      "name": "deploy",
+      "inputs": [
+        {
+          "name": "implementation",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "initCallData",
+          "type": "bytes",
+          "internalType": "bytes"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "isOwner",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool",
+          "internalType": "bool"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "owner",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "proxyImplementationAddress",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "renounceOwnership",
+      "inputs": [],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "setImplementationAddress",
+      "inputs": [
+        {
+          "name": "_proxyImplementationAddress",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "transferOwnership",
+      "inputs": [
+        {
+          "name": "newOwner",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "event",
+      "name": "OwnershipTransferred",
+      "inputs": [
+        {
+          "name": "previousOwner",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "newOwner",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "ProxyCloneCreated",
+      "inputs": [
+        {
+          "name": "proxyClone",
+          "type": "address",
+          "indexed": false,
+          "internalType": "address"
+        }
+      ],
+      "anonymous": false
+    }
+  ],
+  "bytecode": {
+    "object": "0x608060405260006100146100b760201b60201c565b9050806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055508073ffffffffffffffffffffffffffffffffffffffff16600073ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3506100bf565b600033905090565b610acd806100ce6000396000f3fe608060405234801561001057600080fd5b506004361061007d5760003560e01c80638f32d59b1161005b5780638f32d59b14610120578063e97fac0514610142578063ecade2f0146101db578063f2fde38b1461021f5761007d565b8063604c066914610082578063715018a6146100cc5780638da5cb5b146100d6575b600080fd5b61008a610263565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6100d4610289565b005b6100de6103c2565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6101286103eb565b604051808215151515815260200191505060405180910390f35b6101d96004803603604081101561015857600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291908035906020019064010000000081111561019557600080fd5b8201836020820111156101a757600080fd5b803590602001918460018302840111640100000000831117156101c957600080fd5b9091929391929390505050610449565b005b61021d600480360360208110156101f157600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506106da565b005b6102616004803603602081101561023557600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610798565b005b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6102916103eb565b610303576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260208152602001807f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e657281525060200191505060405180910390fd5b600073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a360008060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1661042d61081e565b73ffffffffffffffffffffffffffffffffffffffff1614905090565b6000610476600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16610826565b90508073ffffffffffffffffffffffffffffffffffffffff1663319775c4306040518263ffffffff1660e01b8152600401808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001915050600060405180830381600087803b1580156104f757600080fd5b505af115801561050b573d6000803e3d6000fd5b505050508073ffffffffffffffffffffffffffffffffffffffff166303386ba38585856040518463ffffffff1660e01b8152600401808473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001806020018281038252848482818152602001925080828437600081840152601f19601f820116905080830192505050945050505050600060405180830381600087803b1580156105c257600080fd5b505af11580156105d6573d6000803e3d6000fd5b505050508073ffffffffffffffffffffffffffffffffffffffff1663d29d44ee826040518263ffffffff1660e01b8152600401808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001915050600060405180830381600087803b15801561065957600080fd5b505af115801561066d573d6000803e3d6000fd5b505050507f1637a585e48b00de3c1d6e86f59e82f74ce36f787b2b0d46d7a7bf364fea3d0e81604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a150505050565b6106e26103eb565b610754576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260208152602001807f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e657281525060200191505060405180910390fd5b80600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555050565b6107a06103eb565b610812576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260208152602001807f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e657281525060200191505060405180910390fd5b61081b8161092e565b50565b600033905090565b60006040517f3d602d80600a3d3981f3363d3d373d3d3d363d7300000000000000000000000081528260601b60148201527f5af43d82803e903d91602b57fd5bf3000000000000000000000000000000000060288201526037816000f0915050600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff161415610929576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260168152602001807f455243313136373a20637265617465206661696c65640000000000000000000081525060200191505060405180910390fd5b919050565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614156109b4576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401808060200182810382526026815260200180610a736026913960400191505060405180910390fd5b8073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505056fe4f776e61626c653a206e6577206f776e657220697320746865207a65726f2061646472657373a265627a7a72315820ccd8a76e2941ad0a60795f3825b82f702fa7eb0afc1997857faa2418e9ff60c664736f6c634300050e0032",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x608060405234801561001057600080fd5b506004361061007d5760003560e01c80638f32d59b1161005b5780638f32d59b14610120578063e97fac0514610142578063ecade2f0146101db578063f2fde38b1461021f5761007d565b8063604c066914610082578063715018a6146100cc5780638da5cb5b146100d6575b600080fd5b61008a610263565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6100d4610289565b005b6100de6103c2565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6101286103eb565b604051808215151515815260200191505060405180910390f35b6101d96004803603604081101561015857600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291908035906020019064010000000081111561019557600080fd5b8201836020820111156101a757600080fd5b803590602001918460018302840111640100000000831117156101c957600080fd5b9091929391929390505050610449565b005b61021d600480360360208110156101f157600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506106da565b005b6102616004803603602081101561023557600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610798565b005b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6102916103eb565b610303576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260208152602001807f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e657281525060200191505060405180910390fd5b600073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a360008060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1661042d61081e565b73ffffffffffffffffffffffffffffffffffffffff1614905090565b6000610476600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16610826565b90508073ffffffffffffffffffffffffffffffffffffffff1663319775c4306040518263ffffffff1660e01b8152600401808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001915050600060405180830381600087803b1580156104f757600080fd5b505af115801561050b573d6000803e3d6000fd5b505050508073ffffffffffffffffffffffffffffffffffffffff166303386ba38585856040518463ffffffff1660e01b8152600401808473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001806020018281038252848482818152602001925080828437600081840152601f19601f820116905080830192505050945050505050600060405180830381600087803b1580156105c257600080fd5b505af11580156105d6573d6000803e3d6000fd5b505050508073ffffffffffffffffffffffffffffffffffffffff1663d29d44ee826040518263ffffffff1660e01b8152600401808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001915050600060405180830381600087803b15801561065957600080fd5b505af115801561066d573d6000803e3d6000fd5b505050507f1637a585e48b00de3c1d6e86f59e82f74ce36f787b2b0d46d7a7bf364fea3d0e81604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a150505050565b6106e26103eb565b610754576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260208152602001807f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e657281525060200191505060405180910390fd5b80600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555050565b6107a06103eb565b610812576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260208152602001807f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e657281525060200191505060405180910390fd5b61081b8161092e565b50565b600033905090565b60006040517f3d602d80600a3d3981f3363d3d373d3d3d363d7300000000000000000000000081528260601b60148201527f5af43d82803e903d91602b57fd5bf3000000000000000000000000000000000060288201526037816000f0915050600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff161415610929576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260168152602001807f455243313136373a20637265617465206661696c65640000000000000000000081525060200191505060405180910390fd5b919050565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614156109b4576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401808060200182810382526026815260200180610a736026913960400191505060405180910390fd5b8073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505056fe4f776e61626c653a206e6577206f776e657220697320746865207a65726f2061646472657373a265627a7a72315820ccd8a76e2941ad0a60795f3825b82f702fa7eb0afc1997857faa2418e9ff60c664736f6c634300050e0032",
+    "linkReferences": {}
+  },
+  "methodIdentifiers": {
+    "deploy(address,bytes)": "e97fac05",
+    "isOwner()": "8f32d59b",
+    "owner()": "8da5cb5b",
+    "proxyImplementationAddress()": "604c0669",
+    "renounceOwnership()": "715018a6",
+    "setImplementationAddress(address)": "ecade2f0",
+    "transferOwnership(address)": "f2fde38b"
+  },
+  "metadata": {
+    "compiler": {
+      "version": "0.5.14+commit.01f1aaa4"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address",
+              "indexed": true
+            },
+            {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address",
+              "indexed": true
+            }
+          ],
+          "type": "event",
+          "name": "OwnershipTransferred",
+          "anonymous": false
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "proxyClone",
+              "type": "address",
+              "indexed": false
+            }
+          ],
+          "type": "event",
+          "name": "ProxyCloneCreated",
+          "anonymous": false
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "implementation",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "initCallData",
+              "type": "bytes"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "deploy"
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "isOwner",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "owner",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "proxyImplementationAddress",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "renounceOwnership"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_proxyImplementationAddress",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "setImplementationAddress"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "transferOwnership"
+        }
+      ],
+      "devdoc": {
+        "methods": {
+          "deploy(address,bytes)": {
+            "details": "Grants ownership of the deployed proxy to itself, allowing the proxy to invoke     its own administrative functions if the logic contract permits (use extra caution     with implementations that permit arbitrary function calls).",
+            "params": {
+              "implementation": "The address to point the Proxy to.",
+              "initCallData": "The function to call on the implementation and the corresponding args."
+            }
+          },
+          "isOwner()": {
+            "details": "Returns true if the caller is the current owner."
+          },
+          "owner()": {
+            "details": "Returns the address of the current owner."
+          },
+          "renounceOwnership()": {
+            "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner.     * NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+          },
+          "setImplementationAddress(address)": {
+            "params": {
+              "_proxyImplementationAddress": "The address of the Proxy implementation to clone."
+            }
+          },
+          "transferOwnership(address)": {
+            "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+          }
+        }
+      },
+      "userdoc": {
+        "methods": {
+          "deploy(address,bytes)": {
+            "notice": "Creates an EIP-1167 style clone of a Proxy contract, points the Proxy to an        implementation and initializes it."
+          },
+          "setImplementationAddress(address)": {
+            "notice": "Sets the address of the Proxy implementation to clone."
+          }
+        }
+      }
+    },
+    "settings": {
+      "remappings": [
+        "@celo-contracts-0.5/=contracts-0.5/",
+        "@celo-contracts-8/=contracts/",
+        "@celo-contracts/=contracts/",
+        "@lib/=lib/",
+        "@mento-core/=lib/mento-core/",
+        "@migrations-sol/=migrations_sol/",
+        "@openzeppelin/contracts8/=lib/openzeppelin-contracts8/contracts/",
+        "@summa-tx/memview.sol/=lib/memview.sol",
+        "@test-sol/=test-sol/",
+        "celo-foundry-8/=lib/celo-foundry-8/src/",
+        "celo-foundry/=lib/celo-foundry/src/",
+        "ds-test/=lib/celo-foundry/lib/forge-std/lib/ds-test/src/",
+        "erc4626-tests/=lib/openzeppelin-contracts8/lib/erc4626-tests/",
+        "forge-std-8/=lib/celo-foundry-8/lib/forge-std/src/",
+        "forge-std/=lib/celo-foundry/lib/forge-std/src/",
+        "mento-core/=lib/mento-core/contracts/",
+        "openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/",
+        "openzeppelin-contracts8/=lib/openzeppelin-contracts8/",
+        "openzeppelin-solidity/=lib/openzeppelin-contracts/",
+        "openzeppelin/=lib/openzeppelin-contracts8/contracts/",
+        "solidity-bytes-utils-8/=lib/solidity-bytes-utils-8/",
+        "solidity-bytes-utils/=lib/solidity-bytes-utils/"
+      ],
+      "optimizer": {
+        "enabled": false,
+        "runs": 200
+      },
+      "compilationTarget": {
+        "contracts-0.5/common/ProxyCloneFactory.sol": "ProxyCloneFactory"
+      },
+      "evmVersion": "istanbul",
+      "libraries": {}
+    },
+    "sources": {
+      "contracts-0.5/common/InitializableProxy.sol": {
+        "keccak256": "0xb8f29d8f745cc0657551d45a7c1aee9aa71be5ad4b282d4a7e28dfc10dda9dc0",
+        "urls": [
+          "bzz-raw://f033c6b81578f43e5d34fce80d1f21ce56bd77f6ea774966ef52623cdaa6efa2",
+          "dweb:/ipfs/QmbPVnVi13HbfyfBK29vTHCQ4pHCurBSnTRNcKaGn14tQn"
+        ],
+        "license": null
+      },
+      "contracts-0.5/common/Proxy.sol": {
+        "keccak256": "0xdc37b373733511ee2ead52cb5eab6a978abc125e513927f5c0be6685002e4f80",
+        "urls": [
+          "bzz-raw://e86c35901f60139afff938ba68a996d8b50936b263a66ab7fd1a55e912dccec2",
+          "dweb:/ipfs/QmW5mtMY7DCQPV6vNVe4dHJSdq4LPBuPaJAWmhdY6xDhPg"
+        ],
+        "license": null
+      },
+      "contracts-0.5/common/ProxyCloneFactory.sol": {
+        "keccak256": "0x80544f2eea891b01bd9699b4104b63a59d171fd9b2fa285bc13c00bc15099a2c",
+        "urls": [
+          "bzz-raw://d439db60b25f4c6acb878930e13f5c153e1c55e7f65d14596206fd0d29a8d444",
+          "dweb:/ipfs/QmbJRPw1aKB384a8AqiCqmuy8qCkpZEUBbwwrUKgc89PTM"
+        ],
+        "license": null
+      },
+      "lib/openzeppelin-contracts/contracts/GSN/Context.sol": {
+        "keccak256": "0x90a3995645af7562d84b9d69363ffa5ae7217714ab61e951bf7bc450f40e4061",
+        "urls": [
+          "bzz-raw://216ef9d6b614db4eb46970b4e84903f2534a45572dd30a79f0041f1a5830f436",
+          "dweb:/ipfs/QmNPrJ4MWKUAWzKXpUqeyKRUfosaoANZAqXgvepdrCwZAG"
+        ],
+        "license": null
+      },
+      "lib/openzeppelin-contracts/contracts/ownership/Ownable.sol": {
+        "keccak256": "0x6fb9d7889769d7cc161225f9ef7a90e468ba9788b253816f8d8b6894d3472c24",
+        "urls": [
+          "bzz-raw://cf4c00fc3c37cc5acf0c82ec6fd97bab67d72c2567fdc0ebf023d9c09b30a08e",
+          "dweb:/ipfs/Qmb7TChG6DsEDX7LooJ4vmxot19f7VXX8S1zUGPeJTWbwZ"
+        ],
+        "license": null
+      },
+      "lib/openzeppelin-contracts/contracts/utils/Address.sol": {
+        "keccak256": "0x1a8e5072509c5ea7365eb1d48030b9be865140c8fb779968da0a459a0e174a11",
+        "urls": [
+          "bzz-raw://03335b7b07c7c8c8d613cfdd8ec39a0b5ec133ee510bf2fe6cc5a496767bef4b",
+          "dweb:/ipfs/Qmebp4nzPja645c9yXSdJkGq96oU3am3LUnG2K3R7XxyKf"
+        ],
+        "license": null
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts-0.5/common/ProxyCloneFactory.sol",
+    "nodes": [
+      {
+        "nodeType": "ContractDefinition",
+        "name": "ProxyCloneFactory",
+        "contractKind": "contract"
+      }
+    ]
+  }
+}

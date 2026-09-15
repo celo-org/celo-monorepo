@@ -1,13 +1,14 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
+
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "./interfaces/IRandom.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/UsingPrecompiles.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
 
 /**
  * @title Provides randomness for verifier selection
@@ -38,7 +39,7 @@ contract Random is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -97,7 +98,7 @@ contract Random is
    * @return The associated randomness value.
    * @dev Only available on L1.
    */
-  function getBlockRandomness(uint256 blockNumber) external view onlyL1 returns (bytes32) {
+  function getBlockRandomness(uint256 blockNumber) external view virtual onlyL1 returns (bytes32) {
     return _getBlockRandomness(blockNumber, block.number);
   }
 
@@ -109,7 +110,7 @@ contract Random is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 0);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -225,5 +226,14 @@ contract Random is
       "Cannot query randomness older than the stored history"
     );
     return history[blockNumber];
+  }
+
+  /**
+   * @notice Whether the sender is the owner.
+   * @dev Kept from the Solidity 0.5 implementation: OpenZeppelin 2.5's Ownable exposed it
+   * and 4.9's does not, and the ABI behind the upgraded proxy must not lose a function.
+   */
+  function isOwner() external view returns (bool) {
+    return msg.sender == owner();
   }
 }

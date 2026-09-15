@@ -1,15 +1,16 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts8/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "./interfaces/IOdisPayments.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "../common/Initializable.sol";
-import "../common/UsingRegistryV2.sol";
+import "../common/UsingRegistryV2NoMento.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 /**
@@ -21,10 +22,12 @@ contract OdisPayments is
   ReentrancyGuard,
   Ownable,
   Initializable,
-  UsingRegistryV2
+  UsingRegistryV2NoMento
 {
   using SafeMath for uint256;
   using SafeERC20 for IERC20;
+
+  bytes32 internal constant STABLE_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableToken"));
 
   // Store amount sent (all time) from account to this contract.
   // Values in totalPaidCUSD should only ever be incremented, since ODIS relies
@@ -37,7 +40,7 @@ contract OdisPayments is
    * @notice Sets initialized == true on implementation contracts.
    * @param test Set to true to skip implementation initialization.
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -70,6 +73,15 @@ contract OdisPayments is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
+    return (1, 2, 0, 0);
+  }
+
+  /**
+   * @notice Whether the sender is the owner.
+   * @dev Kept from the Solidity 0.5 implementation: OpenZeppelin 2.5's Ownable exposed it
+   * and 4.9's does not, and the ABI behind the upgraded proxy must not lose a function.
+   */
+  function isOwner() external view returns (bool) {
+    return msg.sender == owner();
   }
 }

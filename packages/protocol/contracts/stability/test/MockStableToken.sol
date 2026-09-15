@@ -1,14 +1,15 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.0 <0.9.0;
 // solhint-disable no-unused-vars
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
 import "../../common/FixidityLib.sol";
 
 /**
  * @title A mock StableToken for testing.
  */
-contract MockStableToken {
+contract MockStableToken08 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -19,7 +20,7 @@ contract MockStableToken {
   // Stored as units. Value can be found using unitsToValue().
   mapping(address => uint256) public balances;
 
-  constructor() public {
+  constructor() {
     setInflationFactor(FixidityLib.fixed1().unwrap());
   }
 

@@ -1,0 +1,228 @@
+[
+  {
+    "label": "_guardCounter",
+    "offset": 0,
+    "slot": "0",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "_owner",
+    "offset": 0,
+    "slot": "1",
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
+  },
+  {
+    "label": "initialized",
+    "offset": 20,
+    "slot": "1",
+    "type": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    }
+  },
+  {
+    "label": "registry",
+    "offset": 0,
+    "slot": "2",
+    "type": {
+      "encoding": "inplace",
+      "label": "contract IRegistry",
+      "numberOfBytes": "20"
+    }
+  },
+  {
+    "label": "escrowedPayments",
+    "offset": 0,
+    "slot": "3",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => struct Escrow.EscrowedPayment)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct Escrow.EscrowedPayment",
+        "members": [
+          {
+            "label": "recipientIdentifier",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "encoding": "inplace",
+              "label": "bytes32",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "sender",
+            "offset": 0,
+            "slot": "1",
+            "type": {
+              "encoding": "inplace",
+              "label": "address",
+              "numberOfBytes": "20"
+            }
+          },
+          {
+            "label": "token",
+            "offset": 0,
+            "slot": "2",
+            "type": {
+              "encoding": "inplace",
+              "label": "address",
+              "numberOfBytes": "20"
+            }
+          },
+          {
+            "label": "value",
+            "offset": 0,
+            "slot": "3",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "sentIndex",
+            "offset": 0,
+            "slot": "4",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "receivedIndex",
+            "offset": 0,
+            "slot": "5",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "timestamp",
+            "offset": 0,
+            "slot": "6",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "expirySeconds",
+            "offset": 0,
+            "slot": "7",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "minAttestations",
+            "offset": 0,
+            "slot": "8",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          }
+        ],
+        "numberOfBytes": "288"
+      }
+    }
+  },
+  {
+    "label": "receivedPaymentIds",
+    "offset": 0,
+    "slot": "4",
+    "type": {
+      "encoding": "mapping",
+      "key": "bytes32",
+      "label": "mapping(bytes32 => address[])",
+      "numberOfBytes": "32",
+      "value": {
+        "base": {
+          "encoding": "inplace",
+          "label": "address",
+          "numberOfBytes": "20"
+        },
+        "encoding": "dynamic_array",
+        "label": "address[]",
+        "numberOfBytes": "32"
+      }
+    }
+  },
+  {
+    "label": "sentPaymentIds",
+    "offset": 0,
+    "slot": "5",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => address[])",
+      "numberOfBytes": "32",
+      "value": {
+        "base": {
+          "encoding": "inplace",
+          "label": "address",
+          "numberOfBytes": "20"
+        },
+        "encoding": "dynamic_array",
+        "label": "address[]",
+        "numberOfBytes": "32"
+      }
+    }
+  },
+  {
+    "label": "trustedIssuersPerPayment",
+    "offset": 0,
+    "slot": "6",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => address[])",
+      "numberOfBytes": "32",
+      "value": {
+        "base": {
+          "encoding": "inplace",
+          "label": "address",
+          "numberOfBytes": "20"
+        },
+        "encoding": "dynamic_array",
+        "label": "address[]",
+        "numberOfBytes": "32"
+      }
+    }
+  },
+  {
+    "label": "defaultTrustedIssuers",
+    "offset": 0,
+    "slot": "7",
+    "type": {
+      "base": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "encoding": "dynamic_array",
+      "label": "address[]",
+      "numberOfBytes": "32"
+    }
+  }
+]

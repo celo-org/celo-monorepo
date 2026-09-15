@@ -1,6 +1,6 @@
 pragma solidity ^0.8.0;
 
-import "../../contracts-0.8/common/EpochManagerEnabler.sol";
+import "../../contracts/common/EpochManagerEnabler.sol";
 
 /**
  * @title A wrapper around EpochManagerEnabler that exposes internal functions for testing.

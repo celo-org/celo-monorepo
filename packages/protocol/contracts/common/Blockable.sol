@@ -1,42 +1,32 @@
-pragma solidity >=0.5.13 <0.9.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
 import "./interfaces/IBlockable.sol";
 import "./interfaces/IBlocker.sol";
 
 /**
- * @title Blockable Contract
- * @notice This contract allows certain actions to be blocked based on the logic of another contract implementing the IBlocker interface.
- * @dev This contract uses an external IBlocker contract to determine if it is blocked. The owner can set the blocking contract.
+ * @title Blockable Contract (0.8)
+ * @notice Allows certain actions to be blocked based on the logic of another
+ * contract implementing IBlocker. 0.8 port of the 0.5 Blockable; abstract
+ * because setBlockedByContract is left to the inheriting contract.
  **/
-contract Blockable is IBlockable {
+abstract contract Blockable is IBlockable {
   // using directly memory slot so contracts can inherit from this contract without breaking storage layout
   bytes32 private constant BLOCKEDBY_POSITION =
     bytes32(uint256(keccak256("blocked_by_position")) - 1);
 
   event BlockedBySet(address indexed _blockedBy);
 
-  /**
-   * @notice Modifier to ensure the function is only executed when the contract is not blocked.
-   * @dev Reverts with an error if the contract is blocked.
-   */
   modifier onlyWhenNotBlocked() {
     require(!_isBlocked(), "Contract is blocked from performing this action");
     _;
   }
 
-  /**
-   * @notice Checks if the contract is currently blocked.
-   * @return Returns true if the contract is blocked, otherwise false.
-   * @dev The function returns false if no blocking contract has been set.
-   */
-  function isBlocked() external view returns (bool) {
+  function isBlocked() external view override returns (bool) {
     return _isBlocked();
   }
 
-  /**
-   * @notice Returns the address of the contract imposing the block.
-   */
-  function getBlockedByContract() public view returns (address blockedBy) {
+  function getBlockedByContract() public view override returns (address blockedBy) {
     bytes32 blockedByPosition = BLOCKEDBY_POSITION;
     assembly {
       blockedBy := sload(blockedByPosition)
@@ -44,10 +34,6 @@ contract Blockable is IBlockable {
     return blockedBy;
   }
 
-  /**
-   * @notice Sets the address of the contract allowed to impose a block.
-   * @param _blockedBy The address of the contract that will impose a block.
-   */
   function _setBlockedBy(address _blockedBy) internal {
     bytes32 blockedByPosition = BLOCKEDBY_POSITION;
     assembly {
@@ -57,9 +43,6 @@ contract Blockable is IBlockable {
     emit BlockedBySet(_blockedBy);
   }
 
-  /**
-   * @notice Checks if the contract is currently blocked.
-   */
   function _isBlocked() internal view returns (bool) {
     if (getBlockedByContract() == address(0)) {
       return false;

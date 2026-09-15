@@ -11,9 +11,9 @@ Deploy and test Celo core contract releases using Foundry-based tooling.
 
 | Step | Command | Output |
 |------|---------|--------|
-| 1. Generate libraries.json | `verify-deployed:foundry -b <PREVIOUS_TAG>` | `libraries.json` |
-| 2. Generate report | `check-versions:foundry -a <PREVIOUS_TAG> -b <NEW_BRANCH>` | `releaseData/versionReports/releaseN-report.json` |
-| 3. Deploy & create proposal | `make-release:foundry -b <NEW_BRANCH>` | `proposal.json` + deployed contracts |
+| 1. Generate the libraries file | `verify-deployed:foundry -b <PREVIOUS_TAG> -n <NETWORK>` | `<NETWORK>-<PREVIOUS_TAG>-libraries.json` |
+| 2. Generate report | `check-versions:foundry -a <PREVIOUS_TAG> -b <NEW_BRANCH>` | `report-<PREVIOUS_TAG>-<NEW_BRANCH>.json` |
+| 3. Deploy & create proposal | `make-release:foundry -b <NEW_BRANCH>` | `proposal-<NETWORK>-<NEW_BRANCH>.json` + deployed contracts |
 
 ## Networks
 
@@ -132,7 +132,7 @@ yarn release:verify-deployed:foundry -b core-contracts.v${PREVIOUS} -n celo-sepo
 yarn release:verify-deployed:foundry -b core-contracts.v${PREVIOUS} -n celo
 ```
 
-**Output**: `libraries.json` in `packages/protocol/`
+**Output**: `<network>-core-contracts.v${PREVIOUS}-libraries.json` in `packages/protocol/` (make-release requires exactly this name for the previous release)
 
 ### Step 2: Generate Compatibility Report
 
@@ -141,11 +141,10 @@ Compare previous release to new release branch:
 ```bash
 yarn release:check-versions:foundry \
   -a core-contracts.v${PREVIOUS} \
-  -b release/core-contracts/${NEW} \
-  -r ./releaseData/versionReports/release${NEW}-report.json
+  -b release/core-contracts/${NEW}
 ```
 
-**Output**: `releaseData/versionReports/release${NEW}-report.json`
+**Output**: `report-core-contracts.v${PREVIOUS}-release_core-contracts_${NEW}.json` (the name is derived from the two refs; `-r` is no longer accepted)
 
 ### Step 3: Prepare Initialization Data
 
@@ -163,15 +162,46 @@ echo "{}" > ./releaseData/initializationData/release${NEW}.json
 
 #### On Local Fork (Testing)
 
+Rehearse the whole release on an anvil fork before touching a network. The tooling derives the
+release number from the ref it builds, so tag HEAD locally with a name that parses as the next
+release and cannot collide with a real tag, and name the libraries file for the release before it:
+
+```bash
+anvil --celo --fork-url https://forno.celo-sepolia.celo-testnet.org --port 8545   # or forno.celo.org
+git tag core-contracts.v${NEW}-head HEAD                                          # delete it afterwards
+yarn release:verify-deployed:foundry -n celo-sepolia -b core-contracts.v${PREVIOUS}
+yarn release:check-versions:foundry -a core-contracts.v${PREVIOUS} -b core-contracts.v${NEW}-head
+yarn release:make:foundry -b core-contracts.v${NEW}-head -k <anvil key> -i ./releaseData/initializationData/release${NEW}.json \
+  -l celo-sepolia-core-contracts.v${PREVIOUS}-libraries.json -n celo-sepolia \
+  -r report-core-contracts.v${PREVIOUS}-core-contracts.v${NEW}-head.json -u http://127.0.0.1:8545 -s
+yarn release:verify-deployed:foundry -n celo-sepolia -b core-contracts.v${NEW}-head \
+  -p proposal-celo-sepolia-core-contracts.v${NEW}-head.json -u http://127.0.0.1:8545
+```
+
+`anvil --celo` is required (CELO token operations silently fail without it). Forno serves fork state
+for roughly the last 10,000 blocks only, so start (or restart) the fork right before `make-release`:
+a fork that aged past that window rejects every transaction. On a Mac, export
+`NODE_OPTIONS=--dns-result-order=ipv4first` so Node reaches the IPv4-only anvil through `localhost`.
+Two rehearsals in worktrees of one repository must use different local tag names: tags are shared.
+
+To run the generated proposal through governance on the fork, submit it with
+`scripts/bash/propose-from-json.sh -p <proposal.json> -u http://127.0.0.1:8545 -k <key> -d <CGP url>`:
+celocli's `governance:propose` cannot build it (its bundled ABIs miss some core contracts), while
+`governance:dequeue`, `governance:approve` (from the impersonated approver), `governance:vote` and
+`governance:execute` work against the fork. A proposal that registers new contracts must keep each
+`setAddressFor` before the matching `_setImplementation`; the script resolves those proxies from the
+`setAddressFor` entries because they are not in the registry until the proposal executes. After
+execution, run `verify-deployed` without `-p` to check the live proxies.
+
+
 ```bash
 yarn release:make:foundry \
   -b release/core-contracts/${NEW} \
   -k $DEPLOYER_PRIVATE_KEY \
   -i ./releaseData/initializationData/release${NEW}.json \
-  -l ./libraries.json \
+  -l ./celo-sepolia-core-contracts.v${PREVIOUS}-libraries.json \
   -n celo-sepolia \
-  -p ./proposal-fork.json \
-  -r ./releaseData/versionReports/release${NEW}-report.json \
+  -r ./report-core-contracts.v${PREVIOUS}-release_core-contracts_${NEW}.json \
   -u http://127.0.0.1:8545
 ```
 
@@ -182,10 +212,9 @@ yarn release:make:foundry \
   -b release/core-contracts/${NEW} \
   -k $CELO_SEPOLIA_DEPLOYER_KEY \
   -i ./releaseData/initializationData/release${NEW}.json \
-  -l ./libraries.json \
+  -l ./celo-sepolia-core-contracts.v${PREVIOUS}-libraries.json \
   -n celo-sepolia \
-  -p ./proposal-celo-sepolia.json \
-  -r ./releaseData/versionReports/release${NEW}-report.json
+  -r ./report-core-contracts.v${PREVIOUS}-release_core-contracts_${NEW}.json
 ```
 
 #### On Mainnet
@@ -198,10 +227,9 @@ yarn release:make:foundry \
   -b release/core-contracts/${NEW} \
   -k $MAINNET_DEPLOYER_KEY \
   -i ./releaseData/initializationData/release${NEW}.json \
-  -l ./libraries.json \
+  -l ./celo-core-contracts.v${PREVIOUS}-libraries.json \
   -n celo \
-  -p ./proposal-mainnet.json \
-  -r ./releaseData/versionReports/release${NEW}-report.json
+  -r ./report-core-contracts.v${PREVIOUS}-release_core-contracts_${NEW}.json
 ```
 
 ## Release Artifacts

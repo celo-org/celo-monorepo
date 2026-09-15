@@ -13,6 +13,7 @@ set -euo pipefail
 # -i: Path to the data needed to initialize contracts (if verifying a smart contracts release).
 # -p: Path to an optional proposal file, to verify the bytecodes of the core contracts after a
 #     proposed release.
+# -u: Custom RPC URL (optional, e.g. a local fork of the network).
 
 BRANCH=""
 NETWORK=""
@@ -20,8 +21,9 @@ FORNO=""
 LOG_FILE="/dev/stdout"
 PROPOSAL=""
 INITIALIZE_DATA=""
+RPC_URL=""
 
-while getopts 'b:n:fl:i:p:' flag; do
+while getopts 'b:n:fl:i:p:u:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
@@ -29,6 +31,7 @@ while getopts 'b:n:fl:i:p:' flag; do
     l) LOG_FILE="${OPTARG}" ;;
     i) INITIALIZE_DATA="--initialize_data $(realpath $OPTARG)" ;;
     p) PROPOSAL="--proposal $(realpath $OPTARG)" ;;
+    u) RPC_URL="--rpcUrl ${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -42,11 +45,10 @@ source scripts/bash/validate-libraries-filename.sh
 LIBRARIES_FILE=$(get_libraries_filename "$NETWORK" "$BRANCH")
 warn_if_libraries_exist "$LIBRARIES_FILE"
 
-cp foundry.toml foundry.toml.bak
+# Each ref builds with its own foundry.toml. Pre-migration tags still define the
+# truffle-compat (Solidity 0.5) profile for their implementations; the single-tree layout
+# does not, and its 0.5 artifacts (the proxies) are the frozen ones under artifacts/solc-0.5.
+build_tag_foundry $BRANCH $LOG_FILE truffle-compat
+build_tag_foundry $BRANCH $LOG_FILE truffle-compat8
 
-build_tag_foundry $BRANCH $LOG_FILE truffle-compat foundry.toml.bak
-build_tag_foundry $BRANCH $LOG_FILE truffle-compat8 foundry.toml.bak
-
-mv foundry.toml.bak foundry.toml
-
-yarn ts-node ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "$LIBRARIES_FILE" $FORNO $PROPOSAL $INITIALIZE_DATA
+yarn ts-node ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "$LIBRARIES_FILE" $FORNO $PROPOSAL $INITIALIZE_DATA $RPC_URL

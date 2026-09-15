@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# The array to iterate is passed by name; expanding it through eval keeps the scripts
+# usable on the bash 3.2 that macOS ships (namerefs need bash 4.3).
+array_by_name() {
+    eval "printf '%s\n' \"\${$1[@]}\""
+}
+
 # Function to copy libraries to temporary directory
 copy_libraries() {
-    local -n lib_array=$1
+    local lib_array=($(array_by_name "$1"))
     for LIB_PATH in "${lib_array[@]}"; do
         IFS=":" read -r SOURCE DEST <<< "$LIB_PATH"
         echo "SOURCE: $SOURCE"
@@ -18,7 +24,7 @@ copy_libraries() {
 
 # Function to deploy libraries
 deploy_libraries() {
-    local -n lib_array=$1
+    local lib_array=($(array_by_name "$1"))
     local profile=$2
     local flags_var=$3
     local version=$4
@@ -43,7 +49,6 @@ fi
 mkdir $TEMP_DIR
 
 # Copy libraries to the directory
-copy_libraries LIBRARIES_PATH
 copy_libraries LIBRARIES_PATH_08
 
 # Creating two variables for better readability
@@ -65,14 +70,7 @@ cp $SOURCE_DIR/remappings.txt $DEST_DIR/remappings.txt
 # Move into the temporary directory
 pushd $TEMP_DIR
 
-# Build libraries
-echo "Building with 0.5 libraries..."
-time FOUNDRY_PROFILE=truffle-compat $FORGE build
-
-# Deploy libraries and building library flag
-export LIBRARY_FLAGS=""
-deploy_libraries LIBRARIES_PATH "truffle-compat" "LIBRARY_FLAGS" "0.5"
-
+# Deploy libraries and build the library flag
 export LIBRARY_FLAGS_08=""
 deploy_libraries LIBRARIES_PATH_08 "truffle-compat8" "LIBRARY_FLAGS_08" "0.8"
 

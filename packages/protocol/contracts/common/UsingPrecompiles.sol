@@ -1,9 +1,10 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.0 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/interfaces/IEpochManager.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
+// Note: This is not an exact copy of UsingPrecompiles in the contract's folder, but in solidity 0.8
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "./interfaces/ICeloVersionedContract.sol";
+import "./IsL2Check.sol";
 
 contract UsingPrecompiles is IsL2Check {
   using SafeMath for uint256;
@@ -73,7 +74,7 @@ contract UsingPrecompiles is IsL2Check {
    * @return Epoch number.
    * @dev This function will be deprecated in L2.
    */
-  function getEpochNumberOfBlock(uint256 blockNumber) public view onlyL1 returns (uint256) {
+  function getEpochNumberOfBlock(uint256 blockNumber) public view virtual onlyL1 returns (uint256) {
     return epochNumberOfBlock(blockNumber, getEpochSize());
   }
 
@@ -82,7 +83,7 @@ contract UsingPrecompiles is IsL2Check {
    * @return Current epoch number.
    * @dev This function will be deprecated in L2.
    */
-  function getEpochNumber() public view onlyL1 returns (uint256) {
+  function getEpochNumber() public view virtual onlyL1 returns (uint256) {
     return getEpochNumberOfBlock(block.number);
   }
 
@@ -94,7 +95,7 @@ contract UsingPrecompiles is IsL2Check {
    */
   function validatorSignerAddressFromCurrentSet(
     uint256 index
-  ) public view onlyL1 returns (address) {
+  ) public view virtual onlyL1 returns (address) {
     bytes memory out;
     bool success;
     (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, uint256(block.number)));
@@ -112,7 +113,7 @@ contract UsingPrecompiles is IsL2Check {
   function validatorSignerAddressFromSet(
     uint256 index,
     uint256 blockNumber
-  ) public view onlyL1 returns (address) {
+  ) public view virtual onlyL1 returns (address) {
     bytes memory out;
     bool success;
     (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, blockNumber));
@@ -125,7 +126,7 @@ contract UsingPrecompiles is IsL2Check {
    * @return Size of the current elected validator set.
    * @dev This function will be deprecated in L2.
    */
-  function numberValidatorsInCurrentSet() public view onlyL1 returns (uint256) {
+  function numberValidatorsInCurrentSet() public view virtual onlyL1 returns (uint256) {
     bytes memory out;
     bool success;
     (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(uint256(block.number)));
@@ -139,7 +140,7 @@ contract UsingPrecompiles is IsL2Check {
    * @return Size of the validator set.
    * @dev This function will be deprecated in L2.
    */
-  function numberValidatorsInSet(uint256 blockNumber) public view onlyL1 returns (uint256) {
+  function numberValidatorsInSet(uint256 blockNumber) public view virtual onlyL1 returns (uint256) {
     bytes memory out;
     bool success;
     (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(blockNumber));
@@ -173,7 +174,9 @@ contract UsingPrecompiles is IsL2Check {
    * @return Block number.
    * @dev This function will be deprecated in L2.
    */
-  function getBlockNumberFromHeader(bytes memory header) public view onlyL1 returns (uint256) {
+  function getBlockNumberFromHeader(
+    bytes memory header
+  ) public view virtual onlyL1 returns (uint256) {
     bytes memory out;
     bool success;
     (success, out) = BLOCK_NUMBER_FROM_HEADER.staticcall(abi.encodePacked(header));
@@ -187,7 +190,7 @@ contract UsingPrecompiles is IsL2Check {
    * @return Header hash.
    * @dev This function will be deprecated in L2.
    */
-  function hashHeader(bytes memory header) public view onlyL1 returns (bytes32) {
+  function hashHeader(bytes memory header) public view virtual onlyL1 returns (bytes32) {
     bytes memory out;
     bool success;
     (success, out) = HASH_HEADER.staticcall(abi.encodePacked(header));
@@ -201,7 +204,7 @@ contract UsingPrecompiles is IsL2Check {
    * @return Bitmap parent seal with set bits at indices corresponding to signing validators.
    * @dev This function will be deprecated in L2.
    */
-  function getParentSealBitmap(uint256 blockNumber) public view onlyL1 returns (bytes32) {
+  function getParentSealBitmap(uint256 blockNumber) public view virtual onlyL1 returns (bytes32) {
     bytes memory out;
     bool success;
     (success, out) = GET_PARENT_SEAL_BITMAP.staticcall(abi.encodePacked(blockNumber));
@@ -219,7 +222,7 @@ contract UsingPrecompiles is IsL2Check {
    */
   function getVerifiedSealBitmapFromHeader(
     bytes memory header
-  ) public view onlyL1 returns (bytes32) {
+  ) public view virtual onlyL1 returns (bytes32) {
     bytes memory out;
     bool success;
     (success, out) = GET_VERIFIED_SEAL_BITMAP.staticcall(abi.encodePacked(header));

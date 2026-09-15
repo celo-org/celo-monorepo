@@ -1,0 +1,372 @@
+[
+  {
+    "label": "_owner",
+    "offset": 0,
+    "slot": "0",
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
+  },
+  {
+    "label": "initialized",
+    "offset": 20,
+    "slot": "0",
+    "type": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    }
+  },
+  {
+    "label": "registry",
+    "offset": 0,
+    "slot": "1",
+    "type": {
+      "encoding": "inplace",
+      "label": "contract IRegistry",
+      "numberOfBytes": "20"
+    }
+  },
+  {
+    "label": "_guardCounter",
+    "offset": 0,
+    "slot": "2",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "deprecated_lastLimitDay",
+    "offset": 0,
+    "slot": "3",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "ignoreRenaming_inverseCarbonFraction",
+    "offset": 0,
+    "slot": "4",
+    "type": {
+      "encoding": "inplace",
+      "label": "struct FixidityLib.Fraction",
+      "members": [
+        {
+          "label": "value",
+          "offset": 0,
+          "slot": "0",
+          "type": {
+            "encoding": "inplace",
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      ],
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "ignoreRenaming_carbonFeeBeneficiary",
+    "offset": 0,
+    "slot": "5",
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
+  },
+  {
+    "label": "deprecated_celoToBeBurned",
+    "offset": 0,
+    "slot": "6",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "tokenStates",
+    "offset": 0,
+    "slot": "7",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => struct FeeHandler.TokenState)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct FeeHandler.TokenState",
+        "members": [
+          {
+            "label": "handler",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "encoding": "inplace",
+              "label": "address",
+              "numberOfBytes": "20"
+            }
+          },
+          {
+            "label": "maxSlippage",
+            "offset": 0,
+            "slot": "1",
+            "type": {
+              "encoding": "inplace",
+              "label": "struct FixidityLib.Fraction",
+              "members": [
+                {
+                  "label": "value",
+                  "offset": 0,
+                  "slot": "0",
+                  "type": {
+                    "encoding": "inplace",
+                    "label": "uint256",
+                    "numberOfBytes": "32"
+                  }
+                }
+              ],
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "dailySellLimit",
+            "offset": 0,
+            "slot": "2",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "currentDaySellLimit",
+            "offset": 0,
+            "slot": "3",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "toDistribute",
+            "offset": 0,
+            "slot": "4",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "pastBurn",
+            "offset": 0,
+            "slot": "5",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "lastLimitDay",
+            "offset": 0,
+            "slot": "6",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "toBurn",
+            "offset": 0,
+            "slot": "7",
+            "type": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          }
+        ],
+        "numberOfBytes": "256"
+      }
+    }
+  },
+  {
+    "label": "activeTokens",
+    "offset": 0,
+    "slot": "8",
+    "type": {
+      "encoding": "inplace",
+      "label": "struct EnumerableSet.AddressSet",
+      "members": [
+        {
+          "label": "index",
+          "offset": 0,
+          "slot": "0",
+          "type": {
+            "encoding": "mapping",
+            "key": "address",
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32",
+            "value": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          }
+        },
+        {
+          "label": "values",
+          "offset": 0,
+          "slot": "1",
+          "type": {
+            "base": {
+              "encoding": "inplace",
+              "label": "address",
+              "numberOfBytes": "20"
+            },
+            "encoding": "dynamic_array",
+            "label": "address[]",
+            "numberOfBytes": "32"
+          }
+        }
+      ],
+      "numberOfBytes": "64"
+    }
+  },
+  {
+    "label": "totalFractionOfOtherBeneficiaries",
+    "offset": 0,
+    "slot": "10",
+    "type": {
+      "encoding": "inplace",
+      "label": "struct FixidityLib.Fraction",
+      "members": [
+        {
+          "label": "value",
+          "offset": 0,
+          "slot": "0",
+          "type": {
+            "encoding": "inplace",
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      ],
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "otherBeneficiaries",
+    "offset": 0,
+    "slot": "11",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => struct FeeHandler.Beneficiary)",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "inplace",
+        "label": "struct FeeHandler.Beneficiary",
+        "members": [
+          {
+            "label": "fraction",
+            "offset": 0,
+            "slot": "0",
+            "type": {
+              "encoding": "inplace",
+              "label": "struct FixidityLib.Fraction",
+              "members": [
+                {
+                  "label": "value",
+                  "offset": 0,
+                  "slot": "0",
+                  "type": {
+                    "encoding": "inplace",
+                    "label": "uint256",
+                    "numberOfBytes": "32"
+                  }
+                }
+              ],
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "name",
+            "offset": 0,
+            "slot": "1",
+            "type": {
+              "encoding": "bytes",
+              "label": "string",
+              "numberOfBytes": "32"
+            }
+          },
+          {
+            "label": "exists",
+            "offset": 0,
+            "slot": "2",
+            "type": {
+              "encoding": "inplace",
+              "label": "bool",
+              "numberOfBytes": "1"
+            }
+          }
+        ],
+        "numberOfBytes": "96"
+      }
+    }
+  },
+  {
+    "label": "otherBeneficiariesAddresses",
+    "offset": 0,
+    "slot": "12",
+    "type": {
+      "encoding": "inplace",
+      "label": "struct EnumerableSet.AddressSet",
+      "members": [
+        {
+          "label": "index",
+          "offset": 0,
+          "slot": "0",
+          "type": {
+            "encoding": "mapping",
+            "key": "address",
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32",
+            "value": {
+              "encoding": "inplace",
+              "label": "uint256",
+              "numberOfBytes": "32"
+            }
+          }
+        },
+        {
+          "label": "values",
+          "offset": 0,
+          "slot": "1",
+          "type": {
+            "base": {
+              "encoding": "inplace",
+              "label": "address",
+              "numberOfBytes": "20"
+            },
+            "encoding": "dynamic_array",
+            "label": "address[]",
+            "numberOfBytes": "32"
+          }
+        }
+      ],
+      "numberOfBytes": "64"
+    }
+  }
+]

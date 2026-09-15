@@ -1,82 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 pragma experimental ABIEncoderV2;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Registry.sol";
-import "@celo-contracts/common/Accounts.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
-import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/DowntimeSlasher.sol";
-import "@celo-contracts/governance/test/MockUsingPrecompiles.sol";
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import "@test-sol/unit/governance/validators/mocks/MockValidators08.sol";
+import "@test-sol/unit/governance/validators/mocks/MockLockedGold08.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
+import "@test-sol/unit/governance/validators/mocks/DowntimeSlasherMock08.sol";
 
-contract DowntimeSlasherMock is DowntimeSlasher(true), MockUsingPrecompiles, TestWithUtils {
-  struct SlashParams {
-    uint256[] startBlocks;
-    uint256[] endBlocks;
-    uint256[] signerIndices;
-    uint256 groupMembershipHistoryIndex;
-    address[] validatorElectionLessers;
-    address[] validatorElectionGreaters;
-    uint256[] validatorElectionIndices;
-    address[] groupElectionLessers;
-    address[] groupElectionGreaters;
-    uint256[] groupElectionIndices;
-  }
-
-  function mockSlash(SlashParams calldata slashParams, address[] calldata _validators) external {
-    require(
-      slashParams.signerIndices.length == _validators.length,
-      "validators list and signerIndices list length are different."
-    );
-
-    ph.mockReturn(
-      ph.GET_VALIDATOR(),
-      abi.encodePacked(slashParams.signerIndices[0], slashParams.startBlocks[0]),
-      abi.encode(_validators[0])
-    );
-
-    if (slashParams.signerIndices.length > 1) {
-      for (uint256 i = 0; i < slashParams.startBlocks.length; i = i.add(1)) {
-        if (i > 0) {
-          if (slashParams.startBlocks[i].mod(17280) == 1) {
-            ph.mockReturn(
-              ph.GET_VALIDATOR(),
-              abi.encodePacked(
-                slashParams.signerIndices[i.sub(1)],
-                slashParams.startBlocks[i].sub(1)
-              ),
-              abi.encode(_validators[0])
-            );
-            ph.mockReturn(
-              ph.GET_VALIDATOR(),
-              abi.encodePacked(slashParams.signerIndices[i], slashParams.startBlocks[i]),
-              abi.encode(_validators[1])
-            );
-          }
-        }
-      }
-    }
-    slash(
-      slashParams.startBlocks,
-      slashParams.endBlocks,
-      slashParams.signerIndices,
-      slashParams.groupMembershipHistoryIndex,
-      slashParams.validatorElectionLessers,
-      slashParams.validatorElectionGreaters,
-      slashParams.validatorElectionIndices,
-      slashParams.groupElectionLessers,
-      slashParams.groupElectionGreaters,
-      slashParams.groupElectionIndices
-    );
-  }
-}
-
-contract DowntimeSlasherTest is TestWithUtils {
+contract DowntimeSlasherTest is TestWithUtils08 {
   using FixidityLib for FixidityLib.Fraction;
-  using SafeMath for uint256;
 
   struct SlashingIncentives {
     // Value of LockedGold to slash from the account.
@@ -85,10 +20,9 @@ contract DowntimeSlasherTest is TestWithUtils {
     uint256 reward;
   }
 
-  Accounts accounts;
-  MockValidators validators;
-  MockLockedGold lockedGold;
-  DowntimeSlasherMock public slasher;
+  MockValidators08 validators;
+  MockLockedGold08 lockedGold;
+  DowntimeSlasherMock08 public slasher;
 
   address nonOwner;
 
@@ -141,7 +75,7 @@ contract DowntimeSlasherTest is TestWithUtils {
   address[] public groupElectionGreaters = new address[](0);
   uint256[] public groupElectionIndices = new uint256[](0);
 
-  DowntimeSlasherMock.SlashParams slashParams;
+  DowntimeSlasherMock08.SlashParams slashParams;
   SlashingIncentives public expectedSlashingIncentives;
 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
@@ -158,7 +92,7 @@ contract DowntimeSlasherTest is TestWithUtils {
     bytes32 bitmap
   );
 
-  function setUp() public {
+  function setUp() public virtual override {
     super.setUp();
     ph.setEpochSize(100);
     (nonOwner, nonOwnerPK) = actorWithPK("nonOwner");
@@ -169,39 +103,30 @@ contract DowntimeSlasherTest is TestWithUtils {
     (otherGroup, groupPK) = actorWithPK("otherGroup");
     (caller2, caller2PK) = actorWithPK("caller2");
 
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    validators = new MockValidators08();
+    lockedGold = new MockLockedGold08();
+    slasher = new DowntimeSlasherMock08();
 
-    accounts = new Accounts(true);
-    validators = new MockValidators();
-    lockedGold = new MockLockedGold();
-    slasher = new DowntimeSlasherMock();
-
-    registry = Registry(REGISTRY_ADDRESS);
-
-    accounts.createAccount();
-
+    // Register additional accounts in the existing Accounts contract from super.setUp()
     vm.prank(nonOwner);
-    accounts.createAccount();
-
-    vm.prank(validator);
-    accounts.createAccount();
+    accountsContract.createAccount();
 
     vm.prank(otherValidator0);
-    accounts.createAccount();
+    accountsContract.createAccount();
+
     vm.prank(otherValidator1);
-    accounts.createAccount();
+    accountsContract.createAccount();
 
     vm.prank(group);
-    accounts.createAccount();
+    accountsContract.createAccount();
 
     vm.prank(otherGroup);
-    accounts.createAccount();
+    accountsContract.createAccount();
 
-    accounts.initialize(REGISTRY_ADDRESS);
-
+    // Register mocks in the existing registry (validator account created by
+    // _registerAndElectValidatorsForL2 via whenL2WithEpochManagerInitialization)
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
-    registry.setAddressFor("Accounts", address(accounts));
 
     vm.prank(validator);
     validators.affiliate(group);
@@ -228,16 +153,14 @@ contract DowntimeSlasherTest is TestWithUtils {
   }
 
   // This function will wait until the middle of a new epoch is reached.
-  // We consider blocks are "safe" if the test could perform a slash, without
-  // the context of the other tests.
-  // This property ensures that each test has an epoch to work with (not depends
-  // on previous tests), and there are enough blocks on that epoch to have a validator
-  // down for a possible slash.
   function _waitUntilSafeBlocks(uint256 _safeEpoch) internal {
-    uint256 blockStableBetweenTests = _getFirstBlockNumberOfEpoch(_safeEpoch).sub(1);
-
-    while (block.number < blockStableBetweenTests || block.number % epochSize <= epochSize.div(2)) {
-      blockTravel(1);
+    uint256 blockStableBetweenTests = _getFirstBlockNumberOfEpoch(_safeEpoch) - 1;
+    if (block.number < blockStableBetweenTests) {
+      blockTravel(blockStableBetweenTests - block.number + 1);
+    }
+    uint256 posInEpoch = block.number % epochSize;
+    if (posInEpoch <= epochSize / 2) {
+      blockTravel(epochSize / 2 + 1 - posInEpoch);
     }
   }
 
@@ -247,9 +170,9 @@ contract DowntimeSlasherTest is TestWithUtils {
     bytes32[] memory _bitmaps
   ) internal {
     uint256 startEpoch = slasher.getEpochNumberOfBlock(fromBlock);
-    uint256 nextEpochStart = _getFirstBlockNumberOfEpoch(startEpoch.add(1));
-    for (uint256 i = fromBlock; i < fromBlock.add(numberOfBlocks); i++) {
-      slasher.setParentSealBitmap(i.add(1), i < nextEpochStart ? _bitmaps[0] : _bitmaps[1]);
+    uint256 nextEpochStart = _getFirstBlockNumberOfEpoch(startEpoch + 1);
+    for (uint256 i = fromBlock; i < fromBlock + numberOfBlocks; i++) {
+      slasher.setParentSealBitmap(i + 1, i < nextEpochStart ? _bitmaps[0] : _bitmaps[1]);
     }
   }
 
@@ -261,24 +184,22 @@ contract DowntimeSlasherTest is TestWithUtils {
     uint256 actualSlashableDowntime = slasher.slashableDowntime();
     uint256 startEpoch = _getFirstBlockNumberOfEpoch(_startBlock);
     uint256 nextEpochStart = _getFirstBlockNumberOfEpoch(startEpoch);
-    uint256 endBlock = _startBlock.add(actualSlashableDowntime).sub(1);
+    uint256 endBlock = _startBlock + actualSlashableDowntime - 1;
 
     for (uint256 i = _startBlock; i <= endBlock; ) {
-      uint256 endBlockForSlot = i.add(intervalSize.sub(1));
+      uint256 endBlockForSlot = i + intervalSize - 1;
       endBlockForSlot = endBlockForSlot > endBlock ? endBlock : endBlockForSlot;
 
       // avoid crossing epoch
-
       endBlockForSlot = endBlockForSlot >= nextEpochStart && i < nextEpochStart
-        ? nextEpochStart.sub(1)
+        ? nextEpochStart - 1
         : endBlockForSlot;
 
       _startingBlocks.push(i);
-
       _endingBlocks.push(endBlockForSlot);
 
       slasher.setBitmapForInterval(i, endBlockForSlot);
-      i = endBlockForSlot.add(1);
+      i = endBlockForSlot + 1;
     }
 
     return (_startingBlocks, _endingBlocks);
@@ -296,8 +217,8 @@ contract DowntimeSlasherTest is TestWithUtils {
     }
 
     _presetParentSealForBlock(startBlock, slashableDowntime, bitmapMasks);
-    _presetParentSealForBlock(startBlock.sub(1), 1, _bitmaps);
-    _presetParentSealForBlock(startBlock.add(slashableDowntime), 1, _bitmaps);
+    _presetParentSealForBlock(startBlock - 1, 1, _bitmaps);
+    _presetParentSealForBlock(startBlock + slashableDowntime, 1, _bitmaps);
     return _calculateEverySlot(startBlock);
   }
 
@@ -317,13 +238,13 @@ contract DowntimeSlasherTest is TestWithUtils {
     if (_epochNumber == 0) {
       return 0;
     }
-    return (_epochNumber.sub(1)).mul(epochSize).add(1);
+    return (_epochNumber - 1) * epochSize + 1;
   }
 }
 
 contract DowntimeSlasherTestInitialize is DowntimeSlasherTest {
   function test_ShouldHaveSetOwner() public {
-    assertEq(slasher.owner(), address(this));
+    assertEq(IOwnable(address(slasher)).owner(), address(this));
   }
 
   function test_ShouldHaveSetSlashingIncentives() public {
@@ -365,7 +286,7 @@ contract DowntimeSlasherTestSetSlashableDowntime is DowntimeSlasherTest {
 }
 
 contract DowntimeSlasherTestGetBitmapForInterval is DowntimeSlasherTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     ph.setEpochSize(17280);
@@ -378,9 +299,9 @@ contract DowntimeSlasherTestGetBitmapForInterval is DowntimeSlasherTest {
 
   function test_Reverts_WhenL2() public {
     epochSize = ph.epochSize();
-    blockTravel(epochSize.mul(4).add(2));
+    blockTravel(epochSize * 4 + 2);
 
-    uint256 _blockNumber = block.number.sub(epochSize.mul(4));
+    uint256 _blockNumber = block.number - epochSize * 4;
 
     vm.expectRevert("This method is no longer supported in L2.");
     slasher.getBitmapForInterval(_blockNumber, _blockNumber);
@@ -388,7 +309,7 @@ contract DowntimeSlasherTestGetBitmapForInterval is DowntimeSlasherTest {
 }
 
 contract DowntimeSlasherTestSetBitmapForInterval is DowntimeSlasherTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     ph.setEpochSize(17280);
@@ -398,26 +319,26 @@ contract DowntimeSlasherTestSetBitmapForInterval is DowntimeSlasherTest {
     blockTravel(epochSize);
     slasher.setNumberValidators(2);
     blockNumber = block.number;
-    blockNumber = blockNumber.sub(3);
-    blockNumber = blockNumber % epochSize == 0 ? blockNumber.sub(1) : blockNumber;
+    blockNumber = blockNumber - 3;
+    blockNumber = blockNumber % epochSize == 0 ? blockNumber - 1 : blockNumber;
 
     epoch = slasher.getEpochNumberOfBlock(blockNumber);
 
     slasher.setEpochSigner(epoch, 0, validator);
 
     slasher.setParentSealBitmap(
-      blockNumber.add(1),
+      blockNumber + 1,
       bytes32(0x0000000000000000000000000000000000000000000000000000000000000001)
     );
     slasher.setParentSealBitmap(
-      blockNumber.add(2),
+      blockNumber + 2,
       bytes32(0x0000000000000000000000000000000000000000000000000000000000000002)
     );
   }
 
   function test_Reverts_WhenInL2_SetBitmapForInterval() public {
     vm.expectRevert("This method is no longer supported in L2.");
-    slasher.setBitmapForInterval(blockNumber, blockNumber.add(1));
+    slasher.setBitmapForInterval(blockNumber, blockNumber + 1);
   }
 }
 
@@ -427,7 +348,7 @@ contract DowntimeSlasherTestSlash_WhenSlashing is DowntimeSlasherTest {
   bytes32[] private _bitmaps0 = new bytes32[](1);
   bytes32[] private _bitmaps1 = new bytes32[](1);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _signerIndices[0] = validatorIndexInEpoch;
@@ -452,7 +373,7 @@ contract DowntimeSlasherTestSlash_WhenSlashing is DowntimeSlasherTest {
       _signerIndices
     );
 
-    slashParams = DowntimeSlasherMock.SlashParams({
+    slashParams = DowntimeSlasherMock08.SlashParams({
       startBlocks: _startBlocks,
       endBlocks: _endBlocks,
       signerIndices: _signerIndices,
@@ -477,11 +398,11 @@ contract DowntimeSlasherTestSlash_WhenSlashing is DowntimeSlasherTest {
     uint256[] memory _startBlocks = new uint256[](2);
     uint256[] memory _endBlocks = new uint256[](2);
     _startBlocks[0] = startBlock;
-    _startBlocks[1] = startBlock.add(2);
-    _endBlocks[0] = startBlock.add(slashableDowntime.sub(3));
-    _endBlocks[1] = startBlock.add(slashableDowntime.sub(1));
+    _startBlocks[1] = startBlock + 2;
+    _endBlocks[0] = startBlock + slashableDowntime - 3;
+    _endBlocks[1] = startBlock + slashableDowntime - 1;
 
-    slashParams = DowntimeSlasherMock.SlashParams({
+    slashParams = DowntimeSlasherMock08.SlashParams({
       startBlocks: _startBlocks,
       endBlocks: _endBlocks,
       signerIndices: _signerIndices,

@@ -17,6 +17,7 @@ import "@celo-contracts-8/stability/test/MockStableToken.sol";
 import { Ownable } from "@openzeppelin/contracts8/access/Ownable.sol";
 
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
+import "@celo-contracts-8/common/interfaces/IScoreManagerGovernance.sol";
 
 contract EpochManagerTest is TestWithUtils08 {
   EpochManager_WithMocks epochManagerContract;
@@ -124,7 +125,7 @@ contract EpochManagerTest is TestWithUtils08 {
 
     sortedOracles.setMedianRate(address(stableToken), stableAmountForRate);
 
-    scoreManager.setValidatorScore(validator1, 1);
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(validator1, 1);
 
     epochManagerContract.initialize(REGISTRY_ADDRESS, 10, address(sortedOracles));
     epochRewards.setCarbonOffsettingPartner(carbonOffsettingPartner);

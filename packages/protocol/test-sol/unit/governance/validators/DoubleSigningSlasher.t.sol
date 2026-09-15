@@ -1,68 +1,31 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 pragma experimental ABIEncoderV2;
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Registry.sol";
-import "@celo-contracts/common/Accounts.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
-import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/DoubleSigningSlasher.sol";
-import "@celo-contracts/governance/test/MockUsingPrecompiles.sol";
+import "@test-sol/unit/governance/validators/mocks/MockValidators08.sol";
+import "@test-sol/unit/governance/validators/mocks/MockLockedGold08.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@test-sol/unit/governance/validators/mocks/DoubleSigningSlasherMock08.sol";
 
-contract DoubleSigningSlasherTest is
-  DoubleSigningSlasher(true),
-  MockUsingPrecompiles,
-  TestWithUtils
-{
-  struct SlashParams {
-    address signer;
-    uint256 index;
-    bytes headerA;
-    bytes headerB;
-    uint256 groupMembershipHistoryIndex;
-    address[] validatorElectionLessers;
-    address[] validatorElectionGreaters;
-    uint256[] validatorElectionIndices;
-    address[] groupElectionLessers;
-    address[] groupElectionGreaters;
-    uint256[] groupElectionIndices;
-  }
-
-  function mockSlash(SlashParams calldata slashParams, address _validator) external {
-    ph.mockReturn(
-      ph.GET_VALIDATOR(),
-      abi.encodePacked(slashParams.index, getBlockNumberFromHeader(slashParams.headerA)),
-      abi.encode(_validator)
-    );
-
-    slash(
-      slashParams.signer,
-      slashParams.index,
-      slashParams.headerA,
-      slashParams.headerB,
-      slashParams.groupMembershipHistoryIndex,
-      slashParams.validatorElectionLessers,
-      slashParams.validatorElectionGreaters,
-      slashParams.validatorElectionIndices,
-      slashParams.groupElectionLessers,
-      slashParams.groupElectionGreaters,
-      slashParams.groupElectionIndices
-    );
-  }
-}
-
-contract DoubleSigningSlasherBaseTest is TestWithUtils {
+contract DoubleSigningSlasherBaseTest is TestWithUtils08 {
   using FixidityLib for FixidityLib.Fraction;
+
+  struct SlashingIncentives {
+    // Value of LockedGold to slash from the account.
+    uint256 penalty;
+    // Value of LockedGold to send to the observer.
+    uint256 reward;
+  }
 
   SlashingIncentives public expectedSlashingIncentives;
 
-  Accounts accounts;
-  MockValidators validators;
-  MockLockedGold lockedGold;
-  DoubleSigningSlasherTest slasher;
+  MockValidators08 validators;
+  MockLockedGold08 lockedGold;
+  DoubleSigningSlasherMock08 public slasher;
 
   address nonOwner;
 
@@ -85,19 +48,12 @@ contract DoubleSigningSlasherBaseTest is TestWithUtils {
   address caller2;
   uint256 caller2PK;
 
-  struct SlashingIncentives {
-    // Value of LockedGold to slash from the account.
-    uint256 penalty;
-    // Value of LockedGold to send to the observer.
-    uint256 reward;
-  }
-
-  DoubleSigningSlasherTest.SlashParams params;
+  DoubleSigningSlasherMock08.SlashParams params;
 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
   event DoubleSigningSlashPerformed(address indexed validator, uint256 indexed blockNumber);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     ph.setEpochSize(100);
     (nonOwner, nonOwnerPK) = actorWithPK("nonOwner");
@@ -107,35 +63,24 @@ contract DoubleSigningSlasherBaseTest is TestWithUtils {
     (otherGroup, groupPK) = actorWithPK("otherGroup");
     (caller2, caller2PK) = actorWithPK("caller2");
 
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    validators = new MockValidators08();
+    lockedGold = new MockLockedGold08();
+    slasher = new DoubleSigningSlasherMock08();
 
-    accounts = new Accounts(true);
-    validators = new MockValidators();
-    lockedGold = new MockLockedGold();
-    slasher = new DoubleSigningSlasherTest();
-
-    accounts.createAccount();
-
+    // Register additional accounts in the existing Accounts contract from super.setUp()
     vm.prank(nonOwner);
-    accounts.createAccount();
-
-    vm.prank(validator);
-    accounts.createAccount();
-
-    vm.prank(otherValidator);
-    accounts.createAccount();
+    accountsContract.createAccount();
 
     vm.prank(group);
-    accounts.createAccount();
+    accountsContract.createAccount();
 
     vm.prank(otherGroup);
-    accounts.createAccount();
+    accountsContract.createAccount();
 
-    accounts.initialize(REGISTRY_ADDRESS);
-
+    // Register mocks in the existing registry (validator/caller2 accounts already
+    // created by _registerAndElectValidatorsForL2 via whenL2WithEpochManagerInitialization)
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
-    registry.setAddressFor("Accounts", address(accounts));
 
     vm.prank(validator);
     validators.affiliate(group);
@@ -160,7 +105,7 @@ contract DoubleSigningSlasherBaseTest is TestWithUtils {
 
 contract DoubleSigningSlasherInitialize is DoubleSigningSlasherBaseTest {
   function test_ShouldHaveSetOwner() public {
-    assertEq(slasher.owner(), address(this));
+    assertEq(IOwnable(address(slasher)).owner(), address(this));
   }
 
   function test_ShouldHaveSetSlashingIncentives() public {
@@ -204,7 +149,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
   uint256[] groupElectionIndices = new uint256[](0);
 
   function test_Reverts_WhenL2() public {
-    params = DoubleSigningSlasherTest.SlashParams({
+    params = DoubleSigningSlasherMock08.SlashParams({
       signer: validator,
       index: validatorIndex,
       headerA: headerA,

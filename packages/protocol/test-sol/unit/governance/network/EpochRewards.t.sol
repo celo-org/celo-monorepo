@@ -1,20 +1,26 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "@celo-contracts/common/Registry.sol";
-import "@celo-contracts/common/Freezer.sol";
+import "@celo-contracts/common/interfaces/IFreezer.sol";
+import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
 
 import "@celo-contracts/governance/test/MockElection.sol";
-import { EpochRewardsMock } from "@celo-contracts/governance/test/EpochRewardsMock.sol";
-import { Reserve } from "@lib/mento-core/contracts/Reserve.sol";
+import { IEpochRewardsMock } from "@celo-contracts/governance/interfaces/IEpochRewardsMock.sol";
+import { IEpochRewardsInitializer } from "@celo-contracts/governance/interfaces/IEpochRewardsInitializer.sol";
+import { IOwnable } from "@celo-contracts/common/interfaces/IOwnable.sol";
+import { MockReserve08 } from "@celo-contracts-8/stability/test/MockReserve.sol";
 
 import { MockSortedOracles } from "@celo-contracts/stability/test/MockSortedOracles.sol";
-import { MockStableToken } from "@celo-contracts/stability/test/MockStableToken.sol";
-import { CeloTokenMock } from "@test-sol/unit/common/CeloTokenMock.sol";
+import { MockStableToken08 } from "@celo-contracts-8/stability/test/MockStableToken.sol";
+import { CeloTokenMock08 } from "@test-sol/unit/governance/network/mocks/CeloTokenMock08.sol";
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
+import { MockEpochManager } from "@test-sol/unit/common/mocks/MockEpochManager.sol";
+// Force compilation of artifacts used by deployCodeTo
+import { EpochRewardsImplMock08 } from "@test-sol/unit/governance/network/mocks/EpochRewardsMocks08.sol";
+import { FreezerCompile } from "@test-sol/unit/common/mocks/FreezerMocks08.sol";
 
-contract EpochRewardsTest is TestWithUtils {
+contract EpochRewardsTest is TestWithUtils08 {
   uint256 constant targetVotingYieldParamsInitial = 0.00016e24; // 0.00016
   uint256 constant targetVotingYieldParamsMax = 0.0005e24; // 0.0005
   uint256 constant targetVotingYieldParamsAdjustmentFactor = 1127990000000000000; // 0.00000112799
@@ -36,13 +42,15 @@ contract EpochRewardsTest is TestWithUtils {
   uint256[] initialAssetAllocationWeights;
 
   // Mocked contracts
-  EpochRewardsMock epochRewards;
+  IEpochRewardsMock epochRewards;
+  address epochRewardsAddress;
   MockElection election;
   MockSortedOracles mockSortedOracles;
-  MockStableToken mockStableToken;
-  CeloTokenMock mockCeloToken;
-  Reserve reserve;
-  Freezer freezer;
+  MockStableToken08 mockStableToken;
+  CeloTokenMock08 mockCeloToken;
+  MockReserve08 reserve;
+  IFreezer freezer;
+  MockEpochManager mockEpochManagerForRewards;
 
   address celoUnreleasedTreasuryAddress;
   address caller = address(this);
@@ -58,11 +66,12 @@ contract EpochRewardsTest is TestWithUtils {
   event TargetVotingYieldParametersSet(uint256 max, uint256 adjustmentFactor);
   event TargetVotingYieldSet(uint256 target);
 
-  function setUp() public {
+  function setUp() public virtual override {
     super.setUp();
     preEpochRewardsSetup();
+    whenL2WithEpochManagerInitialization();
 
-    epochRewards.initialize(
+    IEpochRewardsInitializer(epochRewardsAddress).initialize(
       address(registry),
       targetVotingYieldParamsInitial,
       targetVotingYieldParamsMax,
@@ -76,19 +85,30 @@ contract EpochRewardsTest is TestWithUtils {
       address(0),
       carbonOffsettingFraction
     );
-    whenL2WithEpochManagerInitialization();
   }
+
   function preEpochRewardsSetup() public {
-    // Mocked contracts
-    epochRewards = new EpochRewardsMock();
+    // Deploy EpochRewardsImplMock08 (0.8) via deployCodeTo at a deterministic address.
+    epochRewardsAddress = actor("epochRewards");
+    deployCodeTo("EpochRewardsImplMock08", epochRewardsAddress);
+    epochRewards = IEpochRewardsMock(epochRewardsAddress);
+
     election = new MockElection();
     mockSortedOracles = new MockSortedOracles();
-    mockStableToken = new MockStableToken();
+    mockStableToken = new MockStableToken08();
 
-    mockCeloToken = new CeloTokenMock();
+    mockCeloToken = new CeloTokenMock08();
     mockCeloToken.setRegistry(REGISTRY_ADDRESS);
 
-    freezer = new Freezer(true);
+    // Derive a fresh freezer address per call (keyed on the freshly-created
+    // epochRewards) so re-running preEpochRewardsSetup deploys a new,
+    // uninitialized Freezer instead of re-initializing one at a fixed address.
+    address freezerAddress = address(
+      uint160(uint256(keccak256(abi.encodePacked("freezer", epochRewardsAddress))))
+    );
+    deployCodeTo("FreezerCompile", freezerAddress);
+    freezer = IFreezer(freezerAddress);
+    IFreezerInitializer(freezerAddress).initialize();
 
     celoUnreleasedTreasuryAddress = actor("celoUnreleasedTreasury");
     deployCodeTo("CeloUnreleasedTreasury.sol", abi.encode(false), celoUnreleasedTreasuryAddress);
@@ -105,14 +125,18 @@ contract EpochRewardsTest is TestWithUtils {
       address(mockStableToken),
       sortedOraclesDenominator * exchangeRate
     );
+
+    // Deploy a MockEpochManager so EpochRewards.getEpochManager() works
+    mockEpochManagerForRewards = new MockEpochManager();
+    registry.setAddressFor(EpochManagerContract, address(mockEpochManagerForRewards));
   }
 
   function _setNumberOfElectedInCurrentSetBaseOnLayer(uint256 numberValidators) internal {
-    epochManager.setNumberOfElectedInCurrentSet(numberValidators);
+    mockEpochManagerForRewards.setNumberOfElectedInCurrentSet(numberValidators);
   }
 
   function _updateTargetVotingYieldBasedOnLayer() internal {
-    vm.prank(address(epochManager));
+    vm.prank(address(mockEpochManagerForRewards));
     epochRewards.updateTargetVotingYield();
   }
 
@@ -124,26 +148,9 @@ contract EpochRewardsTest is TestWithUtils {
 }
 
 contract EpochRewardsTest_initialize is EpochRewardsTest {
-  function setUp() public {
-    super.setUp();
-    preEpochRewardsSetup();
-    epochRewards.initialize(
-      address(registry),
-      targetVotingYieldParamsInitial,
-      targetVotingYieldParamsMax,
-      targetVotingYieldParamsAdjustmentFactor,
-      rewardsMultiplierMax,
-      rewardsMultiplierAdjustmentsUnderspend,
-      rewardsMultiplierAdjustmentsOverspend,
-      targetVotingGoldFraction,
-      targetValidatorEpochPayment,
-      communityRewardFraction,
-      address(0),
-      carbonOffsettingFraction
-    );
-  }
+  // Base setUp already deploys and initializes EpochRewardsMock08 once (owner = this).
   function test_ShouldHaveSetOwner() public {
-    assertEq(epochRewards.owner(), caller);
+    assertEq(IOwnable(epochRewardsAddress).owner(), caller);
   }
 
   function test_ShouldHaveSetTargetValidatorEpochPayment() public {
@@ -174,7 +181,7 @@ contract EpochRewardsTest_initialize is EpochRewardsTest {
 
   function test_shouldNotBeCallableAgain() public {
     vm.expectRevert("contract already initialized");
-    epochRewards.initialize(
+    IEpochRewardsInitializer(epochRewardsAddress).initialize(
       address(registry),
       targetVotingYieldParamsInitial,
       targetVotingYieldParamsMax,
@@ -194,7 +201,7 @@ contract EpochRewardsTest_initialize is EpochRewardsTest {
 contract EpochRewardsTest_setTargetVotingGoldFraction is EpochRewardsTest {
   uint256 newFraction;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newFraction = targetVotingGoldFraction + 1;
   }
@@ -450,7 +457,7 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
   uint256 expectedTargetRemainingSupply;
   uint256 targetEpochReward;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     expectedTargetTotalSupply = getExpectedTargetTotalSupply(timeDelta);
@@ -499,29 +506,11 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
   uint256 constant reserveBalance = 1000000 ether;
   uint256 constant floatingSupply = totalSupplyL1 - reserveBalance;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
-    reserve = new Reserve(true);
+    reserve = new MockReserve08();
 
     registry.setAddressFor("Reserve", address(reserve));
-
-    initialAssetAllocationWeights = new uint256[](1);
-    initialAssetAllocationWeights[0] = FIXED1;
-
-    initialAssetAllocationSymbols = new bytes32[](1);
-    initialAssetAllocationSymbols[0] = bytes32("cGLD");
-
-    reserve.initialize(
-      address(registry),
-      60,
-      FIXED1,
-      0,
-      0,
-      initialAssetAllocationSymbols,
-      initialAssetAllocationWeights,
-      0.005e24, // 0.005
-      2 * FIXED1
-    );
 
     vm.deal(celoUnreleasedTreasuryAddress, celoUnreleasedTreasuryBalance);
     vm.deal(address(reserve), reserveBalance);
@@ -572,44 +561,50 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     assertApproxEqRel(result, expected, 1e4);
   }
 
-  function test_ShouldDecreaseTheTargetVotingYieldByVotingFractionTargetVotingGoldPercentageTimesAdjustmentFactor_WhenThePercentageOfVotingGoldIs30p()
-    public
-  {
+  // At 30% voting (< 66.7% target), yield INCREASES.
+  // delta = (targetVotingGoldFraction - 0.3*FIXED1) * adjustmentFactor / FIXED1
+  function test_ShouldIncreaseTheTargetVotingYieldWhenThePercentageOfVotingGoldIs30p() public {
     uint256 totalVotes = (floatingSupply * 3) / 10;
     mockVotes(totalVotes);
-    uint256 expected = targetVotingYieldParamsInitial +
-      uint256(
-        ((targetVotingYieldParamsAdjustmentFactor * (targetVotingGoldFraction - 3 * FIXED1)) / 10)
-      );
+
+    uint256 votingFraction = (3 * FIXED1) / 10; // 0.3 * FIXED1
+    uint256 delta = (targetVotingYieldParamsAdjustmentFactor *
+      (targetVotingGoldFraction - votingFraction)) / FIXED1;
+    uint256 expected = targetVotingYieldParamsInitial + delta;
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
-    assertApproxEqRel(result, expected, 1e1);
+    // FixidityLib.multiply uses mulPrecision() intermediate truncation which may differ
+    // slightly from simple (a*b)/FIXED1; use 1e6 (1e-12 relative) tolerance.
+    assertApproxEqRel(result, expected, 1e6);
   }
 
-  function test_ShouldDecreaseTheTargetVotingYieldByVotingFractionTargetVotingGoldPercentageTimesAdjustmentFactor_WhenThePercentageOfVotingGoldIs90p()
-    public
-  {
+  // At 90% voting (> 66.7% target), yield DECREASES.
+  // delta = (0.9*FIXED1 - targetVotingGoldFraction) * adjustmentFactor / FIXED1
+  function test_ShouldDecreaseTheTargetVotingYieldWhenThePercentageOfVotingGoldIs90p() public {
     uint256 totalVotes = (floatingSupply * 9) / 10;
     mockVotes(totalVotes);
-    uint256 expected = targetVotingYieldParamsInitial +
-      uint256(
-        ((targetVotingYieldParamsAdjustmentFactor * (targetVotingGoldFraction - 9 * FIXED1)) / 10)
-      );
+
+    uint256 votingFraction = (9 * FIXED1) / 10; // 0.9 * FIXED1
+    uint256 delta = (targetVotingYieldParamsAdjustmentFactor *
+      (votingFraction - targetVotingGoldFraction)) / FIXED1;
+    uint256 expected = targetVotingYieldParamsInitial - delta;
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
-    assertApproxEqRel(result, expected, 1e1);
+    assertApproxEqRel(result, expected, 1e6);
   }
 
-  function test_ShouldDecreaseTheTargetVotingYieldBy100minusTargetVotingGoldPercentageTimesAdjustmentFactor_WhenThePercentageOfVotingGoldIs100P()
-    public
-  {
+  // At 100% voting (> 66.7% target), yield DECREASES.
+  // delta = (FIXED1 - targetVotingGoldFraction) * adjustmentFactor / FIXED1
+  function test_ShouldDecreaseTheTargetVotingYieldWhenThePercentageOfVotingGoldIs100P() public {
     uint256 totalVotes = floatingSupply * 1; // explicit one
     mockVotes(totalVotes);
-    uint256 expected = targetVotingYieldParamsInitial +
-      uint256((targetVotingYieldParamsAdjustmentFactor * (targetVotingGoldFraction - FIXED1)));
+
+    uint256 delta = (targetVotingYieldParamsAdjustmentFactor *
+      (FIXED1 - targetVotingGoldFraction)) / FIXED1;
+    uint256 expected = targetVotingYieldParamsInitial - delta;
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
-    assertApproxEqRel(result, expected, 1e1);
+    assertApproxEqRel(result, expected, 1e6);
   }
 
   function test_ShouldEnforceMaximumTargetVotingYield_WhenTargetVotingYieldIsIncreasedByAdjustmentFactor()
@@ -653,10 +648,11 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
       _updateTargetVotingYieldBasedOnLayer();
     }
 
-    uint256 expected = targetVotingYieldParamsInitial +
-      (targetVotingYieldParamsAdjustmentFactor *
-        ((targetVotingGoldFraction / FIXED1 - 0.3e24) / FIXED1) *
-        5);
+    // delta per epoch = (targetVotingGoldFraction - 0.3*FIXED1) * adjustmentFactor / FIXED1
+    uint256 votingFraction = (3 * FIXED1) / 10;
+    uint256 deltaPerEpoch = (targetVotingYieldParamsAdjustmentFactor *
+      (targetVotingGoldFraction - votingFraction)) / FIXED1;
+    uint256 expected = targetVotingYieldParamsInitial + deltaPerEpoch * 5;
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
     assertApproxEqRel(result, expected, 1e7);
@@ -672,10 +668,11 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
       _updateTargetVotingYieldBasedOnLayer();
     }
 
-    uint256 expected = targetVotingYieldParamsInitial +
-      (targetVotingYieldParamsAdjustmentFactor *
-        ((targetVotingGoldFraction / FIXED1 - 8e24 / 10) / FIXED1) *
-        5);
+    // delta per epoch = (0.8*FIXED1 - targetVotingGoldFraction) * adjustmentFactor / FIXED1
+    uint256 votingFraction = (8 * FIXED1) / 10;
+    uint256 deltaPerEpoch = (targetVotingYieldParamsAdjustmentFactor *
+      (votingFraction - targetVotingGoldFraction)) / FIXED1;
+    uint256 expected = targetVotingYieldParamsInitial - deltaPerEpoch * 5;
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
     assertApproxEqRel(result, expected, 1e6);
@@ -697,12 +694,20 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     for (uint256 i = 0; i < votingNumeratorArray.length; i++) {
       uint256 totalVotes = (floatingSupply * votingNumeratorArray[i]) / votingDenominatorArray[i];
       mockVotes(totalVotes);
-      expected =
-        expected +
-        (targetVotingYieldParamsAdjustmentFactor *
-          ((targetVotingGoldFraction /
-            FIXED1 -
-            ((votingNumeratorArray[i] * FIXED1) / votingDenominatorArray[i])) / FIXED1));
+
+      uint256 actualFraction = (votingNumeratorArray[i] * FIXED1) / votingDenominatorArray[i];
+      if (actualFraction > targetVotingGoldFraction) {
+        uint256 delta = (targetVotingYieldParamsAdjustmentFactor *
+          (actualFraction - targetVotingGoldFraction)) / FIXED1;
+        expected = expected > delta ? expected - delta : 0;
+      } else if (actualFraction < targetVotingGoldFraction) {
+        uint256 delta = (targetVotingYieldParamsAdjustmentFactor *
+          (targetVotingGoldFraction - actualFraction)) / FIXED1;
+        expected = expected + delta;
+        if (expected > targetVotingYieldParamsMax) {
+          expected = targetVotingYieldParamsMax;
+        }
+      }
     }
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
@@ -721,7 +726,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     uint256 expected = targetVotingYieldParamsInitial +
       ((targetVotingYieldParamsAdjustmentFactor * 365) / 10);
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
-    assertApproxEqRel(result, expected, 1e16); // TODO I suspect it has a 1% error due rounding errors, but need to double check
+    assertApproxEqRel(result, expected, 1e16);
   }
 
   function test_ShouldChangeTargetVotingYield_WhenTargetVotingYieldIsDecreasedOver365EpochsByAdjustmentFactor()
@@ -736,7 +741,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     uint256 expected = targetVotingYieldParamsInitial -
       ((targetVotingYieldParamsAdjustmentFactor * 365) / 10);
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
-    assertApproxEqRel(result, expected, 1e16); // TODO I suspect it has a 1% error due rounding errors, but need to double check
+    assertApproxEqRel(result, expected, 1e16);
   }
 
   function mockVotes(uint256 votes) internal {
@@ -748,20 +753,20 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
 contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAndTheActualRemainingSupplyIs10pMoreThanTheTargetRemainingSupplyAfterRewards_calculateTargetEpochRewards is
   EpochRewardsTest
 {
-  uint256 constant numberValidators = 100;
+  uint256 constant NUM_VALIDATORS = 100;
   uint256 constant activeVotes = 102398474 ether;
   uint256 constant timeDelta = YEAR * 10;
   uint256 expectedMultiplier;
   uint256 validatorReward;
   uint256 votingReward;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
-    _setNumberOfElectedInCurrentSetBaseOnLayer(numberValidators);
+    _setNumberOfElectedInCurrentSetBaseOnLayer(NUM_VALIDATORS);
     election.setActiveVotes(activeVotes);
     uint256 expectedTargetTotalEpochPaymentsInGold = (targetValidatorEpochPayment *
-      numberValidators) / exchangeRate;
+      NUM_VALIDATORS) / exchangeRate;
 
     uint256 expectedTargetEpochRewards = (targetVotingYieldParamsInitial * activeVotes) / FIXED1;
 
@@ -778,7 +783,7 @@ contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAn
     );
     expectedMultiplier = (FIXED1 + rewardsMultiplierAdjustmentsUnderspend / 10);
 
-    validatorReward = (targetValidatorEpochPayment * numberValidators) / exchangeRate;
+    validatorReward = (targetValidatorEpochPayment * NUM_VALIDATORS) / exchangeRate;
     votingReward = (targetVotingYieldParamsInitial * activeVotes) / FIXED1;
 
     timeTravel(timeDelta);

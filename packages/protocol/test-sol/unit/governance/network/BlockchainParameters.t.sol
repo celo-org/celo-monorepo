@@ -1,26 +1,33 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.8.7 <0.8.20;
 
-import "@celo-contracts/governance/BlockchainParameters.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
+import { BlockchainParameters } from "@celo-contracts-8/governance/BlockchainParameters.sol";
+import "@celo-contracts/governance/interfaces/IBlockchainParameters.sol";
+import "@celo-contracts/governance/interfaces/IBlockchainParametersInitializer.sol";
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 
-contract BlockchainParametersTest is TestWithUtils {
+contract BlockchainParametersTest is TestWithUtils08 {
   uint256 constant gasLimit = 7000000;
   uint256 constant gasForNonGoldCurrencies = 50000;
   address nonOwner;
 
-  BlockchainParameters blockchainParameters;
+  IBlockchainParameters blockchainParameters;
+  address blockchainParametersAddress;
 
   event IntrinsicGasForAlternativeFeeCurrencySet(uint256 gas);
   event BlockGasLimitSet(uint256 limit);
   event UptimeLookbackWindowSet(uint256 window, uint256 activationEpoch);
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     nonOwner = actor("nonOwner");
     ph.setEpochSize(DAY / 5);
-    blockchainParameters = new BlockchainParameters(true);
+    BlockchainParameters bp = new BlockchainParameters(true);
+    blockchainParametersAddress = address(bp);
+    blockchainParameters = IBlockchainParameters(blockchainParametersAddress);
     whenL2WithEpochManagerInitialization();
   }
 }
@@ -30,7 +37,11 @@ contract BlockchainParametersTest_initialize is BlockchainParametersTest {
 
   function test_Reverts_WhenCalledOnL2() public {
     vm.expectRevert("This method is no longer supported in L2.");
-    blockchainParameters.initialize(gasForNonGoldCurrencies, gasLimit, lookbackWindow);
+    IBlockchainParametersInitializer(blockchainParametersAddress).initialize(
+      gasForNonGoldCurrencies,
+      gasLimit,
+      lookbackWindow
+    );
   }
 }
 

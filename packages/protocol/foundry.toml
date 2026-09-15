@@ -4,7 +4,7 @@
 lint_on_build = false
 
 [profile.default]
-src = 'contracts-0.8'
+src = 'contracts'
 out = 'out'
 test = 'test-sol'
 libs = ['lib', 'node_modules']
@@ -20,13 +20,13 @@ no_match_path = "{**/test/BLS12Passthrough.sol,**/test/RandomTest.sol,**/test-so
 
 fs_permissions = [
   { access = "read", path = "./out"},
-  { access = "read", path = "./out-truffle-compat"},
+  { access = "read", path = "./out-solc-0.5"},
   { access = "read", path = "./out-truffle-compat-0.8"},
   { access = "read", path = "./migrations_sol/migrationsConfig.json"},
   { access = "read", path = "./migrations_sol/"},
   { access = "read", path = "./governanceConstitution.json"},
   { access = "read", path = "./artifacts/"},
-  { access = "read", path = "./.tmp/selectors" }
+  { access = "read", path = "./.tmp/selectors" },
 ]
 
 
@@ -40,12 +40,16 @@ no_match_path = "{**/test/BLS12Passthrough.sol,**/test/RandomTest.sol}"
 # from https://github.com/celo-org/celo-monorepo/pull/11488/
 
 # Profile to match Truffle configuration for 0.5.13 contracts
-[profile.truffle-compat]
+# Frozen Solidity 0.5 sources: the proxies and their helpers. Nothing under contracts-0.5
+# is part of the regular build; this profile reproduces the bytecode deployed on mainnet
+# (see artifacts/solc-0.5) and builds the vendored Mento contracts for the devchain.
+# (TOML would split a dotted profile name, hence solc05.)
+[profile.solc05]
 skip=[
     "test-sol/**",          # skip everything under test-sol
   ]
-src = 'contracts'
-out = 'out-truffle-compat'
+src = 'contracts-0.5'
+out = 'out-solc-0.5'
 libs = ['lib', 'node_modules']
 solc_version = '0.5.14'
 ast = true
@@ -54,7 +58,7 @@ evm_version = 'istanbul'
 metadata_literal = true
 via_ir = false
 
-[profile.truffle-compat.lint]
+[profile.solc05.lint]
 lint_on_build = false
 
 # Profile to match Truffle configuration for 0.8.19 contracts
@@ -62,7 +66,7 @@ lint_on_build = false
 skip=[
     "test-sol/**",          # skip everything under test-sol
 ]
-src = 'contracts-0.8'
+src = 'contracts'
 out = 'out-truffle-compat-0.8'
 libs = ['lib', 'node_modules']
 solc_version = '0.8.19'

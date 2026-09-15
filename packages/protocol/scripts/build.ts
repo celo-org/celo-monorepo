@@ -3,7 +3,7 @@
 // Flag ordering:
 //   --solidity <outdir>   Runs `forge build` and writes truffle-style flat JSONs
 //                         ({contractName, abi, bytecode, deployedBytecode}) to
-//                         <outdir>/contracts/ and <outdir>/contracts-0.8/.
+//                         <outdir>/contracts/ (frozen 0.5 artifacts) and <outdir>/contracts-0.8/ (0.8 build).
 //   --web3Types <outdir>  Reads the truffle-style JSONs (set BUILD_DIR to point
 //                         at the same dir --solidity wrote to) and generates
 //                         web3 typings. REQUIRES --solidity to have run first.
@@ -31,7 +31,7 @@ interface ContractArtifact {
 const readJSON = (file: string): ContractArtifact =>
   JSON.parse(readFileSync(file, 'utf-8')) as ContractArtifact
 
-const FOUNDRY_OUT_05 = 'out-truffle-compat'
+const FOUNDRY_OUT_05 = SOLIDITY_05_PACKAGE.forgeOutDir
 const FOUNDRY_OUT_08 = 'out-truffle-compat-0.8'
 
 function exec(cmd: string) {
@@ -85,9 +85,9 @@ function emitTruffleStyleArtifacts(outdir: string) {
 }
 
 function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
-  console.info(`protocol: Compiling solidity with foundry (truffle-compat profiles)`)
+  console.info(`protocol: Compiling solidity with foundry (truffle-compat8 profile)`)
 
-  exec(`FOUNDRY_PROFILE=truffle-compat forge build`)
+  // The 0.5 sources (proxies) are not rebuilt; their frozen artifacts are read as-is.
   exec(`FOUNDRY_PROFILE=truffle-compat8 forge build`)
 
   const contracts = coreContractsOnly ? CoreContracts : ImplContracts

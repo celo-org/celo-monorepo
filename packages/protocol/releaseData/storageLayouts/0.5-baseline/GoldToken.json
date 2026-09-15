@@ -1,0 +1,64 @@
+[
+  {
+    "label": "initialized",
+    "offset": 0,
+    "slot": "0",
+    "type": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    }
+  },
+  {
+    "label": "_owner",
+    "offset": 1,
+    "slot": "0",
+    "type": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    }
+  },
+  {
+    "label": "registry",
+    "offset": 0,
+    "slot": "1",
+    "type": {
+      "encoding": "inplace",
+      "label": "contract IRegistry",
+      "numberOfBytes": "20"
+    }
+  },
+  {
+    "label": "deprecated_totalSupply_",
+    "offset": 0,
+    "slot": "2",
+    "type": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  },
+  {
+    "label": "allowed",
+    "offset": 0,
+    "slot": "3",
+    "type": {
+      "encoding": "mapping",
+      "key": "address",
+      "label": "mapping(address => mapping(address => uint256))",
+      "numberOfBytes": "32",
+      "value": {
+        "encoding": "mapping",
+        "key": "address",
+        "label": "mapping(address => uint256)",
+        "numberOfBytes": "32",
+        "value": {
+          "encoding": "inplace",
+          "label": "uint256",
+          "numberOfBytes": "32"
+        }
+      }
+    }
+  }
+]

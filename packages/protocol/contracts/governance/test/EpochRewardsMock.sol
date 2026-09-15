@@ -1,25 +1,62 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.8.7 <0.8.20;
 
-import "../EpochRewards.sol";
+import "../interfaces/IEpochRewards.sol";
 
 /**
  * @title A wrapper around EpochRewards that exposes internal functions for testing.
  */
-contract EpochRewardsMock is EpochRewards(true) {
+contract EpochRewardsMock08 is IEpochRewards {
   uint256 private numValidatorsInCurrentSet;
+  address public carbonOffsettingPartner;
+
+  uint256 public perValidatorReward = 5;
+  uint256 public totalRewardsVoter = 6;
+  uint256 public totalRewardsCommunity = 7;
+  uint256 public totalRewardsCarbonFund = 8;
 
   function setNumberValidatorsInCurrentSet(uint256 value) external {
     numValidatorsInCurrentSet = value;
   }
 
-  function getRewardsMultiplier(
-    uint256 targetGoldTotalSupplyIncrease
-  ) external view returns (uint256) {
-    return _getRewardsMultiplier(targetGoldTotalSupplyIncrease).unwrap();
+  function updateTargetVotingYield() external {}
+
+  function getRewardsMultiplier(uint256) external pure returns (uint256) {
+    return 0;
+  }
+
+  function calculateTargetEpochRewards()
+    external
+    view
+    returns (uint256, uint256, uint256, uint256)
+  {
+    return (perValidatorReward, totalRewardsVoter, totalRewardsCommunity, totalRewardsCarbonFund);
+  }
+  function getTargetVotingYieldParameters() external pure returns (uint256, uint256, uint256) {
+    return (0, 0, 0);
+  }
+  function getRewardsMultiplierParameters() external pure returns (uint256, uint256, uint256) {
+    return (0, 0, 0);
+  }
+  function getCommunityRewardFraction() external pure returns (uint256) {
+    return 0;
+  }
+  function getCarbonOffsettingFraction() external pure returns (uint256) {
+    return 0;
+  }
+  function getTargetVotingGoldFraction() external pure returns (uint256) {
+    return 0;
+  }
+  function getRewardsMultiplier() external pure returns (uint256) {
+    return 0;
   }
 
   // mocks the precompile
   function numberValidatorsInCurrentSet() public view returns (uint256) {
     return numValidatorsInCurrentSet;
+  }
+
+  function setCarbonOffsettingPartner(address partner) external {
+    carbonOffsettingPartner = partner;
   }
 }

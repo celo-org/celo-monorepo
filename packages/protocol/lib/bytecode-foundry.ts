@@ -93,6 +93,47 @@ export const verifyAndStripLibraryPrefix = (bytecode: string, address = NULL_ADD
   return bytecode.slice(4 + ADDRESS_LENGTH, bytecode.length)
 }
 
+const LINK_PLACEHOLDER_REGEXP = /__\$[0-9a-f]{34}\$__/g
+
+/*
+ * Whether the code at a library address was compiled from the given artifact.
+ * Compares the on-chain runtime bytecode with the artifact's deployedBytecode after
+ * removing what legitimately differs between them: the trailing metadata hash, the
+ * library's own address stamped into the call-protection prefix at deployment, and
+ * any link placeholders the artifact still carries for libraries of its own.
+ */
+export const deployedLibraryMatchesArtifact = (
+  onchainBytecode: string,
+  artifactDeployedBytecode: string,
+  address: string
+): boolean => {
+  let onchain: string
+  let expected: string
+  try {
+    onchain = stripMetadata(onchainBytecode).toLowerCase()
+    expected = stripMetadata(artifactDeployedBytecode).toLowerCase()
+    if (expected.slice(2, 4) === PUSH20_OPCODE) {
+      onchain = verifyAndStripLibraryPrefix(onchain, address)
+      expected = verifyAndStripLibraryPrefix(expected)
+    }
+  } catch (e) {
+    // an unknown metadata trailer or a missing call-protection prefix means the code
+    // was not produced by the compiler that produced the artifact
+    return false
+  }
+  if (onchain.length !== expected.length) {
+    return false
+  }
+  let masked = onchain
+  LINK_PLACEHOLDER_REGEXP.lastIndex = 0
+  let match = LINK_PLACEHOLDER_REGEXP.exec(expected)
+  while (match !== null) {
+    masked = masked.slice(0, match.index) + match[0] + masked.slice(match.index + match[0].length)
+    match = LINK_PLACEHOLDER_REGEXP.exec(expected)
+  }
+  return masked === expected
+}
+
 /*
  * Stores info about libraries linked in an artifact.
  * Specifically, for each library, it stores:
