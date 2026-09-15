@@ -62,3 +62,8 @@ opencode.json
 # usat-rewards hot wallet env
 scripts/usat-rewards/.env
 scripts/usat-rewards/.env.topoff
+
+# usat-rewards local payment memory: the only record of payments Dune has not
+# indexed yet, so it must survive `git clean` and never be committed.
+scripts/usat-rewards/paid-ledger.json
+scripts/usat-rewards/.run-lock/
