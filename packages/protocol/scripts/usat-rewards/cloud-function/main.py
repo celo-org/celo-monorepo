@@ -30,12 +30,19 @@ Environment (plain env vars):
                       post-bump campaign maximum of 5000000 (5 USA₮)
   MAX_TOTAL_PER_RUN   micro-USA₮, default 100000000 (100 USA₮) — a larger owed
                       total aborts the run for manual review
-  MIN_GAS_CELO        CELO floor for gas, default 1; the whole-run estimate is
-                      used when it is higher
-  FEE_CURRENCY_ADAPTER  USA₮ fee-currency adapter for CIP-64 gas payment
+  MIN_GAS_CELO        small CELO floor for gas, default 0.05. The whole-run
+                      estimate (wallets owed × one transfer's gas) governs
+                      whenever it is higher, so keep the floor low enough that
+                      the estimate is what actually decides
+  FEE_CURRENCY_ADAPTER  USA₮ fee-currency adapter for CIP-64 gas payment; empty
+                      disables the fallback, and a gas tank below the estimate
+                      then aborts the run instead of starting it
   ALLOW_DISTRIBUTOR_CHANGE  "1" = accept a hot wallet different from the pinned
                       one (only after migrating the payment history)
-  DRY_RUN             "1" = report what would be paid, send nothing
+  DRY_RUN             "1" = report what would be paid, send nothing and write
+                      nothing
+  FUNCTION_TIMEOUT_SECONDS  the Cloud Run request timeout deploy.sh sets,
+                      default 3600; the run-lock staleness window derives from it
 
 Secrets (mount via Secret Manager):
   PRIVATE_KEY         hot wallet key
@@ -85,7 +92,13 @@ DISTRIBUTOR_OBJECT = "distributor.json"
 # runs again. Redeploying or deleting the function does NOT stop an in-flight
 # request — Cloud Run keeps it alive — so this flag is the only reliable halt.
 HALT_OBJECT = "HALT"
-LOCK_STALE_SECONDS = 3600
+# A lock may only be broken once the run holding it cannot possibly still be
+# alive. Cloud Run keeps a request going until the function timeout, and the
+# last transfer of a run can still be waiting for its receipt right at that
+# edge — so the staleness window is the deployed timeout plus a margin, never
+# the timeout itself. deploy.sh passes the timeout it configures.
+FUNCTION_TIMEOUT_SECONDS = int(os.environ.get("FUNCTION_TIMEOUT_SECONDS", "3600"))
+LOCK_STALE_SECONDS = FUNCTION_TIMEOUT_SECONDS + 1800
 CELO_GAS_LIMIT = 100_000
 # Celo fee abstraction: when the wallet has no CELO, transfers are sent as
 # CIP-64 transactions that pay gas in USA₮ through its fee-currency adapter.
@@ -103,11 +116,12 @@ class DuneStillRunning(Exception):
 
 
 class PendingTransferUnresolved(Exception):
-    """A broadcast transfer is neither mined nor dead — nothing may be sent."""
+    """A broadcast transfer cannot be settled automatically — nothing may be sent."""
 
-    def __init__(self, tx_hash: str):
-        super().__init__(tx_hash)
+    def __init__(self, tx_hash: str, reason: str):
+        super().__init__(f"{tx_hash}: {reason}")
         self.tx_hash = tx_hash
+        self.reason = reason
 
 
 # ---------------------------------------------------------------- state store
@@ -211,8 +225,14 @@ class LocalStore:
             return json.load(f)
 
     def put_json(self, name: str, data: dict) -> None:
-        with open(os.path.join(self.dir, name), "w") as f:
+        # Temp file + rename: a crash mid-write would otherwise truncate the
+        # ledger, which is the only record of payments Dune has not indexed yet.
+        path = os.path.join(self.dir, name)
+        with open(f"{path}.tmp", "w") as f:
             json.dump(data, f, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(f"{path}.tmp", path)
 
     def delete(self, name: str) -> None:
         path = os.path.join(self.dir, name)
@@ -369,10 +389,43 @@ def reconcile(dune_rows: list[dict], ledger: dict) -> tuple[dict[str, int], dict
         },
         "recorded_tx_hashes": sorted(ledger.get("recorded_tx_hashes", [])),
     }
+    # Keep the token/chain stamp: it is what stops a rehearsal against a test
+    # token from being mistaken for mainnet payment memory, so it has to survive
+    # every reconcile.
+    for field in ("token", "chain_id"):
+        if ledger.get(field) is not None:
+            new_ledger[field] = ledger[field]
     return owed_out, new_ledger
 
 
+def ledger_scope_error(ledger: dict, token_address: str, chain_id: int) -> str | None:
+    """Reject payment memory that was written for another token or chain.
+
+    One run with USAT_ADDRESS pointed at a test token against the production
+    bucket would otherwise fold rehearsal payments into the mainnet ledger and
+    suppress rewards that were never really paid.
+    """
+    for field, expected in (("token", token_address), ("chain_id", chain_id)):
+        actual = ledger.get(field)
+        if actual is not None and str(actual).lower() != str(expected).lower():
+            return (
+                f"ledger is scoped to {field}={actual}, refusing to reconcile {expected}; "
+                "use a separate bucket for another chain or token"
+            )
+    return None
+
+
+def stamp_ledger(ledger: dict, token_address: str, chain_id: int) -> dict:
+    return {**ledger, "token": token_address.lower(), "chain_id": chain_id}
+
+
 def ledger_add(ledger: dict, wallet: str, amount: int, tx_hash: str) -> dict:
+    """Fold one confirmed transfer into the ledger, keyed by its hash: a receipt
+    that is read twice — a retry, or an intent whose deletion failed — must not
+    count the same payment twice."""
+    recorded = set(ledger.get("recorded_tx_hashes", []))
+    if tx_hash in recorded:
+        return ledger
     paid = dict(zip(ledger.get("recipients", []), ledger.get("amounts", [])))
     paid[wallet] = paid.get(wallet, 0) + amount
     wallets = sorted(paid)
@@ -380,30 +433,77 @@ def ledger_add(ledger: dict, wallet: str, amount: int, tx_hash: str) -> dict:
         **ledger,
         "recipients": wallets,
         "amounts": [paid[w] for w in wallets],
-        "recorded_tx_hashes": sorted(set(ledger.get("recorded_tx_hashes", [])) | {tx_hash}),
+        "recorded_tx_hashes": sorted(recorded | {tx_hash}),
     }
 
 
-def resolve_pending_transfer(w3, store, token, ledger: dict) -> dict:
+def transfer_is_dropped(w3, pending: dict) -> bool:
+    """Is a broadcast transfer definitively gone?
+
+    A consumed nonce alone does not prove it: forno load-balances across nodes,
+    so a node lagging behind can answer "no receipt" for a transaction that is
+    already mined, and discarding the intent then pays the reward a second time.
+    Require both a nonce that moved past this transaction and a node that knows
+    nothing at all about the hash — anything inconclusive keeps the intent.
+    """
+    try:
+        if w3.eth.get_transaction_count(pending["from"], "latest") <= pending["nonce"]:
+            return False
+        try:
+            # A known transaction is either mined (blockNumber set) or still
+            # queued; neither is dead.
+            w3.eth.get_transaction(pending["tx_hash"])
+            return False
+        except TransactionNotFound:
+            pass
+        # Second opinion from the pool: another node may hold the receipt.
+        w3.eth.get_transaction_receipt(pending["tx_hash"])
+        return False
+    except TransactionNotFound:
+        return True
+    except Exception:  # noqa: BLE001 - an RPC hiccup is not proof of anything
+        return False
+
+
+def resolve_pending_transfer(w3, store, token, ledger: dict, dry_run: bool) -> dict:
     """Fold a transfer that was broadcast but never recorded into the ledger.
 
     Without this, a receipt lost to a timeout or a killed process leaves a
     confirmed transfer invisible to both Dune (not indexed yet) and the ledger,
     and the next run pays it again.
+
+    A dry run only inspects: it never re-broadcasts, never writes the ledger and
+    never clears the intent, so its report describes what a real run would
+    settle without touching any of the state.
     """
     pending = store.get_json(PENDING_TRANSFER_OBJECT)
     if not pending:
         return ledger
+    tx_hash = pending["tx_hash"]
+    if tx_hash in set(ledger.get("recorded_tx_hashes", [])):
+        # Already in the ledger; the intent only survived because deleting it
+        # failed after the save.
+        if not dry_run:
+            store.delete(PENDING_TRANSFER_OBJECT)
+        return ledger
     try:
-        receipt = w3.eth.get_transaction_receipt(pending["tx_hash"])
+        receipt = w3.eth.get_transaction_receipt(tx_hash)
     except TransactionNotFound:
         receipt = None
     if receipt is None:
-        if w3.eth.get_transaction_count(pending["from"], "latest") > pending["nonce"]:
-            # The nonce was consumed by a different transaction, so this one can
-            # never be mined: dropping the intent cannot lose a real payment.
-            store.delete(PENDING_TRANSFER_OBJECT)
+        if transfer_is_dropped(w3, pending):
+            # The nonce was consumed elsewhere and no node has heard of the
+            # hash, so this transaction can never be mined: dropping the intent
+            # cannot lose a real payment.
+            if not dry_run:
+                store.delete(PENDING_TRANSFER_OBJECT)
             return ledger
+        if dry_run:
+            raise PendingTransferUnresolved(
+                tx_hash,
+                "DRY_RUN may neither re-broadcast it nor write the ledger, so only a "
+                "real run can settle it",
+            )
         # The nonce is still free, so re-broadcasting the very same signed
         # transaction either confirms the original or is a no-op.
         try:
@@ -411,19 +511,29 @@ def resolve_pending_transfer(w3, store, token, ledger: dict) -> dict:
         except Exception:  # noqa: BLE001 - "already known" and friends are expected
             pass
         try:
-            receipt = w3.eth.wait_for_transaction_receipt(pending["tx_hash"], timeout=120)
+            receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
         except Exception:  # noqa: BLE001 - still unresolved, decided below
             receipt = None
     if receipt is None:
         # Sending anything now could pay this reward twice; a later trigger
         # retries. Delete the object from the bucket to resolve it by hand.
-        raise PendingTransferUnresolved(pending["tx_hash"])
-    if receipt.status == 1 and transfer_confirmed(
+        raise PendingTransferUnresolved(tx_hash, "neither mined nor dropped yet")
+    outcome = transfer_outcome(
         token, receipt, pending["from"], pending["wallet"], pending["amount"]
-    ):
-        ledger = ledger_add(ledger, pending["wallet"], pending["amount"], pending["tx_hash"])
-        store.save_ledger(ledger)
-    store.delete(PENDING_TRANSFER_OBJECT)
+    )
+    if receipt.status == 1 and outcome == "mismatch":
+        # Tokens moved between the same pair but not the amount the intent
+        # records. Keeping the intent is what keeps the discrepancy visible;
+        # clearing it would leave a real transfer unrecorded.
+        raise PendingTransferUnresolved(
+            tx_hash, f"moved an amount other than the recorded {pending['amount']}"
+        )
+    if receipt.status == 1 and outcome == "confirmed":
+        ledger = ledger_add(ledger, pending["wallet"], pending["amount"], tx_hash)
+        if not dry_run:
+            store.save_ledger(ledger)
+    if not dry_run:
+        store.delete(PENDING_TRANSFER_OBJECT)
     return ledger
 
 
@@ -451,16 +561,24 @@ def build_cip64_transfer(account, chain_id: int, nonce: int, token: str, data: b
     return CIP64_TX_TYPE + rlp.encode(fields + [signature.v, signature.r, signature.s])
 
 
-def transfer_confirmed(token, receipt, sender: str, wallet: str, amount: int) -> bool:
-    """A status-1 receipt is not proof of payment: a token may return false from
-    transfer without reverting, so require the matching Transfer event."""
+def transfer_outcome(token, receipt, sender: str, wallet: str, amount: int) -> str:
+    """Classify a receipt as "confirmed", "mismatch" or "none".
+
+    A status-1 receipt is not proof of payment: a token may return false from
+    transfer without reverting, so the Transfer event decides. "mismatch" means
+    tokens did move between this pair but not the amount we meant to record —
+    a fee-on-transfer token, say — which needs a human rather than a retry.
+    """
     events = token.events.Transfer().process_receipt(receipt, errors=DISCARD)
-    return any(
-        event["args"]["from"].lower() == sender.lower()
-        and event["args"]["to"].lower() == wallet.lower()
-        and event["args"]["value"] == amount
+    same_pair = [
+        event
         for event in events
-    )
+        if event["args"]["from"].lower() == sender.lower()
+        and event["args"]["to"].lower() == wallet.lower()
+    ]
+    if any(event["args"]["value"] == amount for event in same_pair):
+        return "confirmed"
+    return "mismatch" if same_pair else "none"
 
 
 # ------------------------------------------------------------------ entry
@@ -481,6 +599,7 @@ def distribute(request):
     account = w3.eth.account.from_key(private_key)
     hot_wallet = account.address
     token = w3.eth.contract(address=Web3.to_checksum_address(usat_address), abi=ERC20_ABI)
+    chain_id = w3.eth.chain_id
 
     if store.exists(HALT_OBJECT):
         return ({"result": "HALT flag present - nothing done", "hot_wallet": hot_wallet}, 423)
@@ -504,18 +623,25 @@ def distribute(request):
                     },
                     500,
                 )
-        if pinned != hot_wallet:
+        if pinned != hot_wallet and not dry_run:
+            # DRY_RUN reports, it never writes: the pin is taken on the first
+            # real run.
             store.put_json(DISTRIBUTOR_OBJECT, {"distributor": hot_wallet})
 
         ledger = store.load_ledger()
+        scope_error = ledger_scope_error(ledger, usat_address, chain_id)
+        if scope_error:
+            return ({"error": scope_error, "hot_wallet": hot_wallet, "dry_run": dry_run}, 500)
+        ledger = stamp_ledger(ledger, usat_address, chain_id)
         try:
-            ledger = resolve_pending_transfer(w3, store, token, ledger)
+            ledger = resolve_pending_transfer(w3, store, token, ledger, dry_run)
         except PendingTransferUnresolved as unresolved:
             return (
                 {
-                    "error": f"transfer {unresolved.tx_hash} was broadcast and is still unresolved; "
-                             "nothing sent. A later trigger retries once it is mined or dropped.",
+                    "error": f"transfer {unresolved.tx_hash} was broadcast and is unresolved "
+                             f"({unresolved.reason}); nothing sent.",
                     "hot_wallet": hot_wallet,
+                    "dry_run": dry_run,
                 },
                 503,
             )
@@ -537,6 +663,23 @@ def distribute(request):
         if not dry_run:
             store.save_ledger(ledger)  # persist the cleared ledger post-reconcile
 
+        # Refuse the offending row, not the whole batch: a transfer to the zero
+        # address burns the reward irreversibly and a row above the per-wallet cap
+        # is a data error, but aborting on either would block every other wallet
+        # run after run. They stay owed and are reported instead.
+        rejected = []
+        payable: dict[str, int] = {}
+        for wallet, amount in owed.items():
+            if int(wallet, 16) == 0:
+                rejected.append({"wallet": wallet, "reason": "zero address"})
+            elif amount > max_per_wallet:
+                rejected.append(
+                    {"wallet": wallet, "reason": f"owed {amount} > MAX_PER_WALLET {max_per_wallet}"}
+                )
+            else:
+                payable[wallet] = amount
+        owed = payable
+
         total = sum(owed.values())
         summary = {
             "hot_wallet": hot_wallet,
@@ -544,16 +687,10 @@ def distribute(request):
             "total_usat": total / 1e6,
             "dry_run": dry_run,
         }
+        if rejected:
+            summary["rejected"] = rejected
         if not owed:
             return ({**summary, "result": "nothing owed"}, 200)
-
-        for wallet, amount in owed.items():
-            # A transfer to the zero address burns the reward irreversibly and
-            # would then be recorded as paid, so refuse the whole run.
-            if int(wallet, 16) == 0:
-                return ({**summary, "error": "zero-address recipient in the Dune result"}, 500)
-            if amount > max_per_wallet:
-                return ({**summary, "error": f"{wallet} owed {amount} > MAX_PER_WALLET"}, 500)
         if total > max_total_per_run:
             return ({**summary, "error": f"total {total} > MAX_TOTAL_PER_RUN, manual review"}, 500)
 
@@ -563,22 +700,24 @@ def distribute(request):
         summary["token_balance_usat"] = token_balance / 1e6
         summary["gas_balance_celo"] = gas_balance / 1e18
         # Gas for the WHOLE run, not a flat floor: a prefix of the payouts must
-        # never succeed only for the rest to die of an empty gas tank.
-        min_gas_wei = int(float(os.environ.get("MIN_GAS_CELO", "1")) * 10 ** 18)
+        # never succeed only for the rest to die of an empty gas tank. The floor
+        # is deliberately small — it only rules out a dust balance — so that the
+        # per-run estimate is what actually decides.
+        min_gas_wei = int(float(os.environ.get("MIN_GAS_CELO", "0.05")) * 10 ** 18)
         required_gas_wei = max(min_gas_wei, len(owed) * CELO_GAS_LIMIT * gas_price)
         summary["gas_required_celo"] = required_gas_wei / 1e18
-        funded = token_balance >= total and gas_balance >= required_gas_wei
-
-        if dry_run:
-            # Dry run reports what a real run would do, funded or not.
-            return ({**summary, "result": "dry run - nothing sent", "funded": funded}, 200)
 
         # Gas mode: CELO when there is enough of it for every transfer in this
-        # run, otherwise pay gas in USA₮ via the fee-currency adapter and
-        # reserve that gas out of the token balance.
+        # run, otherwise pay gas in USA₮ via the fee-currency adapter and reserve
+        # that gas out of the token balance. Decided before the dry-run report,
+        # so the report describes the mode a real run would actually pick — with
+        # no CELO but enough USA₮ for payouts plus gas, that run pays in full.
         fee_currency = os.environ.get("FEE_CURRENCY_ADAPTER", FEE_CURRENCY_ADAPTER_DEFAULT)
-        gas_in_usat = gas_balance < required_gas_wei and bool(fee_currency)
+        short_on_celo = gas_balance < required_gas_wei
+        gas_in_usat = short_on_celo and bool(fee_currency)
         gas_reserve = 0
+        fc_max_fee = fc_priority = 0
+        payable_balance = token_balance
         if gas_in_usat:
             fc_max_fee, fc_priority = fee_currency_gas_quote(w3, fee_currency)
             # Adapter quotes are 18-decimal while USA₮ balances here are
@@ -586,14 +725,49 @@ def distribute(request):
             # on its own — so reserve the sum of per-transaction ceilings
             # instead of flooring the combined estimate once.
             per_transfer = -(-(FEE_CURRENCY_GAS_LIMIT * fc_max_fee) // 10 ** 12)
-            gas_reserve = len(owed) * per_transfer
+            # Reserve gas only for the transfers this run can actually send. The
+            # loop below walks the same order and skips whatever the balance does
+            # not cover, so reserving for every owed wallet would let a large
+            # under-funded set abort instead of paying the prefix it can afford.
+            affordable = 0
+            committed = 0
+            for _, amount in sorted(owed.items()):
+                if committed + amount + per_transfer > token_balance:
+                    continue
+                committed += amount + per_transfer
+                affordable += 1
+            gas_reserve = affordable * per_transfer
+            payable_balance = token_balance - gas_reserve
             summary["gas_mode"] = "USAT via fee currency"
             summary["gas_reserve_usat"] = gas_reserve / 1e6
-            if token_balance <= gas_reserve:
-                return ({**summary, "error": "no CELO and not enough USAT to even cover gas"}, 500)
-            token_balance -= gas_reserve
+        elif short_on_celo:
+            summary["gas_mode"] = "none - short on CELO with no FEE_CURRENCY_ADAPTER"
         else:
             summary["gas_mode"] = "CELO"
+        funded = (not short_on_celo or gas_in_usat) and payable_balance >= total
+
+        if dry_run:
+            # Dry run reports what a real run would do, funded or not.
+            return ({**summary, "result": "dry run - nothing sent", "funded": funded}, 200)
+
+        if short_on_celo and not fee_currency:
+            # Neither enough CELO for the whole run nor a fee currency to fall
+            # back on: starting would pay a prefix and then die mid-run.
+            return (
+                {
+                    **summary,
+                    "error": "gas balance below the whole-run estimate and no "
+                             "FEE_CURRENCY_ADAPTER configured - nothing sent",
+                },
+                500,
+            )
+        if gas_in_usat and gas_reserve == 0:
+            return (
+                {**summary, "error": "no CELO and not enough USAT to cover even one transfer "
+                                     "plus its gas"},
+                500,
+            )
+        token_balance = payable_balance
         if token_balance < total:
             # Partial mode: pay as many wallets as the balance covers. Whatever is
             # skipped stays "owed" in the ledger and is paid by a later run once
@@ -605,7 +779,6 @@ def distribute(request):
             return ({**summary, "result": "HALT flag present - nothing sent"}, 423)
 
         nonce = w3.eth.get_transaction_count(hot_wallet, "pending")
-        chain_id = w3.eth.chain_id
         paid_count = 0
         skipped_unfunded = 0
         remaining_balance = token_balance
@@ -648,7 +821,18 @@ def distribute(request):
                     {**summary, "paid": paid_count, "error": f"send to {wallet} failed: {error}"[:500]},
                     500,
                 )
-            if receipt.status != 1 or not transfer_confirmed(token, receipt, hot_wallet, wallet, amount):
+            outcome = transfer_outcome(token, receipt, hot_wallet, wallet, amount)
+            if receipt.status == 1 and outcome == "mismatch":
+                # Tokens moved but not the amount the intent records. Keep the
+                # intent: clearing it would leave a real transfer unrecorded and
+                # this wallet would be paid a second time.
+                return (
+                    {**summary, "paid": paid_count,
+                     "error": f"transfer to {wallet} moved an amount other than {amount}; "
+                              "its pending intent is kept for manual reconciliation"},
+                    500,
+                )
+            if receipt.status != 1 or outcome != "confirmed":
                 store.delete(PENDING_TRANSFER_OBJECT)
                 return (
                     {**summary, "paid": paid_count,
@@ -674,4 +858,10 @@ def distribute(request):
             200,
         )
     finally:
-        store.release_lock()
+        try:
+            store.release_lock()
+        except Exception as error:  # noqa: BLE001 - any release problem, logged not raised
+            # The lock times out on its own, so a failed release (the object was
+            # already gone, or another run owns it) must never turn a finished
+            # payout into a 500 the scheduler then retries.
+            print(f"WARNING: releasing the run lock failed: {error}")
