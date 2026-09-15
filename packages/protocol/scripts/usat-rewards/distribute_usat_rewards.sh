@@ -232,6 +232,14 @@ record_payments() {
     fi
 }
 
+# Recording may only happen once the artifact at that path is known to belong to
+# this round — which is decided further down, after the signer is derived. An
+# exit before that point (a rejected key, a signer that is not the declared
+# distributor) must not have this trap record someone else's artifact into the
+# ledger this run selected, which for a fresh ledger would even be accepted and
+# stamp it for the wrong wallet.
+ARTIFACT_IS_OURS=0
+
 # Record on every exit path, signals included: a confirmed transfer that never
 # reaches the ledger is exactly what makes the next run pay it again. A failure
 # to record is therefore fatal rather than a warning — the transfers are on
@@ -239,7 +247,12 @@ record_payments() {
 # next run send them all over again.
 cleanup() {
     local status=$?
-    if [ "$BROADCAST" = "1" ]; then
+    if [ "$BROADCAST" = "1" ] && [ "$ARTIFACT_IS_OURS" = "0" ] \
+        && [ -f "$(broadcast_file)" ]; then
+        echo "note: exiting before the broadcast artifact could be attributed to this round," >&2
+        echo "so nothing was recorded into $PAID_LEDGER_FILE." >&2
+    fi
+    if [ "$BROADCAST" = "1" ] && [ "$ARTIFACT_IS_OURS" = "1" ]; then
         if ! record_payments; then
             echo >&2
             echo "FATAL: the paid ledger could NOT be fully recorded after broadcasting." >&2
@@ -317,6 +330,13 @@ if [ "$BROADCAST" = "1" ] && [ -f "$(broadcast_file)" ]; then
             exit 1
         fi
     fi
+fi
+
+# From here on whatever sits at that path is this round's: either it was just
+# validated or archived above, or forge is about to write it. Only now may the
+# exit trap record it.
+if [ "$BROADCAST" = "1" ]; then
+    ARTIFACT_IS_OURS=1
 fi
 
 # Always distribute from a FRESH Dune snapshot: re-run the ledger query before
