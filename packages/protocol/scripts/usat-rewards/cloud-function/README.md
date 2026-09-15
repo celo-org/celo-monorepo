@@ -20,20 +20,40 @@ DUNE_API_KEY=... \
 ```
 
 Creates (idempotently): the state bucket, the two Secret Manager secrets, an
-invoker service account, the function (`--max-instances 1`, no unauthenticated
-access), and a Cloud Scheduler job (default Mondays 09:00 UTC — override with
-`SCHEDULE="..."`).
+invoker service account, a runtime service account with object access to the
+bucket and read access to both secrets, the function (`--max-instances 1`, no
+unauthenticated access), and a Cloud Scheduler job (default Mondays 09:00 UTC —
+override with `SCHEDULE="..."`).
 
 First deploy with `DRY_RUN=1` env on deploy.sh, trigger once, read the JSON
 response in the logs, then redeploy with `DRY_RUN=0`.
 
 ## Safety rails
 
-- `MAX_PER_WALLET` (default 1 USA₮) — larger owed entry aborts the run
-- `MAX_TOTAL_PER_RUN` (default 100 USA₮) — larger total aborts for manual
-  review; raise deliberately if a big backlog is expected
-- Token + gas balance checks before the first transfer
-- GCS generation-guarded run lock (stale after 1h) + `--max-instances 1`
+The caps come from the deployment, not from the code fallbacks — `deploy.sh`
+passes the post-bump campaign values, so these are what is actually enforced:
+
+- `MAX_PER_WALLET` — 5 USA₮ as deployed (code fallback 1 USA₮); a larger owed
+  entry aborts the run
+- `MAX_TOTAL_PER_RUN` — 5,000 USA₮ as deployed (code fallback 100 USA₮); a
+  larger total aborts for manual review. Lower it on the deploy command if a
+  tighter rail is wanted.
+- Zero-address recipients in the Dune result abort the run
+- The hot wallet is pinned on first run: a later signer change aborts unless
+  `ALLOW_DISTRIBUTOR_CHANGE=1`, because Dune's owed is relative to one
+  distributor and a rotation would present its payouts as unpaid
+- Gas is checked for the whole run (`len(owed) × 100k × gas price`, floored by
+  `MIN_GAS_CELO`), not a flat minimum, so a run cannot pay a prefix and then
+  run dry. Without CELO, gas is paid in USA₮ and reserved out of the balance.
+- GCS generation-guarded run lock (stale after 1h, takeover also
+  generation-guarded) + `--max-instances 1`
+- Each transfer's intent is stored before broadcasting and cleared after the
+  payment is recorded, so a lost receipt is reconciled on the next run instead
+  of paid twice. A transfer that is neither mined nor dead blocks further
+  sending (HTTP 503) until it resolves; `gcloud storage rm
+  gs://$PROJECT-usat-rewards/pending-transfer.json` clears it by hand.
+- A status-1 receipt is not enough: a matching `Transfer` event is required
+  before a payment is recorded
 - Failed/reverted transfer stops the run; everything confirmed is already in
   the ledger, so the next scheduled run pays only the remainder
 
@@ -65,5 +85,9 @@ gcloud functions logs read usat-rewards-distributor --project $PROJECT --region 
 gcloud storage cat gs://$PROJECT-usat-rewards/paid-ledger.json
 ```
 
-Keep the hot wallet funded with USA₮ + a little CELO; a run with insufficient
-balance aborts cleanly before sending anything.
+Keep the hot wallet funded with USA₮ + a little CELO. An underfunded wallet does
+**not** make the run a no-op: it pays as many wallets as the balance covers and
+reports `partial` with the shortfall, leaving the rest owed for a later run.
+Only an empty gas tank with too little USA₮ to cover gas either stops the run
+before the first transfer. Use the `HALT` flag, not underfunding, to stop a
+payout.

@@ -44,27 +44,50 @@ Token: USA₮ ("Tether America USD", 6 decimals) at
 
    Review the logged recipient count, total payout, and hot wallet balance.
 
-3. **Broadcast**:
+3. **Broadcast**. The wrapper refuses to broadcast without the credentials for
+   its own fresh Dune fetch, so pass them here too (or keep them in a `.env`
+   next to this script, which the wrapper sources):
 
    ```bash
-   PRIVATE_KEY=... ./distribute_usat_rewards.sh --broadcast
+   DUNE_API_KEY=... PRIVATE_KEY=... ./distribute_usat_rewards.sh --broadcast
    ```
 
+   `DISTRIBUTOR_ADDRESS` defaults to the address derived from `PRIVATE_KEY`, and
+   a value that is not that address aborts the run — the Dune snapshot would
+   otherwise net out another wallet's payments.
+
    Instead of `PRIVATE_KEY`, a keystore or hardware wallet can be used:
-   `./distribute_usat_rewards.sh --broadcast --account hotwallet` (or
-   `--ledger --sender <addr>`).
+   `DUNE_API_KEY=... DISTRIBUTOR_ADDRESS=0x... ./distribute_usat_rewards.sh
+   --broadcast --account hotwallet` (or `--ledger --sender <addr>`). The signer
+   cannot be derived in that case, so `DISTRIBUTOR_ADDRESS` must be set by hand
+   and must be the wallet that actually sends the transfers.
 
 4. **Record the distributor on Dune**: set the `distributor_address` parameter
    of both queries to the hot wallet address so the dashboard's
    `paid_out_usat` / `payment_status` columns reflect the payout.
 
-## Safety rails in the forge script
+## Safety rails
+
+In the forge script:
 
 - Recipients must be strictly ascending — rejects duplicates in O(n).
-- Every amount must be `> 0` and `<= MAX_PER_WALLET` (default 1 USA₮).
+- Zero-address recipients are rejected (a transfer there burns the reward).
+- Every amount must be `> 0` and `<= MAX_PER_WALLET` (default 5 USA₮, the
+  campaign maximum after the 10× bump: P2P 2.00 + hold 3.00).
 - Aborts if the hot wallet balance is below the total payout.
 - Plain `forge script` run is a simulation; nothing is sent without
   `--broadcast`.
+
+In the wrapper:
+
+- `--broadcast` is honoured wherever it appears in the arguments, and so are the
+  safety branches that key off it.
+- One run at a time: the wrapper holds `.run-lock` for the whole
+  fetch → forge → record sequence, so two overlapping runs cannot pay the same
+  wallets from the same pre-payment snapshot.
+- `DISTRIBUTOR_ADDRESS` must match the signing wallet (see step 3).
+- Confirmed transfers are recorded on every exit path — forge failure, Ctrl-C,
+  SIGTERM — not only on a clean finish.
 
 ## Double-payment protection (idempotency)
 
@@ -77,16 +100,23 @@ the window Dune has not indexed yet. Every payment is counted exactly once:
    from actual on-chain USA₮ transfers out of the hot wallet — a wallet paid
    its 0.30 in the past is owed only the remainder. Without those env vars the
    wrapper refuses to broadcast (`ALLOW_STALE=1` to override).
-2. **Reconciliation at fetch time.** `fetch-recipients.py` subtracts any
-   local-ledger surplus Dune has not indexed yet
-   (`max(0, local_paid − dune_paid)` per wallet) from the owed amounts, then
-   clears the ledger's amounts (tx hashes kept for recorder dedupe). Invariant:
-   after a fetch, the ledger only ever holds payments made *after* it.
-3. **Local paid ledger between fetches.** After every broadcast — including a
-   failed one — the wrapper records each confirmed transfer from the forge
-   receipts (`record-payments.py`, tx-hash deduped). The forge script subtracts
-   the ledger in full, so a no-fetch re-run (e.g. right after a crash) sends
-   only the outstanding remainder.
+2. **Reconciliation at fetch time.** Dune's `paid_out_usat` is cumulative while
+   the ledger only accumulates payments made since the previous fetch, so the
+   ledger stores what makes the two comparable: `dune_paid_baseline` (Dune's
+   cumulative paid at the previous fetch) and `unindexed` (the surplus carried
+   over from it). Per wallet
+   `unindexed' = max(0, unindexed + paid_since_fetch − (dune_paid_now − baseline))`
+   is subtracted from Dune's owed, and the forge-visible `recipients`/`amounts`
+   pair is then emptied — `recipients.json` already has the surplus subtracted,
+   so the forge script must not subtract it again. A payment is therefore
+   counted exactly once, however many fetches Dune takes to index it.
+3. **Local paid ledger between fetches.** After every broadcast — failed or
+   interrupted included — the wrapper records each confirmed transfer from the
+   forge receipts (`record-payments.py`, tx-hash deduped). The forge script
+   subtracts the ledger in full, so a no-fetch re-run (e.g. right after a crash)
+   sends only the outstanding remainder. Only transfers of the expected token on
+   the expected chain are recorded and the ledger is stamped with that pair, so
+   a fork rehearsal can never write into the mainnet payment record.
 4. If reconciliation leaves nobody owed, the wrapper skips the forge run
    entirely ("Nothing owed").
 
@@ -96,4 +126,5 @@ aware), crash mid-broadcast + recovery, stale-Dune refetch after full payout
 (sends nothing), and plain identical re-runs (send nothing).
 
 Never delete `paid-ledger.json` between a broadcast and the next successful
-fetch — in that window it is the only payment memory.
+fetch — in that window it is the only payment memory. It is gitignored so a
+`git clean -fd` leaves it alone, but `-x` would still remove it.
