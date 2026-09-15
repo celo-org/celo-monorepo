@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.15;
 
-import "forge-std-8/Script.sol";
+import 'forge-std-8/Script.sol';
 
 interface IERC20 {
   function transfer(address to, uint256 value) external returns (bool);
@@ -54,23 +54,23 @@ contract DistributeUsatRewards is Script {
 
   function run() external {
     string memory recipientsPath = vm.envOr(
-      "RECIPIENTS_FILE",
-      string("scripts/usat-rewards/recipients.json")
+      'RECIPIENTS_FILE',
+      string('scripts/usat-rewards/recipients.json')
     );
     string memory paidLedgerPath = vm.envOr(
-      "PAID_LEDGER_FILE",
-      string("scripts/usat-rewards/paid-ledger.json")
+      'PAID_LEDGER_FILE',
+      string('scripts/usat-rewards/paid-ledger.json')
     );
-    IERC20 usat = IERC20(vm.envOr("USAT_ADDRESS", USAT_MAINNET));
-    uint256 maxPerWallet = vm.envOr("MAX_PER_WALLET", uint256(5_000_000));
+    IERC20 usat = IERC20(vm.envOr('USAT_ADDRESS', USAT_MAINNET));
+    uint256 maxPerWallet = vm.envOr('MAX_PER_WALLET', uint256(5_000_000));
 
     string memory json = vm.readFile(recipientsPath);
     (address[] memory recipients, uint256[] memory owed) = parseEntries(json);
-    require(recipients.length > 0, "empty recipients list");
+    require(recipients.length > 0, 'empty recipients list');
 
     for (uint256 i = 0; i < recipients.length; i++) {
-      require(owed[i] > 0, "zero amount");
-      require(owed[i] <= maxPerWallet, "amount exceeds MAX_PER_WALLET");
+      require(owed[i] > 0, 'zero amount');
+      require(owed[i] <= maxPerWallet, 'amount exceeds MAX_PER_WALLET');
     }
 
     uint256[] memory payable_ = subtractPaid(recipients, owed, paidLedgerPath);
@@ -84,24 +84,24 @@ contract DistributeUsatRewards is Script {
       }
     }
 
-    uint256 key = vm.envOr("PRIVATE_KEY", uint256(0));
+    uint256 key = vm.envOr('PRIVATE_KEY', uint256(0));
     address sender = key != 0 ? vm.addr(key) : msg.sender;
 
-    console.log("Token:", address(usat), usat.symbol());
-    console.log("Hot wallet:", sender);
-    console.log("Recipients in file:", recipients.length);
-    console.log("Already fully paid (skipped):", recipients.length - outstanding);
-    console.log("Outstanding recipients:", outstanding);
-    console.log("Total payout (micro-USAT):", total);
+    console.log('Token:', address(usat), usat.symbol());
+    console.log('Hot wallet:', sender);
+    console.log('Recipients in file:', recipients.length);
+    console.log('Already fully paid (skipped):', recipients.length - outstanding);
+    console.log('Outstanding recipients:', outstanding);
+    console.log('Total payout (micro-USAT):', total);
 
     if (total == 0) {
-      console.log("Nothing to pay - every recipient is already covered.");
+      console.log('Nothing to pay - every recipient is already covered.');
       return;
     }
 
     uint256 balance = usat.balanceOf(sender);
-    console.log("Hot wallet balance (micro-USAT):", balance);
-    require(balance >= total, "hot wallet balance below total payout");
+    console.log('Hot wallet balance (micro-USAT):', balance);
+    require(balance >= total, 'hot wallet balance below total payout');
 
     if (key != 0) {
       vm.startBroadcast(key);
@@ -110,14 +110,16 @@ contract DistributeUsatRewards is Script {
     }
     for (uint256 i = 0; i < payable_.length; i++) {
       if (payable_[i] > 0) {
-        require(usat.transfer(recipients[i], payable_[i]), "transfer failed");
+        require(usat.transfer(recipients[i], payable_[i]), 'transfer failed');
       }
     }
     vm.stopBroadcast();
 
-    console.log("Done. Paid wallets:", outstanding);
-    console.log("Paid total (micro-USAT):", total);
-    console.log("Record this run: ./scripts/usat-rewards/record-payments.py updates the paid ledger.");
+    console.log('Done. Paid wallets:', outstanding);
+    console.log('Paid total (micro-USAT):', total);
+    console.log(
+      'Record this run: ./scripts/usat-rewards/record-payments.py updates the paid ledger.'
+    );
   }
 
   /// Parses and validates {recipients, amounts} from a JSON document. The
@@ -126,13 +128,13 @@ contract DistributeUsatRewards is Script {
   function parseEntries(
     string memory json
   ) internal pure returns (address[] memory recipients, uint256[] memory amounts) {
-    recipients = vm.parseJsonAddressArray(json, ".recipients");
-    amounts = vm.parseJsonUintArray(json, ".amounts");
-    require(recipients.length == amounts.length, "recipients/amounts length mismatch");
+    recipients = vm.parseJsonAddressArray(json, '.recipients');
+    amounts = vm.parseJsonUintArray(json, '.amounts');
+    require(recipients.length == amounts.length, 'recipients/amounts length mismatch');
     for (uint256 i = 0; i < recipients.length; i++) {
-      require(recipients[i] != address(0), "zero-address recipient");
+      require(recipients[i] != address(0), 'zero-address recipient');
       if (i > 0) {
-        require(recipients[i] > recipients[i - 1], "recipients not strictly ascending");
+        require(recipients[i] > recipients[i - 1], 'recipients not strictly ascending');
       }
     }
   }
@@ -153,7 +155,7 @@ contract DistributeUsatRewards is Script {
       payable_[i] = owed[i];
     }
     if (!vm.isFile(paidLedgerPath)) {
-      console.log("Paid ledger not found (trusting the Dune snapshot alone):", paidLedgerPath);
+      console.log('Paid ledger not found (trusting the Dune snapshot alone):', paidLedgerPath);
       return payable_;
     }
     (address[] memory paidWallets, uint256[] memory paidAmounts) = parseEntries(
