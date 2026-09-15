@@ -38,7 +38,10 @@ time reverts to the code default.
 First deploy with `DRY_RUN=1` env on deploy.sh, trigger once, read the JSON
 response in the logs, then redeploy with `DRY_RUN=0`. A dry run neither sends
 anything nor writes any object in the bucket: it reports what a real run would
-do, including a broadcast transfer it would have to settle first.
+do, including a broadcast transfer it would have to settle first. It also takes
+no run lock — one left behind by a terminated dry-run container would block real
+runs until the staleness window expired — so a report can race a concurrent real
+run and is informational only.
 
 ## Safety rails
 

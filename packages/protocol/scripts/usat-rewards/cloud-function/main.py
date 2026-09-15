@@ -40,9 +40,11 @@ Environment (plain env vars):
   ALLOW_DISTRIBUTOR_CHANGE  "1" = accept a hot wallet different from the pinned
                       one (only after migrating the payment history)
   DRY_RUN             "1" = report what would be paid, send nothing and write
-                      nothing at all to the bucket — the pending Dune execution
-                      marker included, so a dry run cannot change which
-                      snapshot a later real run reconciles against
+                      nothing at all to the bucket — neither the pending Dune
+                      execution marker nor the run lock, so it can neither
+                      change which snapshot a later real run reconciles against
+                      nor leave a lock behind. Taking no lock means a report may
+                      race a concurrent real run and is informational only
   FUNCTION_TIMEOUT_SECONDS  the Cloud Run request timeout deploy.sh sets,
                       default 3600; the run-lock staleness window derives from it
 
@@ -666,8 +668,16 @@ def distribute(request):
     if store.exists(HALT_OBJECT):
         return ({"result": "HALT flag present - nothing done", "hot_wallet": hot_wallet}, 423)
 
-    if not store.acquire_lock():
-        return ({"error": "another run holds the lock"}, 423)
+    # A dry run takes no lock. The lock is persistent bucket state, and a
+    # container terminated mid-report would leave it behind for a real run to
+    # trip over until the staleness window expired. The trade-off is that a
+    # dry-run report can race a concurrent real run, so it is informational
+    # only — which is all it claims to be.
+    locked = False
+    if not dry_run:
+        if not store.acquire_lock():
+            return ({"error": "another run holds the lock"}, 423)
+        locked = True
 
     try:
         # Dune's owed is relative to one distributor and the ledger only tracks
@@ -919,7 +929,8 @@ def distribute(request):
         )
     finally:
         try:
-            store.release_lock()
+            if locked:
+                store.release_lock()
         except Exception as error:  # noqa: BLE001 - any release problem, logged not raised
             # The lock times out on its own, so a failed release (the object was
             # already gone, or another run owns it) must never turn a finished
