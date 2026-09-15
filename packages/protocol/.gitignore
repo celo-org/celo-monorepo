@@ -58,3 +58,15 @@ out-truffle-compat-0.8
 out-truffle-compat
 
 opencode.json
+
+# usat-rewards hot wallet env
+scripts/usat-rewards/.env
+scripts/usat-rewards/.env.topoff
+
+# usat-rewards live payment memory: the only record of payments Dune has not
+# indexed yet, so it must survive `git clean` and never be committed. A finished
+# round's ledger is the opposite — it is the record that keeps that round from
+# being paid twice, so it stays tracked (topoff-paid-ledger.json).
+scripts/usat-rewards/paid-ledger.json
+scripts/usat-rewards/.payout-lock*
+scripts/usat-rewards/.run-lock*
