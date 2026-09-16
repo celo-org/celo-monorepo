@@ -43,6 +43,13 @@ function has_foundry_profile() {
 # 2. builds contracts with Foundry
 # 3. returns to original branch
 # piping output of any commands to the specified log file.
+# Prints the build output directory for a ref. Branch names may contain slashes, which are
+# not directory separators here, so they are flattened to underscores. Every script that
+# locates a ref's artifacts must derive the name from this function so they agree.
+function build_dir_for_ref() {
+  echo "out-$(echo "$1" | sed -e 's#/#_#g')"
+}
+
 # Sets $BUILD_DIR to the directory where resulting build artifacts may be found.
 function build_tag_foundry() {
   local BRANCH="$1"
@@ -61,7 +68,7 @@ function build_tag_foundry() {
 
   git fetch origin +'refs/tags/core-contracts.v*:refs/tags/core-contracts.v*' >> $LOG_FILE
   echo " - Checkout contracts source code at $BRANCH"
-  BUILD_DIR=$(echo out-$(echo $BRANCH | sed -e 's/\//_/g'))
+  BUILD_DIR=$(build_dir_for_ref "$BRANCH")
   if [[ -n "$PROFILE" ]]; then
     BUILD_DIR=${BUILD_DIR}-$PROFILE
   fi

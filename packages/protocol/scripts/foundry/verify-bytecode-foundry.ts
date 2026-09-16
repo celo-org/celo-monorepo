@@ -6,7 +6,10 @@ import { getReleaseVersion } from '../../lib/compatibility/ignored-contracts-v9'
 
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 
-import { instantiateArtifactsFromForge } from '@celo/protocol/lib/compatibility/utils'
+import {
+  buildDirectoryForRef,
+  instantiateArtifactsFromForge,
+} from '@celo/protocol/lib/compatibility/utils'
 import { existsSync, readJsonSync, writeJsonSync } from 'fs-extra'
 import { Abi, Chain, createPublicClient, defineChain, encodeFunctionData, http } from 'viem'
 import * as viemChains from 'viem/chains'
@@ -53,10 +56,10 @@ const argv = require('minimist')(process.argv.slice(2), {
 const branch = (argv.branch ? argv.branch : '') as string
 // Pre-migration tags build their 0.5 implementations with the truffle-compat profile; the
 // single-tree layout builds contracts-0.5 (the proxies) with solc05.
-const buildDir05 = existsSync(`./out-${branch}-truffle-compat`)
-  ? `./out-${branch}-truffle-compat`
-  : `./out-${branch}-solc05`
-const buildDir08 = `./out-${branch}-truffle-compat8`
+const buildDir05 = existsSync(buildDirectoryForRef(branch, 'truffle-compat'))
+  ? buildDirectoryForRef(branch, 'truffle-compat')
+  : buildDirectoryForRef(branch, 'solc05')
+const buildDir08 = buildDirectoryForRef(branch, 'truffle-compat8')
 
 // The Celo Sepolia core proxies were created by an optimized solc 0.5.17 build of Proxy.sol.
 // verify-deployed-forge.sh rebuilds that runtime from the working tree with the

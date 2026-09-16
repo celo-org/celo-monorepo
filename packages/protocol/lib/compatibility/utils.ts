@@ -133,3 +133,13 @@ export function instantiateArtifactsFromForge(buildDirectory: string): BuildArti
   const artifactsIndex: CompilerArtifactsIndex = splitArtifactsByCompiler(artifactPaths)
   return Object.keys(artifactsIndex).map(compiler => new BuildArtifacts(artifactsIndex[compiler]))
 }
+
+/**
+ * Build output directory forge writes a ref's artifacts to (mirrors build_dir_for_ref in
+ * scripts/bash/release-lib.sh). Branch names may contain slashes, which are flattened to
+ * underscores so the directory is a single path segment.
+ */
+export function buildDirectoryForRef(ref: string, profile?: string): string {
+  const base = `./out-${ref.replace(/\//g, '_')}`
+  return profile ? `${base}-${profile}` : base
+}

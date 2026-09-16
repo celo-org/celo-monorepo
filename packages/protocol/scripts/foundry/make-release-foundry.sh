@@ -77,7 +77,9 @@ build_tag_foundry "$BRANCH" /dev/stdout truffle-compat
 build_tag_foundry "$BRANCH" /dev/stdout solc05
 build_tag_foundry "$BRANCH" /dev/stdout truffle-compat8
 
-BUILD_DIR="./out-${BRANCH}"
+# Same flattening build_tag_foundry applied above, so a branch ref such as
+# release/core-contracts/18 resolves to the directories that were just built.
+BUILD_DIR="./$(build_dir_for_ref "$BRANCH")"
 
 # Build the command with optional flags
 OPTIONAL_FLAGS=""
