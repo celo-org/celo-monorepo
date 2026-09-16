@@ -155,9 +155,9 @@ contract MockExchange08 {
       goldBucket = goldBucket.add(sellAmount);
       stableBucket = stableBucket.sub(buyAmount);
       // Pull CELO (gold) from caller into reserve
-      IMockExchangeToken goldToken = IMockExchangeToken(registry.getAddressForOrDie(GOLD_TOKEN_ID));
+      IMockExchangeToken celoToken = IMockExchangeToken(registry.getAddressForOrDie(GOLD_TOKEN_ID));
       require(
-        goldToken.transferFrom(msg.sender, address(reserve), sellAmount),
+        celoToken.transferFrom(msg.sender, address(reserve), sellAmount),
         "Transfer of sell token failed"
       );
       // Mint stable to caller

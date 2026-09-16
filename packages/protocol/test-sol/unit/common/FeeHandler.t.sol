@@ -8,7 +8,7 @@ import { Vm } from "forge-std-8/Vm.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
-import { IGoldTokenTest } from "@test-sol/unit/common/interfaces/IGoldTokenTest.sol";
+import { ICeloTokenTest } from "@test-sol/unit/common/interfaces/ICeloTokenTest.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import "@celo-contracts/stability/test/MockSortedOracles.sol";
 import "@celo-contracts-8/stability/test/MockReserve.sol";
@@ -59,8 +59,6 @@ contract FeeHandlerTest is TestWithUtils08 {
 
   IFeeHandlerTest feeHandler;
 
-  // Deployed via deployCodeTo; different name avoids shadowing inherited celoToken from TestWithUtils08.
-  IGoldTokenTest goldToken;
   MockSortedOracles mockSortedOracles;
   MockReserve08 mockReserve;
 
@@ -122,9 +120,9 @@ contract FeeHandlerTest is TestWithUtils08 {
     reserveFraction = FixidityLib.newFixedFraction(5, 100).value;
     maxSlippage = FixidityLib.newFixedFraction(1, 100).value;
 
-    address goldTokenAddress = actor("goldToken");
-    deployCodeTo("GoldToken.sol", abi.encode(true), goldTokenAddress);
-    goldToken = IGoldTokenTest(goldTokenAddress);
+    address celoTokenAddress = actor("celoToken");
+    deployCodeTo("GoldToken.sol", abi.encode(true), celoTokenAddress);
+    celoToken = ICeloTokenTest(celoTokenAddress);
 
     mockReserve = new MockReserve08();
 
@@ -159,12 +157,12 @@ contract FeeHandlerTest is TestWithUtils08 {
     feeCurrencyWhitelist.initialize();
     registry.setAddressFor("FeeCurrencyWhitelist", address(feeCurrencyWhitelist));
     registry.setAddressFor("Freezer", address(freezer));
-    registry.setAddressFor("GoldToken", address(goldToken));
-    registry.setAddressFor("CeloToken", address(goldToken));
+    registry.setAddressFor("GoldToken", address(celoToken));
+    registry.setAddressFor("CeloToken", address(celoToken));
     registry.setAddressFor("Reserve", address(mockReserve));
     registry.setAddressFor("CeloUnreleasedTreasury", celoUnreleasedTreasuryAddr);
 
-    mockReserve.setGoldToken(address(goldToken));
+    mockReserve.setGoldToken(address(celoToken));
     mockReserve.addToken(address(stableToken));
     mockReserve.addToken(address(stableTokenEUR));
 
@@ -172,7 +170,7 @@ contract FeeHandlerTest is TestWithUtils08 {
     uint256[] memory newMinimumReports;
 
     mentoSeller.initialize(address(registry), tokenAddresses, newMinimumReports);
-    goldToken.initialize(address(registry));
+    celoToken.initialize(address(registry));
 
     mockSortedOracles = new MockSortedOracles();
     registry.setAddressFor("SortedOracles", address(mockSortedOracles));
@@ -231,7 +229,7 @@ contract FeeHandlerTest is TestWithUtils08 {
   }
 
   function fundReserve() public {
-    goldToken.transfer(address(mockReserve), initialReserveBalance);
+    celoToken.transfer(address(mockReserve), initialReserveBalance);
   }
 }
 
@@ -456,7 +454,7 @@ contract FeeHandlerTestAbstract is FeeHandlerTest {
 
   function fundFeeHandlerWithCelo() public {
     uint256 celoAmount = 1e18;
-    goldToken.transfer(address(feeHandler), celoAmount);
+    celoToken.transfer(address(feeHandler), celoAmount);
   }
 }
 
@@ -605,25 +603,25 @@ contract FeeHandlerTest_BurnCelo is FeeHandlerTestAbstract {
 
   function test_BurnsCorrectly() public {
     feeHandler.burnCelo();
-    assertEq(goldToken.balanceOf(address(feeHandler)), 2e17);
-    assertEq(goldToken.getBurnedAmount(), 8e17);
+    assertEq(celoToken.balanceOf(address(feeHandler)), 2e17);
+    assertEq(celoToken.getBurnedAmount(), 8e17);
   }
 
   function test_DoesntBurnPendingDistribution() public {
     feeHandler.burnCelo();
-    assertEq(goldToken.getBurnedAmount(), 8e17);
-    assertEq(goldToken.balanceOf(address(feeHandler)), 2e17);
+    assertEq(celoToken.getBurnedAmount(), 8e17);
+    assertEq(celoToken.balanceOf(address(feeHandler)), 2e17);
     feeHandler.burnCelo();
-    assertEq(goldToken.getBurnedAmount(), 8e17);
-    assertEq(goldToken.balanceOf(address(feeHandler)), 2e17);
+    assertEq(celoToken.getBurnedAmount(), 8e17);
+    assertEq(celoToken.balanceOf(address(feeHandler)), 2e17);
   }
 
   function test_DistributesCorrectlyAfterBurn() public {
     feeHandler.burnCelo();
-    assertEq(goldToken.balanceOf(address(feeHandler)), 2e17);
-    feeHandler.distribute(address(goldToken));
-    assertEq(goldToken.balanceOf(address(feeHandler)), 0);
-    assertEq(goldToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
+    assertEq(celoToken.balanceOf(address(feeHandler)), 2e17);
+    feeHandler.distribute(address(celoToken));
+    assertEq(celoToken.balanceOf(address(feeHandler)), 0);
+    assertEq(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
   }
 }
 
@@ -711,7 +709,7 @@ contract FeeHandlerTest_SellMentoTokens_WhenTokenEnabled is FeeHandlerTest_SellM
     assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
 
     uint256 celoAmount = 1e18;
-    goldToken.approve(address(exchangeEUR), celoAmount);
+    celoToken.approve(address(exchangeEUR), celoAmount);
     exchangeEUR.sell(celoAmount, 0, true);
     uint256 stableAmount = 3000;
     feeHandler.setMaxSplippage(address(stableTokenEUR), FIXED1);
@@ -810,14 +808,14 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
     deadline = block.timestamp + 100;
     tokenA.mint(address(feeHandler), toMint);
     tokenA.mint(user, toMint);
-    goldToken.transfer(user, toMint);
+    celoToken.transfer(user, toMint);
 
     vm.startPrank(user);
     tokenA.approve(address(uniswapRouter), toTransfer);
-    goldToken.approve(address(uniswapRouter), toTransfer);
+    celoToken.approve(address(uniswapRouter), toTransfer);
     uniswapRouter.addLiquidity(
       address(tokenA),
-      address(goldToken),
+      address(celoToken),
       toTransfer,
       toTransfer,
       toTransfer,
@@ -855,16 +853,16 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
 
   function test_UniswapTrade() public setUpLiquidity(1e19, 5e18) {
     uint256 balanceBeforeA = tokenA.balanceOf(user);
-    uint256 balanceBeforeCelo = goldToken.balanceOf(user);
+    uint256 balanceBeforeCelo = celoToken.balanceOf(user);
     vm.startPrank(user);
     tokenA.approve(address(uniswapRouter), 1e18);
     address[] memory tokenAddresses = new address[](2);
     tokenAddresses[0] = address(tokenA);
-    tokenAddresses[1] = address(goldToken);
+    tokenAddresses[1] = address(celoToken);
     uniswapRouter.swapExactTokensForTokens(1e18, 0, tokenAddresses, user, deadline);
     vm.stopPrank();
     assertGt(balanceBeforeA, tokenA.balanceOf(user));
-    assertGt(goldToken.balanceOf(user), balanceBeforeCelo);
+    assertGt(celoToken.balanceOf(user), balanceBeforeCelo);
   }
 
   function test_SellsNonMentoTokens() public setUpLiquidity(1e19, 5e18) {
@@ -885,10 +883,10 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
     uint256 toTransfer2 = 1e19;
     vm.startPrank(user);
     tokenA.approve(address(uniswapRouter2), toTransfer2);
-    goldToken.approve(address(uniswapRouter2), toTransfer2);
+    celoToken.approve(address(uniswapRouter2), toTransfer2);
     uniswapRouter2.addLiquidity(
       address(tokenA),
-      address(goldToken),
+      address(celoToken),
       toTransfer2,
       toTransfer2,
       toTransfer2,
@@ -900,7 +898,7 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTestAbstract {
 
     address[] memory tokenAddresses = new address[](2);
     tokenAddresses[0] = address(tokenA);
-    tokenAddresses[1] = address(goldToken);
+    tokenAddresses[1] = address(celoToken);
 
     uint256 quote1before = uniswapRouter.getAmountsOut(1e18, tokenAddresses)[1];
     uint256 quote2before = uniswapRouter2.getAmountsOut(1e18, tokenAddresses)[1];
@@ -924,17 +922,17 @@ contract FeeHandlerTest_HandleCelo is FeeHandlerTestAbstract {
   }
 
   function test_HandleCelo() public {
-    feeHandler.handle(address(goldToken));
-    assertEq(goldToken.getBurnedAmount(), 8e17);
-    assertEq(goldToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
+    feeHandler.handle(address(celoToken));
+    assertEq(celoToken.getBurnedAmount(), 8e17);
+    assertEq(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
   }
 
   function test_HandleCelo_WhenThereAreMoreBeneficiaries() public {
     feeHandler.addOtherBeneficiary(op, (20 * 1e24) / 100, "OP revenue share");
-    feeHandler.handle(address(goldToken));
-    assertEq(goldToken.getBurnedAmount(), 6e17);
-    assertEq(goldToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
-    assertEq(goldToken.balanceOf(op), 2e17);
+    feeHandler.handle(address(celoToken));
+    assertEq(celoToken.getBurnedAmount(), 6e17);
+    assertEq(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
+    assertEq(celoToken.balanceOf(op), 2e17);
   }
 
   function test_HandleCelo_WhenThereAreMoreTwoOtherBeneficiaries() public {
@@ -943,11 +941,11 @@ contract FeeHandlerTest_HandleCelo is FeeHandlerTestAbstract {
     feeHandler.addOtherBeneficiary(otherBeneficiary, (30 * 1e24) / 100, "otherBeneficiary ");
     assertEq(feeHandler.getTotalFractionOfOtherBeneficiariesAndCarbon(), 7e23);
     assertEq(feeHandler.getBurnFraction(), 3e23);
-    feeHandler.handle(address(goldToken));
-    assertEq(goldToken.getBurnedAmount(), 3e17);
-    assertApproxEqAbs(goldToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17, 1);
-    assertApproxEqAbs(goldToken.balanceOf(op), 2e17, 1);
-    assertApproxEqAbs(goldToken.balanceOf(otherBeneficiary), 3e17, 1);
+    feeHandler.handle(address(celoToken));
+    assertEq(celoToken.getBurnedAmount(), 3e17);
+    assertApproxEqAbs(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17, 1);
+    assertApproxEqAbs(celoToken.balanceOf(op), 2e17, 1);
+    assertApproxEqAbs(celoToken.balanceOf(otherBeneficiary), 3e17, 1);
   }
 }
 
@@ -971,7 +969,7 @@ contract FeeHandlerTest_HandleMentoTokens is FeeHandlerTestAbstract {
     assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
     // Number is not exactly 0.8/2 because of slippage in the Mento exchange
     assertEq(
-      goldToken.balanceOf(address(0x000000000000000000000000000000000000dEaD)),
+      celoToken.balanceOf(address(0x000000000000000000000000000000000000dEaD)),
       398482170620712919
     );
     assertEq(stableToken.balanceOf(address(feeHandler)), 0);
@@ -991,7 +989,7 @@ contract FeeHandlerTest_HandleAll is FeeHandlerTestAbstract {
   }
 
   function test_BurnsWithMento() public {
-    uint256 previousCeloBurn = goldToken.getBurnedAmount();
+    uint256 previousCeloBurn = celoToken.getBurnedAmount();
     assertEq(feeHandler.getPastBurnForToken(address(stableToken)), 0);
     assertEq(feeHandler.getPastBurnForToken(address(stableTokenEUR)), 0);
     feeHandler.handleAll();
@@ -1001,7 +999,7 @@ contract FeeHandlerTest_HandleAll is FeeHandlerTestAbstract {
     assertEq(stableTokenEUR.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
     assertEq(feeHandler.getTokenToDistribute(address(stableToken)), 0);
     assertEq(feeHandler.getTokenToDistribute(address(stableTokenEUR)), 0);
-    assertTrue(goldToken.getBurnedAmount() > previousCeloBurn);
+    assertTrue(celoToken.getBurnedAmount() > previousCeloBurn);
   }
 }
 
