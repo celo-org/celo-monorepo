@@ -61,6 +61,9 @@ interface VerificationContext {
   proxyLookup: ProxyLookup
   chainLookup: ChainLookup
   network: string
+  // Extra Proxy runtimes to accept, keyed by the name used in the log; raw bytecode, the
+  // metadata is stripped alongside the entries of the variants file.
+  proxyRuntimeVariants?: { [name: string]: string }
 }
 
 export interface InitializationData {
@@ -191,9 +194,12 @@ export const isAllowedLegacyLibrary = (contract: string, address: string, networ
 const liveProxyAddress = async (contract: string, context: VerificationContext): Promise<string> =>
   contract === 'Registry' ? celoRegistryAddress : await context.registry.getAddressForString(contract)
 
-// Proxy runtimes other than the one built from the sources: a genesis can place proxies
-// compiled elsewhere (the published devchain does). Keyed by a name used in the log.
-const PROXY_RUNTIME_VARIANTS_FILE = path.join(__dirname, '..', '..', 'artifacts', 'proxy-runtime-variants.json')
+// Proxy runtimes other than the one the build at hand produces. Two sources: proxies
+// compiled outside this repo, whose on-chain fingerprint cannot be rebuilt and is kept as
+// data (the published devchain's genesis), and builds of the sources under another
+// profile (solc05-optimized, which created the Celo Sepolia core proxies), passed in by
+// the caller. Keyed by a name used in the log.
+const PROXY_RUNTIME_VARIANTS_FILE = path.join(__dirname, '..', '..', 'releaseData', 'proxy-runtime-variants.json')
 
 const knownProxyRuntimes = (context: VerificationContext): { [name: string]: string } => {
   const runtimes: { [name: string]: string } = { Proxy: getSourceBytecode('Proxy', context) }
@@ -203,11 +209,14 @@ const knownProxyRuntimes = (context: VerificationContext): { [name: string]: str
       runtimes[name] = stripMetadata(variant.deployedBytecode)
     })
   }
+  Object.entries(context.proxyRuntimeVariants ?? {}).forEach(([name, bytecode]) => {
+    runtimes[name] = stripMetadata(bytecode)
+  })
   return runtimes
 }
 
 // The proxies deployed on mainnet are immutable Solidity 0.5 contracts; every live proxy
-// must still run the runtime bytecode of the Proxy artifact (frozen, or built from a
+// must still run the runtime bytecode of the Proxy artifact (built with solc05, or from a
 // pre-migration tag) or one of the known variants, so a registry entry pointing at
 // anything else is caught here.
 const verifyLiveProxyCode = async (contract: string, context: VerificationContext, errors: string[]) => {
@@ -443,7 +452,8 @@ export const verifyBytecodes = async (
   chainLookup: ChainLookup,
   initializationData: InitializationData = {},
   version?: number,
-  network = 'development'
+  network = 'development',
+  proxyRuntimeVariants: { [name: string]: string } = {}
 ) => {
   assertValidProposalTransactions(proposal)
   assertValidInitializationData(artifacts, proposal, chainLookup, initializationData)
@@ -478,6 +488,7 @@ export const verifyBytecodes = async (
     proxyLookup,
     chainLookup,
     network,
+    proxyRuntimeVariants,
   }
 
   const errors: string[] = []

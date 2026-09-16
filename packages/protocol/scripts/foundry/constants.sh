@@ -60,7 +60,7 @@ GOLD_TOKEN_TOTAL_SUPPLY=700000000 # Arbitrary amount chosen to be approximately 
 export CELO_UNRELEASED_TREASURY_INITIAL_BALANCE="$(($GOLD_TOKEN_CELO_SUPPLY_CAP - $GOLD_TOKEN_TOTAL_SUPPLY))" # During the real L2 genesis, the VM will calculate and set an appropriate balance.
 export RESERVE_INITIAL_BALANCE="5000000" # setting this here because it gets overwritten in the L2 migration script
 
-# Contract libraries (all Solidity 0.8; the frozen 0.5 proxies link none)
+# Contract libraries (all Solidity 0.8; the 0.5 proxies link none)
 export LIBRARIES_PATH_08=("contracts/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
                 "contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
                 "contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"

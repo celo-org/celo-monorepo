@@ -279,7 +279,7 @@ function prepareAbisPackageJson(exports: Exports) {
 }
 
 function prepareContractsPackage() {
-  // The single source tree is the package root; the frozen Solidity 0.5 sources (the
+  // The single source tree is the package root; the Solidity 0.5 sources (the
   // proxies) ship under 0.5/. Earlier releases had the 0.5 tree at the root and the 0.8
   // tree under 0.8/, so both historical layouts are kept importable through stub files
   // that re-export the moved sources.

@@ -43,7 +43,7 @@ describe('staged package imports', () => {
       fs.mkdirSync(staged, { recursive: true })
     })
 
-    it('maps a frozen 0.5 import of a shared interface onto the package root', () => {
+    it('maps a 0.5 import of a shared interface onto the package root', () => {
       write(
         staged,
         '0.5/common/ProxyFactory.sol',

@@ -6,7 +6,7 @@ This is the Celo protocol monorepo containing core smart contracts and OP Stack 
 
 - `packages/protocol/` - Core Solidity contracts
 - `packages/protocol/contracts/` - Solidity 0.8.x contracts (the single source tree: implementations, interfaces, shared bases)
-- `packages/protocol/contracts-0.5/` - Frozen Solidity 0.5 sources (proxies and their helpers); never rebuilt, their artifacts live in `packages/protocol/artifacts/solc-0.5/`
+- `packages/protocol/contracts-0.5/` - Solidity 0.5 sources (proxies and their helpers); built on demand by the solc05 profile into `out-solc-0.5`, never committed
 - `packages/protocol/scripts/` - Deployment and release scripts
 - `packages/protocol/releaseData/` - Release artifacts (version reports, init data)
 - `packages/op-tooling/` - OP Stack upgrade and operations tooling
@@ -83,7 +83,7 @@ yarn keys:decrypt
 ## Code Conventions
 
 - Solidity 0.8.x for every contract in `contracts/`
-- The proxies in `contracts-0.5/` are immutable on chain and stay Solidity 0.5; `scripts/foundry/freeze-solc05-artifacts.sh` regenerates their frozen artifacts and CI checks they match
+- The proxies in `contracts-0.5/` are immutable on chain and stay Solidity 0.5; `FOUNDRY_PROFILE=solc05 forge build` produces `out-solc-0.5`, which tests, devchain and release tooling read
 - All upgradeable contracts use proxy pattern
 - Version numbers follow `getVersionNumber()` convention
 

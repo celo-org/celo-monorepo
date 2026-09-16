@@ -20,7 +20,7 @@ echo "Forge version: $($FORGE --version)"
 # Start a local anvil instance
 $PWD/scripts/foundry/start_anvil.sh --celo
 
-# Build the frozen 0.5 sources plus the Mento dependencies, and the 0.8 libraries
+# Build the Solidity 0.5 sources (the proxies) plus the Mento dependencies, and the 0.8 libraries
 FOUNDRY_PROFILE=solc05 forge build
 FOUNDRY_PROFILE=truffle-compat8 forge build
 
@@ -38,7 +38,7 @@ echo "Compiling 0.8 with libraries..."
 time FOUNDRY_PROFILE=truffle-compat8 forge build $LIBRARY_FLAGS_08
 
 echo "Setting Registry Proxy"
-PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode.object' ./artifacts/solc-0.5/Proxy.sol/Proxy.json)
+PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode.object' ./out-solc-0.5/Proxy.sol/Proxy.json)
 cast rpc anvil_setCode $REGISTRY_ADDRESS $PROXY_DEPLOYED_BYTECODE --rpc-url $ANVIL_RPC_URL
 
 # Sets the storage of the registry so that it has an owner we control

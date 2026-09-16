@@ -47,8 +47,19 @@ warn_if_libraries_exist "$LIBRARIES_FILE"
 
 # Each ref builds with its own foundry.toml. Pre-migration tags still define the
 # truffle-compat (Solidity 0.5) profile for their implementations; the single-tree layout
-# does not, and its 0.5 artifacts (the proxies) are the frozen ones under artifacts/solc-0.5.
+# does not and instead builds contracts-0.5 (the proxies) with solc05, which reproduces the
+# runtime code of the live mainnet proxies. has_foundry_profile skips whichever profile a
+# ref does not define.
 build_tag_foundry $BRANCH $LOG_FILE truffle-compat
+build_tag_foundry $BRANCH $LOG_FILE solc05
 build_tag_foundry $BRANCH $LOG_FILE truffle-compat8
 
-yarn ts-node ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "$LIBRARIES_FILE" $FORNO $PROPOSAL $INITIALIZE_DATA $RPC_URL
+# The Celo Sepolia core proxies were created by an optimized solc 0.5.17 build of Proxy.sol.
+# Proxy.sol never changes, so that runtime is rebuilt here from the working tree (the ref
+# under verification may predate the solc05-optimized profile) and handed to the verifier
+# as a known proxy runtime.
+echo " - Build the Celo Sepolia proxy runtime (solc05-optimized) from the working tree"
+FOUNDRY_PROFILE=solc05-optimized forge build >> $LOG_FILE
+
+# --preferTsExts keeps stale compiled lib/**/*.js from shadowing the TypeScript sources.
+yarn ts-node --preferTsExts ./scripts/foundry/verify-bytecode-foundry.ts --network $NETWORK --branch $BRANCH --librariesFile "$LIBRARIES_FILE" $FORNO $PROPOSAL $INITIALIZE_DATA $RPC_URL

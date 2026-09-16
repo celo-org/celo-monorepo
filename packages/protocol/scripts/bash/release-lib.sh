@@ -31,8 +31,8 @@ function checkout_build_sources() {
 }
 
 # Whether the checked-out foundry.toml defines the given profile. The single-tree
-# layout has no Solidity 0.5 profile any more (the proxies are frozen artifacts), while
-# pre-migration tags still build their 0.5 implementations with one.
+# layout has no truffle-compat profile any more (the proxies build with the solc05
+# profile), while pre-migration tags still build their 0.5 implementations with one.
 function has_foundry_profile() {
   grep -q "^\[profile\.$1\]" foundry.toml
 }

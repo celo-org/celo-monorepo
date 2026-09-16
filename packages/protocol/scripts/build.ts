@@ -3,7 +3,7 @@
 // Flag ordering:
 //   --solidity <outdir>   Runs `forge build` and writes truffle-style flat JSONs
 //                         ({contractName, abi, bytecode, deployedBytecode}) to
-//                         <outdir>/contracts/ (frozen 0.5 artifacts) and <outdir>/contracts-0.8/ (0.8 build).
+//                         <outdir>/contracts/ (the 0.5 proxies) and <outdir>/contracts-0.8/ (0.8 build).
 //   --web3Types <outdir>  Reads the truffle-style JSONs (set BUILD_DIR to point
 //                         at the same dir --solidity wrote to) and generates
 //                         web3 typings. REQUIRES --solidity to have run first.
@@ -85,9 +85,10 @@ function emitTruffleStyleArtifacts(outdir: string) {
 }
 
 function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
-  console.info(`protocol: Compiling solidity with foundry (truffle-compat8 profile)`)
+  console.info(`protocol: Compiling solidity with foundry (solc05 and truffle-compat8 profiles)`)
 
-  // The 0.5 sources (proxies) are not rebuilt; their frozen artifacts are read as-is.
+  // The published packages carry the proxies too, so build contracts-0.5 as well.
+  exec(`FOUNDRY_PROFILE=solc05 forge build`)
   exec(`FOUNDRY_PROFILE=truffle-compat8 forge build`)
 
   const contracts = coreContractsOnly ? CoreContracts : ImplContracts

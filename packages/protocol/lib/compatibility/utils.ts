@@ -80,8 +80,8 @@ export function instantiateArtifacts(buildDirectory: string): BuildArtifacts {
   }
 }
 
-// Frozen artifacts (artifacts/solc-0.5) carry no AST; their source path is the
-// compilation target recorded in the metadata.
+// An artifact built without an AST falls back to the compilation target recorded in its
+// metadata for the source path.
 export function artifactSourcePath(artifact: any): string {
   if (artifact.ast && artifact.ast.absolutePath) {
     return artifact.ast.absolutePath

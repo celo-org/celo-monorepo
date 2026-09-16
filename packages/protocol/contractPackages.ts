@@ -15,8 +15,8 @@ export interface ContractPackage {
   destDir?: string
 }
 
-// The frozen Solidity 0.5 sources: the proxies and their helpers. They are never
-// rebuilt; their artifacts live under artifacts/solc-0.5.
+// The Solidity 0.5 sources: the proxies and their helpers. They are built by the solc05
+// profile (`FOUNDRY_PROFILE=solc05 forge build`) into out-solc-0.5.
 export const SOLIDITY_05_PACKAGE = {
   path: 'contracts-0.5',
   contractsFolder: '',
@@ -24,7 +24,7 @@ export const SOLIDITY_05_PACKAGE = {
   name: '0.5',
   contracts: [] as string[], // catch-all
   truffleConfig: 'truffle-config.js',
-  forgeOutDir: 'artifacts/solc-0.5',
+  forgeOutDir: 'out-solc-0.5',
   destDir: 'contracts',
 } satisfies ContractPackage
 
@@ -34,7 +34,7 @@ export const SOLIDITY_08_PACKAGE = {
   contractsFolder: '',
   folderPath: '',
   name: '0.8',
-  proxiesPath: '/', // Proxies are frozen 0.5 artifacts (SOLIDITY_05_PACKAGE)
+  proxiesPath: '/', // Proxies are Solidity 0.5 sources (SOLIDITY_05_PACKAGE)
   // Catch-all: every implementation now compiles as 0.8, so no per-contract list is
   // maintained. Release tooling resolves each artifact by checking which build tree
   // actually contains it (0.5-first with a fallback), which also stays correct when

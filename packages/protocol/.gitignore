@@ -37,6 +37,9 @@ deployedGrants.json
 # Foundry
 cache/
 out/
+# artifacts/ once held committed copies of the contracts-0.5 build; build output is never
+# committed (contracts-0.5 builds with the solc05 profile into out-solc-0.5, ignored by out*)
+artifacts/
 out-truffle-compat/
 out-truffle-compat-0.8/
 

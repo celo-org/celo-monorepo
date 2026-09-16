@@ -3,7 +3,7 @@ import path from 'path'
 import { SOLIDITY_05_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 
 export const ROOT_DIR = path.join(__dirname, '../')
-// The single tree is the root of the published @celo/contracts package; the frozen
+// The single tree is the root of the published @celo/contracts package; the Solidity
 // 0.5 sources ship under 0.5/.
 export const CONTRACTS_PACKAGE_SRC_DIR = path.join(ROOT_DIR, SOLIDITY_08_PACKAGE.path)
 export const CONTRACTS_05_SOURCE_DIR = path.join(ROOT_DIR, SOLIDITY_05_PACKAGE.path)

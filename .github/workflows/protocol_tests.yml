@@ -40,6 +40,16 @@ jobs:
             echo "All tests should be in a folder"
             exit 1
           fi
+      # Repo-wide: any tracked path (files inside such a directory, or a symlink named like
+      # one) under an artifacts/ or out*/ directory is compiled output that must be built,
+      # not committed.
+      - name: Fail if build output is tracked
+        working-directory: ${{ github.workspace }}
+        run: |
+          if git ls-files | grep -E '(^|/)(artifacts|out(-[^/]*)?)(/|$)' ; then
+            echo "compiled artifacts must not be committed"
+            exit 1
+          fi
 
   compile:
     defaults:
@@ -96,6 +106,10 @@ jobs:
         run: forge install
       - name: Compile Contracts
         run: forge --version && forge compile
+      # The uploaded workspace then carries out-solc-0.5, which the unit, integration and
+      # devchain jobs deploy the proxies from.
+      - name: Build the Solidity 0.5 proxies
+        run: FOUNDRY_PROFILE=solc05 forge build
       # Upload the full workspace (source + compiled artifacts) so child jobs
       # skip both git clone and recompilation.
       - name: Upload workspace
@@ -130,10 +144,6 @@ jobs:
         run: FOUNDRY_PROFILE=truffle-compat8 FOUNDRY_EXTRA_OUTPUT='["storageLayout"]' forge build
       - name: Diff storage layouts against the 0.5 baselines
         run: ./scripts/foundry/storage-diff.sh --all
-      # The proxies are immutable Solidity 0.5 contracts kept as frozen artifacts; the
-      # sources under contracts-0.5 and artifacts/solc-0.5 must never drift apart.
-      - name: Check the frozen 0.5 artifacts match their sources
-        run: ./scripts/foundry/freeze-solc05-artifacts.sh --check
 
   unit-tests:
     needs: compile

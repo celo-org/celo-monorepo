@@ -521,9 +521,6 @@ interface ViemContract {
   linkedLibraryNames: string[] // library names the bytecode has link placeholders for
 }
 
-// Frozen build of contracts-0.5 (see scripts/foundry/freeze-solc05-artifacts.sh).
-const FROZEN_SOLC05_ARTIFACTS = './artifacts/solc-0.5'
-
 const proxiedCoreContracts = new Set<string>([
   'Registry',
   CeloContractName.Accounts,
@@ -992,7 +989,7 @@ const loadContractArtifact = (contractName: string, artifactPath: string): ViemC
   const fullVersion = compiler.version || '0.8.19'
 
   // Determine the foundry profile that reproduces this artifact, for verification:
-  // the frozen 0.5 sources build with solc05, a pre-migration tag's 0.5 tree with
+  // the contracts-0.5 sources build with solc05, a pre-migration tag's 0.5 tree with
   // truffle-compat, and every 0.8 source with truffle-compat8.
   let foundryProfile: string | undefined
   const mainSourceFile =
@@ -1066,8 +1063,24 @@ const getContractArtifactPath = (
   return join(buildDir, `${contractName}.sol`, `${contractName}.json`)
 }
 
+// Whether a forge artifact was compiled from one of the repo's own source trees
+// (contracts, contracts-0.5, contracts-0.8 depending on the ref) rather than from a
+// dependency under lib/ or node_modules/. A build tree also holds every dependency it
+// pulled in, and a 0.5 dependency must not be mistaken for a core contract of the same
+// name (the 0.5-first lookup would then shadow the 0.8 implementation).
+const isOwnSourceArtifact = (artifactPath: string): boolean => {
+  const target = readJsonSync(artifactPath)?.metadata?.settings?.compilationTarget
+  const sourcePath = target ? Object.keys(target)[0] : ''
+  return sourcePath.startsWith('contracts')
+}
+
 const listContractNames = (baseDir: string): string[] => {
   const names: string[] = []
+  // Build directories are produced on demand, and a ref that defines only one of the two
+  // profiles legitimately has no directory for the other.
+  if (!existsSync(baseDir)) {
+    return names
+  }
   const entries = readdirSync(baseDir, { withFileTypes: true })
   for (const entry of entries) {
     if (!entry.isDirectory() || !entry.name.endsWith('.sol')) {
@@ -1078,6 +1091,9 @@ const listContractNames = (baseDir: string): string[] => {
 
     for (const fileEntry of filesInSolDir) {
       if (!fileEntry.isFile() || !fileEntry.name.endsWith('.json')) {
+        continue
+      }
+      if (!isOwnSourceArtifact(join(contractSolDirPath, fileEntry.name as string))) {
         continue
       }
       names.push(basename(fileEntry.name as string, '.json'))
@@ -1469,13 +1485,23 @@ async function main() {
     releaseNetworkName = networkName
     const buildDirBase = argv.buildDirectory
     // Pre-migration tags build their Solidity 0.5 implementations into the truffle-compat
-    // dir; the single-tree layout has no 0.5 build, its proxies are the frozen artifacts.
+    // dir; the single-tree layout builds contracts-0.5 (the proxies) with solc05.
     const buildDir05 = existsSync(`${buildDirBase}-truffle-compat`)
       ? `${buildDirBase}-truffle-compat`
-      : FROZEN_SOLC05_ARTIFACTS
+      : `${buildDirBase}-solc05`
     const buildDir08 = `${buildDirBase}-truffle-compat8`
+    // Every supported ref has both sides: the 0.8 implementations and a 0.5 tree holding
+    // at least the proxies, which new deployments are created from.
     if (!existsSync(buildDir08)) {
-      throw new Error(`${buildDir08} directory not found. Make sure to run foundry build first`)
+      throw new Error(
+        `${buildDir08} not found. Build the 0.8 sources first (FOUNDRY_PROFILE=truffle-compat8 forge build).`
+      )
+    }
+    if (!existsSync(buildDir05)) {
+      throw new Error(
+        `${buildDir05} not found. Build the 0.5 sources first (FOUNDRY_PROFILE=solc05 forge build, ` +
+          `or truffle-compat on a pre-migration tag).`
+      )
     }
 
     // Check for Celoscan API key early (before deployment) for production networks

@@ -5,8 +5,9 @@ import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
 import { GetSetV0, GetSetV1, HasInitializer, MsgSenderCheck } from "@test-sol/unit/common/mocks/ProxyMocks08.sol";
 
-// Proxy is frozen Solidity 0.5 bytecode (artifacts/solc-0.5); deployed here via deployCodeTo and used through a
-// minimal local interface.
+// Proxy is a Solidity 0.5 contract from contracts-0.5, built by the solc05 profile into out-solc-0.5, so run
+// `FOUNDRY_PROFILE=solc05 forge build` first (`yarn test` does). It is deployed here via deployCodeTo and used
+// through a minimal local interface.
 interface IProxy {
   function _getOwner() external view returns (address);
   function _getImplementation() external view returns (address);
@@ -31,7 +32,7 @@ contract ProxyTest is TestWithUtils08 {
   function setUp() public virtual override {
     nonOwner = actor("nonOwner");
     proxyAddress = actor("proxy");
-    deployCodeTo("artifacts/solc-0.5/Proxy.sol/Proxy.json", proxyAddress);
+    deployCodeTo("out-solc-0.5/Proxy.sol/Proxy.json", proxyAddress);
     proxy = IProxy(proxyAddress);
     getSet = new GetSetV0();
     proxiedGetSet = new GetSetV0();

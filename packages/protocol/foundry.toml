@@ -25,7 +25,6 @@ fs_permissions = [
   { access = "read", path = "./migrations_sol/migrationsConfig.json"},
   { access = "read", path = "./migrations_sol/"},
   { access = "read", path = "./governanceConstitution.json"},
-  { access = "read", path = "./artifacts/"},
   { access = "read", path = "./.tmp/selectors" },
 ]
 
@@ -37,12 +36,16 @@ no_match_path = "{**/test/BLS12Passthrough.sol,**/test/RandomTest.sol}"
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
 
-# from https://github.com/celo-org/celo-monorepo/pull/11488/
-
-# Profile to match Truffle configuration for 0.5.13 contracts
-# Frozen Solidity 0.5 sources: the proxies and their helpers. Nothing under contracts-0.5
-# is part of the regular build; this profile reproduces the bytecode deployed on mainnet
-# (see artifacts/solc-0.5) and builds the vendored Mento contracts for the devchain.
+# The proxies under contracts-0.5 are immutable Solidity 0.5 contracts already deployed on
+# mainnet; they are never upgraded, and no Celo implementation compiles with 0.5 any more.
+# Pinning solc 0.5.14, optimizer off, istanbul and literal metadata makes
+# `FOUNDRY_PROFILE=solc05 forge build` reproduce their on-chain runtime code into
+# out-solc-0.5 (only the metadata trailer differs, which the tooling strips before
+# comparing). That build is what the unit tests (which deploy the proxies), the devchain
+# migration (Registry proxy code, Mento dependencies), the publishing build and the release
+# tooling read: verify-deployed compares live proxy code against it, and make-release
+# deploys new proxies from it. The profile also builds the vendored Mento 0.5 contracts the
+# devchain needs. Nothing it produces is committed.
 # (TOML would split a dotted profile name, hence solc05.)
 [profile.solc05]
 skip=[
@@ -59,6 +62,28 @@ metadata_literal = true
 via_ir = false
 
 [profile.solc05.lint]
+lint_on_build = false
+
+# The Celo Sepolia core proxies were created by the old default build (solc 0.5.17,
+# optimizer 200 runs, istanbul) rather than the mainnet one. This profile reproduces that
+# runtime from the same sources so verify-deployed can recognise those proxies instead of
+# reporting them as foreign code. Only the release tooling builds it.
+[profile.solc05-optimized]
+skip=[
+    "test-sol/**",          # skip everything under test-sol
+  ]
+src = 'contracts-0.5'
+out = 'out-solc-0.5-optimized'
+libs = ['lib', 'node_modules']
+solc_version = '0.5.17'
+ast = true
+optimizer = true
+optimizer_runs = 200
+evm_version = 'istanbul'
+metadata_literal = true
+via_ir = false
+
+[profile.solc05-optimized.lint]
 lint_on_build = false
 
 # Profile to match Truffle configuration for 0.8.19 contracts

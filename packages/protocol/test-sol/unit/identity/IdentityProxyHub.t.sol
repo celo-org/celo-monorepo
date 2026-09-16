@@ -6,8 +6,9 @@ import { IdentityProxyTest, MockAttestations } from "@test-sol/unit/identity/moc
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IRegistryInitializer.sol";
 
-// IdentityProxy / IdentityProxyHub are frozen Solidity 0.5 bytecode (artifacts/solc-0.5); deployed via deployCodeTo
-// and used through minimal local interfaces.
+// IdentityProxy / IdentityProxyHub are Solidity 0.5 contracts from contracts-0.5, built by the solc05 profile into
+// out-solc-0.5, so run `FOUNDRY_PROFILE=solc05 forge build` first (`yarn test` does). They are deployed via
+// deployCodeTo and used through minimal local interfaces.
 interface IIdentityProxyHub {
   function makeCall(
     bytes32 identifier,
@@ -36,7 +37,7 @@ contract IdentityProxyHubTest is Test {
     mockAttestations = new MockAttestations();
     identityProxyHubAddress = actor("identityProxyHub");
     deployCodeTo(
-      "artifacts/solc-0.5/IdentityProxyHub.sol/IdentityProxyHub.json",
+      "out-solc-0.5/IdentityProxyHub.sol/IdentityProxyHub.json",
       identityProxyHubAddress
     );
     identityProxyHub = IIdentityProxyHub(identityProxyHubAddress);
@@ -89,7 +90,7 @@ contract IdentityProxyTestGetIdenityProxy is IdentityProxyHubTest {
   }
 
   function test_ReturnsTheCorrectCREATE2Address() public {
-    bytes memory bytecode = vm.getCode("artifacts/solc-0.5/IdentityProxy.sol/IdentityProxy.json");
+    bytes memory bytecode = vm.getCode("out-solc-0.5/IdentityProxy.sol/IdentityProxy.json");
     address expectedAddress = computeCreate2Address(identifier, identityProxyHubAddress, bytecode);
     address identityProxyReturned = identityProxyHub.getOrDeployIdentityProxy(identifier);
     assertEq(expectedAddress, identityProxyReturned);
@@ -100,7 +101,7 @@ contract IdentityProxyTestGetIdenityProxy is IdentityProxyHubTest {
     identityProxyHub.getOrDeployIdentityProxy(identifier);
 
     bytes memory deployedCode = vm.getDeployedCode(
-      "artifacts/solc-0.5/IdentityProxy.sol/IdentityProxy.json"
+      "out-solc-0.5/IdentityProxy.sol/IdentityProxy.json"
     );
     assertEq(deployedCode, at(identityProxyReturned));
   }

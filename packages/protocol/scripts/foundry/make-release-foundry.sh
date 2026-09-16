@@ -71,8 +71,10 @@ source scripts/bash/release-lib.sh
 
 # Each ref builds with its own foundry.toml. Pre-migration tags still define the
 # truffle-compat (Solidity 0.5) profile for their implementations; the single-tree layout
-# does not, and its 0.5 artifacts (the proxies) are the frozen ones under artifacts/solc-0.5.
+# does not and instead builds contracts-0.5 (the proxies new deployments are created from)
+# with solc05. has_foundry_profile skips whichever profile a ref does not define.
 build_tag_foundry "$BRANCH" /dev/stdout truffle-compat
+build_tag_foundry "$BRANCH" /dev/stdout solc05
 build_tag_foundry "$BRANCH" /dev/stdout truffle-compat8
 
 BUILD_DIR="./out-${BRANCH}"
@@ -89,7 +91,8 @@ if [ -n "$CELOSCAN_API_KEY_ARG" ]; then
   OPTIONAL_FLAGS="$OPTIONAL_FLAGS --celoscanApiKey $CELOSCAN_API_KEY_ARG"
 fi
 
-yarn ts-node --transpile-only ./scripts/foundry/make-release.ts \
+# --preferTsExts keeps stale compiled lib/**/*.js from shadowing the TypeScript sources.
+yarn ts-node --transpile-only --preferTsExts ./scripts/foundry/make-release.ts \
   --branch "$BRANCH" \
   --privateKey "$PRIVATE_KEY" \
   --initializeData "$INITIALIZE_DATA" \

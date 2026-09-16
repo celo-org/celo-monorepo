@@ -7,6 +7,8 @@ import { IProxy } from "@celo-contracts/common/interfaces/IProxy.sol";
 // Test imports
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 
+// Proxy is a Solidity 0.5 contract from contracts-0.5, built by the solc05 profile into out-solc-0.5, so run
+// `FOUNDRY_PROFILE=solc05 forge build` first (`yarn test` does).
 contract ProxyFactoryTest is TestWithUtils08 {
   ProxyFactory08 proxyFactory08;
   bytes proxyInitCode;
@@ -15,7 +17,7 @@ contract ProxyFactoryTest is TestWithUtils08 {
   function setUp() public override {
     super.setUp();
     proxyFactory08 = new ProxyFactory08();
-    proxyInitCode = vm.getCode("artifacts/solc-0.5/Proxy.sol/Proxy.json");
+    proxyInitCode = vm.getCode("out-solc-0.5/Proxy.sol/Proxy.json");
   }
 
   function test_deployProxy() public {
@@ -39,13 +41,13 @@ contract ProxyFactoryTest is TestWithUtils08 {
     assertFalse(deployedAddress == deployedAddress2);
   }
 
-  function test_deployedProxyMatchesFrozenArtifact() public {
-    // The frozen artifact carries the runtime bytecode of the proxies deployed on mainnet;
+  function test_deployedProxyMatchesSolc05Build() public {
+    // The solc05 build reproduces the runtime bytecode of the proxies deployed on mainnet;
     // a proxy created from its init code must have exactly that code.
     address deployedAddress = proxyFactory08.deployArbitraryByteCode(0, owner, 0, proxyInitCode);
-    string memory artifact = vm.readFile("./artifacts/solc-0.5/Proxy.sol/Proxy.json");
-    bytes memory frozenRuntime = vm.parseJsonBytes(artifact, ".deployedBytecode.object");
-    assertEq(deployedAddress.code, frozenRuntime);
+    string memory artifact = vm.readFile("./out-solc-0.5/Proxy.sol/Proxy.json");
+    bytes memory solc05Runtime = vm.parseJsonBytes(artifact, ".deployedBytecode.object");
+    assertEq(deployedAddress.code, solc05Runtime);
   }
 
   function substring(

@@ -51,12 +51,23 @@ const argv = require('minimist')(process.argv.slice(2), {
 })
 
 const branch = (argv.branch ? argv.branch : '') as string
-// Pre-migration tags build their 0.5 implementations; the single-tree layout only has the
-// frozen 0.5 artifacts (the proxies).
+// Pre-migration tags build their 0.5 implementations with the truffle-compat profile; the
+// single-tree layout builds contracts-0.5 (the proxies) with solc05.
 const buildDir05 = existsSync(`./out-${branch}-truffle-compat`)
   ? `./out-${branch}-truffle-compat`
-  : './artifacts/solc-0.5'
+  : `./out-${branch}-solc05`
 const buildDir08 = `./out-${branch}-truffle-compat8`
+
+// The Celo Sepolia core proxies were created by an optimized solc 0.5.17 build of Proxy.sol.
+// verify-deployed-forge.sh rebuilds that runtime from the working tree with the
+// solc05-optimized profile (Proxy.sol never changes, and the ref under verification may
+// predate the profile), so it is read from that profile's own out dir, not the ref's.
+const proxyRuntimeVariants: { [name: string]: string } = {}
+const optimizedProxyArtifact = './out-solc-0.5-optimized/Proxy.sol/Proxy.json'
+if (existsSync(optimizedProxyArtifact)) {
+  proxyRuntimeVariants['solc05-optimized'] =
+    readJsonSync(optimizedProxyArtifact).deployedBytecode.object
+}
 const network: string = argv.network ?? 'development'
 const proposal: ProposalTx[] = argv.proposal ? readJsonSync(argv.proposal) : []
 const initializationData: InitializationData = argv.initialize_data
@@ -64,8 +75,18 @@ const initializationData: InitializationData = argv.initialize_data
   : {}
 const librariesFile = argv.librariesFile ?? 'libraries.json'
 
+// Every supported ref has both sides: the 0.8 implementations and a 0.5 tree holding at
+// least the proxies, whose live code is compared against the build.
 if (!existsSync(buildDir08)) {
-  throw new Error(`${buildDir08} directory not found. Make sure to run foundry build first`)
+  throw new Error(
+    `${buildDir08} not found. Build the 0.8 sources first (FOUNDRY_PROFILE=truffle-compat8 forge build).`
+  )
+}
+if (!existsSync(buildDir05)) {
+  throw new Error(
+    `${buildDir05} not found. Build the 0.5 sources first (FOUNDRY_PROFILE=solc05 forge build, ` +
+      `or truffle-compat on a pre-migration tag).`
+  )
 }
 
 // TODO deduplicate with make-release
@@ -178,7 +199,8 @@ verifyBytecodes(
   chainLookup,
   initializationData,
   version,
-  network
+  network,
+  proxyRuntimeVariants
 )
   .then(({ libraryLinkingInfo, verifiedLibraries }) => {
     const allMapping = libraryLinkingInfo.getAddressMapping()

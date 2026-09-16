@@ -23,7 +23,7 @@ export interface UnresolvedImport {
 /**
  * Rewrites relative imports of the staged sources for the published layout.
  *
- * In the repo the source trees sit side by side under the protocol root, so a frozen
+ * In the repo the source trees sit side by side under the protocol root, so a Solidity
  * 0.5 source reaches a shared interface through `../../contracts/...`. The package
  * flattens `contracts/` onto its root and puts `contracts-0.5/` under `0.5/`, so each
  * such import is resolved against the file's original location, mapped to the

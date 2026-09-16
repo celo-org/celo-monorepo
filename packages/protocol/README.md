@@ -95,8 +95,8 @@ Use the appropriate profile to match Truffle compilation settings:
 # All contracts (Solidity 0.8)
 FOUNDRY_PROFILE=truffle-compat8 forge build contracts/.../[CONTRACT].sol
 
-# The proxies (contracts-0.5/) are immutable on chain and are not rebuilt: their frozen
-# artifacts live in artifacts/solc-0.5 (regenerate with scripts/foundry/freeze-solc05-artifacts.sh)
+# The proxies (contracts-0.5/) are immutable on chain; build them with the solc05 profile:
+FOUNDRY_PROFILE=solc05 forge build
 ```
 
 ### 2. Verify with Foundry
