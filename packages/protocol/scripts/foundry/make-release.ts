@@ -1069,7 +1069,10 @@ const getContractArtifactPath = (
 // pulled in, and a 0.5 dependency must not be mistaken for a core contract of the same
 // name (the 0.5-first lookup would then shadow the 0.8 implementation).
 const isOwnSourceArtifact = (artifactPath: string): boolean => {
-  const target = readJsonSync(artifactPath)?.metadata?.settings?.compilationTarget
+  const artifact = readJsonSync(artifactPath) as {
+    metadata?: { settings?: { compilationTarget?: Record<string, string> } }
+  }
+  const target = artifact.metadata?.settings?.compilationTarget
   const sourcePath = target ? Object.keys(target)[0] : ''
   return sourcePath.startsWith('contracts')
 }
