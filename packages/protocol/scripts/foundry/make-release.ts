@@ -8,6 +8,7 @@ import { getCeloContractDependencies } from '@celo/protocol/lib/contract-depende
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { ForgeArtifact } from '@celo/protocol/scripts/foundry/ForgeArtifact'
 import { NULL_ADDRESS, eqAddress } from '@celo/utils/lib/address'
+import { lookupRegistryAddress } from '@celo/protocol/lib/registry-lookup'
 import { exec } from 'child_process'
 import { existsSync, readJsonSync, readdirSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
@@ -55,16 +56,6 @@ type WalletClientMethods = Pick<
   'account' | 'chain' | 'deployContract' | 'writeContract'
 >
 
-// Registry ABI for getAddressForString - used for type-safe contract reads
-const registryGetAddressAbi = [
-  {
-    type: 'function',
-    name: 'getAddressForString',
-    inputs: [{ name: 'identifier', type: 'string' }],
-    outputs: [{ name: '', type: 'address' }],
-    stateMutability: 'view',
-  },
-] as const
 // AbiParameter type is inferred from Abi entries
 type AbiParameter = {
   name?: string
@@ -435,47 +426,20 @@ function bigIntReplacer(_key: string, value: any): unknown {
 
 let ignoredContractsSet = new Set()
 
-const REGISTRY_LOOKUP_ATTEMPTS = 3
-const REGISTRY_LOOKUP_RETRY_DELAY_MS = 2000
-
 class ContractAddresses {
   static async create(
     contracts: string[],
     publicClient: PublicClientMethods,
-    _registryAbi: Abi, // Kept for API compatibility, uses registryGetAddressAbi internally
+    _registryAbi: Abi, // Kept for API compatibility, uses the registry lookup helper internally
     registryAddress: ViemAddress,
     libraryAddresses: LibraryAddresses['addresses']
   ) {
     const addresses = new Map<string, string>()
-    // The registry answers the zero address for an unregistered name; a failed lookup is
-    // something else (an RPC timeout or rate limit) and must not be mistaken for it,
-    // since a contract missing from this map is later treated as having no proxy.
-    const lookup = async (contract: string, attempt = 1): Promise<string> => {
-      try {
-        // Use low-level call to avoid viem's strict readContract typing
-        const callData = encodeFunctionData({
-          abi: registryGetAddressAbi,
-          functionName: 'getAddressForString',
-          args: [contract],
-        })
-        const result = await publicClient.call({ to: registryAddress, data: callData })
-        return result.data
-          ? (decodeFunctionResult({
-              abi: registryGetAddressAbi,
-              functionName: 'getAddressForString',
-              data: result.data,
-            }) as string)
-          : NULL_ADDRESS
-      } catch (error) {
-        if (attempt < REGISTRY_LOOKUP_ATTEMPTS) {
-          await new Promise((resolve) => setTimeout(resolve, REGISTRY_LOOKUP_RETRY_DELAY_MS))
-          return lookup(contract, attempt + 1)
-        }
-        throw new Error(
-          `Registry lookup of ${contract} failed ${attempt} times; refusing to guess whether it is registered: ${error}`
-        )
-      }
-    }
+    // The registry answers the zero address for an unregistered name; anything else that
+    // comes back is not an answer and must not be mistaken for it, since a contract
+    // missing from this map is later treated as having no proxy.
+    const lookup = (contract: string) =>
+      lookupRegistryAddress(publicClient, registryAddress, contract)
     await Promise.all(
       contracts.map(async (contract: string) => {
         const registeredAddress = await lookup(contract)
