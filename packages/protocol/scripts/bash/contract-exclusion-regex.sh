@@ -50,4 +50,14 @@ if [ $VERSION_NUMBER -ge 17 ]
   CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|SortedOracles|AddressSortedLinkedListWithMedian"
 fi
 
+# CalledByVm and SuperBridgeETHWrapper are unversioned helpers: neither is a registry
+# contract and neither declares getVersionNumber, so neither can answer the version bump
+# that a code change asks for. Recompiling with a newer Solidity changes the code of every
+# contract, which is what first asked them for one. GasSponsoredOFTBridge, the contract
+# SuperBridgeETHWrapper sits beside, is left out above for the same reason.
+if [ $VERSION_NUMBER -ge 18 ]
+  then
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|CalledByVm|SuperBridgeETHWrapper"
+fi
+
 echo "FULL CONTRACT_EXCLUSION_REGEX: $CONTRACT_EXCLUSION_REGEX"

@@ -1,9 +1,10 @@
 import { getContractVersion } from '@celo/protocol/lib/compatibility/ast-version'
+import { Artifact } from '@celo/protocol/lib/compatibility/internal'
 import { DEFAULT_VERSION_STRING } from '@celo/protocol/lib/compatibility/version'
 import { assert } from 'chai'
 
-const artifactWithCode = (contractName: string, code: string) =>
-  ({ contractName, deployedBytecode: { object: code } } as any)
+const artifactWithCode = (contractName: string, code: string): Artifact =>
+  ({ contractName, deployedBytecode: { object: code } } as unknown as Artifact)
 
 describe('#getContractVersion()', () => {
   it('runs bytecode built for the EVM version the contracts target', async () => {
