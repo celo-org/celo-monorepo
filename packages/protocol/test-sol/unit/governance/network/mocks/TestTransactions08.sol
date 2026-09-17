@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9.0;
 
 /**
  * @title A contract for transaction testing in 0.8 governance tests.

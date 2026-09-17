@@ -1,3 +1,4 @@
+import { compilerFamily } from '@celo/protocol/lib/compatibility/internal'
 import { reportASTIncompatibilities } from '@celo/protocol/lib/compatibility/ast-code';
 import { reportLayoutIncompatibilities } from '@celo/protocol/lib/compatibility/ast-layout';
 import { Categorizer } from '@celo/protocol/lib/compatibility/categorizer';
@@ -118,11 +119,11 @@ function splitArtifactsByCompiler(artifactPaths: string[]): CompilerArtifactsInd
   const artifactsIndex: CompilerArtifactsIndex = {}
   artifactPaths.forEach(artifactPath => {
     const artifact = readJsonSync(artifactPath)
-    const version = artifact.metadata.compiler.version
-    if (!artifactsIndex[version]) {
-      artifactsIndex[version] = []
+    const family = compilerFamily(artifact.metadata.compiler.version)
+    if (!artifactsIndex[family]) {
+      artifactsIndex[family] = []
     }
-    artifactsIndex[version].push(artifactPath)
+    artifactsIndex[family].push(artifactPath)
   })
 
   return artifactsIndex

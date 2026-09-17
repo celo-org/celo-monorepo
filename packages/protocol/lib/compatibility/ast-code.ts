@@ -5,7 +5,7 @@ import {
   MethodMutabilityChange, MethodRemovedChange, MethodReturnChange,
   MethodVisibilityChange, NewContractChange
 } from '@celo/protocol/lib/compatibility/change'
-import { Artifact, getArtifactByName, getContractName, getDeployedLinkReferences, makeZContract, normalizeLinkPlaceholders } from '@celo/protocol/lib/compatibility/internal'
+import { compilerFamily, Artifact, getArtifactByName, getContractName, getDeployedLinkReferences, makeZContract, normalizeLinkPlaceholders } from '@celo/protocol/lib/compatibility/internal'
 import {
   BuildArtifacts,
   Contract as ZContract
@@ -313,16 +313,18 @@ export function reportASTIncompatibilities(
 
   let out: ASTCodeCompatibilityReport[] = []
 
-  // Helper function to get compiler version from artifacts
+  // Helper function to get the compiler family (major.minor) of an artifact set. Sets are
+  // matched by family so a build with a newer patch release of the same compiler line is
+  // still compared against the previous release instead of being treated as all-new.
   const getCompilerVersion = (artifacts: BuildArtifacts): string => {
     const firstArtifact: Artifact | undefined = artifacts.listArtifacts()[0]
     // Truffle artifacts have .compiler.version at top level
     if (firstArtifact?.compiler?.version) {
-      return firstArtifact.compiler.version
+      return compilerFamily(firstArtifact.compiler.version)
     }
     // Foundry artifacts have .metadata.compiler.version
     if (firstArtifact?.metadata?.compiler?.version) {
-      return firstArtifact.metadata.compiler.version
+      return compilerFamily(firstArtifact.metadata.compiler.version)
     }
     // Fallback: try to determine from artifact content
     return 'unknown'

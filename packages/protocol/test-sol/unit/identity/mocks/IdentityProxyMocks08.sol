@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9.0;
 
 // 0.8 ports of the identity proxy test fixtures (were
 // contracts/identity/test/IdentityProxyTest.sol and MockAttestations.sol).

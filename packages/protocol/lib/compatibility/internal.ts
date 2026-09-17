@@ -175,3 +175,14 @@ export interface StorageInfo {
   path?: string;
   contract?: string;
 }
+
+/**
+ * The part of a solc version that decides whether two builds are comparable: the language
+ * generation (0.5 vs 0.8), not the patch release. A release compiled with a newer 0.8.x
+ * than the previous one must still be compared contract by contract, so artifact sets are
+ * keyed and matched by this family.
+ */
+export function compilerFamily(version: string): string {
+  const match = /^(\d+)\.(\d+)/.exec(version)
+  return match ? `${match[1]}.${match[2]}` : version
+}

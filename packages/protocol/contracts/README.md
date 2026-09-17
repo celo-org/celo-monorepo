@@ -19,7 +19,7 @@ yarn add @celo/contracts
 ### In your Solidity contracts
 
 ```solidity
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9.0;
 
 import '@celo/contracts/common/UsingRegistryV2NoMento.sol';
 

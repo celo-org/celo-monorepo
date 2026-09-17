@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity >=0.5.13 <0.8.20;
+pragma solidity >=0.5.13 <0.9.0;
 
 /**
  * @title Based on predeploy returns whether this is L1 or L2.

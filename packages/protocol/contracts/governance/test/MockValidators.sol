@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9.0;
 
 // 0.8 port of the full Validators mock (was contracts/governance/test/MockValidators.sol).
 // Standalone (does not inherit IValidators) so it stays decoupled from interface churn;

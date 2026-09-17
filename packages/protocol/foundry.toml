@@ -9,6 +9,13 @@ out = 'out'
 test = 'test-sol'
 libs = ['lib', 'node_modules']
 optimizer = true
+solc_version = '0.8.37'
+# Deployment artifacts (truffle-compat8) target paris; tests build for the same EVM so the
+# opcode set matches what ships. Moving the EVM target is a separate decision.
+evm_version = 'paris'
+# Solidity 0.5 importer for the devchain's mento dependencies; the devchain script copies it
+# into contracts-0.5 and builds it with the solc05 profile, so the 0.8 build skips it.
+skip = ['test-sol/devchain/Import05Dependencies.sol']
 
 no_match_test = "skip"
 
@@ -86,7 +93,7 @@ via_ir = false
 [profile.solc05-optimized.lint]
 lint_on_build = false
 
-# Profile to match Truffle configuration for 0.8.19 contracts
+# Profile to match Truffle configuration for the Solidity 0.8 contracts
 [profile.truffle-compat8]
 skip=[
     "test-sol/**",          # skip everything under test-sol
@@ -94,7 +101,7 @@ skip=[
 src = 'contracts'
 out = 'out-truffle-compat-0.8'
 libs = ['lib', 'node_modules']
-solc_version = '0.8.19'
+solc_version = '0.8.37'
 ast = true
 optimizer = true
 optimizer_runs = 200

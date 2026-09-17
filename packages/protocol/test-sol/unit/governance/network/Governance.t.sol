@@ -1,4 +1,4 @@
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9.0;
 pragma experimental ABIEncoderV2;
 
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";

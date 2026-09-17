@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9.0;
 
 // 0.8 ports of the 0.5 identity test mocks used by the Escrow / Attestations /
 // FederatedAttestations unit tests. The 0.5 originals (contracts/identity/test/

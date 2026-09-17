@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9.0;
 
 // ============================================================
 //  Uniswap V2 mocks ported to Solidity 0.8 for Foundry tests.

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9.0;
 
 import "celo-foundry-8/Test.sol";
 import { AttestationsTestMock08 } from "@test-sol/unit/identity/mocks/AttestationsMocks08.sol";
