@@ -1,3 +1,4 @@
+import { existsSync } from 'fs'
 import { artifactSourcePath } from '@celo/protocol/lib/compatibility/utils'
 import { BuildArtifacts, Contract as ZContract } from '@openzeppelin/upgrades'
 const Web3 = require('web3')
@@ -185,4 +186,26 @@ export interface StorageInfo {
 export function compilerFamily(version: string): string {
   const match = /^(\d+)\.(\d+)/.exec(version)
   return match ? `${match[1]}.${match[2]}` : version
+}
+
+export interface BuildDirectories {
+  buildDir05: string
+  buildDir08: string
+}
+
+/**
+ * Locates a ref's 0.5 and 0.8 build directories next to the base directory the release
+ * scripts build it into (`./out-<ref>`, see build_dir_for_ref in release-lib.sh).
+ * Pre-migration tags build their 0.5 implementations with the truffle-compat profile and
+ * the single tree builds contracts-0.5 (the proxies) with solc05. Refs that still define
+ * the truffle-compat8 profile build their 0.8 sources into its own directory; the unified
+ * layout builds them with the default profile into the base directory itself.
+ */
+export function resolveBuildDirectories(
+  base: string,
+  exists: (path: string) => boolean = existsSync
+): BuildDirectories {
+  const buildDir05 = exists(`${base}-truffle-compat`) ? `${base}-truffle-compat` : `${base}-solc05`
+  const buildDir08 = exists(`${base}-truffle-compat8`) ? `${base}-truffle-compat8` : base
+  return { buildDir05, buildDir08 }
 }

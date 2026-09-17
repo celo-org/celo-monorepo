@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { resolveBuildDirectories } from '@celo/protocol/lib/compatibility/internal'
 import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
 import { deployedLibraryMatchesArtifact } from '@celo/protocol/lib/bytecode-foundry'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
@@ -990,7 +991,7 @@ const loadContractArtifact = (contractName: string, artifactPath: string): ViemC
 
   // Determine the foundry profile that reproduces this artifact, for verification:
   // the contracts-0.5 sources build with solc05, a pre-migration tag's 0.5 tree with
-  // truffle-compat, and every 0.8 source with truffle-compat8.
+  // truffle-compat, and every 0.8 source with the default profile.
   let foundryProfile: string | undefined
   const mainSourceFile =
     sourceFiles.find((f) => f.includes(`${contractName}.sol`)) || sourceFiles[0]
@@ -1000,7 +1001,7 @@ const loadContractArtifact = (contractName: string, artifactPath: string): ViemC
     } else if (fullVersion.startsWith('0.5')) {
       foundryProfile = 'truffle-compat'
     } else {
-      foundryProfile = 'truffle-compat8'
+      foundryProfile = 'default'
     }
   }
 
@@ -1487,18 +1488,11 @@ async function main() {
     const networkName = argv.network!
     releaseNetworkName = networkName
     const buildDirBase = argv.buildDirectory
-    // Pre-migration tags build their Solidity 0.5 implementations into the truffle-compat
-    // dir; the single-tree layout builds contracts-0.5 (the proxies) with solc05.
-    const buildDir05 = existsSync(`${buildDirBase}-truffle-compat`)
-      ? `${buildDirBase}-truffle-compat`
-      : `${buildDirBase}-solc05`
-    const buildDir08 = `${buildDirBase}-truffle-compat8`
+    const { buildDir05, buildDir08 } = resolveBuildDirectories(buildDirBase)
     // Every supported ref has both sides: the 0.8 implementations and a 0.5 tree holding
     // at least the proxies, which new deployments are created from.
     if (!existsSync(buildDir08)) {
-      throw new Error(
-        `${buildDir08} not found. Build the 0.8 sources first (FOUNDRY_PROFILE=truffle-compat8 forge build).`
-      )
+      throw new Error(`${buildDir08} not found. Build the 0.8 sources first (forge build).`)
     }
     if (!existsSync(buildDir05)) {
       throw new Error(

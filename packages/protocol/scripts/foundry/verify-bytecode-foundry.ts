@@ -1,3 +1,4 @@
+import { resolveBuildDirectories } from '@celo/protocol/lib/compatibility/internal'
 import {
   InitializationData,
   verifyBytecodes,
@@ -54,12 +55,7 @@ const argv = require('minimist')(process.argv.slice(2), {
 })
 
 const branch = (argv.branch ? argv.branch : '') as string
-// Pre-migration tags build their 0.5 implementations with the truffle-compat profile; the
-// single-tree layout builds contracts-0.5 (the proxies) with solc05.
-const buildDir05 = existsSync(buildDirectoryForRef(branch, 'truffle-compat'))
-  ? buildDirectoryForRef(branch, 'truffle-compat')
-  : buildDirectoryForRef(branch, 'solc05')
-const buildDir08 = buildDirectoryForRef(branch, 'truffle-compat8')
+const { buildDir05, buildDir08 } = resolveBuildDirectories(buildDirectoryForRef(branch))
 
 // The Celo Sepolia core proxies were created by an optimized solc 0.5.17 build of Proxy.sol.
 // verify-deployed-forge.sh rebuilds that runtime from the working tree with the
@@ -81,9 +77,7 @@ const librariesFile = argv.librariesFile ?? 'libraries.json'
 // Every supported ref has both sides: the 0.8 implementations and a 0.5 tree holding at
 // least the proxies, whose live code is compared against the build.
 if (!existsSync(buildDir08)) {
-  throw new Error(
-    `${buildDir08} not found. Build the 0.8 sources first (FOUNDRY_PROFILE=truffle-compat8 forge build).`
-  )
+  throw new Error(`${buildDir08} not found. Build the 0.8 sources first (forge build).`)
 }
 if (!existsSync(buildDir05)) {
   throw new Error(

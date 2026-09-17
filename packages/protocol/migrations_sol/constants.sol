@@ -41,7 +41,7 @@ contract MigrationsConstants is TestConstants {
 
   /**
    * @notice Resolves a contract's forge artifact path.
-   * @dev Implementations compile with Solidity 0.8 into out-truffle-compat-0.8. The
+   * @dev Implementations compile with Solidity 0.8 into out (the default profile). The
    * proxies, their factory and the vendored Mento contracts are Solidity 0.5 and are
    * built by the solc05 profile into out-solc-0.5. Resolving by what actually exists on
    * disk replaces the hand-maintained per-contract version list this contract used to
@@ -50,7 +50,7 @@ contract MigrationsConstants is TestConstants {
   function getContractArtifactPath(string memory contractName) public returns (string memory) {
     Vm vm_ = Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
     string memory suffix = string.concat(contractName, ".sol/", contractName, ".json");
-    string memory path08 = string.concat("out-truffle-compat-0.8/", suffix);
+    string memory path08 = string.concat("out/", suffix);
     if (vm_.isFile(path08)) {
       return path08;
     }

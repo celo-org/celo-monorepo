@@ -49,10 +49,11 @@ warn_if_libraries_exist "$LIBRARIES_FILE"
 # truffle-compat (Solidity 0.5) profile for their implementations; the single-tree layout
 # does not and instead builds contracts-0.5 (the proxies) with solc05, which reproduces the
 # runtime code of the live mainnet proxies. has_foundry_profile skips whichever profile a
-# ref does not define.
+# ref does not define; the 0.8 sources build with truffle-compat8 where a ref still has it,
+# else with the default profile.
 build_tag_foundry $BRANCH $LOG_FILE truffle-compat
 build_tag_foundry $BRANCH $LOG_FILE solc05
-build_tag_foundry $BRANCH $LOG_FILE truffle-compat8
+build_08_sources $BRANCH $LOG_FILE
 
 # The Celo Sepolia core proxies were created by an optimized solc 0.5.17 build of Proxy.sol.
 # Proxy.sol never changes, so that runtime is rebuilt here from the working tree (the ref

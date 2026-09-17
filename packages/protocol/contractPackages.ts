@@ -41,6 +41,6 @@ export const SOLIDITY_08_PACKAGE = {
   // building old release tags.
   contracts: [] as string[],
   truffleConfig: 'truffle-config0.8.js',
-  forgeOutDir: 'out-truffle-compat-0.8',
+  forgeOutDir: 'out',
   destDir: 'contracts-0.8',
 } satisfies ContractPackage

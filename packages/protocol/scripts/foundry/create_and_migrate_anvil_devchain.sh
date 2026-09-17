@@ -22,7 +22,7 @@ $PWD/scripts/foundry/start_anvil.sh --celo
 
 # Build the Solidity 0.5 sources (the proxies) plus the Mento dependencies, and the 0.8 libraries
 FOUNDRY_PROFILE=solc05 forge build
-FOUNDRY_PROFILE=truffle-compat8 forge build
+forge build
 
 # Deploy libraries to the anvil instance
 source $PWD/scripts/foundry/deploy_libraries.sh
@@ -35,7 +35,7 @@ source $PWD/scripts/foundry/build_constitution_selectors_map.sh
 # Including contracts that depend on libraries. This step replaces the library placeholder
 # in the bytecode with the address of the actually deployed library.
 echo "Compiling 0.8 with libraries..."
-time FOUNDRY_PROFILE=truffle-compat8 forge build $LIBRARY_FLAGS_08
+time forge build $LIBRARY_FLAGS_08
 
 echo "Setting Registry Proxy"
 PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode.object' ./out-solc-0.5/Proxy.sol/Proxy.json)

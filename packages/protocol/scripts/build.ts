@@ -32,7 +32,7 @@ const readJSON = (file: string): ContractArtifact =>
   JSON.parse(readFileSync(file, 'utf-8')) as ContractArtifact
 
 const FOUNDRY_OUT_05 = SOLIDITY_05_PACKAGE.forgeOutDir
-const FOUNDRY_OUT_08 = 'out-truffle-compat-0.8'
+const FOUNDRY_OUT_08 = SOLIDITY_08_PACKAGE.forgeOutDir
 
 function exec(cmd: string) {
   return execSync(cmd, { cwd: ROOT_DIR, stdio: 'inherit' })
@@ -85,11 +85,11 @@ function emitTruffleStyleArtifacts(outdir: string) {
 }
 
 function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
-  console.info(`protocol: Compiling solidity with foundry (solc05 and truffle-compat8 profiles)`)
+  console.info(`protocol: Compiling solidity with foundry (solc05 and default profiles)`)
 
   // The published packages carry the proxies too, so build contracts-0.5 as well.
   exec(`FOUNDRY_PROFILE=solc05 forge build`)
-  exec(`FOUNDRY_PROFILE=truffle-compat8 forge build`)
+  exec(`forge build`)
 
   const contracts = coreContractsOnly ? CoreContracts : ImplContracts
   for (const contractName of contracts) {

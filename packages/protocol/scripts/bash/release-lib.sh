@@ -37,6 +37,17 @@ function has_foundry_profile() {
   grep -q "^\[profile\.$1\]" foundry.toml
 }
 
+# USAGE: build_08_sources <ref> <log file>
+# Builds a ref's Solidity 0.8 sources and sets $BUILD_DIR to the result. Refs that still
+# define the truffle-compat8 profile build them with it into its own directory; the
+# unified layout has one profile for the 0.8 tree and builds it with the default profile.
+function build_08_sources() {
+  build_tag_foundry "$1" "$2" truffle-compat8
+  if [[ -z "$BUILD_DIR" ]]; then
+    build_tag_foundry "$1" "$2"
+  fi
+}
+
 # USAGE: build_tag_foundry <branch> <log file>
 # This function:
 # 1. checks out the given branch

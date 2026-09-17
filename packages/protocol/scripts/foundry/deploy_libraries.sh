@@ -72,7 +72,7 @@ pushd $TEMP_DIR
 
 # Deploy libraries and build the library flag
 export LIBRARY_FLAGS_08=""
-deploy_libraries LIBRARIES_PATH_08 "truffle-compat8" "LIBRARY_FLAGS_08" "0.8"
+deploy_libraries LIBRARIES_PATH_08 "default" "LIBRARY_FLAGS_08" "0.8"
 
 
 # Move out of the temporary directory
