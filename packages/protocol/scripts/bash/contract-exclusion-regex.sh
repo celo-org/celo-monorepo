@@ -54,8 +54,10 @@ fi
 # contract and neither declares getVersionNumber, so neither can answer the version bump
 # that a code change asks for. Recompiling with a newer Solidity changes the code of every
 # contract, which is what first asked them for one. GasSponsoredOFTBridge, the contract
-# SuperBridgeETHWrapper sits beside, is left out above for the same reason.
-if [ $VERSION_NUMBER -ge 18 ]
+# SuperBridgeETHWrapper sits beside, is left out above for the same reason. The number is
+# the release being compared against, as in the block above, so 17 is what the CR18
+# release reads; the snapshots committed for earlier releases compare from 16 or lower.
+if [ $VERSION_NUMBER -ge 17 ]
   then
   CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|CalledByVm|SuperBridgeETHWrapper"
 fi
