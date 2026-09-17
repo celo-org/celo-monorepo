@@ -16,9 +16,11 @@ solc_version = '0.8.37'
 optimizer = true
 optimizer_runs = 200
 via_ir = false
-# paris keeps the opcode set of the deployment artifacts unchanged across compiler bumps.
-# Moving the EVM target is a separate decision.
-evm_version = 'paris'
+# Celo L1 could not execute PUSH0, which is why the contracts were capped at paris (and at
+# Solidity <0.8.20). As an OP Stack L2 Celo follows the Ethereum forks: mainnet and Celo
+# Sepolia both run Prague (their headers carry requestsHash) and execute PUSH0, MCOPY and
+# TSTORE/TLOAD today, so the deployment artifacts target prague.
+evm_version = 'prague'
 # The compatibility report reads the AST; literal sources in the metadata match what the
 # release builds have always shipped.
 ast = true

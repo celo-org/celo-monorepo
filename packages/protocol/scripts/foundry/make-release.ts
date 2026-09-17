@@ -1014,7 +1014,7 @@ const loadContractArtifact = (contractName: string, artifactPath: string): ViemC
     compilerVersion: fullVersion,
     optimizerEnabled: optimizer.enabled ?? true,
     optimizerRuns: optimizer.runs ?? 200,
-    evmVersion: settings.evmVersion || 'paris',
+    evmVersion: settings.evmVersion || 'prague',
     foundryProfile,
     linkedLibraryNames: Object.values(artifact.bytecode.linkReferences ?? {}).flatMap((libs) =>
       Object.keys(libs)
