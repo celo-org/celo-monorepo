@@ -9,16 +9,13 @@ const encodedAddress = (address: string) =>
   `0x${address.slice(2).toLowerCase().padStart(64, '0')}` as `0x${string}`
 
 /** A client whose `call` replays the given answers, one per attempt. */
-const clientReturning = (...answers: Array<{ data?: `0x${string}` } | Error>) => {
+const clientReturning = (...answers: ({ data?: `0x${string}` } | Error)[]) => {
   let calls = 0
   const client = {
-    call: async () => {
+    call: () => {
       const answer = answers[Math.min(calls, answers.length - 1)]
       calls += 1
-      if (answer instanceof Error) {
-        throw answer
-      }
-      return answer
+      return answer instanceof Error ? Promise.reject(answer) : Promise.resolve(answer)
     },
   } as unknown as RegistryCallClient
   return { client, callCount: () => calls }

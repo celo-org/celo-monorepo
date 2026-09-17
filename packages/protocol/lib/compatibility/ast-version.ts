@@ -1,6 +1,7 @@
 /* eslint-disable max-classes-per-file: 0 */
 import { Artifact, getContractName } from '@celo/protocol/lib/compatibility/internal';
 import { ContractVersion, ContractVersionChecker, ContractVersionCheckerIndex, ContractVersionDelta, ContractVersionDeltaIndex, ContractVersionIndex, DEFAULT_VERSION_STRING } from '@celo/protocol/lib/compatibility/version';
+import { Chain as EJSChain, Common as EJSCommon, Hardfork as EJSHardfork } from "@ethereumjs/common";
 import { Address as EJSAddress } from "@ethereumjs/util";
 import { VM } from "@ethereumjs/vm";
 import { BuildArtifacts } from '@openzeppelin/upgrades';
@@ -35,8 +36,17 @@ export class ASTContractVersions {
  *
  * If the contract version cannot be retrieved, returns version 1.1.0.0 by default.
  */
+// Reading a version runs the contract's own bytecode, so this EVM has to understand the
+// EVM version the contracts are built for. It defaults to merge, which predates PUSH0 and
+// would make every version read fail against a modern build. Shanghai is as far as this
+// vendored VM goes, which is the ceiling foundry.toml builds against.
+const versionCheckCommon = new EJSCommon({
+  chain: EJSChain.Mainnet,
+  hardfork: EJSHardfork.Shanghai,
+})
+
 export async function getContractVersion(artifact: Artifact, newLinking: boolean): Promise<ContractVersion> {
-  const vm = await VM.create();
+  const vm = await VM.create({ common: versionCheckCommon });
   // @ts-ignore
   const bytecode = artifact.deployedBytecode.object || artifact.deployedBytecode
   const data = '0x' + abi.methodID('getVersionNumber', []).toString('hex')
@@ -50,11 +60,21 @@ export async function getContractVersion(artifact: Artifact, newLinking: boolean
     isStatic: true,
     data: Buffer.from(data.slice(2), 'hex')
   })
-  if (result.execResult.exceptionError === undefined) {
+  const exceptionError = result.execResult.exceptionError
+  if (exceptionError === undefined) {
     const value = result.execResult.returnValue
     if (value.length === 4 * 32) {
       return ContractVersion.fromGetVersionNumberReturnValue(value)
     }
+  } else if (`${exceptionError.error}`.includes('invalid opcode')) {
+    // A contract without getVersionNumber reverts, which is what the default below is for.
+    // An opcode this VM does not implement means the build targets an EVM version it does
+    // not support, and every version would silently read as the default instead.
+    throw new Error(
+      `Cannot read the version of ${getContractName(artifact)}: its bytecode uses an opcode ` +
+        `the version checker's EVM does not implement (${exceptionError.error}). The build ` +
+        `targets an EVM version newer than that EVM supports.`
+    )
   }
   // If we can't fetch the version number, assume default version.
   return ContractVersion.fromString(DEFAULT_VERSION_STRING)

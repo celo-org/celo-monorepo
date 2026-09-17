@@ -49,6 +49,7 @@
     "@celo/cryptographic-utils": "^5.0.7",
     "@celo/utils": "^5.0.6",
     "@celo/wallet-local": "^5.1.2",
+    "@ethereumjs/common": "3.1.1",
     "@ethereumjs/util": "8.0.5",
     "@ethereumjs/vm": "npm:@celo/ethereumjs-vm@6.4.1-unofficial.0",
     "@openzeppelin/contracts8": "npm:@openzeppelin/contracts@^4.4.2",

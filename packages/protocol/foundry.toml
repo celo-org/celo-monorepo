@@ -17,10 +17,14 @@ optimizer = true
 optimizer_runs = 200
 via_ir = false
 # Celo L1 could not execute PUSH0, which is why the contracts were capped at paris (and at
-# Solidity <0.8.20). As an OP Stack L2 Celo follows the Ethereum forks: mainnet and Celo
-# Sepolia both run Prague (their headers carry requestsHash) and execute PUSH0, MCOPY and
-# TSTORE/TLOAD today, so the deployment artifacts target prague.
-evm_version = 'prague'
+# Solidity <0.8.20). As an OP Stack L2 Celo follows the Ethereum forks, and that cap is
+# gone: mainnet and Celo Sepolia both run Prague and execute PUSH0, MCOPY and TSTORE/TLOAD.
+# The ceiling here is our own tooling rather than the chain. The compatibility check reads
+# each contract's version by running its bytecode in the vendored @celo/ethereumjs-vm,
+# which implements no hardfork past shanghai, so a cancun target (MCOPY, TSTORE/TLOAD)
+# would make every version read fail. shanghai takes PUSH0, which is what the L1 cap cost
+# us; going further needs that VM replaced first.
+evm_version = 'shanghai'
 # The compatibility report reads the AST; literal sources in the metadata match what the
 # release builds have always shipped.
 ast = true
