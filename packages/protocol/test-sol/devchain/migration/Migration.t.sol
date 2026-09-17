@@ -112,7 +112,6 @@ contract RegistryIntegrationTest is IntegrationTest, MigrationsConstants {
           actualBytecodeWithMetadataOnDevchain
         );
 
-        string memory contractFileName = string(abi.encodePacked(contractName, ".sol"));
         // Get bytecode from build artifacts
         // this has to be built twice like we do when migrating
         bytes memory expectedBytecodeWithMetadataFromArtifacts = vm.getDeployedCode(

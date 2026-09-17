@@ -1,5 +1,4 @@
 pragma solidity >=0.5.13 <0.9.0;
-pragma experimental ABIEncoderV2;
 
 /**
  * @title Interface for the 0.8 DoubleSigningSlasherMock08 deployed via deployCodeTo.

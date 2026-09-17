@@ -31,7 +31,7 @@ contract PrecompileHandler is UsingPrecompiles {
   Mock private successMock = Mock(true, _empty, true);
   Mock private revertMock = Mock(true, _empty, true);
 
-  constructor() public {
+  constructor() {
     _vm.etch(TRANSFER, proxyTo(TRANSFER_SIG));
     _vm.label(TRANSFER, "TRANSFER");
 

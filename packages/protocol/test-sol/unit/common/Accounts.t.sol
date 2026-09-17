@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.9.0;
-pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts8/utils/cryptography/ECDSA.sol";
 import "@celo-contracts/common/FixidityLib.sol";
@@ -933,6 +932,7 @@ contract AccountsTest_BackwardCompatibility is AccountsTest {
         return accounts.hasAuthorizedValidatorSigner(_signer);
       }
     }
+    revert("unhandled role");
   }
 
   function authorize(
@@ -994,6 +994,7 @@ contract AccountsTest_BackwardCompatibility is AccountsTest {
         return accounts.getValidatorSigner(_account);
       }
     }
+    revert("unhandled role");
   }
 
   function authorizedSignerToAccount(
@@ -1012,6 +1013,7 @@ contract AccountsTest_BackwardCompatibility is AccountsTest {
         return accounts.validatorSignerToAccount(_signer);
       }
     }
+    revert("unhandled role");
   }
 
   function helperShouldSetAuthorizedKey(bool genericRead, bool genericWrite, Role role) public {

@@ -102,12 +102,12 @@ contract MockLockedGold08 is ILockedGold {
 
   function getPendingWithdrawals(
     address
-  ) external view returns (uint256[] memory, uint256[] memory) {
+  ) external pure returns (uint256[] memory, uint256[] memory) {
     uint256[] memory empty = new uint256[](0);
     return (empty, empty);
   }
 
-  function getTotalPendingWithdrawals(address) external view returns (uint256) {
+  function getTotalPendingWithdrawals(address) external pure returns (uint256) {
     return 0;
   }
 
@@ -119,15 +119,15 @@ contract MockLockedGold08 is ILockedGold {
     return totalGovernancePower[account];
   }
 
-  function getPendingWithdrawal(address, uint256) external view returns (uint256, uint256) {
+  function getPendingWithdrawal(address, uint256) external pure returns (uint256, uint256) {
     return (0, 0);
   }
 
-  function unlockingPeriod() external view returns (uint256) {
+  function unlockingPeriod() external pure returns (uint256) {
     return 0;
   }
 
-  function getAccountNonvotingLockedGold(address) external view returns (uint256) {
+  function getAccountNonvotingLockedGold(address) external pure returns (uint256) {
     return 0;
   }
 }

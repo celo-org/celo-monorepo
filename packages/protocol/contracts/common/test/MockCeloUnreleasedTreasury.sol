@@ -23,7 +23,7 @@ contract MockCeloUnreleasedTreasury is ICeloUnreleasedTreasury, UsingRegistry {
   }
 
   function getRemainingBalanceToRelease() external view returns (uint256) {
-    remainingTreasure;
+    return remainingTreasure;
   }
 
   function setRemainingTreasure(uint256 _amount) public {

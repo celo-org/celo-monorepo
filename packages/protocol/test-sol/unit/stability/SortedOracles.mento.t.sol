@@ -2,7 +2,6 @@
 // solhint-disable func-name-mixedcase, var-name-mixedcase, state-visibility
 // solhint-disable const-name-snakecase, max-states-count, contract-name-camelcase
 pragma solidity >=0.8.7 <0.9.0;
-pragma experimental ABIEncoderV2;
 
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 import { SortedOracles } from "@celo-contracts-8/stability/SortedOracles.sol";
@@ -20,19 +19,19 @@ contract MockBreakerBox is IBreakerBox {
     tradingMode = _tradingMode;
   }
 
-  function getBreakers() external view returns (address[] memory) {
+  function getBreakers() external pure returns (address[] memory) {
     return new address[](0);
   }
 
-  function isBreaker(address) external view returns (bool) {
+  function isBreaker(address) external pure returns (bool) {
     return true;
   }
 
-  function getRateFeedTradingMode(address) external view returns (uint8) {
+  function getRateFeedTradingMode(address) external pure returns (uint8) {
     return 0;
   }
 
-  function checkAndSetBreakers(address) external {}
+  function checkAndSetBreakers(address) external pure {}
 }
 
 contract SortedOraclesTest is TestWithUtils08 {

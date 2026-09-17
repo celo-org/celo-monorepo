@@ -152,9 +152,9 @@ contract E2E_GovernanceBase is Devchain {
     );
   }
 
-  function _upvoteProposal(uint256 proposalId, uint256 lesser, uint256 greater) public {
+  function _upvoteProposal(uint256 _proposalId, uint256 lesser, uint256 greater) public {
     vm.prank(tester);
-    governance.upvote(proposalId, lesser, greater);
+    governance.upvote(_proposalId, lesser, greater);
   }
 
   function _approveProposal() public {

@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.5.13 <0.9.0;
-pragma experimental ABIEncoderV2;
 
 // Standalone superset interface used by the 0.5 Election tests to interact with
 // the 0.8 Election implementation deployed via deployCodeTo. Solidity 0.5

@@ -209,9 +209,9 @@ library SortedLinkedList {
       isValueBetween(list, value, list.list.elements[greaterKey].previousKey, greaterKey)
     ) {
       return (list.list.elements[greaterKey].previousKey, greaterKey);
-    } else {
-      require(false, "get lesser and greater failure");
     }
+
+    revert("get lesser and greater failure");
   }
 
   /**

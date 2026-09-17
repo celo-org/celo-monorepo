@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.9.0;
-pragma experimental ABIEncoderV2;
 
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IOwnable.sol";

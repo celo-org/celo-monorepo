@@ -67,7 +67,7 @@ contract IdentityProxyHubTest is Test {
    * Returns bytecode at address
    * @param _addr The address to get the code from
    */
-  function at(address _addr) public view returns (bytes memory o_code) {
+  function codeAt(address _addr) public view returns (bytes memory o_code) {
     assembly {
       // retrieve the size of the code
       let size := extcodesize(_addr)
@@ -103,7 +103,7 @@ contract IdentityProxyTestGetIdenityProxy is IdentityProxyHubTest {
     bytes memory deployedCode = vm.getDeployedCode(
       "out-solc-0.5/IdentityProxy.sol/IdentityProxy.json"
     );
-    assertEq(deployedCode, at(identityProxyReturned));
+    assertEq(deployedCode, codeAt(identityProxyReturned));
   }
 }
 

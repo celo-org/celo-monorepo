@@ -22,7 +22,7 @@ contract MockValidators08 is IValidators {
   mapping(address => uint256) private epochRewards;
   uint256 public mintedStable;
 
-  function updateEcdsaPublicKey(address, address, bytes calldata) external returns (bool) {
+  function updateEcdsaPublicKey(address, address, bytes calldata) external pure returns (bool) {
     return true;
   }
 

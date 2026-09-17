@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.9.0;
-pragma experimental ABIEncoderV2;
 
 import "@celo-contracts-8/governance/Proposals.sol";
 

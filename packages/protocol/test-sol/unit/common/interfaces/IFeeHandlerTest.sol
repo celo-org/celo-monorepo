@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.5.13 <0.9.0;
-pragma experimental ABIEncoderV2;
 
 // Test-only superset interface for the migrated 0.8 FeeHandler. Kept standalone
 // (no inheritance) so it stays compilable from 0.5 test files, which cannot use

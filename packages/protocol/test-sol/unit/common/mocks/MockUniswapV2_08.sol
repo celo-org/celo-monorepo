@@ -129,7 +129,7 @@ library TransferHelper08 {
     );
   }
 
-  function safeTransferETH(address to, uint256 value) internal {
+  function safeTransferETH(address to, uint256 value) internal pure {
     // no-op stub matching 0.5 mock behaviour
     (to, value);
   }

@@ -49,7 +49,7 @@ contract HeapTest is Test {
 
   function generatePRN(uint256 min, uint256 max, uint256 salt) public view returns (uint256) {
     return
-      (uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty, msg.sender, salt))) %
+      (uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender, salt))) %
         (max - min + 1)) + min;
   }
 

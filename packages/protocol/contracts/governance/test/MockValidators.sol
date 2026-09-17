@@ -24,7 +24,7 @@ contract MockValidators {
   uint256 public mintedStable;
   uint256 private _maxVoterRewardCommission;
 
-  function updateEcdsaPublicKey(address, address, bytes calldata) external returns (bool) {
+  function updateEcdsaPublicKey(address, address, bytes calldata) external pure returns (bool) {
     return true;
   }
 
@@ -108,7 +108,7 @@ contract MockValidators {
     return (members[group], commissions[group], 0, 0, sizeHistory, 0, 0);
   }
 
-  function getValidatorGroupSlashingMultiplier(address) external view returns (uint256) {
+  function getValidatorGroupSlashingMultiplier(address) external pure returns (uint256) {
     return FIXED1_UINT;
   }
 
@@ -150,59 +150,59 @@ contract MockValidators {
   }
 
   // Not implemented in mock, added here to support the interface
-  function addFirstMember(address, address, address) external returns (bool) {
+  function addFirstMember(address, address, address) external pure returns (bool) {
     revert("Method not implemented in mock");
   }
 
-  function registerValidatorGroup(uint256) external returns (bool) {
+  function registerValidatorGroup(uint256) external pure returns (bool) {
     revert("Method not implemented in mock");
   }
 
-  function registerValidator(bytes calldata) external returns (bool) {
+  function registerValidator(bytes calldata) external pure returns (bool) {
     revert("Method not implemented in mock");
   }
 
-  function registerValidatorNoBls(bytes calldata) external returns (bool) {
+  function registerValidatorNoBls(bytes calldata) external pure returns (bool) {
     revert("Method not implemented in mock");
   }
 
-  function removeMember(address) external returns (bool) {
+  function removeMember(address) external pure returns (bool) {
     revert("Method not implemented in mock");
   }
-  function setGroupLockedGoldRequirements(uint256, uint256) external returns (bool) {
+  function setGroupLockedGoldRequirements(uint256, uint256) external pure returns (bool) {
     revert("Method not implemented in mock");
   }
-  function setMembershipHistoryLength(uint256) external returns (bool) {
+  function setMembershipHistoryLength(uint256) external pure returns (bool) {
     revert("Method not implemented in mock");
   }
-  function setNextCommissionUpdate(uint256) external {
+  function setNextCommissionUpdate(uint256) external pure {
     revert("Method not implemented in mock");
   }
-  function setSlashingMultiplierResetPeriod(uint256) external {
-    revert("Method not implemented in mock");
-  }
-
-  function updateCommission() external {
+  function setSlashingMultiplierResetPeriod(uint256) external pure {
     revert("Method not implemented in mock");
   }
 
-  function setValidatorLockedGoldRequirements(uint256, uint256) external returns (bool) {
+  function updateCommission() external pure {
     revert("Method not implemented in mock");
   }
 
-  function setMaxGroupSize(uint256) external returns (bool) {
+  function setValidatorLockedGoldRequirements(uint256, uint256) external pure returns (bool) {
     revert("Method not implemented in mock");
   }
 
-  function setCommissionUpdateDelay(uint256) external {
+  function setMaxGroupSize(uint256) external pure returns (bool) {
     revert("Method not implemented in mock");
   }
 
-  function setNextVoterRewardCommissionUpdate(uint256) external {
+  function setCommissionUpdateDelay(uint256) external pure {
     revert("Method not implemented in mock");
   }
 
-  function updateVoterRewardCommission() external {
+  function setNextVoterRewardCommissionUpdate(uint256) external pure {
+    revert("Method not implemented in mock");
+  }
+
+  function updateVoterRewardCommission() external pure {
     revert("Method not implemented in mock");
   }
 
@@ -214,15 +214,15 @@ contract MockValidators {
     return _maxVoterRewardCommission;
   }
 
-  function maxVoterRewardCommissionLastReducedBlock() external view returns (uint256) {
+  function maxVoterRewardCommissionLastReducedBlock() external pure returns (uint256) {
     return 0;
   }
 
-  function resetSlashingMultiplier() external {
+  function resetSlashingMultiplier() external pure {
     revert("Method not implemented in mock");
   }
 
-  function reorderMember(address, address, address) external returns (bool) {
+  function reorderMember(address, address, address) external pure returns (bool) {
     revert("Method not implemented in mock");
   }
 
@@ -230,23 +230,23 @@ contract MockValidators {
     mintedStable = mintedStable + amount;
   }
 
-  function maxGroupSize() external view returns (uint256) {
+  function maxGroupSize() external pure returns (uint256) {
     revert("Method not implemented in mock");
   }
 
-  function getValidatorLockedGoldRequirements() external view returns (uint256, uint256) {
+  function getValidatorLockedGoldRequirements() external pure returns (uint256, uint256) {
     revert("Method not implemented in mock");
   }
 
-  function getRegisteredValidators() external view returns (address[] memory) {
+  function getRegisteredValidators() external pure returns (address[] memory) {
     revert("Method not implemented in mock");
   }
 
-  function getRegisteredValidatorGroups() external view returns (address[] memory) {
+  function getRegisteredValidatorGroups() external pure returns (address[] memory) {
     revert("Method not implemented in mock");
   }
 
-  function getMembershipInLastEpochFromSigner(address) external view returns (address) {
+  function getMembershipInLastEpochFromSigner(address) external pure returns (address) {
     revert("Method not implemented in mock");
   }
 
@@ -254,31 +254,31 @@ contract MockValidators {
     return affiliations[validator];
   }
 
-  function getMembershipHistoryLength() external view returns (uint256) {
+  function getMembershipHistoryLength() external pure returns (uint256) {
     revert("Method not implemented in mock");
   }
 
-  function addMember(address) external returns (bool) {
+  function addMember(address) external pure returns (bool) {
     revert("Method not implemented in mock");
   }
 
-  function deaffiliate() external returns (bool) {
+  function deaffiliate() external pure returns (bool) {
     revert("Method not implemented in mock");
   }
 
-  function deregisterValidator(uint256) external returns (bool) {
+  function deregisterValidator(uint256) external pure returns (bool) {
     revert("Method not implemented in mock");
   }
 
-  function deregisterValidatorGroup(uint256) external returns (bool) {
+  function deregisterValidatorGroup(uint256) external pure returns (bool) {
     revert("Method not implemented in mock");
   }
 
-  function getCommissionUpdateDelay() external view returns (uint256) {
+  function getCommissionUpdateDelay() external pure returns (uint256) {
     revert("Method not implemented in mock");
   }
 
-  function getGroupLockedGoldRequirements() external view returns (uint256, uint256) {
+  function getGroupLockedGoldRequirements() external pure returns (uint256, uint256) {
     revert("Method not implemented in mock");
   }
 
@@ -292,13 +292,13 @@ contract MockValidators {
 
   function getMembershipHistory(
     address
-  ) external view returns (uint256[] memory, address[] memory, uint256, uint256) {
+  ) external pure returns (uint256[] memory, address[] memory, uint256, uint256) {
     revert("Method not implemented in mock");
   }
 
   function getValidator(
     address
-  ) external view returns (bytes memory, bytes memory, address, uint256, address) {
+  ) external pure returns (bytes memory, bytes memory, address, uint256, address) {
     revert("Method not implemented in mock");
   }
 }
