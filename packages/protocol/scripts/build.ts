@@ -142,10 +142,14 @@ function getContractList(coreContractsOnly: boolean) {
 const BUILD_DIR = path.resolve(ROOT_DIR, process.env.BUILD_DIR ?? './build')
 
 function truffleStyleGlobs(contractList: string[]): string[] {
+  return web3TypegenGlobs(contractList, BUILD_DIR)
+}
+
+// Matches the layout emitTruffleStyleArtifacts() writes: <root>/<destDir>/<Name>.json.
+function web3TypegenGlobs(contractList: string[], root: string): string[] {
   const alternation = contractList.join('|')
-  // Matches the layout emitTruffleStyleArtifacts() writes: ${BUILD_DIR}/<destDir>/<Name>.json.
   return [SOLIDITY_05_PACKAGE.destDir, SOLIDITY_08_PACKAGE.destDir].map(
-    (dir) => `${BUILD_DIR}/${dir}/@(${alternation}).json`
+    (dir) => `${root}/${dir}/@(${alternation}).json`
   )
 }
 
@@ -175,15 +179,37 @@ function generateFilesForEthers({ coreContractsOnly, ethersTypes: outdir }: Buil
   exec(`yarn run --silent typechain --target=ethers-v5 --outDir "${outdir}" ${globs}`)
 }
 
+// web3's AbiType union has no "receive", so an artifact carrying one generates
+// typings that do not compile. There is nothing for the wrapper to expose either:
+// value is sent with a plain transaction, not by calling a method. The generator
+// therefore reads copies of the artifacts with those entries removed.
+function withoutReceiveEntries(sourceDir: string, targetDir: string) {
+  if (!existsSync(sourceDir)) return
+  mkdirSync(targetDir, { recursive: true })
+  for (const entry of readdirSync(sourceDir).filter((e) => e.endsWith('.json'))) {
+    const artifact = readJSON(path.join(sourceDir, entry))
+    const abi = Array.isArray(artifact.abi)
+      ? (artifact.abi as { type?: string }[]).filter((item) => item.type !== 'receive')
+      : artifact.abi
+    writeFileSync(path.join(targetDir, entry), JSON.stringify({ ...artifact, abi }, null, 2))
+  }
+}
+
 async function generateFilesForContractKit({ coreContractsOnly, web3Types: outdir }: BuildTargets) {
   console.info(`protocol: Generating Web3 Types to ${outdir}`)
   assertTruffleArtifactsExist()
   exec(`rm -rf ${outdir}`)
   const relativePath = path.relative(ROOT_DIR, outdir)
 
+  const web3ArtifactsDir = path.join(BUILD_DIR, 'web3-typegen-artifacts')
+  exec(`rm -rf ${web3ArtifactsDir}`)
+  for (const sub of [SOLIDITY_05_PACKAGE.destDir, SOLIDITY_08_PACKAGE.destDir]) {
+    withoutReceiveEntries(path.join(BUILD_DIR, sub), path.join(web3ArtifactsDir, sub))
+  }
+
   const cwd = process.cwd()
 
-  for (const glob of truffleStyleGlobs(getContractList(coreContractsOnly))) {
+  for (const glob of web3TypegenGlobs(getContractList(coreContractsOnly), web3ArtifactsDir)) {
     await tsGenerator(
       { cwd, loggingLvl: 'info' },
       new Web3V1Celo({
