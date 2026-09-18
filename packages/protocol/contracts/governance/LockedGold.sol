@@ -522,7 +522,7 @@ contract LockedGold is
     _updateDelegatedAmount(account);
 
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
-    address payable communityFundPayable = payable(address(uint160(communityFund)));
+    address payable communityFundPayable = payable(communityFund);
     require((maxSlash - reward) <= address(this).balance, "Inconsistent balance");
     communityFundPayable.sendValue((maxSlash - reward));
     emit AccountSlashed(account, maxSlash, reporter, reward);
