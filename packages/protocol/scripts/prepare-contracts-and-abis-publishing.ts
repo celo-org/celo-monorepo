@@ -314,7 +314,10 @@ function prepareContractsPackage() {
   // surface in a consumer's build after the package is published.
   const published = publishedSolidityFiles(CONTRACTS_PACKAGE_STAGING_DIR)
   assertStagedImportsResolve(CONTRACTS_PACKAGE_STAGING_DIR, published)
-  assertStagedExternalDependenciesDeclared(CONTRACTS_PACKAGE_STAGING_DIR, published)
+  // The 0.5 subtree is the proxies as they were deployed, published as a record rather
+  // than to be compiled by consumers. Its OpenZeppelin 2.x line is deprecated with no
+  // patched release, so declaring it would fail the repository's dependency review.
+  assertStagedExternalDependenciesDeclared(CONTRACTS_PACKAGE_STAGING_DIR, published, ['0.5'])
 }
 
 function lsRecursive(dir: string): string[] {

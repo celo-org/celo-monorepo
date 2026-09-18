@@ -190,10 +190,13 @@ function externalImportsOf(source: string): string[] {
  * Inside the monorepo those names resolve through the workspace's own node_modules, and
  * some of them (the aliases) exist nowhere else, so a consumer installing only this
  * package would be left with sources that cannot compile.
+ *
+ * `exemptDirs` names subtrees whose dependencies are deliberately left undeclared.
  */
 export function assertStagedExternalDependenciesDeclared(
   packageDir: string,
-  publishedFiles?: string[]
+  publishedFiles?: string[],
+  exemptDirs: string[] = []
 ): void {
   const root = path.resolve(packageDir)
   const manifest = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')) as {
@@ -204,9 +207,9 @@ export function assertStagedExternalDependenciesDeclared(
     ...Object.keys(manifest.dependencies ?? {}),
     ...Object.keys(manifest.peerDependencies ?? {}),
   ])
-  const files = publishedFiles
-    ? publishedFiles.map((f) => path.join(root, f))
-    : listSolidityFiles(root)
+  const files = (
+    publishedFiles ? publishedFiles.map((f) => path.join(root, f)) : listSolidityFiles(root)
+  ).filter((file) => !exemptDirs.some((dir) => isInside(path.relative(root, file), dir)))
   const missing = new Map<string, string>()
   for (const file of files) {
     for (const importPath of externalImportsOf(fs.readFileSync(file, 'utf8'))) {

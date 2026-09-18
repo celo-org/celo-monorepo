@@ -183,11 +183,22 @@ describe('staged package imports', () => {
       manifest({ 'openzeppelin-solidity': '^2.5.0' })
       write(
         root,
+        'common/UsingRegistry.sol',
+        'import "openzeppelin-solidity/contracts/ownership/Ownable.sol";'
+      )
+      write(root, 'common/Other.sol', 'import "solidity-bytes-utils-8/contracts/BytesLib.sol";')
+      assert.throws(() => assertStagedExternalDependenciesDeclared(root), /solidity-bytes-utils-8/)
+    })
+
+    it('skips the subtrees named as exempt', () => {
+      manifest({})
+      write(
+        root,
         '0.5/common/UsingRegistry.sol',
         'import "openzeppelin-solidity/contracts/ownership/Ownable.sol";'
       )
-      write(root, '0.5/common/Other.sol', 'import "solidity-bytes-utils-8/contracts/BytesLib.sol";')
-      assert.throws(() => assertStagedExternalDependenciesDeclared(root), /solidity-bytes-utils-8/)
+      assertStagedExternalDependenciesDeclared(root, undefined, ['0.5'])
+      assert.throws(() => assertStagedExternalDependenciesDeclared(root), /openzeppelin-solidity/)
     })
 
     it('ignores relative imports, which the resolve check already covers', () => {
