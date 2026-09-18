@@ -951,7 +951,7 @@ const loadContractArtifact = (contractName: string, artifactPath: string): ViemC
 
   // Use full compiler version (e.g., "0.5.14+commit.01f1aaa4") for verification
   // Etherscan may require the full version to properly verify
-  const fullVersion = compiler.version || '0.8.37'
+  const fullVersion = compiler.version || '0.8.36'
 
   // Determine the foundry profile that reproduces this artifact, for verification:
   // the contracts-0.5 sources build with solc05, a pre-migration tag's 0.5 tree with
