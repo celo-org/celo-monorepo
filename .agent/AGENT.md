@@ -28,6 +28,14 @@ Quick reference:
 2. `yarn release:check-versions:foundry` - Generate version report
 3. `yarn release:make:foundry` - Deploy contracts and create proposal
 
+### Solidity Compiler and EVM Target
+
+**File:** `.agent/skills/solidity-compiler/SKILL.md`
+
+Use when: bumping solc, changing evm_version or via_ir, adding a foundry profile, reviewing a compiler upgrade, or when mentioning solc version, EVM target, paris/shanghai/cancun/prague, via-IR, or a Solidity compiler bug.
+
+Quick reference: pinned to solc 0.8.36 / shanghai / optimizer 200 / via-IR off. Two rules keep the compiler's known bugs unreachable: never enable via-IR, and never `delete` an element of an array in memory.
+
 ### Node Cache Updates
 
 **File:** `.agent/skills/node-cache-update/SKILL.md`
