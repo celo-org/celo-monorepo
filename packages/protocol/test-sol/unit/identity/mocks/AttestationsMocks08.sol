@@ -3,7 +3,6 @@ pragma solidity >=0.8.7 <0.9.0;
 
 import "@celo-contracts-8/identity/Attestations.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/utils/math/SafeCast.sol";
 
 // Deployable 0.8 helper for the migrated Attestations contract, used by the 0.5 tests
@@ -17,7 +16,6 @@ import "@openzeppelin/contracts8/utils/math/SafeCast.sol";
  * AttestationsTest, deployed via deployCodeTo("AttestationsTestMock08", ...).
  */
 contract AttestationsTestMock08 is Attestations(true) {
-  using SafeMath for uint256;
   using SafeCast for uint256;
 
   address[] private __testValidators;
@@ -49,7 +47,7 @@ contract AttestationsTestMock08 is Attestations(true) {
       IERC20(attestationRequestFeeToken).transferFrom(
         msg.sender,
         address(this),
-        attestationRequestFees[attestationRequestFeeToken].mul(attestationsRequested)
+        (attestationRequestFees[attestationRequestFeeToken] * attestationsRequested)
       ),
       "Transfer of attestation request fees failed"
     );
@@ -70,9 +68,9 @@ contract AttestationsTestMock08 is Attestations(true) {
     state.unselectedRequests[msg.sender].attestationsRequested = attestationsRequested.toUint32();
     state.unselectedRequests[msg.sender].attestationRequestFeeToken = attestationRequestFeeToken;
 
-    state.attestations[msg.sender].requested = uint256(state.attestations[msg.sender].requested)
-      .add(attestationsRequested)
-      .toUint32();
+    state.attestations[msg.sender].requested = uint256(
+      (state.attestations[msg.sender].requested) + attestationsRequested
+    ).toUint32();
 
     emit AttestationsRequested(
       identifier,
@@ -132,9 +130,8 @@ contract AttestationsTestMock08 is Attestations(true) {
     );
     attestedAddress.completed = attestedAddress.completed + 1;
 
-    pendingWithdrawals[token][issuer] = pendingWithdrawals[token][issuer].add(
-      attestationRequestFees[token]
-    );
+    pendingWithdrawals[token][issuer] = (pendingWithdrawals[token][issuer] +
+      attestationRequestFees[token]);
 
     IdentifierState storage state = identifiers[identifier];
     if (identifiers[identifier].attestations[msg.sender].completed == 1) {
@@ -167,12 +164,12 @@ contract AttestationsTestMock08 is Attestations(true) {
     ];
 
     bytes32 seed = getRandom().getBlockRandomness(
-      uint256(unselectedRequest.blockNumber).add(selectIssuersWaitBlocks)
+      uint256((unselectedRequest.blockNumber) + selectIssuersWaitBlocks)
     );
     IAccounts accounts = getAccounts();
     uint256 issuersLength = numberValidatorsInCurrentSet();
     uint256[] memory issuers = new uint256[](issuersLength);
-    for (uint256 i = 0; i < issuersLength; i = i.add(1)) issuers[i] = i;
+    for (uint256 i = 0; i < issuersLength; i = (i + 1)) issuers[i] = i;
 
     require(unselectedRequest.attestationsRequested <= issuersLength, "not enough issuers");
 
@@ -193,7 +190,7 @@ contract AttestationsTestMock08 is Attestations(true) {
         attestation.status == AttestationStatus.None &&
         accounts.hasAuthorizedAttestationSigner(issuer)
       ) {
-        currentIndex = currentIndex.add(1);
+        currentIndex = (currentIndex + 1);
         attestation.status = AttestationStatus.Incomplete;
         attestation.blockNumber = unselectedRequest.blockNumber;
         attestation.attestationRequestFeeToken = unselectedRequest.attestationRequestFeeToken;
@@ -209,7 +206,7 @@ contract AttestationsTestMock08 is Attestations(true) {
 
       // Remove the validator that was selected from the list,
       // by replacing it by the last element in the list
-      issuersLength = issuersLength.sub(1);
+      issuersLength = (issuersLength - 1);
       issuers[idx] = issuers[issuersLength];
     }
   }

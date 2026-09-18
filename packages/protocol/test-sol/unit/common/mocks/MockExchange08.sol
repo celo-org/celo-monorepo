@@ -2,7 +2,6 @@
 pragma solidity >=0.8.7 <0.9.0;
 
 import "@celo-contracts/common/FixidityLib.sol";
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
 interface IMockExchangeToken {
   function mint(address to, uint256 value) external returns (bool);
@@ -36,7 +35,6 @@ interface IMockExchangeRegistry {
  */
 contract MockExchange08 {
   using FixidityLib for FixidityLib.Fraction;
-  using SafeMath for uint256;
 
   IMockExchangeRegistry public registry;
 
@@ -138,7 +136,7 @@ contract MockExchange08 {
       reducedSellAmount
     );
     // Integer division mirrors the original Exchange.sol implementation.
-    return numerator.unwrap().div(denominator.unwrap());
+    return (numerator.unwrap() / denominator.unwrap());
   }
 
   function _getReducedSellAmount(
@@ -152,8 +150,8 @@ contract MockExchange08 {
     IMockExchangeReserve reserve = IMockExchangeReserve(registry.getAddressForOrDie(RESERVE_ID));
 
     if (sellGold) {
-      goldBucket = goldBucket.add(sellAmount);
-      stableBucket = stableBucket.sub(buyAmount);
+      goldBucket = (goldBucket + sellAmount);
+      stableBucket = (stableBucket - buyAmount);
       // Pull CELO (gold) from caller into reserve
       IMockExchangeToken celoToken = IMockExchangeToken(registry.getAddressForOrDie(GOLD_TOKEN_ID));
       require(
@@ -163,8 +161,8 @@ contract MockExchange08 {
       // Mint stable to caller
       require(stableToken.mint(msg.sender, buyAmount), "Mint of stable token failed");
     } else {
-      stableBucket = stableBucket.add(sellAmount);
-      goldBucket = goldBucket.sub(buyAmount);
+      stableBucket = (stableBucket + sellAmount);
+      goldBucket = (goldBucket - buyAmount);
       // Pull stable from caller; burn it
       require(
         stableToken.transferFrom(msg.sender, address(this), sellAmount),
@@ -186,7 +184,7 @@ contract MockExchange08 {
   function _getUpdatedBuckets() private view returns (uint256, uint256) {
     uint256 updatedGoldBucket = _getUpdatedGoldBucket();
     (uint256 rateNumerator, uint256 rateDenominator) = _getOracleExchangeRate();
-    uint256 updatedStableBucket = rateNumerator.mul(updatedGoldBucket).div(rateDenominator);
+    uint256 updatedStableBucket = ((rateNumerator * updatedGoldBucket) / rateDenominator);
     return (updatedGoldBucket, updatedStableBucket);
   }
 

@@ -1,15 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.9.0;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@celo-contracts/governance/interfaces/IValidators.sol";
 
 /**
  * @title A mock Validators for 0.8 tests.
  */
 contract MockValidators08 is IValidators {
-  using SafeMath for uint256;
-
   mapping(address => bool) public isValidator;
   mapping(address => bool) public isValidatorGroup;
   mapping(address => uint256) private numGroupMembers;
@@ -158,7 +155,7 @@ contract MockValidators08 is IValidators {
   }
 
   function mintStableToEpochManager(uint256 amount) external {
-    mintedStable = mintedStable.add(amount);
+    mintedStable = (mintedStable + amount);
   }
 
   function isValidatorGroupMethod(address account) external view returns (bool) {

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.9.0;
 
-import { SafeMath } from "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 

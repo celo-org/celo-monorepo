@@ -3,7 +3,6 @@ pragma solidity >=0.8.7 <0.9.0;
 /* solhint-disable no-inline-assembly, avoid-low-level-calls, func-name-mixedcase, func-order */
 
 // OpenZeppelin imports
-import { SafeMath } from "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
 // Local imports
 import { ExternalCall } from "./ExternalCall.sol";

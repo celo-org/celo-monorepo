@@ -1,15 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.9.0;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@celo-contracts/governance/interfaces/ILockedGold.sol";
 
 /**
  * @title A mock LockedGold for 0.8 tests.
  */
 contract MockLockedGold08 is ILockedGold {
-  using SafeMath for uint256;
-
   mapping(address => uint256) public accountTotalLockedGold;
   mapping(address => uint256) public nonvotingAccountBalance;
   mapping(address => address) public authorizedValidators;
@@ -21,11 +18,11 @@ contract MockLockedGold08 is ILockedGold {
   mapping(address => uint256) public accountTotalDelegatedAmountInPercents;
 
   function incrementNonvotingAccountBalance(address account, uint256 value) external {
-    nonvotingAccountBalance[account] = nonvotingAccountBalance[account].add(value);
+    nonvotingAccountBalance[account] = (nonvotingAccountBalance[account] + value);
   }
 
   function decrementNonvotingAccountBalance(address account, uint256 value) public {
-    nonvotingAccountBalance[account] = nonvotingAccountBalance[account].sub(value);
+    nonvotingAccountBalance[account] = (nonvotingAccountBalance[account] - value);
   }
 
   function setAccountTotalLockedGold(address account, uint256 value) external {
@@ -45,11 +42,11 @@ contract MockLockedGold08 is ILockedGold {
   }
 
   function lock() external payable {
-    accountTotalLockedGold[msg.sender] = accountTotalLockedGold[msg.sender].add(msg.value);
+    accountTotalLockedGold[msg.sender] = (accountTotalLockedGold[msg.sender] + msg.value);
   }
 
   function unlock(uint256 value) external {
-    accountTotalLockedGold[msg.sender] = accountTotalLockedGold[msg.sender].sub(value);
+    accountTotalLockedGold[msg.sender] = (accountTotalLockedGold[msg.sender] - value);
   }
 
   function relock(uint256, uint256) external {
@@ -69,7 +66,7 @@ contract MockLockedGold08 is ILockedGold {
     address[] calldata,
     uint256[] calldata
   ) external {
-    accountTotalLockedGold[account] = accountTotalLockedGold[account].sub(penalty);
+    accountTotalLockedGold[account] = (accountTotalLockedGold[account] - penalty);
   }
 
   function addSlasher(string calldata slasherIdentifier) external {
