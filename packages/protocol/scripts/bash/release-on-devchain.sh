@@ -37,6 +37,9 @@ BASELINE_LIBRARIES=$(get_libraries_filename "anvil" "$BRANCH")
 # make-release expects the libraries file of the release before the one it builds, which
 # is the file verify-deployed writes for the baseline tag.
 RELEASE_LIBRARIES=$(get_previous_libraries_filename "anvil" "$NEXT_BRANCH")
+# What the final verification of the new release writes, which a rerun would otherwise
+# find and stop on.
+NEXT_LIBRARIES=$(get_libraries_filename "anvil" "$NEXT_BRANCH")
 REPORT="report-$BRANCH-$NEXT_BRANCH.json"
 PROPOSAL="proposal-anvil-$NEXT_BRANCH.json"
 ANVIL_PID=""
@@ -51,7 +54,7 @@ trap cleanup EXIT INT TERM
 
 # Reused runners keep files from earlier runs. Start clean so verify-deployed never
 # hits its interactive "libraries file exists" prompt and no stale report is reused.
-rm -f "$BASELINE_LIBRARIES" "$RELEASE_LIBRARIES" "$REPORT" "$PROPOSAL"
+rm -f "$BASELINE_LIBRARIES" "$RELEASE_LIBRARIES" "$NEXT_LIBRARIES" "$REPORT" "$PROPOSAL"
 git tag -f "$NEXT_BRANCH" HEAD >/dev/null
 
 echo "- Run local network"

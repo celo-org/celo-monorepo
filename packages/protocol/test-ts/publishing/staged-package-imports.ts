@@ -1,4 +1,5 @@
 import {
+  assertStagedExternalDependenciesDeclared,
   findUnresolvedRelativeImports,
   rewriteImportsForPackageLayout,
   writeCompatibilityStubs,
@@ -156,6 +157,43 @@ describe('staged package imports', () => {
       assert.deepEqual(findUnresolvedRelativeImports(root, published), [
         { file: path.join('common', 'Registry.sol'), importPath: './test/Mock.sol' },
       ])
+    })
+  })
+
+  describe('#assertStagedExternalDependenciesDeclared()', () => {
+    const manifest = (deps: Record<string, string>) =>
+      write(root, 'package.json', JSON.stringify({ name: '@celo/contracts', dependencies: deps }))
+
+    it('accepts an import of a declared package', () => {
+      manifest({ '@openzeppelin/contracts8': 'npm:@openzeppelin/contracts@^4.4.2' })
+      write(root, 'common/Accounts.sol', 'import "@openzeppelin/contracts8/access/Ownable.sol";')
+      assertStagedExternalDependenciesDeclared(root)
+    })
+
+    it('rejects an import of a package the manifest does not declare', () => {
+      manifest({})
+      write(root, 'common/Accounts.sol', 'import "@openzeppelin/contracts8/access/Ownable.sol";')
+      assert.throws(
+        () => assertStagedExternalDependenciesDeclared(root),
+        /@openzeppelin\/contracts8 \(first imported by common\/Accounts.sol\)/
+      )
+    })
+
+    it('reads unscoped package names too', () => {
+      manifest({ 'openzeppelin-solidity': '^2.5.0' })
+      write(
+        root,
+        '0.5/common/UsingRegistry.sol',
+        'import "openzeppelin-solidity/contracts/ownership/Ownable.sol";'
+      )
+      write(root, '0.5/common/Other.sol', 'import "solidity-bytes-utils-8/contracts/BytesLib.sol";')
+      assert.throws(() => assertStagedExternalDependenciesDeclared(root), /solidity-bytes-utils-8/)
+    })
+
+    it('ignores relative imports, which the resolve check already covers', () => {
+      manifest({})
+      write(root, 'common/Accounts.sol', 'import "./interfaces/IAccounts.sol";')
+      assertStagedExternalDependenciesDeclared(root)
     })
   })
 })

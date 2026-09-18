@@ -4,6 +4,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { sync as rmrfSync } from 'rimraf'
 import {
+  assertStagedExternalDependenciesDeclared,
   assertStagedImportsResolve,
   publishedSolidityFiles,
   rewriteImportsForPackageLayout,
@@ -311,10 +312,9 @@ function prepareContractsPackage() {
 
   // Nothing later compiles the staged tree, so a dangling import would otherwise only
   // surface in a consumer's build after the package is published.
-  assertStagedImportsResolve(
-    CONTRACTS_PACKAGE_STAGING_DIR,
-    publishedSolidityFiles(CONTRACTS_PACKAGE_STAGING_DIR)
-  )
+  const published = publishedSolidityFiles(CONTRACTS_PACKAGE_STAGING_DIR)
+  assertStagedImportsResolve(CONTRACTS_PACKAGE_STAGING_DIR, published)
+  assertStagedExternalDependenciesDeclared(CONTRACTS_PACKAGE_STAGING_DIR, published)
 }
 
 function lsRecursive(dir: string): string[] {

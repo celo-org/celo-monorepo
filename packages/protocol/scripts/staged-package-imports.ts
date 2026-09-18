@@ -166,6 +166,63 @@ export function assertStagedImportsResolve(packageDir: string, publishedFiles?: 
   )
 }
 
+/** The npm package an import path resolves to: `@scope/name/...` or `name/...`. */
+function packageNameOf(importPath: string): string {
+  const parts = importPath.split('/')
+  return importPath.startsWith('@') ? parts.slice(0, 2).join('/') : parts[0]
+}
+
+function externalImportsOf(source: string): string[] {
+  const found: string[] = []
+  IMPORT_PATH_REGEXP.lastIndex = 0
+  let match = IMPORT_PATH_REGEXP.exec(source)
+  while (match !== null) {
+    if (!match[1].startsWith('.')) {
+      found.push(match[1])
+    }
+    match = IMPORT_PATH_REGEXP.exec(source)
+  }
+  return found
+}
+
+/**
+ * Fails when a published source imports a package the published manifest does not declare.
+ * Inside the monorepo those names resolve through the workspace's own node_modules, and
+ * some of them (the aliases) exist nowhere else, so a consumer installing only this
+ * package would be left with sources that cannot compile.
+ */
+export function assertStagedExternalDependenciesDeclared(
+  packageDir: string,
+  publishedFiles?: string[]
+): void {
+  const root = path.resolve(packageDir)
+  const manifest = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')) as {
+    dependencies?: Record<string, string>
+    peerDependencies?: Record<string, string>
+  }
+  const declared = new Set([
+    ...Object.keys(manifest.dependencies ?? {}),
+    ...Object.keys(manifest.peerDependencies ?? {}),
+  ])
+  const files = publishedFiles
+    ? publishedFiles.map((f) => path.join(root, f))
+    : listSolidityFiles(root)
+  const missing = new Map<string, string>()
+  for (const file of files) {
+    for (const importPath of externalImportsOf(fs.readFileSync(file, 'utf8'))) {
+      const name = packageNameOf(importPath)
+      if (!declared.has(name) && !missing.has(name)) {
+        missing.set(name, toPosix(path.relative(root, file)))
+      }
+    }
+  }
+  if (missing.size === 0) {
+    return
+  }
+  const lines = [...missing].map(([name, file]) => `  ${name} (first imported by ${file})`)
+  throw new Error(`Staged contracts package imports undeclared packages:\n${lines.join('\n')}`)
+}
+
 /** The files `npm publish` would ship from the staged package, honoring .npmignore. */
 export function publishedSolidityFiles(packageDir: string): string[] {
   const output = child_process.execSync('npm pack --dry-run --json --ignore-scripts', {
