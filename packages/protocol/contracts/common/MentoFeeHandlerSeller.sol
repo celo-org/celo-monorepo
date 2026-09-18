@@ -27,7 +27,7 @@ contract MentoFeeHandlerSeller is FeeHandlerSeller {
   constructor(bool test) Initializable(test) {}
 
   // without this line the contract can't receive native Celo transfers
-  fallback() external payable {}
+  receive() external payable {}
 
   // Note: current version of Mento is not compatible with this Seller
   function sell(

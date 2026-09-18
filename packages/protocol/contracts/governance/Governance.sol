@@ -310,9 +310,7 @@ contract Governance is
     lastDequeue = block.timestamp;
   }
 
-  fallback() external payable {
-    require(msg.data.length == 0, "unknown method");
-  }
+  receive() external payable {}
 
   /**
    * @notice Updates the ratio of yes:yes+no votes needed for a specific class of proposals to pass.

@@ -313,6 +313,8 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
   // initialize(uint256,uint256,uint256,uint256,uint256,bool,address,address,address,bool,uint256,bool,bool,address)
   bytes4 private constant LEGACY_INITIALIZE_SELECTOR = 0x064a2e68;
 
+  receive() external payable {}
+
   fallback() external payable {
     // Route the legacy initializer ABI; see _initializeLegacy for why it cannot be
     // declared as a regular overload.

@@ -41,7 +41,7 @@ contract UniswapFeeHandlerSeller is FeeHandlerSeller {
   constructor(bool test) Initializable(test) {}
 
   // without this line the contract can't receive native Celo transfers
-  fallback() external payable {}
+  receive() external payable {}
 
   /**
    * @notice Allows owner to set the router for a token.
