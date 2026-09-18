@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.9.0;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts8/token/ERC20/utils/SafeERC20.sol";
@@ -26,7 +25,6 @@ contract Escrow is
   // Maintain storage alignment since Escrow was initially deployed with UsingRegistry.sol
   UsingRegistryV2NoMento
 {
-  using SafeMath for uint256;
   using SafeERC20 for IERC20;
 
   // Placeholder for the registry storage var that lived in
@@ -122,12 +120,12 @@ contract Escrow is
   function addDefaultTrustedIssuer(address trustedIssuer) external onlyOwner {
     require(address(0) != trustedIssuer, "trustedIssuer can't be null");
     require(
-      defaultTrustedIssuers.length.add(1) <= MAX_TRUSTED_ISSUERS_PER_PAYMENT,
+      (defaultTrustedIssuers.length + 1) <= MAX_TRUSTED_ISSUERS_PER_PAYMENT,
       "defaultTrustedIssuers.length can't exceed allowed number of trustedIssuers"
     );
 
     // Ensure list of trusted issuers is unique
-    for (uint256 i = 0; i < defaultTrustedIssuers.length; i = i.add(1)) {
+    for (uint256 i = 0; i < defaultTrustedIssuers.length; i = (i + 1)) {
       require(
         defaultTrustedIssuers[i] != trustedIssuer,
         "trustedIssuer already in defaultTrustedIssuers"
@@ -326,7 +324,7 @@ contract Escrow is
     EscrowedPayment memory payment = escrowedPayments[paymentId];
     require(payment.sender == msg.sender, "Only sender of payment can attempt to revoke payment.");
     require(
-      block.timestamp >= (payment.timestamp.add(payment.expirySeconds)),
+      block.timestamp >= ((payment.timestamp + payment.expirySeconds)),
       "Transaction not redeemable for sender yet."
     );
 
@@ -441,7 +439,7 @@ contract Escrow is
     uint256 minAttestations,
     address[] memory trustedIssuers
   ) internal view returns (bool) {
-    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+    for (uint256 i = 0; i < trustedIssuers.length; i = (i + 1)) {
       if (trustedIssuers[i] != attestationsAddress) {
         continue;
       }
@@ -472,7 +470,7 @@ contract Escrow is
       trustedIssuers
     );
     // Check if an attestation was found for recipientIdentifier -> account
-    for (uint256 i = 0; i < accounts.length; i = i.add(1)) {
+    for (uint256 i = 0; i < accounts.length; i = (i + 1)) {
       if (accounts[i] == account) {
         return true;
       }

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.9.0;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
 import "./UsingRegistry.sol";
@@ -27,8 +26,6 @@ contract GoldToken is
   ICeloTokenInitializer,
   ICeloVersionedContract
 {
-  using SafeMath for uint256;
-
   // Address of the TRANSFER precompiled contract.
   // solhint-disable state-visibility
   address constant TRANSFER = address(0xff - 2);
@@ -125,7 +122,7 @@ contract GoldToken is
   function increaseAllowance(address spender, uint256 value) external returns (bool) {
     require(spender != address(0), "cannot set allowance for 0");
     uint256 oldValue = allowed[msg.sender][spender];
-    uint256 newValue = oldValue.add(value);
+    uint256 newValue = (oldValue + value);
     allowed[msg.sender][spender] = newValue;
     emit Approval(msg.sender, spender, newValue);
     return true;
@@ -139,7 +136,7 @@ contract GoldToken is
    */
   function decreaseAllowance(address spender, uint256 value) external returns (bool) {
     uint256 oldValue = allowed[msg.sender][spender];
-    uint256 newValue = oldValue.sub(value);
+    uint256 newValue = (oldValue - value);
     allowed[msg.sender][spender] = newValue;
     emit Approval(msg.sender, spender, newValue);
     return true;
@@ -164,7 +161,7 @@ contract GoldToken is
     (success, ) = TRANSFER.call{ value: 0, gas: gasleft() }(abi.encode(from, to, value));
     require(success, "CELO transfer failed");
 
-    allowed[from][msg.sender] = allowed[from][msg.sender].sub(value);
+    allowed[from][msg.sender] = (allowed[from][msg.sender] - value);
     emit Transfer(from, to, value);
     return true;
   }

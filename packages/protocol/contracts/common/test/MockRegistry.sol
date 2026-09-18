@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.9.0;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "../interfaces/IRegistry.sol";
@@ -12,8 +11,6 @@ import "../Initializable.sol";
  * @title Routes identifiers to addresses.
  */
 contract MockRegistry is IRegistry, IRegistryInitializer, Ownable, Initializable {
-  using SafeMath for uint256;
-
   mapping(bytes32 => address) public registry;
 
   event RegistryUpdated(string identifier, bytes32 indexed identifierHash, address indexed addr);
@@ -92,7 +89,7 @@ contract MockRegistry is IRegistry, IRegistryInitializer, Ownable, Initializable
     bytes32[] calldata identifierHashes,
     address sender
   ) external view returns (bool) {
-    for (uint256 i = 0; i < identifierHashes.length; i = i.add(1)) {
+    for (uint256 i = 0; i < identifierHashes.length; i = (i + 1)) {
       if (registry[identifierHashes[i]] == sender) {
         return true;
       }

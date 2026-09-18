@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.9.0;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/utils/Address.sol";
 import "solidity-bytes-utils-8/contracts/BytesLib.sol";
 
@@ -12,7 +11,6 @@ import "../common/FixidityLib.sol";
  */
 library Proposals {
   using FixidityLib for FixidityLib.Fraction;
-  using SafeMath for uint256;
   using BytesLib for bytes;
 
   enum Stage {
@@ -92,11 +90,11 @@ library Proposals {
 
     uint256 dataPosition = 0;
     delete proposal.transactions;
-    for (uint256 i = 0; i < transactionCount; i = i.add(1)) {
+    for (uint256 i = 0; i < transactionCount; i = (i + 1)) {
       proposal.transactions.push(
         Transaction(values[i], destinations[i], data.slice(dataPosition, dataLengths[i]))
       );
-      dataPosition = dataPosition.add(dataLengths[i]);
+      dataPosition = (dataPosition + dataLengths[i]);
     }
   }
 
@@ -120,14 +118,14 @@ library Proposals {
     uint256 abstainVotes
   ) public {
     // Subtract previous vote.
-    proposal.votes.yes = proposal.votes.yes.sub(previousYesVotes);
-    proposal.votes.no = proposal.votes.no.sub(previousNoVotes);
-    proposal.votes.abstain = proposal.votes.abstain.sub(previousAbstainVotes);
+    proposal.votes.yes = (proposal.votes.yes - previousYesVotes);
+    proposal.votes.no = (proposal.votes.no - previousNoVotes);
+    proposal.votes.abstain = (proposal.votes.abstain - previousAbstainVotes);
 
     // Add new vote.
-    proposal.votes.yes = proposal.votes.yes.add(yesVotes);
-    proposal.votes.no = proposal.votes.no.add(noVotes);
-    proposal.votes.abstain = proposal.votes.abstain.add(abstainVotes);
+    proposal.votes.yes = (proposal.votes.yes + yesVotes);
+    proposal.votes.no = (proposal.votes.no + noVotes);
+    proposal.votes.abstain = (proposal.votes.abstain + abstainVotes);
   }
 
   /**
@@ -175,7 +173,7 @@ library Proposals {
    * @param transactions The transactions to execute.
    */
   function executeTransactions(Transaction[] memory transactions) internal {
-    for (uint256 i = 0; i < transactions.length; i = i.add(1)) {
+    for (uint256 i = 0; i < transactions.length; i = (i + 1)) {
       require(
         externalCall(
           transactions[i].destination,
@@ -206,14 +204,14 @@ library Proposals {
       return FixidityLib.newFixed(0);
     }
     uint256 noVotes = proposal.votes.no;
-    uint256 totalVotes = yesVotes.add(noVotes).add(proposal.votes.abstain);
+    uint256 totalVotes = ((yesVotes + noVotes) + proposal.votes.abstain);
     uint256 requiredVotes = quorum
       .multiply(FixidityLib.newFixed(proposal.networkWeight))
       .fromFixed();
     if (requiredVotes > totalVotes) {
-      noVotes = noVotes.add(requiredVotes.sub(totalVotes));
+      noVotes = (noVotes + (requiredVotes - totalVotes));
     }
-    return FixidityLib.newFixedFraction(yesVotes, yesVotes.add(noVotes));
+    return FixidityLib.newFixedFraction(yesVotes, (yesVotes + noVotes));
   }
 
   /**
@@ -248,13 +246,13 @@ library Proposals {
 
     uint256 dataPosition = 0;
     proposal.transactions = new Transaction[](transactionCount);
-    for (uint256 i = 0; i < transactionCount; i = i.add(1)) {
+    for (uint256 i = 0; i < transactionCount; i = (i + 1)) {
       proposal.transactions[i] = Transaction(
         values[i],
         destinations[i],
         data.slice(dataPosition, dataLengths[i])
       );
-      dataPosition = dataPosition.add(dataLengths[i]);
+      dataPosition = (dataPosition + dataLengths[i]);
     }
     return proposal;
   }
@@ -268,7 +266,7 @@ library Proposals {
   function getParticipation(
     Proposal storage proposal
   ) internal view returns (FixidityLib.Fraction memory) {
-    uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
+    uint256 totalVotes = ((proposal.votes.yes + proposal.votes.no) + proposal.votes.abstain);
     return FixidityLib.newFixedFraction(totalVotes, proposal.networkWeight);
   }
 

@@ -2,7 +2,6 @@
 pragma solidity >=0.8.7 <0.9.0;
 
 import "@openzeppelin/contracts8/access/Ownable.sol";
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
@@ -15,8 +14,6 @@ import "./interfaces/IValidators.sol";
 //   slot 1: registry (address, 20 bytes)
 //   slot 2-3: slashingIncentives (struct, 64 bytes)
 contract SlasherUtil is Ownable, Initializable, UsingRegistry, PrecompilesOverride {
-  using SafeMath for uint256;
-
   struct SlashingIncentives {
     // Value of LockedGold to slash from the account.
     uint256 penalty;
@@ -62,7 +59,7 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, PrecompilesOverri
     require(epoch != 0, "Cannot slash on epoch 0");
     // Use `epoch-1` because the elections were on that epoch
     return
-      getValidators().groupMembershipInEpoch(validator, epoch.sub(1), groupMembershipHistoryIndex);
+      getValidators().groupMembershipInEpoch(validator, (epoch - 1), groupMembershipHistoryIndex);
   }
 
   function performSlashing(

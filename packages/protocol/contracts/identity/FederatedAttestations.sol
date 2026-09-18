@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.9.0;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts8/utils/math/SafeCast.sol";
@@ -24,7 +23,6 @@ contract FederatedAttestations is
   Initializable,
   UsingRegistryV2NoMento
 {
-  using SafeMath for uint256;
   using SafeCast for uint256;
 
   struct OwnershipAttestation {
@@ -176,7 +174,7 @@ contract FederatedAttestations is
       "Sender does not have permission to revoke attestations from this issuer"
     );
 
-    for (uint256 i = 0; i < identifiers.length; i = i.add(1)) {
+    for (uint256 i = 0; i < identifiers.length; i = (i + 1)) {
       _revokeAttestation(identifiers[i], issuer, accounts[i]);
     }
   }
@@ -220,14 +218,14 @@ contract FederatedAttestations is
     totalAttestations = 0;
     OwnershipAttestation[] memory attestationsPerIssuer;
 
-    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+    for (uint256 i = 0; i < trustedIssuers.length; i = (i + 1)) {
       attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
-      for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
+      for (uint256 j = 0; j < attestationsPerIssuer.length; j = (j + 1)) {
         accounts[totalAttestations] = attestationsPerIssuer[j].account;
         signers[totalAttestations] = attestationsPerIssuer[j].signer;
         issuedOns[totalAttestations] = attestationsPerIssuer[j].issuedOn;
         publishedOns[totalAttestations] = attestationsPerIssuer[j].publishedOn;
-        totalAttestations = totalAttestations.add(1);
+        totalAttestations = (totalAttestations + 1);
       }
     }
     return (countsPerIssuer, accounts, signers, issuedOns, publishedOns);
@@ -254,11 +252,11 @@ contract FederatedAttestations is
 
     uint256 currIndex = 0;
 
-    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+    for (uint256 i = 0; i < trustedIssuers.length; i = (i + 1)) {
       identifiersPerIssuer = addressToIdentifiers[account][trustedIssuers[i]];
-      for (uint256 j = 0; j < identifiersPerIssuer.length; j = j.add(1)) {
+      for (uint256 j = 0; j < identifiersPerIssuer.length; j = (j + 1)) {
         identifiers[currIndex] = identifiersPerIssuer[j];
-        currIndex = currIndex.add(1);
+        currIndex = (currIndex + 1);
       }
     }
     return (countsPerIssuer, identifiers);
@@ -366,9 +364,9 @@ contract FederatedAttestations is
     uint256 numAttestationsForIssuer;
     countsPerIssuer = new uint256[](trustedIssuers.length);
 
-    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+    for (uint256 i = 0; i < trustedIssuers.length; i = (i + 1)) {
       numAttestationsForIssuer = identifierToAttestations[identifier][trustedIssuers[i]].length;
-      totalAttestations = totalAttestations.add(numAttestationsForIssuer);
+      totalAttestations = (totalAttestations + numAttestationsForIssuer);
       countsPerIssuer[i] = numAttestationsForIssuer;
     }
     return (totalAttestations, countsPerIssuer);
@@ -391,9 +389,9 @@ contract FederatedAttestations is
     uint256 numIdentifiersForIssuer;
     countsPerIssuer = new uint256[](trustedIssuers.length);
 
-    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+    for (uint256 i = 0; i < trustedIssuers.length; i = (i + 1)) {
       numIdentifiersForIssuer = addressToIdentifiers[account][trustedIssuers[i]].length;
-      totalIdentifiers = totalIdentifiers.add(numIdentifiersForIssuer);
+      totalIdentifiers = (totalIdentifiers + numIdentifiersForIssuer);
       countsPerIssuer[i] = numIdentifiersForIssuer;
     }
     return (totalIdentifiers, countsPerIssuer);
@@ -420,15 +418,15 @@ contract FederatedAttestations is
     );
     uint256 numExistingAttestations = identifierToAttestations[identifier][issuer].length;
     require(
-      numExistingAttestations.add(1) <= MAX_ATTESTATIONS_PER_IDENTIFIER,
+      (numExistingAttestations + 1) <= MAX_ATTESTATIONS_PER_IDENTIFIER,
       "Max attestations already registered for identifier"
     );
     require(
-      addressToIdentifiers[account][issuer].length.add(1) <= MAX_IDENTIFIERS_PER_ADDRESS,
+      (addressToIdentifiers[account][issuer].length + 1) <= MAX_IDENTIFIERS_PER_ADDRESS,
       "Max identifiers already registered for account"
     );
 
-    for (uint256 i = 0; i < numExistingAttestations; i = i.add(1)) {
+    for (uint256 i = 0; i < numExistingAttestations; i = (i + 1)) {
       // This enforces only one attestation to be uploaded
       // for a given set of (identifier, issuer, account)
       // Editing/upgrading an attestation requires that it be revoked before a new one is registered
@@ -460,7 +458,7 @@ contract FederatedAttestations is
   function _revokeAttestation(bytes32 identifier, address issuer, address account) private {
     OwnershipAttestation[] storage attestations = identifierToAttestations[identifier][issuer];
     uint256 lenAttestations = attestations.length;
-    for (uint256 i = 0; i < lenAttestations; i = i.add(1)) {
+    for (uint256 i = 0; i < lenAttestations; i = (i + 1)) {
       if (attestations[i].account != account) {
         continue;
       }
@@ -478,7 +476,7 @@ contract FederatedAttestations is
       bytes32[] storage identifiers = addressToIdentifiers[account][issuer];
       uint256 lenIdentifiers = identifiers.length;
 
-      for (uint256 j = 0; j < lenIdentifiers; j = j.add(1)) {
+      for (uint256 j = 0; j < lenIdentifiers; j = (j + 1)) {
         if (identifiers[j] != identifier) {
           continue;
         }

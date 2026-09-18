@@ -2,13 +2,10 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 // Note: This is not an exact copy of UsingPrecompiles in the contract's folder, but in solidity 0.8
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "./interfaces/ICeloVersionedContract.sol";
 import "./IsL2Check.sol";
 
 contract UsingPrecompiles is IsL2Check {
-  using SafeMath for uint256;
-
   address constant TRANSFER = address(0xff - 2);
   address constant FRACTION_MUL = address(0xff - 3);
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
@@ -236,7 +233,7 @@ contract UsingPrecompiles is IsL2Check {
    * @dev This function will be deprecated in L2.
    */
   function minQuorumSize(uint256 blockNumber) public view onlyL1 returns (uint256) {
-    return numberValidatorsInSet(blockNumber).mul(2).add(2).div(3);
+    return (((numberValidatorsInSet(blockNumber) * 2) + 2) / 3);
   }
 
   /**
@@ -263,7 +260,7 @@ contract UsingPrecompiles is IsL2Check {
     if (blockNumber % epochSize == 0) {
       return epochNumber;
     } else {
-      return epochNumber.add(1);
+      return (epochNumber + 1);
     }
   }
 
@@ -284,7 +281,7 @@ contract UsingPrecompiles is IsL2Check {
    * @return bytes32 data
    */
   function getBytes32FromBytes(bytes memory bs, uint256 start) internal pure returns (bytes32) {
-    require(bs.length >= start.add(32), "slicing out of range");
+    require(bs.length >= (start + 32), "slicing out of range");
     bytes32 x;
     assembly {
       x := mload(add(bs, add(start, 32)))

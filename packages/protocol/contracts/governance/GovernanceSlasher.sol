@@ -2,7 +2,6 @@
 pragma solidity >=0.8.7 <0.9.0;
 
 import "@openzeppelin/contracts8/access/Ownable.sol";
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
@@ -18,7 +17,6 @@ contract GovernanceSlasher is
   ICeloVersionedContract,
   IGovernanceSlasher
 {
-  using SafeMath for uint256;
   // Maps a slashed address to the amount to be slashed.
   // Note that there is no reward paid when slashing via governance.
   mapping(address => uint256) slashed;
@@ -63,7 +61,7 @@ contract GovernanceSlasher is
    * @dev Only callable by governance.
    */
   function approveSlashing(address account, uint256 penalty) external onlyAuthorizedToSlash {
-    slashed[account] = slashed[account].add(penalty);
+    slashed[account] = (slashed[account] + penalty);
     emit SlashingApproved(account, penalty);
   }
 

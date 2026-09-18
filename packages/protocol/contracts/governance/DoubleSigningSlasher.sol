@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.9.0;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
-
 import "./SlasherUtil.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
@@ -12,8 +10,6 @@ import "../common/interfaces/ICeloVersionedContract.sol";
 //   slot 2-3: slashingIncentives (inherited from SlasherUtil)
 //   slot 4: isSlashed
 contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
-  using SafeMath for uint256;
-
   // For each signer address, check if a block header has already been slashed
   mapping(address => mapping(bytes32 => bool)) isSlashed;
 
@@ -162,8 +158,8 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
   function countSetBits(uint256 v) internal pure returns (uint256) {
     uint256 res = 0;
     uint256 acc = v;
-    for (uint256 i = 0; i < 256; i = i.add(1)) {
-      if (acc & 1 == 1) res = res.add(1);
+    for (uint256 i = 0; i < 256; i = (i + 1)) {
+      if (acc & 1 == 1) res = (res + 1);
       acc = acc >> 1;
     }
     return res;

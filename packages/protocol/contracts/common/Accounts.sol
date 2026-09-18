@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.9.0;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/utils/cryptography/ECDSA.sol";
 
@@ -24,7 +23,6 @@ contract Accounts is
   UsingRegistry
 {
   using FixidityLib for FixidityLib.Fraction;
-  using SafeMath for uint256;
 
   struct Signers {
     // The address that is authorized to vote in governance and validator elections on behalf of the
@@ -284,17 +282,17 @@ contract Accounts is
   ) external view override returns (uint256[] memory, bytes memory) {
     uint256 totalSize = 0;
     uint256[] memory sizes = new uint256[](accountsToQuery.length);
-    for (uint256 i = 0; i < accountsToQuery.length; i = i.add(1)) {
+    for (uint256 i = 0; i < accountsToQuery.length; i = (i + 1)) {
       sizes[i] = bytes(accounts[accountsToQuery[i]].metadataURL).length;
-      totalSize = totalSize.add(sizes[i]);
+      totalSize = (totalSize + sizes[i]);
     }
 
     bytes memory data = new bytes(totalSize);
     uint256 pointer = 0;
-    for (uint256 i = 0; i < accountsToQuery.length; i = i.add(1)) {
-      for (uint256 j = 0; j < sizes[i]; j = j.add(1)) {
+    for (uint256 i = 0; i < accountsToQuery.length; i = (i + 1)) {
+      for (uint256 j = 0; j < sizes[i]; j = (j + 1)) {
         data[pointer] = bytes(accounts[accountsToQuery[i]].metadataURL)[j];
-        pointer = pointer.add(1);
+        pointer = (pointer + 1);
       }
     }
     return (sizes, data);
@@ -313,7 +311,7 @@ contract Accounts is
     uint256 numberRoots = offchainStorageRoots[account].length;
     uint256 totalLength = 0;
     for (uint256 i = 0; i < numberRoots; i++) {
-      totalLength = totalLength.add(offchainStorageRoots[account][i].length);
+      totalLength = (totalLength + offchainStorageRoots[account][i].length);
     }
 
     bytes memory concatenated = new bytes(totalLength);

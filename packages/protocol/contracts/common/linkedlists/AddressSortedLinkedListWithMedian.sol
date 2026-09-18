@@ -1,15 +1,12 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.9.0;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
-
 import "./SortedLinkedListWithMedian.sol";
 
 /**
  * @title Maintains a sorted list of unsigned ints keyed by address.
  */
 library AddressSortedLinkedListWithMedian {
-  using SafeMath for uint256;
   using SortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
 
   /**
@@ -152,7 +149,7 @@ library AddressSortedLinkedListWithMedian {
     uint256[] memory values = new uint256[](byteKeys.length);
     SortedLinkedListWithMedian.MedianRelation[]
       memory relations = new SortedLinkedListWithMedian.MedianRelation[](keys.length);
-    for (uint256 i = 0; i < byteKeys.length; i = i.add(1)) {
+    for (uint256 i = 0; i < byteKeys.length; i = (i + 1)) {
       keys[i] = toAddress(byteKeys[i]);
       values[i] = list.getValue(byteKeys[i]);
       relations[i] = list.relation[byteKeys[i]];

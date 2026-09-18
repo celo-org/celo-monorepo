@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity >=0.8.7 <0.9.0;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "./interfaces/ISortedOracles.sol";
@@ -45,7 +44,6 @@ contract SortedOracles is
   Ownable,
   Initializable
 {
-  using SafeMath for uint256;
   using AddressSortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -158,7 +156,7 @@ contract SortedOracles is
       "token addr null or oracle addr null or index of token oracle not mapped to oracle addr"
     );
     isOracle[token][oracleAddress] = false;
-    oracles[token][index] = oracles[token][oracles[token].length.sub(1)];
+    oracles[token][index] = oracles[token][(oracles[token].length - 1)];
     oracles[token].pop();
     if (reportExists(token, oracleAddress)) {
       removeReport(token, oracleAddress);
@@ -176,7 +174,7 @@ contract SortedOracles is
       token != address(0) && n < timestamps[token].getNumElements(),
       "token addr null or trying to remove too many reports"
     );
-    for (uint256 i = 0; i < n; i = i.add(1)) {
+    for (uint256 i = 0; i < n; i = (i + 1)) {
       (bool isExpired, address oldestAddress) = isOldestReportExpired(token);
       if (isExpired) {
         removeReport(token, oldestAddress);
@@ -416,7 +414,7 @@ contract SortedOracles is
     address oldest = timestamps[token].getTail();
     uint256 timestamp = timestamps[token].getValue(oldest);
     // solhint-disable-next-line not-rely-on-time
-    if (block.timestamp.sub(timestamp) >= getTokenReportExpirySeconds(token)) {
+    if ((block.timestamp - timestamp) >= getTokenReportExpirySeconds(token)) {
       return (true, oldest);
     }
     return (false, oldest);

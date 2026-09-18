@@ -3,7 +3,6 @@ pragma solidity >=0.8.7 <0.9.0;
 
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts8/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts8/utils/Address.sol";
@@ -21,7 +20,6 @@ import "../common/UsingRegistry.sol";
 // `_guardCounter`(slot 2) -> `initialized`(slot 3, packed with `beneficiary`),
 // matching the deployed 0.5 layout byte-for-byte.
 contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseGold {
-  using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
   using Address for address payable; // prettier-ignore
 
@@ -154,11 +152,10 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
 
   modifier onlyExpired() {
     require(revocationInfo.canExpire, "Contract must be expirable");
-    uint256 releaseEndTime = releaseSchedule.releaseStartTime.add(
-      releaseSchedule.numReleasePeriods.mul(releaseSchedule.releasePeriod)
-    );
+    uint256 releaseEndTime = (releaseSchedule.releaseStartTime +
+      (releaseSchedule.numReleasePeriods * releaseSchedule.releasePeriod));
     require(
-      block.timestamp >= releaseEndTime.add(EXPIRATION_TIME),
+      block.timestamp >= (releaseEndTime + EXPIRATION_TIME),
       "`EXPIRATION_TIME` must have passed after the end of releasing"
     );
     _;
@@ -253,7 +250,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
     releaseSchedule.numReleasePeriods = params.numReleasePeriods;
     releaseSchedule.amountReleasedPerPeriod = params.amountReleasedPerPeriod;
     releaseSchedule.releasePeriod = params.releasePeriod;
-    releaseSchedule.releaseCliff = params.releaseStartTime.add(params.releaseCliffTime);
+    releaseSchedule.releaseCliff = (params.releaseStartTime + params.releaseCliffTime);
     releaseSchedule.releaseStartTime = params.releaseStartTime;
     // The 0.5 initializer intended expiry to be opt-in for validating grants
     // (`!canValidate`), but it read the state variable before it was assigned, so every
@@ -302,11 +299,10 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
     require(initialDistributionRatio <= 1000, "Initial distribution ratio out of bounds");
     if (initialDistributionRatio < 1000) {
       // Cannot use `getTotalBalance()` here because the factory has not yet sent the gold.
-      uint256 totalGrant = releaseSchedule.amountReleasedPerPeriod.mul(
-        releaseSchedule.numReleasePeriods
-      );
+      uint256 totalGrant = (releaseSchedule.amountReleasedPerPeriod *
+        releaseSchedule.numReleasePeriods);
       // Initial ratio is expressed to 3 significant figures: [0, 1000].
-      maxDistribution = totalGrant.mul(initialDistributionRatio).div(1000);
+      maxDistribution = ((totalGrant * initialDistributionRatio) / 1000);
     } else {
       maxDistribution = MAX_UINT;
     }
@@ -389,7 +385,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
     } else {
       uint256 totalBalance = getTotalBalance();
       require(totalBalance > 0, "Do not set max distribution before factory sends the gold");
-      maxDistribution = totalBalance.mul(distributionRatio).div(1000);
+      maxDistribution = ((totalBalance * distributionRatio) / 1000);
     }
     emit DistributionLimitSet(beneficiary, maxDistribution);
   }
@@ -418,18 +414,18 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
     }
 
     require(
-      releasedAmount.sub(totalWithdrawn) >= amount,
+      (releasedAmount - totalWithdrawn) >= amount,
       "Requested amount is greater than available released funds"
     );
     require(
-      maxDistribution >= totalWithdrawn.add(amount),
+      maxDistribution >= (totalWithdrawn + amount),
       "Requested amount exceeds current alloted maximum distribution"
     );
     require(
       getRemainingUnlockedBalance() >= amount,
       "Insufficient unlocked balance to withdraw amount"
     );
-    totalWithdrawn = totalWithdrawn.add(amount);
+    totalWithdrawn = (totalWithdrawn + amount);
     beneficiary.sendValue(amount);
     if (getRemainingTotalBalance() == 0) {
       emit ReleaseGoldInstanceDestroyed(beneficiary, address(this));
@@ -442,7 +438,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
    */
   function refundAndFinalize() external nonReentrant onlyReleaseOwnerAndRevoked {
     require(getRemainingLockedBalance() == 0, "Total gold balance must be unlocked");
-    uint256 beneficiaryAmount = revocationInfo.releasedBalanceAtRevoke.sub(totalWithdrawn);
+    uint256 beneficiaryAmount = (revocationInfo.releasedBalanceAtRevoke - totalWithdrawn);
     require(address(this).balance >= beneficiaryAmount, "Inconsistent balance");
     beneficiary.sendValue(beneficiaryAmount);
     uint256 revokerAmount = getRemainingUnlockedBalance();
@@ -726,7 +722,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
     return
       getCurrentReleasedTotalAmount() > 0 ||
       address(this).balance >=
-      releaseSchedule.amountReleasedPerPeriod.mul(releaseSchedule.numReleasePeriods);
+      (releaseSchedule.amountReleasedPerPeriod * releaseSchedule.numReleasePeriods);
   }
 
   /**
@@ -743,7 +739,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
    * @dev The returned amount may vary over time due to locked gold rewards.
    */
   function getTotalBalance() public view returns (uint256) {
-    return getRemainingUnlockedBalance().add(getRemainingLockedBalance()).add(totalWithdrawn);
+    return ((getRemainingUnlockedBalance() + getRemainingLockedBalance()) + totalWithdrawn);
   }
 
   /**
@@ -752,7 +748,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
    * @dev The returned amount may vary over time due to locked gold rewards.
    */
   function getRemainingTotalBalance() public view returns (uint256) {
-    return getRemainingUnlockedBalance().add(getRemainingLockedBalance());
+    return (getRemainingUnlockedBalance() + getRemainingLockedBalance());
   }
 
   /**
@@ -774,7 +770,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
     if (getAccounts().isAccount(address(this))) {
       ILockedGold lockedGold = getLockedGold();
       uint256 pendingWithdrawalSum = lockedGold.getTotalPendingWithdrawals(address(this));
-      return lockedGold.getAccountTotalLockedGold(address(this)).add(pendingWithdrawalSum);
+      return (lockedGold.getAccountTotalLockedGold(address(this)) + pendingWithdrawalSum);
     }
     return 0;
   }
@@ -792,16 +788,15 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
 
     if (
       block.timestamp >=
-      releaseSchedule.releaseStartTime.add(
-        releaseSchedule.numReleasePeriods.mul(releaseSchedule.releasePeriod)
-      )
+      (releaseSchedule.releaseStartTime +
+        (releaseSchedule.numReleasePeriods * releaseSchedule.releasePeriod))
     ) {
       return totalBalance;
     }
 
-    uint256 timeSinceStart = block.timestamp.sub(releaseSchedule.releaseStartTime);
-    uint256 periodsSinceStart = timeSinceStart.div(releaseSchedule.releasePeriod);
-    return totalBalance.mul(periodsSinceStart).div(releaseSchedule.numReleasePeriods);
+    uint256 timeSinceStart = (block.timestamp - releaseSchedule.releaseStartTime);
+    uint256 periodsSinceStart = (timeSinceStart / releaseSchedule.releasePeriod);
+    return ((totalBalance * periodsSinceStart) / releaseSchedule.numReleasePeriods);
   }
 
   /**
@@ -810,7 +805,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, Initializable, IReleaseG
   function getWithdrawableAmount() public view returns (uint256) {
     return
       Math.min(
-        Math.min(maxDistribution, getCurrentReleasedTotalAmount()).sub(totalWithdrawn),
+        (Math.min(maxDistribution, getCurrentReleasedTotalAmount()) - totalWithdrawn),
         getRemainingUnlockedBalance()
       );
   }

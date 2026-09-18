@@ -37,7 +37,6 @@ contract FeeHandler is
     require(!getFreezer().isFrozen(address(this)), "can't call when contract is frozen");
     _;
   }
-  using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
   using EnumerableSet for EnumerableSet.AddressSet;
 
@@ -470,7 +469,7 @@ contract FeeHandler is
 
   function _setDistributionAndBurnAmounts(TokenState storage tokenState, IERC20 token) internal {
     uint256 balanceOfToken = token.balanceOf(address(this));
-    uint256 balanceToProcess = balanceOfToken.sub(tokenState.toDistribute).sub(tokenState.toBurn);
+    uint256 balanceToProcess = ((balanceOfToken - tokenState.toDistribute) - tokenState.toBurn);
     _setDistributeAfterBurn(tokenState, balanceToProcess);
 
     emit DistributionAmountSet(address(token), tokenState.toDistribute);
@@ -502,8 +501,8 @@ contract FeeHandler is
       .newFixed(balanceToProcess)
       .multiply(getBurnFractionFixidity())
       .fromFixed();
-    tokenState.toBurn = tokenState.toBurn.add(balanceToBurn);
-    tokenState.toDistribute = tokenState.toDistribute.add(balanceToProcess.sub(balanceToBurn));
+    tokenState.toBurn = (tokenState.toBurn + balanceToBurn);
+    tokenState.toDistribute = (tokenState.toDistribute + (balanceToProcess - balanceToBurn));
     return tokenState.toBurn;
   }
 
@@ -597,7 +596,7 @@ contract FeeHandler is
       // if no limit set, assume uncapped
       return;
     }
-    tokenState.currentDaySellLimit = tokenState.currentDaySellLimit.sub(amountBurned);
+    tokenState.currentDaySellLimit = (tokenState.currentDaySellLimit - amountBurned);
     emit DailySellLimitUpdated(amountBurned);
   }
 
@@ -680,9 +679,9 @@ contract FeeHandler is
     );
 
     // substract from toBurn only the amount that was burned
-    tokenState.toBurn = tokenState.toBurn.sub(balanceToBurn);
-    getCeloTokenState().toBurn = getCeloTokenState().toBurn.add(celoReceived);
-    tokenState.pastBurn = tokenState.pastBurn.add(balanceToBurn);
+    tokenState.toBurn = (tokenState.toBurn - balanceToBurn);
+    getCeloTokenState().toBurn = (getCeloTokenState().toBurn + celoReceived);
+    tokenState.pastBurn = (tokenState.pastBurn + balanceToBurn);
     updateLimits(tokenAddress, balanceToBurn);
 
     emit SoldAndBurnedToken(tokenAddress, balanceToBurn);

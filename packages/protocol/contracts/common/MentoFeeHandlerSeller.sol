@@ -18,7 +18,6 @@ import "./FeeHandlerSeller.sol";
 // Mento
 // See https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md
 contract MentoFeeHandlerSeller is FeeHandlerSeller {
-  using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
   /**

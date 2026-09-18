@@ -22,7 +22,6 @@ import "../uniswap/interfaces/IUniswapV2FactoryMin.sol";
 // Uniswap V2 API
 // See https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md
 contract UniswapFeeHandlerSeller is FeeHandlerSeller {
-  using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
   using EnumerableSet for EnumerableSet.AddressSet;
 

@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.9.0;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
-
 import "../Governance.sol";
 import "../Proposals.sol";
 import "../../common/FixidityLib.sol";
@@ -19,7 +17,6 @@ import "../../common/linkedlists/IntegerSortedLinkedList.sol";
 contract GovernanceMock08 is Governance(true) {
   using Proposals for Proposals.Proposal;
   using FixidityLib for FixidityLib.Fraction;
-  using SafeMath for uint256;
   using IntegerSortedLinkedList for SortedLinkedList.List;
 
   address[] validatorSet;

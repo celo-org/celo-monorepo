@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.9.0;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "./interfaces/IEpochRewards.sol";
@@ -33,7 +32,6 @@ contract EpochRewards is
   PrecompilesOverride
 {
   using FixidityLib for FixidityLib.Fraction;
-  using SafeMath for uint256;
 
   // This struct governs how the rewards multiplier should deviate from 1.0 based on the ratio of
   // supply remaining to target supply remaining.
@@ -428,12 +426,12 @@ contract EpochRewards is
    * @return The target Gold supply according to the epoch rewards target schedule.
    */
   function getTargetGoldTotalSupply() public view returns (uint256) {
-    uint256 timeSinceInitialization = block.timestamp.sub(startTime);
+    uint256 timeSinceInitialization = (block.timestamp - startTime);
     if (timeSinceInitialization < SECONDS_LINEAR) {
       // Pay out half of all block rewards linearly.
-      uint256 linearRewards = GOLD_SUPPLY_CAP.sub(GENESIS_GOLD_SUPPLY).div(2);
-      uint256 targetRewards = linearRewards.mul(timeSinceInitialization).div(SECONDS_LINEAR);
-      return targetRewards.add(GENESIS_GOLD_SUPPLY);
+      uint256 linearRewards = ((GOLD_SUPPLY_CAP - GENESIS_GOLD_SUPPLY) / 2);
+      uint256 targetRewards = ((linearRewards * timeSinceInitialization) / SECONDS_LINEAR);
+      return (targetRewards + GENESIS_GOLD_SUPPLY);
     } else {
       require(false, "Block reward calculation for years 15-30 unimplemented");
       return 0;
@@ -459,12 +457,8 @@ contract EpochRewards is
   function getTargetTotalEpochPaymentsInGold() public view returns (uint256) {
     address stableTokenAddress = registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID);
     (uint256 numerator, uint256 denominator) = getSortedOracles().medianRate(stableTokenAddress);
-    return
-      getEpochManager()
-        .numberOfElectedInCurrentSet()
-        .mul(targetValidatorEpochPayment)
-        .mul(denominator)
-        .div(numerator);
+    return (((getEpochManager().numberOfElectedInCurrentSet() * targetValidatorEpochPayment) *
+      denominator) / numerator);
   }
 
   /**
@@ -476,9 +470,8 @@ contract EpochRewards is
   }
 
   function getVotingGoldFraction() public view returns (uint256) {
-    uint256 liquidGold = ICeloToken(address(getCeloToken())).allocatedSupply().sub(
-      getReserve().getReserveGoldBalance()
-    );
+    uint256 liquidGold = (ICeloToken(address(getCeloToken())).allocatedSupply() -
+      getReserve().getReserveGoldBalance());
     uint256 votingGold = getElection().getTotalVotes();
     return FixidityLib.newFixed(votingGold).divide(FixidityLib.newFixed(liquidGold)).unwrap();
   }
@@ -529,8 +522,8 @@ contract EpochRewards is
     uint256 targetSupply = getTargetGoldTotalSupply();
     uint256 allocatedSupply = ICeloToken(address(getCeloToken())).allocatedSupply();
 
-    uint256 remainingSupply = GOLD_SUPPLY_CAP.sub(allocatedSupply.add(targetGoldSupplyIncrease));
-    uint256 targetRemainingSupply = GOLD_SUPPLY_CAP.sub(targetSupply);
+    uint256 remainingSupply = (GOLD_SUPPLY_CAP - (allocatedSupply + targetGoldSupplyIncrease));
+    uint256 targetRemainingSupply = (GOLD_SUPPLY_CAP - targetSupply);
 
     FixidityLib.Fraction memory remainingToTargetRatio = FixidityLib
       .newFixed(remainingSupply)
@@ -567,7 +560,7 @@ contract EpochRewards is
   function _getTargetGoldSupplyIncrease() internal view returns (uint256) {
     uint256 targetEpochRewards = getTargetVoterRewards();
     uint256 targetTotalEpochPaymentsInGold = getTargetTotalEpochPaymentsInGold();
-    uint256 targetGoldSupplyIncrease = targetEpochRewards.add(targetTotalEpochPaymentsInGold);
+    uint256 targetGoldSupplyIncrease = (targetEpochRewards + targetTotalEpochPaymentsInGold);
     // increase /= (1 - fraction) st the final community reward is fraction * increase
     targetGoldSupplyIncrease = FixidityLib
       .newFixed(targetGoldSupplyIncrease)

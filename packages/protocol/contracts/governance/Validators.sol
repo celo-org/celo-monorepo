@@ -3,7 +3,6 @@ pragma solidity >=0.8.7 <0.9.0;
 
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "solidity-bytes-utils-8/contracts/BytesLib.sol";
 
 import "./interfaces/IValidators.sol";
@@ -33,7 +32,6 @@ contract Validators is
 {
   using FixidityLib for FixidityLib.Fraction;
   using AddressLinkedList for LinkedList.List;
-  using SafeMath for uint256;
   using BytesLib for bytes;
 
   // For Validators, these requirements must be met in order to:
@@ -254,9 +252,8 @@ contract Validators is
         "Has been group member recently"
       );
     }
-    uint256 requirementEndTime = validator.membershipHistory.lastRemovedFromGroupTimestamp.add(
-      validatorLockedGoldRequirements.duration
-    );
+    uint256 requirementEndTime = (validator.membershipHistory.lastRemovedFromGroupTimestamp +
+      validatorLockedGoldRequirements.duration);
     require(requirementEndTime < block.timestamp, "Not yet requirement end time");
 
     // Remove the validator.
@@ -338,7 +335,7 @@ contract Validators is
     uint256[] storage sizeHistory = groups[account].sizeHistory;
     if (sizeHistory.length > 1) {
       require(
-        sizeHistory[1].add(groupLockedGoldRequirements.duration) < block.timestamp,
+        (sizeHistory[1] + groupLockedGoldRequirements.duration) < block.timestamp,
         "Hasn't been empty for long enough"
       );
     }
@@ -456,7 +453,7 @@ contract Validators is
     require(commission != group.commission.unwrap(), "Commission must be different");
 
     group.nextCommission = FixidityLib.wrap(commission);
-    group.nextCommissionBlock = block.number.add(commissionUpdateDelay);
+    group.nextCommissionBlock = (block.number + commissionUpdateDelay);
     emit ValidatorGroupCommissionUpdateQueued(account, commission, group.nextCommissionBlock);
   }
 
@@ -580,7 +577,7 @@ contract Validators is
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     require(
-      block.timestamp >= group.slashInfo.lastSlashed.add(slashingMultiplierResetPeriod),
+      block.timestamp >= (group.slashInfo.lastSlashed + slashingMultiplierResetPeriod),
       "`resetSlashingMultiplier` called before resetPeriod expired"
     );
     group.slashInfo.multiplier = FixidityLib.fixed1();
@@ -593,7 +590,7 @@ contract Validators is
   function halveSlashingMultiplier(address account) external nonReentrant onlySlasher {
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
-    group.slashInfo.multiplier = FixidityLib.wrap(group.slashInfo.multiplier.unwrap().div(2));
+    group.slashInfo.multiplier = FixidityLib.wrap((group.slashInfo.multiplier.unwrap() / 2));
     group.slashInfo.lastSlashed = block.timestamp;
   }
 
@@ -681,7 +678,7 @@ contract Validators is
 
     IAccounts accounts = getAccounts();
 
-    for (uint256 i = 0; i < n; i = i.add(1)) {
+    for (uint256 i = 0; i < n; i = (i + 1)) {
       topValidators[i] = accounts.getValidatorSigner(topAccounts[i]);
     }
     return topValidators;
@@ -710,7 +707,7 @@ contract Validators is
     address[] calldata accounts
   ) external view returns (uint256[] memory) {
     uint256[] memory numMembers = new uint256[](accounts.length);
-    for (uint256 i = 0; i < accounts.length; i = i.add(1)) {
+    for (uint256 i = 0; i < accounts.length; i = (i + 1)) {
       numMembers[i] = getGroupNumMembers(accounts[i]);
     }
     return numMembers;
@@ -749,7 +746,7 @@ contract Validators is
   function getRegisteredValidatorSigners() external view returns (address[] memory) {
     IAccounts accounts = getAccounts();
     address[] memory signers = new address[](registeredValidators.length);
-    for (uint256 i = 0; i < signers.length; i = i.add(1)) {
+    for (uint256 i = 0; i < signers.length; i = (i + 1)) {
       signers[i] = accounts.getValidatorSigner(registeredValidators[i]);
     }
     return signers;
@@ -807,12 +804,12 @@ contract Validators is
     require(isValidator(account), "Not a validator");
     require(epochNumber <= getEpochNumber(), "Epoch cannot be larger than current");
     MembershipHistory storage history = validators[account].membershipHistory;
-    require(index < history.tail.add(history.numEntries), "index out of bounds");
+    require(index < (history.tail + history.numEntries), "index out of bounds");
     require(index >= history.tail && history.numEntries > 0, "index out of bounds");
     bool isExactMatch = history.entries[index].epochNumber == epochNumber;
-    bool isLastEntry = index.sub(history.tail) == history.numEntries.sub(1);
+    bool isLastEntry = (index - history.tail) == (history.numEntries - 1);
     bool isWithinRange = history.entries[index].epochNumber < epochNumber &&
-      (history.entries[index.add(1)].epochNumber > epochNumber || isLastEntry);
+      (history.entries[(index + 1)].epochNumber > epochNumber || isLastEntry);
     require(
       isExactMatch || isWithinRange,
       "provided index does not match provided epochNumber at index in history."
@@ -834,8 +831,8 @@ contract Validators is
     MembershipHistory storage history = validators[account].membershipHistory;
     uint256[] memory epochs = new uint256[](history.numEntries);
     address[] memory membershipGroups = new address[](history.numEntries);
-    for (uint256 i = 0; i < history.numEntries; i = i.add(1)) {
-      uint256 index = history.tail.add(i);
+    for (uint256 i = 0; i < history.numEntries; i = (i + 1)) {
+      uint256 index = (history.tail + i);
       epochs[i] = history.entries[index].epochNumber;
       membershipGroups[i] = history.entries[index].group;
     }
@@ -1063,14 +1060,14 @@ contract Validators is
       uint256 multiplier = Math.max(1, groups[account].members.numElements);
       uint256[] storage sizeHistory = groups[account].sizeHistory;
       if (sizeHistory.length > 0) {
-        for (uint256 i = sizeHistory.length.sub(1); i > 0; i = i.sub(1)) {
-          if (sizeHistory[i].add(groupLockedGoldRequirements.duration) >= block.timestamp) {
+        for (uint256 i = (sizeHistory.length - 1); i > 0; i = (i - 1)) {
+          if ((sizeHistory[i] + groupLockedGoldRequirements.duration) >= block.timestamp) {
             multiplier = Math.max(i, multiplier);
             break;
           }
         }
       }
-      return groupLockedGoldRequirements.value.mul(multiplier);
+      return (groupLockedGoldRequirements.value * multiplier);
     }
     return 0;
   }
@@ -1084,12 +1081,12 @@ contract Validators is
     uint256 epochNumber = getEpochNumber();
 
     MembershipHistory storage history = validators[account].membershipHistory;
-    uint256 head = history.numEntries == 0 ? 0 : history.tail.add(history.numEntries.sub(1));
+    uint256 head = history.numEntries == 0 ? 0 : (history.tail + (history.numEntries - 1));
     // If the most recent entry in the membership history is for the current epoch number, we need
     // to look at the previous entry.
     if (history.entries[head].epochNumber == epochNumber) {
       if (head > history.tail) {
-        head = head.sub(1);
+        head = (head - 1);
       }
     }
     return history.entries[head].group;
@@ -1104,7 +1101,7 @@ contract Validators is
     uint256 balance = getLockedGold().getAccountTotalLockedGold(account);
     // Add a bit of "wiggle room" to accommodate the fact that vote activation can result in ~1
     // wei rounding errors. Using 10 as an additional margin of safety.
-    return balance.add(10) >= getAccountLockedGoldRequirement(account);
+    return (balance + 10) >= getAccountLockedGoldRequirement(account);
   }
 
   /**
@@ -1213,7 +1210,7 @@ contract Validators is
     require(_group.members.numElements < maxGroupSize, "group would exceed maximum size");
     require(validators[validator].affiliation == group, "Not affiliated to group");
     require(!_group.members.contains(validator), "Already in group");
-    uint256 numMembers = _group.members.numElements.add(1);
+    uint256 numMembers = (_group.members.numElements + 1);
     _group.members.push(validator);
     require(meetsAccountLockedGoldRequirements(group), "Group requirements not met");
     require(meetsAccountLockedGoldRequirements(validator), "Validator requirements not met");
@@ -1221,7 +1218,7 @@ contract Validators is
       getElection().markGroupEligible(group, lesser, greater);
     }
     updateMembershipHistory(validator, group);
-    updateSizeHistory(group, numMembers.sub(1));
+    updateSizeHistory(group, (numMembers - 1));
     emit ValidatorGroupMemberAdded(group, validator);
     return true;
   }
@@ -1258,7 +1255,7 @@ contract Validators is
    */
   function deleteElement(address[] storage list, address element, uint256 index) private {
     require(index < list.length && list[index] == element, "deleteElement: index out of range");
-    uint256 lastIndex = list.length.sub(1);
+    uint256 lastIndex = (list.length - 1);
     list[index] = list[lastIndex];
     delete list[lastIndex];
     list.pop();
@@ -1283,7 +1280,7 @@ contract Validators is
       getElection().markGroupIneligible(group);
     }
     updateMembershipHistory(validator, address(0));
-    updateSizeHistory(group, numMembers.add(1));
+    updateSizeHistory(group, (numMembers + 1));
     emit ValidatorGroupMemberRemoved(group, validator);
     return true;
   }
@@ -1300,7 +1297,7 @@ contract Validators is
     MembershipHistory storage history = validators[account].membershipHistory;
     uint256 epochNumber = getEpochNumber();
 
-    uint256 head = history.numEntries == 0 ? 0 : history.tail.add(history.numEntries.sub(1));
+    uint256 head = history.numEntries == 0 ? 0 : (history.tail + (history.numEntries - 1));
 
     if (history.numEntries > 0 && group == address(0)) {
       history.lastRemovedFromGroupTimestamp = block.timestamp;
@@ -1314,21 +1311,21 @@ contract Validators is
     }
 
     // There have been elections since the validator last changed membership, create a new entry.
-    uint256 index = history.numEntries == 0 ? 0 : head.add(1);
+    uint256 index = history.numEntries == 0 ? 0 : (head + 1);
     history.entries[index] = MembershipHistoryEntry(epochNumber, group);
     if (history.numEntries < membershipHistoryLength) {
       // Not enough entries, don't remove any.
-      history.numEntries = history.numEntries.add(1);
+      history.numEntries = (history.numEntries + 1);
     } else if (history.numEntries == membershipHistoryLength) {
       // Exactly enough entries, delete the oldest one to account for the one we added.
       delete history.entries[history.tail];
-      history.tail = history.tail.add(1);
+      history.tail = (history.tail + 1);
     } else {
       // Too many entries, delete the oldest two to account for the one we added.
       delete history.entries[history.tail];
-      delete history.entries[history.tail.add(1)];
-      history.numEntries = history.numEntries.sub(1);
-      history.tail = history.tail.add(2);
+      delete history.entries[(history.tail + 1)];
+      history.numEntries = (history.numEntries - 1);
+      history.tail = (history.tail + 2);
     }
     return true;
   }

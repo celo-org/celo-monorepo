@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.9.0;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts8/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
@@ -24,7 +23,6 @@ contract OdisPayments is
   Initializable,
   UsingRegistryV2NoMento
 {
-  using SafeMath for uint256;
   using SafeERC20 for IERC20;
 
   bytes32 internal constant STABLE_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableToken"));
@@ -61,7 +59,7 @@ contract OdisPayments is
       address(this),
       value
     );
-    totalPaidCUSD[account] = totalPaidCUSD[account].add(value);
+    totalPaidCUSD[account] = (totalPaidCUSD[account] + value);
     emit PaymentMade(account, value);
   }
 

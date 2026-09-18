@@ -18,7 +18,6 @@ abstract contract FeeHandlerSeller is
   UsingRegistry,
   ICeloVersionedContract
 {
-  using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
   // Address of the token

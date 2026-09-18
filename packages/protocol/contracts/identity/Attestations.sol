@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.9.0;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts8/utils/math/SafeCast.sol";
@@ -27,7 +26,6 @@ contract Attestations is
   UsingRegistry,
   ReentrancyGuard
 {
-  using SafeMath for uint256;
   using SafeCast for uint256;
 
   enum AttestationStatus {
@@ -171,7 +169,7 @@ contract Attestations is
         attestationRequestFeeTokens.length == attestationRequestFeeValues.length,
       "attestationRequestFeeTokens specification was invalid"
     );
-    for (uint256 i = 0; i < attestationRequestFeeTokens.length; i = i.add(1)) {
+    for (uint256 i = 0; i < attestationRequestFeeTokens.length; i = (i + 1)) {
       setAttestationRequestFee(attestationRequestFeeTokens[i], attestationRequestFeeValues[i]);
     }
   }
@@ -189,7 +187,7 @@ contract Attestations is
       "Index does not match msg.sender"
     );
 
-    uint256 newNumAccounts = numAccounts.sub(1);
+    uint256 newNumAccounts = (numAccounts - 1);
     if (index != newNumAccounts) {
       identifiers[identifier].accounts[index] = identifiers[identifier].accounts[newNumAccounts];
     }
@@ -283,9 +281,9 @@ contract Attestations is
     uint64[] memory total = new uint64[](addresses.length);
 
     uint256 currentIndex = 0;
-    for (uint256 i = 0; i < identifiersToLookup.length; i = i.add(1)) {
+    for (uint256 i = 0; i < identifiersToLookup.length; i = (i + 1)) {
       address[] memory addrs = identifiers[identifiersToLookup[i]].accounts;
-      for (uint256 matchIndex = 0; matchIndex < matches[i]; matchIndex = matchIndex.add(1)) {
+      for (uint256 matchIndex = 0; matchIndex < matches[i]; matchIndex = (matchIndex + 1)) {
         addresses[currentIndex] = getAccounts().getWalletAddress(addrs[matchIndex]);
         completed[currentIndex] = identifiers[identifiersToLookup[i]]
           .attestations[addrs[matchIndex]]
@@ -293,7 +291,7 @@ contract Attestations is
         total[currentIndex] = identifiers[identifiersToLookup[i]]
           .attestations[addrs[matchIndex]]
           .requested;
-        currentIndex = currentIndex.add(1);
+        currentIndex = (currentIndex + 1);
       }
     }
 
@@ -341,9 +339,9 @@ contract Attestations is
     address[] storage issuers = state.selectedIssuers;
 
     uint256 num = 0;
-    for (uint256 i = 0; i < issuers.length; i = i.add(1)) {
+    for (uint256 i = 0; i < issuers.length; i = (i + 1)) {
       if (isAttestationCompletable(state.issuedAttestations[issuers[i]])) {
-        num = num.add(1);
+        num = (num + 1);
       }
     }
 
@@ -351,11 +349,11 @@ contract Attestations is
     address[] memory completableIssuers = new address[](num);
 
     uint256 pointer = 0;
-    for (uint256 i = 0; i < issuers.length; i = i.add(1)) {
+    for (uint256 i = 0; i < issuers.length; i = (i + 1)) {
       if (isAttestationCompletable(state.issuedAttestations[issuers[i]])) {
         blockNumbers[pointer] = state.issuedAttestations[issuers[i]].blockNumber;
         completableIssuers[pointer] = issuers[i];
-        pointer = pointer.add(1);
+        pointer = (pointer + 1);
       }
     }
 
@@ -517,10 +515,10 @@ contract Attestations is
     uint256 totalAddresses = 0;
     uint256[] memory matches = new uint256[](identifiersToLookup.length);
 
-    for (uint256 i = 0; i < identifiersToLookup.length; i = i.add(1)) {
+    for (uint256 i = 0; i < identifiersToLookup.length; i = (i + 1)) {
       uint256 count = identifiers[identifiersToLookup[i]].accounts.length;
 
-      totalAddresses = totalAddresses.add(count);
+      totalAddresses = (totalAddresses + count);
       matches[i] = count;
     }
 
@@ -528,7 +526,7 @@ contract Attestations is
   }
 
   function isAttestationExpired(uint32 attestationRequestBlock) internal view returns (bool) {
-    return block.number >= uint256(attestationRequestBlock).add(attestationExpiryBlocks);
+    return block.number >= uint256((attestationRequestBlock) + attestationExpiryBlocks);
   }
 
   function isAttestationCompletable(Attestation storage attestation) internal view returns (bool) {
@@ -539,7 +537,7 @@ contract Attestations is
   function isAttestationRequestSelectable(
     uint256 attestationRequestBlock
   ) internal view returns (bool) {
-    return block.number < attestationRequestBlock.add(getRandom().randomnessBlockRetentionWindow());
+    return block.number < (attestationRequestBlock + getRandom().randomnessBlockRetentionWindow());
   }
 
   /**

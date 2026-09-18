@@ -3,7 +3,6 @@ pragma solidity >=0.8.7 <0.9.0;
 
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
 import "./interfaces/IElection.sol";
 import "./interfaces/IValidators.sol";
@@ -43,7 +42,6 @@ contract Election is
 {
   using AddressSortedLinkedList for SortedLinkedList.List;
   using FixidityLib for FixidityLib.Fraction;
-  using SafeMath for uint256;
 
   struct PendingVote {
     // The value of the vote, in gold.
@@ -247,7 +245,7 @@ contract Election is
     // Add group to the groups voted for by the account.
     bool alreadyVotedForGroup = false;
     address[] storage groups = votes.groupsVotedFor[account];
-    for (uint256 i = 0; i < groups.length; i = i.add(1)) {
+    for (uint256 i = 0; i < groups.length; i = (i + 1)) {
       alreadyVotedForGroup = alreadyVotedForGroup || groups[i] == group;
     }
     if (!alreadyVotedForGroup) {
@@ -441,17 +439,16 @@ contract Election is
     );
     // Iterate in reverse order to hopefully optimize removing pending votes before active votes
     // And to attempt to preserve `account`'s earliest votes (assuming earliest = preferred)
-    for (uint256 i = info.groups.length; i > 0; i = i.sub(1)) {
-      info.remainingValue = info.remainingValue.sub(
+    for (uint256 i = info.groups.length; i > 0; i = (i - 1)) {
+      info.remainingValue = (info.remainingValue -
         _decrementVotes(
           account,
-          info.groups[i.sub(1)],
+          info.groups[(i - 1)],
           info.remainingValue,
-          lessers[i.sub(1)],
-          greaters[i.sub(1)],
-          indices[i.sub(1)]
-        )
-      );
+          lessers[(i - 1)],
+          greaters[(i - 1)],
+          indices[(i - 1)]
+        ));
       if (info.remainingValue == 0) {
         break;
       }
@@ -488,14 +485,13 @@ contract Election is
    * @dev Note that a group's vote total may exceed this number through rewards or config changes.
    */
   function getNumVotesReceivable(address group) external view returns (uint256) {
-    uint256 numerator = getValidators().getGroupNumMembers(group).add(1).mul(
-      getLockedGold().getTotalLockedGold()
-    );
+    uint256 numerator = ((getValidators().getGroupNumMembers(group) + 1) *
+      getLockedGold().getTotalLockedGold());
     uint256 denominator = Math.min(
       electableValidators.max,
       getValidators().getNumRegisteredValidators()
     );
-    return numerator.div(denominator);
+    return (numerator / denominator);
   }
 
   /**
@@ -550,8 +546,8 @@ contract Election is
     }
 
     uint256 total = 0;
-    for (uint256 i = 0; i < groups.length; i = i.add(1)) {
-      total = total.add(getTotalVotesForGroupByAccount(groups[i], account));
+    for (uint256 i = 0; i < groups.length; i = (i + 1)) {
+      total = (total + getTotalVotesForGroupByAccount(groups[i], account));
     }
     return total;
   }
@@ -765,13 +761,11 @@ contract Election is
    *   returns false.
    */
   function canReceiveVotes(address group, uint256 value) public view returns (bool) {
-    uint256 totalVotesForGroup = getTotalVotesForGroup(group).add(value);
-    uint256 left = totalVotesForGroup.mul(
-      Math.min(electableValidators.max, getValidators().getNumRegisteredValidators())
-    );
-    uint256 right = getValidators().getGroupNumMembers(group).add(1).mul(
-      getLockedGold().getTotalLockedGold()
-    );
+    uint256 totalVotesForGroup = (getTotalVotesForGroup(group) + value);
+    uint256 left = (totalVotesForGroup *
+      Math.min(electableValidators.max, getValidators().getNumRegisteredValidators()));
+    uint256 right = ((getValidators().getGroupNumMembers(group) + 1) *
+      getLockedGold().getTotalLockedGold());
     return left <= right;
   }
 
@@ -780,7 +774,7 @@ contract Election is
    * @return The total votes received across all groups.
    */
   function getTotalVotes() public view returns (uint256) {
-    return votes.active.total.add(votes.pending.total);
+    return (votes.active.total + votes.pending.total);
   }
 
   /**
@@ -816,7 +810,7 @@ contract Election is
   function getCurrentValidatorSigners() public view returns (address[] memory) {
     uint256 n = numberValidatorsInCurrentSet();
     address[] memory res = new address[](n);
-    for (uint256 i = 0; i < n; i = i.add(1)) {
+    for (uint256 i = 0; i < n; i = (i + 1)) {
       res[i] = validatorSignerAddressFromCurrentSet(i);
     }
     return res;
@@ -860,7 +854,7 @@ contract Election is
   ) public view returns (uint256) {
     uint256 pending = getPendingVotesForGroupByAccount(group, account);
     uint256 active = getActiveVotesForGroupByAccount(group, account);
-    return pending.add(active);
+    return (pending + active);
   }
 
   /**
@@ -869,7 +863,7 @@ contract Election is
    * @return The total votes made for `group`.
    */
   function getTotalVotesForGroup(address group) public view returns (uint256) {
-    return votes.pending.forGroup[group].total.add(votes.active.forGroup[group].total);
+    return (votes.pending.forGroup[group].total + votes.active.forGroup[group].total);
   }
 
   /**
@@ -904,12 +898,12 @@ contract Election is
     address greater
   ) internal {
     if (votes.total.eligible.contains(group)) {
-      uint256 newVoteTotal = votes.total.eligible.getValue(group).add(value);
+      uint256 newVoteTotal = (votes.total.eligible.getValue(group) + value);
       votes.total.eligible.update(group, newVoteTotal, lesser, greater);
     }
 
-    votes.active.forGroup[group].total = votes.active.forGroup[group].total.add(value);
-    votes.active.total = votes.active.total.add(value);
+    votes.active.forGroup[group].total = (votes.active.forGroup[group].total + value);
+    votes.active.total = (votes.active.total + value);
     emit EpochRewardsDistributedToVoters(group, value);
   }
 
@@ -980,16 +974,16 @@ contract Election is
       uint256 decrementValue = Math.min(remainingValue, pendingVotes);
       decrementPendingVotes(group, account, decrementValue);
       emit ValidatorGroupPendingVoteRevoked(account, group, decrementValue);
-      remainingValue = remainingValue.sub(decrementValue);
+      remainingValue = (remainingValue - decrementValue);
     }
     uint256 activeVotes = getActiveVotesForGroupByAccount(group, account);
     if (activeVotes > 0 && remainingValue > 0) {
       uint256 decrementValue = Math.min(remainingValue, activeVotes);
       uint256 units = decrementActiveVotes(group, account, decrementValue);
       emit ValidatorGroupActiveVoteRevoked(account, group, decrementValue, units);
-      remainingValue = remainingValue.sub(decrementValue);
+      remainingValue = (remainingValue - decrementValue);
     }
-    uint256 decrementedValue = maxValue.sub(remainingValue);
+    uint256 decrementedValue = (maxValue - remainingValue);
     if (decrementedValue > 0) {
       decrementTotalVotes(account, group, decrementedValue, lesser, greater);
       if (getTotalVotesForGroupByAccount(group, account) == 0) {
@@ -1032,7 +1026,7 @@ contract Election is
     FixidityLib.Fraction[] memory votesForNextMember = new FixidityLib.Fraction[](
       electionGroups.length
     );
-    for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
+    for (uint256 i = 0; i < electionGroups.length; i = (i + 1)) {
       keys[i] = i;
       votesForNextMember[i] = FixidityLib.newFixed(
         votes.total.eligible.getValue(electionGroups[i])
@@ -1049,13 +1043,13 @@ contract Election is
         votesForNextMember[groupIndex] = FixidityLib.wrap(0);
       } else {
         // Elect the next member from the validator group
-        numMembersElected[groupIndex] = numMembersElected[groupIndex].add(1);
-        totalNumMembersElected = totalNumMembersElected.add(1);
+        numMembersElected[groupIndex] = (numMembersElected[groupIndex] + 1);
+        totalNumMembersElected = (totalNumMembersElected + 1);
         // If there are already n elected members in a group, the votes for the next member
         // are total votes of group divided by n+1
         votesForNextMember[groupIndex] = FixidityLib
           .newFixed(votes.total.eligible.getValue(electionGroups[groupIndex]))
-          .divide(FixidityLib.newFixed(numMembersElected[groupIndex].add(1)));
+          .divide(FixidityLib.newFixed((numMembersElected[groupIndex] + 1)));
       }
       Heap.heapifyDown(keys, votesForNextMember);
     }
@@ -1066,7 +1060,7 @@ contract Election is
 
     IValidators validators = getValidators();
 
-    for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
+    for (uint256 i = 0; i < electionGroups.length; i = (i + 1)) {
       // We use the validating delegate if one is set.
       address[] memory electedGroupValidators;
       if (useAccounts) {
@@ -1080,9 +1074,9 @@ contract Election is
           numMembersElected[i]
         );
       }
-      for (uint256 j = 0; j < electedGroupValidators.length; j = j.add(1)) {
+      for (uint256 j = 0; j < electedGroupValidators.length; j = (j + 1)) {
         electedValidators[totalNumMembersElected] = electedGroupValidators[j];
-        totalNumMembersElected = totalNumMembersElected.add(1);
+        totalNumMembersElected = (totalNumMembersElected + 1);
       }
     }
     return electedValidators;
@@ -1104,7 +1098,7 @@ contract Election is
     address lesser,
     address greater
   ) private {
-    uint256 newVoteTotal = votes.total.eligible.getValue(group).add(value);
+    uint256 newVoteTotal = (votes.total.eligible.getValue(group) + value);
     votes.total.eligible.update(group, newVoteTotal, lesser, greater);
 
     // Always refresh the cache so cachedVotesPerGroup[g] stays equal to the
@@ -1130,7 +1124,7 @@ contract Election is
     address greater
   ) private {
     if (votes.total.eligible.contains(group)) {
-      uint256 newVoteTotal = votes.total.eligible.getValue(group).sub(value);
+      uint256 newVoteTotal = (votes.total.eligible.getValue(group) - value);
       votes.total.eligible.update(group, newVoteTotal, lesser, greater);
     }
 
@@ -1147,13 +1141,13 @@ contract Election is
    */
   function incrementPendingVotes(address group, address account, uint256 value) private {
     PendingVotes storage pending = votes.pending;
-    pending.total = pending.total.add(value);
+    pending.total = (pending.total + value);
 
     GroupPendingVotes storage groupPending = pending.forGroup[group];
-    groupPending.total = groupPending.total.add(value);
+    groupPending.total = (groupPending.total + value);
 
     PendingVote storage pendingVote = groupPending.byAccount[account];
-    pendingVote.value = pendingVote.value.add(value);
+    pendingVote.value = (pendingVote.value + value);
     pendingVote.epoch = getEpochNumber();
   }
 
@@ -1165,13 +1159,13 @@ contract Election is
    */
   function decrementPendingVotes(address group, address account, uint256 value) private {
     PendingVotes storage pending = votes.pending;
-    pending.total = pending.total.sub(value);
+    pending.total = (pending.total - value);
 
     GroupPendingVotes storage groupPending = pending.forGroup[group];
-    groupPending.total = groupPending.total.sub(value);
+    groupPending.total = (groupPending.total - value);
 
     PendingVote storage pendingVote = groupPending.byAccount[account];
-    pendingVote.value = pendingVote.value.sub(value);
+    pendingVote.value = (pendingVote.value - value);
     if (pendingVote.value == 0) {
       pendingVote.epoch = 0;
     }
@@ -1189,15 +1183,15 @@ contract Election is
     uint256 value
   ) private returns (uint256) {
     ActiveVotes storage active = votes.active;
-    active.total = active.total.add(value);
+    active.total = (active.total + value);
 
     uint256 units = votesToUnits(group, value);
 
     GroupActiveVotes storage groupActive = active.forGroup[group];
-    groupActive.total = groupActive.total.add(value);
+    groupActive.total = (groupActive.total + value);
 
-    groupActive.totalUnits = groupActive.totalUnits.add(units);
-    groupActive.unitsByAccount[account] = groupActive.unitsByAccount[account].add(units);
+    groupActive.totalUnits = (groupActive.totalUnits + units);
+    groupActive.unitsByAccount[account] = (groupActive.unitsByAccount[account] + units);
     return units;
   }
 
@@ -1213,7 +1207,7 @@ contract Election is
     uint256 value
   ) private returns (uint256) {
     ActiveVotes storage active = votes.active;
-    active.total = active.total.sub(value);
+    active.total = (active.total - value);
 
     // Rounding may cause votesToUnits to return 0 for value != 0, preventing users
     // from revoking the last of their votes. The case where value == votes is special cased
@@ -1227,9 +1221,9 @@ contract Election is
       units = votesToUnits(group, value);
     }
 
-    groupActive.total = groupActive.total.sub(value);
-    groupActive.totalUnits = groupActive.totalUnits.sub(units);
-    groupActive.unitsByAccount[account] = groupActive.unitsByAccount[account].sub(units);
+    groupActive.total = (groupActive.total - value);
+    groupActive.totalUnits = (groupActive.totalUnits - units);
+    groupActive.unitsByAccount[account] = (groupActive.unitsByAccount[account] - units);
     return units;
   }
 
@@ -1241,7 +1235,7 @@ contract Election is
    */
   function deleteElement(address[] storage list, address element, uint256 index) private {
     require(index < list.length && list[index] == element, "Bad index");
-    uint256 lastIndex = list.length.sub(1);
+    uint256 lastIndex = (list.length - 1);
     list[index] = list[lastIndex];
     list.pop();
   }
@@ -1254,10 +1248,10 @@ contract Election is
    */
   function votesToUnits(address group, uint256 value) private view returns (uint256) {
     if (votes.active.forGroup[group].totalUnits == 0) {
-      return value.mul(UNIT_PRECISION_FACTOR);
+      return (value * UNIT_PRECISION_FACTOR);
     } else {
-      return
-        value.mul(votes.active.forGroup[group].totalUnits).div(votes.active.forGroup[group].total);
+      return ((value * votes.active.forGroup[group].totalUnits) /
+        votes.active.forGroup[group].total);
     }
   }
 
@@ -1271,8 +1265,8 @@ contract Election is
     if (votes.active.forGroup[group].totalUnits == 0) {
       return 0;
     } else {
-      return
-        value.mul(votes.active.forGroup[group].total).div(votes.active.forGroup[group].totalUnits);
+      return ((value * votes.active.forGroup[group].total) /
+        votes.active.forGroup[group].totalUnits);
     }
   }
 

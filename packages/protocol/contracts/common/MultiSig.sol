@@ -31,8 +31,6 @@ import { IMultiSig } from "./interfaces/IMultiSig.sol";
  * Solidity users.
  */
 contract MultiSig is Initializable, IMultiSig {
-  using SafeMath for uint256;
-
   struct Transaction {
     address destination;
     uint256 value;
@@ -148,7 +146,7 @@ contract MultiSig is Initializable, IMultiSig {
     validRequirement(_owners.length, _required)
     validRequirement(_owners.length, _internalRequired)
   {
-    for (uint256 i = 0; i < _owners.length; i = i.add(1)) {
+    for (uint256 i = 0; i < _owners.length; i = (i + 1)) {
       require(
         !isOwner[_owners[i]] && _owners[i] != address(0),
         "owner was null or already given owner status"
@@ -169,7 +167,7 @@ contract MultiSig is Initializable, IMultiSig {
     onlyWallet
     ownerDoesNotExist(owner)
     notNull(owner)
-    validRequirement(owners.length.add(1), internalRequired)
+    validRequirement((owners.length + 1), internalRequired)
   {
     isOwner[owner] = true;
     owners.push(owner);
@@ -180,9 +178,9 @@ contract MultiSig is Initializable, IMultiSig {
   /// @param owner Address of owner.
   function removeOwner(address owner) external onlyWallet ownerExists(owner) {
     isOwner[owner] = false;
-    for (uint256 i = 0; i < owners.length.sub(1); i = i.add(1))
+    for (uint256 i = 0; i < (owners.length - 1); i = (i + 1))
       if (owners[i] == owner) {
-        owners[i] = owners[owners.length.sub(1)];
+        owners[i] = owners[(owners.length - 1)];
         break;
       }
     owners.pop();
@@ -198,7 +196,7 @@ contract MultiSig is Initializable, IMultiSig {
     address owner,
     address newOwner
   ) external onlyWallet ownerExists(owner) notNull(newOwner) ownerDoesNotExist(newOwner) {
-    for (uint256 i = 0; i < owners.length; i = i.add(1))
+    for (uint256 i = 0; i < owners.length; i = (i + 1))
       if (owners[i] == owner) {
         owners[i] = newOwner;
         break;
@@ -244,8 +242,8 @@ contract MultiSig is Initializable, IMultiSig {
   /// @param transactionId Transaction ID.
   /// @return count Number of confirmations.
   function getConfirmationCount(uint256 transactionId) external view returns (uint256 count) {
-    for (uint256 i = 0; i < owners.length; i = i.add(1))
-      if (confirmations[transactionId][owners[i]]) count = count.add(1);
+    for (uint256 i = 0; i < owners.length; i = (i + 1))
+      if (confirmations[transactionId][owners[i]]) count = (count + 1);
   }
 
   /// @dev Returns total number of transactions after filters are applied.
@@ -253,9 +251,9 @@ contract MultiSig is Initializable, IMultiSig {
   /// @param executed Include executed transactions.
   /// @return count Total number of transactions after filters are applied.
   function getTransactionCount(bool pending, bool executed) external view returns (uint256 count) {
-    for (uint256 i = 0; i < transactionCount; i = i.add(1))
+    for (uint256 i = 0; i < transactionCount; i = (i + 1))
       if ((pending && !transactions[i].executed) || (executed && transactions[i].executed))
-        count = count.add(1);
+        count = (count + 1);
   }
 
   /// @dev Returns list of owners.
@@ -273,13 +271,13 @@ contract MultiSig is Initializable, IMultiSig {
     address[] memory confirmationsTemp = new address[](owners.length);
     uint256 count = 0;
     uint256 i;
-    for (i = 0; i < owners.length; i = i.add(1))
+    for (i = 0; i < owners.length; i = (i + 1))
       if (confirmations[transactionId][owners[i]]) {
         confirmationsTemp[count] = owners[i];
-        count = count.add(1);
+        count = (count + 1);
       }
     _confirmations = new address[](count);
-    for (i = 0; i < count; i = i.add(1)) _confirmations[i] = confirmationsTemp[i];
+    for (i = 0; i < count; i = (i + 1)) _confirmations[i] = confirmationsTemp[i];
   }
 
   /// @dev Returns list of transaction IDs in defined range.
@@ -297,13 +295,13 @@ contract MultiSig is Initializable, IMultiSig {
     uint256[] memory transactionIdsTemp = new uint256[](transactionCount);
     uint256 count = 0;
     uint256 i;
-    for (i = 0; i < transactionCount; i = i.add(1))
+    for (i = 0; i < transactionCount; i = (i + 1))
       if ((pending && !transactions[i].executed) || (executed && transactions[i].executed)) {
         transactionIdsTemp[count] = i;
-        count = count.add(1);
+        count = (count + 1);
       }
-    _transactionIds = new uint256[](to.sub(from));
-    for (i = from; i < to; i = i.add(1)) _transactionIds[i.sub(from)] = transactionIdsTemp[i];
+    _transactionIds = new uint256[]((to - from));
+    for (i = from; i < to; i = (i + 1)) _transactionIds[(i - from)] = transactionIdsTemp[i];
   }
 
   /// @dev Allows to change the number of required confirmations. Transaction has to be sent by
@@ -360,8 +358,8 @@ contract MultiSig is Initializable, IMultiSig {
   /// @return Confirmation status.
   function isConfirmed(uint256 transactionId) public view returns (bool) {
     uint256 count = 0;
-    for (uint256 i = 0; i < owners.length; i = i.add(1)) {
-      if (confirmations[transactionId][owners[i]]) count = count.add(1);
+    for (uint256 i = 0; i < owners.length; i = (i + 1)) {
+      if (confirmations[transactionId][owners[i]]) count = (count + 1);
       bool isInternal = transactions[transactionId].destination == address(this);
       if ((isInternal && count == internalRequired) || (!isInternal && count == required))
         return true;
@@ -389,7 +387,7 @@ contract MultiSig is Initializable, IMultiSig {
       data: data,
       executed: false
     });
-    transactionCount = transactionCount.add(1);
+    transactionCount = (transactionCount + 1);
     emit Submission(transactionId);
   }
 }

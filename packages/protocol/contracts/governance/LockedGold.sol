@@ -2,7 +2,6 @@
 pragma solidity >=0.8.7 <0.9.0;
 
 import "@openzeppelin/contracts8/utils/math/Math.sol";
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/utils/Address.sol";
 import "../common/libraries/EnumerableSet.sol";
 
@@ -46,7 +45,6 @@ contract LockedGold is
   UsingRegistry,
   Blockable
 {
-  using SafeMath for uint256;
   using Address for address payable; // prettier-ignore
   using FixidityLib for FixidityLib.Fraction;
   using EnumerableSet for EnumerableSet.AddressSet;
@@ -208,7 +206,7 @@ contract LockedGold is
     uint256 totalLockedGold = getAccountTotalLockedGold(msg.sender);
     // Prevent unlocking CELO when voting on governance proposals so that the CELO cannot be
     // used to vote more than once.
-    uint256 remainingLockedGold = totalLockedGold.sub(value);
+    uint256 remainingLockedGold = (totalLockedGold - value);
 
     uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(msg.sender);
     require(
@@ -229,7 +227,7 @@ contract LockedGold is
       "Either account doesn't have enough locked Celo or locked Celo is being used for voting."
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
-    uint256 available = block.timestamp.add(unlockingPeriod);
+    uint256 available = (block.timestamp + unlockingPeriod);
     // CERTORA: the slot containing the length could be MAX_UINT
     account.pendingWithdrawals.push(PendingWithdrawal(value, available));
     emit GoldUnlocked(msg.sender, value, available);
@@ -252,7 +250,7 @@ contract LockedGold is
     if (value == pendingWithdrawal.value) {
       deletePendingWithdrawal(account.pendingWithdrawals, index);
     } else {
-      pendingWithdrawal.value = pendingWithdrawal.value.sub(value);
+      pendingWithdrawal.value = (pendingWithdrawal.value - value);
     }
     _incrementNonvotingAccountBalance(msg.sender, value);
     _updateDelegatedAmount(msg.sender);
@@ -367,10 +365,9 @@ contract LockedGold is
       .add(percentageToDelegate);
     currentDelegateeInfo.percentage = percentageToDelegate;
 
-    currentDelegateeInfo.currentAmount = currentDelegateeInfo.currentAmount.add(amountToDelegate);
-    totalDelegatedCelo[delegateeAccount] = totalDelegatedCelo[delegateeAccount].add(
-      amountToDelegate
-    );
+    currentDelegateeInfo.currentAmount = (currentDelegateeInfo.currentAmount + amountToDelegate);
+    totalDelegatedCelo[delegateeAccount] = (totalDelegatedCelo[delegateeAccount] +
+      amountToDelegate);
 
     emit CeloDelegated(
       delegatorAccount,
@@ -510,7 +507,7 @@ contract LockedGold is
       uint256 difference = 0;
       // If not enough nonvoting, revoke the difference
       if (nonvotingBalance < maxSlash) {
-        difference = maxSlash.sub(nonvotingBalance);
+        difference = (maxSlash - nonvotingBalance);
         require(
           getElection().forceDecrementVotes(account, difference, lessers, greaters, indices) ==
             difference,
@@ -518,7 +515,7 @@ contract LockedGold is
         );
       }
       // forceDecrementVotes does not increment nonvoting account balance, so we can't double count
-      _decrementNonvotingAccountBalance(account, maxSlash.sub(difference));
+      _decrementNonvotingAccountBalance(account, (maxSlash - difference));
       _incrementNonvotingAccountBalance(reporter, reward);
     }
 
@@ -526,8 +523,8 @@ contract LockedGold is
 
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
     address payable communityFundPayable = payable(address(uint160(communityFund)));
-    require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
-    communityFundPayable.sendValue(maxSlash.sub(reward));
+    require((maxSlash - reward) <= address(this).balance, "Inconsistent balance");
+    communityFundPayable.sendValue((maxSlash - reward));
     emit AccountSlashed(account, maxSlash, reporter, reward);
   }
 
@@ -546,7 +543,7 @@ contract LockedGold is
    * @return The total amount of locked CELO in the system.
    */
   function getTotalLockedGold() external view returns (uint256) {
-    return totalNonvoting.add(getElection().getTotalVotes());
+    return (totalNonvoting + getElection().getTotalVotes());
   }
 
   /**
@@ -603,8 +600,8 @@ contract LockedGold is
   function getTotalPendingWithdrawals(address account) external view returns (uint256) {
     uint256 pendingWithdrawalSum = 0;
     PendingWithdrawal[] memory withdrawals = balances[account].pendingWithdrawals;
-    for (uint256 i = 0; i < withdrawals.length; i = i.add(1)) {
-      pendingWithdrawalSum = pendingWithdrawalSum.add(withdrawals[i].value);
+    for (uint256 i = 0; i < withdrawals.length; i = (i + 1)) {
+      pendingWithdrawalSum = (pendingWithdrawalSum + withdrawals[i].value);
     }
     return pendingWithdrawalSum;
   }
@@ -754,7 +751,7 @@ contract LockedGold is
     uint256 length = _to - from + 1;
     uint256[] memory values = new uint256[](length);
     uint256[] memory timestamps = new uint256[](length);
-    for (uint256 i = from; i <= _to; i = i.add(1)) {
+    for (uint256 i = from; i <= _to; i = (i + 1)) {
       PendingWithdrawal memory pendingWithdrawal = balances[account].pendingWithdrawals[i];
       values[i - from] = pendingWithdrawal.value;
       timestamps[i - from] = pendingWithdrawal.timestamp;
@@ -778,7 +775,7 @@ contract LockedGold is
    */
   function getAccountTotalLockedGold(address account) public view returns (uint256) {
     uint256 total = balances[account].nonvoting;
-    return total.add(getElection().getTotalVotesByAccount(account));
+    return (total + getElection().getTotalVotesByAccount(account));
   }
 
   /**
@@ -797,7 +794,7 @@ contract LockedGold is
       .multiply(availableUndelegatedPercents)
       .fromFixed();
 
-    return availableForVoting.add(totalDelegatedCelo[account]);
+    return (availableForVoting + totalDelegatedCelo[account]);
   }
 
   /**
@@ -848,7 +845,7 @@ contract LockedGold is
     );
 
     currentDelegateeInfo.currentAmount = expected;
-    totalDelegatedCelo[delegatee] = totalDelegatedCelo[delegatee].sub(real).add(expected);
+    totalDelegatedCelo[delegatee] = ((totalDelegatedCelo[delegatee] - real) + expected);
 
     return expected;
   }
@@ -859,8 +856,8 @@ contract LockedGold is
    * @param value The amount by which to increment.
    */
   function _incrementNonvotingAccountBalance(address account, uint256 value) private {
-    balances[account].nonvoting = balances[account].nonvoting.add(value);
-    totalNonvoting = totalNonvoting.add(value);
+    balances[account].nonvoting = (balances[account].nonvoting + value);
+    totalNonvoting = (totalNonvoting + value);
   }
 
   /**
@@ -869,8 +866,8 @@ contract LockedGold is
    * @param value The amount by which to decrement.
    */
   function _decrementNonvotingAccountBalance(address account, uint256 value) private {
-    balances[account].nonvoting = balances[account].nonvoting.sub(value);
-    totalNonvoting = totalNonvoting.sub(value);
+    balances[account].nonvoting = (balances[account].nonvoting - value);
+    totalNonvoting = (totalNonvoting - value);
   }
 
   /**
@@ -883,7 +880,7 @@ contract LockedGold is
 
     Delegated storage delegated = delegatorInfo[delegator];
 
-    for (uint256 i = 0; i < delegatees.length; i = i.add(1)) {
+    for (uint256 i = 0; i < delegatees.length; i = (i + 1)) {
       DelegatedInfo storage currentDelegateeInfo = delegated.delegateesWithPercentagesAndAmount[
         delegatees[i]
       ];
@@ -895,7 +892,7 @@ contract LockedGold is
         .newFixed(amountToRevoke)
         .multiply(currentDelegateeInfo.percentage)
         .fromFixed();
-      delegateeAmountToRevoke = delegateeAmountToRevoke.sub(expected.sub(real));
+      delegateeAmountToRevoke = (delegateeAmountToRevoke - (expected - real));
       _decreaseDelegateeVotingPower(delegatees[i], delegateeAmountToRevoke, currentDelegateeInfo);
       emit DelegatedCeloRevoked(delegator, delegatees[i], 0, delegateeAmountToRevoke);
     }
@@ -914,21 +911,21 @@ contract LockedGold is
   ) private {
     uint256 delegateeTotalVotingPower = getAccountTotalGovernanceVotingPower(delegatee);
     uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(delegatee);
-    uint256 unusedReferendumVotes = delegateeTotalVotingPower.sub(totalReferendumVotes);
+    uint256 unusedReferendumVotes = (delegateeTotalVotingPower - totalReferendumVotes);
     if (unusedReferendumVotes < amountToRevoke) {
       getGovernance().removeVotesWhenRevokingDelegatedVotes(
         delegatee,
-        delegateeTotalVotingPower.sub(amountToRevoke)
+        (delegateeTotalVotingPower - amountToRevoke)
       );
     }
-    delegateeInfo.currentAmount = delegateeInfo.currentAmount.sub(amountToRevoke);
-    totalDelegatedCelo[delegatee] = totalDelegatedCelo[delegatee].sub(amountToRevoke);
+    delegateeInfo.currentAmount = (delegateeInfo.currentAmount - amountToRevoke);
+    totalDelegatedCelo[delegatee] = (totalDelegatedCelo[delegatee] - amountToRevoke);
   }
 
   function _updateDelegatedAmount(address delegator) private {
     address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
     EnumerableSet.AddressSet storage delegatees = delegatorInfo[delegatorAccount].delegatees;
-    for (uint256 i = 0; i < delegatees.length(); i = i.add(1)) {
+    for (uint256 i = 0; i < delegatees.length(); i = (i + 1)) {
       _updateDelegatedAmount(delegatorAccount, delegatees.at(i));
     }
   }
@@ -939,7 +936,7 @@ contract LockedGold is
    * @param index The index of the pending withdrawal to delete.
    */
   function deletePendingWithdrawal(PendingWithdrawal[] storage list, uint256 index) private {
-    uint256 lastIndex = list.length.sub(1);
+    uint256 lastIndex = (list.length - 1);
     list[index] = list[lastIndex];
     list.pop();
   }

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.9.0;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "../FixidityLib.sol";
 
 /**
@@ -9,7 +8,6 @@ import "../FixidityLib.sol";
  */
 library Heap {
   using FixidityLib for FixidityLib.Fraction;
-  using SafeMath for uint256;
 
   /**
    * @notice Fixes the heap invariant.
@@ -29,8 +27,8 @@ library Heap {
     require(length <= keys.length, "heap length out of range");
     uint256 i = start;
     while (true) {
-      uint256 leftChild = i.mul(2).add(1);
-      uint256 rightChild = i.mul(2).add(2);
+      uint256 leftChild = ((i * 2) + 1);
+      uint256 rightChild = ((i * 2) + 2);
       uint256 maxIndex = i;
       if (leftChild < length && values[keys[leftChild]].gt(values[keys[maxIndex]])) {
         maxIndex = leftChild;

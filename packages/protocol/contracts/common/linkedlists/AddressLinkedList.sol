@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.0 <0.9.0;
 
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
-
 import "./LinkedList.sol";
 
 /**
@@ -11,7 +9,6 @@ import "./LinkedList.sol";
  */
 library AddressLinkedList {
   using LinkedList for LinkedList.List;
-  using SafeMath for uint256;
   /**
    * @notice Inserts an element into a doubly linked list.
    * @param list A storage pointer to the underlying list.
@@ -82,7 +79,7 @@ library AddressLinkedList {
   function headN(LinkedList.List storage list, uint256 n) public view returns (address[] memory) {
     bytes32[] memory byteKeys = list.headN(n);
     address[] memory keys = new address[](n);
-    for (uint256 i = 0; i < n; i = i.add(1)) {
+    for (uint256 i = 0; i < n; i = (i + 1)) {
       keys[i] = toAddress(byteKeys[i]);
     }
     return keys;

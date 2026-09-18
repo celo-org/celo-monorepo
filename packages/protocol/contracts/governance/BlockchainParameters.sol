@@ -2,7 +2,6 @@
 pragma solidity >=0.8.7 <0.9.0;
 
 import "@openzeppelin/contracts8/access/Ownable.sol";
-import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingPrecompiles.sol";
@@ -11,8 +10,6 @@ import "../common/UsingPrecompiles.sol";
  * @title Contract for storing blockchain parameters that can be set by governance.
  */
 contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
-  using SafeMath for uint256;
-
   // obsolete
   struct ClientVersion {
     uint256 major;
@@ -97,14 +94,14 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   function setUptimeLookbackWindow(uint256 window) public onlyL1 onlyOwner {
     require(window >= 3 && window <= 720, "UptimeLookbackWindow must be within safe range");
     require(
-      window <= getEpochSize().sub(2),
+      window <= (getEpochSize() - 2),
       "UptimeLookbackWindow must be smaller or equal to epochSize - 2"
     );
 
     uptimeLookbackWindow.oldValue = _getUptimeLookbackWindow();
 
     // changes only take place on the next epoch
-    uptimeLookbackWindow.nextValueActivationEpoch = getEpochNumber().add(1);
+    uptimeLookbackWindow.nextValueActivationEpoch = (getEpochNumber() + 1);
     uptimeLookbackWindow.nextValue = window;
 
     emit UptimeLookbackWindowSet(window, uptimeLookbackWindow.nextValueActivationEpoch);
