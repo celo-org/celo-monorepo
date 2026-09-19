@@ -351,6 +351,8 @@ library Proposals {
       let x := mload(0x40) // "Allocate" memory for output (0x40 is where "free memory" pointer is stored by convention)
       let d := add(data, 32) // First 32 bytes are the padded length of data, so exclude that
       result := call(
+        // The subtraction is a fixed figure taken from the gas schedule of the day, so it
+        // does not track repricings; it only ever forwards less than the call could.
         sub(gas(), 34710), // 34710 is the value that solidity is currently emitting
         // It includes callGas (700) + callVeryLow (3, to pay for SUB) + callValueTransferGas (9000) +
         // callNewAccountGas (25000, in case the destination address does not exist and needs creating)

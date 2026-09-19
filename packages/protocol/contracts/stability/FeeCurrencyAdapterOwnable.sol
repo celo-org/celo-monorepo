@@ -22,6 +22,13 @@ contract FeeCurrencyAdapterOwnable is FeeCurrencyAdapter, Ownable {
    * @param _symbol The symbol of the adapted token.
    * @param _expectedDecimals The expected number of decimals of the adapted token.
    */
+  /**
+   * @dev Deliberately carries no `initializer` modifier. The guard lives on the
+   * FeeCurrencyAdapter.initialize this delegates to, and Initializable's modifier sets the
+   * flag before running the body, so declaring it here as well would make that parent call
+   * revert on the very first initialization. A repeat call reverts inside the parent, which
+   * rolls back the ownership transfer above it.
+   */
   function initialize(
     address _adaptedToken,
     string memory _name,

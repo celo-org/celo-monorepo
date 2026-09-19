@@ -90,7 +90,7 @@ contract UniswapFeeHandlerSeller is FeeHandlerSeller {
     path[1] = address(celoToken);
 
     for (uint256 i = 0; i < routerAddresses[sellTokenAddress].length(); i++) {
-      address poolAddress = routerAddresses[sellTokenAddress].at(i);
+      address poolAddress = routerAddresses[sellTokenAddress].pos(i);
       IUniswapV2RouterMin router = IUniswapV2RouterMin(poolAddress);
 
       // Using the second return value becuase it's the last argument,

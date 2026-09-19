@@ -926,7 +926,7 @@ contract LockedGold is
     address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
     EnumerableSet.AddressSet storage delegatees = delegatorInfo[delegatorAccount].delegatees;
     for (uint256 i = 0; i < delegatees.length(); i = (i + 1)) {
-      _updateDelegatedAmount(delegatorAccount, delegatees.at(i));
+      _updateDelegatedAmount(delegatorAccount, delegatees.pos(i));
     }
   }
 

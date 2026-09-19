@@ -10,7 +10,7 @@ pragma solidity >=0.8.7 <0.9.0;
  * OpenZeppelin 4.x reverses that order, so upgrading an implementation to the
  * 4.x library would make every persisted set read as empty. This port keeps
  * the 2.5 storage layout (member order and names) while exposing the richer
- * 4.x-style API (length/at/getValues) that the migrated contracts use.
+ * 4.x-style API (length/pos/getValues) that the migrated contracts use.
  *
  * `getValues` is deliberately not named `values` because the struct member of
  * that name (required for layout compatibility) would shadow the function.
@@ -128,7 +128,7 @@ library EnumerableSet {
    * Requirements:
    * - `index` must be strictly less than {length}.
    */
-  function at(AddressSet storage set, uint256 index) internal view returns (address) {
+  function pos(AddressSet storage set, uint256 index) internal view returns (address) {
     return set.values[index];
   }
 

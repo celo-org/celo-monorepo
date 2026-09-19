@@ -721,7 +721,7 @@ contract FeeHandler is
     _executePayment(tokenAddress, ignoreRenaming_carbonFeeBeneficiary, carbonFundAmount);
 
     for (uint256 i = 0; i < otherBeneficiariesAddresses.length(); i++) {
-      address beneficiary = otherBeneficiariesAddresses.at(i);
+      address beneficiary = otherBeneficiariesAddresses.pos(i);
       Beneficiary storage otherBeneficiary = otherBeneficiaries[beneficiary];
 
       uint256 amount = _calculateDistributeAmounts(
@@ -755,7 +755,7 @@ contract FeeHandler is
 
   function _distributeAll() private {
     for (uint256 i = 0; i < activeTokens.length(); i++) {
-      address token = activeTokens.at(i);
+      address token = activeTokens.pos(i);
       _distribute(token);
     }
     // distribute Celo
