@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: apache-2.0
-pragma solidity >=0.8.7 <=0.8.20;
+pragma solidity >=0.8.7 <0.9.0;
 
 import "celo-foundry-8/Test.sol";
 
@@ -123,6 +123,16 @@ contract FeeCurrencyAdapter_Initialize is FeeCurrencyAdapterTest {
   function test_shouldRevertWhenCalledAgain() public {
     vm.expectRevert("contract already initialized");
     feeCurrencyAdapter.initialize(address(feeCurrency), "adapter", "ad", 18);
+  }
+
+  // The ownable override transfers ownership before delegating to the guarded parent
+  // initializer, so the guard has to undo that transfer when it rejects a repeat call.
+  function test_ShouldLeaveOwnerUnchanged_WhenCalledAgainByAnotherAccount() public {
+    address ownerBefore = feeCurrencyAdapter.owner();
+    vm.prank(nonOwner);
+    vm.expectRevert("contract already initialized");
+    feeCurrencyAdapter.initialize(address(feeCurrency), "adapter", "ad", 18);
+    assertEq(feeCurrencyAdapter.owner(), ownerBefore);
   }
 
   function test_ShouldSucceed_WhenExpectedDecimalsAreMoreThenDecimals_Fuzz(uint8 amount) public {

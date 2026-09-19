@@ -30,9 +30,6 @@ import { deployViemContract } from '@celo/protocol/test-ts/util/viem'
 const registryAbi = readJsonSync(`./out/Registry.sol/Registry.json`).abi as Abi
 const registryBytecode = readJsonSync(`./out/Registry.sol/Registry.json`).bytecode.object as string
 
-const proxyAbi = readJsonSync(`./out/Proxy.sol/Proxy.json`).abi as Abi
-const proxyBytecode = readJsonSync(`./out/Proxy.sol/Proxy.json`).bytecode.object as string
-
 // TODO remove this duplicate
 export interface ProposalTx {
   contract: string
@@ -89,6 +86,12 @@ const setPlaceholderHash = (links: LibraryLinks, library: string, artifacts: Bui
 const buildArtifacts = getTestArtifacts('linked_libraries')[0]
 const upgradedLibBuildArtifacts = getTestArtifacts('linked_libraries_upgraded_lib')[0]
 const upgradedContractBuildArtifacts = getTestArtifacts('linked_libraries_upgraded_contract')[0]
+
+// The proxies deployed for these tests come from the same artifact set they are later
+// verified against, so the live-proxy code check sees the build it expects.
+const proxyArtifact = getArtifactByName('Proxy', upgradedContractBuildArtifacts)
+const proxyAbi = proxyArtifact.abi as Abi
+const proxyBytecode = getBytecode(proxyArtifact)
 
 describe('', () => {
   const artifact = getArtifactByName('TestContract', buildArtifacts)

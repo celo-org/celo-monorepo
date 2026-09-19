@@ -17,6 +17,10 @@ export const ignoredContractsV9Only = [
   // Between CR9 and CR10, a Mento upgrade MU03 also upgraded SortedOracles. For the purposes of our compatibility tests, we use the Mento version of the contract in CR10, so that we're comparing the most recent pre-CR10 contracts with the CR10 versions.
 ]
 
+// SortedOracles is owned and upgraded by Mento; its proxy no longer answers to Celo
+// Governance, so from CR18 on Celo releases neither deploy nor verify it.
+export const ignoredContractsV18 = ['SortedOracles']
+
 export function getReleaseVersion(tag: string): number {
   // Support two formats:
   // 1. Tag format: core-contracts.vX (e.g., core-contracts.v14)

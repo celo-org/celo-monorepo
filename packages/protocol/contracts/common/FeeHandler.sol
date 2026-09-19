@@ -1,27 +1,25 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.9.0;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/math/Math.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/utils/EnumerableSet.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
+import "./libraries/EnumerableSet.sol";
 
 import "./UsingRegistry.sol";
-import "../common/Freezable.sol";
-import "../common/FixidityLib.sol";
-import "../common/Initializable.sol";
+import "./FixidityLib.sol";
+import "./Initializable.sol";
 
-import "../common/interfaces/IFeeHandler.sol";
-import "../common/interfaces/IFeeHandlerSeller.sol";
+import "./interfaces/IFeeHandler.sol";
+import "./interfaces/IFeeHandlerSeller.sol";
 
 // TODO move to IStableToken when it adds method getExchangeRegistryId
 import "./interfaces/IStableTokenMento.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/interfaces/ICeloToken.sol";
+import "./interfaces/ICeloVersionedContract.sol";
+import "./interfaces/ICeloToken.sol";
 
 // Using the minimal required signatures in the interfaces so more contracts could be compatible
-import "../common/libraries/ReentrancyGuard.sol";
+import "./libraries/ReentrancyGuard.sol";
 
 // An implementation of FeeHandler as described in CIP-52
 // See https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md
@@ -30,11 +28,14 @@ contract FeeHandler is
   Initializable,
   UsingRegistry,
   ICeloVersionedContract,
-  Freezable,
   IFeeHandler,
   ReentrancyGuard
 {
-  using SafeMath for uint256;
+  // onlyWhenNotFrozen functions can only be called when the contract is not frozen.
+  modifier onlyWhenNotFrozen() {
+    require(!getFreezer().isFrozen(address(this)), "can't call when contract is frozen");
+    _;
+  }
   using FixidityLib for FixidityLib.Fraction;
   using EnumerableSet for EnumerableSet.AddressSet;
 
@@ -107,7 +108,7 @@ contract FeeHandler is
    * @notice Sets initialized == true on implementation contracts.
    * @param test Set to true to skip implementation initialisation.
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -141,7 +142,7 @@ contract FeeHandler is
   }
 
   // Without this the contract cant receive Celo as native transfer
-  function() external payable {}
+  receive() external payable {}
 
   function setCarbonFraction(uint256 newFraction) external onlyOwner {
     _setCarbonFraction(newFraction);
@@ -420,7 +421,7 @@ contract FeeHandler is
   }
 
   function getOtherBeneficiariesAddresses() external view returns (address[] memory) {
-    return otherBeneficiariesAddresses.values;
+    return otherBeneficiariesAddresses.getValues();
   }
 
   /**
@@ -431,7 +432,7 @@ contract FeeHandler is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 1);
+    return (1, 3, 0, 0);
   }
 
   /**
@@ -447,7 +448,7 @@ contract FeeHandler is
       return false;
     }
 
-    uint256 currentDay = now / 1 days;
+    uint256 currentDay = block.timestamp / 1 days;
     // Pattern borrowed from Reserve.sol
     if (currentDay > tokenState.lastLimitDay) {
       tokenState.lastLimitDay = currentDay;
@@ -458,7 +459,7 @@ contract FeeHandler is
   }
 
   function getActiveTokens() public view returns (address[] memory) {
-    return activeTokens.values;
+    return activeTokens.getValues();
   }
 
   function _getBurnFraction() internal view returns (uint256) {
@@ -467,7 +468,7 @@ contract FeeHandler is
 
   function _setDistributionAndBurnAmounts(TokenState storage tokenState, IERC20 token) internal {
     uint256 balanceOfToken = token.balanceOf(address(this));
-    uint256 balanceToProcess = balanceOfToken.sub(tokenState.toDistribute).sub(tokenState.toBurn);
+    uint256 balanceToProcess = ((balanceOfToken - tokenState.toDistribute) - tokenState.toBurn);
     _setDistributeAfterBurn(tokenState, balanceToProcess);
 
     emit DistributionAmountSet(address(token), tokenState.toDistribute);
@@ -499,8 +500,8 @@ contract FeeHandler is
       .newFixed(balanceToProcess)
       .multiply(getBurnFractionFixidity())
       .fromFixed();
-    tokenState.toBurn = tokenState.toBurn.add(balanceToBurn);
-    tokenState.toDistribute = tokenState.toDistribute.add(balanceToProcess.sub(balanceToBurn));
+    tokenState.toBurn = (tokenState.toBurn + balanceToBurn);
+    tokenState.toDistribute = (tokenState.toDistribute + (balanceToProcess - balanceToBurn));
     return tokenState.toBurn;
   }
 
@@ -594,7 +595,7 @@ contract FeeHandler is
       // if no limit set, assume uncapped
       return;
     }
-    tokenState.currentDaySellLimit = tokenState.currentDaySellLimit.sub(amountBurned);
+    tokenState.currentDaySellLimit = (tokenState.currentDaySellLimit - amountBurned);
     emit DailySellLimitUpdated(amountBurned);
   }
 
@@ -677,9 +678,9 @@ contract FeeHandler is
     );
 
     // substract from toBurn only the amount that was burned
-    tokenState.toBurn = tokenState.toBurn.sub(balanceToBurn);
-    getCeloTokenState().toBurn = getCeloTokenState().toBurn.add(celoReceived);
-    tokenState.pastBurn = tokenState.pastBurn.add(balanceToBurn);
+    tokenState.toBurn = (tokenState.toBurn - balanceToBurn);
+    getCeloTokenState().toBurn = (getCeloTokenState().toBurn + celoReceived);
+    tokenState.pastBurn = (tokenState.pastBurn + balanceToBurn);
     updateLimits(tokenAddress, balanceToBurn);
 
     emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
@@ -719,8 +720,8 @@ contract FeeHandler is
 
     _executePayment(tokenAddress, ignoreRenaming_carbonFeeBeneficiary, carbonFundAmount);
 
-    for (uint256 i = 0; i < EnumerableSet.length(otherBeneficiariesAddresses); i++) {
-      address beneficiary = otherBeneficiariesAddresses.get(i);
+    for (uint256 i = 0; i < otherBeneficiariesAddresses.length(); i++) {
+      address beneficiary = otherBeneficiariesAddresses.pos(i);
       Beneficiary storage otherBeneficiary = otherBeneficiaries[beneficiary];
 
       uint256 amount = _calculateDistributeAmounts(
@@ -753,8 +754,8 @@ contract FeeHandler is
   }
 
   function _distributeAll() private {
-    for (uint256 i = 0; i < EnumerableSet.length(activeTokens); i++) {
-      address token = activeTokens.get(i);
+    for (uint256 i = 0; i < activeTokens.length(); i++) {
+      address token = activeTokens.pos(i);
       _distribute(token);
     }
     // distribute Celo
@@ -762,7 +763,7 @@ contract FeeHandler is
   }
 
   function _handleAll() private {
-    _handle(activeTokens.values);
+    _handle(activeTokens.getValues());
   }
 
   function _handleCelo() private {
@@ -795,5 +796,14 @@ contract FeeHandler is
 
   function getCeloTokenState() private view returns (TokenState storage) {
     return tokenStates[getCeloTokenAddress()];
+  }
+
+  /**
+   * @notice Whether the sender is the owner.
+   * @dev Kept from the Solidity 0.5 implementation: OpenZeppelin 2.5's Ownable exposed it
+   * and 4.9's does not, and the ABI behind the upgraded proxy must not lose a function.
+   */
+  function isOwner() external view returns (bool) {
+    return msg.sender == owner();
   }
 }

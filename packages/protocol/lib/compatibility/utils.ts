@@ -1,3 +1,4 @@
+import { compilerFamily } from '@celo/protocol/lib/compatibility/internal'
 import { reportASTIncompatibilities } from '@celo/protocol/lib/compatibility/ast-code';
 import { reportLayoutIncompatibilities } from '@celo/protocol/lib/compatibility/ast-layout';
 import { Categorizer } from '@celo/protocol/lib/compatibility/categorizer';
@@ -80,9 +81,19 @@ export function instantiateArtifacts(buildDirectory: string): BuildArtifacts {
   }
 }
 
+// An artifact built without an AST falls back to the compilation target recorded in its
+// metadata for the source path.
+export function artifactSourcePath(artifact: any): string {
+  if (artifact.ast && artifact.ast.absolutePath) {
+    return artifact.ast.absolutePath
+  }
+  const target = artifact.metadata && artifact.metadata.settings && artifact.metadata.settings.compilationTarget
+  return target ? Object.keys(target)[0] : ''
+}
+
 function listForgeBuildArtifacts(buildDirectory: string): string[] {
   const buildInfoPathPattern = /build-info/
-  const coreContractPathPattern = /contracts(-0\.8)?\//
+  const coreContractPathPattern = /contracts(-0\.[58])?\//
   const nonFoundryDependencyPathPattern = /lib\/(?!celo)/
   const foundryTestContractPathPattern = /test-ts\//
   const pathPatterns = [ coreContractPathPattern, nonFoundryDependencyPathPattern, foundryTestContractPathPattern ]
@@ -93,7 +104,7 @@ function listForgeBuildArtifacts(buildDirectory: string): string[] {
       return false
     }
     const artifact = readJsonSync(artifactPath)
-    const sourcePath = artifact.ast.absolutePath
+    const sourcePath = artifactSourcePath(artifact)
     return pathPatterns.some((pattern: RegExp) => sourcePath.match(pattern))
   })
 
@@ -108,11 +119,11 @@ function splitArtifactsByCompiler(artifactPaths: string[]): CompilerArtifactsInd
   const artifactsIndex: CompilerArtifactsIndex = {}
   artifactPaths.forEach(artifactPath => {
     const artifact = readJsonSync(artifactPath)
-    const version = artifact.metadata.compiler.version
-    if (!artifactsIndex[version]) {
-      artifactsIndex[version] = []
+    const family = compilerFamily(artifact.metadata.compiler.version)
+    if (!artifactsIndex[family]) {
+      artifactsIndex[family] = []
     }
-    artifactsIndex[version].push(artifactPath)
+    artifactsIndex[family].push(artifactPath)
   })
 
   return artifactsIndex
@@ -122,4 +133,14 @@ export function instantiateArtifactsFromForge(buildDirectory: string): BuildArti
   const artifactPaths = listForgeBuildArtifacts(buildDirectory)
   const artifactsIndex: CompilerArtifactsIndex = splitArtifactsByCompiler(artifactPaths)
   return Object.keys(artifactsIndex).map(compiler => new BuildArtifacts(artifactsIndex[compiler]))
+}
+
+/**
+ * Build output directory forge writes a ref's artifacts to (mirrors build_dir_for_ref in
+ * scripts/bash/release-lib.sh). Branch names may contain slashes, which are flattened to
+ * underscores so the directory is a single path segment.
+ */
+export function buildDirectoryForRef(ref: string, profile?: string): string {
+  const base = `./out-${ref.replace(/\//g, '_')}`
+  return profile ? `${base}-${profile}` : base
 }

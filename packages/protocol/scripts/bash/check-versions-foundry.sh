@@ -33,7 +33,8 @@ if [ -n "$REPORT" ]; then
   echo "See: https://github.com/celo-org/celo-monorepo/pull/11662" >&2
   exit 1
 fi
-REPORT="report-$BRANCH-$NEW_BRANCH.json"
+# A ref name may contain slashes (release/core-contracts/18); the report is a plain file.
+REPORT="report-$(echo "$BRANCH" | sed -e 's#/#_#g')-$(echo "$NEW_BRANCH" | sed -e 's#/#_#g').json"
 
 # CONTRACT_EXCLUSION_REGEX imported from here
 source scripts/bash/contract-exclusion-regex.sh

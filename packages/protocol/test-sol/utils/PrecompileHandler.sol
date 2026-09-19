@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.5.13 <0.8.20;
+pragma solidity >=0.5.13 <0.9.0;
 
 // Note: This is contract is a copy of `PrecompileHandler` in celo-foundry, but uses `UsingPrecompile` instead of `Precompiles`.
 // This contract is to be removed/deprecated once the transition to L2 is live on mainnet.
@@ -31,7 +31,7 @@ contract PrecompileHandler is UsingPrecompiles {
   Mock private successMock = Mock(true, _empty, true);
   Mock private revertMock = Mock(true, _empty, true);
 
-  constructor() public {
+  constructor() {
     _vm.etch(TRANSFER, proxyTo(TRANSFER_SIG));
     _vm.label(TRANSFER, "TRANSFER");
 

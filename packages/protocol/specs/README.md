@@ -2,6 +2,13 @@
 
 This directory contains all necessary material in order to execute the Certora Prover: spec files, run scripts, and harnesses.
 
+> **Legacy — targets the Solidity 0.5 implementations.** The harnesses import the
+> 0.5 sources (`contracts/common/Accounts.sol`, `contracts/governance/Governance.sol`,
+> …) which were migrated to `contracts-0.8/` and no longer exist at HEAD. To run these
+> specs, check out a ref where the 0.5 implementations are present (up to the
+> `core-contracts.v17` tag). Formal verification of the 0.8 implementations is a
+> separate harness set and is not covered by this directory.
+
 ## Spec files
 
 ### Accounts

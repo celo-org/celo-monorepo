@@ -4,6 +4,11 @@ export interface ForgeArtifact {
   abi: any
   bytecode: {
     object: Hex
+    linkReferences?: {
+      [sourcePath: string]: {
+        [libraryName: string]: { start: number; length: number }[]
+      }
+    }
   }
   metadata: {
     sources: {

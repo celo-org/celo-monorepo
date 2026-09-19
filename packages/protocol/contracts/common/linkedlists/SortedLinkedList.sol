@@ -1,13 +1,12 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.0 <0.9.0;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./LinkedList.sol";
 
 /**
  * @title Maintains a sorted list of unsigned ints keyed by bytes32.
  */
 library SortedLinkedList {
-  using SafeMath for uint256;
   using LinkedList for LinkedList.List;
 
   struct List {
@@ -107,7 +106,7 @@ library SortedLinkedList {
   function popN(List storage list, uint256 n) internal returns (bytes32[] memory) {
     require(n <= list.list.numElements, "not enough elements");
     bytes32[] memory keys = new bytes32[](n);
-    for (uint256 i = 0; i < n; i = i.add(1)) {
+    for (uint256 i = 0; i < n; i = (i + 1)) {
       bytes32 key = list.list.head;
       keys[i] = key;
       remove(list, key);
@@ -146,7 +145,7 @@ library SortedLinkedList {
   ) internal view returns (bytes32[] memory, uint256[] memory) {
     bytes32[] memory keys = getKeys(list);
     uint256[] memory values = new uint256[](keys.length);
-    for (uint256 i = 0; i < keys.length; i = i.add(1)) {
+    for (uint256 i = 0; i < keys.length; i = (i + 1)) {
       values[i] = list.values[keys[i]];
     }
     return (keys, values);
@@ -173,7 +172,7 @@ library SortedLinkedList {
   }
 
   /**
-   * @notice Returns the keys of the elements greaterKey than and less than the provided value.
+   * @notice Returns the keys of the elements greater than and less than the provided value.
    * @param list A storage pointer to the underlying list.
    * @param value The element value.
    * @param lesserKey The key of the element which could be just left of the new value.
@@ -208,9 +207,9 @@ library SortedLinkedList {
       isValueBetween(list, value, list.list.elements[greaterKey].previousKey, greaterKey)
     ) {
       return (list.list.elements[greaterKey].previousKey, greaterKey);
-    } else {
-      require(false, "get lesser and greater failure");
     }
+
+    revert("get lesser and greater failure");
   }
 
   /**
