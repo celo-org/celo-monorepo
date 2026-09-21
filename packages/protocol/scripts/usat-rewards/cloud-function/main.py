@@ -375,7 +375,9 @@ def distribute(request):
             balance_now = token.functions.balanceOf(hot_wallet).call()
             if balance_now < int(float(os.environ.get("MIN_BALANCE_USAT", "1500")) * 10 ** 6):
                 topup_alert("rewards wallet below the runway threshold - top up USAT",
-                            wallet=hot_wallet, balance_usat=round(balance_now / 1e6, 2))
+                            wallet=hot_wallet, balance_usat=round(balance_now / 1e6, 2),
+                            wallets_owed=0, owed_now_usat=0, topup_needed_usat=0,
+                            topup_recommended_usat=round((int(float(os.environ.get("MIN_BALANCE_USAT", "1500")) * 10 ** 6) - balance_now) / 1e6, 2))
             return ({**summary, "result": "nothing owed", "balance_usat": balance_now / 1e6}, 200)
 
         for wallet, amount in owed.items():
@@ -397,6 +399,7 @@ def distribute(request):
 
         # Gas mode: CELO when there is enough of it, otherwise pay gas in USA₮
         # via the fee-currency adapter and reserve that gas out of the token balance.
+        min_balance = int(float(os.environ.get("MIN_BALANCE_USAT", "1500")) * 10 ** 6)
         fee_currency = os.environ.get("FEE_CURRENCY_ADAPTER", FEE_CURRENCY_ADAPTER_DEFAULT)
         gas_in_usat = gas_balance < min_gas_wei and bool(fee_currency)
         gas_reserve = 0
@@ -407,9 +410,12 @@ def distribute(request):
             summary["gas_mode"] = "USAT via fee currency"
             summary["gas_reserve_usat"] = gas_reserve / 1e6
             if token_balance <= gas_reserve:
+                needed_now = total + gas_reserve - token_balance
                 topup_alert("rewards wallet is empty - cannot even cover gas - top up USAT",
                             wallet=hot_wallet, balance_usat=round(token_balance / 1e6, 2),
-                            owed_now_usat=round(total / 1e6, 2), wallets_owed=len(owed))
+                            owed_now_usat=round(total / 1e6, 2), wallets_owed=len(owed),
+                            topup_needed_usat=round(needed_now / 1e6, 2),
+                            topup_recommended_usat=round((needed_now + min_balance) / 1e6, 2))
                 return ({**summary, "error": "no CELO and not enough USAT to even cover gas"}, 500)
             token_balance -= gas_reserve
         else:
@@ -417,10 +423,12 @@ def distribute(request):
 
         # Pre-run funding check: alert if this run cannot be fully paid, or if
         # the balance left afterwards would fall below the runway threshold.
-        min_balance = int(float(os.environ.get("MIN_BALANCE_USAT", "1500")) * 10 ** 6)
+        needed_now = max(0, total + gas_reserve - token_balance)
         wallet_facts = {"wallet": hot_wallet, "balance_usat": round(token_balance / 1e6, 2),
                         "owed_now_usat": round(total / 1e6, 2), "wallets_owed": len(owed),
-                        "gas_reserve_usat": round(gas_reserve / 1e6, 2), "min_balance_usat": min_balance / 1e6}
+                        "gas_reserve_usat": round(gas_reserve / 1e6, 2), "min_balance_usat": min_balance / 1e6,
+                        "topup_needed_usat": round(needed_now / 1e6, 2),
+                        "topup_recommended_usat": round((needed_now + min_balance) / 1e6, 2)}
         if token_balance < total:
             topup_alert("rewards wallet cannot cover this run - top up USAT", shortfall_usat=round((total - token_balance) / 1e6, 2), **wallet_facts)
         elif token_balance - total < min_balance:
@@ -487,12 +495,18 @@ def distribute(request):
         # Post-run funding check: did the run end short, or is runway now thin?
         balance_after = token.functions.balanceOf(hot_wallet).call()
         if skipped_unfunded:
+            still_owed = total - paid_total
             topup_alert("run ended with unpaid wallets because the rewards wallet ran dry - top up USAT",
                         wallet=hot_wallet, balance_usat=round(balance_after / 1e6, 2), paid=paid_count,
-                        skipped_unfunded=skipped_unfunded, still_owed_usat=round((total - paid_total) / 1e6, 2))
+                        skipped_unfunded=skipped_unfunded, wallets_owed=skipped_unfunded,
+                        owed_now_usat=round(still_owed / 1e6, 2),
+                        topup_needed_usat=round(max(0, still_owed - balance_after) / 1e6, 2),
+                        topup_recommended_usat=round((max(0, still_owed - balance_after) + min_balance) / 1e6, 2))
         elif balance_after < min_balance:
             topup_alert("rewards wallet below the runway threshold after this run - top up USAT",
-                        wallet=hot_wallet, balance_usat=round(balance_after / 1e6, 2), min_balance_usat=min_balance / 1e6)
+                        wallet=hot_wallet, balance_usat=round(balance_after / 1e6, 2), min_balance_usat=min_balance / 1e6,
+                        wallets_owed=0, owed_now_usat=0, topup_needed_usat=0,
+                        topup_recommended_usat=round((min_balance - balance_after) / 1e6, 2))
         summary["balance_after_usat"] = balance_after / 1e6
 
         return (
