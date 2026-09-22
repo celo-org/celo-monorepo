@@ -82,7 +82,6 @@ solc_version = '0.5.14'
 ast = true
 optimizer = false
 evm_version = 'istanbul'
-metadata_literal = true
 via_ir = false
 
 [profile.solc05.lint]
@@ -104,7 +103,6 @@ ast = true
 optimizer = true
 optimizer_runs = 200
 evm_version = 'istanbul'
-metadata_literal = true
 via_ir = false
 
 [profile.solc05-optimized.lint]
