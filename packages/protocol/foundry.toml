@@ -3,12 +3,37 @@
 [lint]
 lint_on_build = false
 
+# The one profile for the Solidity 0.8 sources: the same build serves `forge test`, the
+# devchain, the published packages and the release tooling, so the artifacts under `out`
+# are the deployment artifacts. The settings reproduce the historic (Truffle-era) release
+# builds; a Solidity 0.8 core contract deployed on mainnet verifies against this profile.
 [profile.default]
-src = 'contracts-0.8'
+src = 'contracts'
 out = 'out'
 test = 'test-sol'
 libs = ['lib', 'node_modules']
+solc_version = '0.8.36'
 optimizer = true
+optimizer_runs = 200
+via_ir = false
+# Celo L1 could not execute PUSH0, which is why the contracts were capped at paris (and at
+# Solidity <0.8.20). As an OP Stack L2 Celo follows the Ethereum forks, and that cap is
+# gone: mainnet and Celo Sepolia both run Prague and execute PUSH0, MCOPY and TSTORE/TLOAD.
+# The ceiling here is our own tooling rather than the chain. The compatibility check reads
+# each contract's version by running its bytecode in the vendored @celo/ethereumjs-vm,
+# which implements no hardfork past shanghai, so a cancun target (MCOPY, TSTORE/TLOAD)
+# would make every version read fail. shanghai takes PUSH0, which is what the L1 cap cost
+# us; going further needs that VM replaced first.
+evm_version = 'shanghai'
+# The compatibility report reads the AST; literal sources in the metadata match what the
+# release builds have always shipped.
+ast = true
+use_literal_content = true
+bytecode_hash = 'ipfs'
+cbor_metadata = true
+# Solidity 0.5 importer for the devchain's mento dependencies; the devchain script copies it
+# into contracts-0.5 and builds it with the solc05 profile, so the 0.8 build skips it.
+skip = ['test-sol/devchain/Import05Dependencies.sol']
 
 no_match_test = "skip"
 
@@ -20,13 +45,11 @@ no_match_path = "{**/test/BLS12Passthrough.sol,**/test/RandomTest.sol,**/test-so
 
 fs_permissions = [
   { access = "read", path = "./out"},
-  { access = "read", path = "./out-truffle-compat"},
-  { access = "read", path = "./out-truffle-compat-0.8"},
+  { access = "read", path = "./out-solc-0.5"},
   { access = "read", path = "./migrations_sol/migrationsConfig.json"},
   { access = "read", path = "./migrations_sol/"},
   { access = "read", path = "./governanceConstitution.json"},
-  { access = "read", path = "./artifacts/"},
-  { access = "read", path = "./.tmp/selectors" }
+  { access = "read", path = "./.tmp/selectors" },
 ]
 
 
@@ -37,41 +60,52 @@ no_match_path = "{**/test/BLS12Passthrough.sol,**/test/RandomTest.sol}"
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
 
-# from https://github.com/celo-org/celo-monorepo/pull/11488/
-
-# Profile to match Truffle configuration for 0.5.13 contracts
-[profile.truffle-compat]
+# The proxies under contracts-0.5 are immutable Solidity 0.5 contracts already deployed on
+# mainnet; they are never upgraded, and no Celo implementation compiles with 0.5 any more.
+# Pinning solc 0.5.14, optimizer off, istanbul and literal metadata makes
+# `FOUNDRY_PROFILE=solc05 forge build` reproduce their on-chain runtime code into
+# out-solc-0.5 (only the metadata trailer differs, which the tooling strips before
+# comparing). That build is what the unit tests (which deploy the proxies), the devchain
+# migration (Registry proxy code, Mento dependencies), the publishing build and the release
+# tooling read: verify-deployed compares live proxy code against it, and make-release
+# deploys new proxies from it. The profile also builds the vendored Mento 0.5 contracts the
+# devchain needs. Nothing it produces is committed.
+# (TOML would split a dotted profile name, hence solc05.)
+[profile.solc05]
 skip=[
     "test-sol/**",          # skip everything under test-sol
   ]
-src = 'contracts'
-out = 'out-truffle-compat'
+src = 'contracts-0.5'
+out = 'out-solc-0.5'
 libs = ['lib', 'node_modules']
 solc_version = '0.5.14'
 ast = true
 optimizer = false
 evm_version = 'istanbul'
-metadata_literal = true
 via_ir = false
 
-[profile.truffle-compat.lint]
+[profile.solc05.lint]
 lint_on_build = false
 
-# Profile to match Truffle configuration for 0.8.19 contracts
-[profile.truffle-compat8]
+# The Celo Sepolia core proxies were created by the old default build (solc 0.5.17,
+# optimizer 200 runs, istanbul) rather than the mainnet one. This profile reproduces that
+# runtime from the same sources so verify-deployed can recognise those proxies instead of
+# reporting them as foreign code. Only the release tooling builds it.
+[profile.solc05-optimized]
 skip=[
     "test-sol/**",          # skip everything under test-sol
-]
-src = 'contracts-0.8'
-out = 'out-truffle-compat-0.8'
+  ]
+src = 'contracts-0.5'
+out = 'out-solc-0.5-optimized'
 libs = ['lib', 'node_modules']
-solc_version = '0.8.19'
+solc_version = '0.5.17'
 ast = true
 optimizer = true
 optimizer_runs = 200
-use_literal_content = true
+evm_version = 'istanbul'
 via_ir = false
-evm_version = 'paris'
-bytecode_hash = 'ipfs'
-cbor_metadata = true
+
+[profile.solc05-optimized.lint]
+lint_on_build = false
+
 # See more config options https://github.com/foundry-rs/foundry/tree/master/crates/config

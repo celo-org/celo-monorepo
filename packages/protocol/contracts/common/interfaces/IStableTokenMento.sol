@@ -1,4 +1,4 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.5.13 <0.9.0;
 
 /**
  * @title This interface describes the functions specific to Celo Stable Tokens, and in the

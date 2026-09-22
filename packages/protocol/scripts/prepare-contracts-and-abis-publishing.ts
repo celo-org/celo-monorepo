@@ -3,6 +3,13 @@ import * as child_process from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
 import { sync as rmrfSync } from 'rimraf'
+import {
+  assertStagedExternalDependenciesDeclared,
+  assertStagedImportsResolve,
+  publishedSolidityFiles,
+  rewriteImportsForPackageLayout,
+  writeCompatibilityStubs,
+} from './staged-package-imports'
 import { SOLIDITY_05_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 import {
   ABIS_BUILD_DIR,
@@ -11,10 +18,11 @@ import {
   AliasedContracts,
   BUILD_EXECUTABLE,
   BuildTarget,
-  CONTRACTS_08_SOURCE_DIR,
+  CONTRACTS_05_SOURCE_DIR,
   CONTRACTS_PACKAGE_SRC_DIR,
   CONTRACTS_PACKAGE_STAGING_DIR,
   PublishContracts,
+  ROOT_DIR,
   TSCONFIG_PATH,
 } from './consts'
 
@@ -272,26 +280,44 @@ function prepareAbisPackageJson(exports: Exports) {
 }
 
 function prepareContractsPackage() {
-  // Assemble the staging dir from the source trees. We never mutate
-  // CONTRACTS_PACKAGE_SRC_DIR or CONTRACTS_08_SOURCE_DIR — the published
-  // tarball is built entirely under CONTRACTS_PACKAGE_STAGING_DIR.
+  // The single source tree is the package root; the Solidity 0.5 sources (the
+  // proxies) ship under 0.5/. Earlier releases had the 0.5 tree at the root and the 0.8
+  // tree under 0.8/, so both historical layouts are kept importable through stub files
+  // that re-export the moved sources.
   fs.mkdirSync(CONTRACTS_PACKAGE_STAGING_DIR, { recursive: true })
-  const copies = [
-    // 0.5 contents land at the staging root (matches existing npm layout)
+
+  for (const { src, dest } of [
     { src: `${CONTRACTS_PACKAGE_SRC_DIR}/.`, dest: `${CONTRACTS_PACKAGE_STAGING_DIR}/` },
-    // 0.8 contracts land under staging/0.8/
-    { src: CONTRACTS_08_SOURCE_DIR, dest: path.join(CONTRACTS_PACKAGE_STAGING_DIR, '0.8') },
-  ]
-  for (const { src, dest } of copies) {
+    { src: CONTRACTS_05_SOURCE_DIR, dest: path.join(CONTRACTS_PACKAGE_STAGING_DIR, '0.5') },
+  ]) {
     const cmd = `cp -R ${src} ${dest}`
     log(cmd)
     child_process.execSync(cmd)
   }
 
+  // Relative imports crossing between the trees have to be re-expressed for the
+  // package layout or they are dangling in the tarball.
+  rewriteImportsForPackageLayout(CONTRACTS_PACKAGE_STAGING_DIR, ROOT_DIR, [
+    { stagedDir: '', sourceDir: SOLIDITY_08_PACKAGE.path },
+    { stagedDir: '0.5', sourceDir: SOLIDITY_05_PACKAGE.path },
+  ])
+  // `0.8/<path>` used to hold the 0.8 tree, and the proxies used to sit at the root.
+  writeCompatibilityStubs(CONTRACTS_PACKAGE_STAGING_DIR, '', '0.8', ['0.5'])
+  writeCompatibilityStubs(CONTRACTS_PACKAGE_STAGING_DIR, '0.5', '', [])
+
   // Always prepare the manifest; replacePackageVersionAndMakePublic sets the real
   // RELEASE_VERSION or a dry-run placeholder so `npm publish --dry-run` stays valid.
   const packageJsonPath = path.join(CONTRACTS_PACKAGE_STAGING_DIR, 'package.json')
   replacePackageVersionAndMakePublic(packageJsonPath)
+
+  // Nothing later compiles the staged tree, so a dangling import would otherwise only
+  // surface in a consumer's build after the package is published.
+  const published = publishedSolidityFiles(CONTRACTS_PACKAGE_STAGING_DIR)
+  assertStagedImportsResolve(CONTRACTS_PACKAGE_STAGING_DIR, published)
+  // The 0.5 subtree is the proxies as they were deployed, published as a record rather
+  // than to be compiled by consumers. Its OpenZeppelin 2.x line is deprecated with no
+  // patched release, so declaring it would fail the repository's dependency review.
+  assertStagedExternalDependenciesDeclared(CONTRACTS_PACKAGE_STAGING_DIR, published, ['0.5'])
 }
 
 function lsRecursive(dir: string): string[] {

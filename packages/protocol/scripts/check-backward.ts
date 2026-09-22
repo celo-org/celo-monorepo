@@ -4,7 +4,6 @@ import { getReleaseVersion } from '@celo/protocol/lib/compatibility/ignored-cont
 import { CategorizedChanges } from '@celo/protocol/lib/compatibility/report'
 import {
   ASTBackwardReport,
-  instantiateArtifacts,
   instantiateArtifactsFromForge,
 } from '@celo/protocol/lib/compatibility/utils'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
@@ -40,9 +39,10 @@ const argv = yargs
     demandOption: true,
   })
   .option('forge', {
-    description: 'Specifies that Forge artifacts are provided, rather than Truffle artifacts',
+    description:
+      'Deprecated no-op: Forge artifacts are the only supported input since Truffle was removed',
     type: 'boolean',
-    default: false,
+    default: true,
   })
   .option('output_file', {
     alias: 'f',
@@ -77,35 +77,13 @@ interface ArtifactsFolders {
   new: string[]
 }
 
-const getForgeArtifactsFolders = (): ArtifactsFolders => {
+const getArtifactFolders = (): ArtifactsFolders => {
   const oldArtifactsFolder = path.relative(process.cwd(), argv.old_contracts)
   const newArtifactsFolder = path.relative(process.cwd(), argv.new_contracts)
 
   return {
     old: [oldArtifactsFolder],
     new: [newArtifactsFolder],
-  }
-}
-
-const getTruffleArtifactsFolders = (): ArtifactsFolders => {
-  const oldArtifactsFolder = path.relative(process.cwd(), argv.old_contracts)
-  const oldArtifactsFolder08 = path.relative(process.cwd(), argv.old_contracts + '-0.8')
-  const newArtifactsFolder = path.relative(process.cwd(), argv.new_contracts)
-  const newArtifactsFolder08 = path.relative(process.cwd(), argv.new_contracts + '-0.8')
-  const newArtifactsFolders = [newArtifactsFolder, newArtifactsFolder08]
-  const oldArtifactsFolders = [oldArtifactsFolder, oldArtifactsFolder08]
-
-  return {
-    old: oldArtifactsFolders,
-    new: newArtifactsFolders,
-  }
-}
-
-const getArtifactFolders = (): ArtifactsFolders => {
-  if (argv.forge) {
-    return getForgeArtifactsFolders()
-  } else {
-    return getTruffleArtifactsFolders()
   }
 }
 
@@ -119,30 +97,12 @@ interface BuildArtifactSets {
   new: BuildArtifacts[]
 }
 
-const getForgeArtifactSets = (folders: ArtifactsFolders): BuildArtifactSets => {
+const getArtifactSets = (folders: ArtifactsFolders): BuildArtifactSets => {
+  // A forge out dir can mix compiler versions (e.g. a tag with 0.5 and 0.8 trees);
+  // instantiateArtifactsFromForge splits one dir into per-compiler artifact sets.
   return {
     old: instantiateArtifactsFromForge(folders.old[0]),
     new: instantiateArtifactsFromForge(folders.new[0]),
-  }
-}
-
-const getTruffleArtifactSets = (folders: ArtifactsFolders): BuildArtifactSets => {
-  const oldArtifacts = instantiateArtifacts(folders.old[0])
-  const oldArtifacts08 = instantiateArtifacts(folders.old[1])
-  const newArtifacts = instantiateArtifacts(folders.new[0])
-  const newArtifacts08 = instantiateArtifacts(folders.new[1])
-
-  return {
-    old: [oldArtifacts, oldArtifacts08],
-    new: [newArtifacts, newArtifacts08],
-  }
-}
-
-const getArtifactSets = (folders: ArtifactsFolders): BuildArtifactSets => {
-  if (argv.forge) {
-    return getForgeArtifactSets(folders)
-  } else {
-    return getTruffleArtifactSets(folders)
   }
 }
 

@@ -1,34 +1,32 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.9.0;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
-import "../../lib/mento-core/contracts/interfaces/IExchange.sol";
+import "./interfaces/IExchange.sol";
 import "./interfaces/IStableTokenMento.sol";
 
 import "./UsingRegistry.sol";
-import "../common/interfaces/IFeeHandlerSeller.sol";
+import "./interfaces/IFeeHandlerSeller.sol";
 import "../stability/interfaces/ISortedOracles.sol";
-import "../common/FixidityLib.sol";
-import "../common/Initializable.sol";
+import "./FixidityLib.sol";
+import "./Initializable.sol";
 import "./FeeHandlerSeller.sol";
 
 // An implementation of FeeHandlerSeller supporting interfaces compatible with
 // Mento
 // See https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md
-contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
-  using SafeMath for uint256;
+contract MentoFeeHandlerSeller is FeeHandlerSeller {
   using FixidityLib for FixidityLib.Fraction;
 
   /**
    * @notice Sets initialized == true on implementation contracts.
    * @param test Set to true to skip implementation initialisation.
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   // without this line the contract can't receive native Celo transfers
-  function() external payable {}
+  receive() external payable {}
 
   // Note: current version of Mento is not compatible with this Seller
   function sell(
@@ -81,6 +79,6 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 2, 0, 0);
   }
 }

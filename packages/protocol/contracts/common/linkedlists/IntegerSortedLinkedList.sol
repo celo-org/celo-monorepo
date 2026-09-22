@@ -1,6 +1,5 @@
-pragma solidity ^0.5.13;
-
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.0 <0.9.0;
 
 import "./SortedLinkedList.sol";
 
@@ -8,7 +7,6 @@ import "./SortedLinkedList.sol";
  * @title Maintains a sorted list of unsigned ints keyed by uint256.
  */
 library IntegerSortedLinkedList {
-  using SafeMath for uint256;
   using SortedLinkedList for SortedLinkedList.List;
 
   /**
@@ -75,7 +73,7 @@ library IntegerSortedLinkedList {
   function popN(SortedLinkedList.List storage list, uint256 n) public returns (uint256[] memory) {
     bytes32[] memory byteKeys = list.popN(n);
     uint256[] memory keys = new uint256[](byteKeys.length);
-    for (uint256 i = 0; i < byteKeys.length; i = i.add(1)) {
+    for (uint256 i = 0; i < byteKeys.length; i = (i + 1)) {
       keys[i] = uint256(byteKeys[i]);
     }
     return keys;
@@ -113,7 +111,7 @@ library IntegerSortedLinkedList {
     bytes32[] memory byteKeys = list.getKeys();
     uint256[] memory keys = new uint256[](byteKeys.length);
     uint256[] memory values = new uint256[](byteKeys.length);
-    for (uint256 i = 0; i < byteKeys.length; i = i.add(1)) {
+    for (uint256 i = 0; i < byteKeys.length; i = (i + 1)) {
       keys[i] = uint256(byteKeys[i]);
       values[i] = list.values[byteKeys[i]];
     }

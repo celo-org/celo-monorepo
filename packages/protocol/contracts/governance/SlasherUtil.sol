@@ -1,16 +1,19 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.9.0;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
-import "../common/UsingPrecompiles.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
+import "../common/PrecompilesOverride.sol";
+import "./interfaces/ILockedGold.sol";
+import "./interfaces/IValidators.sol";
 
-contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles {
-  using SafeMath for uint256;
-
+// Storage layout (must match 0.5 baseline):
+//   slot 0: _owner (address, 20 bytes) + initialized (bool, 1 byte) — packed
+//   slot 1: registry (address, 20 bytes)
+//   slot 2-3: slashingIncentives (struct, 64 bytes)
+contract SlasherUtil is Ownable, Initializable, UsingRegistry, PrecompilesOverride {
   struct SlashingIncentives {
     // Value of LockedGold to slash from the account.
     uint256 penalty;
@@ -26,7 +29,7 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Sets slashing incentives.
@@ -56,7 +59,7 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
     require(epoch != 0, "Cannot slash on epoch 0");
     // Use `epoch-1` because the elections were on that epoch
     return
-      getValidators().groupMembershipInEpoch(validator, epoch.sub(1), groupMembershipHistoryIndex);
+      getValidators().groupMembershipInEpoch(validator, (epoch - 1), groupMembershipHistoryIndex);
   }
 
   function performSlashing(

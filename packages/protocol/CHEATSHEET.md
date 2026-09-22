@@ -16,7 +16,7 @@ Covers changes in `package.json` scripts introduced starting with PR [#11369](ht
 | `migrate`                               | `devchain:migrate`                            |
 | `devchain:reset`                        | `devchain:reset`                              |
 | `check-opcodes`                         | `release:check-opcodes`                       |
-| `check-versions`                        | `release:check-versions`                      |
+| `check-versions`                        | `release:check-versions:foundry`              |
 | `determine-release-version`             | `release:determine-release-version`           |
 | `make-release`                          | `release:make`                                |
 | `verify-deployed`                       | `release:verify-deployed`                     |

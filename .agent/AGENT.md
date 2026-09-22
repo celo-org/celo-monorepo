@@ -4,9 +4,9 @@ This is the Celo protocol monorepo containing core smart contracts and OP Stack 
 
 ## Project Structure
 
-- `packages/protocol/` - Core Solidity contracts (0.5.x and 0.8.x)
-- `packages/protocol/contracts/` - Solidity 0.5.x contracts
-- `packages/protocol/contracts-0.8/` - Solidity 0.8.x contracts
+- `packages/protocol/` - Core Solidity contracts
+- `packages/protocol/contracts/` - Solidity 0.8.x contracts (the single source tree: implementations, interfaces, shared bases)
+- `packages/protocol/contracts-0.5/` - Solidity 0.5 sources (proxies and their helpers); built on demand by the solc05 profile into `out-solc-0.5`, never committed
 - `packages/protocol/scripts/` - Deployment and release scripts
 - `packages/protocol/releaseData/` - Release artifacts (version reports, init data)
 - `packages/op-tooling/` - OP Stack upgrade and operations tooling
@@ -27,6 +27,14 @@ Quick reference:
 1. `yarn release:verify-deployed:foundry` - Generate libraries.json
 2. `yarn release:check-versions:foundry` - Generate version report
 3. `yarn release:make:foundry` - Deploy contracts and create proposal
+
+### Solidity Compiler and EVM Target
+
+**File:** `.agent/skills/solidity-compiler/SKILL.md`
+
+Use when: bumping solc, changing evm_version or via_ir, adding a foundry profile, reviewing a compiler upgrade, or when mentioning solc version, EVM target, paris/shanghai/cancun/prague, via-IR, or a Solidity compiler bug.
+
+Quick reference: pinned to solc 0.8.36 / shanghai / optimizer 200 / via-IR off. Two rules keep the compiler's known bugs unreachable: never enable via-IR, and never `delete` an element of an array in memory.
 
 ### Node Cache Updates
 
@@ -82,8 +90,8 @@ yarn keys:decrypt
 
 ## Code Conventions
 
-- Solidity 0.5.x for existing contracts in `contracts/`
-- Solidity 0.8.x for new contracts in `contracts-0.8/`
+- Solidity 0.8.x for every contract in `contracts/`
+- The proxies in `contracts-0.5/` are immutable on chain and stay Solidity 0.5; `FOUNDRY_PROFILE=solc05 forge build` produces `out-solc-0.5`, which tests, devchain and release tooling read
 - All upgradeable contracts use proxy pattern
 - Version numbers follow `getVersionNumber()` convention
 

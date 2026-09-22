@@ -3,7 +3,7 @@
 // Flag ordering:
 //   --solidity <outdir>   Runs `forge build` and writes truffle-style flat JSONs
 //                         ({contractName, abi, bytecode, deployedBytecode}) to
-//                         <outdir>/contracts/ and <outdir>/contracts-0.8/.
+//                         <outdir>/contracts/ (the 0.5 proxies) and <outdir>/contracts-0.8/ (0.8 build).
 //   --web3Types <outdir>  Reads the truffle-style JSONs (set BUILD_DIR to point
 //                         at the same dir --solidity wrote to) and generates
 //                         web3 typings. REQUIRES --solidity to have run first.
@@ -31,8 +31,8 @@ interface ContractArtifact {
 const readJSON = (file: string): ContractArtifact =>
   JSON.parse(readFileSync(file, 'utf-8')) as ContractArtifact
 
-const FOUNDRY_OUT_05 = 'out-truffle-compat'
-const FOUNDRY_OUT_08 = 'out-truffle-compat-0.8'
+const FOUNDRY_OUT_05 = SOLIDITY_05_PACKAGE.forgeOutDir
+const FOUNDRY_OUT_08 = SOLIDITY_08_PACKAGE.forgeOutDir
 
 function exec(cmd: string) {
   return execSync(cmd, { cwd: ROOT_DIR, stdio: 'inherit' })
@@ -85,10 +85,11 @@ function emitTruffleStyleArtifacts(outdir: string) {
 }
 
 function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
-  console.info(`protocol: Compiling solidity with foundry (truffle-compat profiles)`)
+  console.info(`protocol: Compiling solidity with foundry (solc05 and default profiles)`)
 
-  exec(`FOUNDRY_PROFILE=truffle-compat forge build`)
-  exec(`FOUNDRY_PROFILE=truffle-compat8 forge build`)
+  // The published packages carry the proxies too, so build contracts-0.5 as well.
+  exec(`FOUNDRY_PROFILE=solc05 forge build`)
+  exec(`forge build`)
 
   const contracts = coreContractsOnly ? CoreContracts : ImplContracts
   for (const contractName of contracts) {
@@ -141,10 +142,14 @@ function getContractList(coreContractsOnly: boolean) {
 const BUILD_DIR = path.resolve(ROOT_DIR, process.env.BUILD_DIR ?? './build')
 
 function truffleStyleGlobs(contractList: string[]): string[] {
+  return web3TypegenGlobs(contractList, BUILD_DIR)
+}
+
+// Matches the layout emitTruffleStyleArtifacts() writes: <root>/<destDir>/<Name>.json.
+function web3TypegenGlobs(contractList: string[], root: string): string[] {
   const alternation = contractList.join('|')
-  // Matches the layout emitTruffleStyleArtifacts() writes: ${BUILD_DIR}/<destDir>/<Name>.json.
   return [SOLIDITY_05_PACKAGE.destDir, SOLIDITY_08_PACKAGE.destDir].map(
-    (dir) => `${BUILD_DIR}/${dir}/@(${alternation}).json`
+    (dir) => `${root}/${dir}/@(${alternation}).json`
   )
 }
 
@@ -174,15 +179,37 @@ function generateFilesForEthers({ coreContractsOnly, ethersTypes: outdir }: Buil
   exec(`yarn run --silent typechain --target=ethers-v5 --outDir "${outdir}" ${globs}`)
 }
 
+// web3's AbiType union has no "receive", so an artifact carrying one generates
+// typings that do not compile. There is nothing for the wrapper to expose either:
+// value is sent with a plain transaction, not by calling a method. The generator
+// therefore reads copies of the artifacts with those entries removed.
+function withoutReceiveEntries(sourceDir: string, targetDir: string) {
+  if (!existsSync(sourceDir)) return
+  mkdirSync(targetDir, { recursive: true })
+  for (const entry of readdirSync(sourceDir).filter((e) => e.endsWith('.json'))) {
+    const artifact = readJSON(path.join(sourceDir, entry))
+    const abi = Array.isArray(artifact.abi)
+      ? (artifact.abi as { type?: string }[]).filter((item) => item.type !== 'receive')
+      : artifact.abi
+    writeFileSync(path.join(targetDir, entry), JSON.stringify({ ...artifact, abi }, null, 2))
+  }
+}
+
 async function generateFilesForContractKit({ coreContractsOnly, web3Types: outdir }: BuildTargets) {
   console.info(`protocol: Generating Web3 Types to ${outdir}`)
   assertTruffleArtifactsExist()
   exec(`rm -rf ${outdir}`)
   const relativePath = path.relative(ROOT_DIR, outdir)
 
+  const web3ArtifactsDir = path.join(BUILD_DIR, 'web3-typegen-artifacts')
+  exec(`rm -rf ${web3ArtifactsDir}`)
+  for (const sub of [SOLIDITY_05_PACKAGE.destDir, SOLIDITY_08_PACKAGE.destDir]) {
+    withoutReceiveEntries(path.join(BUILD_DIR, sub), path.join(web3ArtifactsDir, sub))
+  }
+
   const cwd = process.cwd()
 
-  for (const glob of truffleStyleGlobs(getContractList(coreContractsOnly))) {
+  for (const glob of web3TypegenGlobs(getContractList(coreContractsOnly), web3ArtifactsDir)) {
     await tsGenerator(
       { cwd, loggingLvl: 'info' },
       new Web3V1Celo({

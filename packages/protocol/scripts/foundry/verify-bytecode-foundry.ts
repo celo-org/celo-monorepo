@@ -1,3 +1,4 @@
+import { resolveBuildDirectories } from '@celo/protocol/lib/compatibility/internal'
 import {
   InitializationData,
   verifyBytecodes,
@@ -6,9 +7,12 @@ import { getReleaseVersion } from '../../lib/compatibility/ignored-contracts-v9'
 
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 
-import { instantiateArtifactsFromForge } from '@celo/protocol/lib/compatibility/utils'
+import {
+  buildDirectoryForRef,
+  instantiateArtifactsFromForge,
+} from '@celo/protocol/lib/compatibility/utils'
 import { existsSync, readJsonSync, writeJsonSync } from 'fs-extra'
-import { Chain, createPublicClient, defineChain, encodeFunctionData, http } from 'viem'
+import { Abi, Chain, createPublicClient, defineChain, encodeFunctionData, http } from 'viem'
 import * as viemChains from 'viem/chains'
 
 /*
@@ -39,12 +43,30 @@ export interface ProposalTx {
 }
 
 const argv = require('minimist')(process.argv.slice(2), {
-  string: ['build_artifacts', 'proposal', 'initialize_data', 'network', 'librariesFile', 'branch'],
+  string: [
+    'build_artifacts',
+    'proposal',
+    'initialize_data',
+    'network',
+    'librariesFile',
+    'branch',
+    'rpcUrl',
+  ],
 })
 
 const branch = (argv.branch ? argv.branch : '') as string
-const buildDir05 = `./out-${branch}-truffle-compat`
-const buildDir08 = `./out-${branch}-truffle-compat8`
+const { buildDir05, buildDir08 } = resolveBuildDirectories(buildDirectoryForRef(branch))
+
+// The Celo Sepolia core proxies were created by an optimized solc 0.5.17 build of Proxy.sol.
+// verify-deployed-forge.sh rebuilds that runtime from the working tree with the
+// solc05-optimized profile (Proxy.sol never changes, and the ref under verification may
+// predate the profile), so it is read from that profile's own out dir, not the ref's.
+const proxyRuntimeVariants: { [name: string]: string } = {}
+const optimizedProxyArtifact = './out-solc-0.5-optimized/Proxy.sol/Proxy.json'
+if (existsSync(optimizedProxyArtifact)) {
+  proxyRuntimeVariants['solc05-optimized'] =
+    readJsonSync(optimizedProxyArtifact).deployedBytecode.object
+}
 const network: string = argv.network ?? 'development'
 const proposal: ProposalTx[] = argv.proposal ? readJsonSync(argv.proposal) : []
 const initializationData: InitializationData = argv.initialize_data
@@ -52,12 +74,16 @@ const initializationData: InitializationData = argv.initialize_data
   : {}
 const librariesFile = argv.librariesFile ?? 'libraries.json'
 
-if (!existsSync(buildDir05)) {
-  throw new Error(`${buildDir05} directory not found. Make sure to run foundry build first`)
-}
-
+// Every supported ref has both sides: the 0.8 implementations and a 0.5 tree holding at
+// least the proxies, whose live code is compared against the build.
 if (!existsSync(buildDir08)) {
-  throw new Error(`${buildDir08} directory not found. Make sure to run foundry build first`)
+  throw new Error(`${buildDir08} not found. Build the 0.8 sources first (forge build).`)
+}
+if (!existsSync(buildDir05)) {
+  throw new Error(
+    `${buildDir05} not found. Build the 0.5 sources first (FOUNDRY_PROFILE=solc05 forge build, ` +
+      `or truffle-compat on a pre-migration tag).`
+  )
 }
 
 // TODO deduplicate with make-release
@@ -95,7 +121,8 @@ const getViemChain = (networkName: string): Chain => {
   }
 }
 const viemChain = getViemChain(network)
-const transportUrl = viemChain.rpcUrls.default.http[0]
+// A custom RPC (a local fork of the network) keeps the network's chain definition.
+const transportUrl: string = argv.rpcUrl || viemChain.rpcUrls.default.http[0]
 const publicClient = createPublicClient({
   chain: viemChain,
   transport: http(transportUrl),
@@ -104,8 +131,17 @@ const publicClient = createPublicClient({
 const version = getReleaseVersion(branch)
 
 const registryAddress = '0x000000000000000000000000000000000000ce10'
-const registryAbi = readJsonSync(`${buildDir05}/Registry.sol/Registry.json`).abi
-const proxyAbi = readJsonSync(`${buildDir05}/Proxy.sol/Proxy.json`).abi
+
+// Registry moved to the 0.8 tree, so its artifact lives in the 0.8 build dir; prefer it
+// and fall back to the 0.5 dir so the script still works on pre-migration branches.
+const readAbiWithFallback = (artifactRelPath: string): Abi => {
+  const path08 = `${buildDir08}/${artifactRelPath}`
+  const artifactPath = existsSync(path08) ? path08 : `${buildDir05}/${artifactRelPath}`
+  return (readJsonSync(artifactPath) as { abi: Abi }).abi
+}
+
+const registryAbi = readAbiWithFallback('Registry.sol/Registry.json')
+const proxyAbi = readAbiWithFallback('Proxy.sol/Proxy.json')
 
 const getAddressForString = async (contract: string): Promise<string> => {
   const result = await publicClient.readContract({
@@ -151,7 +187,8 @@ const chainLookup = {
 const [artifacts05] = instantiateArtifactsFromForge(buildDir05)
 const [artifacts08] = instantiateArtifactsFromForge(buildDir08)
 verifyBytecodes(
-  Object.keys(CeloContractName),
+  // Registry does not register itself; verify its implementation alongside the rest.
+  [...Object.keys(CeloContractName), 'Registry'],
   [artifacts05, artifacts08],
   registryLookup,
   proposal,
@@ -159,7 +196,8 @@ verifyBytecodes(
   chainLookup,
   initializationData,
   version,
-  network
+  network,
+  proxyRuntimeVariants
 )
   .then(({ libraryLinkingInfo, verifiedLibraries }) => {
     const allMapping = libraryLinkingInfo.getAddressMapping()

@@ -27,8 +27,8 @@ git fetch
 
 # Get the list of changed Solidity files between the two branches/tags
 # Exclude .t.sol files and files containing test/Test in the name
-# Include only those in contracts or contracts-0.8 folders, regardless of their depth in the directory structure
-CHANGED_FILES=$(git diff --name-only "$BRANCH1" "$BRANCH2" | grep -E '(.*/contracts/|.*/contracts-0.8/).*\.sol$' | grep -v '\.t\.sol$' | grep -v -i 'test')
+# Include only those in the contracts, contracts-0.8 (pre-migration tags) or contracts-0.5 folders, regardless of their depth in the directory structure
+CHANGED_FILES=$(git diff --name-only "$BRANCH1" "$BRANCH2" | grep -E '(.*/contracts/|.*/contracts-0.8/|.*/contracts-0.5/).*\.sol$' | grep -v '\.t\.sol$' | grep -v -i 'test')
 
 # Print the changed Solidity files
 echo "Changed Solidity files between $BRANCH1 and $BRANCH2 (excluding *.t.sol and files containing 'test'/'Test' and including only contracts or contracts-0.8 folders):"

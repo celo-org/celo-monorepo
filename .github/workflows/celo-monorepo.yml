@@ -24,7 +24,7 @@ defaults:
 
 env:
   # Increment these to force cache rebuilding
-  NODE_MODULE_CACHE_VERSION: 10
+  NODE_MODULE_CACHE_VERSION: 11
   NODE_OPTIONS: '--max-old-space-size=4096'
   TERM: dumb
   GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
@@ -211,9 +211,9 @@ jobs:
       - name: Install forge dependencies
         working-directory: packages/protocol
         run: forge install
-      - name: Test against current release
+      - name: Release HEAD against the current release's devchain
         run: |
-          echo "Comparing against $RELEASE_TAG"
+          echo "Baseline devchain: $RELEASE_TAG; release under test: HEAD"
           BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
           yarn --cwd packages/protocol ci:test-make-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR
 

@@ -1,11 +1,14 @@
 /* eslint-disable no-console */
-import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
+import { resolveBuildDirectories } from '@celo/protocol/lib/compatibility/internal'
 import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
+import { deployedLibraryMatchesArtifact } from '@celo/protocol/lib/bytecode-foundry'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
+import { isAllowedLegacyLibrary } from '@celo/protocol/lib/compatibility/verify-bytecode-foundry'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { ForgeArtifact } from '@celo/protocol/scripts/foundry/ForgeArtifact'
 import { NULL_ADDRESS, eqAddress } from '@celo/utils/lib/address'
+import { lookupRegistryAddress } from '@celo/protocol/lib/registry-lookup'
 import { exec } from 'child_process'
 import { existsSync, readJsonSync, readdirSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
@@ -33,7 +36,11 @@ import { mnemonicToAccount, privateKeyToAccount } from 'viem/accounts'
 import * as viemChains from 'viem/chains'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
-import { getReleaseVersion, ignoredContractsV9 } from '../../lib/compatibility/ignored-contracts-v9'
+import {
+  getReleaseVersion,
+  ignoredContractsV18,
+  ignoredContractsV9,
+} from '../../lib/compatibility/ignored-contracts-v9'
 
 const execAsync = promisify(exec)
 
@@ -41,7 +48,7 @@ const execAsync = promisify(exec)
 // This maintains compatibility with viem's complex generics
 type PublicClientMethods = Pick<
   PublicClient<Transport, Chain>,
-  'call' | 'waitForTransactionReceipt'
+  'call' | 'getCode' | 'waitForTransactionReceipt'
 >
 
 type WalletClientMethods = Pick<
@@ -49,16 +56,6 @@ type WalletClientMethods = Pick<
   'account' | 'chain' | 'deployContract' | 'writeContract'
 >
 
-// Registry ABI for getAddressForString - used for type-safe contract reads
-const registryGetAddressAbi = [
-  {
-    type: 'function',
-    name: 'getAddressForString',
-    inputs: [{ name: 'identifier', type: 'string' }],
-    outputs: [{ name: '', type: 'address' }],
-    stateMutability: 'view',
-  },
-] as const
 // AbiParameter type is inferred from Abi entries
 type AbiParameter = {
   name?: string
@@ -304,6 +301,12 @@ const verifyContractOnCeloscan = async (
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
 
 const promptUserConfirmation = (message: string): Promise<boolean> => {
+  if (!process.stdin.isTTY) {
+    // Without a terminal the question can never be answered; readline would wait for
+    // input that never comes and the process would end without a result.
+    console.warn(`${message} -- no terminal to confirm on, treating as no`)
+    return Promise.resolve(false)
+  }
   const rl = createInterface({ input: process.stdin, output: process.stdout })
   return new Promise((resolve) => {
     rl.question(`${message} (y/N): `, (answer) => {
@@ -427,42 +430,30 @@ class ContractAddresses {
   static async create(
     contracts: string[],
     publicClient: PublicClientMethods,
-    _registryAbi: Abi, // Kept for API compatibility, uses registryGetAddressAbi internally
+    _registryAbi: Abi, // Kept for API compatibility, uses the registry lookup helper internally
     registryAddress: ViemAddress,
     libraryAddresses: LibraryAddresses['addresses']
   ) {
     const addresses = new Map<string, string>()
+    // The registry answers the zero address for an unregistered name; anything else that
+    // comes back is not an answer and must not be mistaken for it, since a contract
+    // missing from this map is later treated as having no proxy.
+    const lookup = (contract: string) =>
+      lookupRegistryAddress(publicClient, registryAddress, contract)
     await Promise.all(
       contracts.map(async (contract: string) => {
-        try {
-          // Use low-level call to avoid viem's strict readContract typing
-          const callData = encodeFunctionData({
-            abi: registryGetAddressAbi,
-            functionName: 'getAddressForString',
-            args: [contract],
-          })
-          const result = await publicClient.call({
-            to: registryAddress,
-            data: callData,
-          })
-          const registeredAddress = result.data
-            ? decodeFunctionResult({
-                abi: registryGetAddressAbi,
-                functionName: 'getAddressForString',
-                data: result.data,
-              })
-            : NULL_ADDRESS
-          if (registeredAddress && !eqAddress(registeredAddress, NULL_ADDRESS)) {
-            addresses.set(contract, registeredAddress)
-          }
-        } catch (error) {
-          /* Ignore error if contract not in registry */
+        const registeredAddress = await lookup(contract)
+        if (!eqAddress(registeredAddress, NULL_ADDRESS)) {
+          addresses.set(contract, registeredAddress)
         }
       })
     )
     Object.entries(libraryAddresses).forEach(([library, address]) =>
       addresses.set(library, address as string)
     )
+    // The Registry proxy lives at the protocol-constant address and is not an entry in
+    // itself, so seed it explicitly for the release loop.
+    addresses.set('Registry', registryAddress)
     return new ContractAddresses(addresses)
   }
 
@@ -492,9 +483,11 @@ interface ViemContract {
   optimizerRuns: number
   evmVersion: string
   foundryProfile?: string // Foundry compilation profile for verification
+  linkedLibraryNames: string[] // library names the bytecode has link placeholders for
 }
 
 const proxiedCoreContracts = new Set<string>([
+  'Registry',
   CeloContractName.Accounts,
   CeloContractName.Attestations,
   CeloContractName.BlockchainParameters,
@@ -541,8 +534,10 @@ const isProxiedContract = (
   )
 }
 
+// Registry does not register itself, so it has no entry in CeloContractName; its
+// implementation is still released through RegistryProxy like every other core contract.
 const isCoreContract = (contractName: string) =>
-  [...Object.keys(CeloContractName)].includes(contractName)
+  contractName === 'Registry' || [...Object.keys(CeloContractName)].includes(contractName)
 
 type ViemAbiConstructor = Extract<Abi[number], { type: 'constructor' }>
 
@@ -664,9 +659,22 @@ const deployImplementation = async (
       (item: any) => item.type === 'function' && item.name === 'getVersionNumber'
     )
     if (!getVersionNumberAbiEntry) {
-      throw new Error(
-        `Contract ${contractName} has changes but does not specify a version number in its ABI`
-      )
+      // Registry and Freezer are foundational contracts that historically shipped without
+      // a getVersionNumber (older release tags, e.g. core-contracts.v17, have no version in
+      // their ABI). The 0.5 -> 0.8 migration newly versions them, which makes the diff report
+      // flag them as changed; when this tooling re-deploys the older baseline build it would
+      // otherwise hard-fail. Version compatibility for the new release is enforced separately
+      // by check-versions, so warn instead of throwing for these.
+      if (UNVERSIONED_BASELINE_CONTRACTS.has(contractName)) {
+        console.warn(
+          `Contract ${contractName} has changes but does not specify a version number in its ABI ` +
+            `(known unversioned baseline contract); continuing.`
+        )
+      } else {
+        throw new Error(
+          `Contract ${contractName} has changes but does not specify a version number in its ABI`
+        )
+      }
     }
   }
 
@@ -742,15 +750,39 @@ const deployProxy = async (
     account: walletClient.account!,
     chain: walletClient.chain!,
   })
-  await publicClient.waitForTransactionReceipt({ hash: transferHash })
+  const transferReceipt = await publicClient.waitForTransactionReceipt({ hash: transferHash })
+  if (transferReceipt.status !== 'success') {
+    throw new Error(`Transferring ${proxyContractName} to Governance failed: ${transferHash}`)
+  }
   return deployedProxyContract
 }
 
-const shouldDeployProxy = (report: ASTDetailedVersionedReport, contractName: string) => {
+const shouldDeployProxy = (
+  report: ASTDetailedVersionedReport,
+  contractName: string,
+  addresses: ContractAddresses
+) => {
   const hasStorageChanges = report.contracts[contractName].changes.storage.length > 0
   const isNewContract = report.contracts[contractName].changes.major.find(
     (change: any) => change.type === 'NewContract'
   )
+  if (!hasStorageChanges && isNewContract) {
+    // The AST code comparison buckets artifacts by compiler version, so a contract
+    // migrated 0.5 -> 0.8 is reported as NewContract (it is absent from the old build's
+    // 0.8 bucket) even though its proxy is live with a preserved storage layout. Such
+    // contracts are in-place upgrades: keep the existing proxy. Presence in the
+    // on-chain Registry is the authoritative signal (the build trees cannot be used --
+    // for a real release they contain the new branch, where every contract exists).
+    // Registry itself is seeded into the addresses at the protocol-constant address.
+    const hasExistingProxy = addresses.addresses.has(contractName)
+    if (hasExistingProxy) {
+      console.log(
+        `${contractName} is reported as NewContract but its proxy is already live ` +
+          `(compiler migration); upgrading in place instead of deploying a new proxy.`
+      )
+      return false
+    }
+  }
   return hasStorageChanges || isNewContract
 }
 
@@ -785,7 +817,7 @@ const deployCoreContract = async (
     value: '0',
   }
 
-  if (!shouldDeployProxy(report, contractName)) {
+  if (!shouldDeployProxy(report, contractName, addresses)) {
     proposal.push(setImplementationTx)
   } else {
     const proxyArtifactName = `${contractName}Proxy`
@@ -919,19 +951,21 @@ const loadContractArtifact = (contractName: string, artifactPath: string): ViemC
 
   // Use full compiler version (e.g., "0.5.14+commit.01f1aaa4") for verification
   // Etherscan may require the full version to properly verify
-  const fullVersion = compiler.version || '0.8.19'
+  const fullVersion = compiler.version || '0.8.36'
 
-  // Determine foundry profile based on source file paths
-  // contracts/ = truffle-compat (Solidity 0.5.x)
-  // contracts-0.8/ = truffle-compat8 (Solidity 0.8.x)
+  // Determine the foundry profile that reproduces this artifact, for verification:
+  // the contracts-0.5 sources build with solc05, a pre-migration tag's 0.5 tree with
+  // truffle-compat, and every 0.8 source with the default profile.
   let foundryProfile: string | undefined
   const mainSourceFile =
     sourceFiles.find((f) => f.includes(`${contractName}.sol`)) || sourceFiles[0]
   if (mainSourceFile) {
-    if (mainSourceFile.startsWith('contracts-0.8/')) {
-      foundryProfile = 'truffle-compat8'
-    } else if (mainSourceFile.startsWith('contracts/')) {
+    if (mainSourceFile.startsWith('contracts-0.5/')) {
+      foundryProfile = 'solc05'
+    } else if (fullVersion.startsWith('0.5')) {
       foundryProfile = 'truffle-compat'
+    } else {
+      foundryProfile = 'default'
     }
   }
 
@@ -944,22 +978,45 @@ const loadContractArtifact = (contractName: string, artifactPath: string): ViemC
     compilerVersion: fullVersion,
     optimizerEnabled: optimizer.enabled ?? true,
     optimizerRuns: optimizer.runs ?? 200,
-    evmVersion: settings.evmVersion || 'paris',
+    evmVersion: settings.evmVersion || 'prague',
     foundryProfile,
+    linkedLibraryNames: Object.values(artifact.bytecode.linkReferences ?? {}).flatMap((libs) =>
+      Object.keys(libs)
+    ),
   }
 }
 
-const contracts08Set = new Set(SOLIDITY_08_PACKAGE.contracts)
+// Contracts that historically shipped without a getVersionNumber in older release tags.
+// The 0.5 -> 0.8 migration newly versions them, so when this tooling re-deploys an older
+// baseline build (which lacks the version) the deploy-time version assertion must not
+// hard-fail; check-versions still enforces version compatibility for the new release.
+// GovernanceApproverMultiSig is a proxied core contract whose implementation has never
+// been versioned (in either compiler tree), so it stays exempt on the new-release path too.
+const UNVERSIONED_BASELINE_CONTRACTS = new Set([
+  'Registry',
+  'Freezer',
+  'GovernanceApproverMultiSig',
+])
 
 const getContractBuildDir = (
   contractName: string,
   buildDir05: string,
   buildDir08: string
 ): string => {
-  if (contracts08Set.has(contractName)) {
+  // A contract lives in exactly one compiler tree per branch, and the tooling builds
+  // both old release tags and the current branch. Preferring the 0.5 dir keeps old-tag
+  // deploys on the artifacts that match what is on chain (a tag can have the same
+  // library in both trees), while anything that only compiles as 0.8 — every current
+  // implementation — is found by the fallback. No per-contract list needed.
+  const path05 = join(buildDir05, `${contractName}.sol`, `${contractName}.json`)
+  if (existsSync(path05)) {
+    return buildDir05
+  }
+  const path08 = join(buildDir08, `${contractName}.sol`, `${contractName}.json`)
+  if (existsSync(path08)) {
     return buildDir08
   }
-  return buildDir05
+  return buildDir08
 }
 
 const getContractArtifactPath = (
@@ -971,8 +1028,27 @@ const getContractArtifactPath = (
   return join(buildDir, `${contractName}.sol`, `${contractName}.json`)
 }
 
+// Whether a forge artifact was compiled from one of the repo's own source trees
+// (contracts, contracts-0.5, contracts-0.8 depending on the ref) rather than from a
+// dependency under lib/ or node_modules/. A build tree also holds every dependency it
+// pulled in, and a 0.5 dependency must not be mistaken for a core contract of the same
+// name (the 0.5-first lookup would then shadow the 0.8 implementation).
+const isOwnSourceArtifact = (artifactPath: string): boolean => {
+  const artifact = readJsonSync(artifactPath) as {
+    metadata?: { settings?: { compilationTarget?: Record<string, string> } }
+  }
+  const target = artifact.metadata?.settings?.compilationTarget
+  const sourcePath = target ? Object.keys(target)[0] : ''
+  return sourcePath.startsWith('contracts')
+}
+
 const listContractNames = (baseDir: string): string[] => {
   const names: string[] = []
+  // Build directories are produced on demand, and a ref that defines only one of the two
+  // profiles legitimately has no directory for the other.
+  if (!existsSync(baseDir)) {
+    return names
+  }
   const entries = readdirSync(baseDir, { withFileTypes: true })
   for (const entry of entries) {
     if (!entry.isDirectory() || !entry.name.endsWith('.sol')) {
@@ -985,10 +1061,137 @@ const listContractNames = (baseDir: string): string[] => {
       if (!fileEntry.isFile() || !fileEntry.name.endsWith('.json')) {
         continue
       }
+      if (!isOwnSourceArtifact(join(contractSolDirPath, fileEntry.name as string))) {
+        continue
+      }
       names.push(basename(fileEntry.name as string, '.json'))
     }
   }
   return names
+}
+
+// Library addresses seeded from the libraries file are only known to hold code, not the
+// code this build links against. When a library moved compilers, or changed without the
+// compatibility report noticing, its name still resolves to the stale deployment and the
+// new implementation would be bound to code compiled from different source. Every
+// pre-existing library is therefore checked against its artifact before linking; a
+// library deployed in this run is trusted, and so is a deployment verify-deployed
+// accepts as a known legacy library (the original 0.5 AddressLinkedList on mainnet,
+// which the live Validators links and which is not worth relinking).
+const proxyGetOwnerAbi = [
+  {
+    type: 'function',
+    name: '_getOwner',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+  },
+] as const
+
+// A proposal is executed by Governance, so every proxy it repoints must be owned by the
+// Governance proxy. A proxy owned by someone else (Mento's SortedOracles on mainnet, an
+// EOA on a testnet) makes that entry revert at execution time; say so when the proposal
+// is generated instead.
+const warnAboutProxiesGovernanceCannotUpgrade = async (
+  proposal: ProposalTx[],
+  addresses: ContractAddresses,
+  publicClient: PublicClientMethods
+): Promise<void> => {
+  if (!addresses.addresses.has('Governance')) {
+    return
+  }
+  const governance = `0x${addresses.get('Governance').replace(/^0x/, '')}`
+  for (const tx of proposal) {
+    const repointsProxy =
+      tx.function === '_setImplementation' || tx.function === '_setAndInitializeImplementation'
+    if (!repointsProxy || !tx.contract.endsWith('Proxy')) {
+      continue
+    }
+    const contractName = tx.contract.slice(0, -'Proxy'.length)
+    // A proxy this proposal registers itself is not in the registry yet; its address is
+    // the one the setAddressFor entry carries.
+    const registeredHere = proposal.find(
+      (other) => other.function === 'setAddressFor' && other.args[0] === contractName
+    )
+    const knownAddress = addresses.addresses.has(contractName)
+      ? addresses.get(contractName)
+      : registeredHere?.args[1]
+    if (!knownAddress) {
+      continue
+    }
+    const proxyAddress = `0x${knownAddress.replace(/^0x/, '')}` as ViemAddress
+    const result = await publicClient.call({
+      to: proxyAddress,
+      data: encodeFunctionData({ abi: proxyGetOwnerAbi, functionName: '_getOwner' }),
+    })
+    const owner = result.data
+      ? (decodeFunctionResult({
+          abi: proxyGetOwnerAbi,
+          functionName: '_getOwner',
+          data: result.data,
+        }) as string)
+      : NULL_ADDRESS
+    if (!eqAddress(owner, governance)) {
+      console.warn(
+        `WARNING: ${tx.contract} at ${proxyAddress} is owned by ${owner}, not by Governance ` +
+          `(${governance}); Governance cannot execute its _setImplementation`
+      )
+    }
+  }
+}
+
+const verifiedLibraries = new Set<string>()
+// Set once in main(); the network decides which legacy library deployments are accepted.
+let releaseNetworkName = ''
+
+const assertLinkedLibrariesMatchArtifacts = async (
+  contractName: string,
+  contractDependencies: string[],
+  released: Set<string>,
+  addresses: ContractAddresses,
+  buildDir05: string,
+  buildDir08: string,
+  publicClient: PublicClientMethods
+): Promise<void> => {
+  for (const dep of contractDependencies) {
+    if (released.has(dep) || !addresses.addresses.has(dep)) {
+      continue
+    }
+    const address = `0x${addresses.get(dep).replace(/^0x/, '')}` as ViemAddress
+    if (verifiedLibraries.has(`${dep}@${address}`)) {
+      continue
+    }
+    const artifactPath = getContractArtifactPath(dep, buildDir05, buildDir08)
+    if (!existsSync(artifactPath)) {
+      throw new Error(`Artifact for library ${dep} not found at ${artifactPath}.`)
+    }
+    const expected = (readJsonSync(artifactPath) as ForgeArtifact).deployedBytecode?.object
+    if (!expected) {
+      throw new Error(`Artifact for library ${dep} at ${artifactPath} has no deployedBytecode.`)
+    }
+    const onchain = await publicClient.getCode({ address })
+    if (!onchain || onchain === '0x') {
+      throw new Error(`Library ${dep} at ${address} has no code on chain.`)
+    }
+    if (isAllowedLegacyLibrary(dep, address, releaseNetworkName)) {
+      console.warn(
+        `Library ${dep} at ${address} is the known legacy deployment on ${releaseNetworkName}; ` +
+          `linking ${contractName} against it as verify-deployed does`
+      )
+      verifiedLibraries.add(`${dep}@${address}`)
+      continue
+    }
+    if (!deployedLibraryMatchesArtifact(onchain, expected, address)) {
+      throw new Error(
+        `Library ${dep} at ${address} was not compiled from ${artifactPath}, so ${contractName} ` +
+          `cannot be linked against it. Either the compatibility report must list ${dep} as ` +
+          `changed so a fresh deployment is linked, or remove ${dep} from the libraries file ` +
+          `to deploy it anew.`
+      )
+    }
+    verifiedLibraries.add(`${dep}@${address}`)
+    console.log(`Library ${dep} at ${address} matches the compiled artifact`)
+  }
 }
 
 const linkLibraries = (
@@ -1098,7 +1301,14 @@ const performRelease = async (
   }
 
   if (shouldDeployContract) {
-    const contractDependencies = dependencies.get(contractName) || []
+    // The static dependency map spans compiler eras: old release tags still link libraries
+    // (e.g. Signatures) that the 0.8 contracts replaced with internal code. Only keep the
+    // dependencies this artifact's bytecode actually has link placeholders for, so baseline
+    // re-deploys still link them while current builds don't prompt for unused libraries.
+    const linkedLibraryNames = new Set(contractViemArtifact.linkedLibraryNames)
+    const contractDependencies = (dependencies.get(contractName) || []).filter((dep) =>
+      linkedLibraryNames.has(dep)
+    )
     for (const dependency of contractDependencies) {
       if (!released.has(dependency)) {
         await performRelease(
@@ -1146,6 +1356,16 @@ const performRelease = async (
         released.add(lib)
       }
     }
+
+    await assertLinkedLibrariesMatchArtifacts(
+      contractName,
+      contractDependencies,
+      released,
+      addresses,
+      buildDir05,
+      buildDir08,
+      publicClient
+    )
 
     const linkedLibraries = linkLibraries(contractViemArtifact, contractDependencies, addresses)
 
@@ -1230,14 +1450,19 @@ async function main() {
       }).argv
 
     const networkName = argv.network!
+    releaseNetworkName = networkName
     const buildDirBase = argv.buildDirectory
-    const buildDir05 = `${buildDirBase}-truffle-compat`
-    const buildDir08 = `${buildDirBase}-truffle-compat8`
-    if (!existsSync(buildDir05)) {
-      throw new Error(`${buildDir05} directory not found. Make sure to run foundry build first`)
-    }
+    const { buildDir05, buildDir08 } = resolveBuildDirectories(buildDirBase)
+    // Every supported ref has both sides: the 0.8 implementations and a 0.5 tree holding
+    // at least the proxies, which new deployments are created from.
     if (!existsSync(buildDir08)) {
-      throw new Error(`${buildDir08} directory not found. Make sure to run foundry build first`)
+      throw new Error(`${buildDir08} not found. Build the 0.8 sources first (forge build).`)
+    }
+    if (!existsSync(buildDir05)) {
+      throw new Error(
+        `${buildDir05} not found. Build the 0.5 sources first (FOUNDRY_PROFILE=solc05 forge build, ` +
+          `or truffle-compat on a pre-migration tag).`
+      )
     }
 
     // Check for Celoscan API key early (before deployment) for production networks
@@ -1323,6 +1548,9 @@ async function main() {
     if (version >= 9) {
       ignoredContractsSet = new Set(ignoredContractsV9)
     }
+    if (version >= 18) {
+      ignoredContractsSet = new Set([...ignoredContractsV9, ...ignoredContractsV18])
+    }
 
     const names05 = listContractNames(buildDir05)
     const names08 = listContractNames(buildDir08)
@@ -1372,6 +1600,7 @@ async function main() {
       }
     }
 
+    await warnAboutProxiesGovernanceCannotUpgrade(proposal, addresses, publicClient)
     writeJsonSync(argv.proposal, proposal, { spaces: 2 })
     console.log(`Proposal successfully written to ${argv.proposal}`)
 
@@ -1402,6 +1631,8 @@ async function main() {
     }
   } catch (error) {
     console.error('Error during script execution:', error)
+    // rethrow so the process exits non-zero; the shell wrappers rely on the exit code
+    throw error
   }
 }
 

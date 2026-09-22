@@ -58,7 +58,7 @@ if [ -n "$PROPOSAL" ]; then
   echo "See: https://github.com/celo-org/celo-monorepo/pull/11662" >&2
   exit 1
 fi
-PROPOSAL="proposal-$NETWORK-$BRANCH.json"
+PROPOSAL="proposal-$NETWORK-$(echo "$BRANCH" | sed -e 's#/#_#g').json"
 
 source scripts/bash/validate-libraries-filename.sh
 validate_libraries_filename "$LIBRARIES" "$NETWORK" "$BRANCH"
@@ -69,14 +69,19 @@ validate_libraries_bytecode "$LIBRARIES" "$VALIDATION_RPC_URL"
 
 source scripts/bash/release-lib.sh
 
-cp foundry.toml foundry.toml.bak
+# Each ref builds with its own foundry.toml. Pre-migration tags still define the
+# truffle-compat (Solidity 0.5) profile for their implementations; the single-tree layout
+# does not and instead builds contracts-0.5 (the proxies new deployments are created from)
+# with solc05. has_foundry_profile skips whichever profile a ref does not define, and the
+# 0.8 sources build with truffle-compat8 where a ref still has it, else with the default
+# profile.
+build_tag_foundry "$BRANCH" /dev/stdout truffle-compat
+build_tag_foundry "$BRANCH" /dev/stdout solc05
+build_08_sources "$BRANCH" /dev/stdout
 
-build_tag_foundry "$BRANCH" /dev/stdout truffle-compat foundry.toml.bak
-build_tag_foundry "$BRANCH" /dev/stdout truffle-compat8 foundry.toml.bak
-
-mv foundry.toml.bak foundry.toml
-
-BUILD_DIR="./out-${BRANCH}"
+# Same flattening build_tag_foundry applied above, so a branch ref such as
+# release/core-contracts/18 resolves to the directories that were just built.
+BUILD_DIR="./$(build_dir_for_ref "$BRANCH")"
 
 # Build the command with optional flags
 OPTIONAL_FLAGS=""
@@ -90,7 +95,8 @@ if [ -n "$CELOSCAN_API_KEY_ARG" ]; then
   OPTIONAL_FLAGS="$OPTIONAL_FLAGS --celoscanApiKey $CELOSCAN_API_KEY_ARG"
 fi
 
-yarn ts-node --transpile-only ./scripts/foundry/make-release.ts \
+# --preferTsExts keeps stale compiled lib/**/*.js from shadowing the TypeScript sources.
+yarn ts-node --transpile-only --preferTsExts ./scripts/foundry/make-release.ts \
   --branch "$BRANCH" \
   --privateKey "$PRIVATE_KEY" \
   --initializeData "$INITIALIZE_DATA" \
