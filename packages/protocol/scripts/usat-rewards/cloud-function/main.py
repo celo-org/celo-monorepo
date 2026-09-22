@@ -459,23 +459,40 @@ def distribute(request):
             if amount > remaining_balance:
                 skipped_unfunded += 1
                 continue
-            try:
-                if gas_in_usat:
-                    data = token.encode_abi(abi_element_identifier="transfer",
-                                            args=[Web3.to_checksum_address(wallet), amount])
-                    tx_hash = send_cip64_transfer(w3, account, chain_id, nonce, usat_address, bytes.fromhex(data[2:]),
-                                                  fee_currency, fc_max_fee, fc_priority)
-                else:
-                    tx = token.functions.transfer(
-                        Web3.to_checksum_address(wallet), amount
-                    ).build_transaction(
-                        {"from": hot_wallet, "nonce": nonce, "gas": 100_000, "gasPrice": gas_price, "chainId": chain_id}
-                    )
-                    tx_hash = w3.eth.send_raw_transaction(account.sign_transaction(tx).raw_transaction)
-                receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
-            except Exception as error:  # noqa: BLE001 - surface the RPC reason, keep the ledger intact
+            # A transient RPC hiccup must not end a 2,000-wallet run. Retry the
+            # send a few times; if the transaction was already broadcast, only
+            # the receipt wait is retried (re-sending would reuse the nonce).
+            tx_hash = None
+            receipt = None
+            last_error = None
+            for attempt in range(4):
+                try:
+                    if tx_hash is None:
+                        nonce = w3.eth.get_transaction_count(hot_wallet, "pending")
+                        if gas_in_usat:
+                            data = token.encode_abi(abi_element_identifier="transfer",
+                                                    args=[Web3.to_checksum_address(wallet), amount])
+                            tx_hash = send_cip64_transfer(w3, account, chain_id, nonce, usat_address, bytes.fromhex(data[2:]),
+                                                          fee_currency, fc_max_fee, fc_priority)
+                        else:
+                            tx = token.functions.transfer(
+                                Web3.to_checksum_address(wallet), amount
+                            ).build_transaction(
+                                {"from": hot_wallet, "nonce": nonce, "gas": 100_000, "gasPrice": gas_price, "chainId": chain_id}
+                            )
+                            tx_hash = w3.eth.send_raw_transaction(account.sign_transaction(tx).raw_transaction)
+                    receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
+                    break
+                except Exception as error:  # noqa: BLE001 - log, back off, retry
+                    last_error = error
+                    print(json.dumps({"severity": "WARNING", "message": f"send attempt {attempt + 1} for {wallet} failed: {str(error)[:300]}",
+                                      "tx_hash": Web3.to_hex(tx_hash) if tx_hash else None}), flush=True)
+                    time.sleep(5 * (attempt + 1))
+            if receipt is None:
+                print(json.dumps({"severity": "ERROR", "message": f"giving up on {wallet} after retries: {str(last_error)[:300]}",
+                                  "paid_so_far": paid_count}), flush=True)
                 return (
-                    {**summary, "paid": paid_count, "error": f"send to {wallet} failed: {error}"[:500]},
+                    {**summary, "paid": paid_count, "error": f"send to {wallet} failed: {last_error}"[:500]},
                     500,
                 )
             if receipt.status != 1:
