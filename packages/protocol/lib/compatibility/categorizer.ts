@@ -3,7 +3,7 @@ import {
   ChangeVisitor,
   ContractKindChange, DeployedBytecodeChange, LibraryLinkingChange,
   MethodAddedChange, MethodMutabilityChange, MethodRemovedChange,
-  MethodReturnChange, MethodVisibilityChange, NewContractChange
+  MethodReturnChange, MethodVisibilityChange, NewContractChange, StructExpandedChange
 } from '@celo/protocol/lib/compatibility/change'
 
 /**
@@ -33,7 +33,7 @@ export function categorize(changes: Change[], categorizer: Categorizer): Change[
  *  Major:
  *    New contract, Mutability, Params, Return Params, Method Removed, Contract type changes
  *  Minor:
- *    Method Added
+ *    Method Added, Struct Expanded
  *  Patch:
  *    Visibility, Bytecode (implementation) changes
  */
@@ -45,6 +45,9 @@ export class DefaultCategorizer implements Categorizer {
   onContractKind = (_change: ContractKindChange): ChangeType => ChangeType.Major
 
   onMethodAdded = (_change: MethodAddedChange): ChangeType => ChangeType.Minor
+  // Members appended to a struct held only in mappings or dynamic arrays; existing data
+  // keeps its slots, the storage only gains new ones.
+  onStructExpanded = (_change: StructExpandedChange): ChangeType => ChangeType.Minor
   // Changing between public and external visibility has no impact.
   onMethodVisibility = (_change: MethodVisibilityChange): ChangeType => ChangeType.Patch
   onDeployedBytecode = (_change: DeployedBytecodeChange): ChangeType => ChangeType.Patch

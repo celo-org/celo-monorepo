@@ -254,36 +254,6 @@ const isStructExpandable = (structLabel: string, oldLayout: StorageLayout) =>
     (variable) => canonicalType(variable.type, oldLayout.types) === `t_struct<${structLabel}>`
   )
 
-/**
- * Struct names in the order the retired @openzeppelin/upgrades SDK first met them while
- * walking the state variables: a struct before its members, and only the value side of
- * mappings and arrays. generateStructsCompatibilityReport visits structs in this order,
- * which decides the `expanded` flag it reports.
- */
-const structVisitOrder = (layout: StorageLayout): string[] => {
-  const order: string[] = []
-  const visit = (id: string) => {
-    const { head, args } = parseTypeId(id)
-    if (head === 't_struct') {
-      const type = layout.types[id]
-      const name = declaredName(type ? type.label : args[0])
-      if (order.includes(name)) {
-        return
-      }
-      order.push(name)
-      if (type && type.members) {
-        ;(type.members as { type: string }[]).forEach((member) => visit(member.type))
-      }
-    } else if (head === 't_mapping') {
-      visit(args[1])
-    } else if (head === 't_array') {
-      visit(args[0])
-    }
-  }
-  layout.storage.forEach((variable) => visit(variable.type))
-  return order
-}
-
 const generateStructsCompatibilityReport = (
   oldLayout: StorageLayout,
   newLayout: StorageLayout
@@ -294,7 +264,7 @@ const generateStructsCompatibilityReport = (
   let errors = []
   let expanded: boolean
 
-  structVisitOrder(newLayout).forEach((name) => {
+  Object.keys(newStructs).forEach((name) => {
     const oldType = oldStructs[name]
     const newType = newStructs[name]
     if (oldType === undefined || newType === undefined) {
@@ -305,9 +275,7 @@ const generateStructsCompatibilityReport = (
       compatible = false
       errors = errors.concat(structReport.errors)
     }
-    // Only the last struct compared decides this flag, as it always has; the release
-    // reports on record were produced that way.
-    expanded = structReport.expanded
+    expanded = expanded || structReport.expanded
   })
 
   return {

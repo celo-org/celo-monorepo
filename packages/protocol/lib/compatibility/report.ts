@@ -5,7 +5,7 @@ import { ContractAST } from '@celo/protocol/lib/compatibility/contract-ast'
 import { ASTCodeCompatibilityReport } from '@celo/protocol/lib/compatibility/ast-code'
 import { ASTStorageCompatibilityReport } from '@celo/protocol/lib/compatibility/ast-layout'
 import { categorize, Categorizer, ChangeType } from '@celo/protocol/lib/compatibility/categorizer'
-import { Change } from '@celo/protocol/lib/compatibility/change'
+import { Change, StructExpandedChange } from '@celo/protocol/lib/compatibility/change'
 import { getArtifactByName } from '@celo/protocol/lib/compatibility/internal'
 import { ContractVersionDelta, ContractVersionDeltaIndex } from '@celo/protocol/lib/compatibility/version'
 /**
@@ -73,9 +73,14 @@ export class CategorizedChanges {
     reports: ASTReports,
     categorizer: Categorizer): CategorizedChanges {
     const storage = reports.storage.filter(r => !r.compatible)
-    const storageExpandedReports = reports.storage.filter(r => r.expanded)
-    const c = categorize(reports.code.getChanges().concat(reports.libraryLinking), categorizer)
-    const major = [...c[ChangeType.Major], ...storageExpandedReports.map(r => ({ getContract: () => r.contract, accept: () => null}))]
+    const structExpansions = reports.storage
+      .filter(r => r.expanded)
+      .map(r => new StructExpandedChange(r.contract))
+    const c = categorize(
+      reports.code.getChanges().concat(reports.libraryLinking, structExpansions),
+      categorizer
+    )
+    const major = c[ChangeType.Major]
     const minor = c[ChangeType.Minor]
     const patch = c[ChangeType.Patch]
     return new CategorizedChanges(storage, major, minor, patch)

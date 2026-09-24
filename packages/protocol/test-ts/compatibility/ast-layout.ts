@@ -34,6 +34,12 @@ const testCases = {
   original_struct_in_mapping: getTestArtifacts('original_struct_in_mapping'),
   inserted_in_struct_mapping: getTestArtifacts('inserted_in_struct_mapping'),
   inserted_in_library_struct_mapping: getTestArtifacts('inserted_in_library_struct_mapping'),
+  inserted_front_in_struct_mapping: getTestArtifacts('inserted_front_in_struct_mapping'),
+  original_two_structs_in_mapping: getTestArtifacts('original_two_structs_in_mapping'),
+  appended_to_first_of_two_structs_in_mapping: getTestArtifacts(
+    'appended_to_first_of_two_structs_in_mapping'
+  ),
+  inserted_middle_in_struct_mapping: getTestArtifacts('inserted_middle_in_struct_mapping'),
   deprecated_prefixed_in_library_struct_mapping: getTestArtifacts(
     'deprecated_prefixed_in_library_struct_mapping'
   ),
@@ -158,6 +164,42 @@ describe('#reportLayoutIncompatibilities()', () => {
         testCases.inserted_in_struct_mapping
       )
       assertCompatible(report)
+      assert.isTrue(selectReportFor(report, 'TestContract').expanded)
+    })
+  })
+
+  describe('when only one of several structs in mappings grows', () => {
+    it('records the expansion whichever struct is compared last', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_two_structs_in_mapping,
+        testCases.appended_to_first_of_two_structs_in_mapping
+      )
+      assertCompatible(report)
+      assert.isTrue(selectReportFor(report, 'TestContract').expanded)
+    })
+  })
+
+  // Appending is only safe at the end: a field inserted before existing ones shifts them
+  // within every entry already stored in the mapping.
+  describe('when a field is inserted at the front of a struct in mapping', () => {
+    it('reports a struct change', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_struct_in_mapping,
+        testCases.inserted_front_in_struct_mapping
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
+    })
+  })
+
+  describe('when a field is inserted in the middle of a struct in mapping', () => {
+    it('reports a struct change', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_struct_in_mapping,
+        testCases.inserted_middle_in_struct_mapping
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
     })
   })
 

@@ -20,6 +20,7 @@ export interface ChangeVisitor<T> {
   onNewContract(change: NewContractChange): T
   onDeployedBytecode(change: DeployedBytecodeChange): T
   onLibraryLinking(change: LibraryLinkingChange): T
+  onStructExpanded(change: StructExpandedChange): T
 }
 
 /**
@@ -181,5 +182,16 @@ export class LibraryLinkingChange extends ContractChange {
 
   accept<T>(visitor: ChangeVisitor<T>): T {
     return visitor.onLibraryLinking(this)
+  }
+}
+
+/**
+ * A struct the contract keeps only in mappings or dynamic arrays gained members at its
+ * end. Every entry has its own slot range, so the existing fields stay where they were.
+ */
+export class StructExpandedChange extends ContractChange {
+  type = 'StructExpanded'
+  accept<T>(visitor: ChangeVisitor<T>): T {
+    return visitor.onStructExpanded(this)
   }
 }
