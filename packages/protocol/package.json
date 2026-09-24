@@ -50,7 +50,7 @@
     "@ethereumjs/util": "8.0.5",
     "@ethereumjs/vm": "npm:@celo/ethereumjs-vm@6.4.1-unofficial.0",
     "@openzeppelin/contracts8": "npm:@openzeppelin/contracts@^4.4.2",
-    "@openzeppelin/upgrades": "^2.8.0",
+    "@openzeppelin/upgrades-core": "1.41.0",
     "bignumber.js": "9.1.0",
     "bn.js": "^5.1.0",
     "chai": "^4.3.6",
@@ -66,6 +66,7 @@
     "prompts": "^2.0.1",
     "semver": "^7.5.4",
     "solhint": "^4.5.4",
+    "solidity-ast": "^0.4.60",
     "solidity-bytes-utils-8": "npm:solidity-bytes-utils@^0.8.2",
     "viem": "2.29.4",
     "web3": "1.10.0"

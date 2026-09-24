@@ -308,11 +308,7 @@ describe('#reportLayoutIncompatibilities()', () => {
     })
   })
 
-  // TODO(m-chrzan): @openzeppelin/upgrades erases information about mapping key
-  // types before generating a layout diff. We might want to patch this behavior
-  // so that this sort of type change is identified as a backwards
-  // incompatibility.
-  describe.skip('when the source of a mapping changes', () => {
+  describe('when the source of a mapping changes', () => {
     it('reports a typechanged variable', () => {
       const report = reportLayoutIncompatibilities(
         testCases.original_complex,
@@ -323,7 +319,7 @@ describe('#reportLayoutIncompatibilities()', () => {
     })
   })
 
-  describe.skip('when the source of a nested mapping changes', () => {
+  describe('when the source of a nested mapping changes', () => {
     it('reports a typechanged variable', () => {
       const report = reportLayoutIncompatibilities(
         testCases.original_complex,

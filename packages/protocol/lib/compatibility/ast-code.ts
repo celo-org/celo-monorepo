@@ -5,12 +5,9 @@ import {
   MethodMutabilityChange, MethodRemovedChange, MethodReturnChange,
   MethodVisibilityChange, NewContractChange
 } from '@celo/protocol/lib/compatibility/change'
-import { compilerFamily, Artifact, getArtifactByName, getContractName, getDeployedLinkReferences, makeZContract, normalizeLinkPlaceholders } from '@celo/protocol/lib/compatibility/internal'
-import {
-  BuildArtifacts,
-  Contract as ZContract
-} from '@openzeppelin/upgrades'
-import ContractAST from '@openzeppelin/upgrades/lib/utils/ContractAST'
+import { BuildArtifacts } from '@celo/protocol/lib/compatibility/build-artifacts'
+import { ContractAST } from '@celo/protocol/lib/compatibility/contract-ast'
+import { compilerFamily, Artifact, getArtifactByName, getContractName, getDeployedBytecode, getDeployedLinkReferences, normalizeLinkPlaceholders } from '@celo/protocol/lib/compatibility/internal'
 
 export enum Visibility {
   NONE = "",
@@ -157,7 +154,7 @@ const getCheckableMethodsFromAST = (contract: ContractAST, id: string): any[] =>
     return contract.getMethods().filter(checkableMethods)
   } catch (error) {
     throw {
-      message: `Error in the @openzeppelin/.../ContractAST.getMethods() for the artifacts in the '${id}' folder. 
+      message: `Error in ContractAST.getMethods() for the artifacts in the '${id}' folder. 
     Most likely this is due to a botched build, or a build on a non-cleaned folder.`,
       error
     }
@@ -195,8 +192,8 @@ function doASTCompatibilityReport(
   return report
 }
 
-function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: BuildArtifacts,
-  newContract: ZContract, newArtifacts: BuildArtifacts): ASTCodeCompatibilityReport {
+function generateASTCompatibilityReport(oldContract: Artifact, oldArtifacts: BuildArtifacts,
+  newContract: Artifact, newArtifacts: BuildArtifacts): ASTCodeCompatibilityReport {
   // Sanity checks
   if (newContract === null) {
     throw new Error('newContract cannot be null')
@@ -207,11 +204,8 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
   if (newArtifacts === null) {
     throw new Error('newArtifacts cannot be null')
   }
-  const contractName = newContract.schema.contractName
+  const contractName = getContractName(newContract)
 
-  // Need to manually use ContractAST since its internal use in ZContract
-  // does not pass the artifacts parameter to the constructor, therefore
-  // forcing a reloading of BuildArtifacts.
   const newAST = new ContractAST(newContract, newArtifacts)
   const newKind = newAST.getContractNode().contractKind
   if (oldContract === null) {
@@ -225,8 +219,8 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
   }
 
   // Name sanity check
-  if (oldContract.schema.contractName !== contractName) {
-    throw new Error(`Contract names should be equal: ${oldContract.schema.contractName} !== ${contractName}`)
+  if (getContractName(oldContract) !== contractName) {
+    throw new Error(`Contract names should be equal: ${getContractName(oldContract)} !== ${contractName}`)
   }
 
   const oldAST = new ContractAST(oldContract, oldArtifacts)
@@ -239,10 +233,10 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
   const report = doASTCompatibilityReport(contractName, oldAST, newAST)
   // Check deployed byte code change
   const oldBytecodeStripped = stripMetadata(
-    normalizeLinkPlaceholders(oldContract.schema.deployedBytecode, getDeployedLinkReferences(oldContract))
+    normalizeLinkPlaceholders(getDeployedBytecode(oldContract), getDeployedLinkReferences(oldContract))
   )
   const newBytecodeStripped = stripMetadata(
-    normalizeLinkPlaceholders(newContract.schema.deployedBytecode, getDeployedLinkReferences(newContract))
+    normalizeLinkPlaceholders(getDeployedBytecode(newContract), getDeployedLinkReferences(newContract))
   )
 
   if (oldBytecodeStripped !== newBytecodeStripped) {
@@ -279,7 +273,7 @@ function findMigratedLibrary(
   newArtifacts: BuildArtifacts,
   oldArtifactsSet: BuildArtifacts[],
   sameCompilerOldArtifacts: BuildArtifacts | null): MigratedLibraryMatch | null {
-  const newAST = new ContractAST(makeZContract(newArtifact), newArtifacts)
+  const newAST = new ContractAST(newArtifact, newArtifacts)
   if (newAST.getContractNode().contractKind !== CONTRACT_KIND_LIBRARY) {
     return null
   }
@@ -361,16 +355,16 @@ export function reportASTIncompatibilities(
           const newContractName = getContractName(newArtifact)
           const oldArtifact = getArtifactByName(newContractName, matchingOldArtifacts!)
           if (oldArtifact) {
-            return generateASTCompatibilityReport(makeZContract(oldArtifact), matchingOldArtifacts!, makeZContract(newArtifact), newArtifacts)
+            return generateASTCompatibilityReport(oldArtifact, matchingOldArtifacts!, newArtifact, newArtifacts)
           }
           const migrated = findMigratedLibrary(newArtifact, newArtifacts, oldArtifactsSet, matchingOldArtifacts)
           if (migrated) {
             console.log(`[INFO] Library ${newContractName} moved to compiler ${newCompilerVersion}: comparing against its ${getCompilerVersion(migrated.artifacts)} build`)
-            return generateASTCompatibilityReport(makeZContract(migrated.artifact), migrated.artifacts, makeZContract(newArtifact), newArtifacts)
+            return generateASTCompatibilityReport(migrated.artifact, migrated.artifacts, newArtifact, newArtifacts)
           }
           // Contract doesn't exist in old artifacts of same version
           console.log(`[INFO] New contract detected: ${newContractName} (compiler: ${newCompilerVersion})`)
-          return generateASTCompatibilityReport(null, matchingOldArtifacts!, makeZContract(newArtifact), newArtifacts)
+          return generateASTCompatibilityReport(null, matchingOldArtifacts!, newArtifact, newArtifacts)
         })
       out = [...out, ...reports]
     } else {
@@ -384,10 +378,10 @@ export function reportASTIncompatibilities(
             const migrated = findMigratedLibrary(newArtifact, newArtifacts, oldArtifactsSet, null)
             if (migrated) {
               console.log(`[INFO] Library ${newContractName} moved to compiler ${newCompilerVersion}: comparing against its ${getCompilerVersion(migrated.artifacts)} build`)
-              return generateASTCompatibilityReport(makeZContract(migrated.artifact), migrated.artifacts, makeZContract(newArtifact), newArtifacts)
+              return generateASTCompatibilityReport(migrated.artifact, migrated.artifacts, newArtifact, newArtifacts)
             }
             console.log(`[INFO] New contract (no matching old version): ${newContractName} (compiler: ${newCompilerVersion})`)
-            return generateASTCompatibilityReport(null, fallbackOldArtifacts!, makeZContract(newArtifact), newArtifacts)
+            return generateASTCompatibilityReport(null, fallbackOldArtifacts!, newArtifact, newArtifacts)
           })
         out = [...out, ...reports]
       } else {

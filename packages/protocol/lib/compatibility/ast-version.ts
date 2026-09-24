@@ -4,7 +4,7 @@ import { ContractVersion, ContractVersionChecker, ContractVersionCheckerIndex, C
 import { Chain as EJSChain, Common as EJSCommon, Hardfork as EJSHardfork } from "@ethereumjs/common";
 import { Address as EJSAddress } from "@ethereumjs/util";
 import { VM } from "@ethereumjs/vm";
-import { BuildArtifacts } from '@openzeppelin/upgrades';
+import { BuildArtifacts } from '@celo/protocol/lib/compatibility/build-artifacts'
 import { isLibrary } from './report';
 const abi = require('ethereumjs-abi')
 

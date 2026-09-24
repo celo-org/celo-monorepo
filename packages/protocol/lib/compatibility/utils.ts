@@ -1,3 +1,4 @@
+import { BuildArtifacts } from '@celo/protocol/lib/compatibility/build-artifacts'
 import { compilerFamily } from '@celo/protocol/lib/compatibility/internal'
 import { reportASTIncompatibilities } from '@celo/protocol/lib/compatibility/ast-code';
 import { reportLayoutIncompatibilities } from '@celo/protocol/lib/compatibility/ast-layout';
@@ -5,7 +6,6 @@ import { Categorizer } from '@celo/protocol/lib/compatibility/categorizer';
 import { reportLibraryLinkingIncompatibilities } from '@celo/protocol/lib/compatibility/library-linking';
 import { ASTDetailedVersionedReport, ASTReports } from '@celo/protocol/lib/compatibility/report';
 import { linkedLibraries } from '@celo/protocol/lib/linked-libraries';
-import { BuildArtifacts, Contracts, getBuildArtifacts } from '@openzeppelin/upgrades';
 import { readJsonSync } from 'fs-extra';
 import { globSync } from 'glob'
 
@@ -56,29 +56,6 @@ export class ASTBackwardReport {
     public readonly exclude: string,
     public readonly report: ASTDetailedVersionedReport
   ) { }
-}
-
-function ensureValidArtifacts(artifactsPaths: string[]): void {
-  artifactsPaths.forEach((path) => {
-    const artifact = readJsonSync(path)
-    if (artifact.ast === undefined) {
-      console.error(`ERROR: invalid artifact file found: '${path}'`)
-      process.exit(10001)
-    }
-  })
-}
-
-export function instantiateArtifacts(buildDirectory: string): BuildArtifacts {
-  // Check if all jsons in the buildDirectory are valid artifacts,
-  // otherwise getBuildArtifacts fail with the enigmatic
-  // "Cannot read property 'absolutePath' of undefined"
-  ensureValidArtifacts(Contracts.listBuildArtifacts(buildDirectory))
-  try {
-    return getBuildArtifacts(buildDirectory)
-  } catch (error) {
-    console.error(`ERROR: could not create BuildArtifacts on directory '${buildDirectory}`)
-    process.exit(10002)
-  }
 }
 
 // An artifact built without an AST falls back to the compilation target recorded in its
