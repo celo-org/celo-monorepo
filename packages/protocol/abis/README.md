@@ -27,10 +27,11 @@ import { accountsABI }  from '@celo/abis'
 
 // abi in js/ts for viem, wagmi, etc (with moduleResolution and module set to "Node16" in your tsconfig.json file)
 import { accountsABI }  from '@celo/abis/Accounts'
-
-// abi in js/ts for use with contractkit
-import { type Accounts, newAccounts, ABI } from '@celo/abis/web3/Accounts'
 ```
+
+Version 18 removed the web3.js typings that earlier versions exported under
+`@celo/abis/web3/*`. Use the ABIs above with viem, or stay on `@celo/abis@17` if you
+still depend on them.
 
 ### CommonJS syntax
 
