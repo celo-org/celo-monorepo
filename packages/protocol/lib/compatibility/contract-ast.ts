@@ -26,9 +26,9 @@ const collectImportClosure = (root: SourceUnit, artifacts: BuildArtifacts): Sour
         .map((artifact) => artifact.ast as SourceUnit)
         .find((ast) => ast.id === node.sourceUnit)
       if (imported === undefined) {
-        // A file declaring no contract, interface or library produces no artifact. Nothing
-        // the compatibility checks resolve (contracts, their state variables and the types
-        // those use) can live there without also being imported by a file that does.
+        // A file declaring no contract, interface or library produces no artifact, so its
+        // AST is not available; the retired SDK skipped such imports the same way. Should a
+        // check ever need a node from it, the dereferencer throws rather than guessing.
         continue
       }
       closure.set(imported.id, imported)
@@ -38,11 +38,13 @@ const collectImportClosure = (root: SourceUnit, artifacts: BuildArtifacts): Sour
   return [...closure.values()]
 }
 
-const dereferencers = new WeakMap<BuildArtifacts, Map<SourceUnit, ASTDereferencer>>()
+const dereferencers = new WeakMap<BuildArtifacts, Map<string, ASTDereferencer>>()
 
 /**
  * An AST dereferencer over the artifact's source file and its imports, cached per build
- * and source file since every contract of a file shares both.
+ * and source file since every contract of a file shares both. Each contract's artifact
+ * carries its own parsed copy of the file's AST, so the cache is keyed by the file and
+ * the id solc gave it in that run, not by the AST object.
  */
 export const dereferencerFor = (artifact: any, artifacts: BuildArtifacts): ASTDereferencer => {
   let perBuild = dereferencers.get(artifacts)
@@ -51,14 +53,15 @@ export const dereferencerFor = (artifact: any, artifacts: BuildArtifacts): ASTDe
     dereferencers.set(artifacts, perBuild)
   }
   const root: SourceUnit = artifact.ast
-  let deref = perBuild.get(root)
+  const key = `${root.absolutePath}#${root.id}`
+  let deref = perBuild.get(key)
   if (deref === undefined) {
     const sources: { [path: string]: { ast: SourceUnit; id: number } } = {}
     collectImportClosure(root, artifacts).forEach((ast) => {
       sources[`${ast.absolutePath}#${ast.id}`] = { ast, id: ast.id }
     })
     deref = astDereferencer({ sources } as any)
-    perBuild.set(root, deref)
+    perBuild.set(key, deref)
   }
   return deref
 }
