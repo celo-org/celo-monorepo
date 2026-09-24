@@ -92,6 +92,10 @@
               "contract": "Validators",
               "signature": "maxVoterRewardCommissionLastReducedBlock()",
               "type": "MethodAdded"
+            },
+            {
+              "contract": "Validators",
+              "type": "StructExpanded"
             }
           ],
           "patch": [
