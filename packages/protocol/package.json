@@ -46,9 +46,6 @@
   "dependencies": {
     "@celo/base": "^6.0.0",
     "@celo/connect": "^5.1.2",
-    "@celo/cryptographic-utils": "^5.0.7",
-    "@celo/utils": "^5.0.6",
-    "@celo/wallet-local": "^5.1.2",
     "@ethereumjs/common": "3.1.1",
     "@ethereumjs/util": "8.0.5",
     "@ethereumjs/vm": "npm:@celo/ethereumjs-vm@6.4.1-unofficial.0",
@@ -69,14 +66,9 @@
     "prompts": "^2.0.1",
     "semver": "^7.5.4",
     "solhint": "^4.5.4",
-    "solidity-bytes-utils": "0.0.7",
     "solidity-bytes-utils-8": "npm:solidity-bytes-utils@^0.8.2",
     "viem": "2.29.4",
-    "web3": "1.10.0",
-    "web3-core": "1.10.0",
-    "web3-core-helpers": "1.10.3",
-    "web3-provider-engine": "^16.0.5",
-    "web3-utils": "1.10.4"
+    "web3": "1.10.0"
   },
   "devDependencies": {
     "@celo/typechain-target-web3-v1-celo": "^1.0.0",
