@@ -1,5 +1,15 @@
 import { getContractName } from '@celo/protocol/lib/compatibility/internal'
 import { readJsonSync } from 'fs-extra'
+import path from 'path'
+
+/**
+ * The contract an artifact file describes. Foundry writes `<Source>.sol/<Contract>.json`,
+ * or `<Contract>.<solc version>.json` when a build compiles it with several compilers,
+ * and puts no contract name inside. The file name is the only reliable source: all
+ * contracts of one source file share that file's AST.
+ */
+export const contractNameFromArtifactPath = (artifactPath: string): string =>
+  path.basename(artifactPath, '.json').replace(/\.\d+\.\d+\.\d+$/, '')
 
 /**
  * The compiler artifacts of one build, indexed by the source file that produced them.
@@ -13,8 +23,11 @@ export class BuildArtifacts {
   private readonly sourcesToArtifacts: { [sourcePath: string]: any[] } = {}
 
   constructor(artifactsPaths: string[]) {
-    artifactsPaths.forEach((path) => {
-      const artifact = readJsonSync(path)
+    artifactsPaths.forEach((artifactPath) => {
+      const artifact = readJsonSync(artifactPath)
+      if (!artifact.contractName) {
+        artifact.contractName = contractNameFromArtifactPath(artifactPath)
+      }
       const sourcePath = artifact.ast.absolutePath
       if (!this.sourcesToArtifacts[sourcePath]) {
         this.sourcesToArtifacts[sourcePath] = []
@@ -31,8 +44,6 @@ export class BuildArtifacts {
     return ([] as any[]).concat(...Object.values(this.sourcesToArtifacts))
   }
 
-  // Foundry artifacts carry no contractName; the name comes from the AST as everywhere
-  // else in the compatibility tooling.
   getArtifactByName(name: string): any {
     return this.listArtifacts().find((artifact) => getContractName(artifact) === name)
   }

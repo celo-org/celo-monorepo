@@ -43,6 +43,8 @@ interface LayoutField {
 interface TypeChange {
   kind: string
   inner?: TypeChange
+  original?: { item: { label: string } }
+  updated?: { item: { label: string } }
 }
 
 interface LayoutOperation {
@@ -60,9 +62,12 @@ const isAllowedRename = (original: string, updated: string) =>
 // Struct members are checked by generateStructsCompatibilityReport, which also decides when
 // a struct may grow and compares the enums and value types its members use; the layout
 // diff only reports what else changed about a variable.
+// Only when the variable still holds the same struct: a different struct type is not
+// compared by that report, so the change must stay in the layout diff.
 const isStructMembersChange = (change: TypeChange | undefined): boolean =>
   change !== undefined &&
-  (change.kind === 'struct members' ||
+  ((change.kind === 'struct members' &&
+    change.original.item.label === change.updated.item.label) ||
     ((change.kind === 'mapping value' || change.kind === 'array value') &&
       isStructMembersChange(change.inner)))
 

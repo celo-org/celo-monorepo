@@ -41,6 +41,7 @@ const testCases = {
   appended_to_nested_struct: getTestArtifacts('appended_to_nested_struct'),
   reordered_enum_in_struct_mapping: getTestArtifacts('reordered_enum_in_struct_mapping'),
   appended_enum_in_struct_mapping: getTestArtifacts('appended_enum_in_struct_mapping'),
+  substituted_struct_in_mapping: getTestArtifacts('substituted_struct_in_mapping'),
   appended_to_first_of_two_structs_in_mapping: getTestArtifacts(
     'appended_to_first_of_two_structs_in_mapping'
   ),
@@ -205,6 +206,17 @@ describe('#reportLayoutIncompatibilities()', () => {
       )
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/member kind changed type/])
+    })
+  })
+
+  describe('when a mapping switches to a different struct type', () => {
+    it('reports a typechanged variable', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_struct_uses,
+        testCases.substituted_struct_in_mapping
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/had type/])
     })
   })
 
