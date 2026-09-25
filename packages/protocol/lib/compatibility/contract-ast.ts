@@ -32,13 +32,13 @@ const collectImportClosure = (
       }
       const imported = artifacts
         .getArtifactsFromSourcePath(node.absolutePath)
-        .filter((artifact) => compilerRun(artifact) === run)
+        // A source-only artifact records no compiler; the source unit id still has to match.
+        .filter((artifact) => compilerRun(artifact) === run || compilerRun(artifact) === '')
         .map((artifact) => artifact.ast as SourceUnit)
         .find((ast) => ast.id === node.sourceUnit)
       if (imported === undefined) {
-        // A file declaring no contract, interface or library produces no artifact, so its
-        // AST is not available; the retired SDK skipped such imports the same way. Should a
-        // check ever need a node from it, the dereferencer throws rather than guessing.
+        // Not part of this build's artifacts. Should a check ever need a node from it, the
+        // dereferencer throws rather than guessing.
         continue
       }
       closure.set(imported.id, imported)

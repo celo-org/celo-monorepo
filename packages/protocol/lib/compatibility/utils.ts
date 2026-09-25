@@ -92,10 +92,17 @@ interface CompilerArtifactsIndex {
   [index: string]: string[]
 }
 
+// A source file declaring only file-level types or functions gets an artifact with its AST
+// but no metadata, so neither its compiler nor a contract to compare is known.
+const isSourceOnly = (artifact: any): boolean => !artifact.metadata || !artifact.metadata.compiler
+
 function splitArtifactsByCompiler(artifactPaths: string[]): CompilerArtifactsIndex {
   const artifactsIndex: CompilerArtifactsIndex = {}
   artifactPaths.forEach(artifactPath => {
     const artifact = readJsonSync(artifactPath)
+    if (isSourceOnly(artifact)) {
+      return
+    }
     const family = compilerFamily(artifact.metadata.compiler.version)
     if (!artifactsIndex[family]) {
       artifactsIndex[family] = []
@@ -109,7 +116,12 @@ function splitArtifactsByCompiler(artifactPaths: string[]): CompilerArtifactsInd
 export function instantiateArtifactsFromForge(buildDirectory: string): BuildArtifacts[] {
   const artifactPaths = listForgeBuildArtifacts(buildDirectory)
   const artifactsIndex: CompilerArtifactsIndex = splitArtifactsByCompiler(artifactPaths)
-  return Object.keys(artifactsIndex).map(compiler => new BuildArtifacts(artifactsIndex[compiler]))
+  // Source-only artifacts hold no contract to report on, but contracts of any compiler may
+  // import the types they declare, so every set can resolve imports through them.
+  const sourceOnlyPaths = artifactPaths.filter(artifactPath => isSourceOnly(readJsonSync(artifactPath)))
+  return Object.keys(artifactsIndex).map(
+    compiler => new BuildArtifacts(artifactsIndex[compiler], sourceOnlyPaths)
+  )
 }
 
 /**

@@ -44,6 +44,8 @@ const testCases = {
   reordered_enum_in_struct_mapping: getTestArtifacts('reordered_enum_in_struct_mapping'),
   appended_enum_in_struct_mapping: getTestArtifacts('appended_enum_in_struct_mapping'),
   substituted_struct_in_mapping: getTestArtifacts('substituted_struct_in_mapping'),
+  original_file_level_struct: getTestArtifacts('original_file_level_struct'),
+  appended_to_file_level_struct: getTestArtifacts('appended_to_file_level_struct'),
   original_function_in_struct_mapping: getTestArtifacts('original_function_in_struct_mapping'),
   changed_function_visibility_in_struct_mapping: getTestArtifacts(
     'changed_function_visibility_in_struct_mapping'
@@ -251,6 +253,19 @@ describe('#reportLayoutIncompatibilities()', () => {
         testCases.changed_function_signature_in_struct_mapping
       )
       assertCompatible(report)
+    })
+  })
+
+  // A file declaring only types still gets an artifact carrying its AST, which is what
+  // resolves a struct declared at file level.
+  describe('when a file-level struct held in a mapping gains a member at its end', () => {
+    it('records the expansion', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_file_level_struct,
+        testCases.appended_to_file_level_struct
+      )
+      assertCompatible(report)
+      assert.isTrue(selectReportFor(report, 'TestContract').expanded)
     })
   })
 

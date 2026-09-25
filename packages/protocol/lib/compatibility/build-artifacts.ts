@@ -21,8 +21,18 @@ export const contractNameFromArtifactPath = (artifactPath: string): string =>
  */
 export class BuildArtifacts {
   private readonly sourcesToArtifacts: { [sourcePath: string]: any[] } = {}
+  // ASTs of source files that declare no contract, only used to resolve imports.
+  private readonly sourceOnlyArtifacts: { [sourcePath: string]: any[] } = {}
 
-  constructor(artifactsPaths: string[]) {
+  constructor(artifactsPaths: string[], sourceOnlyPaths: string[] = []) {
+    sourceOnlyPaths.forEach((artifactPath) => {
+      const artifact = readJsonSync(artifactPath)
+      const sourcePath = artifact.ast.absolutePath
+      if (!this.sourceOnlyArtifacts[sourcePath]) {
+        this.sourceOnlyArtifacts[sourcePath] = []
+      }
+      this.sourceOnlyArtifacts[sourcePath].push(artifact)
+    })
     artifactsPaths.forEach((artifactPath) => {
       const artifact = readJsonSync(artifactPath)
       if (!artifact.contractName) {
@@ -49,6 +59,9 @@ export class BuildArtifacts {
   }
 
   getArtifactsFromSourcePath(sourcePath: string): any[] {
-    return this.sourcesToArtifacts[sourcePath] || []
+    return [
+      ...(this.sourcesToArtifacts[sourcePath] || []),
+      ...(this.sourceOnlyArtifacts[sourcePath] || []),
+    ]
   }
 }
