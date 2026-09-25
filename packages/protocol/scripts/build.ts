@@ -4,18 +4,14 @@
 //   --solidity <outdir>   Runs `forge build` and writes truffle-style flat JSONs
 //                         ({contractName, abi, bytecode, deployedBytecode}) to
 //                         <outdir>/contracts/ (the 0.5 proxies) and <outdir>/contracts-0.8/ (0.8 build).
-//   --web3Types <outdir>  Reads the truffle-style JSONs (set BUILD_DIR to point
+//   --ethersTypes <outdir> Reads the truffle-style JSONs (set BUILD_DIR to point
 //                         at the same dir --solidity wrote to) and generates
-//                         web3 typings. REQUIRES --solidity to have run first.
-//   --ethersTypes <outdir> Same as --web3Types but for ethers-v5. REQUIRES
-//                         --solidity to have run first.
+//                         ethers-v5 typings. REQUIRES --solidity to have run first.
 
-import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs'
 import minimist, { ParsedArgs } from 'minimist'
 import path from 'path'
-import { tsGenerator } from 'ts-generator'
 import { SOLIDITY_05_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 import { contractPackages, CoreContracts, ImplContracts, Interfaces, ROOT_DIR } from './consts'
 
@@ -137,19 +133,15 @@ function getContractList(coreContractsOnly: boolean) {
 }
 
 // Truffle-style flat artifacts directory that `--solidity` writes to and that
-// `--web3Types` / `--ethersTypes` then read. Defaults to ./build (matching the
+// `--ethersTypes` then reads. Defaults to ./build (matching the
 // BUILD_DIR env convention used by package.json's build scripts).
 const BUILD_DIR = path.resolve(ROOT_DIR, process.env.BUILD_DIR ?? './build')
 
+// Matches the layout emitTruffleStyleArtifacts() writes: <BUILD_DIR>/<destDir>/<Name>.json.
 function truffleStyleGlobs(contractList: string[]): string[] {
-  return web3TypegenGlobs(contractList, BUILD_DIR)
-}
-
-// Matches the layout emitTruffleStyleArtifacts() writes: <root>/<destDir>/<Name>.json.
-function web3TypegenGlobs(contractList: string[], root: string): string[] {
   const alternation = contractList.join('|')
   return [SOLIDITY_05_PACKAGE.destDir, SOLIDITY_08_PACKAGE.destDir].map(
-    (dir) => `${root}/${dir}/@(${alternation}).json`
+    (dir) => `${BUILD_DIR}/${dir}/@(${alternation}).json`
   )
 }
 
@@ -179,71 +171,21 @@ function generateFilesForEthers({ coreContractsOnly, ethersTypes: outdir }: Buil
   exec(`yarn run --silent typechain --target=ethers-v5 --outDir "${outdir}" ${globs}`)
 }
 
-// web3's AbiType union has no "receive", so an artifact carrying one generates
-// typings that do not compile. There is nothing for the wrapper to expose either:
-// value is sent with a plain transaction, not by calling a method. The generator
-// therefore reads copies of the artifacts with those entries removed.
-function withoutReceiveEntries(sourceDir: string, targetDir: string) {
-  if (!existsSync(sourceDir)) return
-  mkdirSync(targetDir, { recursive: true })
-  for (const entry of readdirSync(sourceDir).filter((e) => e.endsWith('.json'))) {
-    const artifact = readJSON(path.join(sourceDir, entry))
-    const abi = Array.isArray(artifact.abi)
-      ? (artifact.abi as { type?: string }[]).filter((item) => item.type !== 'receive')
-      : artifact.abi
-    writeFileSync(path.join(targetDir, entry), JSON.stringify({ ...artifact, abi }, null, 2))
-  }
-}
-
-async function generateFilesForContractKit({ coreContractsOnly, web3Types: outdir }: BuildTargets) {
-  console.info(`protocol: Generating Web3 Types to ${outdir}`)
-  assertTruffleArtifactsExist()
-  exec(`rm -rf ${outdir}`)
-  const relativePath = path.relative(ROOT_DIR, outdir)
-
-  const web3ArtifactsDir = path.join(BUILD_DIR, 'web3-typegen-artifacts')
-  exec(`rm -rf ${web3ArtifactsDir}`)
-  for (const sub of [SOLIDITY_05_PACKAGE.destDir, SOLIDITY_08_PACKAGE.destDir]) {
-    withoutReceiveEntries(path.join(BUILD_DIR, sub), path.join(web3ArtifactsDir, sub))
-  }
-
-  const cwd = process.cwd()
-
-  for (const glob of web3TypegenGlobs(getContractList(coreContractsOnly), web3ArtifactsDir)) {
-    await tsGenerator(
-      { cwd, loggingLvl: 'info' },
-      new Web3V1Celo({
-        cwd,
-        rawConfig: {
-          files: glob,
-          outDir: relativePath,
-        },
-      })
-    )
-  }
-
-  exec(`yarn prettier --write "${outdir}/**/*.ts"`)
-}
-
 const _buildTargets: ParsedArgs = {
   _: [] as string[],
   solidity: undefined,
-  web3Types: undefined,
   ethersTypes: undefined,
 } as const
 type BuildTargets = Record<keyof typeof _buildTargets, string> & {
   coreContractsOnly: boolean
 }
 
-async function main(buildTargets: BuildTargets) {
+function main(buildTargets: BuildTargets) {
   if (buildTargets.solidity) {
     compile(buildTargets)
   }
   if (buildTargets.ethersTypes) {
     generateFilesForEthers(buildTargets)
-  }
-  if (buildTargets.web3Types) {
-    await generateFilesForContractKit(buildTargets)
   }
 }
 
@@ -252,7 +194,9 @@ const argv = minimist(process.argv.slice(2), {
   boolean: ['coreContractsOnly'],
 }) as unknown as BuildTargets
 
-main(argv).catch((err) => {
+try {
+  main(argv)
+} catch (err) {
   console.error(err)
   process.exit(1)
-})
+}

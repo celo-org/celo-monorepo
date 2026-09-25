@@ -1,4 +1,4 @@
-import { BuildArtifacts } from '@openzeppelin/upgrades'
+import { BuildArtifacts } from '@celo/protocol/lib/compatibility/build-artifacts'
 import { assert } from 'chai'
 import { readJsonSync } from 'fs-extra'
 import { Abi, AbiFunction, encodeFunctionData, GetProofReturnType } from 'viem'
