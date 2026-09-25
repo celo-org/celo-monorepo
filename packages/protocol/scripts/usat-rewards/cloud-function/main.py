@@ -6,10 +6,11 @@ Scheduled by Cloud Scheduler, this function performs one distribution round:
   2. Trigger a FRESH execution of the public Dune per-account rewards ledger
      (query 7506058) with distributor = the hot wallet. Dune computes
      owed = earned − USA₮ already sent on-chain by the hot wallet.
-  3. Reconcile against the paid ledger stored in GCS: subtract any payments
-     Dune has not indexed yet (max(0, local − dune) per wallet), then clear
-     the ledger's amounts — after a fetch the ledger only ever holds payments
-     made after it, so every payment is subtracted exactly once.
+  3. Reconcile against the paid ledger stored in GCS. The ledger is the
+     cumulative amount ever sent to each wallet; whatever exceeds Dune's
+     paid_out is not indexed yet and is subtracted from owed
+     (max(0, local − dune) per wallet). The ledger is never trimmed, so the
+     comparison stays exact across any number of back-to-back runs.
   4. Safety rails: per-wallet cap, per-run total cap, token + gas balance
      checks. Any violation aborts before a single transfer is sent.
   5. Send ERC-20 transfers sequentially, appending each confirmed payment to
@@ -242,12 +243,19 @@ def fetch_dune_rows(key: str, distributor: str, store) -> list[dict]:
 
 # -------------------------------------------------------------- reconcile
 def reconcile(dune_rows: list[dict], ledger: dict) -> tuple[dict[str, int], dict]:
-    """Same contract as fetch-recipients.py: Dune's owed minus the ledger
-    surplus Dune has not indexed yet; ledger amounts are then cleared so the
-    ledger only ever holds payments made after this fetch."""
-    local_paid = dict(
-        zip((w.lower() for w in ledger.get("recipients", [])), ledger.get("amounts", []))
-    )
+    """Dune's owed minus the payments Dune has not indexed yet.
+
+    The ledger holds the CUMULATIVE amount ever sent to each wallet, the same
+    quantity Dune reports as paid_out once indexed, so the unindexed part is
+    max(0, local − dune) and drops to 0 once Dune catches up. The ledger is
+    never reduced. An earlier version trimmed it to that surplus after each
+    fetch, which broke the comparison on the next run: for a wallet with an
+    old, indexed payment and a fresh, unindexed one, Dune's cumulative total
+    cancelled part of the fresh payment and the wallet was paid twice.
+    """
+    local_paid: dict[str, int] = {}
+    for wallet, amount in zip(ledger.get("recipients", []), ledger.get("amounts", [])):
+        local_paid[wallet.lower()] = local_paid.get(wallet.lower(), 0) + int(amount)
     dune_paid_by_wallet = {
         row["wallet"].lower(): round(float(row.get("paid_out_usat") or 0) * 1_000_000)
         for row in dune_rows
@@ -256,24 +264,16 @@ def reconcile(dune_rows: list[dict], ledger: dict) -> tuple[dict[str, int], dict
     for row in dune_rows:
         wallet = row["wallet"].lower()
         owed = round(float(row["owed_usat"]) * 1_000_000)
-        surplus = max(0, local_paid.get(wallet, 0) - dune_paid_by_wallet[wallet])
-        remaining = owed - surplus
+        unindexed = max(0, local_paid.get(wallet, 0) - dune_paid_by_wallet[wallet])
+        remaining = owed - unindexed
         if remaining > 0:
             owed_out[wallet] = remaining
-    # Keep only the surplus Dune has not indexed yet. A payment therefore stays
-    # protected for as many runs as it takes Dune to index it (not just one),
-    # and the ledger still shrinks to empty once Dune has caught up.
-    kept = {
-        w: a - dune_paid_by_wallet.get(w, 0)
-        for w, a in local_paid.items()
-        if a - dune_paid_by_wallet.get(w, 0) > 0
+    normalized = {
+        "recipients": sorted(local_paid),
+        "amounts": [local_paid[w] for w in sorted(local_paid)],
+        "recorded_tx_hashes": sorted(set(ledger.get("recorded_tx_hashes", []))),
     }
-    new_ledger = {
-        "recipients": sorted(kept),
-        "amounts": [kept[w] for w in sorted(kept)],
-        "recorded_tx_hashes": sorted(ledger.get("recorded_tx_hashes", [])),
-    }
-    return owed_out, new_ledger
+    return owed_out, normalized
 
 
 def ledger_add(ledger: dict, wallet: str, amount: int, tx_hash: str) -> dict:
