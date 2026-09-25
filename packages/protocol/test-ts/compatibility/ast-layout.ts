@@ -1,7 +1,9 @@
 import {
+  getLayout,
   reportLayoutIncompatibilities,
   ASTStorageCompatibilityReport,
 } from '@celo/protocol/lib/compatibility/ast-layout'
+import { getArtifactByName } from '@celo/protocol/lib/compatibility/internal'
 import { getTestArtifacts } from '@celo/protocol/test-ts/util/compatibility'
 import { assert } from 'chai'
 
@@ -86,6 +88,19 @@ const assertContractErrorsMatch = (
     assert.match(error, expectedMatches[i])
   })
 }
+
+describe('#getLayout()', () => {
+  // The layout is assembled base by base; each variable must appear once, in
+  // linearization order.
+  it('lists every inherited variable once, most basic contract first', () => {
+    const [artifacts] = testCases.appended_in_parent
+    const layout = getLayout(getArtifactByName('TestContract', artifacts), artifacts)
+    const variables = layout.storage.map((variable) => `${variable.contract}.${variable.label}`)
+    assert.equal(new Set(variables).size, variables.length)
+    const contracts = layout.storage.map((variable) => variable.contract)
+    assert.deepEqual([...new Set(contracts)], ['Ownable', 'TestParent', 'TestContract'])
+  })
+})
 
 describe('#reportLayoutIncompatibilities()', () => {
   describe('when the contracts are the same', () => {
