@@ -11,6 +11,12 @@ library SecondInFile {
 }
 
 contract TestContract {
+  constructor() public {}
+
+  function isConstructor() public pure returns (bool) {
+    return false;
+  }
+
   struct Thing {
     uint128 a;
     uint128 b;

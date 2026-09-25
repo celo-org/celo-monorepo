@@ -12,6 +12,15 @@ export const contractNameFromArtifactPath = (artifactPath: string): string =>
   path.basename(artifactPath, '.json').replace(/\.\d+\.\d+\.\d+$/, '')
 
 /**
+ * The compiler version Foundry puts in an artifact's file name when it compiled the source
+ * with several compilers (`<Name>.<solc version>.json`), undefined when it used only one.
+ */
+export const compilerVersionFromArtifactPath = (artifactPath: string): string | undefined => {
+  const match = /\.(\d+\.\d+\.\d+)$/.exec(path.basename(artifactPath, '.json'))
+  return match ? match[1] : undefined
+}
+
+/**
  * The compiler artifacts of one build, indexed by the source file that produced them.
  *
  * Same contract as the BuildArtifacts class of the retired @openzeppelin/upgrades SDK,
@@ -27,6 +36,9 @@ export class BuildArtifacts {
   constructor(artifactsPaths: string[], sourceOnlyPaths: string[] = []) {
     sourceOnlyPaths.forEach((artifactPath) => {
       const artifact = readJsonSync(artifactPath)
+      // Source-only artifacts carry no metadata; the file name is all that tells which
+      // compiler run produced them.
+      artifact.sourceOnlyCompilerVersion = compilerVersionFromArtifactPath(artifactPath)
       const sourcePath = artifact.ast.absolutePath
       if (!this.sourceOnlyArtifacts[sourcePath]) {
         this.sourceOnlyArtifacts[sourcePath] = []

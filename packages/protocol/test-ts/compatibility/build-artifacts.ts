@@ -1,4 +1,7 @@
-import { contractNameFromArtifactPath } from '@celo/protocol/lib/compatibility/build-artifacts'
+import {
+  compilerVersionFromArtifactPath,
+  contractNameFromArtifactPath,
+} from '@celo/protocol/lib/compatibility/build-artifacts'
 import { Artifact, getContractName } from '@celo/protocol/lib/compatibility/internal'
 import { getTestArtifacts } from '@celo/protocol/test-ts/util/compatibility'
 import { assert } from 'chai'
@@ -43,5 +46,15 @@ describe('contractNameFromArtifactPath()', () => {
       contractNameFromArtifactPath('out/Initializable.sol/Initializable.0.8.19.json'),
       'Initializable'
     )
+  })
+})
+
+describe('compilerVersionFromArtifactPath()', () => {
+  it('reads the compiler of a source compiled by several compilers', () => {
+    assert.equal(compilerVersionFromArtifactPath('out/Types.sol/Types.0.8.19.json'), '0.8.19')
+  })
+
+  it('is undefined when a single compiler built the source', () => {
+    assert.isUndefined(compilerVersionFromArtifactPath('out/Types.sol/Types.json'))
   })
 })

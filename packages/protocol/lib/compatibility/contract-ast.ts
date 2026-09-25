@@ -3,11 +3,25 @@ import { getContractName } from '@celo/protocol/lib/compatibility/internal'
 import type { ContractDefinition, FunctionDefinition, SourceUnit } from 'solidity-ast'
 import { ASTDereferencer, astDereferencer } from 'solidity-ast/utils'
 
-// The exact compiler an artifact was built with. Foundry runs solc once per version, so
-// this identifies the run; a build set groups every patch version of one language
-// generation, and ids from different runs can collide.
+// The exact compiler version an artifact was built with. Foundry runs solc once per
+// version, so this identifies the run; a build set groups every patch version of one
+// language generation, and ids from different runs can collide.
 const compilerRun = (artifact: any): string =>
-  artifact.metadata && artifact.metadata.compiler ? artifact.metadata.compiler.version : ''
+  artifact.metadata && artifact.metadata.compiler
+    ? artifact.metadata.compiler.version.split('+')[0]
+    : ''
+
+// Whether an artifact comes from the given compiler run. An artifact of a source declaring
+// no contract records no compiler; Foundry names it after the compiler only when several
+// compiled that source, and a single untagged copy can only be that one run's.
+const isFromRun = (artifact: any, run: string): boolean => {
+  if (artifact.metadata && artifact.metadata.compiler) {
+    return compilerRun(artifact) === run
+  }
+  return (
+    artifact.sourceOnlyCompilerVersion === undefined || artifact.sourceOnlyCompilerVersion === run
+  )
+}
 
 /**
  * Collects the AST of the artifact's source file and of everything it imports,
@@ -32,8 +46,7 @@ const collectImportClosure = (
       }
       const imported = artifacts
         .getArtifactsFromSourcePath(node.absolutePath)
-        // A source-only artifact records no compiler; the source unit id still has to match.
-        .filter((artifact) => compilerRun(artifact) === run || compilerRun(artifact) === '')
+        .filter((artifact) => isFromRun(artifact, run))
         .map((artifact) => artifact.ast as SourceUnit)
         .find((ast) => ast.id === node.sourceUnit)
       if (imported === undefined) {
@@ -109,9 +122,14 @@ export class ContractAST {
   getMethods(): any[] {
     return ([] as any[])
       .concat(...this.getLinearizedBaseContracts().map((contract) => contract.nodes))
+      // Constructors, fallback and receive functions are no methods; recent compilers mark
+      // them by kind, older ones leave them unnamed.
       .filter(
         (node: any) =>
-          node.nodeType === 'FunctionDefinition' && node.name !== '' && node.name !== 'isConstructor'
+          node.nodeType === 'FunctionDefinition' &&
+          node.name !== '' &&
+          !node.isConstructor &&
+          (node.kind === undefined || node.kind === 'function')
       )
       .map((node: FunctionDefinition) => {
         const inputs = node.parameters.parameters.map(({ name, typeDescriptions }) => ({
