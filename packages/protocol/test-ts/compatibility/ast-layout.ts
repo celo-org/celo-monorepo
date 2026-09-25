@@ -291,7 +291,7 @@ describe('#reportLayoutIncompatibilities()', () => {
   describe('when a field is inserted at the front of a struct in mapping', () => {
     it('reports a struct change', () => {
       const report = reportLayoutIncompatibilities(
-        testCases.original_struct_in_mapping,
+        testCases.original_two_structs_in_mapping,
         testCases.inserted_front_in_struct_mapping
       )
       assertNotCompatible(report)
@@ -302,7 +302,7 @@ describe('#reportLayoutIncompatibilities()', () => {
   describe('when a field is inserted in the middle of a struct in mapping', () => {
     it('reports a struct change', () => {
       const report = reportLayoutIncompatibilities(
-        testCases.original_struct_in_mapping,
+        testCases.original_two_structs_in_mapping,
         testCases.inserted_middle_in_struct_mapping
       )
       assertNotCompatible(report)

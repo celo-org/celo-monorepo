@@ -1,8 +1,6 @@
 pragma solidity ^0.5.13;
 
-import "./TestParent.sol";
-
-contract TestContract is TestParent {
+contract TestContract {
   enum Kind {
     A,
     B

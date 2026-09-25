@@ -1,7 +1,5 @@
 pragma solidity ^0.5.13;
 
-import "./TestParent.sol";
-
 interface IFirstInFile {
   function first() external;
 }
@@ -12,7 +10,7 @@ library SecondInFile {
   }
 }
 
-contract TestContract is TestParent {
+contract TestContract {
   struct Thing {
     uint128 a;
     uint128 b;
