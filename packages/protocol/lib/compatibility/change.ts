@@ -186,8 +186,8 @@ export class LibraryLinkingChange extends ContractChange {
 }
 
 /**
- * A struct the contract keeps only in mappings or dynamic arrays gained members at its
- * end. Every entry has its own slot range, so the existing fields stay where they were.
+ * A struct the contract keeps only as mapping values gained members at its end. Every
+ * value has its own hashed slot range, so the existing fields stay where they were.
  */
 export class StructExpandedChange extends ContractChange {
   type = 'StructExpanded'

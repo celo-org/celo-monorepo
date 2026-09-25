@@ -45,8 +45,8 @@ export class DefaultCategorizer implements Categorizer {
   onContractKind = (_change: ContractKindChange): ChangeType => ChangeType.Major
 
   onMethodAdded = (_change: MethodAddedChange): ChangeType => ChangeType.Minor
-  // Members appended to a struct held only in mappings or dynamic arrays; existing data
-  // keeps its slots, the storage only gains new ones.
+  // Members appended to a struct held only as mapping values; existing data keeps its
+  // slots, the storage only gains new ones.
   onStructExpanded = (_change: StructExpandedChange): ChangeType => ChangeType.Minor
   // Changing between public and external visibility has no impact.
   onMethodVisibility = (_change: MethodVisibilityChange): ChangeType => ChangeType.Patch

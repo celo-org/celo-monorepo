@@ -36,6 +36,11 @@ const testCases = {
   inserted_in_library_struct_mapping: getTestArtifacts('inserted_in_library_struct_mapping'),
   inserted_front_in_struct_mapping: getTestArtifacts('inserted_front_in_struct_mapping'),
   original_two_structs_in_mapping: getTestArtifacts('original_two_structs_in_mapping'),
+  original_struct_uses: getTestArtifacts('original_struct_uses'),
+  appended_to_struct_in_array: getTestArtifacts('appended_to_struct_in_array'),
+  appended_to_nested_struct: getTestArtifacts('appended_to_nested_struct'),
+  reordered_enum_in_struct_mapping: getTestArtifacts('reordered_enum_in_struct_mapping'),
+  appended_enum_in_struct_mapping: getTestArtifacts('appended_enum_in_struct_mapping'),
   appended_to_first_of_two_structs_in_mapping: getTestArtifacts(
     'appended_to_first_of_two_structs_in_mapping'
   ),
@@ -165,6 +170,51 @@ describe('#reportLayoutIncompatibilities()', () => {
       )
       assertCompatible(report)
       assert.isTrue(selectReportFor(report, 'TestContract').expanded)
+    })
+  })
+
+  // Array elements and struct members are laid out one after the other, so a longer struct
+  // shifts everything stored after the first one.
+  describe('when a field is appended to a struct stored in an array', () => {
+    it('reports a struct change', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_struct_uses,
+        testCases.appended_to_struct_in_array
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
+    })
+  })
+
+  describe('when a field is appended to a struct nested in a struct in mapping', () => {
+    it('reports a struct change', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_struct_uses,
+        testCases.appended_to_nested_struct
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
+    })
+  })
+
+  describe('when an enum used by a struct in mapping is reordered', () => {
+    it('reports a changed member type', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_struct_uses,
+        testCases.reordered_enum_in_struct_mapping
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/member kind changed type/])
+    })
+  })
+
+  describe('when an enum used by a struct in mapping gains a member at its end', () => {
+    it('reports no incompatibilities', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_struct_uses,
+        testCases.appended_enum_in_struct_mapping
+      )
+      assertCompatible(report)
     })
   })
 

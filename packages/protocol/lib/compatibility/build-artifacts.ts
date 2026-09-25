@@ -1,3 +1,4 @@
+import { getContractName } from '@celo/protocol/lib/compatibility/internal'
 import { readJsonSync } from 'fs-extra'
 
 /**
@@ -30,8 +31,10 @@ export class BuildArtifacts {
     return ([] as any[]).concat(...Object.values(this.sourcesToArtifacts))
   }
 
+  // Foundry artifacts carry no contractName; the name comes from the AST as everywhere
+  // else in the compatibility tooling.
   getArtifactByName(name: string): any {
-    return this.listArtifacts().find((artifact) => artifact.contractName === name)
+    return this.listArtifacts().find((artifact) => getContractName(artifact) === name)
   }
 
   getArtifactsFromSourcePath(sourcePath: string): any[] {

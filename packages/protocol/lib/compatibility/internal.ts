@@ -1,5 +1,5 @@
 import { existsSync } from 'fs'
-import { BuildArtifacts } from '@celo/protocol/lib/compatibility/build-artifacts'
+import type { BuildArtifacts } from '@celo/protocol/lib/compatibility/build-artifacts'
 import { artifactSourcePath } from '@celo/protocol/lib/compatibility/utils'
 
 // Foundry build artifacts do not have a `.contractName` field, so we get it from the
