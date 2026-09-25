@@ -44,6 +44,13 @@ const testCases = {
   reordered_enum_in_struct_mapping: getTestArtifacts('reordered_enum_in_struct_mapping'),
   appended_enum_in_struct_mapping: getTestArtifacts('appended_enum_in_struct_mapping'),
   substituted_struct_in_mapping: getTestArtifacts('substituted_struct_in_mapping'),
+  original_function_in_struct_mapping: getTestArtifacts('original_function_in_struct_mapping'),
+  changed_function_visibility_in_struct_mapping: getTestArtifacts(
+    'changed_function_visibility_in_struct_mapping'
+  ),
+  changed_function_signature_in_struct_mapping: getTestArtifacts(
+    'changed_function_signature_in_struct_mapping'
+  ),
   appended_to_first_of_two_structs_in_mapping: getTestArtifacts(
     'appended_to_first_of_two_structs_in_mapping'
   ),
@@ -221,6 +228,29 @@ describe('#reportLayoutIncompatibilities()', () => {
       )
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/member kind changed type/])
+    })
+  })
+
+  // An external function pointer stores an address and a selector, an internal one only a
+  // code offset, so the two are not interchangeable in storage.
+  describe('when a function pointer in a struct in mapping changes visibility', () => {
+    it('reports a changed member type', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_function_in_struct_mapping,
+        testCases.changed_function_visibility_in_struct_mapping
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/member hook changed type/])
+    })
+  })
+
+  describe('when a function pointer in a struct in mapping only changes signature', () => {
+    it('reports no incompatibilities', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_function_in_struct_mapping,
+        testCases.changed_function_signature_in_struct_mapping
+      )
+      assertCompatible(report)
     })
   })
 

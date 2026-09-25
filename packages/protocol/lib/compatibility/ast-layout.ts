@@ -154,8 +154,8 @@ const declaredName = (label: string) => label.replace(/^(struct|enum) /, '')
 
 /**
  * A type identifier without the AST ids solc embeds in it, so that the same type compares
- * equal across two builds. Contract types count as addresses and function types as one
- * type, since neither changes the storage they take. Enums carry their members and user
+ * equal across two builds. Contract types count as addresses, and function types keep only
+ * whether they are internal or external, since nothing else changes the storage they take. Enums carry their members and user
  * defined value types their underlying type, since changing either changes what the
  * stored values mean.
  */
@@ -181,7 +181,11 @@ export const canonicalType = (id: string, types: StorageLayout['types']): string
       return `t_array:${length}<${canonicalType(args[0], types)}>`
     }
     default:
-      return head.startsWith('t_function') ? 't_function' : id.replace(/_storage(_ptr)?$/, '')
+      // Internal and external function pointers take different storage, so only the
+      // visibility is kept; signature and mutability do not change the stored value.
+      return head.startsWith('t_function_')
+        ? `t_function_${head.split('_')[2]}`
+        : id.replace(/_storage(_ptr)?$/, '')
   }
 }
 
