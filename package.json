@@ -34,7 +34,7 @@
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.3",
     "@types/jest": "^29.1.1",
-    "@types/node": "18.7.16",
+    "@types/node": "24.19.0",
     "@types/prompt": "1.1.1",
     "@types/semver": "7.5.8",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
