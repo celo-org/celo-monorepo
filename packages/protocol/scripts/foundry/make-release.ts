@@ -7,7 +7,7 @@ import { isAllowedLegacyLibrary } from '@celo/protocol/lib/compatibility/verify-
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { ForgeArtifact } from '@celo/protocol/scripts/foundry/ForgeArtifact'
-import { NULL_ADDRESS, eqAddress } from '@celo/utils/lib/address'
+import { NULL_ADDRESS, eqAddress } from '@celo/base/lib/address'
 import { lookupRegistryAddress } from '@celo/protocol/lib/registry-lookup'
 import { exec } from 'child_process'
 import { existsSync, readJsonSync, readdirSync, writeJsonSync } from 'fs-extra'

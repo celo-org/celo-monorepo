@@ -45,9 +45,6 @@ try {
   // Generate all ABIs
   build(`--solidity ${path.join(ABIS_BUILD_DIR)}`)
 
-  // Generate web3 typings
-  build(`--web3Types ${path.join(ABIS_BUILD_DIR, 'web3')}`)
-
   // Merge per-package subfolders at the root of the build dir
   log('Merging files at the root of the build dir')
   mergeFromFolder(

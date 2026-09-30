@@ -10,7 +10,7 @@ import {
 import { getArtifactByName, getContractName, getDeployedBytecode } from '@celo/protocol/lib/compatibility/internal'
 import { verifyProxyStorageProofFoundry } from '@celo/protocol/lib/proxy-utils'
 import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
-import { BuildArtifacts } from '@openzeppelin/upgrades'
+import { BuildArtifacts } from '@celo/protocol/lib/compatibility/build-artifacts'
 import { existsSync, readJsonSync } from 'fs-extra'
 import path from 'path'
 import { ignoredContractsV18, ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9'

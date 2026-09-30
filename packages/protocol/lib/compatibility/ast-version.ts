@@ -4,9 +4,9 @@ import { ContractVersion, ContractVersionChecker, ContractVersionCheckerIndex, C
 import { Chain as EJSChain, Common as EJSCommon, Hardfork as EJSHardfork } from "@ethereumjs/common";
 import { Address as EJSAddress } from "@ethereumjs/util";
 import { VM } from "@ethereumjs/vm";
-import { BuildArtifacts } from '@openzeppelin/upgrades';
+import { BuildArtifacts } from '@celo/protocol/lib/compatibility/build-artifacts'
+import { toFunctionSelector } from 'viem'
 import { isLibrary } from './report';
-const abi = require('ethereumjs-abi')
 
 /**
  * A mapping {contract name => {@link ContractVersion}}.
@@ -49,7 +49,7 @@ export async function getContractVersion(artifact: Artifact, newLinking: boolean
   const vm = await VM.create({ common: versionCheckCommon });
   // @ts-ignore
   const bytecode = artifact.deployedBytecode.object || artifact.deployedBytecode
-  const data = '0x' + abi.methodID('getVersionNumber', []).toString('hex')
+  const data = toFunctionSelector('getVersionNumber()')
   const nullAddress = '0000000000000000000000000000000000000000'
   const compilerLinkRegex = newLinking ? /__\$[a-f0-9]{34}\$__/g : /__[A-Za-z0-9_]{36}__/g
   const linkedBytecode = bytecode.split(compilerLinkRegex).join(nullAddress)

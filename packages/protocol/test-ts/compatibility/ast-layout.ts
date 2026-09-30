@@ -1,7 +1,9 @@
 import {
+  getLayout,
   reportLayoutIncompatibilities,
   ASTStorageCompatibilityReport,
 } from '@celo/protocol/lib/compatibility/ast-layout'
+import { getArtifactByName } from '@celo/protocol/lib/compatibility/internal'
 import { getTestArtifacts } from '@celo/protocol/test-ts/util/compatibility'
 import { assert } from 'chai'
 
@@ -34,6 +36,27 @@ const testCases = {
   original_struct_in_mapping: getTestArtifacts('original_struct_in_mapping'),
   inserted_in_struct_mapping: getTestArtifacts('inserted_in_struct_mapping'),
   inserted_in_library_struct_mapping: getTestArtifacts('inserted_in_library_struct_mapping'),
+  inserted_front_in_struct_mapping: getTestArtifacts('inserted_front_in_struct_mapping'),
+  original_two_structs_in_mapping: getTestArtifacts('original_two_structs_in_mapping'),
+  original_struct_uses: getTestArtifacts('original_struct_uses'),
+  appended_to_struct_in_array: getTestArtifacts('appended_to_struct_in_array'),
+  appended_to_nested_struct: getTestArtifacts('appended_to_nested_struct'),
+  reordered_enum_in_struct_mapping: getTestArtifacts('reordered_enum_in_struct_mapping'),
+  appended_enum_in_struct_mapping: getTestArtifacts('appended_enum_in_struct_mapping'),
+  substituted_struct_in_mapping: getTestArtifacts('substituted_struct_in_mapping'),
+  original_file_level_struct: getTestArtifacts('original_file_level_struct'),
+  appended_to_file_level_struct: getTestArtifacts('appended_to_file_level_struct'),
+  original_function_in_struct_mapping: getTestArtifacts('original_function_in_struct_mapping'),
+  changed_function_visibility_in_struct_mapping: getTestArtifacts(
+    'changed_function_visibility_in_struct_mapping'
+  ),
+  changed_function_signature_in_struct_mapping: getTestArtifacts(
+    'changed_function_signature_in_struct_mapping'
+  ),
+  appended_to_first_of_two_structs_in_mapping: getTestArtifacts(
+    'appended_to_first_of_two_structs_in_mapping'
+  ),
+  inserted_middle_in_struct_mapping: getTestArtifacts('inserted_middle_in_struct_mapping'),
   deprecated_prefixed_in_library_struct_mapping: getTestArtifacts(
     'deprecated_prefixed_in_library_struct_mapping'
   ),
@@ -74,6 +97,19 @@ const assertContractErrorsMatch = (
     assert.match(error, expectedMatches[i])
   })
 }
+
+describe('#getLayout()', () => {
+  // The layout is assembled base by base; each variable must appear once, in
+  // linearization order.
+  it('lists every inherited variable once, most basic contract first', () => {
+    const [artifacts] = testCases.appended_in_parent
+    const layout = getLayout(getArtifactByName('TestContract', artifacts), artifacts)
+    const variables = layout.storage.map((variable) => `${variable.contract}.${variable.label}`)
+    assert.equal(new Set(variables).size, variables.length)
+    const contracts = layout.storage.map((variable) => variable.contract)
+    assert.deepEqual([...new Set(contracts)], ['Ownable', 'TestParent', 'TestContract'])
+  })
+})
 
 describe('#reportLayoutIncompatibilities()', () => {
   describe('when the contracts are the same', () => {
@@ -158,6 +194,134 @@ describe('#reportLayoutIncompatibilities()', () => {
         testCases.inserted_in_struct_mapping
       )
       assertCompatible(report)
+      assert.isTrue(selectReportFor(report, 'TestContract').expanded)
+    })
+  })
+
+  // Array elements and struct members are laid out one after the other, so a longer struct
+  // shifts everything stored after the first one.
+  describe('when a field is appended to a struct stored in an array', () => {
+    it('reports a struct change', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_struct_uses,
+        testCases.appended_to_struct_in_array
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
+    })
+  })
+
+  describe('when a field is appended to a struct nested in a struct in mapping', () => {
+    it('reports a struct change', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_struct_uses,
+        testCases.appended_to_nested_struct
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
+    })
+  })
+
+  describe('when an enum used by a struct in mapping is reordered', () => {
+    it('reports a changed member type', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_struct_uses,
+        testCases.reordered_enum_in_struct_mapping
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/member kind changed type/])
+    })
+  })
+
+  // An external function pointer stores an address and a selector, an internal one only a
+  // code offset, so the two are not interchangeable in storage.
+  describe('when a function pointer in a struct in mapping changes visibility', () => {
+    it('reports a changed member type', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_function_in_struct_mapping,
+        testCases.changed_function_visibility_in_struct_mapping
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/member hook changed type/])
+    })
+  })
+
+  describe('when a function pointer in a struct in mapping only changes signature', () => {
+    it('reports no incompatibilities', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_function_in_struct_mapping,
+        testCases.changed_function_signature_in_struct_mapping
+      )
+      assertCompatible(report)
+    })
+  })
+
+  // A file declaring only types still gets an artifact carrying its AST, which is what
+  // resolves a struct declared at file level.
+  describe('when a file-level struct held in a mapping gains a member at its end', () => {
+    it('records the expansion', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_file_level_struct,
+        testCases.appended_to_file_level_struct
+      )
+      assertCompatible(report)
+      assert.isTrue(selectReportFor(report, 'TestContract').expanded)
+    })
+  })
+
+  describe('when a mapping switches to a different struct type', () => {
+    it('reports a typechanged variable', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_struct_uses,
+        testCases.substituted_struct_in_mapping
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/had type/])
+    })
+  })
+
+  describe('when an enum used by a struct in mapping gains a member at its end', () => {
+    it('reports no incompatibilities', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_struct_uses,
+        testCases.appended_enum_in_struct_mapping
+      )
+      assertCompatible(report)
+    })
+  })
+
+  describe('when only one of several structs in mappings grows', () => {
+    it('records the expansion whichever struct is compared last', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_two_structs_in_mapping,
+        testCases.appended_to_first_of_two_structs_in_mapping
+      )
+      assertCompatible(report)
+      assert.isTrue(selectReportFor(report, 'TestContract').expanded)
+    })
+  })
+
+  // Appending is only safe at the end: a field inserted before existing ones shifts them
+  // within every entry already stored in the mapping.
+  describe('when a field is inserted at the front of a struct in mapping', () => {
+    it('reports a struct change', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_two_structs_in_mapping,
+        testCases.inserted_front_in_struct_mapping
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
+    })
+  })
+
+  describe('when a field is inserted in the middle of a struct in mapping', () => {
+    it('reports a struct change', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_two_structs_in_mapping,
+        testCases.inserted_middle_in_struct_mapping
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
     })
   })
 
@@ -308,11 +472,7 @@ describe('#reportLayoutIncompatibilities()', () => {
     })
   })
 
-  // TODO(m-chrzan): @openzeppelin/upgrades erases information about mapping key
-  // types before generating a layout diff. We might want to patch this behavior
-  // so that this sort of type change is identified as a backwards
-  // incompatibility.
-  describe.skip('when the source of a mapping changes', () => {
+  describe('when the source of a mapping changes', () => {
     it('reports a typechanged variable', () => {
       const report = reportLayoutIncompatibilities(
         testCases.original_complex,
@@ -323,7 +483,7 @@ describe('#reportLayoutIncompatibilities()', () => {
     })
   })
 
-  describe.skip('when the source of a nested mapping changes', () => {
+  describe('when the source of a nested mapping changes', () => {
     it('reports a typechanged variable', () => {
       const report = reportLayoutIncompatibilities(
         testCases.original_complex,

@@ -1,8 +1,6 @@
 import { existsSync } from 'fs'
+import type { BuildArtifacts } from '@celo/protocol/lib/compatibility/build-artifacts'
 import { artifactSourcePath } from '@celo/protocol/lib/compatibility/utils'
-import { BuildArtifacts, Contract as ZContract } from '@openzeppelin/upgrades'
-const Web3 = require('web3')
-const web3 = new Web3(null)
 
 // Foundry build artifacts do not have a `.contractName` field, so we get it from the
 // `ContractDefinition` expression in the AST.
@@ -67,33 +65,9 @@ export const getSourceFile = (artifact: Artifact): string => {
   }
 }
 
-// getStorageLayout needs an oz-sdk Contract class instance. This class is a
-// subclass of Contract from web3-eth-contract, with an added .schema member and
-// several methods.
-//
-// Couldn't find an easy way of getting one just from contract artifacts. But
-// for getStorageLayout we really only need .schema.ast and .schema.contractName.
-export function makeZContract(artifact: Artifact): ZContract {
-  const web3Contract = new web3.eth.Contract(artifact.abi)
-  // @ts-ignore
-  const contract = web3Contract as Contract
-  // @ts-ignore
-  contract.schema = {}
-  contract.schema.ast = artifact.ast
-  contract.contractName = getContractName(artifact)
-  contract.schema.contractName = contract.contractName
-  if (typeof artifact.deployedBytecode === "string") {
-    contract.schema.deployedBytecode = artifact.deployedBytecode
-  } else {
-    contract.schema.deployedBytecode = artifact.deployedBytecode.object
-    contract.schema.deployedLinkReferences = artifact.deployedBytecode.linkReferences
-  }
-  return contract
-}
-
-// The schema is a plain object (see makeZContract); the field is ours, not oz-sdk's.
-export const getDeployedLinkReferences = (contract: ZContract): LinkReferences | undefined =>
-  (contract.schema as any).deployedLinkReferences
+// The link references of an artifact's deployed bytecode, if it links any library.
+export const getDeployedLinkReferences = (artifact: Artifact): LinkReferences | undefined =>
+  typeof artifact.deployedBytecode === "string" ? undefined : artifact.deployedBytecode.linkReferences
 
 /**
  * Replaces every unlinked-library placeholder in a bytecode with a token derived from
@@ -136,7 +110,7 @@ export interface LinkReferences {
   [sourcePath: string]: LibraryLinkReference
 }
 
-// Inlined from OpenZeppelin SDK since its not exported.
+// A contract's compiler artifact.
 export interface Artifact {
   abi: any[]
   ast: any
@@ -154,27 +128,6 @@ export interface Artifact {
   sourceMap: string
   sourcePath: string
   updatedAt: string
-}
-
-// Inlined from OpenZeppelin SDK since its not exported.
-export interface TypeInfo {
-  id: string;
-  kind: string;
-  label: string;
-  valueType?: string;
-  length?: number;
-  members?: StorageInfo[];
-  src?: any;
-}
-
-// Inlined from OpenZeppelin SDK since its not exported.
-export interface StorageInfo {
-  label: string;
-  astId: number;
-  type: any;
-  src: string;
-  path?: string;
-  contract?: string;
 }
 
 /**

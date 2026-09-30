@@ -6,7 +6,7 @@ import {
   ASTBackwardReport,
   instantiateArtifactsFromForge,
 } from '@celo/protocol/lib/compatibility/utils'
-import { BuildArtifacts } from '@openzeppelin/upgrades'
+import { BuildArtifacts } from '@celo/protocol/lib/compatibility/build-artifacts'
 import { writeJsonSync } from 'fs-extra'
 import path from 'path'
 import tmp from 'tmp'
