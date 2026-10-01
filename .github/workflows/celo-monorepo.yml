@@ -1,10 +1,10 @@
 name: Build & Integration Tests
 run-name: 'Build & Integration Tests: ${{ github.head_ref || github.ref_name }}'
 
-# Dockerfile for the self-hosted runner:
-# https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo22.04-node18
-# The Node.js bundled in that image is not used: every job installs the version
-# pinned in .nvmrc through actions/setup-node.
+# The self-hosted jobs run on the org 8-cpu runner scale set, whose image is
+# https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-scaleset-generic
+# Node.js does not come from that image: every job installs the version pinned
+# in .nvmrc through actions/setup-node.
 
 on:
   push:
@@ -52,7 +52,7 @@ jobs:
       # Adding a initial comma so ',<path>' matches also for the first file
       all_modified_files: ',${{ steps.changed-files.outputs.all_modified_files }}'
       artifacts_to_cache: ${{ steps.get_artifacts_to_cache.outputs.artifacts_to_cache }}
-    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
+    runs-on: ['self-hosted', 'org', '8-cpu']
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -158,7 +158,7 @@ jobs:
 
   lint-checks:
     name: Lint code
-    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
+    runs-on: ['self-hosted', 'org', '8-cpu']
     timeout-minutes: 30
     needs: install-dependencies
     steps:
@@ -177,7 +177,7 @@ jobs:
 
   protocol-test-release:
     name: Protocol Test Release
-    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
+    runs-on: ['self-hosted', 'org', '8-cpu']
     timeout-minutes: 90
     needs: install-dependencies
     if: |
@@ -233,7 +233,7 @@ jobs:
   protocol-test-matrix:
     # Keeping name short because GitHub UI does not handle long names well
     name: ${{ matrix.name }}
-    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
+    runs-on: ['self-hosted', 'org', '8-cpu']
     timeout-minutes: 60
     needs: install-dependencies
     if: |
@@ -301,7 +301,7 @@ jobs:
   # NOTE: This has not been fully tested as we don't have a license for certora
   certora-test:
     name: Certora test ${{ matrix.name }}
-    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
+    runs-on: ['self-hosted', 'org', '8-cpu']
     timeout-minutes: 30
     needs: install-dependencies
     # Disable as certora license is not active
