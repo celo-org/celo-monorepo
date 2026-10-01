@@ -22,7 +22,7 @@ jobs:
       run:
         working-directory: packages/protocol
     name: Run tests
-    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
+    runs-on: ['self-hosted', 'org', '8-cpu']
     steps:
       - uses: actions/checkout@v4
         with:
