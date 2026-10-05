@@ -75,13 +75,15 @@ if gcloud scheduler jobs describe "$FUNCTION_NAME" --project "$PROJECT" --locati
     gcloud scheduler jobs update http "$FUNCTION_NAME" \
         --project "$PROJECT" --location "$REGION" \
         --schedule "$SCHEDULE" --uri "$FUNCTION_URL" \
-        --oidc-service-account-email "$SA_EMAIL"
+        --oidc-service-account-email "$SA_EMAIL" \
+        --max-retry-attempts 3 --min-backoff 60s --max-backoff 600s
 else
     gcloud scheduler jobs create http "$FUNCTION_NAME" \
         --project "$PROJECT" --location "$REGION" \
         --schedule "$SCHEDULE" --uri "$FUNCTION_URL" --http-method POST \
         --oidc-service-account-email "$SA_EMAIL" \
-        --attempt-deadline 1800s
+        --attempt-deadline 1800s \
+        --max-retry-attempts 3 --min-backoff 60s --max-backoff 600s
 fi
 
 echo

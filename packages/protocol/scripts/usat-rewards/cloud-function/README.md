@@ -37,6 +37,17 @@ response in the logs, then redeploy with `DRY_RUN=0`.
 - Failed/reverted transfer stops the run; everything confirmed is already in
   the ledger, so the next scheduled run pays only the remainder
 
+## Slow Dune executions
+
+Dune can keep an execution queued for longer than one invocation waits
+(`DUNE_POLL_SECONDS`). The run then answers HTTP 503 and leaves the execution
+id in `pending-execution.json`; Cloud Scheduler retries (the job is created
+with 3 retry attempts) and the retry resumes that execution instead of
+starting over. The marker is only honoured for `PENDING_MAX_AGE_SECONDS`
+(default 2h). An older one belongs to a previous day: it is a stale snapshot,
+computed with whatever query text was live back then, so it is discarded and
+a fresh execution is started.
+
 ## Emergency stop (kill switch)
 
 Redeploying or deleting the function does **not** stop a payout already in

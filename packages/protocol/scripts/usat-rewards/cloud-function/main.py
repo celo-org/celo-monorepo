@@ -36,6 +36,7 @@ Response: JSON summary {paid, skipped, total_usat, tx, dry_run, ...}.
 import json
 import os
 import time
+import urllib.error
 import urllib.request
 
 import functions_framework
@@ -55,6 +56,10 @@ ERC20_ABI = json.loads(
 LEDGER_OBJECT = "paid-ledger.json"
 LOCK_OBJECT = "run-lock.json"
 PENDING_OBJECT = "pending-execution.json"
+# A pending Dune execution is only resumed by retries of the run that started
+# it. Anything older is a previous day's snapshot, computed with whatever
+# query text was live back then, and must not drive a payout.
+PENDING_MAX_AGE_SECONDS_DEFAULT = 2 * 3600
 # Kill switch: while this object exists in the bucket no transfer is sent.
 # Create it to stop a running payout within one transfer; delete it to allow
 # runs again. Redeploying or deleting the function does NOT stop an in-flight
@@ -69,7 +74,7 @@ FEE_CURRENCY_GAS_LIMIT = 200_000  # ERC-20 transfer + the adapter's 85k intrinsi
 
 
 class DuneStillRunning(Exception):
-    """Dune execution outlived our poll budget; a later trigger resumes it."""
+    """Dune execution outlived our poll budget; a retry of this run resumes it."""
 
     def __init__(self, execution_id: str):
         super().__init__(execution_id)
@@ -206,12 +211,28 @@ def dune_api(path: str, key: str, body: dict | None = None) -> dict:
         return json.load(resp)
 
 
-def fetch_dune_rows(key: str, distributor: str, store) -> list[dict]:
-    # Reuse an execution a previous invocation left running: Dune executions
-    # survive our process, so a slow query converges across scheduled retries
-    # instead of restarting from zero each time.
+def resumable_execution_id(store) -> str | None:
+    """Execution an earlier attempt of this run left behind, if still fresh."""
     pending = store.get_json(PENDING_OBJECT)
-    execution_id = pending.get("execution_id") if pending else None
+    if pending is None:
+        return None
+    marker = pending if isinstance(pending, dict) else {}
+    execution_id, started_at = marker.get("execution_id"), marker.get("started_at")
+    max_age = int(os.environ.get("PENDING_MAX_AGE_SECONDS", PENDING_MAX_AGE_SECONDS_DEFAULT))
+    # A marker that cannot be dated, or is dated in the future, is never
+    # trusted: its age would not expire and it would be resumed forever.
+    if execution_id and isinstance(started_at, (int, float)) and 0 <= time.time() - started_at <= max_age:
+        return execution_id
+    print(json.dumps({"severity": "WARNING", "message": f"discarding stale Dune execution marker {execution_id}"}))
+    store.delete(PENDING_OBJECT)
+    return None
+
+
+def fetch_dune_rows(key: str, distributor: str, store) -> list[dict]:
+    # Reuse an execution an earlier attempt of this run left running: Dune
+    # executions survive our process, so a slow query converges across the
+    # scheduler's retries instead of restarting from zero each time.
+    execution_id = resumable_execution_id(store)
 
     if not execution_id:
         # No performance tier requested: Dune picks the largest tier the API
@@ -222,19 +243,26 @@ def fetch_dune_rows(key: str, distributor: str, store) -> list[dict]:
             {"query_parameters": {"distributor_address": distributor}},
         )
         execution_id = execution["execution_id"]
-        store.put_json(PENDING_OBJECT, {"execution_id": execution_id})
+        store.put_json(PENDING_OBJECT, {"execution_id": execution_id, "started_at": time.time()})
 
     poll_budget = int(os.environ.get("DUNE_POLL_SECONDS", "1200"))
     deadline = time.time() + poll_budget
     while True:
-        state = dune_api(f"/execution/{execution_id}/status", key)["state"]
+        try:
+            state = dune_api(f"/execution/{execution_id}/status", key)["state"]
+        except urllib.error.HTTPError as error:
+            if 400 <= error.code < 500 and error.code != 429:
+                # Dune rejects this id, and would reject it on every retry too:
+                # drop the marker so the next attempt starts a fresh execution.
+                store.delete(PENDING_OBJECT)
+            raise
         if state == "QUERY_STATE_COMPLETED":
             break
         if state in ("QUERY_STATE_FAILED", "QUERY_STATE_CANCELLED", "QUERY_STATE_EXPIRED"):
             store.delete(PENDING_OBJECT)
             raise RuntimeError(f"Dune execution {execution_id} ended in {state}")
         if time.time() > deadline:
-            # Leave the pending marker in place; the next trigger resumes it.
+            # Leave the pending marker in place; the scheduler's retry resumes it.
             raise DuneStillRunning(execution_id)
         time.sleep(5)
     store.delete(PENDING_OBJECT)
@@ -353,11 +381,13 @@ def distribute(request):
         except DuneStillRunning as pending:
             return (
                 {
-                    "result": "dune execution still running - next trigger resumes it",
+                    "result": "dune execution still running - retry resumes it",
                     "execution_id": pending.execution_id,
                     "dry_run": dry_run,
                 },
-                202,
+                # Not a 2xx: Cloud Scheduler only retries a failed attempt, and
+                # without a retry tonight's payout would be skipped.
+                503,
             )
         ledger = store.load_ledger()
         owed, ledger = reconcile(rows, ledger)
