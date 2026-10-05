@@ -7,9 +7,17 @@ faucet drip (the faucet enforces Self verification, 18+, and OFAC screening):
 | First faucet drip | P2P send to an EOA | Hold ≥10 consecutive days | Max |
 |---|---|---|---|
 | $5 | 2.00 | 3.00 (> $50) | 5.00 |
+| $2 | 0.80 | 1.20 (> $20) | 2.00 |
 | $1 | 0.40 | 0.60 (> $10) | 1.00 |
-| $0.50 (legacy) or SBT-only | 0.20 | 0.30 (> $5) | 0.50 |
+| $0.50 or SBT-only, first verified on/after 2026-10-05 00:00 UTC | 0.20 | 0.30 (≥ $5) | 0.50 |
+| $0.50 or SBT-only, first verified earlier | 0.20 | 0.30 (> $5) | 0.50 |
 | $0.05 | none (unspecified) | none | 0 |
+
+The faucet returned to $0.50 drips on 2026-10-05 with "hold $5+" as the hold
+rule, so exactly $5.00 qualifies for wallets first verified from that day on.
+Wallets verified earlier keep the strict "> $5" they were measured with: the
+tiers only ever grow by adding rows, never by editing one, so no wallet's
+historical reward can change.
 
 This tooling pays the P2P + hold portion only (max 5.00 USA₮ per wallet). All
 milestone activity is measured on USA₮ only. A wallet counts as verified when
