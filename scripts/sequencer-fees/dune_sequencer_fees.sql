@@ -124,8 +124,8 @@ l1_costs AS (
 eigenda_costs AS (
     -- One row per payment event, summed per day: joined unaggregated, a day
     -- with several payments (2025-09-10 has three) is returned once per
-    -- payment, each copy carrying the full revenue. The hosted query joins
-    -- query_6898371 and needs the same GROUP BY.
+    -- payment, each copy carrying the full revenue. The hosted query (6898547,
+    -- version 6, 2026-10-06) aggregates query_6898371 the same way.
     SELECT
         block_date AS day,
         SUM(bytearray_to_uint256(bytearray_substring(l.data, 23, 10))) / 1e18 AS EigenDA_cost_eth
