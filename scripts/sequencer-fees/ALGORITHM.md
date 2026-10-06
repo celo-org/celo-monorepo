@@ -36,12 +36,12 @@ produces the operator action plan.
   including one that straddles past withdrawals/distributes — yields the correct
   in-window amount. Funds that accrued before `A` are removed by the
   `−balance_at(A)` term. Adjacent windows compose additively.
-- **CGP-287 cutoff clamp (default).** Revenue on/before `2026-04-08` was already
-  settled by CGP-287. If the requested window starts before the cutoff, the
+- **CGP-234 cutoff clamp (default).** Revenue on/before `2026-04-08` was already
+  settled by CGP-234. If the requested window starts before the cutoff, the
   effective start is clamped to the day after it, and the output states the
   excluded pre-cutoff amount (CELO + each stablecoin). Set `INCLUDE_PRE_CUTOFF=1`
   to report the raw accrual instead — the output then shows the included
-  pre-cutoff amount and warns it double-counts what CGP-287 already paid.
+  pre-cutoff amount and warns it double-counts what CGP-234 already paid.
 
 ## Pricing Strategy
 
@@ -59,7 +59,7 @@ This is more accurate than converting period totals (non-linear with `max()`).
 
 ```
 revenue_celo  = CELO_fees + (stablecoin_fees_usd / celo_price)
-carbon        = revenue_celo × carbon_fraction          # read live (0% post-CGP-288)
+carbon        = revenue_celo × carbon_fraction          # read live (0% post-CGP-236)
 L1_costs_celo = (batcher + proposer + challenger + eigenDA gas in ETH) × eth_price / celo_price
 op_profit     = revenue_celo − L1_costs_celo
 OP_share      = max(2.5% × revenue_celo, 15% × op_profit)   # whichever is higher

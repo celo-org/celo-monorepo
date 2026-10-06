@@ -77,15 +77,19 @@ CELO_TOKEN_ADDR = "0x471EcE3750Da237f93B8E339c536989b8978a438"
 SAFE_ADDR = "0x7A1E98FC9a008107DbD1f430a05Ace8cf6f3FE19"
 L2_GENESIS_DATE = "2025-03-26"
 
-# CGP-287 (https://mondo.celo.org/governance/287) returned pre-cutoff revenue
+# Proposals are named by their CGP number (celo-org/governance): CGP-233 is
+# CELOccelerate (on-chain proposal 286), CGP-234 the return of pre-cutoff revenue
+# (proposal 287) and CGP-236 the carbon-fund pause (proposal 288).
+#
+# CGP-234 (https://mondo.celo.org/governance/cgp-234) returned pre-cutoff revenue
 # to Governance. Revenue on/before this date is EXCLUDED from this report.
-CGP_287_CUTOFF_DATE = "2026-04-08"
+CGP_234_CUTOFF_DATE = "2026-04-08"
 
-# CGP-287 already paid to Governance on 2026-04-01 (Safe -> Gov, tx
+# CGP-234 already paid to Governance on 2026-04-01 (Safe -> Gov, tx
 # 0xfbe1dac031726b6f580b561bfc2a80262b9529d09e4463fc3600cc74dce31a86).
 # The pre-cutoff revenue equivalent computed below is reduced by this amount;
 # the remainder is the surplus that gets routed to SURPLUS_RECIPIENT_DEFAULT.
-CGP_287_PAID_TO_GOV_CELO = 1748952
+CGP_234_PAID_TO_GOV_CELO = 1748952
 
 # Recipient defaults (overridable via env vars). Placeholders point to the
 # Operations Safe itself; real addresses TBD.
@@ -1169,11 +1173,11 @@ def main():
         print("Error: dates must be YYYY-MM-DD format", file=sys.stderr)
         sys.exit(1)
 
-    # CGP-287 settled all revenue on/before the cutoff. By default, ignore any
+    # CGP-234 settled all revenue on/before the cutoff. By default, ignore any
     # pre-cutoff portion: clamp the effective window start to the day after the
     # cutoff. This is shown visibly (not silently). Override with
     # INCLUDE_PRE_CUTOFF=1 to report the raw accrual including pre-cutoff.
-    cutoff_next = (dt.datetime.strptime(CGP_287_CUTOFF_DATE, "%Y-%m-%d") + dt.timedelta(days=1)).strftime("%Y-%m-%d")
+    cutoff_next = (dt.datetime.strptime(CGP_234_CUTOFF_DATE, "%Y-%m-%d") + dt.timedelta(days=1)).strftime("%Y-%m-%d")
     requested_from = args.date_from
     include_pre_cutoff = bool(os.environ.get("INCLUDE_PRE_CUTOFF"))
     spans_pre_cutoff = args.date_from < cutoff_next
@@ -1221,7 +1225,7 @@ def main():
 
     # ---- Distributable: per-token accrual (what actually reached the Safe) ----
     # Read the live Safe-beneficiary fraction of the FeeHandler (carbon goes
-    # elsewhere). Post-CGP-288 this is 100%.
+    # elsewhere). Post-CGP-236 this is 100%.
     try:
         carbon_raw = cast_cmd(["cast", "call", FEE_HANDLER, "getCarbonFraction()(uint256)", "--rpc-url", rpc])
         carbon_frac = int(carbon_raw.split()[0]) / 1e24 if carbon_raw else 0.0
@@ -1232,14 +1236,14 @@ def main():
     vlog("Computing per-token accruals (flow reconciliation)...")
     accr, block_A = compute_token_accruals(args.api_key, rpc, args.date_from, args.date_to, clabs_frac)
 
-    # If the REQUESTED window reached before the CGP-287 cutoff, quantify that
+    # If the REQUESTED window reached before the CGP-234 cutoff, quantify that
     # pre-cutoff portion separately so the output can say exactly how much was
     # excluded (default) or how much extra is included (INCLUDE_PRE_CUTOFF=1).
     pre_cutoff = None
     if spans_pre_cutoff:
         vlog("Computing pre-cutoff portion...")
         try:
-            pc_accr, _ = compute_token_accruals(args.api_key, rpc, requested_from, CGP_287_CUTOFF_DATE, clabs_frac)
+            pc_accr, _ = compute_token_accruals(args.api_key, rpc, requested_from, CGP_234_CUTOFF_DATE, clabs_frac)
             pre_cutoff = pc_accr
         except Exception:
             pre_cutoff = None
@@ -1308,16 +1312,16 @@ def main():
     if cutoff_clamped:
         req_from, req_to = cutoff_clamped
         print(f"  {YELLOW}NOTE:{RESET} requested {req_from} -> {req_to}, but revenue on/before the "
-              f"CGP-287 cutoff ({CGP_287_CUTOFF_DATE}) was already settled by CGP-287.")
+              f"CGP-234 cutoff ({CGP_234_CUTOFF_DATE}) was already settled by CGP-234.")
         print(f"  {DIM}Window clamped to {args.date_from}.{RESET}")
         if pre_cutoff is not None:
-            print(f"  {DIM}Pre-cutoff portion EXCLUDED ({requested_from} -> {CGP_287_CUTOFF_DATE}):{RESET} {_fmt_pre(pre_cutoff)}")
+            print(f"  {DIM}Pre-cutoff portion EXCLUDED ({requested_from} -> {CGP_234_CUTOFF_DATE}):{RESET} {_fmt_pre(pre_cutoff)}")
         print(f"  {DIM}Set INCLUDE_PRE_CUTOFF=1 to include it.{RESET}")
     elif include_pre_cutoff and spans_pre_cutoff:
         print(f"  {YELLOW}NOTE:{RESET} INCLUDE_PRE_CUTOFF=1 — pre-cutoff revenue is INCLUDED below.")
-        print(f"  {DIM}It would normally be EXCLUDED: CGP-287 already settled revenue on/before")
-        print(f"  the cutoff ({CGP_287_CUTOFF_DATE}), so including it double-counts that portion.{RESET}")
-        print(f"  {DIM}Pre-cutoff portion INCLUDED ({requested_from} -> {CGP_287_CUTOFF_DATE}):{RESET} {_fmt_pre(pre_cutoff)}")
+        print(f"  {DIM}It would normally be EXCLUDED: CGP-234 already settled revenue on/before")
+        print(f"  the cutoff ({CGP_234_CUTOFF_DATE}), so including it double-counts that portion.{RESET}")
+        print(f"  {DIM}Pre-cutoff portion INCLUDED ({requested_from} -> {CGP_234_CUTOFF_DATE}):{RESET} {_fmt_pre(pre_cutoff)}")
 
     # Distribution: steps [1]-[4] from the accrual basis
     check_operations_during_period(args.date_from, args.date_to, rpc, dist, args.api_key, args.detail)

@@ -1,6 +1,6 @@
 # Sequencer Fee Distribution Tooling
 
-Tooling to track and distribute Celo L2 sequencer fee revenue per [CGP-286
+Tooling to track and distribute Celo L2 sequencer fee revenue per [CGP-233
 (CELOccelerate)](https://forum.celo.org/t/celoccelerate-celo-tokenomics-proposal/13147).
 
 For the full computation, see **[ALGORITHM.md](./ALGORITHM.md)**.
@@ -109,7 +109,7 @@ cast send 0x4200000000000000000000000000000000000011 'withdraw()' \
 
 `handleAll()` distributes base-fee CELO per the live beneficiary fractions
 (0% Carbon Fund + 100% Operations Safe after
-[CGP-288](https://forum.celo.org/t/celoccelerate-celo-tokenomics-proposal-pausing-carbon-fund-payments/13218)).
+[CGP-236](https://forum.celo.org/t/celoccelerate-celo-tokenomics-proposal-pausing-carbon-fund-payments/13218)).
 FeeHandler stablecoins are released with a separate `distribute(token)` call each
 (the report prints the exact command per non-zero balance).
 
@@ -160,7 +160,7 @@ https://app.safe.global/transactions/queue?safe=celo:0x7A1E98FC9a008107DbD1f430a
 | ETH | Daily VWAP `prices.day` |
 
 ```
-Carbon  = revenue × carbon_fraction       (live from FeeHandler, 0% post-CGP-288)
+Carbon  = revenue × carbon_fraction       (live from FeeHandler, 0% post-CGP-236)
 L1      = (batcher + proposer + challenger + EigenDA gas in ETH) × eth_price / celo_price
 OP      = max(2.5% of revenue, 15% of profit)   (per-day)
 Profit  = revenue − Carbon − L1 − OP
@@ -176,7 +176,7 @@ Profit  = revenue − Carbon − L1 − OP
 | `--csv` / `--json` | Export |
 | `L1_COST_RECIPIENT` | L1 reimbursement address |
 | `OP_SHARE_RECIPIENT` | OP treasury (enables real WETH swap; default = Safe placeholder) |
-| `INCLUDE_PRE_CUTOFF` | `1` reports the raw accrual including pre-CGP-287 revenue (default clamps the window start to the cutoff and prints the excluded amount) |
+| `INCLUDE_PRE_CUTOFF` | `1` reports the raw accrual including pre-CGP-234 revenue (default clamps the window start to the cutoff and prints the excluded amount) |
 | `RPC_URL` | Celo RPC (default forno; archive node needed for very old window starts) |
 | `NO_COLOR` | Disable ANSI colors (also off when piped) |
 

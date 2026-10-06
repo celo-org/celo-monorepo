@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Prepare a Safe Transaction Builder batch for the one-time CGP-287 pre-cutoff
+Prepare a Safe Transaction Builder batch for the one-time CGP-234 pre-cutoff
 sweep.
 
 Pre-cutoff sequencer revenue (before 2026-04-08) was returned to Governance
-via CGP-287. This batch moves the equivalent CELO amount from the cold wallet
+via CGP-234. This batch moves the equivalent CELO amount from the cold wallet
 Safe to a recipient address provided by the operator.
 
 Usage:
@@ -39,7 +39,7 @@ def cast_calldata(sig: str, args: list) -> str:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate Safe batch for CGP-287 pre-cutoff sweep")
+    parser = argparse.ArgumentParser(description="Generate Safe batch for CGP-234 pre-cutoff sweep")
     parser.add_argument("--celo-amount", type=Decimal, required=True, help="CELO amount to sweep (human units, decimal string)")
     parser.add_argument("--recipient", required=True, help="Recipient address (TBD per operator)")
     parser.add_argument("--cold-wallet-safe", required=True, help="Cold wallet Safe address (createdFromSafeAddress)")
@@ -51,7 +51,7 @@ def main() -> None:
 
     amount_wei = int(args.celo_amount * Decimal(10) ** 18)
 
-    print(f"=== CGP-287 Pre-cutoff Sweep Batch ===", file=sys.stderr)
+    print(f"=== CGP-234 Pre-cutoff Sweep Batch ===", file=sys.stderr)
     print(f"  Cold wallet Safe: {args.cold_wallet_safe}", file=sys.stderr)
     print(f"  Recipient:        {args.recipient}", file=sys.stderr)
     print(f"  Amount:           {args.celo_amount:,.6f} CELO ({amount_wei} wei)", file=sys.stderr)
@@ -64,9 +64,9 @@ def main() -> None:
         "chainId": CHAIN_ID,
         "createdAt": 0,
         "meta": {
-            "name": "CGP-287 Pre-cutoff Sweep",
+            "name": "CGP-234 Pre-cutoff Sweep",
             "description": (
-                f"One-time sweep of pre-CGP-287 sequencer revenue equivalent. "
+                f"One-time sweep of pre-CGP-234 sequencer revenue equivalent. "
                 f"Transfers {args.celo_amount} CELO to {args.recipient}."
             ),
             "txBuilderVersion": "1.16.5",

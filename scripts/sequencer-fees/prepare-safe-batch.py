@@ -49,13 +49,13 @@ L1_COST_RECIPIENT_DEFAULT = "0x6b145ebf66602ec524b196426b46631259689583"
 OP_SHARE_RECIPIENT_DEFAULT = SAFE
 
 # Surplus recipient PLACEHOLDER (= Operations Safe).
-# Receives CGP-287 pre-cutoff residual (revenue equiv - CGP-287 already paid).
+# Receives CGP-234 pre-cutoff residual (revenue equiv - CGP-234 already paid).
 # Override via --surplus-recipient once real surplus wallet is known.
 SURPLUS_RECIPIENT_DEFAULT = SAFE
 
-# CGP-287 already paid to Governance on 2026-04-01 (Safe -> Gov, on-chain confirmed).
+# CGP-234 already paid to Governance on 2026-04-01 (Safe -> Gov, on-chain confirmed).
 # Used to compute pre-cutoff residual that gets routed to SURPLUS_RECIPIENT.
-CGP_287_PAID_TO_GOV_CELO = 1748952
+CGP_234_PAID_TO_GOV_CELO = 1748952
 
 # Canonical bridged WETH on Celo L2 (name: "Wrapped Ether (Celo native bridge)")
 WETH = "0xD221812de1BD094f35587EE8E174B07B6167D9Af"
@@ -128,7 +128,7 @@ def main():
     parser.add_argument("--op-share-celo", type=Decimal, default=Decimal(0), help="OP share size in CELO (human units)")
     parser.add_argument("--op-share-recipient", default=OP_SHARE_RECIPIENT_DEFAULT, help=f"OP recipient. If == Safe ({SAFE}) (placeholder), swap is SKIPPED and OP CELO retained in Safe.")
     parser.add_argument("--op-share-weth-min", type=Decimal, default=Decimal(0), help="Minimum WETH out from swap (slippage protection, human units). REQUIRED when swap is enabled (recipient != Safe).")
-    parser.add_argument("--surplus-celo", type=Decimal, default=Decimal(0), help="Pre-CGP-287 residual CELO (computed by report.py)")
+    parser.add_argument("--surplus-celo", type=Decimal, default=Decimal(0), help="Pre-CGP-234 residual CELO (computed by report.py)")
     parser.add_argument("--surplus-recipient", default=SURPLUS_RECIPIENT_DEFAULT, help=f"Surplus recipient (default placeholder = Safe: {SURPLUS_RECIPIENT_DEFAULT})")
     parser.add_argument("--reserve-celo", type=Decimal, default=Decimal(0), help="CELO to keep in Safe as buffer")
     parser.add_argument("--dry-run", action="store_true", help="Print plan without generating batch JSON")
@@ -252,7 +252,7 @@ def main():
         )
         transactions.append(safe_tx(SWAP_ROUTER, swap_data))
 
-    # Surplus (CGP-287 pre-cutoff residual): explicit transfer for audit trail.
+    # Surplus (CGP-234 pre-cutoff residual): explicit transfer for audit trail.
     # If recipient == Safe (placeholder), this is a Safe -> Safe self-transfer
     # that documents the residual carve-out without moving funds elsewhere.
     if surplus_wei > 0:

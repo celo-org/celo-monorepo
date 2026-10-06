@@ -122,13 +122,18 @@ l1_costs AS (
 -- 3. EIGENDA COSTS (from query_6898371)
 -- =============================================
 eigenda_costs AS (
+    -- One row per payment event, summed per day: joined unaggregated, a day
+    -- with several payments (2025-09-10 has three) is returned once per
+    -- payment, each copy carrying the full revenue. The hosted query joins
+    -- query_6898371 and needs the same GROUP BY.
     SELECT
         block_date AS day,
-        bytearray_to_uint256(bytearray_substring(l.data, 23, 10)) / 1e18 AS EigenDA_cost_eth
+        SUM(bytearray_to_uint256(bytearray_substring(l.data, 23, 10))) / 1e18 AS EigenDA_cost_eth
     FROM ethereum.logs l
     WHERE l.contract_address = 0xb2e7ef419a2A399472ae22ef5cFcCb8bE97A4B05
       AND l.topic0 = 0x6fbb447a2c09b8901d70b0d5b9fbce159ee8fda4460e5af2570cab3fe0adf268
       AND l.topic1 = 0x000000000000000000000000ecf08b0a4f196e06e9aece95d5dd724bc121f09c
+    GROUP BY block_date
 ),
 
 -- =============================================
