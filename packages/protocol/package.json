@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@celo/base": "^6.0.0",
-    "@ethereumjs/common": "3.1.1",
+    "@ethereumjs/common": "3.2.0",
     "@ethereumjs/util": "8.0.5",
     "@ethereumjs/vm": "npm:@celo/ethereumjs-vm@6.4.1-unofficial.0",
     "@openzeppelin/contracts8": "npm:@openzeppelin/contracts@^4.4.2",
