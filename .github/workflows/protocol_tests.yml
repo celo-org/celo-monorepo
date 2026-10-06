@@ -22,7 +22,7 @@ jobs:
       run:
         working-directory: packages/protocol
     name: Run tests
-    runs-on: ['self-hosted', 'org', 'ubuntu22-node18']
+    runs-on: ['self-hosted', 'org', '8-cpu']
     steps:
       - uses: actions/checkout@v4
         with:
@@ -222,7 +222,9 @@ jobs:
         run: chmod +x scripts/foundry/*.sh scripts/bash/*.sh
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          # This job only downloads an artifact and never checks out the repository,
+          # so it cannot read .nvmrc. Keep the two in sync.
+          node-version: '24'
       - name: Setup yarn
         run: npm install --global yarn
       - name: Install packages

@@ -1,4 +1,5 @@
-FROM node:18
+# bookworm is pinned: the apt-key based Cloud SDK install below is gone on trixie.
+FROM node:24-bookworm
 LABEL org.opencontainers.image.authors="devops@clabs.co"
 
 WORKDIR /celo-monorepo

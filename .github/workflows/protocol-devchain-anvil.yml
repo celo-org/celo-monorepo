@@ -31,7 +31,7 @@ jobs:
       run:
         working-directory: packages/protocol
     name: Generate anvil
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ['self-hosted', 'org', '8-cpu']
     environment:
       name: production
     permissions:
@@ -120,7 +120,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version-file: .nvmrc
 
       - name: 'Setup yarn'
         shell: bash
@@ -244,11 +244,13 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          # This job only downloads an artifact and never checks out the repository,
+          # so it cannot read .nvmrc. Keep the two in sync.
+          node-version: '24'
 
       - name: Update npm for OIDC trusted publishing
-        # npm 11 is the newest major that still supports the node 20 pinned above;
-        # npm@latest (12+) requires node >= 22 and makes this step fail.
+        # npm is pinned to a major so a release does not pick up whatever npm@latest
+        # happens to be that day; OIDC trusted publishing needs npm >= 11.5.
         run: npm install -g npm@11
 
       - name: Publish @celo/devchain-anvil
