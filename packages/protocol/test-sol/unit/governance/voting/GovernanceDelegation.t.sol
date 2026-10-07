@@ -48,6 +48,9 @@ interface IGovernanceDelegationTest {
   function getVoteTotals(uint256 proposalId) external view returns (uint256, uint256, uint256);
   function getDequeue() external view returns (uint256[] memory);
   function getAmountOfGoldUsedForVoting(address account) external view returns (uint256);
+  function getProposal(
+    uint256 proposalId
+  ) external view returns (address, uint256, uint256, uint256, string memory, uint256, bool);
 }
 
 contract GovernanceDelegationTest is TestWithUtils08 {
@@ -229,6 +232,131 @@ contract GovernanceDelegationTest is TestWithUtils08 {
 
     uint256 reported = governance.getAmountOfGoldUsedForVoting(delegator);
     assertEq(reported, LOCKED_AMOUNT, "delegator upvote should report locked gold weight");
+  }
+
+  // --- Delegation accounting: a delegator's recorded votes stay in step with its
+  // --- voting power when it unlocks.
+
+  // When a delegator unlocks the delegated slice after voting, its own recorded
+  // referendum votes are brought down to its reduced voting power, just like the
+  // delegatee's, so recorded votes never exceed the stake backing them.
+  function test_ShouldClampDelegatorOwnVotes_WhenUnlockingAfterVoting() public {
+    uint256 half = FixidityLib.newFixedFraction(1, 2).unwrap();
+    uint256 prop = _referendumProposal();
+    uint256 idx = _getDequeuedIndex(prop);
+
+    // delegator (1000 locked) delegates 50% to delegatee2 (no own lock).
+    vm.prank(delegator);
+    lockedGold.delegateGovernanceVotes(delegatee2, half);
+    assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegator), 500 ether);
+    assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegatee2), 500 ether);
+
+    vm.prank(delegator);
+    governance.votePartially(prop, idx, 500 ether, 0, 0);
+    vm.prank(delegatee2);
+    governance.votePartially(prop, idx, 500 ether, 0, 0);
+
+    (uint256 yesBefore, , ) = governance.getVoteTotals(prop);
+    assertEq(yesBefore, 1000 ether, "both sides voted");
+
+    // Unlock the whole delegated slice.
+    vm.prank(delegator);
+    lockedGold.unlock(500 ether);
+
+    // Delegator power halved, and its recorded vote is clamped to match.
+    assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegator), 250 ether, "power");
+    assertEq(governance.getAmountOfGoldUsedForVoting(delegator), 250 ether, "own vote clamped");
+    // Delegatee clamp (pre-existing behaviour) still applies.
+    assertEq(governance.getAmountOfGoldUsedForVoting(delegatee2), 250 ether, "delegatee clamped");
+
+    // The tally equals the voting power still backed by locked CELO.
+    (uint256 yesAfter, , ) = governance.getVoteTotals(prop);
+    assertEq(yesAfter, 500 ether, "tally matches backed voting power");
+    assertEq(
+      yesAfter,
+      lockedGold.getAccountTotalGovernanceVotingPower(delegator) +
+        lockedGold.getAccountTotalGovernanceVotingPower(delegatee2),
+      "tally == backed voting power"
+    );
+  }
+
+  // The clamp only reduces when needed: a delegator that voted below its post-unlock
+  // power keeps its full recorded vote.
+  function test_ShouldNotReduceDelegatorVotes_WhenStillBackedAfterUnlock() public {
+    uint256 half = FixidityLib.newFixedFraction(1, 2).unwrap();
+    uint256 prop = _referendumProposal();
+    uint256 idx = _getDequeuedIndex(prop);
+
+    vm.prank(delegator);
+    lockedGold.delegateGovernanceVotes(delegatee2, half);
+
+    // delegator votes only 200 of its 500 power.
+    vm.prank(delegator);
+    governance.votePartially(prop, idx, 200 ether, 0, 0);
+
+    // Unlock the delegated slice; new own power is 250 >= 200, so no clamp.
+    vm.prank(delegator);
+    lockedGold.unlock(500 ether);
+
+    assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegator), 250 ether, "power");
+    assertEq(governance.getAmountOfGoldUsedForVoting(delegator), 200 ether, "vote unchanged");
+    (uint256 yes, , ) = governance.getVoteTotals(prop);
+    assertEq(yes, 200 ether, "tally unchanged");
+  }
+
+  // The raw guard still blocks unlocking more than the delegated slice while the
+  // delegator is voting its full own power.
+  function test_ShouldRevert_WhenUnlockingBeyondDelegatedSliceWhileVoting() public {
+    uint256 half = FixidityLib.newFixedFraction(1, 2).unwrap();
+    uint256 prop = _referendumProposal();
+    uint256 idx = _getDequeuedIndex(prop);
+
+    vm.prank(delegator);
+    lockedGold.delegateGovernanceVotes(delegatee2, half);
+    vm.prank(delegator);
+    governance.votePartially(prop, idx, 500 ether, 0, 0);
+
+    vm.prank(delegator);
+    vm.expectRevert("Not enough unlockable celo. Celo is locked in voting.");
+    lockedGold.unlock(500 ether + 1);
+  }
+
+  // When the unlock clamps a delegator's votes, the proposal's network weight (the quorum
+  // denominator) is refreshed to the reduced locked total, matching the revoke path; otherwise
+  // participation would be scored against a stale, larger denominator.
+  function test_ShouldRefreshNetworkWeight_WhenClampingVotesOnUnlock() public {
+    uint256 half = FixidityLib.newFixedFraction(1, 2).unwrap();
+    uint256 prop = _referendumProposal();
+    uint256 idx = _getDequeuedIndex(prop);
+
+    vm.prank(delegator);
+    lockedGold.delegateGovernanceVotes(delegatee2, half);
+    vm.prank(delegator);
+    governance.votePartially(prop, idx, 500 ether, 0, 0);
+    vm.prank(delegatee2);
+    governance.votePartially(prop, idx, 500 ether, 0, 0);
+
+    uint256 lockedBefore = lockedGold.getTotalLockedGold();
+    (, , , , , uint256 nwBefore, ) = governance.getProposal(prop);
+    assertEq(nwBefore, lockedBefore, "network weight tracks locked total at vote time");
+
+    vm.prank(delegator);
+    lockedGold.unlock(500 ether);
+
+    uint256 lockedAfter = lockedGold.getTotalLockedGold();
+    assertEq(lockedAfter, lockedBefore - 500 ether, "unlock reduced the locked total");
+    (, , , , , uint256 nwAfter, ) = governance.getProposal(prop);
+    assertEq(nwAfter, lockedAfter, "network weight refreshed to the reduced locked total");
+  }
+
+  // Creates a proposal, moves it into the Referendum stage and approves it.
+  function _referendumProposal() private returns (uint256 prop) {
+    prop = _makeProposal(delegator);
+    vm.warp(block.timestamp + DEQUEUE_FREQUENCY + 1);
+    governance.dequeueProposalsIfReady();
+    uint256 idx = _getDequeuedIndex(prop);
+    vm.prank(approver);
+    governance.approve(prop, idx);
   }
 
   function _makeProposal(address proposer) private returns (uint256) {
