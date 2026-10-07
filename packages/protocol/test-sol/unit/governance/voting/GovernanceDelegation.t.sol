@@ -48,6 +48,9 @@ interface IGovernanceDelegationTest {
   function getVoteTotals(uint256 proposalId) external view returns (uint256, uint256, uint256);
   function getDequeue() external view returns (uint256[] memory);
   function getAmountOfGoldUsedForVoting(address account) external view returns (uint256);
+  function getProposal(
+    uint256 proposalId
+  ) external view returns (address, uint256, uint256, uint256, string memory, uint256, bool);
 }
 
 contract GovernanceDelegationTest is TestWithUtils08 {
@@ -316,6 +319,34 @@ contract GovernanceDelegationTest is TestWithUtils08 {
     vm.prank(delegator);
     vm.expectRevert("Not enough unlockable celo. Celo is locked in voting.");
     lockedGold.unlock(500 ether + 1);
+  }
+
+  // When the unlock clamps a delegator's votes, the proposal's network weight (the quorum
+  // denominator) is refreshed to the reduced locked total, matching the revoke path; otherwise
+  // participation would be scored against a stale, larger denominator.
+  function test_ShouldRefreshNetworkWeight_WhenClampingVotesOnUnlock() public {
+    uint256 half = FixidityLib.newFixedFraction(1, 2).unwrap();
+    uint256 prop = _referendumProposal();
+    uint256 idx = _getDequeuedIndex(prop);
+
+    vm.prank(delegator);
+    lockedGold.delegateGovernanceVotes(delegatee2, half);
+    vm.prank(delegator);
+    governance.votePartially(prop, idx, 500 ether, 0, 0);
+    vm.prank(delegatee2);
+    governance.votePartially(prop, idx, 500 ether, 0, 0);
+
+    uint256 lockedBefore = lockedGold.getTotalLockedGold();
+    (, , , , , uint256 nwBefore, ) = governance.getProposal(prop);
+    assertEq(nwBefore, lockedBefore, "network weight tracks locked total at vote time");
+
+    vm.prank(delegator);
+    lockedGold.unlock(500 ether);
+
+    uint256 lockedAfter = lockedGold.getTotalLockedGold();
+    assertEq(lockedAfter, lockedBefore - 500 ether, "unlock reduced the locked total");
+    (, , , , , uint256 nwAfter, ) = governance.getProposal(prop);
+    assertEq(nwAfter, lockedAfter, "network weight refreshed to the reduced locked total");
   }
 
   // Creates a proposal, moves it into the Referendum stage and approves it.

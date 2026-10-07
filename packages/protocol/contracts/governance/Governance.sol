@@ -1371,20 +1371,38 @@ contract Governance is
         continue;
       }
 
-      uint256 sumOfVotes = ((voteRecord.yesVotes + voteRecord.noVotes) + voteRecord.abstainVotes);
+      // A legacy record keeps its weight in deprecated_weight with yes/no/abstain all zero.
+      // Normalize it into the current fields so the clamp accounts for it, matching how
+      // getAmountOfGoldUsedForVoting and revokeVotes treat such records during the transition.
+      uint256 currentYes = voteRecord.yesVotes;
+      uint256 currentNo = voteRecord.noVotes;
+      uint256 currentAbstain = voteRecord.abstainVotes;
+      if (voteRecord.deprecated_weight != 0) {
+        currentYes = voteRecord.deprecated_value == Proposals.VoteValue.Yes
+          ? voteRecord.deprecated_weight
+          : 0;
+        currentNo = voteRecord.deprecated_value == Proposals.VoteValue.No
+          ? voteRecord.deprecated_weight
+          : 0;
+        currentAbstain = voteRecord.deprecated_value == Proposals.VoteValue.Abstain
+          ? voteRecord.deprecated_weight
+          : 0;
+      }
+
+      uint256 sumOfVotes = ((currentYes + currentNo) + currentAbstain);
 
       if (sumOfVotes > newVotingPower) {
         uint256 toRemove = (sumOfVotes - newVotingPower);
 
-        uint256 abstainToRemove = getVotesPortion(toRemove, voteRecord.abstainVotes, sumOfVotes);
-        uint256 yesToRemove = getVotesPortion(toRemove, voteRecord.yesVotes, sumOfVotes);
-        uint256 noToRemove = getVotesPortion(toRemove, voteRecord.noVotes, sumOfVotes);
+        uint256 abstainToRemove = getVotesPortion(toRemove, currentAbstain, sumOfVotes);
+        uint256 yesToRemove = getVotesPortion(toRemove, currentYes, sumOfVotes);
+        uint256 noToRemove = getVotesPortion(toRemove, currentNo, sumOfVotes);
 
         uint256 totalRemoved = ((abstainToRemove + yesToRemove) + noToRemove);
 
-        uint256 yesVotes = (voteRecord.yesVotes - yesToRemove);
-        uint256 noVotes = (voteRecord.noVotes - noToRemove);
-        uint256 abstainVotes = (voteRecord.abstainVotes - abstainToRemove);
+        uint256 yesVotes = (currentYes - yesToRemove);
+        uint256 noVotes = (currentNo - noToRemove);
+        uint256 abstainVotes = (currentAbstain - abstainToRemove);
 
         if (totalRemoved < toRemove) {
           // in case of rounding error
@@ -1406,18 +1424,18 @@ contract Governance is
           }
         }
 
-        proposal.updateVote(
-          voteRecord.yesVotes,
-          voteRecord.noVotes,
-          voteRecord.abstainVotes,
-          yesVotes,
-          noVotes,
-          abstainVotes
-        );
+        proposal.updateVote(currentYes, currentNo, currentAbstain, yesVotes, noVotes, abstainVotes);
+        // Keep the quorum denominator in step with the current locked total, as revokeVotes does;
+        // otherwise a clamp that follows a stake reduction would score participation against a
+        // stale, larger network weight.
+        proposal.networkWeight = getLockedGold().getTotalLockedGold();
 
         voteRecord.abstainVotes = abstainVotes;
         voteRecord.yesVotes = yesVotes;
         voteRecord.noVotes = noVotes;
+        // The record is now expressed in the current fields; retire the legacy weight.
+        voteRecord.deprecated_weight = 0;
+        voteRecord.deprecated_value = Proposals.VoteValue.None;
       }
     }
   }
