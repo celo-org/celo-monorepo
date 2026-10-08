@@ -71,6 +71,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   IProxyFactory internal proxyFactory;
   uint256 internal proxyNonce = 0;
   address DEPLOYER_ACCOUNT;
+  uint256 DEPLOYER_PK;
   address SECP256K1Address;
 
   ConstitutionHelper.ConstitutionEntry[] internal constitutionEntries;
@@ -155,15 +156,20 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function setUp() public {
     console.log("Setting up migration...");
-    configurationFileRawJSON = vm.readFile("./migrations_sol/migrationsConfig.json");
-    DEPLOYER_ACCOUNT = configurationFileRawJSON.readAddress(".deployerAccount");
+    // Live-chain run: the config path and every key come from the environment, so no key is
+    // read from disk.
+    configurationFileRawJSON = vm.readFile(
+      vm.envOr("MIGRATION_CONFIG", string("./migrations_sol/migrationsConfig.json"))
+    );
+    DEPLOYER_PK = vm.envUint("DEPLOYER_PRIVATE_KEY");
+    DEPLOYER_ACCOUNT = vm.addr(DEPLOYER_PK);
   }
 
   /**
    * First part of the migration, deploys most contracts
    */
   function runMigration() external {
-    vm.startBroadcast(DEPLOYER_ACCOUNT);
+    vm.startBroadcast(DEPLOYER_PK);
 
     proxyFactory = IProxyFactory(deployContract("ProxyFactory", 0));
 
@@ -199,7 +205,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     vm.stopBroadcast();
 
     // fund the CeloUnreleasedTreasury
-    vm.startBroadcast(configurationFileRawJSON.readUint(".deployerPrivateKey"));
+    vm.startBroadcast(DEPLOYER_PK);
 
     // doing a native transfer is not allowed by the unreleased treasury
     uint256 treasuryBalance = configurationFileRawJSON.readUint(
@@ -218,7 +224,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function runAfterMigration() public {
     setupUsingRegistry();
 
-    vm.startBroadcast(DEPLOYER_ACCOUNT);
+    vm.startBroadcast(DEPLOYER_PK);
     // increase the salt to avoid address collision from previous run
     proxyFactory = IProxyFactory(deployContract("ProxyFactory", bytes32(uint256(1))));
 
@@ -229,13 +235,31 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     initializeEpochManager(configurationFileRawJSON);
 
-    vm.startBroadcast(DEPLOYER_ACCOUNT);
+    vm.startBroadcast(DEPLOYER_PK);
     migrateGovernance(configurationFileRawJSON);
 
     SECP256K1Address = address(new SECP256K1());
     vm.stopBroadcast();
 
+    fundValidatorAccounts();
     electValidators(configurationFileRawJSON);
+  }
+
+  /**
+   * On a live chain the group and validator accounts start empty, so the deployer funds them
+   * before they lock CELO and register. A zero `accountFunding` skips this (anvil prefunds them).
+   */
+  function fundValidatorAccounts() public {
+    uint256 accountFunding = configurationFileRawJSON.readUint(".validators.accountFunding");
+    if (accountFunding == 0) {
+      return;
+    }
+    uint256[] memory valKeys = vm.envUint("VALIDATOR_KEYS", ",");
+    vm.startBroadcast(DEPLOYER_PK);
+    for (uint256 i = 0; i < valKeys.length; i++) {
+      payable(vm.addr(valKeys[i])).transfer(accountFunding);
+    }
+    vm.stopBroadcast();
   }
 
   function checkUnreleasedTreasuryBalance() internal {
@@ -809,7 +833,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function initializeEpochManager(string memory json) public {
     console.log("Initialize EpochManager...");
-    uint256[] memory valKeys = configurationFileRawJSON.readUintArray(".validators.valKeys");
+    uint256[] memory valKeys = vm.envUint("VALIDATOR_KEYS", ",");
     uint256 maxGroupSize = configurationFileRawJSON.readUint(".validators.maxGroupSize");
     uint256 groupCount = configurationFileRawJSON.readUint(".validators.groupCount");
     uint256 totalValidators = maxGroupSize * groupCount;
@@ -831,7 +855,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       }
     }
 
-    vm.startBroadcast(DEPLOYER_ACCOUNT);
+    vm.startBroadcast(DEPLOYER_PK);
     IEpochManager(getEpochManager()).initializeSystem(1, block.number, signers);
     vm.stopBroadcast();
   }
@@ -1080,10 +1104,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 minElectableValidators = configurationFileRawJSON.readUint(
       ".election.minElectableValidators"
     );
-    uint256[] memory valKeys = configurationFileRawJSON.readUintArray(".validators.valKeys");
-    string memory signersMnemonic = configurationFileRawJSON.readString(
-      ".validators.signersMnemonic"
-    );
+    uint256[] memory valKeys = vm.envUint("VALIDATOR_KEYS", ",");
+    string memory signersMnemonic = vm.envString("VALIDATOR_SIGNERS_MNEMONIC");
     uint256 maxGroupSize = configurationFileRawJSON.readUint(".validators.maxGroupSize");
     uint256 validatorLockedGoldRequirements = configurationFileRawJSON.readUint(
       ".validators.validatorLockedGoldRequirements.value"

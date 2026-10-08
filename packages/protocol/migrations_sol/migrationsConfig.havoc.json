@@ -1,0 +1,204 @@
+{
+  "deployerAccount": "0x6865c71c93799e9156F01Acce806FBdf5AB065F7",
+  "goldToken": {
+    "frozen": false
+  },
+  "celoUnreleasedTreasury": {
+    "initialBalance": "0"
+  },
+  "feeCurrencyDirectory": {
+    "intrinsicGas": 75000
+  },
+  "sortedOracles": {
+    "reportExpirySeconds": 300
+  },
+  "gasPriceMinimum": {
+    "minimumFloor": 100000000,
+    "targetDensity": 500000000000000000000000,
+    "adjustmentSpeed": 500000000000000000000000,
+    "baseFeeOpCodeActivationBlock": 0
+  },
+  "reserve": {
+    "tobinTaxStalenessThreshold": 3153600000,
+    "tobinTax": 0,
+    "tobinTaxReserveRatio": 0,
+    "spendingRatio": 50000000000000000000000,
+    "frozenGold": null,
+    "frozenDays": null,
+    "spenders": [],
+    "otherAddresses": [
+      "0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB",
+      "0x298FbD6dad2Fc2cB56d7E37d8aCad8Bf07324f67"
+    ],
+    "assetAllocationSymbols_": [
+      "cGLD",
+      "BTC",
+      "ETH",
+      "DAI",
+      "They are don't by converting string to hex, and then `cast to-bytes32`"
+    ],
+    "assetAllocationSymbols": [
+      "0x63474c4400000000000000000000000000000000000000000000000000000000",
+      "0x4254430000000000000000000000000000000000000000000000000000000000",
+      "0x4554480000000000000000000000000000000000000000000000000000000000",
+      "0x4441490000000000000000000000000000000000000000000000000000000000"
+    ],
+    "assetAllocationWeights": [
+      500000000000000000000000,
+      300000000000000000000000,
+      150000000000000000000000,
+      50000000000000000000000
+    ],
+    "initialBalance": 5000000000000000000000000
+  },
+  "stableTokens": {
+    "names": [
+      "Celo Dollar",
+      "Celo Euro",
+      "Celo Brazilian Real"
+    ],
+    "symbols": [
+      "cUSD",
+      "cEUR",
+      "cREAL"
+    ],
+    "contractSuffixes": [
+      "",
+      "EUR",
+      "BRL"
+    ],
+    "decimals": 18,
+    "celoPrice": 1,
+    "inflationRate": 1,
+    "inflationPeriod": 47304000,
+    "initialBalance": 5000000000000000000000000,
+    "frozen": false
+  },
+  "exchange": {
+    "spread": 5000000000000000000000,
+    "reserveFraction": 10000000000000000000000,
+    "updateFrequency": 300,
+    "minimumReports": 1,
+    "frozen": false
+  },
+  "lockedGold": {
+    "unlockingPeriod": 21600,
+    "unlockingPeriod_helper": "6 * HOUR"
+  },
+  "validators": {
+    "groupLockedGoldRequirements": {
+      "value": 10000000000000000000000,
+      "duration": 15552000,
+      "duration_help": "180 * DAY"
+    },
+    "validatorLockedGoldRequirements": {
+      "value": 10000000000000000000000,
+      "duration": 5184000,
+      "duration_help": "60 * DAY"
+    },
+    "membershipHistoryLength": 60,
+    "commissionUpdateDelay": 51840,
+    "commissionUpdateDelay_help": "(3 * DAY) / 5",
+    "groupCount": 3,
+    "maxGroupSize": 2,
+    "slashingMultiplierResetPeriod": 2592000,
+    "slashingPenaltyResetPeriod_help": "30 * DAY",
+    "validatorKeys": [],
+    "attestationKeys": [],
+    "groupName": "cLabs",
+    "commission": 100000000000000000000000,
+    "votesRatioOfLastVsFirstGroup": 2000000000000000000000000,
+    "valKeys": [],
+    "accountFunding": 30000000000000000000000
+  },
+  "election": {
+    "minElectableValidators": 1,
+    "maxElectableValidators": 110,
+    "maxNumGroupsVotedFor": 10,
+    "electabilityThreshold": 1000000000000000000000
+  },
+  "epochRewards": {
+    "targetVotingYieldParameters": {
+      "initial": 160000000000000000000,
+      "max": 500000000000000000000,
+      "max_helper": "(x + 1) ^ 365 = 1.20",
+      "adjustmentFactor": 0,
+      "adjustmentFactor_helper": "Change to 1 / 3650 once Mainnet activated."
+    },
+    "rewardsMultiplierParameters": {
+      "max": 2000000000000000000000000,
+      "adjustmentFactors": {
+        "underspend": 500000000000000000000000,
+        "overspend": 5000000000000000000000000
+      }
+    },
+    "targetVotingGoldFraction": 500000000000000000000000,
+    "maxValidatorEpochPayment": 205479452054794520547,
+    "maxValidatorEpochPayment_helper": "(75,000 / 365) * 10 ^ 18",
+    "communityRewardFraction": 250000000000000000000000,
+    "carbonOffsettingPartner": "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972",
+    "carbonOffsettingFraction": 1000000000000000000000,
+    "frozen": false
+  },
+  "epochManager": {
+    "newEpochDuration": 86400
+  },
+  "random": {
+    "randomnessBlockRetentionWindow": "720",
+    "randomnessBlockRetentionWindow_helper": "HOUR / 5"
+  },
+  "blockchainParameters": {
+    "gasForNonGoldCurrencies": 50000,
+    "deploymentBlockGasLimit": 20000000,
+    "gasLimit": 13000000,
+    "lookbackWindow": 12
+  },
+  "doubleSigningSlasher": {
+    "reward": 1000000000000000000000,
+    "penalty": 9000000000000000000000
+  },
+  "downtimeSlasher": {
+    "reward": 10000000000000000000,
+    "penalty": 100000000000000000000,
+    "slashableDowntime": 60
+  },
+  "governanceApproverMultiSig": {
+    "required": 1,
+    "internalRequired": 1,
+    "governanceApproverMultiSig": true
+  },
+  "reserveSpenderMultiSig": {
+    "required": 1,
+    "internalRequired": 1
+  },
+  "feeHandler": {
+    "beneficiary": "0x2A486910DBC72cACcbb8d0e1439C96b03B2A4699",
+    "burnFraction": 800000000000000000000000
+  },
+  "governance": {
+    "concurrentProposals": 3,
+    "dequeueFrequency": 14400,
+    "queueExpiry": 2419200,
+    "queueExpiry_helper": "4 * WEEK",
+    "dequeueFrequency_helper": "4 * HOUR",
+    "approvalStageDuration": 14400,
+    "approvalStageDuration_helper": "4 * HOUR",
+    "referendumStageDuration": 86400,
+    "referendumStageDuration_hlper": "DAY",
+    "executionStageDuration": 604800,
+    "executionStageDuration_hlper": "WEEK",
+    "participationBaseline": 5000000000000000000000,
+    "minDeposit": 100000000000000000000,
+    "participationFloor": 10000000000000000000000,
+    "baselineUpdateFactor": 200000000000000000000000,
+    "baselineQuorumFactor": 1000000000000000000000000,
+    "skipSetConstitution": false,
+    "skipTransferOwnership": true
+  },
+  "proxies": {
+    "feeCurrencyDirectory": "0x15F344b9E6c3Cb6F0376A36A64928b13F62C6276",
+    "celoToken": "0x471EcE3750Da237f93B8E339c536989b8978a438",
+    "feeHandler": "0xcD437749E43A154C07F3553504c68fBfD56B8778",
+    "celoUnreleasedTreasury": "0xB76D502Ad168F9D545661ea628179878DcA92FD5"
+  }
+}

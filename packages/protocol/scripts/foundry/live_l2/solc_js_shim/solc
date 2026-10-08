@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+// Minimal `solc` CLI shim around solc-js 0.5.14, for machines that cannot run the x86_64 native binary.
+// Supports what foundry needs: `--version` and `--standard-json` (input on stdin, output on stdout).
+const path = require('path');
+const args = process.argv.slice(2);
+const solc = require(path.join(__dirname, 'node_modules', 'solc'));
+if (args.includes('--version')) {
+  process.stdout.write('solc, the solidity compiler commandline interface\nVersion: ' + solc.version() + '\n');
+  process.exit(0);
+}
+if (!args.includes('--standard-json')) {
+  process.stderr.write('solc shim: only --version and --standard-json are supported\n');
+  process.exit(1);
+}
+let input = '';
+process.stdin.setEncoding('utf8');
+process.stdin.on('data', (c) => (input += c));
+process.stdin.on('end', () => {
+  const fs = require('fs');
+  const findImports = (p) => {
+    try { return { contents: fs.readFileSync(p, 'utf8') }; } catch (e) { return { error: 'File not found: ' + p }; }
+  };
+  process.stdout.write(solc.compile(input, findImports));
+});
