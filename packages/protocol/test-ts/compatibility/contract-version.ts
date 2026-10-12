@@ -8,19 +8,27 @@ const artifactWithCode = (contractName: string, code: string): Artifact =>
 
 describe('#getContractVersion()', () => {
   it('runs bytecode built for the EVM version the contracts target', async () => {
-    // PUSH0 PUSH0 RETURN: valid from shanghai on, an invalid opcode before it. The reader
-    // defaults to merge unless it is told otherwise, which would fail here.
+    // PUSH0 PUSH0 RETURN: valid from shanghai on, an invalid opcode before it. Fails if the
+    // reader's hardfork ever drops below what foundry.toml targets.
     const version = await getContractVersion(artifactWithCode('Shanghai', '0x5f5ff3'), true)
     assert.equal(version.toString(), DEFAULT_VERSION_STRING)
   })
 
+  it('runs cancun bytecode, which the reader executes on prague', async () => {
+    // PUSH1 0 PUSH1 0 PUSH1 0 MCOPY STOP: MCOPY arrived in cancun.
+    const version = await getContractVersion(artifactWithCode('Cancun', '0x6000600060005e00'), true)
+    assert.equal(version.toString(), DEFAULT_VERSION_STRING)
+  })
+
   it('reports bytecode using an opcode its EVM does not implement', async () => {
-    // MCOPY, which arrived in cancun, past what the vendored EVM implements.
+    // INVALID (0xfe) is reserved as an invalid opcode by every hardfork, so it takes the same
+    // path a not-yet-implemented opcode would without depending on which opcodes this EVM
+    // happens to assign.
     try {
-      await getContractVersion(artifactWithCode('Cancun', '0x5e'), true)
+      await getContractVersion(artifactWithCode('Unsupported', '0xfe'), true)
       assert.fail('expected the unreadable version to be reported')
     } catch (error) {
-      assert.include((error as Error).message, 'Cannot read the version of Cancun')
+      assert.include((error as Error).message, 'Cannot read the version of Unsupported')
       assert.include((error as Error).message, 'does not implement')
     }
   })
