@@ -1,9 +1,8 @@
 /* eslint-disable max-classes-per-file: 0 */
 import { Artifact, getContractName } from '@celo/protocol/lib/compatibility/internal';
 import { ContractVersion, ContractVersionChecker, ContractVersionCheckerIndex, ContractVersionDelta, ContractVersionDeltaIndex, ContractVersionIndex, DEFAULT_VERSION_STRING } from '@celo/protocol/lib/compatibility/version';
-import { Chain as EJSChain, Common as EJSCommon, Hardfork as EJSHardfork } from "@ethereumjs/common";
-import { Address as EJSAddress } from "@ethereumjs/util";
-import { VM } from "@ethereumjs/vm";
+import { EVM } from '@ethereumjs/evm'
+import { Address, hexToBytes } from '@ethereumjs/util'
 import { BuildArtifacts } from '@celo/protocol/lib/compatibility/build-artifacts'
 import { toFunctionSelector } from 'viem'
 import { isLibrary } from './report';
@@ -36,33 +35,30 @@ export class ASTContractVersions {
  *
  * If the contract version cannot be retrieved, returns version 1.1.0.0 by default.
  */
-// Reading a version runs the contract's own bytecode, so this EVM has to understand the
-// EVM version the contracts are built for. It defaults to merge, which predates PUSH0 and
-// would make every version read fail against a modern build. Shanghai is as far as this
-// vendored VM goes, which is the ceiling foundry.toml builds against.
-const versionCheckCommon = new EJSCommon({
-  chain: EJSChain.Mainnet,
-  hardfork: EJSHardfork.Shanghai,
-})
+// Reading a version runs the contract's own bytecode, so this EVM has to understand every
+// opcode the contracts are built with. Celo mainnet executes prague today, so the check runs
+// on prague as well: any evm_version up to and including it in foundry.toml reads correctly.
+const VERSION_CHECK_HARDFORK = 'prague'
 
 export async function getContractVersion(artifact: Artifact, newLinking: boolean): Promise<ContractVersion> {
-  const vm = await VM.create({ common: versionCheckCommon });
+  const evm = await EVM.create()
+  evm.common.setHardfork(VERSION_CHECK_HARDFORK)
   // @ts-ignore
   const bytecode = artifact.deployedBytecode.object || artifact.deployedBytecode
   const data = toFunctionSelector('getVersionNumber()')
   const nullAddress = '0000000000000000000000000000000000000000'
   const compilerLinkRegex = newLinking ? /__\$[a-f0-9]{34}\$__/g : /__[A-Za-z0-9_]{36}__/g
   const linkedBytecode = bytecode.split(compilerLinkRegex).join(nullAddress)
-  const result = await vm.evm.runCall({
-    to: new EJSAddress(Buffer.from(nullAddress, 'hex')),
-    caller: new EJSAddress(Buffer.from(nullAddress, 'hex')),
-    code: Buffer.from(linkedBytecode.slice(2), 'hex'),
+  const result = await evm.runCall({
+    to: Address.zero(),
+    caller: Address.zero(),
+    code: hexToBytes(linkedBytecode),
     isStatic: true,
-    data: Buffer.from(data.slice(2), 'hex')
+    data: hexToBytes(data),
   })
   const exceptionError = result.execResult.exceptionError
   if (exceptionError === undefined) {
-    const value = result.execResult.returnValue
+    const value = Buffer.from(result.execResult.returnValue)
     if (value.length === 4 * 32) {
       return ContractVersion.fromGetVersionNumberReturnValue(value)
     }
