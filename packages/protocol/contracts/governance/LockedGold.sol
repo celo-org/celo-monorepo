@@ -227,6 +227,16 @@ contract LockedGold is
       "Either account doesn't have enough locked Celo or locked Celo is being used for voting."
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
+    if (FixidityLib.gt(delegatedPercentage, FixidityLib.newFixed(0))) {
+      // A delegator's own governance voting power is only the undelegated share of its locked
+      // CELO, so unlocking reduces it. Bring the delegator's own recorded referendum votes down
+      // to that reduced power, mirroring the delegatee handling above, so an account's recorded
+      // votes never exceed the stake backing them.
+      getGovernance().removeVotesWhenRevokingDelegatedVotes(
+        msg.sender,
+        getAccountTotalGovernanceVotingPower(msg.sender)
+      );
+    }
     uint256 available = (block.timestamp + unlockingPeriod);
     // CERTORA: the slot containing the length could be MAX_UINT
     account.pendingWithdrawals.push(PendingWithdrawal(value, available));
