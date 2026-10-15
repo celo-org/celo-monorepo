@@ -21,3 +21,6 @@
 	path = packages/protocol/lib/solidity-bytes-utils-8
 	url = https://github.com/GNSPS/solidity-bytes-utils
 	branch = master
+[submodule "xaut0-adapter-fix/lib/forge-std"]
+	path = xaut0-adapter-fix/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std

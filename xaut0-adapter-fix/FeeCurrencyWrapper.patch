@@ -1,0 +1,28 @@
+--- a/contracts/Wrappers/FeeCurrencyWrapper.sol
++++ b/contracts/Wrappers/FeeCurrencyWrapper.sol
+@@ -82,7 +82,7 @@
+    * @param value Debited value in the wrapped digits.
+    */
+   function debitGasFees(address from, uint256 value) external override onlyVm {
+-    uint256 toDebit = downscale(value);
++    uint256 toDebit = downscaleCeil(value);
+     require(toDebit > 0, "Can not debit 0");
+    
+     debited = toDebit;
+@@ -146,6 +146,16 @@
+     return value * digitDifference;
+   }
+ 
++  /**
++   * @notice Downscales value to the wrapped token's native digits, rounding up.
++   * @dev Used only for debits so that any non-zero fee debits at least one native unit.
++   * Credits keep using the flooring `downscale`, which guarantees that the sum of the
++   * credited components never exceeds `debited`.
++   */
++  function downscaleCeil(uint256 value) internal view returns (uint256) {
++    return (value + digitDifference - 1) / digitDifference;
++  }
++
+   function downscale(uint256 value) internal view returns (uint256) {
+     return value / digitDifference;
+   }

@@ -1,0 +1,14 @@
+[profile.default]
+src = "src"
+test = "test"
+libs = ["lib"]
+# Mirrors the verified mainnet build of FeeCurrencyWrapper (0x06d886Ff518b5E642E7E6aaD3cE797B7DABD8e9a),
+# except solc 0.8.19 instead of 0.8.4 because forge-std needs >=0.8.13. Still inside the wrapper's pragma range.
+solc = "0.8.19"
+evm_version = "istanbul"
+optimizer = true
+optimizer_runs = 100000
+remappings = [
+  "@openzeppelin/=lib/@openzeppelin/",
+  "forge-std/=lib/forge-std/src/",
+]
