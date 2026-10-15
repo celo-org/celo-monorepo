@@ -20,9 +20,10 @@ via_ir = false
 # Solidity <0.8.20). As an OP Stack L2 Celo follows the Ethereum forks, and that cap is
 # gone: mainnet and Celo Sepolia both run Prague and execute PUSH0, MCOPY and TSTORE/TLOAD.
 # The compatibility check reads each contract's version by running its bytecode in upstream
-# @ethereumjs/evm on prague, so any target up to prague works with the tooling. shanghai is
-# kept for now because raising it changes the bytecode of every contract; moving to cancun
-# or prague is a release decision, not a tooling limit.
+# @ethereumjs/evm on cancun; solc emits the same opcodes for prague, so any target up to
+# prague works with the tooling. shanghai is kept for now because raising it changes the
+# bytecode of every contract; moving to cancun or prague is a release decision, not a
+# tooling limit.
 evm_version = 'shanghai'
 # The compatibility report reads the AST; literal sources in the metadata match what the
 # release builds have always shipped.

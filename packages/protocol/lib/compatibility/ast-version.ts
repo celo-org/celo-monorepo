@@ -36,9 +36,11 @@ export class ASTContractVersions {
  * If the contract version cannot be retrieved, returns version 1.1.0.0 by default.
  */
 // Reading a version runs the contract's own bytecode, so this EVM has to understand every
-// opcode the contracts are built with. Celo mainnet executes prague today, so the check runs
-// on prague as well: any evm_version up to and including it in foundry.toml reads correctly.
-const VERSION_CHECK_HARDFORK = 'prague'
+// opcode the contracts are built with. cancun is the newest hardfork @ethereumjs/common 4.x
+// marks final; its prague entry is a draft that still carries EIP-3074 (AUTH/AUTHCALL), which
+// mainnet Prague dropped. solc emits no new opcodes for prague, so any evm_version up to and
+// including prague in foundry.toml reads correctly on cancun.
+const VERSION_CHECK_HARDFORK = 'cancun'
 
 export async function getContractVersion(artifact: Artifact, newLinking: boolean): Promise<ContractVersion> {
   const evm = await EVM.create()

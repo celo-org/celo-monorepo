@@ -14,7 +14,7 @@ describe('#getContractVersion()', () => {
     assert.equal(version.toString(), DEFAULT_VERSION_STRING)
   })
 
-  it('runs cancun bytecode, which the reader executes on prague', async () => {
+  it('runs cancun bytecode, the newest opcodes solc emits', async () => {
     // PUSH1 0 PUSH1 0 PUSH1 0 MCOPY STOP: MCOPY arrived in cancun.
     const version = await getContractVersion(artifactWithCode('Cancun', '0x6000600060005e00'), true)
     assert.equal(version.toString(), DEFAULT_VERSION_STRING)
@@ -29,6 +29,18 @@ describe('#getContractVersion()', () => {
       assert.fail('expected the unreadable version to be reported')
     } catch (error) {
       assert.include((error as Error).message, 'Cannot read the version of Unsupported')
+      assert.include((error as Error).message, 'does not implement')
+    }
+  })
+
+  it('does not run opcodes that only a draft hardfork assigns', async () => {
+    // AUTH (0xf6) exists only in the draft prague entry of @ethereumjs/common 4.x (EIP-3074,
+    // dropped from mainnet Prague). On the reader's hardfork it has to stay an invalid opcode;
+    // otherwise a contract using it would silently read as the default version.
+    try {
+      await getContractVersion(artifactWithCode('Auth', '0xf6'), true)
+      assert.fail('expected the unreadable version to be reported')
+    } catch (error) {
       assert.include((error as Error).message, 'does not implement')
     }
   })

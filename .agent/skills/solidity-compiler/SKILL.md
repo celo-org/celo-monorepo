@@ -57,8 +57,9 @@ binding one. Raise the pin once Blockscout lists the version.
 **EVM target is shanghai by choice, not by tooling limit.** Celo mainnet and Celo Sepolia run
 Prague and execute PUSH0, MCOPY and TSTORE/TLOAD today. `lib/compatibility/ast-version.ts`
 reads each contract's version by executing its bytecode in upstream `@ethereumjs/evm` on
-prague, so any `evm_version` up to prague works with the release tooling. Raising it changes
-the bytecode of every contract, so treat it as a release decision. Older builds were capped
+cancun, and solc emits the same opcodes for prague, so any `evm_version` up to prague works
+with the release tooling. Raising it changes the bytecode of every contract, so treat it as a
+release decision. Older builds were capped
 at `paris` because Celo L1 could not execute PUSH0; that limit died with the L2 migration.
 
 **Newer is usually safer, not riskier.** Known-bug counts fall as versions rise: 0.8.19
