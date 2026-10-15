@@ -241,13 +241,16 @@ jobs:
         run: |
           source ./scripts/foundry/constants.sh
 
-          FOUNDRY_PROFILE=devchain forge test -vvv \
+          FOUNDRY_PROFILE=devchain forge test -vvv --offline \
           --match-path "test-sol/devchain/migration/*" \
           --fork-url $ANVIL_RPC_URL
       - name: Run e2e tests against local anvil devchain
         run: |
           source ./scripts/foundry/constants.sh
 
-          FOUNDRY_PROFILE=devchain forge test -vvv \
+          # --offline: at -vvv forge decodes every trace and asks openchain.xyz for each signature it
+          # cannot resolve locally; one 110M-gas e2e trace turned that into hours of waiting. The
+          # local ABIs still decode everything these tests call.
+          FOUNDRY_PROFILE=devchain forge test -vvv --offline \
           --match-path "test-sol/devchain/e2e/*" \
           --fork-url $ANVIL_RPC_URL
