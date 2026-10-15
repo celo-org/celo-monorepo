@@ -4,9 +4,10 @@ pragma solidity ^0.8.4;
 import "forge-std/Test.sol";
 import "src/contracts/Wrappers/FeeCurrencyWrapper.sol";
 
-/// Runs against a Celo mainnet fork. Shows the deployed XAUt0 adapter reverting on the
-/// minimal mainnet transaction, then swaps in the patched bytecode at the implementation
-/// address (storage untouched, as a proxy upgrade would) and shows the same debit succeed.
+/// Runs against a Celo mainnet fork pinned at block FORK_BLOCK. Shows the deployed XAUt0
+/// adapter reverting on the minimal mainnet transaction, then swaps in the patched bytecode at
+/// the implementation address (storage untouched, as a proxy upgrade would) and shows the same
+/// debit succeed. `vm.etch` replaces the code in place; it does not exercise the ProxyAdmin path.
 ///
 ///   RUN_FORK=true forge test --match-contract MainnetFork -vv
 contract MainnetForkTest is Test {
@@ -14,8 +15,11 @@ contract MainnetForkTest is Test {
   address constant IMPL = 0x06d886Ff518b5E642E7E6aaD3cE797B7DABD8e9a;
   address constant TOKEN = 0xaf37E8B6C9ED7f6318979f56Fc287d76c30847ff;
   address constant GAS_FEE_ADDRESS = 0x000000000000000000000000000000000Ce106A5;
-  // Any EOA holding XAUt0 works; this one held 10.597952 XAUt0 on 2026-10-15.
-  address constant HOLDER = 0x77134cbC06cB00b66F4c7e623D5fdBF6777635EC;
+  // Any address with at least two native units at FORK_BLOCK works; this contract held
+  // 29.651182 XAUt0 there.
+  address constant HOLDER = 0xbb469A28f64C72aECC7d05Ca6e45B2FB1a63B4F9;
+  uint256 constant FORK_BLOCK = 80156596;
+  bytes32 constant IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
   address constant VM = address(0);
 
   uint256 constant GAS = 106_000;
@@ -30,7 +34,12 @@ contract MainnetForkTest is Test {
 
   function setUp() public {
     vm.skip(!vm.envOr("RUN_FORK", false));
-    vm.createSelectFork(vm.envOr("CELO_RPC", string("https://forno.celo.org")));
+    vm.createSelectFork(vm.envOr("CELO_RPC", string("https://forno.celo.org")), FORK_BLOCK);
+    assertEq(
+      address(uint160(uint256(vm.load(PROXY, IMPLEMENTATION_SLOT)))),
+      IMPL,
+      "proxy implementation changed since this test was written"
+    );
     assertEq(adapter.digitDifference(), 1e12);
     assertGt(token.balanceOf(HOLDER), 2, "holder needs at least 2 units");
   }

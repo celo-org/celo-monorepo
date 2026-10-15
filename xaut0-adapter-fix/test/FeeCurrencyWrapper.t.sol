@@ -84,8 +84,10 @@ contract FeeCurrencyWrapperTest is Test {
     _assertDebit(MAINNET_EFFECTIVE_DEBIT, 1);
   }
 
-  function test_vector_debit_mainnet_admission_fee_charges_two_units() public {
-    // Floor gave 1 here; the extra unit is refunded through creditGasFees.
+  function test_vector_debit_mainnet_max_fee_charges_two_units() public {
+    // The builder debits this amount when base fee + tip reaches the max fee. Floor gave 1 here.
+    // The second unit is not refunded: the refund floors to 0 and the rounding remainder goes to
+    // the base-fee recipient (see the credit vector below).
     _assertDebit(MAINNET_ADMISSION_DEBIT, 2);
   }
 
@@ -122,7 +124,7 @@ contract FeeCurrencyWrapperTest is Test {
     assertEq(wrapper.debited(), 0);
   }
 
-  function test_vector_credit_after_mainnet_admission_debit_refunds_extra_unit() public {
+  function test_vector_credit_after_mainnet_max_fee_debit_sends_both_units_to_base_fee() public {
     _assertDebit(MAINNET_ADMISSION_DEBIT, 2);
     uint256 refund = MAINNET_ADMISSION_DEBIT - MAINNET_EFFECTIVE_DEBIT; // 62,483,714,000
 
@@ -134,6 +136,24 @@ contract FeeCurrencyWrapperTest is Test {
     assertEq(token.balanceOf(tipRecipient), 0);
     assertEq(token.balanceOf(baseFeeRecipient), 2);
     assertEq(wrapper.debited(), 0);
+  }
+
+  /// Worst case for the user: a fractional debit rounded up and a fractional refund rounded
+  /// down. The user pays ceil(debit) - floor(refund) native units, which is below the exact fee
+  /// plus two units. Here the exact fee is 0.02 units and the user pays 2.
+  function test_vector_overpayment_stays_below_two_units() public {
+    uint256 debit = 1_010_000_000_000;
+    uint256 refund = 990_000_000_000;
+    uint256 baseFee = debit - refund; // 20,000,000,000
+    _assertDebit(debit, 2);
+
+    vm.prank(VM);
+    wrapper.creditGasFees(holder, tipRecipient, address(0), baseFeeRecipient, refund, 0, 0, baseFee);
+
+    uint256 paid = 1_000_000 - token.balanceOf(holder);
+    assertEq(paid, 2);
+    assertEq(token.balanceOf(baseFeeRecipient), 2);
+    assertLt(paid * DIGIT_DIFFERENCE, baseFee + 2 * DIGIT_DIFFERENCE, "overpayment below two units");
   }
 
   function test_credit_is_noop_when_nothing_debited() public {
@@ -166,6 +186,23 @@ contract FeeCurrencyWrapperTest is Test {
     assertEq(token.balanceOf(token.GAS_FEE_ADDRESS()), 0, "escrow fully distributed");
     assertEq(token.balanceOf(tipRecipient) + token.balanceOf(baseFeeRecipient), credited);
     assertEq(wrapper.debited(), 0);
+  }
+
+  /// What the user pays, ceil(debit) - floor(refund), is never below the exact fee and always
+  /// below the exact fee plus two native units.
+  function testFuzz_user_never_underpays_and_overpays_below_two_units(uint256 value, uint256 refund) public {
+    value = bound(value, 1, 1_000_000 * DIGIT_DIFFERENCE);
+    refund = bound(refund, 0, value);
+    uint256 exactFee = value - refund;
+
+    vm.prank(VM);
+    wrapper.debitGasFees(holder, value);
+    vm.prank(VM);
+    wrapper.creditGasFees(holder, tipRecipient, address(0), baseFeeRecipient, refund, 0, 0, exactFee);
+
+    uint256 paidScaled = (1_000_000 - token.balanceOf(holder)) * DIGIT_DIFFERENCE;
+    assertGe(paidScaled, exactFee, "never underpays");
+    assertLt(paidScaled, exactFee + 2 * DIGIT_DIFFERENCE, "overpays by less than two units");
   }
 
   /// The patched debit differs from the original by at most one native unit, and only
