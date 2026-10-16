@@ -20,22 +20,23 @@ echo "Forge version: $($FORGE --version)"
 # Start a local anvil instance
 $PWD/scripts/foundry/start_anvil.sh --celo
 
-# Build the Solidity 0.5 sources (the proxies) plus the Mento dependencies, and the 0.8 libraries
+# Build the Solidity 0.5 sources (the proxies) plus the Mento dependencies
 FOUNDRY_PROFILE=solc05 forge build
-forge build
 
-# Deploy libraries to the anvil instance
+# Deploy libraries to the anvil instance; they are compiled on their own in a scratch project
 source $PWD/scripts/foundry/deploy_libraries.sh
 echo "Library flags 0.8 are: $LIBRARY_FLAGS_08"
 
-# Build map of selectors from governanceConstitution.json
-source $PWD/scripts/foundry/build_constitution_selectors_map.sh
-
 # Build all contracts with deployed libraries
 # Including contracts that depend on libraries. This step replaces the library placeholder
-# in the bytecode with the address of the actually deployed library.
+# in the bytecode with the address of the actually deployed library. The addresses are
+# compiler settings, so this is the one full 0.8 build of the run: anything built without
+# them beforehand would only be compiled again here.
 echo "Compiling 0.8 with libraries..."
 time forge build $LIBRARY_FLAGS_08
+
+# Build map of selectors from governanceConstitution.json out of the artifacts just built
+source $PWD/scripts/foundry/build_constitution_selectors_map.sh
 
 echo "Setting Registry Proxy"
 PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode.object' ./out-solc-0.5/Proxy.sol/Proxy.json)
