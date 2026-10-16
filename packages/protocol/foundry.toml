@@ -77,6 +77,10 @@ skip=[
   ]
 src = 'contracts-0.5'
 out = 'out-solc-0.5'
+# A profile with its own src and out needs its own cache file: the cache records a single
+# source root, so building this profile into the shared one drops every entry of the 0.8
+# build and the next default build recompiles all of it.
+cache_path = 'cache-solc-0.5'
 libs = ['lib', 'node_modules']
 solc_version = '0.5.14'
 ast = true
@@ -97,6 +101,7 @@ skip=[
   ]
 src = 'contracts-0.5'
 out = 'out-solc-0.5-optimized'
+cache_path = 'cache-solc-0.5-optimized' # own cache file, same reason as solc05
 libs = ['lib', 'node_modules']
 solc_version = '0.5.17'
 ast = true
