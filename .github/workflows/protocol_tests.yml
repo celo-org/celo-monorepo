@@ -214,7 +214,10 @@ jobs:
       # from the same inputs instead of checking optimism out and deriving it again.
       - name: Resolve optimism revision
         id: optimism-rev
-        run: echo "sha=$(git ls-remote https://github.com/celo-org/optimism.git refs/heads/celo/core-contracts-base | cut -f1)" >> "$GITHUB_OUTPUT"
+        run: |
+          sha=$(git ls-remote --exit-code https://github.com/celo-org/optimism.git refs/heads/celo/core-contracts-base | cut -f1)
+          [ -n "$sha" ] || { echo "celo/core-contracts-base not found on celo-org/optimism" >&2; exit 1; }
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
       - name: Devchain initial state cache
         id: initial-state
         uses: actions/cache@v4
