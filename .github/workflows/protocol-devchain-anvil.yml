@@ -10,17 +10,13 @@ on:
     branches: [release/core-contracts/*, master]
     paths:
       - 'packages/protocol/**'
+      - '.github/workflows/protocol-devchain-anvil.yml'
   workflow_dispatch:
     inputs:
       npm_tag:
         description: 'NPM TAG e.g. alpha, pre-merge (default: canary) '
         required: true
         type: string
-
-env:
-  # Increment these to force cache rebuilding
-  FOUNDRY_CACHE_KEY: 1
-  # TODO: Standardize Foundry version across workflows https://github.com/celo-org/celo-monorepo/issues/11714
 
 permissions:
   contents: read
@@ -52,18 +48,21 @@ jobs:
             tree test-sol | grep -i ".sol" | grep -v ".sol"
             exit 1
           fi
-      - name: Foundry cache
-        id: foundry-cache
-        uses: actions/cache@v4
+      # The migration builds every 0.8 contract with the deployed library addresses linked in.
+      # The addresses come out the same on every run, so restoring the newest earlier build
+      # leaves forge only the sources that changed since then to recompile.
+      - name: Foundry build cache
+        id: foundry-build
+        uses: actions/cache/restore@v4
         with:
-          path: ./cache
-          key: ${{ runner.os }}-foundry-cache-${{ env.FOUNDRY_CACHE_KEY }}
-      - name: Foundry out
-        id: foundry-out
-        uses: actions/cache@v4
-        with:
-          path: ./out
-          key: ${{ runner.os }}-foundry-out-${{ env.FOUNDRY_CACHE_KEY }}
+          path: |
+            packages/protocol/cache
+            packages/protocol/cache-solc-0.5
+            packages/protocol/out
+            packages/protocol/out-solc-0.5
+          key: ${{ runner.os }}-foundry-anvil-build-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-foundry-anvil-build-
 
       - name: Display SHA
         run: |
@@ -133,17 +132,35 @@ jobs:
         shell: bash
         run: yarn
 
+      # The initial state is a function of the optimism revision, the script that derives it
+      # and the foundry that runs the script, so a run reuses the state an earlier run built
+      # from the same inputs instead of checking optimism out and deriving it again.
+      - name: Resolve optimism revision
+        id: optimism-rev
+        run: |
+          sha=$(git ls-remote --exit-code https://github.com/celo-org/optimism.git refs/heads/celo/core-contracts-base | cut -f1)
+          [ -n "$sha" ] || { echo "celo/core-contracts-base not found on celo-org/optimism" >&2; exit 1; }
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+      - name: Devchain initial state cache
+        id: initial-state
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/celo-optimism/packages/contracts-bedrock/anvil-state.json
+          key: devchain-initial-state-${{ steps.optimism-rev.outputs.sha }}-${{ hashFiles('packages/protocol/scripts/bash/generate-devchain-initial-state.sh') }}-foundry-v1.5.0
       - name: Checkout Optimism repo
+        if: steps.initial-state.outputs.cache-hit != 'true'
         uses: actions/checkout@v4
-        if: success() || failure()
         with:
           repository: 'celo-org/optimism'
+          # The literal branch, not the resolved sha: a step output as checkout ref reads to
+          # CodeQL as untrusted code in a cache-writing workflow. Should the branch move between
+          # the two steps, the entry is saved under the older sha, which no later run resolves.
           ref: 'celo/core-contracts-base'
           path: celo-optimism
           submodules: recursive
 
       - name: Generate initial state for devchain
-        if: success() || failure()
+        if: steps.initial-state.outputs.cache-hit != 'true'
         run: yarn devchain:generate-initial-state --contracts-dir ${{ github.workspace }}/celo-optimism/packages/contracts-bedrock
 
       - name: Install celocli
@@ -155,6 +172,20 @@ jobs:
         if: success() || failure()
         run: |
           LOAD_STATE=${{ github.workspace }}/celo-optimism/packages/contracts-bedrock/anvil-state.json yarn anvil-devchain:start
+
+      # Saved before the devchain tests: their FOUNDRY_PROFILE=devchain build shares cache/ and
+      # out/ and rebuilds the sources it needs without the library addresses, which would leave
+      # an unlinked build in the cache for the next run to recompile.
+      - name: Save foundry build cache
+        if: steps.foundry-build.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            packages/protocol/cache
+            packages/protocol/cache-solc-0.5
+            packages/protocol/out
+            packages/protocol/out-solc-0.5
+          key: ${{ runner.os }}-foundry-anvil-build-${{ github.sha }}
 
       - name: Dump migrated devchain state to l2-devchain.json
         if: success() || failure()
