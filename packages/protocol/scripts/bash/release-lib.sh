@@ -94,20 +94,30 @@ function build_tag_foundry() {
     echo " - $BRANCH defines no $PROFILE profile, nothing to build for it"
     # A build of the same ref name from before the profile was removed must not linger:
     # the release tooling picks its artifact directories by existence.
-    rm -rf $BUILD_DIR
+    rm -rf $BUILD_DIR $BUILD_DIR.inputs
     BUILD_DIR=""
     checkout_build_sources $CURRENT_HASH $LOG_FILE -s
     return 0
   fi
 
-  # Always rebuild from scratch. On reused (self-hosted) runners a previously-built
-  # $BUILD_DIR for the same tag persists across runs; reusing it can compare against a
-  # stale baseline and produce phantom storage diffs (e.g. a spurious change attributed
-  # to Governance, which then trips the no-new-proxy guard). Removing it forces a fresh,
-  # deterministic build of the checked-out sources.
-  echo " - Build contract artifacts at $BUILD_DIR (fresh)"
-  rm -rf $BUILD_DIR
+  # A directory left by an earlier build is reused only when it was built from exactly
+  # these inputs, recorded next to it in $BUILD_DIR.inputs. Matching by ref name alone is
+  # not enough: on reused (self-hosted) runners a build of the same name from older sources
+  # or another toolchain compared against a stale baseline and produced phantom storage
+  # diffs (e.g. a spurious change attributed to Governance, which then trips the
+  # no-new-proxy guard). Anything else is rebuilt from scratch.
+  local MARKER="$BUILD_DIR.inputs"
   export FOUNDRY_PROFILE=$PROFILE
+  local INPUTS
+  INPUTS=$(build_inputs "$BRANCH" "$PROFILE") || INPUTS=""
+  if [[ -n "$INPUTS" && -d $BUILD_DIR && -f $MARKER && "$(cat $MARKER)" == "$INPUTS" ]]; then
+    echo " - Reuse contract artifacts at $BUILD_DIR (built from the same inputs)"
+    checkout_build_sources $CURRENT_HASH $LOG_FILE -s
+    return 0
+  fi
+
+  echo " - Build contract artifacts at $BUILD_DIR (fresh)"
+  rm -rf $BUILD_DIR $MARKER
   # Put the working tree back even when the build fails; otherwise the caller (and a
   # reused CI runner) is left with the tag's sources checked out over the branch.
   if ! forge build --out $BUILD_DIR --ast >> $LOG_FILE; then
@@ -115,6 +125,36 @@ function build_tag_foundry() {
     checkout_build_sources $CURRENT_HASH $LOG_FILE -s
     return 1
   fi
+  # Written only after a successful build, so an interrupted build is never reused.
+  if [[ -n "$INPUTS" ]]; then
+    printf '%s\n' "$INPUTS" > $MARKER
+  fi
 
   checkout_build_sources $CURRENT_HASH $LOG_FILE -s
+}
+
+# USAGE: build_inputs <ref> <profile>
+# Prints everything a build of the checked-out sources of <ref> depends on, or fails when
+# the build cannot be fingerprinted (the ref does not resolve to a commit, a lib/
+# submodule has local changes, or forge cannot resolve its configuration). A failure means
+# the build is never reused. build_tag_foundry restores only a ref's contract sources and
+# its foundry.toml and remappings.txt; the libraries (the lib/ submodules and
+# node_modules), the compiler driver and the environment come from the current checkout,
+# so they are inputs too. forge's resolved configuration covers every way of configuring
+# it (foundry.toml, FOUNDRY_CONFIG, FOUNDRY_* and DAPP_* variables, remappings).
+function build_inputs() {
+  local COMMIT CONFIG
+  COMMIT=$(git rev-parse --verify --quiet "$1^{commit}") || return 1
+  if [[ -n "$(git submodule foreach --recursive --quiet 'git status --porcelain')" ]]; then
+    return 1
+  fi
+  CONFIG=$(forge config --json 2>/dev/null | git hash-object --stdin) || return 1
+  echo "format 2: forge build --out <dir> --ast"
+  echo "commit $COMMIT"
+  echo "profile $2"
+  echo "config $CONFIG"
+  echo "yarn.lock $(git hash-object "$(git rev-parse --show-toplevel)/yarn.lock")"
+  forge --version | sed 's/^/forge /'
+  # Commit and path only: the trailing describe label depends on which refs a clone has.
+  git submodule status --recursive -- lib | awk '{ print "submodule", $1, $2 }'
 }
