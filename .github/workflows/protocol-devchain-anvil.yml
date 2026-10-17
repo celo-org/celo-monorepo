@@ -162,10 +162,12 @@ jobs:
           # In LOAD_STATE mode start_anvil.sh omits --dump-state, so anvil-devchain:start
           # never persists the migrated state and the published package ships without a
           # devchain. Dump the still-running anvil over RPC and decompress the gzip+hex
-          # payload into the plain-JSON file consumers load via --load-state.
+          # payload into the plain-JSON file consumers load via --load-state. python3 does
+          # the hex and gzip decoding because the runner image has no xxd.
           source ./scripts/foundry/constants.sh
           cast rpc --rpc-url "$ANVIL_RPC_URL" anvil_dumpState \
-            | tr -d '"' | sed 's/^0x//' | xxd -r -p | gunzip > ".tmp/devchain/$L2_DEVCHAIN_FILE_NAME"
+            | python3 -c 'import gzip, json, sys; sys.stdout.buffer.write(gzip.decompress(bytes.fromhex(json.load(sys.stdin).removeprefix("0x"))))' \
+            > ".tmp/devchain/$L2_DEVCHAIN_FILE_NAME"
           ls -la ".tmp/devchain"
 
       - name: Run migration tests against local op-geth devchain
