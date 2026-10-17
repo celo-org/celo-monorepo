@@ -224,6 +224,20 @@ jobs:
       - name: Install forge dependencies
         working-directory: packages/protocol
         run: forge install
+      # Release tags never change, so their builds carry over between runs. build_tag_foundry
+      # reuses a restored build only when its recorded inputs match the current ones exactly
+      # (see release-lib.sh); this key only decides how often that happens.
+      - name: Release tag build cache key
+        id: tag-builds
+        working-directory: packages/protocol
+        run: echo "submodules=$(git submodule status --recursive -- lib | awk '{ print $1, $2 }' | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
+      - name: Release tag build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages/protocol/out-core-contracts.v*
+            !packages/protocol/out-core-contracts.v*-head*
+          key: release-tag-builds-test-release-foundry-v1.5.0-${{ env.RELEASE_TAG }}-${{ hashFiles('yarn.lock', 'packages/protocol/scripts/bash/release-lib.sh') }}-${{ steps.tag-builds.outputs.submodules }}
       - name: Release HEAD against the current release's devchain
         run: |
           echo "Baseline devchain: $RELEASE_TAG; release under test: HEAD"
@@ -290,6 +304,22 @@ jobs:
       - name: Install forge dependencies
         working-directory: packages/protocol
         run: forge install
+      # Release tags never change, so their builds carry over between runs. build_tag_foundry
+      # reuses a restored build only when its recorded inputs match the current ones exactly
+      # (see release-lib.sh); this key only decides how often that happens.
+      - name: Release tag build cache key
+        if: matrix.name == 'Protocol Release Snapshots'
+        id: tag-builds
+        working-directory: packages/protocol
+        run: echo "submodules=$(git submodule status --recursive -- lib | awk '{ print $1, $2 }' | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
+      - name: Release tag build cache
+        if: matrix.name == 'Protocol Release Snapshots'
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages/protocol/out-core-contracts.v*
+            !packages/protocol/out-core-contracts.v*-head*
+          key: release-tag-builds-snapshots-foundry-v1.0.0-${{ env.RELEASE_TAG }}-${{ hashFiles('yarn.lock', 'packages/protocol/scripts/bash/release-lib.sh') }}-${{ steps.tag-builds.outputs.submodules }}
       - name: Execute matrix command for test
         uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
         with:
