@@ -194,6 +194,21 @@ jobs:
         with:
           name: protocol-workspace
           path: packages/protocol
+      # The migration rebuilds every 0.8 contract with the deployed library addresses linked
+      # in, which the workspace build does not have. The addresses come out the same on every
+      # run, so laying the newest earlier linked build over the workspace leaves forge only
+      # the sources that changed since then to recompile.
+      - name: Devchain build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages/protocol/cache
+            packages/protocol/cache-solc-0.5
+            packages/protocol/out
+            packages/protocol/out-solc-0.5
+          key: ${{ runner.os }}-foundry-devchain-build-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-foundry-devchain-build-
       - name: Install Foundry
         # foundry-toolchain v1.7.0 https://github.com/foundry-rs/foundry-toolchain/releases/tag/v1.7.0
         uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
