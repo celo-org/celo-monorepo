@@ -54,13 +54,13 @@ Blockscout and Celoscan. Shipping a version Blockscout does not have leaves the 
 unverified on the explorer Celo links to. Celoscan is usually ahead; Blockscout is the
 binding one. Raise the pin once Blockscout lists the version.
 
-**EVM target is shanghai, not what the chain supports.** Celo mainnet and Celo Sepolia run
-Prague and execute PUSH0, MCOPY and TSTORE/TLOAD today. The limit is our own tooling:
-`lib/compatibility/ast-version.ts` reads each contract's version by executing its bytecode
-in the vendored `@celo/ethereumjs-vm`, which implements no hardfork past shanghai. Target
-cancun or later and every version read fails. Moving past shanghai means replacing that VM
-first. Older builds were capped at `paris` because Celo L1 could not execute PUSH0; that
-limit died with the L2 migration.
+**EVM target is shanghai by choice, not by tooling limit.** Celo mainnet and Celo Sepolia run
+Prague and execute PUSH0, MCOPY and TSTORE/TLOAD today. `lib/compatibility/ast-version.ts`
+reads each contract's version by executing its bytecode in upstream `@ethereumjs/evm` on
+cancun, and solc emits the same opcodes for prague, so any `evm_version` up to prague works
+with the release tooling. Raising it changes the bytecode of every contract, so treat it as a
+release decision. Older builds were capped
+at `paris` because Celo L1 could not execute PUSH0; that limit died with the L2 migration.
 
 **Newer is usually safer, not riskier.** Known-bug counts fall as versions rise: 0.8.19
 seven, 0.8.28 six, 0.8.35 five, 0.8.36 three. Treat "use an older, battle-tested version"

@@ -19,11 +19,11 @@ via_ir = false
 # Celo L1 could not execute PUSH0, which is why the contracts were capped at paris (and at
 # Solidity <0.8.20). As an OP Stack L2 Celo follows the Ethereum forks, and that cap is
 # gone: mainnet and Celo Sepolia both run Prague and execute PUSH0, MCOPY and TSTORE/TLOAD.
-# The ceiling here is our own tooling rather than the chain. The compatibility check reads
-# each contract's version by running its bytecode in the vendored @celo/ethereumjs-vm,
-# which implements no hardfork past shanghai, so a cancun target (MCOPY, TSTORE/TLOAD)
-# would make every version read fail. shanghai takes PUSH0, which is what the L1 cap cost
-# us; going further needs that VM replaced first.
+# The compatibility check reads each contract's version by running its bytecode in upstream
+# @ethereumjs/evm on cancun; solc emits the same opcodes for prague, so any target up to
+# prague works with the tooling. shanghai is kept for now because raising it changes the
+# bytecode of every contract; moving to cancun or prague is a release decision, not a
+# tooling limit.
 evm_version = 'shanghai'
 # The compatibility report reads the AST; literal sources in the metadata match what the
 # release builds have always shipped.
@@ -77,6 +77,10 @@ skip=[
   ]
 src = 'contracts-0.5'
 out = 'out-solc-0.5'
+# A profile with its own src and out needs its own cache file: the cache records a single
+# source root, so building this profile into the shared one drops every entry of the 0.8
+# build and the next default build recompiles all of it.
+cache_path = 'cache-solc-0.5'
 libs = ['lib', 'node_modules']
 solc_version = '0.5.14'
 ast = true
@@ -97,6 +101,7 @@ skip=[
   ]
 src = 'contracts-0.5'
 out = 'out-solc-0.5-optimized'
+cache_path = 'cache-solc-0.5-optimized' # own cache file, same reason as solc05
 libs = ['lib', 'node_modules']
 solc_version = '0.5.17'
 ast = true

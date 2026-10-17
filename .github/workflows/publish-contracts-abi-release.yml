@@ -57,12 +57,12 @@ jobs:
       # publish-contracts-abi-release.yml), so no long-lived npm token is required.
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version-file: .nvmrc
           registry-url: 'https://registry.npmjs.org'
 
       - name: Update npm for OIDC trusted publishing
-        # npm 11 is the newest major that still supports the node 20 pinned above;
-        # npm@latest (12+) requires node >= 22 and makes this step fail.
+        # npm is pinned to a major so a release does not pick up whatever npm@latest
+        # happens to be that day; OIDC trusted publishing needs npm >= 11.5.
         run: npm install -g npm@11
 
       - name: 'Setup yarn'

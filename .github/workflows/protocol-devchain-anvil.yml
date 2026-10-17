@@ -31,7 +31,7 @@ jobs:
       run:
         working-directory: packages/protocol
     name: Generate anvil
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ['self-hosted', 'org', '8-cpu']
     environment:
       name: production
     permissions:
@@ -120,7 +120,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version-file: .nvmrc
 
       - name: 'Setup yarn'
         shell: bash
@@ -162,17 +162,19 @@ jobs:
           # In LOAD_STATE mode start_anvil.sh omits --dump-state, so anvil-devchain:start
           # never persists the migrated state and the published package ships without a
           # devchain. Dump the still-running anvil over RPC and decompress the gzip+hex
-          # payload into the plain-JSON file consumers load via --load-state.
+          # payload into the plain-JSON file consumers load via --load-state. python3 does
+          # the hex and gzip decoding because the runner image has no xxd.
           source ./scripts/foundry/constants.sh
           cast rpc --rpc-url "$ANVIL_RPC_URL" anvil_dumpState \
-            | tr -d '"' | sed 's/^0x//' | xxd -r -p | gunzip > ".tmp/devchain/$L2_DEVCHAIN_FILE_NAME"
+            | python3 -c 'import gzip, json, sys; sys.stdout.buffer.write(gzip.decompress(bytes.fromhex(json.load(sys.stdin).removeprefix("0x"))))' \
+            > ".tmp/devchain/$L2_DEVCHAIN_FILE_NAME"
           ls -la ".tmp/devchain"
 
       - name: Run migration tests against local op-geth devchain
         run: |
           source ./scripts/foundry/constants.sh
 
-          FOUNDRY_PROFILE=devchain forge test -vvv \
+          FOUNDRY_PROFILE=devchain forge test -vvv --offline \
           --match-path "test-sol/devchain/migration/*" \
           --fork-url $ANVIL_RPC_URL
       
@@ -180,7 +182,10 @@ jobs:
         run: |
           source ./scripts/foundry/constants.sh
 
-          FOUNDRY_PROFILE=devchain forge test -vvv \
+          # --offline: at -vvv forge decodes every trace and asks openchain.xyz for each signature it
+          # cannot resolve locally; one 110M-gas e2e trace turned that into hours of waiting. The
+          # local ABIs still decode everything these tests call.
+          FOUNDRY_PROFILE=devchain forge test -vvv --offline \
           --match-path "test-sol/devchain/e2e/*" \
           --fork-url $ANVIL_RPC_URL
 
@@ -244,11 +249,13 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          # This job only downloads an artifact and never checks out the repository,
+          # so it cannot read .nvmrc. Keep the two in sync.
+          node-version: '24'
 
       - name: Update npm for OIDC trusted publishing
-        # npm 11 is the newest major that still supports the node 20 pinned above;
-        # npm@latest (12+) requires node >= 22 and makes this step fail.
+        # npm is pinned to a major so a release does not pick up whatever npm@latest
+        # happens to be that day; OIDC trusted publishing needs npm >= 11.5.
         run: npm install -g npm@11
 
       - name: Publish @celo/devchain-anvil
