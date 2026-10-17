@@ -225,24 +225,41 @@ jobs:
         working-directory: packages/protocol
         run: forge install
       # Release tags never change, so their builds carry over between runs. build_tag_foundry
-      # reuses a restored build only when its recorded inputs match the current ones exactly
-      # (see release-lib.sh); this key only decides how often that happens.
-      - name: Release tag build cache key
+      # reuses a restored build only when its recorded inputs (<dir>.inputs, see
+      # release-lib.sh) match the current ones exactly; the newest saved set is offered and
+      # anything stale in it is rebuilt.
+      - name: Restore release tag builds
         id: tag-builds
-        working-directory: packages/protocol
-        run: echo "submodules=$(git submodule status --recursive -- lib | awk '{ print $1, $2 }' | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
-      - name: Release tag build cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             packages/protocol/out-core-contracts.v*
             !packages/protocol/out-core-contracts.v*-head*
-          key: release-tag-builds-test-release-foundry-v1.5.0-${{ env.RELEASE_TAG }}-${{ hashFiles('yarn.lock', 'packages/protocol/scripts/bash/release-lib.sh') }}-${{ steps.tag-builds.outputs.submodules }}
+          key: release-tag-builds-test-release-
+          restore-keys: release-tag-builds-test-release-
       - name: Release HEAD against the current release's devchain
         run: |
           echo "Baseline devchain: $RELEASE_TAG; release under test: HEAD"
           BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
           yarn --cwd packages/protocol ci:test-make-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR
+      # Saved under a digest of the recorded inputs, so a set rebuilt because any input
+      # changed lands in a new entry instead of being shadowed by the stale one.
+      - name: Fingerprint release tag builds
+        id: tag-builds-digest
+        working-directory: packages/protocol
+        run: |
+          markers=$(ls out-core-contracts.v*.inputs 2>/dev/null | grep -v -- '-head' || true)
+          if [[ -n "$markers" ]]; then
+            echo "digest=$(cat $markers | sha256sum | cut -c1-32)" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Save release tag builds
+        if: steps.tag-builds-digest.outputs.digest != '' && steps.tag-builds.outputs.cache-matched-key != format('release-tag-builds-test-release-{0}', steps.tag-builds-digest.outputs.digest)
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            packages/protocol/out-core-contracts.v*
+            !packages/protocol/out-core-contracts.v*-head*
+          key: release-tag-builds-test-release-${{ steps.tag-builds-digest.outputs.digest }}
 
   protocol-test-matrix:
     # Keeping name short because GitHub UI does not handle long names well
@@ -305,21 +322,19 @@ jobs:
         working-directory: packages/protocol
         run: forge install
       # Release tags never change, so their builds carry over between runs. build_tag_foundry
-      # reuses a restored build only when its recorded inputs match the current ones exactly
-      # (see release-lib.sh); this key only decides how often that happens.
-      - name: Release tag build cache key
+      # reuses a restored build only when its recorded inputs (<dir>.inputs, see
+      # release-lib.sh) match the current ones exactly; the newest saved set is offered and
+      # anything stale in it is rebuilt.
+      - name: Restore release tag builds
         if: matrix.name == 'Protocol Release Snapshots'
         id: tag-builds
-        working-directory: packages/protocol
-        run: echo "submodules=$(git submodule status --recursive -- lib | awk '{ print $1, $2 }' | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
-      - name: Release tag build cache
-        if: matrix.name == 'Protocol Release Snapshots'
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             packages/protocol/out-core-contracts.v*
             !packages/protocol/out-core-contracts.v*-head*
-          key: release-tag-builds-snapshots-foundry-v1.0.0-${{ env.RELEASE_TAG }}-${{ hashFiles('yarn.lock', 'packages/protocol/scripts/bash/release-lib.sh') }}-${{ steps.tag-builds.outputs.submodules }}
+          key: release-tag-builds-snapshots-
+          restore-keys: release-tag-builds-snapshots-
       - name: Execute matrix command for test
         uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
         with:
@@ -327,6 +342,25 @@ jobs:
           max_attempts: 3
           command: |
             ${{ matrix.command }}
+      # Saved under a digest of the recorded inputs, so a set rebuilt because any input
+      # changed lands in a new entry instead of being shadowed by the stale one.
+      - name: Fingerprint release tag builds
+        if: matrix.name == 'Protocol Release Snapshots'
+        id: tag-builds-digest
+        working-directory: packages/protocol
+        run: |
+          markers=$(ls out-core-contracts.v*.inputs 2>/dev/null | grep -v -- '-head' || true)
+          if [[ -n "$markers" ]]; then
+            echo "digest=$(cat $markers | sha256sum | cut -c1-32)" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Save release tag builds
+        if: matrix.name == 'Protocol Release Snapshots' && steps.tag-builds-digest.outputs.digest != '' && steps.tag-builds.outputs.cache-matched-key != format('release-tag-builds-snapshots-{0}', steps.tag-builds-digest.outputs.digest)
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            packages/protocol/out-core-contracts.v*
+            !packages/protocol/out-core-contracts.v*-head*
+          key: release-tag-builds-snapshots-${{ steps.tag-builds-digest.outputs.digest }}
 
   # NOTE: This has not been fully tested as we don't have a license for certora
   certora-test:
