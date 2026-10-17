@@ -152,7 +152,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: 'celo-org/optimism'
-          ref: ${{ steps.optimism-rev.outputs.sha }}
+          # The literal branch, not the resolved sha: a step output as checkout ref reads to
+          # CodeQL as untrusted code in a cache-writing workflow. Should the branch move between
+          # the two steps, the entry is saved under the older sha, which no later run resolves.
+          ref: 'celo/core-contracts-base'
           path: celo-optimism
           submodules: recursive
 
