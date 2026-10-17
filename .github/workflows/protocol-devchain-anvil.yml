@@ -10,6 +10,7 @@ on:
     branches: [release/core-contracts/*, master]
     paths:
       - 'packages/protocol/**'
+      - '.github/workflows/protocol-devchain-anvil.yml'
   workflow_dispatch:
     inputs:
       npm_tag:
