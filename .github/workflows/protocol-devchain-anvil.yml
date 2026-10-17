@@ -52,7 +52,8 @@ jobs:
       # The addresses come out the same on every run, so restoring the newest earlier build
       # leaves forge only the sources that changed since then to recompile.
       - name: Foundry build cache
-        uses: actions/cache@v4
+        id: foundry-build
+        uses: actions/cache/restore@v4
         with:
           path: |
             packages/protocol/cache
@@ -168,6 +169,20 @@ jobs:
         if: success() || failure()
         run: |
           LOAD_STATE=${{ github.workspace }}/celo-optimism/packages/contracts-bedrock/anvil-state.json yarn anvil-devchain:start
+
+      # Saved before the devchain tests: their FOUNDRY_PROFILE=devchain build shares cache/ and
+      # out/ and rebuilds the sources it needs without the library addresses, which would leave
+      # an unlinked build in the cache for the next run to recompile.
+      - name: Save foundry build cache
+        if: steps.foundry-build.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            packages/protocol/cache
+            packages/protocol/cache-solc-0.5
+            packages/protocol/out
+            packages/protocol/out-solc-0.5
+          key: ${{ runner.os }}-foundry-anvil-build-${{ github.sha }}
 
       - name: Dump migrated devchain state to l2-devchain.json
         if: success() || failure()
