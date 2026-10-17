@@ -135,23 +135,26 @@ function build_tag_foundry() {
 
 # USAGE: build_inputs <ref> <profile>
 # Prints everything a build of the checked-out sources of <ref> depends on, or fails when
-# <ref> does not resolve to a commit. build_tag_foundry restores only a ref's contract
-# sources and its foundry.toml and remappings.txt; the libraries (the lib/ submodules and
-# node_modules), the compiler driver and the FOUNDRY_* environment come from the current
-# checkout, so they are inputs too.
+# the build cannot be fingerprinted (the ref does not resolve to a commit, a lib/
+# submodule has local changes, or forge cannot resolve its configuration). A failure means
+# the build is never reused. build_tag_foundry restores only a ref's contract sources and
+# its foundry.toml and remappings.txt; the libraries (the lib/ submodules and
+# node_modules), the compiler driver and the environment come from the current checkout,
+# so they are inputs too. forge's resolved configuration covers every way of configuring
+# it (foundry.toml, FOUNDRY_CONFIG, FOUNDRY_* and DAPP_* variables, remappings).
 function build_inputs() {
-  local COMMIT
+  local COMMIT CONFIG
   COMMIT=$(git rev-parse --verify --quiet "$1^{commit}") || return 1
-  echo "format 1: forge build --out <dir> --ast"
+  if [[ -n "$(git submodule foreach --recursive --quiet 'git status --porcelain')" ]]; then
+    return 1
+  fi
+  CONFIG=$(forge config --json 2>/dev/null | git hash-object --stdin) || return 1
+  echo "format 2: forge build --out <dir> --ast"
   echo "commit $COMMIT"
   echo "profile $2"
-  echo "foundry.toml $(git hash-object foundry.toml)"
-  if [[ -f remappings.txt ]]; then
-    echo "remappings.txt $(git hash-object remappings.txt)"
-  fi
+  echo "config $CONFIG"
   echo "yarn.lock $(git hash-object "$(git rev-parse --show-toplevel)/yarn.lock")"
   forge --version | sed 's/^/forge /'
   # Commit and path only: the trailing describe label depends on which refs a clone has.
   git submodule status --recursive -- lib | awk '{ print "submodule", $1, $2 }'
-  env | grep '^FOUNDRY_' | grep -v '^FOUNDRY_PROFILE=' | sort | sed 's/^/env /' || true
 }
