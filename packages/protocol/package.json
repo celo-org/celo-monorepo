@@ -48,7 +48,7 @@
     "@ethereumjs/evm": "^3.1.1",
     "@ethereumjs/util": "^9.1.0",
     "@openzeppelin/contracts8": "npm:@openzeppelin/contracts@^4.4.2",
-    "@openzeppelin/upgrades-core": "1.41.0",
+    "@openzeppelin/upgrades-core": "1.46.0",
     "bignumber.js": "9.1.0",
     "bn.js": "^5.1.0",
     "chai": "^4.3.6",
