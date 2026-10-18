@@ -87,6 +87,10 @@ if [ "${AUTO_IMPERSONATE:-}" = true ]; then
   IMPERSONATE_FLAGS="--auto-impersonate --accounts 0"
 fi
 
+# Automine (no --block-time): the migration broadcasts from several senders, so forge waits
+# for each receipt before sending the next transaction, and interval mining would cost a
+# whole block of wall time per transaction. Anything that needs time or blocks to pass
+# advances them explicitly through evm_increaseTime / anvil_mine.
 $ANVIL \
   $USE_CELO \
   --port $ANVIL_PORT \
@@ -96,7 +100,6 @@ $ANVIL \
   --gas-limit $GAS_LIMIT \
   --code-size-limit $CODE_SIZE_LIMIT \
   --balance $BALANCE \
-  --block-time 1 \
   --steps-tracing &
 
 # For context "&" tells the shell to start a command as a background process.

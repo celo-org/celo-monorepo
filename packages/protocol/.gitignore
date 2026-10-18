@@ -36,6 +36,8 @@ deployedGrants.json
 
 # Foundry
 cache/
+cache-solc-0.5/
+cache-solc-0.5-optimized/
 out/
 # artifacts/ once held committed copies of the contracts-0.5 build; build output is never
 # committed (contracts-0.5 builds with the solc05 profile into out-solc-0.5, ignored by out*)
