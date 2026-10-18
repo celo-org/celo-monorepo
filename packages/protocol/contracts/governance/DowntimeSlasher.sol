@@ -1,14 +1,17 @@
-pragma solidity ^0.5.13;
-
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.9.0;
 
 import "./SlasherUtil.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
+// Storage layout (must match 0.5 baseline):
+//   slot 0: _owner (address, 20 bytes) + initialized (bool, 1 byte) — packed
+//   slot 1: registry (address, 20 bytes)
+//   slot 2-3: slashingIncentives (inherited from SlasherUtil)
+//   slot 4: lastSlashedBlock
+//   slot 5: bitmaps
+//   slot 6: slashableDowntime
 contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
-  using SafeMath for uint256;
-
   // Maps validator address -> end block of the latest interval for which it has been slashed.
   mapping(address => uint256) public lastSlashedBlock;
 
@@ -35,7 +38,7 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public SlasherUtil(test) {}
+  constructor(bool test) SlasherUtil(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -64,7 +67,7 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (2, 0, 0, 1);
+    return (2, 1, 0, 0);
   }
 
   /**
@@ -129,9 +132,9 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
     uint256[] memory groupElectionIndices
   ) public onlyL1 {
     uint256 startBlock = startBlocks[0];
-    uint256 endBlock = endBlocks[endBlocks.length.sub(1)];
+    uint256 endBlock = endBlocks[(endBlocks.length - 1)];
     require(
-      endBlock.sub(startBlock).add(1) >= slashableDowntime,
+      ((endBlock - startBlock) + 1) >= slashableDowntime,
       "the provided intervals must span slashableDowntime blocks"
     );
     address validator = getValidatorAccountFromSignerIndex(signerIndices[0], startBlock);
@@ -175,14 +178,14 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
     // The signature bitmap for block N is stored in block N+1.
     // The latest block is `block.number - 1`, which stores the signature bitmap for
     // `block.number - 2`.
-    uint256 lastBlockWithSignatureBitmap = block.number.sub(2);
+    uint256 lastBlockWithSignatureBitmap = (block.number - 2);
     require(
       endBlock <= lastBlockWithSignatureBitmap,
       "the signature bitmap for endBlock is not yet available"
     );
     uint256 epochSize = getEpochSize();
     require(
-      block.number.sub(startBlock) < epochSize.mul(4),
+      (block.number - startBlock) < (epochSize * 4),
       "startBlock must be within 4 epochs of the current head"
     );
     require(
@@ -194,10 +197,10 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
     for (
       uint256 blockNumber = startBlock;
       blockNumber <= endBlock;
-      blockNumber = blockNumber.add(1)
+      blockNumber = (blockNumber + 1)
     ) {
       // The canonical signatures for block N are stored in the parent seal bitmap for block N+1.
-      bitmap |= getParentSealBitmap(blockNumber.add(1));
+      bitmap |= getParentSealBitmap((blockNumber + 1));
     }
 
     return bitmap;
@@ -222,7 +225,7 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
       "bitmap for specified interval not yet set"
     );
 
-    return (bitmaps[msg.sender][startBlock][endBlock] & bytes32(1 << signerIndex)) == 0;
+    return (bitmaps[msg.sender][startBlock][endBlock] & bytes32(uint256(1) << signerIndex)) == 0;
   }
 
   /**
@@ -260,18 +263,18 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
 
     uint256 epochSize = getEpochSize();
     uint256 signerIndicesIndex = 0;
-    for (uint256 i = 0; i < startBlocks.length; i = i.add(1)) {
+    for (uint256 i = 0; i < startBlocks.length; i = (i + 1)) {
       if (i > 0) {
         require(
-          startBlocks[i.sub(1)] < startBlocks[i],
+          startBlocks[(i - 1)] < startBlocks[i],
           "each interval must start after the start of the previous interval"
         );
         require(
-          startBlocks[i] <= endBlocks[i.sub(1)].add(1),
+          startBlocks[i] <= (endBlocks[(i - 1)] + 1),
           "each interval must start at most one block after the end of the previous interval"
         );
         require(
-          endBlocks[i.sub(1)] < endBlocks[i],
+          endBlocks[(i - 1)] < endBlocks[i],
           "each interval must end after the end of the previous interval"
         );
         // The signer index of a particular validator may change from epoch to epoch.
@@ -279,19 +282,19 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
         // epochs, and because intervals processed by this function are guaranteed to be
         // overlapping or contiguous, whenever we cross epoch boundaries we are guaranteed to
         // process an interval that starts with the first block of that epoch.
-        if (startBlocks[i].mod(epochSize) == 1) {
+        if ((startBlocks[i] % epochSize) == 1) {
           require(
             getValidatorAccountFromSignerIndex(
               signerIndices[signerIndicesIndex],
-              startBlocks[i].sub(1)
+              (startBlocks[i] - 1)
             ) ==
               getValidatorAccountFromSignerIndex(
-                signerIndices[signerIndicesIndex.add(1)],
+                signerIndices[(signerIndicesIndex + 1)],
                 startBlocks[i]
               ),
             "indices do not point to the same validator"
           );
-          signerIndicesIndex = signerIndicesIndex.add(1);
+          signerIndicesIndex = (signerIndicesIndex + 1);
         }
       }
       if (!wasDownForInterval(startBlocks[i], endBlocks[i], signerIndices[signerIndicesIndex])) {
@@ -313,5 +316,14 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
     uint256 blockNumber
   ) internal view returns (address) {
     return getAccounts().signerToAccount(validatorSignerAddressFromSet(signerIndex, blockNumber));
+  }
+
+  /**
+   * @notice Whether the sender is the owner.
+   * @dev Kept from the Solidity 0.5 implementation: OpenZeppelin 2.5's Ownable exposed it
+   * and 4.9's does not, and the ABI behind the upgraded proxy must not lose a function.
+   */
+  function isOwner() external view returns (bool) {
+    return msg.sender == owner();
   }
 }

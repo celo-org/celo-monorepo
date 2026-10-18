@@ -7,6 +7,7 @@ import { IEpochManagerEnablerMock } from "@test-sol/unit/common/interfaces/IEpoc
 import { EpochManagerEnablerMock } from "@test-sol/mocks/EpochManagerEnablerMock.sol";
 import { MockCeloUnreleasedTreasury } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasury.sol";
 import { MockCeloToken08 } from "@celo-contracts-8/common/test/MockCeloToken.sol";
+import { ICeloTokenTest } from "@test-sol/unit/common/interfaces/ICeloTokenTest.sol";
 
 import { IRegistry } from "@celo-contracts/common/interfaces/IRegistry.sol";
 import { IAccounts } from "@celo-contracts/common/interfaces/IAccounts.sol";
@@ -21,7 +22,12 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
   EpochManager_WithMocks public epochManager;
   EpochManagerEnablerMock epochManagerEnabler;
   MockCeloUnreleasedTreasury celoUnreleasedTreasury;
-  MockCeloToken08 celoToken;
+  // The CELO token handle tests use: the mock by default, or the real GoldToken once a test
+  // deploys it and points the handle at it.
+  ICeloTokenTest celoToken;
+  // Base helpers set balances through the mock directly so they keep working after a test
+  // repoints celoToken at the real GoldToken.
+  MockCeloToken08 celoTokenMock;
 
   IAccounts accountsContract;
   IEpochManagerEnablerMock epochManagerEnablerMockInterface;
@@ -71,9 +77,10 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
   }
 
   function setupCeloToken() public {
-    celoToken = new MockCeloToken08();
+    celoTokenMock = new MockCeloToken08();
+    celoToken = ICeloTokenTest(address(celoTokenMock));
     registry.setAddressFor(CeloTokenContract, address(celoToken));
-    celoToken.setTotalSupply(CELO_SUPPLY_CAP);
+    celoTokenMock.setTotalSupply(CELO_SUPPLY_CAP);
   }
 
   function setupCeloUnreleasedTreasury() public {
@@ -86,7 +93,7 @@ contract TestWithUtils08 is ForgeTest, TestConstants, IsL2Check, PrecompilesOver
     address _currentCeloUnreleasedTreasuryAddress = registry.getAddressForStringOrDie(
       CeloUnreleasedTreasuryContract
     );
-    celoToken.setBalanceOf(_currentCeloUnreleasedTreasuryAddress, L2_INITIAL_STASH_BALANCE);
+    celoTokenMock.setBalanceOf(_currentCeloUnreleasedTreasuryAddress, L2_INITIAL_STASH_BALANCE);
     vm.deal(_currentCeloUnreleasedTreasuryAddress, L2_INITIAL_STASH_BALANCE);
   }
 

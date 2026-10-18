@@ -1,8 +1,8 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.9.0;
 /* solhint-disable no-inline-assembly, avoid-low-level-calls, func-name-mixedcase, func-order */
 
 // OpenZeppelin imports
-import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 // Local imports
 import { ExternalCall } from "./ExternalCall.sol";
@@ -30,8 +30,6 @@ import { IMultiSig } from "./interfaces/IMultiSig.sol";
  * Solidity users.
  */
 contract MultiSig is Initializable, IMultiSig {
-  using SafeMath for uint256;
-
   struct Transaction {
     address destination;
     uint256 value;
@@ -123,7 +121,12 @@ contract MultiSig is Initializable, IMultiSig {
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
+
+  /// @dev Allows to deposit ether.
+  receive() external payable {
+    if (msg.value > 0) emit Deposit(msg.sender, msg.value);
+  }
 
   /*
    * Public functions
@@ -142,7 +145,7 @@ contract MultiSig is Initializable, IMultiSig {
     validRequirement(_owners.length, _required)
     validRequirement(_owners.length, _internalRequired)
   {
-    for (uint256 i = 0; i < _owners.length; i = i.add(1)) {
+    for (uint256 i = 0; i < _owners.length; i = (i + 1)) {
       require(
         !isOwner[_owners[i]] && _owners[i] != address(0),
         "owner was null or already given owner status"
@@ -154,11 +157,6 @@ contract MultiSig is Initializable, IMultiSig {
     internalRequired = _internalRequired;
   }
 
-  /// @dev Fallback function allows to deposit ether.
-  function() external payable {
-    if (msg.value > 0) emit Deposit(msg.sender, msg.value);
-  }
-
   /// @dev Allows to add a new owner. Transaction has to be sent by wallet.
   /// @param owner Address of new owner.
   function addOwner(
@@ -168,7 +166,7 @@ contract MultiSig is Initializable, IMultiSig {
     onlyWallet
     ownerDoesNotExist(owner)
     notNull(owner)
-    validRequirement(owners.length.add(1), internalRequired)
+    validRequirement((owners.length + 1), internalRequired)
   {
     isOwner[owner] = true;
     owners.push(owner);
@@ -179,12 +177,12 @@ contract MultiSig is Initializable, IMultiSig {
   /// @param owner Address of owner.
   function removeOwner(address owner) external onlyWallet ownerExists(owner) {
     isOwner[owner] = false;
-    for (uint256 i = 0; i < owners.length.sub(1); i = i.add(1))
+    for (uint256 i = 0; i < (owners.length - 1); i = (i + 1))
       if (owners[i] == owner) {
-        owners[i] = owners[owners.length.sub(1)];
+        owners[i] = owners[(owners.length - 1)];
         break;
       }
-    owners.length = owners.length.sub(1);
+    owners.pop();
     if (required > owners.length) changeRequirement(owners.length);
     if (internalRequired > owners.length) changeInternalRequirement(owners.length);
     emit OwnerRemoval(owner);
@@ -197,7 +195,7 @@ contract MultiSig is Initializable, IMultiSig {
     address owner,
     address newOwner
   ) external onlyWallet ownerExists(owner) notNull(newOwner) ownerDoesNotExist(newOwner) {
-    for (uint256 i = 0; i < owners.length; i = i.add(1))
+    for (uint256 i = 0; i < owners.length; i = (i + 1))
       if (owners[i] == owner) {
         owners[i] = newOwner;
         break;
@@ -226,7 +224,7 @@ contract MultiSig is Initializable, IMultiSig {
   /// @param destination Transaction target address.
   /// @param value Transaction ether value.
   /// @param data Transaction data payload.
-  /// @return Returns transaction ID.
+  /// @return transactionId Returns transaction ID.
   function submitTransaction(
     address destination,
     uint256 value,
@@ -241,20 +239,20 @@ contract MultiSig is Initializable, IMultiSig {
    */
   /// @dev Returns number of confirmations of a transaction.
   /// @param transactionId Transaction ID.
-  /// @return Number of confirmations.
+  /// @return count Number of confirmations.
   function getConfirmationCount(uint256 transactionId) external view returns (uint256 count) {
-    for (uint256 i = 0; i < owners.length; i = i.add(1))
-      if (confirmations[transactionId][owners[i]]) count = count.add(1);
+    for (uint256 i = 0; i < owners.length; i = (i + 1))
+      if (confirmations[transactionId][owners[i]]) count = (count + 1);
   }
 
   /// @dev Returns total number of transactions after filters are applied.
   /// @param pending Include pending transactions.
   /// @param executed Include executed transactions.
-  /// @return Total number of transactions after filters are applied.
+  /// @return count Total number of transactions after filters are applied.
   function getTransactionCount(bool pending, bool executed) external view returns (uint256 count) {
-    for (uint256 i = 0; i < transactionCount; i = i.add(1))
+    for (uint256 i = 0; i < transactionCount; i = (i + 1))
       if ((pending && !transactions[i].executed) || (executed && transactions[i].executed))
-        count = count.add(1);
+        count = (count + 1);
   }
 
   /// @dev Returns list of owners.
@@ -265,20 +263,20 @@ contract MultiSig is Initializable, IMultiSig {
 
   /// @dev Returns array with owner addresses, which confirmed transaction.
   /// @param transactionId Transaction ID.
-  /// @return Returns array of owner addresses.
+  /// @return _confirmations Returns array of owner addresses.
   function getConfirmations(
     uint256 transactionId
   ) external view returns (address[] memory _confirmations) {
     address[] memory confirmationsTemp = new address[](owners.length);
     uint256 count = 0;
     uint256 i;
-    for (i = 0; i < owners.length; i = i.add(1))
+    for (i = 0; i < owners.length; i = (i + 1))
       if (confirmations[transactionId][owners[i]]) {
         confirmationsTemp[count] = owners[i];
-        count = count.add(1);
+        count = (count + 1);
       }
     _confirmations = new address[](count);
-    for (i = 0; i < count; i = i.add(1)) _confirmations[i] = confirmationsTemp[i];
+    for (i = 0; i < count; i = (i + 1)) _confirmations[i] = confirmationsTemp[i];
   }
 
   /// @dev Returns list of transaction IDs in defined range.
@@ -286,7 +284,7 @@ contract MultiSig is Initializable, IMultiSig {
   /// @param to Index end position of transaction array.
   /// @param pending Include pending transactions.
   /// @param executed Include executed transactions.
-  /// @return Returns array of transaction IDs.
+  /// @return _transactionIds Returns array of transaction IDs.
   function getTransactionIds(
     uint256 from,
     uint256 to,
@@ -296,13 +294,13 @@ contract MultiSig is Initializable, IMultiSig {
     uint256[] memory transactionIdsTemp = new uint256[](transactionCount);
     uint256 count = 0;
     uint256 i;
-    for (i = 0; i < transactionCount; i = i.add(1))
+    for (i = 0; i < transactionCount; i = (i + 1))
       if ((pending && !transactions[i].executed) || (executed && transactions[i].executed)) {
         transactionIdsTemp[count] = i;
-        count = count.add(1);
+        count = (count + 1);
       }
-    _transactionIds = new uint256[](to.sub(from));
-    for (i = from; i < to; i = i.add(1)) _transactionIds[i.sub(from)] = transactionIdsTemp[i];
+    _transactionIds = new uint256[]((to - from));
+    for (i = from; i < to; i = (i + 1)) _transactionIds[(i - from)] = transactionIdsTemp[i];
   }
 
   /// @dev Allows to change the number of required confirmations. Transaction has to be sent by
@@ -359,8 +357,8 @@ contract MultiSig is Initializable, IMultiSig {
   /// @return Confirmation status.
   function isConfirmed(uint256 transactionId) public view returns (bool) {
     uint256 count = 0;
-    for (uint256 i = 0; i < owners.length; i = i.add(1)) {
-      if (confirmations[transactionId][owners[i]]) count = count.add(1);
+    for (uint256 i = 0; i < owners.length; i = (i + 1)) {
+      if (confirmations[transactionId][owners[i]]) count = (count + 1);
       bool isInternal = transactions[transactionId].destination == address(this);
       if ((isInternal && count == internalRequired) || (!isInternal && count == required))
         return true;
@@ -375,7 +373,7 @@ contract MultiSig is Initializable, IMultiSig {
   /// @param destination Transaction target address.
   /// @param value Transaction ether value.
   /// @param data Transaction data payload.
-  /// @return Returns transaction ID.
+  /// @return transactionId Returns transaction ID.
   function addTransaction(
     address destination,
     uint256 value,
@@ -388,7 +386,7 @@ contract MultiSig is Initializable, IMultiSig {
       data: data,
       executed: false
     });
-    transactionCount = transactionCount.add(1);
+    transactionCount = (transactionCount + 1);
     emit Submission(transactionId);
   }
 }

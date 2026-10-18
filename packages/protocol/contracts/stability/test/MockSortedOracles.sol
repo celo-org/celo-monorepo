@@ -1,5 +1,5 @@
 pragma solidity >=0.5.13 <0.9.0;
-import "../../../contracts-0.8/common/interfaces/IOracle.sol";
+import "../../common/interfaces/IOracle.sol";
 
 /**
  * @title A mock SortedOracles for testing.

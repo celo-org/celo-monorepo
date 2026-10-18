@@ -1,25 +1,10 @@
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9.0;
+
+import { Vm } from "forge-std-8/Vm.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";
 
-enum SolidityVersions {
-  SOLIDITY_05,
-  SOLIDITY_08
-}
-
 contract MigrationsConstants is TestConstants {
-  // Contracts compiled with Solidity 0.8
-  mapping(string => bool) internal is08Contract;
-
-  // List of contracts compiled with Solidity 0.8
-  string[] solidity08Contracts = [
-    "CeloUnreleasedTreasury",
-    "EpochManager",
-    "FeeCurrencyDirectory",
-    "ScoreManager",
-    "Validators"
-  ];
-
   // List of contracts that are expected to be in Registry.sol
   string[] contractsInRegistry = [
     "Accounts",
@@ -54,33 +39,21 @@ contract MigrationsConstants is TestConstants {
     "StableTokenBRL"
   ];
 
-  function _markAs08Contract(string memory contractName) internal {
-    is08Contract[contractName] = true;
-  }
-
-  constructor() {
-    for (uint256 i = 0; i < solidity08Contracts.length; i++) {
-      _markAs08Contract(solidity08Contracts[i]);
+  /**
+   * @notice Resolves a contract's forge artifact path.
+   * @dev Implementations compile with Solidity 0.8 into out (the default profile). The
+   * proxies, their factory and the vendored Mento contracts are Solidity 0.5 and are
+   * built by the solc05 profile into out-solc-0.5. Resolving by what actually exists on
+   * disk replaces the hand-maintained per-contract version list this contract used to
+   * carry.
+   */
+  function getContractArtifactPath(string memory contractName) public returns (string memory) {
+    Vm vm_ = Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
+    string memory suffix = string.concat(contractName, ".sol/", contractName, ".json");
+    string memory path08 = string.concat("out/", suffix);
+    if (vm_.isFile(path08)) {
+      return path08;
     }
-  }
-
-  function getSolidityVersion(string memory contractName) public view returns (SolidityVersions) {
-    if (is08Contract[contractName]) {
-      return SolidityVersions.SOLIDITY_08;
-    }
-    return SolidityVersions.SOLIDITY_05;
-  }
-
-  function getSolidityVersionPath(SolidityVersions version) public pure returns (string memory) {
-    if (version == SolidityVersions.SOLIDITY_05) {
-      return "out-truffle-compat/";
-    }
-    return "out-truffle-compat-0.8/";
-  }
-
-  function getContractArtifactPath(string memory contractName) public view returns (string memory) {
-    SolidityVersions version = getSolidityVersion(contractName);
-    string memory versionPath = getSolidityVersionPath(version);
-    return string.concat(versionPath, contractName, ".sol/", contractName, ".json");
+    return string.concat("out-solc-0.5/", suffix);
   }
 }

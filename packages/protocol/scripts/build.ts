@@ -3,19 +3,15 @@
 // Flag ordering:
 //   --solidity <outdir>   Runs `forge build` and writes truffle-style flat JSONs
 //                         ({contractName, abi, bytecode, deployedBytecode}) to
-//                         <outdir>/contracts/ and <outdir>/contracts-0.8/.
-//   --web3Types <outdir>  Reads the truffle-style JSONs (set BUILD_DIR to point
+//                         <outdir>/contracts/ (the 0.5 proxies) and <outdir>/contracts-0.8/ (0.8 build).
+//   --ethersTypes <outdir> Reads the truffle-style JSONs (set BUILD_DIR to point
 //                         at the same dir --solidity wrote to) and generates
-//                         web3 typings. REQUIRES --solidity to have run first.
-//   --ethersTypes <outdir> Same as --web3Types but for ethers-v5. REQUIRES
-//                         --solidity to have run first.
+//                         ethers-v5 typings. REQUIRES --solidity to have run first.
 
-import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs'
 import minimist, { ParsedArgs } from 'minimist'
 import path from 'path'
-import { tsGenerator } from 'ts-generator'
 import { SOLIDITY_05_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 import { contractPackages, CoreContracts, ImplContracts, Interfaces, ROOT_DIR } from './consts'
 
@@ -31,8 +27,8 @@ interface ContractArtifact {
 const readJSON = (file: string): ContractArtifact =>
   JSON.parse(readFileSync(file, 'utf-8')) as ContractArtifact
 
-const FOUNDRY_OUT_05 = 'out-truffle-compat'
-const FOUNDRY_OUT_08 = 'out-truffle-compat-0.8'
+const FOUNDRY_OUT_05 = SOLIDITY_05_PACKAGE.forgeOutDir
+const FOUNDRY_OUT_08 = SOLIDITY_08_PACKAGE.forgeOutDir
 
 function exec(cmd: string) {
   return execSync(cmd, { cwd: ROOT_DIR, stdio: 'inherit' })
@@ -85,10 +81,11 @@ function emitTruffleStyleArtifacts(outdir: string) {
 }
 
 function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
-  console.info(`protocol: Compiling solidity with foundry (truffle-compat profiles)`)
+  console.info(`protocol: Compiling solidity with foundry (solc05 and default profiles)`)
 
-  exec(`FOUNDRY_PROFILE=truffle-compat forge build`)
-  exec(`FOUNDRY_PROFILE=truffle-compat8 forge build`)
+  // The published packages carry the proxies too, so build contracts-0.5 as well.
+  exec(`FOUNDRY_PROFILE=solc05 forge build`)
+  exec(`forge build`)
 
   const contracts = coreContractsOnly ? CoreContracts : ImplContracts
   for (const contractName of contracts) {
@@ -136,13 +133,13 @@ function getContractList(coreContractsOnly: boolean) {
 }
 
 // Truffle-style flat artifacts directory that `--solidity` writes to and that
-// `--web3Types` / `--ethersTypes` then read. Defaults to ./build (matching the
+// `--ethersTypes` then reads. Defaults to ./build (matching the
 // BUILD_DIR env convention used by package.json's build scripts).
 const BUILD_DIR = path.resolve(ROOT_DIR, process.env.BUILD_DIR ?? './build')
 
+// Matches the layout emitTruffleStyleArtifacts() writes: <BUILD_DIR>/<destDir>/<Name>.json.
 function truffleStyleGlobs(contractList: string[]): string[] {
   const alternation = contractList.join('|')
-  // Matches the layout emitTruffleStyleArtifacts() writes: ${BUILD_DIR}/<destDir>/<Name>.json.
   return [SOLIDITY_05_PACKAGE.destDir, SOLIDITY_08_PACKAGE.destDir].map(
     (dir) => `${BUILD_DIR}/${dir}/@(${alternation}).json`
   )
@@ -174,49 +171,21 @@ function generateFilesForEthers({ coreContractsOnly, ethersTypes: outdir }: Buil
   exec(`yarn run --silent typechain --target=ethers-v5 --outDir "${outdir}" ${globs}`)
 }
 
-async function generateFilesForContractKit({ coreContractsOnly, web3Types: outdir }: BuildTargets) {
-  console.info(`protocol: Generating Web3 Types to ${outdir}`)
-  assertTruffleArtifactsExist()
-  exec(`rm -rf ${outdir}`)
-  const relativePath = path.relative(ROOT_DIR, outdir)
-
-  const cwd = process.cwd()
-
-  for (const glob of truffleStyleGlobs(getContractList(coreContractsOnly))) {
-    await tsGenerator(
-      { cwd, loggingLvl: 'info' },
-      new Web3V1Celo({
-        cwd,
-        rawConfig: {
-          files: glob,
-          outDir: relativePath,
-        },
-      })
-    )
-  }
-
-  exec(`yarn prettier --write "${outdir}/**/*.ts"`)
-}
-
 const _buildTargets: ParsedArgs = {
   _: [] as string[],
   solidity: undefined,
-  web3Types: undefined,
   ethersTypes: undefined,
 } as const
 type BuildTargets = Record<keyof typeof _buildTargets, string> & {
   coreContractsOnly: boolean
 }
 
-async function main(buildTargets: BuildTargets) {
+function main(buildTargets: BuildTargets) {
   if (buildTargets.solidity) {
     compile(buildTargets)
   }
   if (buildTargets.ethersTypes) {
     generateFilesForEthers(buildTargets)
-  }
-  if (buildTargets.web3Types) {
-    await generateFilesForContractKit(buildTargets)
   }
 }
 
@@ -225,7 +194,9 @@ const argv = minimist(process.argv.slice(2), {
   boolean: ['coreContractsOnly'],
 }) as unknown as BuildTargets
 
-main(argv).catch((err) => {
+try {
+  main(argv)
+} catch (err) {
   console.error(err)
   process.exit(1)
-})
+}

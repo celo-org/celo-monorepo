@@ -1,14 +1,14 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.9.0;
 
-import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
 
-import { Initializable } from "../common/Initializable.sol";
-import { UsingRegistry } from "../common/UsingRegistry.sol";
-import { ICeloVersionedContract } from "../common/interfaces/ICeloVersionedContract.sol";
-import { IValidators } from "./interfaces/IValidators.sol";
-import { ILockedGold } from "./interfaces/ILockedGold.sol";
-import { IGovernanceSlasher } from "./interfaces/IGovernanceSlasher.sol";
+import "../common/Initializable.sol";
+import "../common/UsingRegistry.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
+import "./interfaces/IValidators.sol";
+import "./interfaces/ILockedGold.sol";
+import "./interfaces/IGovernanceSlasher.sol";
 
 contract GovernanceSlasher is
   Ownable,
@@ -17,7 +17,6 @@ contract GovernanceSlasher is
   ICeloVersionedContract,
   IGovernanceSlasher
 {
-  using SafeMath for uint256;
   // Maps a slashed address to the amount to be slashed.
   // Note that there is no reward paid when slashing via governance.
   mapping(address => uint256) slashed;
@@ -39,7 +38,7 @@ contract GovernanceSlasher is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -62,7 +61,7 @@ contract GovernanceSlasher is
    * @dev Only callable by governance.
    */
   function approveSlashing(address account, uint256 penalty) external onlyAuthorizedToSlash {
-    slashed[account] = slashed[account].add(penalty);
+    slashed[account] = (slashed[account] + penalty);
     emit SlashingApproved(account, penalty);
   }
 
@@ -105,7 +104,7 @@ contract GovernanceSlasher is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 0);
+    return (1, 3, 0, 0);
   }
 
   /**
@@ -119,9 +118,9 @@ contract GovernanceSlasher is
   function slashL2(
     address account,
     address group,
-    address[] memory electionLessers,
-    address[] memory electionGreaters,
-    uint256[] memory electionIndices
+    address[] calldata electionLessers,
+    address[] calldata electionGreaters,
+    uint256[] calldata electionIndices
   ) public onlyAuthorizedToSlash returns (bool) {
     uint256 penalty = slashed[account];
     require(penalty > 0, "No penalty given by governance");
@@ -156,5 +155,14 @@ contract GovernanceSlasher is
 
     emit GovernanceSlashPerformed(account, group, penalty);
     return true;
+  }
+
+  /**
+   * @notice Whether the sender is the owner.
+   * @dev Kept from the Solidity 0.5 implementation: OpenZeppelin 2.5's Ownable exposed it
+   * and 4.9's does not, and the ABI behind the upgraded proxy must not lose a function.
+   */
+  function isOwner() external view returns (bool) {
+    return msg.sender == owner();
   }
 }

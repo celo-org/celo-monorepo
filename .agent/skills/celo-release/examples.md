@@ -165,7 +165,7 @@ Verifying 4 contract(s) on celo-sepolia...
 
 Verifying EpochManager at 0xecaf98acf55c598ee8f2e5ebbcc9f683b15a11a8...
   Compiler: 0.8.19+commit.7dd6d404, Optimizer: 200 runs, EVM: paris
-  Foundry profile: truffle-compat8
+  Foundry profile: default
   ✓ EpochManager verified on Blockscout
   ✓ EpochManager verified on Celoscan
 
@@ -184,7 +184,7 @@ Verification Summary:
 ```
 
 Key verification features:
-- **Foundry profile**: Automatically detected from source path (`contracts/` → `truffle-compat`, `contracts-0.8/` → `truffle-compat8`)
+- **Foundry profile**: Automatically detected from the artifact (`contracts-0.5/` → `solc05`, a 0.5 compiler → `truffle-compat`, otherwise the default profile; was: `contracts/` → `truffle-compat`, `contracts-0.8/` → `truffle-compat8`)
 - **Linked libraries**: Automatically detected and passed to verifier for contracts that use libraries
 - **Full compiler version**: Uses version with commit hash for accurate bytecode matching
 

@@ -1,10 +1,11 @@
+import { BuildArtifacts } from '@celo/protocol/lib/compatibility/build-artifacts'
+import { compilerFamily } from '@celo/protocol/lib/compatibility/internal'
 import { reportASTIncompatibilities } from '@celo/protocol/lib/compatibility/ast-code';
 import { reportLayoutIncompatibilities } from '@celo/protocol/lib/compatibility/ast-layout';
 import { Categorizer } from '@celo/protocol/lib/compatibility/categorizer';
 import { reportLibraryLinkingIncompatibilities } from '@celo/protocol/lib/compatibility/library-linking';
 import { ASTDetailedVersionedReport, ASTReports } from '@celo/protocol/lib/compatibility/report';
 import { linkedLibraries } from '@celo/protocol/lib/linked-libraries';
-import { BuildArtifacts, Contracts, getBuildArtifacts } from '@openzeppelin/upgrades';
 import { readJsonSync } from 'fs-extra';
 import { globSync } from 'glob'
 
@@ -57,32 +58,19 @@ export class ASTBackwardReport {
   ) { }
 }
 
-function ensureValidArtifacts(artifactsPaths: string[]): void {
-  artifactsPaths.forEach((path) => {
-    const artifact = readJsonSync(path)
-    if (artifact.ast === undefined) {
-      console.error(`ERROR: invalid artifact file found: '${path}'`)
-      process.exit(10001)
-    }
-  })
-}
-
-export function instantiateArtifacts(buildDirectory: string): BuildArtifacts {
-  // Check if all jsons in the buildDirectory are valid artifacts,
-  // otherwise getBuildArtifacts fail with the enigmatic
-  // "Cannot read property 'absolutePath' of undefined"
-  ensureValidArtifacts(Contracts.listBuildArtifacts(buildDirectory))
-  try {
-    return getBuildArtifacts(buildDirectory)
-  } catch (error) {
-    console.error(`ERROR: could not create BuildArtifacts on directory '${buildDirectory}`)
-    process.exit(10002)
+// An artifact built without an AST falls back to the compilation target recorded in its
+// metadata for the source path.
+export function artifactSourcePath(artifact: any): string {
+  if (artifact.ast && artifact.ast.absolutePath) {
+    return artifact.ast.absolutePath
   }
+  const target = artifact.metadata && artifact.metadata.settings && artifact.metadata.settings.compilationTarget
+  return target ? Object.keys(target)[0] : ''
 }
 
 function listForgeBuildArtifacts(buildDirectory: string): string[] {
   const buildInfoPathPattern = /build-info/
-  const coreContractPathPattern = /contracts(-0\.8)?\//
+  const coreContractPathPattern = /contracts(-0\.[58])?\//
   const nonFoundryDependencyPathPattern = /lib\/(?!celo)/
   const foundryTestContractPathPattern = /test-ts\//
   const pathPatterns = [ coreContractPathPattern, nonFoundryDependencyPathPattern, foundryTestContractPathPattern ]
@@ -93,7 +81,7 @@ function listForgeBuildArtifacts(buildDirectory: string): string[] {
       return false
     }
     const artifact = readJsonSync(artifactPath)
-    const sourcePath = artifact.ast.absolutePath
+    const sourcePath = artifactSourcePath(artifact)
     return pathPatterns.some((pattern: RegExp) => sourcePath.match(pattern))
   })
 
@@ -104,15 +92,22 @@ interface CompilerArtifactsIndex {
   [index: string]: string[]
 }
 
+// A source file declaring only file-level types or functions gets an artifact with its AST
+// but no metadata, so neither its compiler nor a contract to compare is known.
+const isSourceOnly = (artifact: any): boolean => !artifact.metadata || !artifact.metadata.compiler
+
 function splitArtifactsByCompiler(artifactPaths: string[]): CompilerArtifactsIndex {
   const artifactsIndex: CompilerArtifactsIndex = {}
   artifactPaths.forEach(artifactPath => {
     const artifact = readJsonSync(artifactPath)
-    const version = artifact.metadata.compiler.version
-    if (!artifactsIndex[version]) {
-      artifactsIndex[version] = []
+    if (isSourceOnly(artifact)) {
+      return
     }
-    artifactsIndex[version].push(artifactPath)
+    const family = compilerFamily(artifact.metadata.compiler.version)
+    if (!artifactsIndex[family]) {
+      artifactsIndex[family] = []
+    }
+    artifactsIndex[family].push(artifactPath)
   })
 
   return artifactsIndex
@@ -121,5 +116,20 @@ function splitArtifactsByCompiler(artifactPaths: string[]): CompilerArtifactsInd
 export function instantiateArtifactsFromForge(buildDirectory: string): BuildArtifacts[] {
   const artifactPaths = listForgeBuildArtifacts(buildDirectory)
   const artifactsIndex: CompilerArtifactsIndex = splitArtifactsByCompiler(artifactPaths)
-  return Object.keys(artifactsIndex).map(compiler => new BuildArtifacts(artifactsIndex[compiler]))
+  // Source-only artifacts hold no contract to report on, but contracts of any compiler may
+  // import the types they declare, so every set can resolve imports through them.
+  const sourceOnlyPaths = artifactPaths.filter(artifactPath => isSourceOnly(readJsonSync(artifactPath)))
+  return Object.keys(artifactsIndex).map(
+    compiler => new BuildArtifacts(artifactsIndex[compiler], sourceOnlyPaths)
+  )
+}
+
+/**
+ * Build output directory forge writes a ref's artifacts to (mirrors build_dir_for_ref in
+ * scripts/bash/release-lib.sh). Branch names may contain slashes, which are flattened to
+ * underscores so the directory is a single path segment.
+ */
+export function buildDirectoryForRef(ref: string, profile?: string): string {
+  const base = `./out-${ref.replace(/\//g, '_')}`
+  return profile ? `${base}-${profile}` : base
 }

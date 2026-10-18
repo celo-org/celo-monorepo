@@ -6,6 +6,8 @@ import { Devchain } from "@test-sol/devchain/e2e/utils.sol";
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@test-sol/utils/ECDSAHelper08.sol";
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
+import { Ownable } from "@openzeppelin/contracts8/access/Ownable.sol";
+import "@celo-contracts-8/common/interfaces/IScoreManagerGovernance.sol";
 
 contract E2E_EpochManager is ECDSAHelper08, Devchain {
   using EnumerableSet for EnumerableSet.AddressSet;
@@ -175,8 +177,11 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
         newValidatorGroup
       );
 
-      vm.prank(scoreManager.owner());
-      scoreManager.setValidatorScore(validatorAddresses[i], validatorScore[6]);
+      vm.prank(Ownable(address(scoreManager)).owner());
+      IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+        validatorAddresses[i],
+        validatorScore[6]
+      );
     }
 
     vm.prank(newValidatorGroup);
@@ -192,8 +197,8 @@ contract E2E_EpochManager is ECDSAHelper08, Devchain {
       validators.addMember(validatorAddresses[i]);
     }
 
-    vm.prank(scoreManager.owner());
-    scoreManager.setGroupScore(newValidatorGroup, groupScore[3]);
+    vm.prank(Ownable(address(scoreManager)).owner());
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(newValidatorGroup, groupScore[3]);
   }
 
   function getValidatorGroupsFromElected() internal view returns (address[] memory) {
@@ -310,18 +315,36 @@ contract E2E_EpochManager_StartNextEpochProcess is E2E_EpochManager {
     validatorsArray = getValidators().getRegisteredValidators();
     groups = getValidators().getRegisteredValidatorGroups();
 
-    address scoreManagerOwner = scoreManager.owner();
+    address scoreManagerOwner = Ownable(address(scoreManager)).owner();
     vm.startPrank(scoreManagerOwner);
-    scoreManager.setGroupScore(groups[0], groupScore[0]);
-    scoreManager.setGroupScore(groups[1], groupScore[1]);
-    scoreManager.setGroupScore(groups[2], groupScore[2]);
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(groups[0], groupScore[0]);
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(groups[1], groupScore[1]);
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(groups[2], groupScore[2]);
 
-    scoreManager.setValidatorScore(validatorsArray[0], validatorScore[0]);
-    scoreManager.setValidatorScore(validatorsArray[1], validatorScore[1]);
-    scoreManager.setValidatorScore(validatorsArray[2], validatorScore[2]);
-    scoreManager.setValidatorScore(validatorsArray[3], validatorScore[3]);
-    scoreManager.setValidatorScore(validatorsArray[4], validatorScore[4]);
-    scoreManager.setValidatorScore(validatorsArray[5], validatorScore[5]);
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[0],
+      validatorScore[0]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[1],
+      validatorScore[1]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[2],
+      validatorScore[2]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[3],
+      validatorScore[3]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[4],
+      validatorScore[4]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[5],
+      validatorScore[5]
+    );
     vm.stopPrank();
   }
 
@@ -382,19 +405,37 @@ contract E2E_EpochManager_FinishNextEpochProcess is E2E_EpochManager {
     validatorsArray = getValidators().getRegisteredValidators();
     groups = getValidators().getRegisteredValidatorGroups();
 
-    address scoreManagerOwner = scoreManager.owner();
+    address scoreManagerOwner = Ownable(address(scoreManager)).owner();
 
     vm.startPrank(scoreManagerOwner);
-    scoreManager.setGroupScore(groups[0], groupScore[0]);
-    scoreManager.setGroupScore(groups[1], groupScore[1]);
-    scoreManager.setGroupScore(groups[2], groupScore[2]);
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(groups[0], groupScore[0]);
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(groups[1], groupScore[1]);
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(groups[2], groupScore[2]);
 
-    scoreManager.setValidatorScore(validatorsArray[0], validatorScore[0]);
-    scoreManager.setValidatorScore(validatorsArray[1], validatorScore[1]);
-    scoreManager.setValidatorScore(validatorsArray[2], validatorScore[2]);
-    scoreManager.setValidatorScore(validatorsArray[3], validatorScore[3]);
-    scoreManager.setValidatorScore(validatorsArray[4], validatorScore[4]);
-    scoreManager.setValidatorScore(validatorsArray[5], validatorScore[5]);
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[0],
+      validatorScore[0]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[1],
+      validatorScore[1]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[2],
+      validatorScore[2]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[3],
+      validatorScore[3]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[4],
+      validatorScore[4]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[5],
+      validatorScore[5]
+    );
 
     vm.stopPrank();
 
@@ -1025,17 +1066,35 @@ contract E2E_GasTest_Setup is E2E_EpochManager {
     validatorsArray = getValidators().getRegisteredValidators();
     groups = getValidators().getRegisteredValidatorGroups();
 
-    vm.startPrank(scoreManager.owner());
-    scoreManager.setGroupScore(groups[0], groupScore[0]);
-    scoreManager.setGroupScore(groups[1], groupScore[1]);
-    scoreManager.setGroupScore(groups[2], groupScore[2]);
+    vm.startPrank(Ownable(address(scoreManager)).owner());
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(groups[0], groupScore[0]);
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(groups[1], groupScore[1]);
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(groups[2], groupScore[2]);
 
-    scoreManager.setValidatorScore(validatorsArray[0], validatorScore[0]);
-    scoreManager.setValidatorScore(validatorsArray[1], validatorScore[1]);
-    scoreManager.setValidatorScore(validatorsArray[2], validatorScore[2]);
-    scoreManager.setValidatorScore(validatorsArray[3], validatorScore[3]);
-    scoreManager.setValidatorScore(validatorsArray[4], validatorScore[4]);
-    scoreManager.setValidatorScore(validatorsArray[5], validatorScore[5]);
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[0],
+      validatorScore[0]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[1],
+      validatorScore[1]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[2],
+      validatorScore[2]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[3],
+      validatorScore[3]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[4],
+      validatorScore[4]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[5],
+      validatorScore[5]
+    );
 
     vm.stopPrank();
 
@@ -1168,17 +1227,35 @@ contract E2E_FinishNextEpochProcess_Split is E2E_GasTest_Setup {
     validatorsArray = getValidators().getRegisteredValidators();
     groups = getValidators().getRegisteredValidatorGroups();
 
-    vm.startPrank(scoreManager.owner());
-    scoreManager.setGroupScore(groups[0], groupScore[0]);
-    scoreManager.setGroupScore(groups[1], groupScore[1]);
-    scoreManager.setGroupScore(groups[2], groupScore[2]);
+    vm.startPrank(Ownable(address(scoreManager)).owner());
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(groups[0], groupScore[0]);
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(groups[1], groupScore[1]);
+    IScoreManagerGovernance(address(scoreManager)).setGroupScore(groups[2], groupScore[2]);
 
-    scoreManager.setValidatorScore(validatorsArray[0], validatorScore[0]);
-    scoreManager.setValidatorScore(validatorsArray[1], validatorScore[1]);
-    scoreManager.setValidatorScore(validatorsArray[2], validatorScore[2]);
-    scoreManager.setValidatorScore(validatorsArray[3], validatorScore[3]);
-    scoreManager.setValidatorScore(validatorsArray[4], validatorScore[4]);
-    scoreManager.setValidatorScore(validatorsArray[5], validatorScore[5]);
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[0],
+      validatorScore[0]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[1],
+      validatorScore[1]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[2],
+      validatorScore[2]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[3],
+      validatorScore[3]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[4],
+      validatorScore[4]
+    );
+    IScoreManagerGovernance(address(scoreManager)).setValidatorScore(
+      validatorsArray[5],
+      validatorScore[5]
+    );
 
     vm.stopPrank();
 

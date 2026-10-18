@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.9.0;
 
 // Foundry imports
 import { console2 } from "forge-std-8/console2.sol";
@@ -152,9 +152,9 @@ contract E2E_GovernanceBase is Devchain {
     );
   }
 
-  function _upvoteProposal(uint256 proposalId, uint256 lesser, uint256 greater) public {
+  function _upvoteProposal(uint256 _proposalId, uint256 lesser, uint256 greater) public {
     vm.prank(tester);
-    governance.upvote(proposalId, lesser, greater);
+    governance.upvote(_proposalId, lesser, greater);
   }
 
   function _approveProposal() public {

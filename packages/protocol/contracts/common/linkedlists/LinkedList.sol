@@ -1,14 +1,11 @@
-pragma solidity ^0.5.13;
-
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.0 <0.9.0;
 
 /**
  * @title Maintains a doubly linked list keyed by bytes32.
  * @dev Following the `next` pointers will lead you to the head, rather than the tail.
  */
 library LinkedList {
-  using SafeMath for uint256;
-
   struct Element {
     bytes32 previousKey;
     bytes32 nextKey;
@@ -74,7 +71,7 @@ library LinkedList {
       }
     }
 
-    list.numElements = list.numElements.add(1);
+    list.numElements = (list.numElements + 1);
   }
 
   /**
@@ -109,7 +106,7 @@ library LinkedList {
     }
 
     delete list.elements[key];
-    list.numElements = list.numElements.sub(1);
+    list.numElements = (list.numElements - 1);
   }
 
   /**
@@ -149,7 +146,7 @@ library LinkedList {
     require(n <= list.numElements, "not enough elements");
     bytes32[] memory keys = new bytes32[](n);
     bytes32 key = list.head;
-    for (uint256 i = 0; i < n; i = i.add(1)) {
+    for (uint256 i = 0; i < n; i = (i + 1)) {
       keys[i] = key;
       key = list.elements[key].previousKey;
     }

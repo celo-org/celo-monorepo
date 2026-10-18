@@ -1,4 +1,4 @@
-pragma solidity >=0.5.13 <0.8.20;
+pragma solidity >=0.5.13 <0.9.0;
 import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 import "@test-sol/utils/SECP256K1.sol";
 

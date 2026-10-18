@@ -1,17 +1,19 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.9.0;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts8/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts8/utils/cryptography/ECDSA.sol";
 
 import "./interfaces/IAttestations.sol";
 import "./interfaces/IFederatedAttestations.sol";
 import "./interfaces/IEscrow.sol";
-import "../common/Initializable.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/UsingRegistryV2BackwardsCompatible.sol";
-import "../common/Signatures.sol";
+import "../common/interfaces/IRegistry.sol";
+
+import "../common/Initializable.sol";
+import "../common/UsingRegistryV2NoMento.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 contract Escrow is
@@ -21,10 +23,15 @@ contract Escrow is
   Ownable,
   Initializable,
   // Maintain storage alignment since Escrow was initially deployed with UsingRegistry.sol
-  UsingRegistryV2BackwardsCompatible
+  UsingRegistryV2NoMento
 {
-  using SafeMath for uint256;
-  using SafeERC20 for ERC20;
+  using SafeERC20 for IERC20;
+
+  // Placeholder for the registry storage var that lived in
+  // UsingRegistryV2BackwardsCompatible (slot 2). Kept here to preserve the
+  // storage layout of the originally deployed proxy. Use `registryContract`
+  // (from UsingRegistryV2NoMento) for the actual registry address.
+  IRegistry public registry;
 
   struct EscrowedPayment {
     bytes32 recipientIdentifier;
@@ -95,7 +102,7 @@ contract Escrow is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -113,12 +120,12 @@ contract Escrow is
   function addDefaultTrustedIssuer(address trustedIssuer) external onlyOwner {
     require(address(0) != trustedIssuer, "trustedIssuer can't be null");
     require(
-      defaultTrustedIssuers.length.add(1) <= MAX_TRUSTED_ISSUERS_PER_PAYMENT,
+      (defaultTrustedIssuers.length + 1) <= MAX_TRUSTED_ISSUERS_PER_PAYMENT,
       "defaultTrustedIssuers.length can't exceed allowed number of trustedIssuers"
     );
 
     // Ensure list of trusted issuers is unique
-    for (uint256 i = 0; i < defaultTrustedIssuers.length; i = i.add(1)) {
+    for (uint256 i = 0; i < defaultTrustedIssuers.length; i = (i + 1)) {
       require(
         defaultTrustedIssuers[i] != trustedIssuer,
         "trustedIssuer already in defaultTrustedIssuers"
@@ -249,7 +256,12 @@ contract Escrow is
     bytes32 r,
     bytes32 s
   ) external nonReentrant returns (bool) {
-    address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
+    address signer = ECDSA.recover(
+      ECDSA.toEthSignedMessageHash(keccak256(abi.encodePacked(msg.sender))),
+      v,
+      r,
+      s
+    );
     require(signer == paymentId, "Failed to prove ownership of the withdraw key");
     EscrowedPayment memory payment = escrowedPayments[paymentId];
     require(payment.token != address(0) && payment.value > 0, "Invalid withdraw value.");
@@ -288,7 +300,7 @@ contract Escrow is
 
     deletePayment(paymentId);
 
-    ERC20(payment.token).safeTransfer(msg.sender, payment.value);
+    IERC20(payment.token).safeTransfer(msg.sender, payment.value);
 
     emit Withdrawal(
       payment.recipientIdentifier,
@@ -312,13 +324,13 @@ contract Escrow is
     EscrowedPayment memory payment = escrowedPayments[paymentId];
     require(payment.sender == msg.sender, "Only sender of payment can attempt to revoke payment.");
     require(
-      now >= (payment.timestamp.add(payment.expirySeconds)),
+      block.timestamp >= ((payment.timestamp + payment.expirySeconds)),
       "Transaction not redeemable for sender yet."
     );
 
     deletePayment(paymentId);
 
-    ERC20(payment.token).safeTransfer(msg.sender, payment.value);
+    IERC20(payment.token).safeTransfer(msg.sender, payment.value);
 
     emit Revocation(
       payment.recipientIdentifier,
@@ -368,7 +380,7 @@ contract Escrow is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 0);
+    return (1, 3, 0, 0);
   }
 
   /**
@@ -377,6 +389,16 @@ contract Escrow is
    */
   function getDefaultTrustedIssuers() public view returns (address[] memory) {
     return defaultTrustedIssuers;
+  }
+
+  /**
+   * @notice Returns the Attestations contract from the registry.
+   * @return The IAttestations contract.
+   * @dev Provided locally because UsingRegistryV2NoMento omits the Mento-coupled
+   *      getter; the registry id is still defined upstream.
+   */
+  function getAttestations() internal view returns (IAttestations) {
+    return IAttestations(registryContract.getAddressForOrDie(ATTESTATIONS_REGISTRY_ID));
   }
 
   /**
@@ -417,7 +439,7 @@ contract Escrow is
     uint256 minAttestations,
     address[] memory trustedIssuers
   ) internal view returns (bool) {
-    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+    for (uint256 i = 0; i < trustedIssuers.length; i = (i + 1)) {
       if (trustedIssuers[i] != attestationsAddress) {
         continue;
       }
@@ -448,7 +470,7 @@ contract Escrow is
       trustedIssuers
     );
     // Check if an attestation was found for recipientIdentifier -> account
-    for (uint256 i = 0; i < accounts.length; i = i.add(1)) {
+    for (uint256 i = 0; i < accounts.length; i = (i + 1)) {
       if (accounts[i] == account) {
         return true;
       }
@@ -511,8 +533,13 @@ contract Escrow is
       "minAttestations larger than limit"
     );
 
-    uint256 sentIndex = sentPaymentIds[msg.sender].push(paymentId).sub(1);
-    uint256 receivedIndex = receivedPaymentIds[identifier].push(paymentId).sub(1);
+    // `.push(x)` no longer returns the new length in Solidity 0.8, so derive the
+    // index from the current length before pushing (equivalent to the old
+    // `.push(paymentId).sub(1)`).
+    uint256 sentIndex = sentPaymentIds[msg.sender].length;
+    sentPaymentIds[msg.sender].push(paymentId);
+    uint256 receivedIndex = receivedPaymentIds[identifier].length;
+    receivedPaymentIds[identifier].push(paymentId);
 
     EscrowedPayment storage newPayment = escrowedPayments[paymentId];
     require(newPayment.timestamp == 0, "paymentId already used");
@@ -531,7 +558,7 @@ contract Escrow is
       trustedIssuersPerPayment[paymentId] = trustedIssuers;
     }
 
-    ERC20(token).safeTransferFrom(msg.sender, address(this), value);
+    IERC20(token).safeTransferFrom(msg.sender, address(this), value);
     emit Transfer(msg.sender, identifier, token, value, paymentId, minAttestations);
     // Split into a second event for ABI backwards compatibility
     emit TrustedIssuersSet(paymentId, trustedIssuers);
@@ -550,14 +577,25 @@ contract Escrow is
 
     escrowedPayments[received[received.length - 1]].receivedIndex = payment.receivedIndex;
     received[payment.receivedIndex] = received[received.length - 1];
-    received.length = received.length.sub(1);
+    // `.length -= 1` is no longer allowed in Solidity 0.8; `.pop()` removes the
+    // (now duplicated) last element.
+    received.pop();
 
     escrowedPayments[sent[sent.length - 1]].sentIndex = payment.sentIndex;
     sent[payment.sentIndex] = sent[sent.length - 1];
-    sent.length = sent.length.sub(1);
+    sent.pop();
 
     delete escrowedPayments[paymentId];
     delete trustedIssuersPerPayment[paymentId];
     emit TrustedIssuersUnset(paymentId);
+  }
+
+  /**
+   * @notice Whether the sender is the owner.
+   * @dev Kept from the Solidity 0.5 implementation: OpenZeppelin 2.5's Ownable exposed it
+   * and 4.9's does not, and the ABI behind the upgraded proxy must not lose a function.
+   */
+  function isOwner() external view returns (bool) {
+    return msg.sender == owner();
   }
 }
