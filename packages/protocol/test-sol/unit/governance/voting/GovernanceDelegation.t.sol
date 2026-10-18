@@ -349,6 +349,32 @@ contract GovernanceDelegationTest is TestWithUtils08 {
     assertEq(nwAfter, lockedAfter, "network weight refreshed to the reduced locked total");
   }
 
+  // The same refresh applies when the unlock clamps a delegatee's votes while the delegator
+  // itself cast none: the delegatee's clamp runs as part of the unlock, so the network weight
+  // it records must be the locked total after the unlock, not before it.
+  function test_ShouldRefreshNetworkWeight_WhenClampingDelegateeVotesOnUnlock() public {
+    uint256 half = FixidityLib.newFixedFraction(1, 2).unwrap();
+    uint256 prop = _referendumProposal();
+    uint256 idx = _getDequeuedIndex(prop);
+
+    vm.prank(delegator);
+    lockedGold.delegateGovernanceVotes(delegatee2, half);
+    // Only the delegatee votes, with its full delegated power.
+    vm.prank(delegatee2);
+    governance.votePartially(prop, idx, 500 ether, 0, 0);
+
+    uint256 lockedBefore = lockedGold.getTotalLockedGold();
+
+    vm.prank(delegator);
+    lockedGold.unlock(500 ether);
+
+    uint256 lockedAfter = lockedGold.getTotalLockedGold();
+    assertEq(lockedAfter, lockedBefore - 500 ether, "unlock reduced the locked total");
+    assertEq(governance.getAmountOfGoldUsedForVoting(delegatee2), 250 ether, "delegatee clamped");
+    (, , , , , uint256 nwAfter, ) = governance.getProposal(prop);
+    assertEq(nwAfter, lockedAfter, "network weight refreshed to the reduced locked total");
+  }
+
   // Creates a proposal, moves it into the Referendum stage and approves it.
   function _referendumProposal() private returns (uint256 prop) {
     prop = _makeProposal(delegator);
