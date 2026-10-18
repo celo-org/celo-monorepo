@@ -3,7 +3,7 @@ import FormData from 'form-data'
 import fs from 'fs'
 import fetch from 'node-fetch'
 import path from 'path'
-import Web3 from 'web3'
+import { createPublicClient, http } from 'viem'
 
 /*
  * A script that reads the artifacts from the build/contracts directory and publish using the sourcify api.
@@ -50,8 +50,8 @@ async function main(buildTargets: BuildOptions) {
   const reportPath = buildTargets.proposalPath || './proposal.json'
   const report = require(path.join(process.cwd(), reportPath))
   const network = buildTargets.network
-  const web3 = new Web3('http://localhost:8545')
-  const chainId = await web3.eth.getChainId()
+  const client = createPublicClient({ transport: http('http://localhost:8545') })
+  const chainId = await client.getChainId()
 
   console.info('Uploading sources & metadata')
   console.info('============================')

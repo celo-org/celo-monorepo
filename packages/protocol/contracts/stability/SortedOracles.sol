@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.9.0;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "./interfaces/ISortedOracles.sol";
 import "./interfaces/ISortedOraclesInitializer.sol";
@@ -13,7 +12,7 @@ import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../common/linkedlists/SortedLinkedListWithMedian.sol";
-import "../../contracts-0.8/common/interfaces/IOracle.sol";
+import "../common/interfaces/IOracle.sol";
 
 /**
  * @title   SortedOracles
@@ -45,7 +44,6 @@ contract SortedOracles is
   Ownable,
   Initializable
 {
-  using SafeMath for uint256;
   using AddressSortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -100,7 +98,7 @@ contract SortedOracles is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -158,7 +156,7 @@ contract SortedOracles is
       "token addr null or oracle addr null or index of token oracle not mapped to oracle addr"
     );
     isOracle[token][oracleAddress] = false;
-    oracles[token][index] = oracles[token][oracles[token].length.sub(1)];
+    oracles[token][index] = oracles[token][(oracles[token].length - 1)];
     oracles[token].pop();
     if (reportExists(token, oracleAddress)) {
       removeReport(token, oracleAddress);
@@ -176,7 +174,7 @@ contract SortedOracles is
       token != address(0) && n < timestamps[token].getNumElements(),
       "token addr null or trying to remove too many reports"
     );
-    for (uint256 i = 0; i < n; i = i.add(1)) {
+    for (uint256 i = 0; i < n; i = (i + 1)) {
       (bool isExpired, address oldestAddress) = isOldestReportExpired(token);
       if (isExpired) {
         removeReport(token, oldestAddress);
@@ -244,11 +242,12 @@ contract SortedOracles is
     timestamps[token].insert(
       msg.sender,
       // solhint-disable-next-line not-rely-on-time
-      now,
+      block.timestamp,
       timestamps[token].getHead(),
       address(0)
     );
-    emit OracleReported(token, msg.sender, now, value);
+    // solhint-disable-next-line not-rely-on-time
+    emit OracleReported(token, msg.sender, block.timestamp, value);
     uint256 newMedian = rates[token].getMedianValue();
     if (newMedian != originalMedian) {
       emit MedianUpdated(token, newMedian);
@@ -331,8 +330,8 @@ contract SortedOracles is
   /**
    * @notice Returns the exchange rate for a specified token.
    * @param token The token for which the exchange rate is being retrieved.
-   * @return uint256 The exchange rate for the specified token.
-   * @return uint256 The denominator for the exchange rate.
+   * @return numerator The exchange rate numerator for the specified token.
+   * @return denominator The denominator for the exchange rate.
    */
   function getExchangeRate(
     address token
@@ -348,7 +347,7 @@ contract SortedOracles is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 4, 0);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -415,7 +414,7 @@ contract SortedOracles is
     address oldest = timestamps[token].getTail();
     uint256 timestamp = timestamps[token].getValue(oldest);
     // solhint-disable-next-line not-rely-on-time
-    if (now.sub(timestamp) >= getTokenReportExpirySeconds(token)) {
+    if ((block.timestamp - timestamp) >= getTokenReportExpirySeconds(token)) {
       return (true, oldest);
     }
     return (false, oldest);
@@ -494,5 +493,14 @@ contract SortedOracles is
         breakerBox.checkAndSetBreakers(token);
       }
     }
+  }
+
+  /**
+   * @notice Whether the sender is the owner.
+   * @dev Kept from the Solidity 0.5 implementation: OpenZeppelin 2.5's Ownable exposed it
+   * and 4.9's does not, and the ABI behind the upgraded proxy must not lose a function.
+   */
+  function isOwner() external view returns (bool) {
+    return msg.sender == owner();
   }
 }

@@ -1037,7 +1037,7 @@ The release script automatically verifies deployed contracts on:
 
 The script handles verification automatically with:
 - **Linked libraries**: Contracts using libraries (e.g., Governance with Proposals library) are verified with the `--libraries` flag
-- **Foundry profiles**: Sets `FOUNDRY_PROFILE` environment variable (`truffle-compat` for 0.5.x, `truffle-compat8` for 0.8.x) to ensure bytecode matches
+- **Foundry profiles**: Sets `FOUNDRY_PROFILE` environment variable (`solc05` for the proxies, `truffle-compat` for a pre-migration tag's 0.5 implementations, the default profile for 0.8.x) to ensure bytecode matches
 - **Full compiler version**: Uses full version with commit hash (e.g., `0.5.14+commit.01f1aaa4`)
 - **Automatic retries**: Up to 6 retries with logarithmic delays (5s, 10s, 20s, 40s, 60s, 60s) for block explorer indexing
 

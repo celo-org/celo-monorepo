@@ -2,7 +2,7 @@
 pragma solidity ^0.8.15;
 
 import "forge-std/Script.sol";
-import "../contracts-0.8/common/GasSponsoredOFTBridge.sol";
+import "../contracts/common/GasSponsoredOFTBridge.sol";
 
 contract DeployGasSponsoredOFTBridge is Script {
   function run() external {

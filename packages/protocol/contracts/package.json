@@ -9,5 +9,8 @@
     "directory": "packages/protocol/contracts"
   },
   "scripts": {},
-  "dependencies": {}
+  "dependencies": {
+    "@openzeppelin/contracts8": "npm:@openzeppelin/contracts@^4.4.2",
+    "solidity-bytes-utils-8": "npm:solidity-bytes-utils@^0.8.2"
+  }
 }

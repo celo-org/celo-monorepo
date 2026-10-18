@@ -20,6 +20,16 @@ const testCases = {
   metadata_changed: getTestArtifacts('metadata_changed'),
   big_original: getTestArtifacts('big_original'),
   big_original_modified: getTestArtifacts('big_original_modified'),
+  // a linkable library with its callers, compiled by solc 0.5
+  linked_library: getTestArtifacts('linked_library'),
+  // the same sources under another directory, so every link placeholder differs
+  linked_library_copy: getTestArtifacts('linked_library_copy'),
+  // the same sources ported to solc 0.8, plus a standalone contract
+  linked_library_08: getTestArtifacts('linked_library_08'),
+  // the 0.8 port with the library's function made internal, so it is inlined
+  inlined_library_08: getTestArtifacts('inlined_library_08'),
+  // only the standalone contract, as an older 0.8 build that predates the migration
+  previous_08: getTestArtifacts('previous_08'),
 }
 
 const comp = (c1: Change, c2: Change): number => {
@@ -133,6 +143,88 @@ describe('#reportASTIncompatibilities()', () => {
       const changes = report.getChanges()
       changes.sort(comp)
       assert.deepEqual(changes, expected)
+    })
+  })
+
+  describe('when a linked library only changed its path', () => {
+    it('reports no changes', () => {
+      const report = reportASTIncompatibilities(
+        testCases.linked_library,
+        testCases.linked_library_copy
+      )
+      assert.isEmpty(report.getChanges())
+    })
+  })
+
+  describe('when a library moves to a new compiler', () => {
+    const changesOf = (report: Change[], contract: string) =>
+      report.filter((change) => change.getContract() === contract)
+    const changesExcept = (report: Change[], contract: string) =>
+      report.filter((change) => change.getContract() !== contract)
+
+    describe('and the old build has no artifacts for that compiler', () => {
+      it('reports the library as changed instead of ignoring it', () => {
+        const report = reportASTIncompatibilities(
+          testCases.linked_library,
+          testCases.linked_library_08
+        )
+        const expected = [new DeployedBytecodeChange('TestLibrary')]
+        assert.deepEqual(
+          changesOf(report.getChanges(), 'TestLibrary').sort(comp),
+          expected.sort(comp)
+        )
+      })
+
+      it('still reports the migrated contracts as new', () => {
+        const report = reportASTIncompatibilities(
+          testCases.linked_library,
+          testCases.linked_library_08
+        )
+        const expected = [
+          new NewContractChange('TestContract'),
+          new NewContractChange('TestParent'),
+          new NewContractChange('TestStandalone'),
+        ]
+        assert.deepEqual(
+          changesExcept(report.getChanges(), 'TestLibrary').sort(comp),
+          expected.sort(comp)
+        )
+      })
+    })
+
+    describe('and the old build already has artifacts for that compiler', () => {
+      const oldArtifacts = [...testCases.linked_library, ...testCases.previous_08]
+
+      it('reports the library as changed instead of ignoring it', () => {
+        const report = reportASTIncompatibilities(oldArtifacts, testCases.linked_library_08)
+        const expected = [new DeployedBytecodeChange('TestLibrary')]
+        assert.deepEqual(
+          changesOf(report.getChanges(), 'TestLibrary').sort(comp),
+          expected.sort(comp)
+        )
+      })
+
+      it('keeps comparing the contracts that were already on that compiler', () => {
+        const report = reportASTIncompatibilities(oldArtifacts, testCases.linked_library_08)
+        const expected = [
+          new NewContractChange('TestContract'),
+          new NewContractChange('TestParent'),
+        ]
+        assert.deepEqual(
+          changesExcept(report.getChanges(), 'TestLibrary').sort(comp),
+          expected.sort(comp)
+        )
+      })
+    })
+
+    describe('and the library no longer has linkable functions', () => {
+      it('does not report the inlined library', () => {
+        const report = reportASTIncompatibilities(
+          testCases.linked_library,
+          testCases.inlined_library_08
+        )
+        assert.isEmpty(changesOf(report.getChanges(), 'TestLibrary'))
+      })
     })
   })
 })

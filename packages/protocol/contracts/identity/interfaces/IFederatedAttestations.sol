@@ -58,4 +58,21 @@ interface IFederatedAttestations {
     address signer,
     uint64 issuedOn
   ) external pure returns (bytes32);
+
+  // public state variable getters
+  function identifierToAttestations(
+    bytes32 identifier,
+    address issuer,
+    uint256 index
+  ) external view returns (address account, address signer, uint64 issuedOn, uint64 publishedOn);
+  function addressToIdentifiers(
+    address account,
+    address issuer,
+    uint256 index
+  ) external view returns (bytes32);
+  function revokedAttestations(bytes32 attestationHash) external view returns (bool);
+  function eip712DomainSeparator() external view returns (bytes32);
+  function EIP712_OWNERSHIP_ATTESTATION_TYPEHASH() external view returns (bytes32);
+  function MAX_ATTESTATIONS_PER_IDENTIFIER() external view returns (uint256);
+  function MAX_IDENTIFIERS_PER_ADDRESS() external view returns (uint256);
 }

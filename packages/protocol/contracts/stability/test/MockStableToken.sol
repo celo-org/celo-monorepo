@@ -1,16 +1,14 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.0 <0.9.0;
 // solhint-disable no-unused-vars
-
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "../../common/FixidityLib.sol";
 
 /**
  * @title A mock StableToken for testing.
  */
-contract MockStableToken {
+contract MockStableToken08 {
   using FixidityLib for FixidityLib.Fraction;
-  using SafeMath for uint256;
 
   uint8 public constant decimals = 18;
   uint256 public _totalSupply;
@@ -19,7 +17,7 @@ contract MockStableToken {
   // Stored as units. Value can be found using unitsToValue().
   mapping(address => uint256) public balances;
 
-  constructor() public {
+  constructor() {
     setInflationFactor(FixidityLib.fixed1().unwrap());
   }
 
@@ -29,14 +27,14 @@ contract MockStableToken {
 
   function mint(address to, uint256 value) external returns (bool) {
     require(to != address(0), "0 is a reserved address");
-    balances[to] = balances[to].add(valueToUnits(value));
-    _totalSupply = _totalSupply.add(value);
+    balances[to] = (balances[to] + valueToUnits(value));
+    _totalSupply = (_totalSupply + value);
     return true;
   }
 
   function burn(uint256 value) external returns (bool) {
-    balances[msg.sender] = balances[msg.sender].sub(valueToUnits(value));
-    _totalSupply = _totalSupply.sub(value);
+    balances[msg.sender] = (balances[msg.sender] - valueToUnits(value));
+    _totalSupply = (_totalSupply - value);
     return true;
   }
 
@@ -74,8 +72,8 @@ contract MockStableToken {
       return false;
     }
     uint256 units = valueToUnits(value);
-    balances[from] = balances[from].sub(units);
-    balances[to] = balances[to].add(units);
+    balances[from] = (balances[from] - units);
+    balances[to] = (balances[to] + units);
     return true;
   }
 }

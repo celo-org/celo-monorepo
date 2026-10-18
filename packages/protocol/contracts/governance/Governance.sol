@@ -1,9 +1,9 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.9.0;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/math/Math.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/utils/Address.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
+import "@openzeppelin/contracts8/utils/Address.sol";
 
 import "./interfaces/IGovernance.sol";
 import "./Proposals.sol";
@@ -16,6 +16,15 @@ import "../common/UsingRegistry.sol";
 import "../common/PrecompilesOverride.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
+
+// Storage layout (must match the 0.5 baseline). The inherited prefix is:
+//   slot 0: _owner (address) — Ownable
+//   slot 1: initialized (bool) — Initializable
+//   slot 2: _guardCounter (uint256) — ReentrancyGuard
+//   slot 3: registry (IRegistry) — UsingRegistry
+// PrecompilesOverride is zero-storage. Implementation storage starts at slot 4.
+// The inheritance order below (Ownable, Initializable, ReentrancyGuard,
+// UsingRegistry, PrecompilesOverride) reproduces the 0.5 contract exactly.
 
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
@@ -31,7 +40,6 @@ contract Governance is
 {
   using Proposals for Proposals.Proposal;
   using FixidityLib for FixidityLib.Fraction;
-  using SafeMath for uint256;
   using IntegerSortedLinkedList for SortedLinkedList.List;
   using BytesLib for bytes;
   using Address for address payable; // prettier-ignore
@@ -239,7 +247,10 @@ contract Governance is
    */
   modifier hotfixTimedOut(bytes32 hash) {
     require(hotfixes[hash].executionTimeLimit > 0, "hotfix not prepared");
-    require(hotfixes[hash].executionTimeLimit < now, "hotfix execution time limit not reached");
+    require(
+      hotfixes[hash].executionTimeLimit < block.timestamp,
+      "hotfix execution time limit not reached"
+    );
     _;
   }
 
@@ -247,7 +258,7 @@ contract Governance is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -296,12 +307,10 @@ contract Governance is
     setBaselineUpdateFactor(baselineUpdateFactor);
     setBaselineQuorumFactor(baselineQuorumFactor);
     // solhint-disable-next-line not-rely-on-time
-    lastDequeue = now;
+    lastDequeue = block.timestamp;
   }
 
-  function() external payable {
-    require(msg.data.length == 0, "unknown method");
-  }
+  receive() external payable {}
 
   /**
    * @notice Updates the ratio of yes:yes+no votes needed for a specific class of proposals to pass.
@@ -373,13 +382,19 @@ contract Governance is
     dequeueProposalsIfReady();
     require(msg.value >= minDeposit, "Too small deposit");
 
-    proposalCount = proposalCount.add(1);
+    proposalCount = (proposalCount + 1);
     Proposals.Proposal storage proposal = proposals[proposalCount];
     proposal.make(values, destinations, data, dataLengths, msg.sender, msg.value);
     proposal.setDescriptionUrl(descriptionUrl);
     queue.push(proposalCount);
     // solhint-disable-next-line not-rely-on-time
-    emit ProposalQueued(proposalCount, msg.sender, proposal.transactions.length, msg.value, now);
+    emit ProposalQueued(
+      proposalCount,
+      msg.sender,
+      proposal.transactions.length,
+      msg.value,
+      block.timestamp
+    );
     return proposalCount;
   }
 
@@ -415,7 +430,7 @@ contract Governance is
       voter.upvote.proposalId == 0 || !queue.contains(voter.upvote.proposalId),
       "cannot upvote more than one queued proposal"
     );
-    uint256 upvotes = queue.getValue(proposalId).add(weight);
+    uint256 upvotes = (queue.getValue(proposalId) + weight);
     queue.update(proposalId, upvotes, lesser, greater);
     voter.upvote = UpvoteRecord(proposalId, weight);
     emit ProposalUpvoted(proposalId, account, weight);
@@ -439,12 +454,7 @@ contract Governance is
     require(proposalId != 0, "Account has no historical upvote");
     removeIfQueuedAndExpired(proposalId);
     if (queue.contains(proposalId)) {
-      queue.update(
-        proposalId,
-        queue.getValue(proposalId).sub(voter.upvote.weight),
-        lesser,
-        greater
-      );
+      queue.update(proposalId, (queue.getValue(proposalId) - voter.upvote.weight), lesser, greater);
       emit ProposalUpvoteRevoked(proposalId, account, voter.upvote.weight);
     }
     voter.upvote = UpvoteRecord(0, 0);
@@ -552,7 +562,7 @@ contract Governance is
     uint256 totalVotingPower = getLockedGold().getAccountTotalGovernanceVotingPower(account);
 
     require(
-      totalVotingPower >= yesVotes.add(noVotes).add(abstainVotes),
+      totalVotingPower >= ((yesVotes + noVotes) + abstainVotes),
       "Voter doesn't have enough locked Celo (formerly known as Celo Gold)"
     );
     _vote(proposal, proposalId, index, account, yesVotes, noVotes, abstainVotes);
@@ -570,7 +580,7 @@ contract Governance is
     for (
       uint256 dequeueIndex = 0;
       dequeueIndex < dequeued.length;
-      dequeueIndex = dequeueIndex.add(1)
+      dequeueIndex = (dequeueIndex + 1)
     ) {
       VoteRecord storage voteRecord = voter.referendumVotes[dequeueIndex];
 
@@ -692,14 +702,14 @@ contract Governance is
   function prepareHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
     HotfixRecord storage _currentHotfix = hotfixes[hash];
 
-    uint256 _currentTime = now;
+    uint256 _currentTime = block.timestamp;
     require(hotfixExecutionTimeWindow > 0, "Hotfix execution time window not set");
     require(_currentHotfix.executionTimeLimit == 0, "Hotfix already prepared for this timeframe.");
     require(_currentHotfix.approved, "Hotfix not approved by approvers.");
     require(_currentHotfix.councilApproved, "Hotfix not approved by security council.");
 
-    _currentHotfix.executionTimeLimit = _currentTime.add(hotfixExecutionTimeWindow);
-    emit HotfixPrepared(hash, _currentTime.add(hotfixExecutionTimeWindow));
+    _currentHotfix.executionTimeLimit = (_currentTime + hotfixExecutionTimeWindow);
+    emit HotfixPrepared(hash, (_currentTime + hotfixExecutionTimeWindow));
   }
 
   /**
@@ -729,7 +739,10 @@ contract Governance is
     require(!executed, "hotfix already executed");
     require(approved, "hotfix not approved");
     require(councilApproved, "hotfix not approved by security council");
-    require(executionTimeLimit >= now, "Execution time limit has already been reached.");
+    require(
+      executionTimeLimit >= block.timestamp,
+      "Execution time limit has already been reached."
+    );
     Proposals.makeMem(values, destinations, data, dataLengths, msg.sender, 0).executeMem();
 
     hotfixes[hash].executed = true;
@@ -745,7 +758,7 @@ contract Governance is
     require(value != 0, "Nothing to withdraw");
     require(value <= address(this).balance, "Inconsistent balance");
     refundedDeposits[msg.sender] = 0;
-    msg.sender.sendValue(value);
+    payable(msg.sender).sendValue(value);
     return true;
   }
 
@@ -1007,7 +1020,7 @@ contract Governance is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 5, 1, 0);
+    return (1, 6, 0, 0);
   }
 
   /**
@@ -1187,38 +1200,37 @@ contract Governance is
    */
   function dequeueProposalsIfReady() public {
     // solhint-disable-next-line not-rely-on-time
-    if (now >= lastDequeue.add(dequeueFrequency)) {
+    if (block.timestamp >= (lastDequeue + dequeueFrequency)) {
       uint256 numProposalsToDequeue = Math.min(concurrentProposals, queue.list.numElements);
       uint256[] memory dequeuedIds = queue.popN(numProposalsToDequeue);
 
       bool wasAnyProposalDequeued = false;
-      for (uint256 i = 0; i < numProposalsToDequeue; i = i.add(1)) {
+      for (uint256 i = 0; i < numProposalsToDequeue; i = (i + 1)) {
         uint256 proposalId = dequeuedIds[i];
         Proposals.Proposal storage proposal = proposals[proposalId];
         if (_isQueuedProposalExpired(proposal)) {
           emit ProposalExpired(proposalId);
           continue;
         }
-        refundedDeposits[proposal.proposer] = refundedDeposits[proposal.proposer].add(
-          proposal.deposit
-        );
+        refundedDeposits[proposal.proposer] = (refundedDeposits[proposal.proposer] +
+          proposal.deposit);
         // solhint-disable-next-line not-rely-on-time
-        proposal.timestamp = now;
+        proposal.timestamp = block.timestamp;
         if (emptyIndices.length != 0) {
-          uint256 indexOfLastEmptyIndex = emptyIndices.length.sub(1);
+          uint256 indexOfLastEmptyIndex = (emptyIndices.length - 1);
           dequeued[emptyIndices[indexOfLastEmptyIndex]] = proposalId;
           delete emptyIndices[indexOfLastEmptyIndex];
-          emptyIndices.length = indexOfLastEmptyIndex;
+          emptyIndices.pop();
         } else {
           dequeued.push(proposalId);
         }
         // solhint-disable-next-line not-rely-on-time
-        emit ProposalDequeued(proposalId, now);
+        emit ProposalDequeued(proposalId, block.timestamp);
         wasAnyProposalDequeued = true;
       }
       if (wasAnyProposalDequeued) {
         // solhint-disable-next-line not-rely-on-time
-        lastDequeue = now;
+        lastDequeue = block.timestamp;
       }
     }
   }
@@ -1303,7 +1315,7 @@ contract Governance is
     }
 
     uint256 maxReferendumUsed = 0;
-    for (uint256 index = 0; index < dequeued.length; index = index.add(1)) {
+    for (uint256 index = 0; index < dequeued.length; index = (index + 1)) {
       uint256 proposalId = dequeued[index];
       Proposals.Proposal storage proposal = proposals[proposalId];
       bool isVotingReferendum = (getProposalDequeuedStage(proposal) == Proposals.Stage.Referendum);
@@ -1318,7 +1330,7 @@ contract Governance is
         continue;
       }
 
-      uint256 votesCast = voteRecord.yesVotes.add(voteRecord.noVotes).add(voteRecord.abstainVotes);
+      uint256 votesCast = ((voteRecord.yesVotes + voteRecord.noVotes) + voteRecord.abstainVotes);
       maxReferendumUsed = Math.max(
         maxReferendumUsed,
         // backward compatibility for transition period - this should be updated later on
@@ -1342,7 +1354,7 @@ contract Governance is
   ) internal {
     Voter storage voter = voters[account];
 
-    for (uint256 index = 0; index < dequeued.length; index = index.add(1)) {
+    for (uint256 index = 0; index < dequeued.length; index = (index + 1)) {
       uint256 proposalId = dequeued[index];
       Proposals.Proposal storage proposal = proposals[proposalId];
       bool isVotingReferendum = (getProposalDequeuedStage(proposal) == Proposals.Stage.Referendum);
@@ -1359,38 +1371,38 @@ contract Governance is
         continue;
       }
 
-      uint256 sumOfVotes = voteRecord.yesVotes.add(voteRecord.noVotes).add(voteRecord.abstainVotes);
+      uint256 sumOfVotes = ((voteRecord.yesVotes + voteRecord.noVotes) + voteRecord.abstainVotes);
 
       if (sumOfVotes > newVotingPower) {
-        uint256 toRemove = sumOfVotes.sub(newVotingPower);
+        uint256 toRemove = (sumOfVotes - newVotingPower);
 
         uint256 abstainToRemove = getVotesPortion(toRemove, voteRecord.abstainVotes, sumOfVotes);
         uint256 yesToRemove = getVotesPortion(toRemove, voteRecord.yesVotes, sumOfVotes);
         uint256 noToRemove = getVotesPortion(toRemove, voteRecord.noVotes, sumOfVotes);
 
-        uint256 totalRemoved = abstainToRemove.add(yesToRemove).add(noToRemove);
+        uint256 totalRemoved = ((abstainToRemove + yesToRemove) + noToRemove);
 
-        uint256 yesVotes = voteRecord.yesVotes.sub(yesToRemove);
-        uint256 noVotes = voteRecord.noVotes.sub(noToRemove);
-        uint256 abstainVotes = voteRecord.abstainVotes.sub(abstainToRemove);
+        uint256 yesVotes = (voteRecord.yesVotes - yesToRemove);
+        uint256 noVotes = (voteRecord.noVotes - noToRemove);
+        uint256 abstainVotes = (voteRecord.abstainVotes - abstainToRemove);
 
         if (totalRemoved < toRemove) {
           // in case of rounding error
-          uint256 roundingToRemove = toRemove.sub(totalRemoved);
+          uint256 roundingToRemove = (toRemove - totalRemoved);
 
           uint256 toRemoveRounding = Math.min(roundingToRemove, yesVotes);
-          yesVotes = yesVotes.sub(toRemoveRounding);
-          roundingToRemove = roundingToRemove.sub(toRemoveRounding);
+          yesVotes = (yesVotes - toRemoveRounding);
+          roundingToRemove = (roundingToRemove - toRemoveRounding);
 
           if (roundingToRemove != 0) {
             toRemoveRounding = Math.min(roundingToRemove, noVotes);
-            noVotes = noVotes.sub(toRemoveRounding);
-            roundingToRemove = roundingToRemove.sub(toRemoveRounding);
+            noVotes = (noVotes - toRemoveRounding);
+            roundingToRemove = (roundingToRemove - toRemoveRounding);
           }
 
           if (roundingToRemove != 0) {
             toRemoveRounding = Math.min(roundingToRemove, abstainVotes);
-            abstainVotes = abstainVotes.sub(toRemoveRounding);
+            abstainVotes = (abstainVotes - toRemoveRounding);
           }
         }
 
@@ -1433,12 +1445,11 @@ contract Governance is
   function getProposalDequeuedStage(
     Proposals.Proposal storage proposal
   ) internal view returns (Proposals.Stage) {
-    uint256 stageStartTime = proposal.timestamp.add(stageDurations.referendum).add(
-      stageDurations.execution
-    );
+    uint256 stageStartTime = ((proposal.timestamp + stageDurations.referendum) +
+      stageDurations.execution);
     // solhint-disable-next-line not-rely-on-time
     if (
-      now >= stageStartTime &&
+      block.timestamp >= stageStartTime &&
       (proposal.transactions.length != 0 ||
         // proposals with 0 transactions can expire only when not approved or not passing
         !proposal.isApproved() ||
@@ -1446,9 +1457,9 @@ contract Governance is
     ) {
       return Proposals.Stage.Expiration;
     }
-    stageStartTime = stageStartTime.sub(stageDurations.execution);
+    stageStartTime = (stageStartTime - stageDurations.execution);
     // solhint-disable-next-line not-rely-on-time
-    if (now >= stageStartTime) {
+    if (block.timestamp >= stageStartTime) {
       return Proposals.Stage.Execution;
     }
     return Proposals.Stage.Referendum;
@@ -1497,7 +1508,6 @@ contract Governance is
    * @param yesVotes The yes votes weight.
    * @param noVotes The no votes weight.
    * @param abstainVotes The abstain votes weight.
-   * @return Whether or not the proposal is passing.
    */
   function _vote(
     Proposals.Proposal storage proposal,
@@ -1620,7 +1630,7 @@ contract Governance is
       return support.gt(threshold);
     }
 
-    for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
+    for (uint256 i = 0; i < proposal.transactions.length; i = (i + 1)) {
       bytes4 functionId = ExtractFunctionSignature.extractFunctionSignature(
         proposal.transactions[i].data
       );
@@ -1676,7 +1686,7 @@ contract Governance is
     Proposals.Proposal storage proposal
   ) private view returns (bool) {
     // solhint-disable-next-line not-rely-on-time
-    return now >= proposal.timestamp.add(queueExpiry);
+    return block.timestamp >= (proposal.timestamp + queueExpiry);
   }
 
   /**
@@ -1695,5 +1705,14 @@ contract Governance is
         .newFixed(totalToRemove)
         .multiply(FixidityLib.newFixedFraction(votes, sumOfAllVotes))
         .fromFixed();
+  }
+
+  /**
+   * @notice Whether the sender is the owner.
+   * @dev Kept from the Solidity 0.5 implementation: OpenZeppelin 2.5's Ownable exposed it
+   * and 4.9's does not, and the ABI behind the upgraded proxy must not lose a function.
+   */
+  function isOwner() external view returns (bool) {
+    return msg.sender == owner();
   }
 }

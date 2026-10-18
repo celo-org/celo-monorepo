@@ -5,7 +5,7 @@
   "license": "SEE LICENSE IN SUB-PACKAGES",
   "private": true,
   "scripts": {
-    "lint": "yarn lerna run lint && yarn run --silent lint:do-not-merge",
+    "lint": "yarn --cwd packages/protocol lint && yarn run --silent lint:do-not-merge",
     "lint:do-not-merge": "! git grep -E 'DO[ _]*NOT[ _]*MERGE'",
     "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|js|sol)'",
     "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+(ts|js|sol)'",
@@ -13,11 +13,11 @@
     "reset-cache": "yarn reset-yarn",
     "reset-modules": "rm -rf node_modules/ packages/*/node_modules",
     "reset-yarn": "yarn cache clean",
-    "test": "yarn run lerna run test",
-    "build": "yarn run lerna run build",
-    "clean": "yarn run lerna run clean",
+    "test": "yarn --cwd packages/protocol test",
+    "build": "yarn --cwd packages/protocol build",
+    "clean": "yarn --cwd packages/protocol clean",
     "check-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'",
-    "postinstall": "yarn run lerna run postinstall",
+    "postinstall": "echo 'no workspace package defines a postinstall script'",
     "keys:decrypt": "bash scripts/key_placer.sh decrypt",
     "keys:encrypt": "bash scripts/key_placer.sh encrypt",
     "check:packages": "node ./scripts/check-packages.js",
@@ -28,14 +28,13 @@
       "packages/*"
     ],
     "nohoist": [
-      "**/openzeppelin-solidity",
-      "**/solidity-bytes-utils"
+      "**/openzeppelin-solidity"
     ]
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.3",
     "@types/jest": "^29.1.1",
-    "@types/node": "18.7.16",
+    "@types/node": "24.19.0",
     "@types/prompt": "1.1.1",
     "@types/semver": "7.5.8",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
@@ -60,6 +59,6 @@
   "resolutions": {
     "bip39": "https://github.com/bitcoinjs/bip39#a7ecbfe2e60d0214ce17163d610cad9f7b23140c",
     "@types/bn.js": "4.11.6",
-    "bignumber.js": "9.0.0"
+    "bignumber.js": "9.1.2"
   }
 }

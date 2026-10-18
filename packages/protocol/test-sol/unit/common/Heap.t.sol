@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.9.0;
 
-import "celo-foundry/Test.sol";
-import "@celo-contracts/common/libraries/Heap.sol";
+import "celo-foundry-8/Test.sol";
+import "@celo-contracts-8/common/libraries/Heap.sol";
+import "@celo-contracts/common/FixidityLib.sol";
 
 contract HeapMock {
   using FixidityLib for FixidityLib.Fraction;
@@ -48,7 +49,7 @@ contract HeapTest is Test {
 
   function generatePRN(uint256 min, uint256 max, uint256 salt) public view returns (uint256) {
     return
-      (uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty, msg.sender, salt))) %
+      (uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender, salt))) %
         (max - min + 1)) + min;
   }
 

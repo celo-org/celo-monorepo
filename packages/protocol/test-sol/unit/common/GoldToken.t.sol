@@ -1,13 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.9.0;
 
-import "@celo-contracts/common/GoldToken.sol";
+import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
+import { ICeloTokenTest } from "@test-sol/unit/common/interfaces/ICeloTokenTest.sol";
 
-import { TestWithUtils } from "@test-sol/TestWithUtils.sol";
-
-contract CeloTokenTest is TestWithUtils {
-  GoldToken celoToken;
-
+contract CeloTokenTest is TestWithUtils08 {
   uint256 constant ONE_CELOTOKEN = 1000000000000000000;
   address receiver;
   address sender;
@@ -18,15 +15,15 @@ contract CeloTokenTest is TestWithUtils {
   event Transfer(address indexed from, address indexed to, uint256 value);
   event TransferComment(string comment);
 
-  function setUp() public {
+  function setUp() public virtual override {
     super.setUp();
     celoTokenOwner = actor("celoTokenOwner");
     celoUnreleasedTreasuryAddress = actor("celoUnreleasedTreasury");
     deployCodeTo("CeloUnreleasedTreasury.sol", abi.encode(false), celoUnreleasedTreasuryAddress);
 
-    vm.prank(celoTokenOwner);
-    celoToken = new GoldToken(true);
-    vm.prank(celoTokenOwner);
+    address celoTokenAddress = actor("celoToken");
+    deployCodeTo("GoldToken.sol", abi.encode(true), celoTokenAddress);
+    celoToken = ICeloTokenTest(celoTokenAddress);
     celoToken.setRegistry(REGISTRY_ADDRESS);
     registry.setAddressFor(CeloUnreleasedTreasuryContract, celoUnreleasedTreasuryAddress);
     receiver = actor("receiver");
@@ -92,7 +89,7 @@ contract CeloTokenTest_general is CeloTokenTest {
 }
 
 contract CeloTokenTest_transfer is CeloTokenTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -135,19 +132,17 @@ contract CeloTokenTest_transfer is CeloTokenTest {
   }
 
   function test_FailsWhenNativeTransferingToCeloUnreleasedTreasury() public payable {
-    (bool success, ) = address(uint160(celoUnreleasedTreasuryAddress)).call.value(ONE_CELOTOKEN)(
-      ""
-    );
+    (bool success, ) = payable(celoUnreleasedTreasuryAddress).call{ value: ONE_CELOTOKEN }("");
 
     assertFalse(success);
 
-    bool sent = address(uint160(celoUnreleasedTreasuryAddress)).send(ONE_CELOTOKEN);
+    bool sent = payable(celoUnreleasedTreasuryAddress).send(ONE_CELOTOKEN);
     assertFalse(sent);
   }
 }
 
 contract CeloTokenTest_transferFrom is CeloTokenTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     vm.prank(sender);
     celoToken.approve(receiver, ONE_CELOTOKEN);
@@ -195,7 +190,7 @@ contract CeloTokenTest_burn is CeloTokenTest {
   uint256 startBurn;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     startBurn = celoToken.getBurnedAmount();
   }

@@ -142,7 +142,7 @@ contract MockEpochManager is IEpochManager {
 
   function getEpochProcessingState()
     external
-    view
+    pure
     returns (uint256, uint256, uint256, uint256, uint256)
   {
     return (0, 0, 0, 0, 0);
@@ -167,7 +167,7 @@ contract MockEpochManager is IEpochManager {
 
   function getEpochByBlockNumber(
     uint256
-  ) external view returns (uint256, uint256, uint256, uint256) {
+  ) external pure returns (uint256, uint256, uint256, uint256) {
     return (0, 0, 0, 0);
   }
 

@@ -2,7 +2,10 @@
 
 
 function checkout_build_sources() {
-  local BUILD_SOURCES="contracts contracts-0.8 test-sol migrations_sol foundry.toml remappings.txt"
+  # Every source tree any supported ref may carry: pre-migration tags have contracts
+  # (0.5) and contracts-0.8, the single-tree layout has contracts (0.8) and
+  # contracts-0.5. Only the paths present in the ref are restored; the rest are removed.
+  local BUILD_SOURCES="contracts contracts-0.8 contracts-0.5 test-sol migrations_sol foundry.toml remappings.txt"
   local FROM=$1
   local LOG_FILE=$2
   # The third argument is optional. We temporarily allow unset variables.
@@ -15,8 +18,34 @@ function checkout_build_sources() {
     FLAGS="--staged --worktree"
   fi
 
+  local PREFIX=$(git rev-parse --show-prefix)
+  local PRESENT=""
+  for SOURCE in $BUILD_SOURCES; do
+    if git cat-file -e "$FROM:$PREFIX$SOURCE" 2>/dev/null; then
+      PRESENT="$PRESENT $SOURCE"
+    fi
+  done
+
   rm -rf $BUILD_SOURCES
-  git restore --source $FROM $FLAGS $BUILD_SOURCES 2>>$LOG_FILE >> $LOG_FILE
+  git restore --source $FROM $FLAGS $PRESENT 2>>$LOG_FILE >> $LOG_FILE
+}
+
+# Whether the checked-out foundry.toml defines the given profile. The single-tree
+# layout has no truffle-compat profile any more (the proxies build with the solc05
+# profile), while pre-migration tags still build their 0.5 implementations with one.
+function has_foundry_profile() {
+  grep -q "^\[profile\.$1\]" foundry.toml
+}
+
+# USAGE: build_08_sources <ref> <log file>
+# Builds a ref's Solidity 0.8 sources and sets $BUILD_DIR to the result. Refs that still
+# define the truffle-compat8 profile build them with it into its own directory; the
+# unified layout has one profile for the 0.8 tree and builds it with the default profile.
+function build_08_sources() {
+  build_tag_foundry "$1" "$2" truffle-compat8
+  if [[ -z "$BUILD_DIR" ]]; then
+    build_tag_foundry "$1" "$2"
+  fi
 }
 
 # USAGE: build_tag_foundry <branch> <log file>
@@ -25,6 +54,13 @@ function checkout_build_sources() {
 # 2. builds contracts with Foundry
 # 3. returns to original branch
 # piping output of any commands to the specified log file.
+# Prints the build output directory for a ref. Branch names may contain slashes, which are
+# not directory separators here, so they are flattened to underscores. Every script that
+# locates a ref's artifacts must derive the name from this function so they agree.
+function build_dir_for_ref() {
+  echo "out-$(echo "$1" | sed -e 's#/#_#g')"
+}
+
 # Sets $BUILD_DIR to the directory where resulting build artifacts may be found.
 function build_tag_foundry() {
   local BRANCH="$1"
@@ -43,7 +79,7 @@ function build_tag_foundry() {
 
   git fetch origin +'refs/tags/core-contracts.v*:refs/tags/core-contracts.v*' >> $LOG_FILE
   echo " - Checkout contracts source code at $BRANCH"
-  BUILD_DIR=$(echo out-$(echo $BRANCH | sed -e 's/\//_/g'))
+  BUILD_DIR=$(build_dir_for_ref "$BRANCH")
   if [[ -n "$PROFILE" ]]; then
     BUILD_DIR=${BUILD_DIR}-$PROFILE
   fi
@@ -54,13 +90,71 @@ function build_tag_foundry() {
     cp "$CONFIG" foundry.toml
   fi
 
-  if [ ! -d $BUILD_DIR ]; then
-    echo " - Build contract artifacts at $BUILD_DIR"
-    export FOUNDRY_PROFILE=$PROFILE
-    forge build --out $BUILD_DIR --ast >> $LOG_FILE
-  else
-    echo " - Contract artifacts already built at $BUILD_DIR"
+  if [[ -n "$PROFILE" ]] && ! has_foundry_profile "$PROFILE"; then
+    echo " - $BRANCH defines no $PROFILE profile, nothing to build for it"
+    # A build of the same ref name from before the profile was removed must not linger:
+    # the release tooling picks its artifact directories by existence.
+    rm -rf $BUILD_DIR $BUILD_DIR.inputs
+    BUILD_DIR=""
+    checkout_build_sources $CURRENT_HASH $LOG_FILE -s
+    return 0
+  fi
+
+  # A directory left by an earlier build is reused only when it was built from exactly
+  # these inputs, recorded next to it in $BUILD_DIR.inputs. Matching by ref name alone is
+  # not enough: on reused (self-hosted) runners a build of the same name from older sources
+  # or another toolchain compared against a stale baseline and produced phantom storage
+  # diffs (e.g. a spurious change attributed to Governance, which then trips the
+  # no-new-proxy guard). Anything else is rebuilt from scratch.
+  local MARKER="$BUILD_DIR.inputs"
+  export FOUNDRY_PROFILE=$PROFILE
+  local INPUTS
+  INPUTS=$(build_inputs "$BRANCH" "$PROFILE") || INPUTS=""
+  if [[ -n "$INPUTS" && -d $BUILD_DIR && -f $MARKER && "$(cat $MARKER)" == "$INPUTS" ]]; then
+    echo " - Reuse contract artifacts at $BUILD_DIR (built from the same inputs)"
+    checkout_build_sources $CURRENT_HASH $LOG_FILE -s
+    return 0
+  fi
+
+  echo " - Build contract artifacts at $BUILD_DIR (fresh)"
+  rm -rf $BUILD_DIR $MARKER
+  # Put the working tree back even when the build fails; otherwise the caller (and a
+  # reused CI runner) is left with the tag's sources checked out over the branch.
+  if ! forge build --out $BUILD_DIR --ast >> $LOG_FILE; then
+    echo " - Build of $BRANCH failed, restoring sources at $CURRENT_HASH (see $LOG_FILE)" >&2
+    checkout_build_sources $CURRENT_HASH $LOG_FILE -s
+    return 1
+  fi
+  # Written only after a successful build, so an interrupted build is never reused.
+  if [[ -n "$INPUTS" ]]; then
+    printf '%s\n' "$INPUTS" > $MARKER
   fi
 
   checkout_build_sources $CURRENT_HASH $LOG_FILE -s
+}
+
+# USAGE: build_inputs <ref> <profile>
+# Prints everything a build of the checked-out sources of <ref> depends on, or fails when
+# the build cannot be fingerprinted (the ref does not resolve to a commit, a lib/
+# submodule has local changes, or forge cannot resolve its configuration). A failure means
+# the build is never reused. build_tag_foundry restores only a ref's contract sources and
+# its foundry.toml and remappings.txt; the libraries (the lib/ submodules and
+# node_modules), the compiler driver and the environment come from the current checkout,
+# so they are inputs too. forge's resolved configuration covers every way of configuring
+# it (foundry.toml, FOUNDRY_CONFIG, FOUNDRY_* and DAPP_* variables, remappings).
+function build_inputs() {
+  local COMMIT CONFIG
+  COMMIT=$(git rev-parse --verify --quiet "$1^{commit}") || return 1
+  if [[ -n "$(git submodule foreach --recursive --quiet 'git status --porcelain')" ]]; then
+    return 1
+  fi
+  CONFIG=$(forge config --json 2>/dev/null | git hash-object --stdin) || return 1
+  echo "format 2: forge build --out <dir> --ast"
+  echo "commit $COMMIT"
+  echo "profile $2"
+  echo "config $CONFIG"
+  echo "yarn.lock $(git hash-object "$(git rev-parse --show-toplevel)/yarn.lock")"
+  forge --version | sed 's/^/forge /'
+  # Commit and path only: the trailing describe label depends on which refs a clone has.
+  git submodule status --recursive -- lib | awk '{ print "submodule", $1, $2 }'
 }
