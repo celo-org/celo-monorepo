@@ -114,11 +114,11 @@ ACCOUNT="0x..." TEAM="council" GC_MULTISIG="0x..." MOCKED_SIGNER_1="0x..." MOCKE
 
 ### `mock-sepolia.sh`
 
-Prepares a forked testnet environment for Sepolia or Chaos networks. Fixes the SuperchainConfig proxy admin and transfers ownership of key OP Stack contracts to the deployed Gnosis Safe. Requires a running Anvil instance (typically started by `fork_l1.sh`).
+Prepares a forked testnet environment for Sepolia, Chaos or Havoc. Fixes the SuperchainConfig proxy admin and transfers ownership of key OP Stack contracts to the target Gnosis Safe. Requires a running Anvil instance (typically started by `fork_l1.sh`).
 
 **Required Environment Variables:**
 
-- `NETWORK` - Network to mock (`sepolia` or `chaos`)
+- `NETWORK` - Network to mock (`sepolia`, `chaos` or `havoc`)
 
 **Features:**
 
@@ -129,21 +129,27 @@ Prepares a forked testnet environment for Sepolia or Chaos networks. Fixes the S
 
 **Network-Specific Addresses:**
 
-|                            | sepolia                                      | chaos                                        |
-| -------------------------- | -------------------------------------------- | -------------------------------------------- |
-| **Safe**                   | `0x009A6Ac23EeBe98488ED28A52af69Bf46F1C18cb` | `0x6F8DB5374003c9ffa7084d8b65c57655963766a9` |
-| **SuperchainConfig Proxy** | `0x31bEef32135c90AE8E56Fb071B3587de289Aaf77` | `0x7801D0a005d13CB66f8113BC28cb2640D8f44A6F` |
-| **ProxyAdmin**             | `0xF7d7A3d3bb8aBb6829249B3D3aD3d525D052027e` | `0xb2a0c2b49cdc2d3f0a0a291be0a6c20559ec053e` |
-| **SystemConfig**           | `0x760a5F022C9940f4A074e0030be682F560d29818` | `0x6baf5959cc06a39793c338e6586f49473c731b4c` |
-| **DisputeGameFactory**     | `0x57C45d82D1a995F1e135B8D7EDc0a6BB5211cfAA` | `0x338ac809e6a045cfc8aeb16ff8a4329147b61afb` |
-| **DelayedWETH**            | `0x082F5f58B664CD1d51F9845fEE322aBA2cED9CbA` | `0x9a95f7f7cdbb5195674a32d1579504e8fd302cc9` |
-| **ProtocolVersions**       | `0x0e2d45F3393C3A02ebf285F998c5bF990A1541cd` | `0x433a83893DDA68B941D4aefA908DED9c599522ad` |
+|                            | sepolia                                      | chaos                                        | havoc                                          |
+| -------------------------- | -------------------------------------------- | -------------------------------------------- | ---------------------------------------------- |
+| **Safe**                   | `0x009A6Ac23EeBe98488ED28A52af69Bf46F1C18cb` | `0x6F8DB5374003c9ffa7084d8b65c57655963766a9` | `0x3Da8387E062A4B93EF08E84812b4bcbbBa7a0c3d` <sup>1</sup> |
+| **SuperchainConfig Proxy** | `0x31bEef32135c90AE8E56Fb071B3587de289Aaf77` | `0x7801D0a005d13CB66f8113BC28cb2640D8f44A6F` | `0x570823cfBA339A4c6a4afB4aBBd17Bc192aD6e6a` <sup>2</sup> |
+| **ProxyAdmin**             | `0xF7d7A3d3bb8aBb6829249B3D3aD3d525D052027e` | `0xb2a0c2b49cdc2d3f0a0a291be0a6c20559ec053e` | `0x4FD0DAE261BF3dCEf71D19Dc98ef1e0323906952`   |
+| **SystemConfig**           | `0x760a5F022C9940f4A074e0030be682F560d29818` | `0x6baf5959cc06a39793c338e6586f49473c731b4c` | `0xafc6fa968aebf7b4030f4acae02da34c3287bc78`   |
+| **DisputeGameFactory**     | `0x57C45d82D1a995F1e135B8D7EDc0a6BB5211cfAA` | `0x338ac809e6a045cfc8aeb16ff8a4329147b61afb` | `0x6C4F9BF787bbBEcBF9D90Eb23791abd778905469`   |
+| **DelayedWETH**            | `0x082F5f58B664CD1d51F9845fEE322aBA2cED9CbA` | `0x9a95f7f7cdbb5195674a32d1579504e8fd302cc9` | `0x34902939c0c2CB528DcB0f6ABa4a2782CE9dd26B` <sup>3</sup> |
+| **ProtocolVersions**       | `0x0e2d45F3393C3A02ebf285F998c5bF990A1541cd` | `0x433a83893DDA68B941D4aefA908DED9c599522ad` | `0x36742bb793e9a87ee73ad44af0ccf98d1a3f1ee7` <sup>4</sup> |
+
+1. The same Safe `exec-upgrade.sh` uses for havoc. Its sole owner is `0x6865c71c…`, the EOA that currently owns havoc's ProxyAdmin and SystemConfig, so the transfer is a no-op away from a real signer.
+2. The external SuperchainConfig (2.4.0), not the CeloSuperchainConfig wrapper sitting in front of it.
+3. Deployed, but version 1.5.0 takes its authority from `config()` and exposes no `owner()`. The script detects that and skips the transfer. Sepolia and chaos run 1.3.0, which does have `owner()`.
+4. From `rollup.json`'s `protocol_versions_address`; SystemConfig exposes no getter for it.
 
 **Example Execution:**
 
 ```bash
 NETWORK="sepolia" ./mock-sepolia.sh
 NETWORK="chaos" ./mock-sepolia.sh
+NETWORK="havoc" ./mock-sepolia.sh
 ```
 
 ## Usage Workflow
@@ -176,7 +182,7 @@ NETWORK="chaos" ./mock-sepolia.sh
    # For mainnet fork: use the same addresses that correspond to your private keys in exec-mocked.sh
    MOCKED_SIGNER_1="0x..." MOCKED_SIGNER_2="0x..." MOCKED_SIGNER_3="0x..." MOCKED_SIGNER_4="0x..." ./mock-mainnet.sh
 
-   # For Sepolia/Chaos fork: set NETWORK to sepolia or chaos
+   # For Sepolia/Chaos/Havoc fork: set NETWORK accordingly
    NETWORK="sepolia" ./mock-sepolia.sh
    ```
 

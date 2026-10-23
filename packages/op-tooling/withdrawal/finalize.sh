@@ -4,14 +4,20 @@ set -euo pipefail
 # Determine network
 NETWORK=${NETWORK:-}; [ -z "${NETWORK:-}" ] && echo "Need to set the NETWORK via env" && exit 1;
 case $NETWORK in
-  sepolia)
-    L1_OPTIMISM_PORTAL=0x44ae3d41a335a7d05eb533029917aad35662dcc2
-    ;;
   mainnet)
     L1_OPTIMISM_PORTAL=0xc5c5D157928BDBD2ACf6d0777626b6C75a9EAEDC
     ;;
+  sepolia)
+    L1_OPTIMISM_PORTAL=0x44ae3d41a335a7d05eb533029917aad35662dcc2
+    ;;
+  chaos)
+    L1_OPTIMISM_PORTAL=0x101f7d8038BEb55D92919E9F944FEb0fAf211a9b
+    ;;
+  havoc)
+    L1_OPTIMISM_PORTAL=0x7a79515f9f916f38B1AED2DDc2658139C2ecF709
+    ;;
   *)
-    echo "Unsupported network: $NETWORK"
+    echo "Unsupported network: $NETWORK (supported: mainnet, sepolia, chaos, havoc)"
     exit 1
     ;;
 esac

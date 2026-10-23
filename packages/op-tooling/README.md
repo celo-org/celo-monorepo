@@ -4,6 +4,7 @@ Sections:
 
 - [deposit](./deposit/) - scripts for performing L1 to L2 deposit via OptimismPortal
 - [exec](./exec/) - scripts for executing upgrade transactions
+- [fee-currency](./fee-currency/) - scripts for sending CIP-64 transactions & seeding the SequencerFeeVault with fee currencies
 - [fork](./fork/) - scripts for forking & mocking networks (most useful: `fork_l1.sh` & `mock-mainnet.sh`)
 - [impls](./impls/) - scripts for deployment & upgrade of individual OpStack contracts
 - [op-deployer](./op-deployer/) - scripts for interacting with op-deployer upgrade pipeline, organized by version ([v3](./op-deployer/v3/), [v4](./op-deployer/v4/), [v5](./op-deployer/v5/))

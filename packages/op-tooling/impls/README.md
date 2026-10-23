@@ -43,24 +43,30 @@ MIN_PROPOSAL_SIZE=1000 CHALLENGE_PERIOD=3600 forge script DeployMIPS.sol --root 
 
 ### `DeployPortalImpl.s.sol`
 
-Deploys a new OptimismPortal2 implementation contract with configurable proof maturity and dispute game finality delays.
-
-**Features:**
-
-- Deploys OptimismPortal2 implementation using deterministic deployment
-- Configurable proof maturity delay and dispute game finality delay
-- Uses DeployUtils for consistent deployment patterns
-- Outputs deployed implementation address
+Deploys a new OptimismPortal2 implementation contract with a configurable proof maturity delay (immutable, set in constructor). The dispute game finality delay is read from AnchorStateRegistry - see `DeployRegistryImpl.s.sol`.
 
 **Required Environment Variables:**
 
 - `PROOF_MATURITY_DELAY_SECONDS` - Proof maturity delay in seconds
+
+**Example Execution:**
+
+```bash
+PROOF_MATURITY_DELAY_SECONDS=604800 forge script DeployPortalImpl.s.sol --root $PATH_TO_OP_REPO/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
+```
+
+### `DeployRegistryImpl.s.sol`
+
+Deploys a new AnchorStateRegistry implementation contract with a configurable dispute game finality delay (immutable, set in constructor). Pair with `DeployPortalImpl.s.sol` to retune both withdrawal delays; activate with `SafeSetRegistry.s.sol` (and `SafeSetPortal.s.sol` for the portal).
+
+**Required Environment Variables:**
+
 - `DISPUTE_GAME_FINALITY_DELAY_SECONDS` - Dispute game finality delay in seconds
 
 **Example Execution:**
 
 ```bash
-PROOF_MATURITY_DELAY_SECONDS=604800 DISPUTE_GAME_FINALITY_DELAY_SECONDS=604800 forge script DeployPortalImpl.s.sol --root $PATH_TO_OP_REPO/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
+DISPUTE_GAME_FINALITY_DELAY_SECONDS=302400 forge script DeployRegistryImpl.s.sol --root $PATH_TO_OP_REPO/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
 ```
 
 ### `SafeSetPortal.s.sol`
@@ -102,6 +108,36 @@ cast wallet sign --no-hash --private-key $PK $HASH
 
 # Execute transaction with signature
 PORTAL_PROXY="0x..." PORTAL_IMPL="0x..." PROXY_ADMIN="0x..." SAFE="0x..." SENDER="0x..." SIG="0x..." forge script SafeSetPortal.s.sol --sig "execTransaction()" --root $PATH_TO_OP_REPO/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
+```
+
+### `SafeSetRegistry.s.sol`
+
+Executes a Safe multisig transaction to upgrade the AnchorStateRegistry proxy to a new implementation via `ProxyAdmin.upgrade` (delegatecall + Multicall3). Storage (anchor game, respected game type, retirement timestamp) is preserved.
+
+**Required Environment Variables:**
+
+- `ASR_PROXY` - Address of the AnchorStateRegistry proxy
+- `ASR_IMPL` - Address of the new AnchorStateRegistry implementation
+- `PROXY_ADMIN` - Address of the ProxyAdmin contract
+- `SAFE` - Address of the Safe multisig wallet
+- `SENDER` - Address of the transaction sender
+
+**Optional Environment Variables:**
+
+- `SIG` - Transaction signatures (required for execution)
+
+**Example Execution:**
+
+```bash
+# Generate transaction hash
+ASR_PROXY="0x..." ASR_IMPL="0x..." PROXY_ADMIN="0x..." SAFE="0x..." SENDER="0x..." \
+  forge script SafeSetRegistry.s.sol --sig "getTransactionHash()" \
+  --root $PATH_TO_OP_REPO/packages/contracts-bedrock --rpc-url $RPC
+
+# Execute with signature
+ASR_PROXY="0x..." ASR_IMPL="0x..." PROXY_ADMIN="0x..." SAFE="0x..." SENDER="0x..." SIG="0x..." \
+  forge script SafeSetRegistry.s.sol --sig "execTransaction()" \
+  --root $PATH_TO_OP_REPO/packages/contracts-bedrock --broadcast --private-key $PK --rpc-url $RPC
 ```
 
 ### `RedeployGames.s.sol`
