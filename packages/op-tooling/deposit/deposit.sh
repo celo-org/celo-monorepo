@@ -36,18 +36,39 @@ L1_RPC_URL=${L1_RPC_URL:-}; [ -z "${L1_RPC_URL:-}" ] && echo "Need to set the L1
 GAS_LIMIT=${GAS_LIMIT:-100000}
 IS_CREATION=${IS_CREATION:-false}
 DATA=${DATA:-"0x00"}
+# v2 drops the portal's depositERC20Transaction() and reverts gasPayingToken(), so the paths share no calls.
+CGT_VERSION=${CGT_VERSION:-v1}
 
-# Retrieve gas paying token on L1
-echo "1. Retrieving gas paying token on L1..."
-CELO_L1=$(cast call $SYSTEM_CONFIG "gasPayingToken()(address,uint8)" --rpc-url $L1_RPC_URL)
-read -r CELO_L1 <<< "$CELO_L1"
-echo "  >>> Gas paying token on L1: $CELO_L1"
+case $CGT_VERSION in
+  v1)
+    # Retrieve gas paying token on L1
+    echo "1. Retrieving gas paying token on L1 (CGT v1)..."
+    CELO_L1=$(cast call $SYSTEM_CONFIG "gasPayingToken()(address,uint8)" --rpc-url $L1_RPC_URL)
+    read -r CELO_L1 <<< "$CELO_L1"
+    echo "  >>> Gas paying token on L1: $CELO_L1"
+    SPENDER=$OPTIMISM_PORTAL
+    ;;
+  v2)
+    # Deployed per network by DeployV2.s.sol, so it comes from env; the token is read back off it.
+    CELO_GAS_BRIDGE=${CELO_GAS_BRIDGE:-}
+    [ -z "${CELO_GAS_BRIDGE:-}" ] && echo "Need to set the CELO_GAS_BRIDGE via env for CGT_VERSION=v2" && exit 1;
+    echo "1. Retrieving CELO token from CeloGasBridgeL1 (CGT v2)..."
+    CELO_L1=$(cast call $CELO_GAS_BRIDGE "celoTokenL1()(address)" --rpc-url $L1_RPC_URL)
+    echo "  >>> CeloGasBridgeL1: $CELO_GAS_BRIDGE"
+    echo "  >>> CELO token on L1: $CELO_L1"
+    SPENDER=$CELO_GAS_BRIDGE
+    ;;
+  *)
+    echo "Unsupported CGT_VERSION: $CGT_VERSION (supported: v1, v2)"
+    exit 1
+    ;;
+esac
 
 # Give approval on L1
 echo "2. Giving approval on L1..."
 cast send $CELO_L1 \
   "approve(address,uint256)" \
-  $OPTIMISM_PORTAL \
+  $SPENDER \
   $VALUE \
   --private-key $PK \
   --rpc-url $L1_RPC_URL
@@ -55,14 +76,26 @@ echo "  >>> Approval transaction sent."
 
 # Perform deposit on L1
 echo "3. Performing deposit on L1..."
-cast send $OPTIMISM_PORTAL \
-  "depositERC20Transaction(address,uint256,uint256,uint64,bool,bytes)" \
-  $RECIPIENT \
-  $VALUE \
-  $VALUE \
-  $GAS_LIMIT \
-  $IS_CREATION \
-  $DATA \
-  --private-key $PK \
-  --rpc-url $L1_RPC_URL
+if [ "$CGT_VERSION" = "v1" ]; then
+  cast send $OPTIMISM_PORTAL \
+    "depositERC20Transaction(address,uint256,uint256,uint64,bool,bytes)" \
+    $RECIPIENT \
+    $VALUE \
+    $VALUE \
+    $GAS_LIMIT \
+    $IS_CREATION \
+    $DATA \
+    --private-key $PK \
+    --rpc-url $L1_RPC_URL
+else
+  # The bridge mints on L2 via the messenger, so there is no isCreation equivalent.
+  cast send $CELO_GAS_BRIDGE \
+    "deposit(address,uint256,uint32,bytes)" \
+    $RECIPIENT \
+    $VALUE \
+    $GAS_LIMIT \
+    $DATA \
+    --private-key $PK \
+    --rpc-url $L1_RPC_URL
+fi
 echo "  >>> Deposit transaction sent."

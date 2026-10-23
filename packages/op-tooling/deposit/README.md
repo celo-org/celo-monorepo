@@ -36,19 +36,35 @@ RECIPIENT=0x... VALUE=1000000000000000000 PK=123... L1_RPC_URL=https://... ./dep
 - `NETWORK`: Network to use (`mainnet`, `sepolia`, `chaos` or `havoc`)
 
 **Optional Environment Variables:**
+- `CGT_VERSION`: Custom gas token version, `v1` (default) or `v2`
+- `CELO_GAS_BRIDGE`: `CeloGasBridgeL1` address. **Required** when `CGT_VERSION=v2`
 - `GAS_LIMIT`: Gas limit for the L2 transaction (default: 100000)
-- `IS_CREATION`: Whether this is a contract creation (default: false)
+- `IS_CREATION`: Whether this is a contract creation (default: false, `v1` only)
 - `DATA`: Additional data to include (default: "0x00")
 
 **Output:** Transaction hashes for approval and deposit transactions
 
 ## How It Works
 
-The deposit script performs three automated steps:
+The script performs three steps; which contracts they touch depends on `CGT_VERSION`.
 
-1. **Retrieves Gas Paying Token**: Queries the System Config contract to get the gas paying token (CELO) address on L1
-2. **Approves Token**: Calls `approve()` on the gas paying token contract to allow the Optimism Portal to spend the specified amount
-3. **Deposits Token**: Calls `depositERC20Transaction()` on the Optimism Portal to bridge tokens to L2
+**`v1` (default)** — CELO routes through the Optimism Portal:
+
+1. **Retrieves Gas Paying Token**: `SystemConfig.gasPayingToken()` for the CELO address on L1
+2. **Approves Token**: `approve()` on CELO, letting the Optimism Portal spend the amount
+3. **Deposits Token**: `OptimismPortal.depositERC20Transaction()`
+
+**`v2`** — CELO routes through `CeloGasBridgeL1`:
+
+1. **Retrieves CELO Token**: `CeloGasBridgeL1.celoTokenL1()`, so the token cannot drift from the bridge
+2. **Approves Token**: `approve()` on CELO, letting the bridge spend the amount
+3. **Deposits Token**: `CeloGasBridgeL1.deposit()`
+
+The CGT v2 migration removes `depositERC20Transaction()` from the portal and makes
+`SystemConfig.gasPayingToken()` revert, so the two paths share no calls and the version must be set
+explicitly. `IS_CREATION` has no `v2` equivalent, since the bridge mints on L2 via the messenger.
+`CeloGasBridgeL1` is deployed per network by `DeployV2.s.sol`, hence the `CELO_GAS_BRIDGE` env var
+rather than a hardcoded address.
 
 ## Contract Addresses
 
@@ -88,6 +104,12 @@ NETWORK=sepolia RECIPIENT=0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb VALUE=100000
 NETWORK=mainnet RECIPIENT=0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb VALUE=100000000000000000 PK=your_private_key L1_RPC_URL=https://mainnet.infura.io/v3/YOUR_KEY ./deposit.sh
 ```
 
+### Deposit 0.1 CELO after the CGT v2 migration
+
+```sh
+NETWORK=havoc CGT_VERSION=v2 CELO_GAS_BRIDGE=0x... RECIPIENT=0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb VALUE=100000000000000000 PK=your_private_key L1_RPC_URL=https://... ./deposit.sh
+```
+
 ## Checking Deposit on L2
 
 After initiating a deposit, you can check if it has arrived on L2 by:
@@ -103,6 +125,7 @@ After initiating a deposit, you can check if it has arrived on L2 by:
 - **Private key format**: Ensure PK is provided without 0x prefix
 - **Value format**: Ensure VALUE is in wei (not ETH/CELO in decimal form)
 - **Network errors**: Ensure NETWORK is set to one of: `mainnet`, `sepolia`, `chaos`, `havoc`
+- **`gasPayingToken()` reverts**: The network already migrated to CGT v2; set `CGT_VERSION=v2` and `CELO_GAS_BRIDGE`
 - **Deposit not appearing on L2**: Wait up to 15 minutes for the deposit to be processed
 
 ## Related Documentation
