@@ -24,10 +24,21 @@ case "$NETWORK" in
     PROTOCOL_VERSIONS_PROXY=0x433a83893DDA68B941D4aefA908DED9c599522ad
     NETWORK_LABEL="Celo Chaos"
     ;;
+  havoc)
+    SAFE=0x3Da8387E062A4B93EF08E84812b4bcbbBa7a0c3d
+    SUPERCHAIN_CONFIG_PROXY=0x570823cfBA339A4c6a4afB4aBBd17Bc192aD6e6a
+    PROXY_ADMIN=0x4FD0DAE261BF3dCEf71D19Dc98ef1e0323906952
+    SYSTEM_CONFIG_PROXY=0xafc6fa968aebf7b4030f4acae02da34c3287bc78
+    DISPUTE_GAME_FACTORY_PROXY=0x6C4F9BF787bbBEcBF9D90Eb23791abd778905469
+    DELAYED_WETH_PROXY=0x34902939c0c2CB528DcB0f6ABa4a2782CE9dd26B
+    PROTOCOL_VERSIONS_PROXY=0x36742bb793e9a87ee73ad44af0ccf98d1a3f1ee7
+    NETWORK_LABEL="Celo Havoc"
+    ;;
   *)
-    echo "Usage: NETWORK=[sepolia|chaos] $0"
+    echo "Usage: NETWORK=[sepolia|chaos|havoc] $0"
     echo "  sepolia  — Celo Sepolia Testnet"
     echo "  chaos    — Celo Chaos Testnet"
+    echo "  havoc    — Celo Havoc Testnet"
     exit 1
     ;;
 esac
@@ -58,7 +69,17 @@ transfer_ownership() {
   CONTRACT=$1
   NAME=$2
 
-  CURRENT_OWNER=$(cast call $CONTRACT "owner()(address)" -r $RPC_URL)
+  if [ -z "$CONTRACT" ]; then
+    echo "  $NAME: not configured for this network, skipping"
+    return
+  fi
+
+  CURRENT_OWNER=$(cast call $CONTRACT "owner()(address)" -r $RPC_URL 2>/dev/null)
+  if [ -z "$CURRENT_OWNER" ]; then
+    # DelayedWETH 1.5.0 takes its authority from config(); there is nothing to transfer.
+    echo "  $NAME: no owner() on this version, skipping"
+    return
+  fi
   if [ "$CURRENT_OWNER" = "$SAFE" ]; then
     echo "  $NAME: already owned by Safe, skipping"
     return
@@ -72,11 +93,11 @@ transfer_ownership() {
 }
 
 echo "Transferring ownership to Safe..."
-transfer_ownership $PROXY_ADMIN "ProxyAdmin"
-transfer_ownership $SYSTEM_CONFIG_PROXY "SystemConfig"
-transfer_ownership $DISPUTE_GAME_FACTORY_PROXY "DisputeGameFactory"
-transfer_ownership $DELAYED_WETH_PROXY "DelayedWETH"
-transfer_ownership $PROTOCOL_VERSIONS_PROXY "ProtocolVersions"
+transfer_ownership "$PROXY_ADMIN" "ProxyAdmin"
+transfer_ownership "$SYSTEM_CONFIG_PROXY" "SystemConfig"
+transfer_ownership "$DISPUTE_GAME_FACTORY_PROXY" "DisputeGameFactory"
+transfer_ownership "$DELAYED_WETH_PROXY" "DelayedWETH"
+transfer_ownership "$PROTOCOL_VERSIONS_PROXY" "ProtocolVersions"
 
 # ============================================================
 # 3. Validation
@@ -87,8 +108,13 @@ echo "--- SuperchainConfig Proxy ($SUPERCHAIN_CONFIG_PROXY) ---"
 echo "Admin: $(cast storage $SUPERCHAIN_CONFIG_PROXY 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 -r $RPC_URL)"
 echo ""
 echo "--- Ownership (expected: $SAFE) ---"
-echo "ProxyAdmin owner:          $(cast call $PROXY_ADMIN 'owner()(address)' -r $RPC_URL)"
-echo "SystemConfig owner:        $(cast call $SYSTEM_CONFIG_PROXY 'owner()(address)' -r $RPC_URL)"
-echo "DisputeGameFactory owner:  $(cast call $DISPUTE_GAME_FACTORY_PROXY 'owner()(address)' -r $RPC_URL)"
-echo "DelayedWETH owner:         $(cast call $DELAYED_WETH_PROXY 'owner()(address)' -r $RPC_URL)"
-echo "ProtocolVersions owner:    $(cast call $PROTOCOL_VERSIONS_PROXY 'owner()(address)' -r $RPC_URL)"
+report_owner() {
+  [ -z "$1" ] && return
+  OWNER=$(cast call "$1" 'owner()(address)' -r $RPC_URL 2>/dev/null)
+  printf "%-26s %s\n" "$2 owner:" "${OWNER:-<no owner() on this version>}"
+}
+report_owner "$PROXY_ADMIN" "ProxyAdmin"
+report_owner "$SYSTEM_CONFIG_PROXY" "SystemConfig"
+report_owner "$DISPUTE_GAME_FACTORY_PROXY" "DisputeGameFactory"
+report_owner "$DELAYED_WETH_PROXY" "DelayedWETH"
+report_owner "$PROTOCOL_VERSIONS_PROXY" "ProtocolVersions"
