@@ -348,4 +348,4 @@ Use anvil's default test key for local forks:
 
 ## Additional Resources
 
-For complete documentation, see [RELEASE_PROCESS_FOUNDRY.md](../../packages/protocol/RELEASE_PROCESS_FOUNDRY.md)
+For complete documentation, see [RELEASE_PROCESS_FOUNDRY.md](../../../packages/protocol/RELEASE_PROCESS_FOUNDRY.md)
