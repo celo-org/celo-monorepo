@@ -4,12 +4,14 @@ This package builds cryptographic proofs required for L2 to L1 withdrawals on Ce
 
 ## Supported Networks
 
-The package supports two network configurations:
+The package supports four network configurations:
 
-- **Sepolia**: L1 (Ethereum Sepolia) ↔ L2 (Celo Sepolia) - *Testnet*
 - **Mainnet**: L1 (Ethereum Mainnet) ↔ L2 (Celo Mainnet)
+- **Sepolia**: L1 (Ethereum Sepolia) ↔ L2 (Celo Sepolia) - *Testnet*
+- **Chaos**: L1 (Ethereum Sepolia) ↔ L2 (Celo Chaos) - *Testnet*
+- **Havoc**: L1 (Ethereum Sepolia) ↔ L2 (Celo Havoc) - *Testnet*
 
-Set the `NETWORK` environment variable to specify which network to use (`sepolia` or `mainnet`). This variable is **required**.
+Set the `NETWORK` environment variable to specify which network to use (`mainnet`, `sepolia`, `chaos` or `havoc`). This variable is **required**.
 
 ## Overview
 
@@ -35,7 +37,7 @@ The script requires the following environment variables:
 **Required:**
 - `PK`: Private key of the account that initiated the withdrawal (without 0x prefix)
 - `TX_HASH`: Transaction hash of the withdrawal initiation on L2 (with 0x prefix)
-- `NETWORK`: Network to use (`sepolia` or `mainnet`)
+- `NETWORK`: Network to use (`mainnet`, `sepolia`, `chaos` or `havoc`)
 
 
 ## Usage
@@ -128,17 +130,25 @@ The "Prove Args" output contains all the data needed for the `prove.sh` script:
 
 ### Network-Specific Contract Addresses
 
+**Mainnet (L1: Ethereum Mainnet, L2: Celo Mainnet):**
+- **L2L1MessagePasser**: `0x4200000000000000000000000000000000000016` (Celo Mainnet)
+- **Portal Contract**: `0xc5c5D157928BDBD2ACf6d0777626b6C75a9EAEDC` (Ethereum Mainnet)
+
 **Sepolia (L1: Ethereum Sepolia, L2: Celo Sepolia):**
 - **L2L1MessagePasser**: `0x4200000000000000000000000000000000000016` (Celo Sepolia)
 - **Portal Contract**: `0x44ae3d41a335a7d05eb533029917aad35662dcc2` (Ethereum Sepolia)
 
-**Mainnet (L1: Ethereum Mainnet, L2: Celo Mainnet):**
-- **L2L1MessagePasser**: `0x4200000000000000000000000000000000000016` (Celo Mainnet)
-- **Portal Contract**: `0xc5c5D157928BDBD2ACf6d0777626b6C75a9EAEDC` (Ethereum Mainnet)
+**Chaos (L1: Ethereum Sepolia, L2: Celo Chaos):**
+- **L2L1MessagePasser**: `0x4200000000000000000000000000000000000016` (Celo Chaos)
+- **Portal Contract**: `0x101f7d8038BEb55D92919E9F944FEb0fAf211a9b` (Ethereum Sepolia)
+
+**Havoc (L1: Ethereum Sepolia, L2: Celo Havoc):**
+- **L2L1MessagePasser**: `0x4200000000000000000000000000000000000016` (Celo Havoc)
+- **Portal Contract**: `0x7a79515f9f916f38B1AED2DDc2658139C2ecF709` (Ethereum Sepolia)
 
 ## Troubleshooting
 
 - **"waiting-to-prove" status**: Wait up to 1 hour after withdrawal initiation
 - **Private key format**: Ensure PK is provided without 0x prefix
-- **Network errors**: Ensure NETWORK is set to one of: `sepolia`, `mainnet`
+- **Network errors**: Ensure NETWORK is set to one of: `mainnet`, `sepolia`, `chaos`, `havoc`
 - **Unsupported network**: Check that you're using a supported network configuration
