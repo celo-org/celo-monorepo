@@ -2358,10 +2358,10 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.9.1.tgz#afa804d2c68398704b0175acc94d91a54f203645"
   integrity sha512-aLDTLu/If1qYIFW5g4ZibuQaUsFGWQPBq1mZKp/txaebUnGHDmmiBhRLY1tDNedN0m+fJtKZ1zAODS9Yk+V6uA==
 
-"@openzeppelin/upgrades-core@1.46.0":
-  version "1.46.0"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/upgrades-core/-/upgrades-core-1.46.0.tgz#7fc435b52238a5a52544055bcae13be69da9b5e1"
-  integrity sha512-UFSeO/4r8eeXj0C/HAwV+J4b72sE1HX0aALQFs5S2RBOsfXvKweyjQf35vrK32LQiyHdP6IPShAsEBVvpSEgGQ==
+"@openzeppelin/upgrades-core@1.47.0":
+  version "1.47.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/upgrades-core/-/upgrades-core-1.47.0.tgz#02ec65f178aee298f8913bb80ac3aafcc7b61d71"
+  integrity sha512-HmEt8Ndr5cWmD6njlMoRz7s2vA5QPZJcBG1LiY+O7GPu/0voK/iXGRHNiM0v6L8AWwX/MrcGbLnQYIDjMexdPA==
   dependencies:
     "@nomicfoundation/slang" "^0.18.3"
     bignumber.js "^9.1.2"
