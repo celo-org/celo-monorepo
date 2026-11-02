@@ -9,18 +9,20 @@ set -euo pipefail
 #   ./exec-upgrade.sh sepolia succ-v210
 #   OPCM_ADDRESS=0x... ./exec-upgrade.sh chaos v4
 #   SUCCINCT_IMPL=0x... ./exec-upgrade.sh chaos succ-v2
+#   BUNDLE_PATH=/abs/cgt-bundle.json ./exec-upgrade.sh havoc cgt-v2
 #
 # Supported:
 #   mainnet: v2, v3, v4, v5, succ-v1, succ-v102, succ-v2, succ-v201, succ-v210, eigenda-cert-v3
 #   sepolia: v4, v5, succ-v2, succ-v210
-#   chaos:   v4, v5, succ-v2   (flat single-owner Safe; calldata built dynamically)
+#   chaos:   v4, v5, succ-v2, cgt-v2
+#   havoc:   cgt-v2
 
 # ─── Args ────────────────────────────────────────────────────
-NETWORK=${1:?Usage: $0 <mainnet|sepolia|chaos> <version>}
-VERSION=${2:?Usage: $0 <mainnet|sepolia|chaos> <version>}
+NETWORK=${1:?Usage: $0 <mainnet|sepolia|chaos|havoc> <version>}
+VERSION=${2:?Usage: $0 <mainnet|sepolia|chaos|havoc> <version>}
 case $NETWORK in
-  mainnet|sepolia|chaos) ;;
-  *) echo "Usage: $0 <mainnet|sepolia|chaos> <version>" && exit 1 ;;
+  mainnet|sepolia|chaos|havoc) ;;
+  *) echo "Usage: $0 <mainnet|sepolia|chaos|havoc> <version>" && exit 1 ;;
 esac
 
 # get repo root
@@ -28,7 +30,8 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 
 # required envs
 [ -z "${PK:-}" ] && echo "Need to set the PK via env" && exit 1
-echo "Logged in as wallet: $(cast wallet address --private-key $PK)"
+SENDER=$(cast wallet address --private-key $PK)
+echo "Logged in as wallet: $SENDER"
 
 # optional envs
 RPC_URL=${RPC_URL:-"http://127.0.0.1:8545"}
@@ -284,12 +287,31 @@ case "${NETWORK}-${VERSION}" in
     XFER_OWN=$(cast calldata 'transferOwnership(address)' $SC_OWNER_TARGET)
     CALLDATA=$(cast calldata 'aggregate3((address,bool,bytes)[])' "[($CHAOS_DGF,false,$SET_IMPL),($CHAOS_SYSTEM_CONFIG,false,$XFER_OWN)]")
     ;;
+  "mainnet-cgt-v2"|"sepolia-cgt-v2")
+    # TBD
+    echo "$NETWORK cgt-v2: TBD, not wired here." >&2
+    echo "  Nested Safe flow needs collected signatures; sign and execute via CeloSuperchainOps." >&2
+    exit 1
+    ;;
+  "chaos-cgt-v2"|"havoc-cgt-v2")
+    # BUNDLE_PATH is the single-entry JSON written by MigrateV1V2.runBuildBundle()
+    USE_GC=false
+    [ -z "${BUNDLE_PATH:-}" ] && echo "BUNDLE_PATH env required for $NETWORK $VERSION (path to cgt-bundle.json)" >&2 && exit 1
+    [ ! -f "$BUNDLE_PATH" ] && echo "cgt bundle not found: $BUNDLE_PATH" >&2 && exit 1
+    ENTRIES=$(jq 'length' "$BUNDLE_PATH")
+    [ "$ENTRIES" != "1" ] && echo "expected a single atomic entry, found $ENTRIES (stale per-step bundle?)" >&2 && exit 1
+    REFUND_RECEIVER=$SENDER
+    TARGET_ADDRESS=$(jq -r '.[0].target' "$BUNDLE_PATH")
+    CALLDATA=$(jq -r '.[0].calldata' "$BUNDLE_PATH")
+    [ "$(jq -r '.[0].operation' "$BUNDLE_PATH")" != "1" ] && echo "bundle operation must be 1: the Safe path below delegatecalls" >&2 && exit 1
+    ;;
   *)
     echo "Unsupported: $NETWORK-$VERSION" >&2
     echo "Supported:" >&2
     echo "  mainnet: v2, v3, v4, v5, succ-v1, succ-v102, succ-v2, succ-v201, succ-v210, eigenda-cert-v3" >&2
     echo "  sepolia: v4, v5, succ-v2, succ-v210" >&2
-    echo "  chaos:   v4, v5, succ-v2" >&2
+    echo "  chaos:   v4, v5, succ-v2, cgt-v2" >&2
+    echo "  havoc:   cgt-v2   (one atomic tx covering every step)" >&2
     exit 1
     ;;
 esac
@@ -361,22 +383,25 @@ safe_exec() {
     "$@"
 }
 
-# Chaos: flat Safe (single owner, threshold 1) -- direct sign + exec.
+# Chaos and Havoc: single-owner Safe (threshold 1) -- direct sign + exec.
 # No nested approval chain; the deployer PK is the Safe's sole owner.
-# TARGET_ADDRESS and CALLDATA were built dynamically in the per-version case.
-if [ "$NETWORK" = "chaos" ]; then
-  CHAOS_SAFE=0x6F8DB5374003c9ffa7084d8b65c57655963766a9
-  CHAOS_NONCE=$(cast call $CHAOS_SAFE "nonce()(uint256)" -r $RPC_URL)
-  echo "--------- CHAOS ${VERSION} ---------"
-  echo "Safe:   $CHAOS_SAFE (nonce $CHAOS_NONCE)"
+# TARGET_ADDRESS and CALLDATA were set in the per-version case.
+if [ "$NETWORK" = "chaos" ] || [ "$NETWORK" = "havoc" ]; then
+  case $NETWORK in
+    chaos) SAFE_ADDRESS=0x6F8DB5374003c9ffa7084d8b65c57655963766a9 ;;
+    havoc) SAFE_ADDRESS=0x3Da8387E062A4B93EF08E84812b4bcbbBa7a0c3d ;;
+  esac
+  SAFE_NONCE=$(cast call $SAFE_ADDRESS "nonce()(uint256)" -r $RPC_URL)
+  echo "--------- $(echo $NETWORK | tr '[:lower:]' '[:upper:]') ${VERSION} ---------"
+  echo "Safe:   $SAFE_ADDRESS (nonce $SAFE_NONCE)"
   echo "Target: $TARGET_ADDRESS"
   echo "Refund: $REFUND_RECEIVER"
   echo "Calldata: ${CALLDATA:0:74}..."
-  CHAOS_TX_HASH=$(safe_tx_hash $CHAOS_SAFE $TARGET_ADDRESS "$CALLDATA" $OP_DELEGATECALL $CHAOS_NONCE)
-  echo "Tx hash: $CHAOS_TX_HASH"
-  CHAOS_SIG=$(cast wallet sign --no-hash $CHAOS_TX_HASH --private-key $PK)
+  SAFE_TX_HASH=$(safe_tx_hash $SAFE_ADDRESS $TARGET_ADDRESS "$CALLDATA" $OP_DELEGATECALL $SAFE_NONCE)
+  echo "Tx hash: $SAFE_TX_HASH"
+  SAFE_SIG=$(cast wallet sign --no-hash $SAFE_TX_HASH --private-key $PK)
   echo "--- Exec ---"
-  safe_exec $CHAOS_SAFE $TARGET_ADDRESS "$CALLDATA" $OP_DELEGATECALL "$CHAOS_SIG" --gas-limit 16000000
+  safe_exec $SAFE_ADDRESS $TARGET_ADDRESS "$CALLDATA" $OP_DELEGATECALL "$SAFE_SIG" --gas-limit 16000000
   echo "Upgrade executed"
   echo "--------- EOF ---------"
   exit 0

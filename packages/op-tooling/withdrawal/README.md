@@ -4,12 +4,14 @@ This directory contains tooling for performing L2 to L1 withdrawals of CELO from
 
 ## Supported Networks
 
-The tooling supports two network configurations:
+The tooling supports four network configurations:
 
-- **Sepolia**: L1 (Ethereum Sepolia) ↔ L2 (Celo Sepolia) - *Testnet*
 - **Mainnet**: L1 (Ethereum Mainnet) ↔ L2 (Celo Mainnet)
+- **Sepolia**: L1 (Ethereum Sepolia) ↔ L2 (Celo Sepolia) - *Testnet*
+- **Chaos**: L1 (Ethereum Sepolia) ↔ L2 (Celo Chaos) - *Testnet*
+- **Havoc**: L1 (Ethereum Sepolia) ↔ L2 (Celo Havoc) - *Testnet*
 
-Set the `NETWORK` environment variable to specify which network to use (`sepolia` or `mainnet`). This variable is **required**.
+Set the `NETWORK` environment variable to specify which network to use (`mainnet`, `sepolia`, `chaos` or `havoc`). This variable is **required**.
 
 ## Important Notes
 
@@ -56,7 +58,7 @@ cd build_proof && yarn install && PK=123... TX_HASH=0x... yarn build_proof
 **Required Environment Variables:**
 - `PK`: Private key (without 0x prefix) of the sender
 - `TX_HASH`: Transaction hash from the initiation step
-- `NETWORK`: Network to use (`sepolia` or `mainnet`)
+- `NETWORK`: Network to use (`mainnet`, `sepolia`, `chaos` or `havoc`)
 
 For detailed information about proof building, see [build_proof README](./build_proof/).
 
@@ -85,7 +87,7 @@ WITHDRAWAL_NONCE=123... SENDER=0x... RECIPIENT=0x... VALUE=1000000000000000000 \
 - `WITHDRAWAL_PROOF`: Array of proof bytes from proof building
 - `PK`: Private key (without 0x prefix) for submitting the proof
 - `L1_RPC_URL`: L1 RPC URL to use for the proof submission
-- `NETWORK`: Network to use (`sepolia` or `mainnet`)
+- `NETWORK`: Network to use (`mainnet`, `sepolia`, `chaos` or `havoc`)
 
 **Optional Environment Variables:**
 - `GAS_LIMIT`: Gas limit for the transaction (default: 0 - which means no gas limit)
@@ -103,7 +105,7 @@ WITHDRAWAL_HASH=0x... PROOF_SUBMITTER=0x... L1_RPC_URL=https://... ./get.sh
 - `WITHDRAWAL_HASH`: Hash of the withdrawal transaction
 - `PROOF_SUBMITTER`: Address that submitted the proof
 - `L1_RPC_URL`: L1 RPC URL to use for checking status
-- `NETWORK`: Network to use (`sepolia` or `mainnet`)
+- `NETWORK`: Network to use (`mainnet`, `sepolia`, `chaos` or `havoc`)
 
 ## Step 5: Wait 7 Days
 
@@ -121,7 +123,7 @@ WITHDRAWAL_HASH=0x... PROOF_SUBMITTER=0x... L1_RPC_URL=https://... ./check.sh
 - `WITHDRAWAL_HASH`: Hash of the withdrawal transaction
 - `PROOF_SUBMITTER`: Address that submitted the proof
 - `L1_RPC_URL`: L1 RPC URL to use for checking readiness
-- `NETWORK`: Network to use (`sepolia` or `mainnet`)
+- `NETWORK`: Network to use (`mainnet`, `sepolia`, `chaos` or `havoc`)
 
 **Output:** 
 - Reverts with error message if withdrawal has issues
@@ -143,7 +145,7 @@ WITHDRAWAL_NONCE=123... SENDER=0x... RECIPIENT=0x... VALUE=1000000000000000000 \
 - `VALUE`: Amount being withdrawn in wei
 - `PK`: Private key (without 0x prefix) for finalizing
 - `L1_RPC_URL`: L1 RPC URL to use for finalizing the withdrawal
-- `NETWORK`: Network to use (`sepolia` or `mainnet`)
+- `NETWORK`: Network to use (`mainnet`, `sepolia`, `chaos` or `havoc`)
 
 **Optional Environment Variables:**
 - `GAS_LIMIT`: Gas limit for the transaction (default: 0 - which means no gas limit)
@@ -153,13 +155,18 @@ WITHDRAWAL_NONCE=123... SENDER=0x... RECIPIENT=0x... VALUE=1000000000000000000 \
 
 ### Network-Specific Contract Addresses
 
-**Sepolia (L1: Ethereum Sepolia, L2: Celo Sepolia):**
-- **L2_L1_MESSAGE_PASSER**: `0x4200000000000000000000000000000000000016` (Celo Sepolia)
-- **L1_OPTIMISM_PORTAL**: `0x44ae3d41a335a7d05eb533029917aad35662dcc2` (Ethereum Sepolia)
-
 **Mainnet (L1: Ethereum Mainnet, L2: Celo Mainnet):**
 - **L2_L1_MESSAGE_PASSER**: `0x4200000000000000000000000000000000000016` (Celo Mainnet)
 - **L1_OPTIMISM_PORTAL**: `0xc5c5D157928BDBD2ACf6d0777626b6C75a9EAEDC` (Ethereum Mainnet)
+**Sepolia (L1: Ethereum Sepolia, L2: Celo Sepolia):**
+- **L2_L1_MESSAGE_PASSER**: `0x4200000000000000000000000000000000000016` (Celo Sepolia)
+- **L1_OPTIMISM_PORTAL**: `0x44ae3d41a335a7d05eb533029917aad35662dcc2` (Ethereum Sepolia)
+**Chaos (L1: Ethereum Sepolia, L2: Celo Chaos):**
+- **L2_L1_MESSAGE_PASSER**: `0x4200000000000000000000000000000000000016` (Celo Chaos)
+- **L1_OPTIMISM_PORTAL**: `0x101f7d8038BEb55D92919E9F944FEb0fAf211a9b` (Ethereum Sepolia)
+**Havoc (L1: Ethereum Sepolia, L2: Celo Havoc):**
+- **L2_L1_MESSAGE_PASSER**: `0x4200000000000000000000000000000000000016` (Celo Havoc)
+- **L1_OPTIMISM_PORTAL**: `0x7a79515f9f916f38B1AED2DDc2658139C2ecF709` (Ethereum Sepolia)
 
 ## Troubleshooting
 
@@ -168,7 +175,7 @@ WITHDRAWAL_NONCE=123... SENDER=0x... RECIPIENT=0x... VALUE=1000000000000000000 \
 - **Gas issues**: Adjust GAS_LIMIT environment variable
 - **Private key format**: Ensure PK is provided without 0x prefix
 - **Value format**: Ensure VALUE is in wei (not ETH)
-- **Network errors**: Ensure NETWORK is set to one of: `sepolia`, `mainnet`
+- **Network errors**: Ensure NETWORK is set to one of: `mainnet`, `sepolia`, `chaos`, `havoc`
 - **Unsupported network**: Check that you're using a supported network configuration
 
 ## Example Withdrawal Proof
