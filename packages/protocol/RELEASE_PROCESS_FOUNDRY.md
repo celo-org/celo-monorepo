@@ -667,7 +667,7 @@ forge test -vvv
 
 ```bash
 # Start local anvil devchain (L2)
-yarn anvil-devchain:start-L2
+yarn anvil-devchain:start
 
 # Run integration tests
 yarn anvil-devchain:integration-tests

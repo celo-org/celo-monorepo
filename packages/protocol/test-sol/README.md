@@ -10,7 +10,7 @@ These test suites are verified to work with Foundry version 1.0.0-stable.
 
 ### Testing
 
-We are in the process of migrating our tests to use [Foundry](https://book.getfoundry.sh/). The tests in this folder have already been migrated from [Truffle](../test).
+We are in the process of migrating our tests to use [Foundry](https://book.getfoundry.sh/). The tests in this folder have already been migrated from Truffle.
 
 To run tests with Foundry there's no need to `yarn` or manage any Javascript dependencies. The proxy tests deploy the Solidity 0.5 proxies from the `solc05` profile's build, so build that first (once per checkout), then run
 
