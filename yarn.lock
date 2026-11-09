@@ -2358,10 +2358,10 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.9.1.tgz#afa804d2c68398704b0175acc94d91a54f203645"
   integrity sha512-aLDTLu/If1qYIFW5g4ZibuQaUsFGWQPBq1mZKp/txaebUnGHDmmiBhRLY1tDNedN0m+fJtKZ1zAODS9Yk+V6uA==
 
-"@openzeppelin/upgrades-core@1.47.0":
-  version "1.47.0"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/upgrades-core/-/upgrades-core-1.47.0.tgz#02ec65f178aee298f8913bb80ac3aafcc7b61d71"
-  integrity sha512-HmEt8Ndr5cWmD6njlMoRz7s2vA5QPZJcBG1LiY+O7GPu/0voK/iXGRHNiM0v6L8AWwX/MrcGbLnQYIDjMexdPA==
+"@openzeppelin/upgrades-core@1.48.0":
+  version "1.48.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/upgrades-core/-/upgrades-core-1.48.0.tgz#f2f6eb136f4329ef5b76fca87d5fde9d0129be41"
+  integrity sha512-mlrCU9MtXy3wgpQZj1MaAAu59slktjtFRQeiu91rpWRKg+e8KDJlzpE4zuIxXbdP0sE5voNeCiKch5IsPn/PWA==
   dependencies:
     "@nomicfoundation/slang" "^0.18.3"
     bignumber.js "^9.1.2"
@@ -2369,6 +2369,7 @@
     chalk "^4.1.0"
     compare-versions "^6.0.0"
     debug "^4.1.1"
+    env-paths "^2.2.1"
     ethereumjs-util "^7.0.3"
     minimatch "^10.2.5"
     minimist "^1.2.7"
@@ -4894,7 +4895,7 @@ enquirer@~2.3.6:
   dependencies:
     ansi-colors "^4.1.1"
 
-env-paths@^2.2.0:
+env-paths@^2.2.0, env-paths@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/env-paths/-/env-paths-2.2.1.tgz#420399d416ce1fbe9bc0a07c62fa68d67fd0f8f2"
   integrity sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==
