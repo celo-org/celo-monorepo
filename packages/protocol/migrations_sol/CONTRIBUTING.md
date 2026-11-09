@@ -24,7 +24,7 @@ cast block-number \
 ### Start L2 devchain
 
 ```sh
-$ yarn anvil-devchain:start-L2
+$ yarn anvil-devchain:start
 ```
 
 Starts a new anvil devchain serving at localhost (default port 8546).
