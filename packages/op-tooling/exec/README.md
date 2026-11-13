@@ -31,7 +31,7 @@ Unified runner for executing OPCM upgrade transactions through the complete mult
 
 - Unified runner for all historical and current upgrades
 - Supports positional arguments for network and version selection
-- Extensive support for Mainnet (10 versions) and Sepolia (4 versions)
+- Extensive support for Mainnet (10 versions) and Sepolia (5 versions)
 - Chaos support (`v4`, `v5`, `succ-v2`) as a single-owner Safe (threshold 1) with calldata built dynamically at runtime
 - `cgt-v2`: Celo mainnet and Sepolia are **TBD** and fail fast, pointing at CeloSuperchainOps. Chaos and Havoc run the whole migration as one atomic Safe transaction, calldata read from a JSON bundle
 - Handles both 2-tier and 3-tier nested Safe approval flows
@@ -55,7 +55,6 @@ PK=0x... RPC_URL=... ./exec-upgrade.sh <network> <version>
 - `SUCCINCT_IMPL` - Succinct dispute game implementation address (required for chaos `succ-v2`)
 - `SC_OWNER_TARGET` - SystemConfig ownership transfer target (optional, chaos `succ-v2`; defaults to the Safe)
 - `BUNDLE_PATH` - Path to `cgt-bundle.json` from `MigrateV1V2.runBuildBundle()` (required for `cgt-v2`). Must hold exactly one entry, the atomic batch; any other count is rejected
-- `SUCCINCT_GAME_IMPL` - Redeployed `OPSuccinctFaultDisputeGame`. Required where `gameImpls(42) != 0` (Chaos, Celo Sepolia, mainnet), must be unset where it is zero (Havoc); either mismatch is rejected. Needed whenever the AccessManager is redeployed, since the game holds it as an immutable
 
 **Version Matrix:**
 
@@ -76,6 +75,7 @@ PK=0x... RPC_URL=... ./exec-upgrade.sh <network> <version>
 | sepolia | v5 | 2-tier (1-of-2 children) | `0x5e60d…` | inline |
 | sepolia | succ-v2 | 2-tier (1-of-2 children) | `0x5e60d…` | inline |
 | sepolia | succ-v210 | 2-tier (1-of-2 children) | `0x5e60d…` | inline |
+| sepolia | succ-v220 | 2-tier (1-of-2 children) | `0x5e60d…` | inline |
 | sepolia | cgt-v2 | **TBD** | — | not wired; sign via CeloSuperchainOps |
 | chaos | v4 | Safe (1-of-1) | `0xa3A3a…` | deployer PK (dynamic calldata) |
 | chaos | v5 | Safe (1-of-1) | `0xa3A3a…` | deployer PK (dynamic calldata) |
@@ -133,8 +133,8 @@ PK=0x... RPC_URL=... SUCCINCT_IMPL=0x... ./exec-upgrade.sh chaos succ-v2
 #   forge script scripts/cgt/MigrateV1V2.s.sol --tc MigrateV1V2 \
 #     --sig "runBuildBundle()" --rpc-url $RPC_URL --non-interactive
 export PK=0x... RPC_URL=... BUNDLE_PATH=/abs/path/deployments/cgt-bundle.json
-./exec-upgrade.sh chaos cgt-v2   # 6 tasks; needs SUCCINCT_GAME_IMPL
-./exec-upgrade.sh havoc cgt-v2   # 5 tasks; SUCCINCT_GAME_IMPL must be unset
+./exec-upgrade.sh chaos cgt-v2   # 5 tasks
+./exec-upgrade.sh havoc cgt-v2   # 5 tasks
 ```
 
 ### `exec-basefee.sh`
