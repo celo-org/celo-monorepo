@@ -430,7 +430,12 @@ contract LockedGold is
         currentDelegateeInfo.currentAmount
       );
 
-    _decreaseDelegateeVotingPower(delegateeAccount, amountToRevoke, currentDelegateeInfo);
+    _decreaseDelegateeVotingPower(
+      delegatorAccount,
+      delegateeAccount,
+      amountToRevoke,
+      currentDelegateeInfo
+    );
 
     delegated.totalDelegatedCeloFraction = delegated.totalDelegatedCeloFraction.subtract(
       percentageToRevoke
@@ -912,30 +917,44 @@ contract LockedGold is
         .multiply(currentDelegateeInfo.percentage)
         .fromFixed();
       delegateeAmountToRevoke = (delegateeAmountToRevoke - (expected - real));
-      _decreaseDelegateeVotingPower(delegatees[i], delegateeAmountToRevoke, currentDelegateeInfo);
+      _decreaseDelegateeVotingPower(
+        delegator,
+        delegatees[i],
+        delegateeAmountToRevoke,
+        currentDelegateeInfo
+      );
       emit DelegatedCeloRevoked(delegator, delegatees[i], 0, delegateeAmountToRevoke);
     }
   }
 
   /**
    * @notice Decreases delegatee voting power when removing or unlocking delegated votes.
+   * @param delegator The account whose delegation is being reduced.
    * @param delegatee The delegatee.
    * @param amountToRevoke Amount to revoke.
    * @param delegateeInfo Delegatee info.
    */
   function _decreaseDelegateeVotingPower(
+    address delegator,
     address delegatee,
     uint256 amountToRevoke,
     DelegatedInfo storage delegateeInfo
   ) private {
-    uint256 delegateeTotalVotingPower = getAccountTotalGovernanceVotingPower(delegatee);
-    uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(delegatee);
-    uint256 unusedReferendumVotes = (delegateeTotalVotingPower - totalReferendumVotes);
-    if (unusedReferendumVotes < amountToRevoke) {
-      getGovernance().removeVotesWhenRevokingDelegatedVotes(
-        delegatee,
-        (delegateeTotalVotingPower - amountToRevoke)
-      );
+    // A share delegated to oneself moves between the account's own undelegated and delegated
+    // power, so revoking it takes no voting power from anyone else and there are no delegatee
+    // votes to remove. While unlocking, the account's power has already dropped below its
+    // recorded votes at this point, so the subtraction below would revert; `unlock` brings the
+    // account's own votes down to its reduced power once all delegations are processed.
+    if (delegatee != delegator) {
+      uint256 delegateeTotalVotingPower = getAccountTotalGovernanceVotingPower(delegatee);
+      uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(delegatee);
+      uint256 unusedReferendumVotes = (delegateeTotalVotingPower - totalReferendumVotes);
+      if (unusedReferendumVotes < amountToRevoke) {
+        getGovernance().removeVotesWhenRevokingDelegatedVotes(
+          delegatee,
+          (delegateeTotalVotingPower - amountToRevoke)
+        );
+      }
     }
     delegateeInfo.currentAmount = (delegateeInfo.currentAmount - amountToRevoke);
     totalDelegatedCelo[delegatee] = (totalDelegatedCelo[delegatee] - amountToRevoke);
