@@ -217,16 +217,26 @@ contract LockedGold is
     FixidityLib.Fraction memory delegatedPercentage = delegatorInfo[msg.sender]
       .totalDelegatedCeloFraction;
 
-    if (FixidityLib.gt(delegatedPercentage, FixidityLib.newFixed(0))) {
-      revokeFromDelegatedWhenUnlocking(msg.sender, value);
-    }
-
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
     require(
       balanceRequirement == 0 || balanceRequirement <= remainingLockedGold,
       "Either account doesn't have enough locked Celo or locked Celo is being used for voting."
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
+    if (FixidityLib.gt(delegatedPercentage, FixidityLib.newFixed(0))) {
+      // Both clamps below record the network weight of the proposals they touch, so they run
+      // only now that the locked total has been reduced. The delegated amounts to revoke are
+      // still sized against the pre-unlock total, which is what they were last derived from.
+      revokeFromDelegatedWhenUnlocking(msg.sender, value, totalLockedGold);
+      // A delegator's own governance voting power is only the undelegated share of its locked
+      // CELO, so unlocking reduces it. Bring the delegator's own recorded referendum votes down
+      // to that reduced power, mirroring the delegatee handling above, so an account's recorded
+      // votes never exceed the stake backing them.
+      getGovernance().removeVotesWhenRevokingDelegatedVotes(
+        msg.sender,
+        getAccountTotalGovernanceVotingPower(msg.sender)
+      );
+    }
     uint256 available = (block.timestamp + unlockingPeriod);
     // CERTORA: the slot containing the length could be MAX_UINT
     account.pendingWithdrawals.push(PendingWithdrawal(value, available));
@@ -420,7 +430,12 @@ contract LockedGold is
         currentDelegateeInfo.currentAmount
       );
 
-    _decreaseDelegateeVotingPower(delegateeAccount, amountToRevoke, currentDelegateeInfo);
+    _decreaseDelegateeVotingPower(
+      delegatorAccount,
+      delegateeAccount,
+      amountToRevoke,
+      currentDelegateeInfo
+    );
 
     delegated.totalDelegatedCeloFraction = delegated.totalDelegatedCeloFraction.subtract(
       percentageToRevoke
@@ -874,8 +889,13 @@ contract LockedGold is
    * @notice Revokes amount during unlocking. It will revoke votes from voted proposals if necessary.
    * @param delegator The delegator account.
    * @param amountToRevoke The amount to revoke.
+   * @param lockedBeforeUnlock The delegator's total locked CELO before this unlock.
    */
-  function revokeFromDelegatedWhenUnlocking(address delegator, uint256 amountToRevoke) private {
+  function revokeFromDelegatedWhenUnlocking(
+    address delegator,
+    uint256 amountToRevoke,
+    uint256 lockedBeforeUnlock
+  ) private {
     address[] memory delegatees = getDelegateesOfDelegator(delegator);
 
     Delegated storage delegated = delegatorInfo[delegator];
@@ -884,39 +904,57 @@ contract LockedGold is
       DelegatedInfo storage currentDelegateeInfo = delegated.delegateesWithPercentagesAndAmount[
         delegatees[i]
       ];
-      (uint256 expected, uint256 real) = _getDelegatorDelegateeExpectedAndRealAmount(
-        delegator,
-        delegatees[i]
-      );
+      // The amount currently delegated was sized against the delegator's locked total before
+      // this unlock; that total has already been reduced by the time this runs, so it is
+      // passed in rather than read back.
+      uint256 expected = FixidityLib
+        .newFixed(lockedBeforeUnlock)
+        .multiply(currentDelegateeInfo.percentage)
+        .fromFixed();
+      uint256 real = currentDelegateeInfo.currentAmount;
       uint256 delegateeAmountToRevoke = FixidityLib
         .newFixed(amountToRevoke)
         .multiply(currentDelegateeInfo.percentage)
         .fromFixed();
       delegateeAmountToRevoke = (delegateeAmountToRevoke - (expected - real));
-      _decreaseDelegateeVotingPower(delegatees[i], delegateeAmountToRevoke, currentDelegateeInfo);
+      _decreaseDelegateeVotingPower(
+        delegator,
+        delegatees[i],
+        delegateeAmountToRevoke,
+        currentDelegateeInfo
+      );
       emit DelegatedCeloRevoked(delegator, delegatees[i], 0, delegateeAmountToRevoke);
     }
   }
 
   /**
    * @notice Decreases delegatee voting power when removing or unlocking delegated votes.
+   * @param delegator The account whose delegation is being reduced.
    * @param delegatee The delegatee.
    * @param amountToRevoke Amount to revoke.
    * @param delegateeInfo Delegatee info.
    */
   function _decreaseDelegateeVotingPower(
+    address delegator,
     address delegatee,
     uint256 amountToRevoke,
     DelegatedInfo storage delegateeInfo
   ) private {
-    uint256 delegateeTotalVotingPower = getAccountTotalGovernanceVotingPower(delegatee);
-    uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(delegatee);
-    uint256 unusedReferendumVotes = (delegateeTotalVotingPower - totalReferendumVotes);
-    if (unusedReferendumVotes < amountToRevoke) {
-      getGovernance().removeVotesWhenRevokingDelegatedVotes(
-        delegatee,
-        (delegateeTotalVotingPower - amountToRevoke)
-      );
+    // A share delegated to oneself moves between the account's own undelegated and delegated
+    // power, so revoking it takes no voting power from anyone else and there are no delegatee
+    // votes to remove. While unlocking, the account's power has already dropped below its
+    // recorded votes at this point, so the subtraction below would revert; `unlock` brings the
+    // account's own votes down to its reduced power once all delegations are processed.
+    if (delegatee != delegator) {
+      uint256 delegateeTotalVotingPower = getAccountTotalGovernanceVotingPower(delegatee);
+      uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(delegatee);
+      uint256 unusedReferendumVotes = (delegateeTotalVotingPower - totalReferendumVotes);
+      if (unusedReferendumVotes < amountToRevoke) {
+        getGovernance().removeVotesWhenRevokingDelegatedVotes(
+          delegatee,
+          (delegateeTotalVotingPower - amountToRevoke)
+        );
+      }
     }
     delegateeInfo.currentAmount = (delegateeInfo.currentAmount - amountToRevoke);
     totalDelegatedCelo[delegatee] = (totalDelegatedCelo[delegatee] - amountToRevoke);
