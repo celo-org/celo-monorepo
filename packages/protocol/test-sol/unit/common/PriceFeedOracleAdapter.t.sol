@@ -2,9 +2,9 @@
 pragma solidity >=0.8.7 <0.9.0;
 
 import "celo-foundry-8/Test.sol";
-import "@celo-contracts-8/common/ChainlinkOracleAdapter.sol";
+import "@celo-contracts-8/common/PriceFeedOracleAdapter.sol";
 
-contract MockAggregator is IChainlinkAggregator {
+contract MockAggregator is IPriceFeed {
   uint8 public decimals;
   int256 public answer;
   uint256 public updatedAt;
@@ -24,21 +24,21 @@ contract MockAggregator is IChainlinkAggregator {
   }
 }
 
-contract ChainlinkOracleAdapterBase is Test {
+contract PriceFeedOracleAdapterBase is Test {
   uint32 constant MAX_AGE = 1 hours;
 
-  ChainlinkOracleAdapter adapter;
+  PriceFeedOracleAdapter adapter;
   MockAggregator celoUsd;
   MockAggregator eurUsd;
   address token = address(0x1234);
   address nonOwner;
 
-  event FeedsSet(address indexed token, ChainlinkOracleAdapter.Feed[] feeds);
+  event FeedsSet(address indexed token, PriceFeedOracleAdapter.Feed[] feeds);
 
   function setUp() public virtual {
     vm.warp(1_800_000_000);
     nonOwner = actor("nonOwner");
-    adapter = new ChainlinkOracleAdapter();
+    adapter = new PriceFeedOracleAdapter();
     celoUsd = new MockAggregator(8, 6_000_000); // 0.06 USD per CELO
     eurUsd = new MockAggregator(8, 120_000_000); // 1.20 USD per EUR
   }
@@ -46,9 +46,9 @@ contract ChainlinkOracleAdapterBase is Test {
   function feed(
     MockAggregator aggregator,
     bool invert
-  ) internal pure returns (ChainlinkOracleAdapter.Feed memory) {
+  ) internal pure returns (PriceFeedOracleAdapter.Feed memory) {
     return
-      ChainlinkOracleAdapter.Feed({
+      PriceFeedOracleAdapter.Feed({
         aggregator: address(aggregator),
         invert: invert,
         maxAge: MAX_AGE
@@ -56,27 +56,27 @@ contract ChainlinkOracleAdapterBase is Test {
   }
 
   function one(
-    ChainlinkOracleAdapter.Feed memory a
-  ) internal pure returns (ChainlinkOracleAdapter.Feed[] memory feeds) {
-    feeds = new ChainlinkOracleAdapter.Feed[](1);
+    PriceFeedOracleAdapter.Feed memory a
+  ) internal pure returns (PriceFeedOracleAdapter.Feed[] memory feeds) {
+    feeds = new PriceFeedOracleAdapter.Feed[](1);
     feeds[0] = a;
   }
 
   function two(
-    ChainlinkOracleAdapter.Feed memory a,
-    ChainlinkOracleAdapter.Feed memory b
-  ) internal pure returns (ChainlinkOracleAdapter.Feed[] memory feeds) {
-    feeds = new ChainlinkOracleAdapter.Feed[](2);
+    PriceFeedOracleAdapter.Feed memory a,
+    PriceFeedOracleAdapter.Feed memory b
+  ) internal pure returns (PriceFeedOracleAdapter.Feed[] memory feeds) {
+    feeds = new PriceFeedOracleAdapter.Feed[](2);
     feeds[0] = a;
     feeds[1] = b;
   }
 }
 
-contract ChainlinkOracleAdapterTest_setFeeds is ChainlinkOracleAdapterBase {
+contract PriceFeedOracleAdapterTest_setFeeds is PriceFeedOracleAdapterBase {
   function test_ShouldStoreFeeds() public {
     adapter.setFeeds(token, two(feed(celoUsd, false), feed(eurUsd, true)));
 
-    ChainlinkOracleAdapter.Feed[] memory stored = adapter.getFeeds(token);
+    PriceFeedOracleAdapter.Feed[] memory stored = adapter.getFeeds(token);
     assertEq(stored.length, 2);
     assertEq(stored[0].aggregator, address(celoUsd));
     assertEq(stored[0].invert, false);
@@ -86,7 +86,7 @@ contract ChainlinkOracleAdapterTest_setFeeds is ChainlinkOracleAdapterBase {
   }
 
   function test_ShouldEmitFeedsSet() public {
-    ChainlinkOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
+    PriceFeedOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
     vm.expectEmit(true, true, true, true);
     emit FeedsSet(token, feeds);
     adapter.setFeeds(token, feeds);
@@ -101,7 +101,7 @@ contract ChainlinkOracleAdapterTest_setFeeds is ChainlinkOracleAdapterBase {
 
   function test_ShouldRemoveToken_WhenFeedsEmpty() public {
     adapter.setFeeds(token, one(feed(celoUsd, false)));
-    adapter.setFeeds(token, new ChainlinkOracleAdapter.Feed[](0));
+    adapter.setFeeds(token, new PriceFeedOracleAdapter.Feed[](0));
 
     assertEq(adapter.getFeeds(token).length, 0);
     vm.expectRevert("Token not configured");
@@ -115,7 +115,7 @@ contract ChainlinkOracleAdapterTest_setFeeds is ChainlinkOracleAdapterBase {
   }
 
   function test_Reverts_WhenTooManyFeeds() public {
-    ChainlinkOracleAdapter.Feed[] memory feeds = new ChainlinkOracleAdapter.Feed[](5);
+    PriceFeedOracleAdapter.Feed[] memory feeds = new PriceFeedOracleAdapter.Feed[](5);
     for (uint256 i = 0; i < feeds.length; i++) {
       feeds[i] = feed(celoUsd, false);
     }
@@ -124,14 +124,14 @@ contract ChainlinkOracleAdapterTest_setFeeds is ChainlinkOracleAdapterBase {
   }
 
   function test_Reverts_WhenAggregatorIsZero() public {
-    ChainlinkOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
+    PriceFeedOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
     feeds[0].aggregator = address(0);
     vm.expectRevert("Aggregator cannot be zero");
     adapter.setFeeds(token, feeds);
   }
 
   function test_Reverts_WhenMaxAgeIsZero() public {
-    ChainlinkOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
+    PriceFeedOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
     feeds[0].maxAge = 0;
     vm.expectRevert("Max age cannot be zero");
     adapter.setFeeds(token, feeds);
@@ -149,7 +149,7 @@ contract ChainlinkOracleAdapterTest_setFeeds is ChainlinkOracleAdapterBase {
     vm.expectRevert("Stale price");
     adapter.getExchangeRate(token);
 
-    ChainlinkOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
+    PriceFeedOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
     feeds[0].maxAge = 2 * MAX_AGE;
     adapter.setFeeds(token, feeds);
 
@@ -158,14 +158,14 @@ contract ChainlinkOracleAdapterTest_setFeeds is ChainlinkOracleAdapterBase {
   }
 
   function test_Reverts_WhenAggregatorIsNotAContract() public {
-    ChainlinkOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
+    PriceFeedOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
     feeds[0].aggregator = address(0xdead);
     vm.expectRevert();
     adapter.setFeeds(token, feeds);
   }
 }
 
-contract ChainlinkOracleAdapterTest_getExchangeRate is ChainlinkOracleAdapterBase {
+contract PriceFeedOracleAdapterTest_getExchangeRate is PriceFeedOracleAdapterBase {
   function test_ShouldReturnTokenPerCelo_WhenSingleFeed() public {
     adapter.setFeeds(token, one(feed(celoUsd, false)));
 
@@ -202,7 +202,7 @@ contract ChainlinkOracleAdapterTest_getExchangeRate is ChainlinkOracleAdapterBas
 
   function test_ShouldComposeMaxFeeds() public {
     // 0.06 * 1.2 / 1.2 * 1.2 = 0.072
-    ChainlinkOracleAdapter.Feed[] memory feeds = new ChainlinkOracleAdapter.Feed[](4);
+    PriceFeedOracleAdapter.Feed[] memory feeds = new PriceFeedOracleAdapter.Feed[](4);
     feeds[0] = feed(celoUsd, false);
     feeds[1] = feed(eurUsd, false);
     feeds[2] = feed(eurUsd, true);
@@ -215,7 +215,7 @@ contract ChainlinkOracleAdapterTest_getExchangeRate is ChainlinkOracleAdapterBas
 
   function test_ShouldNotOverflow_WhenManyHighDecimalFeeds() public {
     MockAggregator half = new MockAggregator(18, 0.5e18);
-    ChainlinkOracleAdapter.Feed[] memory feeds = new ChainlinkOracleAdapter.Feed[](4);
+    PriceFeedOracleAdapter.Feed[] memory feeds = new PriceFeedOracleAdapter.Feed[](4);
     for (uint256 i = 0; i < feeds.length; i++) {
       feeds[i] = feed(half, false);
     }
@@ -251,7 +251,7 @@ contract ChainlinkOracleAdapterTest_getExchangeRate is ChainlinkOracleAdapterBas
     MockAggregator huge = new MockAggregator(0, 1e30);
     adapter.setFeeds(token, one(feed(celoUsd, false)));
     celoUsd.set(1, block.timestamp);
-    ChainlinkOracleAdapter.Feed[] memory feeds = two(feed(celoUsd, false), feed(huge, true));
+    PriceFeedOracleAdapter.Feed[] memory feeds = two(feed(celoUsd, false), feed(huge, true));
 
     vm.expectRevert("Rate rounds to zero");
     adapter.setFeeds(token, feeds);

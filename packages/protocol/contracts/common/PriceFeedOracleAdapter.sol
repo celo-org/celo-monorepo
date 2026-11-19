@@ -6,7 +6,9 @@ import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 import "./interfaces/IOracle.sol";
 
-interface IChainlinkAggregator {
+// The price feed interface published by Chainlink (AggregatorV3Interface), which other
+// providers such as RedStone implement as well.
+interface IPriceFeed {
   function decimals() external view returns (uint8);
 
   function latestRoundData()
@@ -22,9 +24,10 @@ interface IChainlinkAggregator {
 }
 
 /**
- * @title ChainlinkOracleAdapter
- * @notice IOracle that prices a token against CELO straight from Chainlink aggregators,
- * with no relayer or keeper in between.
+ * @title PriceFeedOracleAdapter
+ * @notice IOracle that prices a token against CELO straight from on-chain price feeds
+ * (Chainlink aggregators or any feed with the same interface), with no relayer or
+ * keeper in between.
  *
  * The rate for a token is the product of its configured feeds, each optionally inverted.
  * The product must come out as "token units per 1 CELO", the same meaning as
@@ -40,7 +43,7 @@ interface IChainlinkAggregator {
  *
  * Unlike SortedOracles, a stale or non-positive price reverts instead of being served.
  */
-contract ChainlinkOracleAdapter is IOracle, Ownable {
+contract PriceFeedOracleAdapter is IOracle, Ownable {
   struct Feed {
     address aggregator;
     // When true the feed contributes 1 / price instead of price.
@@ -112,7 +115,7 @@ contract ChainlinkOracleAdapter is IOracle, Ownable {
 
     numerator = RATE_DENOMINATOR;
     for (uint256 i = 0; i < tokenFeeds.length; i++) {
-      IChainlinkAggregator aggregator = IChainlinkAggregator(tokenFeeds[i].aggregator);
+      IPriceFeed aggregator = IPriceFeed(tokenFeeds[i].aggregator);
       (, int256 answer, , uint256 updatedAt, ) = aggregator.latestRoundData();
       require(answer > 0, "Invalid price");
       require(!requireFresh || updatedAt + tokenFeeds[i].maxAge >= block.timestamp, "Stale price");
