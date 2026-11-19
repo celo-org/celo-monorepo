@@ -30,19 +30,16 @@ interface IPriceFeed {
  * keeper in between.
  *
  * The rate for a token is the product of its configured feeds, each optionally inverted.
- * The product must come out as "whole tokens per 1 CELO", the same meaning as
- * SortedOracles.medianRate(token). For an 18-decimal token it is returned over the same
- * 1e24 denominator, so the adapter is a drop-in oracle for FeeCurrencyDirectory and
- * EpochManager.
+ * The product must come out as "token units per 1 CELO", the same meaning as
+ * SortedOracles.medianRate(token), and it is returned over the same 1e24 denominator,
+ * so the adapter is a drop-in oracle for FeeCurrencyDirectory and EpochManager.
  *
  * Examples:
  *   USD stable: [CELO/USD]
  *   EUR stable: [CELO/USD, EUR/USD inverted]
  *
- * The returned rate converts base units: tokenUnits = celoWei * numerator / denominator.
- * Each token is configured with its decimals, and a token that is not 18-decimal has
- * the difference folded into the rate. SortedOracles cannot do this, which is why such
- * tokens are priced there through an 18-decimal fee adapter.
+ * Like SortedOracles, the rate is a price ratio between whole units: it is not rescaled
+ * for token decimals, so tokens that are not 18-decimal go through their fee adapter.
  *
  * Unlike SortedOracles, a stale or non-positive price reverts instead of being served.
  */
@@ -58,16 +55,12 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
 
   uint256 public constant RATE_DENOMINATOR = 1e24;
   uint256 public constant MAX_FEEDS = 4;
-  uint8 public constant CELO_DECIMALS = 18;
-  uint8 public constant MAX_TOKEN_DECIMALS = 36;
 
   mapping(address => Feed[]) private feeds;
-  mapping(address => uint8) private tokenDecimals;
 
-  event FeedsSet(address indexed token, uint8 tokenDecimals, Feed[] feeds);
+  event FeedsSet(address indexed token, Feed[] feeds);
 
   error TooManyFeeds();
-  error TokenDecimalsTooHigh();
   error ZeroAggregator();
   error ZeroMaxAge();
   error TokenNotConfigured(address token);
@@ -76,26 +69,17 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
   error RateRoundsToZero();
 
   /**
-   * @notice Replaces the decimals and feeds used to price a token. An empty feed list
-   * removes the token.
+   * @notice Replaces the feeds used to price a token. An empty list removes the token.
    * @dev Reverts unless the new feeds yield a rate, which rejects addresses that are not
    * aggregators. Freshness is not checked here, so that a larger maxAge can still be
    * set while a feed is stale and getExchangeRate is reverting.
    * @param token The token to price, as passed to getExchangeRate.
-   * @param newTokenDecimals Decimals of the token's base unit. Use 18 for a token that is
-   * registered through an 18-decimal fee adapter.
-   * @param newFeeds Feeds whose product is the amount of whole tokens per 1 CELO.
+   * @param newFeeds Feeds whose product is the amount of token per 1 CELO.
    */
-  function setFeeds(
-    address token,
-    uint8 newTokenDecimals,
-    Feed[] calldata newFeeds
-  ) external onlyOwner {
+  function setFeeds(address token, Feed[] calldata newFeeds) external onlyOwner {
     if (newFeeds.length > MAX_FEEDS) revert TooManyFeeds();
-    if (newTokenDecimals > MAX_TOKEN_DECIMALS) revert TokenDecimalsTooHigh();
 
     delete feeds[token];
-    tokenDecimals[token] = newFeeds.length > 0 ? newTokenDecimals : 0;
     for (uint256 i = 0; i < newFeeds.length; i++) {
       if (newFeeds[i].aggregator == address(0)) revert ZeroAggregator();
       if (newFeeds[i].maxAge == 0) revert ZeroMaxAge();
@@ -105,7 +89,7 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
     if (newFeeds.length > 0) {
       rate(token, false);
     }
-    emit FeedsSet(token, newTokenDecimals, newFeeds);
+    emit FeedsSet(token, newFeeds);
   }
 
   /**
@@ -116,21 +100,13 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
   }
 
   /**
-   * @notice Returns the decimals configured for a token.
-   */
-  function getTokenDecimals(address token) external view returns (uint8) {
-    return tokenDecimals[token];
-  }
-
-  /**
-   * @notice Returns the rate from CELO to a token as numerator / denominator, in base
-   * units of both: tokenUnits = celoWei * numerator / denominator.
+   * @notice Returns the amount of token per 1 CELO as numerator / denominator.
    * @dev Reverts if the token is not configured or any feed is stale or non-positive.
    * Each feed is folded in at 1e24 precision with a full-width multiply, so the running
    * rate never needs more room than the rate itself.
    * @param token The token to price.
-   * @return numerator The rate numerator.
-   * @return denominator RATE_DENOMINATOR for an 18-decimal token.
+   * @return numerator The rate scaled by RATE_DENOMINATOR.
+   * @return denominator Always RATE_DENOMINATOR.
    */
   function getExchangeRate(
     address token
@@ -161,15 +137,7 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
         : Math.mulDiv(numerator, price, unit);
     }
 
-    if (numerator == 0) revert RateRoundsToZero();
     denominator = RATE_DENOMINATOR;
-
-    // Scale whichever side keeps the result exact.
-    uint8 decimals = tokenDecimals[token];
-    if (decimals < CELO_DECIMALS) {
-      denominator *= 10 ** uint256(CELO_DECIMALS - decimals);
-    } else {
-      numerator *= 10 ** uint256(decimals - CELO_DECIMALS);
-    }
+    if (numerator == 0) revert RateRoundsToZero();
   }
 }
