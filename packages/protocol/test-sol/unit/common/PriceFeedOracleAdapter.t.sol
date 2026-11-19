@@ -33,7 +33,7 @@ contract PriceFeedOracleAdapterBase is Test {
   address token = address(0x1234);
   address nonOwner;
 
-  event FeedsSet(address indexed token, PriceFeedOracleAdapter.Feed[] feeds);
+  event FeedsSet(address indexed token, uint8 tokenDecimals, PriceFeedOracleAdapter.Feed[] feeds);
 
   function setUp() public virtual {
     vm.warp(1_800_000_000);
@@ -74,7 +74,7 @@ contract PriceFeedOracleAdapterBase is Test {
 
 contract PriceFeedOracleAdapterTest_setFeeds is PriceFeedOracleAdapterBase {
   function test_ShouldStoreFeeds() public {
-    adapter.setFeeds(token, two(feed(celoUsd, false), feed(eurUsd, true)));
+    adapter.setFeeds(token, 18, two(feed(celoUsd, false), feed(eurUsd, true)));
 
     PriceFeedOracleAdapter.Feed[] memory stored = adapter.getFeeds(token);
     assertEq(stored.length, 2);
@@ -88,20 +88,34 @@ contract PriceFeedOracleAdapterTest_setFeeds is PriceFeedOracleAdapterBase {
   function test_ShouldEmitFeedsSet() public {
     PriceFeedOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
     vm.expectEmit(true, true, true, true);
-    emit FeedsSet(token, feeds);
-    adapter.setFeeds(token, feeds);
+    emit FeedsSet(token, 18, feeds);
+    adapter.setFeeds(token, 18, feeds);
   }
 
   function test_ShouldReplaceExistingFeeds() public {
-    adapter.setFeeds(token, two(feed(celoUsd, false), feed(eurUsd, true)));
-    adapter.setFeeds(token, one(feed(celoUsd, false)));
+    adapter.setFeeds(token, 18, two(feed(celoUsd, false), feed(eurUsd, true)));
+    adapter.setFeeds(token, 18, one(feed(celoUsd, false)));
 
     assertEq(adapter.getFeeds(token).length, 1);
   }
 
+  function test_ShouldStoreTokenDecimals() public {
+    adapter.setFeeds(token, 6, one(feed(celoUsd, false)));
+    assertEq(adapter.getTokenDecimals(token), 6);
+
+    adapter.setFeeds(token, 6, new PriceFeedOracleAdapter.Feed[](0));
+    assertEq(adapter.getTokenDecimals(token), 0);
+  }
+
+  function test_Reverts_WhenTokenDecimalsTooHigh() public {
+    PriceFeedOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
+    vm.expectRevert(PriceFeedOracleAdapter.TokenDecimalsTooHigh.selector);
+    adapter.setFeeds(token, 37, feeds);
+  }
+
   function test_ShouldRemoveToken_WhenFeedsEmpty() public {
-    adapter.setFeeds(token, one(feed(celoUsd, false)));
-    adapter.setFeeds(token, new PriceFeedOracleAdapter.Feed[](0));
+    adapter.setFeeds(token, 18, one(feed(celoUsd, false)));
+    adapter.setFeeds(token, 18, new PriceFeedOracleAdapter.Feed[](0));
 
     assertEq(adapter.getFeeds(token).length, 0);
     vm.expectRevert(
@@ -113,7 +127,7 @@ contract PriceFeedOracleAdapterTest_setFeeds is PriceFeedOracleAdapterBase {
   function test_Reverts_WhenCalledByNonOwner() public {
     vm.prank(nonOwner);
     vm.expectRevert("Ownable: caller is not the owner");
-    adapter.setFeeds(token, one(feed(celoUsd, false)));
+    adapter.setFeeds(token, 18, one(feed(celoUsd, false)));
   }
 
   function test_Reverts_WhenTooManyFeeds() public {
@@ -122,21 +136,21 @@ contract PriceFeedOracleAdapterTest_setFeeds is PriceFeedOracleAdapterBase {
       feeds[i] = feed(celoUsd, false);
     }
     vm.expectRevert(PriceFeedOracleAdapter.TooManyFeeds.selector);
-    adapter.setFeeds(token, feeds);
+    adapter.setFeeds(token, 18, feeds);
   }
 
   function test_Reverts_WhenAggregatorIsZero() public {
     PriceFeedOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
     feeds[0].aggregator = address(0);
     vm.expectRevert(PriceFeedOracleAdapter.ZeroAggregator.selector);
-    adapter.setFeeds(token, feeds);
+    adapter.setFeeds(token, 18, feeds);
   }
 
   function test_Reverts_WhenMaxAgeIsZero() public {
     PriceFeedOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
     feeds[0].maxAge = 0;
     vm.expectRevert(PriceFeedOracleAdapter.ZeroMaxAge.selector);
-    adapter.setFeeds(token, feeds);
+    adapter.setFeeds(token, 18, feeds);
   }
 
   function test_Reverts_WhenFeedDoesNotYieldRate() public {
@@ -144,11 +158,11 @@ contract PriceFeedOracleAdapterTest_setFeeds is PriceFeedOracleAdapterBase {
     vm.expectRevert(
       abi.encodeWithSelector(PriceFeedOracleAdapter.InvalidPrice.selector, address(celoUsd))
     );
-    adapter.setFeeds(token, one(feed(celoUsd, false)));
+    adapter.setFeeds(token, 18, one(feed(celoUsd, false)));
   }
 
   function test_ShouldAllowRaisingMaxAge_WhenFeedIsStale() public {
-    adapter.setFeeds(token, one(feed(celoUsd, false)));
+    adapter.setFeeds(token, 18, one(feed(celoUsd, false)));
     vm.warp(block.timestamp + MAX_AGE + 1);
     vm.expectRevert(
       abi.encodeWithSelector(PriceFeedOracleAdapter.StalePrice.selector, address(celoUsd))
@@ -157,7 +171,7 @@ contract PriceFeedOracleAdapterTest_setFeeds is PriceFeedOracleAdapterBase {
 
     PriceFeedOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
     feeds[0].maxAge = 2 * MAX_AGE;
-    adapter.setFeeds(token, feeds);
+    adapter.setFeeds(token, 18, feeds);
 
     (uint256 numerator, ) = adapter.getExchangeRate(token);
     assertEq(numerator, 0.06e24);
@@ -167,13 +181,13 @@ contract PriceFeedOracleAdapterTest_setFeeds is PriceFeedOracleAdapterBase {
     PriceFeedOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
     feeds[0].aggregator = address(0xdead);
     vm.expectRevert();
-    adapter.setFeeds(token, feeds);
+    adapter.setFeeds(token, 18, feeds);
   }
 }
 
 contract PriceFeedOracleAdapterTest_getExchangeRate is PriceFeedOracleAdapterBase {
   function test_ShouldReturnTokenPerCelo_WhenSingleFeed() public {
-    adapter.setFeeds(token, one(feed(celoUsd, false)));
+    adapter.setFeeds(token, 18, one(feed(celoUsd, false)));
 
     (uint256 numerator, uint256 denominator) = adapter.getExchangeRate(token);
     assertEq(numerator, 0.06e24);
@@ -182,7 +196,7 @@ contract PriceFeedOracleAdapterTest_getExchangeRate is PriceFeedOracleAdapterBas
 
   function test_ShouldComposeInvertedFeed() public {
     // 0.06 USD per CELO / 1.20 USD per EUR = 0.05 EUR per CELO
-    adapter.setFeeds(token, two(feed(celoUsd, false), feed(eurUsd, true)));
+    adapter.setFeeds(token, 18, two(feed(celoUsd, false), feed(eurUsd, true)));
 
     (uint256 numerator, uint256 denominator) = adapter.getExchangeRate(token);
     assertEq(numerator, 0.05e24);
@@ -191,7 +205,7 @@ contract PriceFeedOracleAdapterTest_getExchangeRate is PriceFeedOracleAdapterBas
 
   function test_ShouldHandleFeedsWithDifferentDecimals() public {
     MockAggregator usdJpy = new MockAggregator(18, 150e18); // 150 JPY per USD
-    adapter.setFeeds(token, two(feed(celoUsd, false), feed(usdJpy, false)));
+    adapter.setFeeds(token, 18, two(feed(celoUsd, false), feed(usdJpy, false)));
 
     (uint256 numerator, uint256 denominator) = adapter.getExchangeRate(token);
     assertEq(numerator, 9e24);
@@ -199,7 +213,7 @@ contract PriceFeedOracleAdapterTest_getExchangeRate is PriceFeedOracleAdapterBas
   }
 
   function test_ShouldReturnRate_WhenAgeEqualsMaxAge() public {
-    adapter.setFeeds(token, one(feed(celoUsd, false)));
+    adapter.setFeeds(token, 18, one(feed(celoUsd, false)));
     vm.warp(block.timestamp + MAX_AGE);
 
     (uint256 numerator, ) = adapter.getExchangeRate(token);
@@ -213,10 +227,29 @@ contract PriceFeedOracleAdapterTest_getExchangeRate is PriceFeedOracleAdapterBas
     feeds[1] = feed(eurUsd, false);
     feeds[2] = feed(eurUsd, true);
     feeds[3] = feed(eurUsd, false);
-    adapter.setFeeds(token, feeds);
+    adapter.setFeeds(token, 18, feeds);
 
     (uint256 numerator, ) = adapter.getExchangeRate(token);
     assertEq(numerator, 0.072e24);
+  }
+
+  function test_ShouldScaleDenominator_WhenTokenHasFewerDecimalsThanCelo() public {
+    adapter.setFeeds(token, 6, one(feed(celoUsd, false)));
+
+    (uint256 numerator, uint256 denominator) = adapter.getExchangeRate(token);
+    assertEq(numerator, 0.06e24);
+    assertEq(denominator, 1e36);
+    // 1 CELO buys 0.06 of a 6-decimal token: 60_000 base units.
+    assertEq((1 ether * numerator) / denominator, 60_000);
+  }
+
+  function test_ShouldScaleNumerator_WhenTokenHasMoreDecimalsThanCelo() public {
+    adapter.setFeeds(token, 24, one(feed(celoUsd, false)));
+
+    (uint256 numerator, uint256 denominator) = adapter.getExchangeRate(token);
+    assertEq(numerator, 0.06e30);
+    assertEq(denominator, 1e24);
+    assertEq((1 ether * numerator) / denominator, 0.06e24);
   }
 
   function test_ShouldNotOverflow_WhenManyHighDecimalFeeds() public {
@@ -225,7 +258,7 @@ contract PriceFeedOracleAdapterTest_getExchangeRate is PriceFeedOracleAdapterBas
     for (uint256 i = 0; i < feeds.length; i++) {
       feeds[i] = feed(half, false);
     }
-    adapter.setFeeds(token, feeds);
+    adapter.setFeeds(token, 18, feeds);
 
     (uint256 numerator, ) = adapter.getExchangeRate(token);
     assertEq(numerator, 0.0625e24);
@@ -239,7 +272,7 @@ contract PriceFeedOracleAdapterTest_getExchangeRate is PriceFeedOracleAdapterBas
   }
 
   function test_Reverts_WhenAnyFeedIsStale() public {
-    adapter.setFeeds(token, two(feed(celoUsd, false), feed(eurUsd, true)));
+    adapter.setFeeds(token, 18, two(feed(celoUsd, false), feed(eurUsd, true)));
     vm.warp(block.timestamp + MAX_AGE + 1);
     celoUsd.set(6_000_000, block.timestamp);
 
@@ -250,7 +283,7 @@ contract PriceFeedOracleAdapterTest_getExchangeRate is PriceFeedOracleAdapterBas
   }
 
   function test_Reverts_WhenPriceIsNegative() public {
-    adapter.setFeeds(token, one(feed(celoUsd, false)));
+    adapter.setFeeds(token, 18, one(feed(celoUsd, false)));
     celoUsd.set(-1, block.timestamp);
 
     vm.expectRevert(
@@ -261,12 +294,12 @@ contract PriceFeedOracleAdapterTest_getExchangeRate is PriceFeedOracleAdapterBas
 
   function test_Reverts_WhenRateRoundsToZero() public {
     MockAggregator huge = new MockAggregator(0, 1e30);
-    adapter.setFeeds(token, one(feed(celoUsd, false)));
+    adapter.setFeeds(token, 18, one(feed(celoUsd, false)));
     celoUsd.set(1, block.timestamp);
     PriceFeedOracleAdapter.Feed[] memory feeds = two(feed(celoUsd, false), feed(huge, true));
 
     vm.expectRevert(PriceFeedOracleAdapter.RateRoundsToZero.selector);
-    adapter.setFeeds(token, feeds);
+    adapter.setFeeds(token, 18, feeds);
   }
 
   function testFuzz_ShouldMatchDirectDivision(uint64 celoPrice, uint64 quotePrice) public {
@@ -276,7 +309,7 @@ contract PriceFeedOracleAdapterTest_getExchangeRate is PriceFeedOracleAdapterBas
     uint256 expected = (uint256(celoPrice) * 1e24) / uint256(quotePrice);
     vm.assume(expected > 0);
 
-    adapter.setFeeds(token, two(feed(celoUsd, false), feed(eurUsd, true)));
+    adapter.setFeeds(token, 18, two(feed(celoUsd, false), feed(eurUsd, true)));
     (uint256 numerator, uint256 denominator) = adapter.getExchangeRate(token);
     assertEq(numerator, expected);
     assertEq(denominator, 1e24);
