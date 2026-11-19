@@ -60,6 +60,14 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
 
   event FeedsSet(address indexed token, Feed[] feeds);
 
+  error TooManyFeeds();
+  error ZeroAggregator();
+  error ZeroMaxAge();
+  error TokenNotConfigured(address token);
+  error InvalidPrice(address aggregator);
+  error StalePrice(address aggregator);
+  error RateRoundsToZero();
+
   /**
    * @notice Replaces the feeds used to price a token. An empty list removes the token.
    * @dev Reverts unless the new feeds yield a rate, which rejects addresses that are not
@@ -69,12 +77,12 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
    * @param newFeeds Feeds whose product is the amount of token per 1 CELO.
    */
   function setFeeds(address token, Feed[] calldata newFeeds) external onlyOwner {
-    require(newFeeds.length <= MAX_FEEDS, "Too many feeds");
+    if (newFeeds.length > MAX_FEEDS) revert TooManyFeeds();
 
     delete feeds[token];
     for (uint256 i = 0; i < newFeeds.length; i++) {
-      require(newFeeds[i].aggregator != address(0), "Aggregator cannot be zero");
-      require(newFeeds[i].maxAge > 0, "Max age cannot be zero");
+      if (newFeeds[i].aggregator == address(0)) revert ZeroAggregator();
+      if (newFeeds[i].maxAge == 0) revert ZeroMaxAge();
       feeds[token].push(newFeeds[i]);
     }
 
@@ -111,14 +119,16 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
     bool requireFresh
   ) private view returns (uint256 numerator, uint256 denominator) {
     Feed[] memory tokenFeeds = feeds[token];
-    require(tokenFeeds.length > 0, "Token not configured");
+    if (tokenFeeds.length == 0) revert TokenNotConfigured(token);
 
     numerator = RATE_DENOMINATOR;
     for (uint256 i = 0; i < tokenFeeds.length; i++) {
       IPriceFeed aggregator = IPriceFeed(tokenFeeds[i].aggregator);
       (, int256 answer, , uint256 updatedAt, ) = aggregator.latestRoundData();
-      require(answer > 0, "Invalid price");
-      require(!requireFresh || updatedAt + tokenFeeds[i].maxAge >= block.timestamp, "Stale price");
+      if (answer <= 0) revert InvalidPrice(address(aggregator));
+      if (requireFresh && updatedAt + tokenFeeds[i].maxAge < block.timestamp) {
+        revert StalePrice(address(aggregator));
+      }
 
       uint256 price = uint256(answer);
       uint256 unit = 10 ** uint256(aggregator.decimals());
@@ -128,6 +138,6 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
     }
 
     denominator = RATE_DENOMINATOR;
-    require(numerator > 0, "Rate rounds to zero");
+    if (numerator == 0) revert RateRoundsToZero();
   }
 }
