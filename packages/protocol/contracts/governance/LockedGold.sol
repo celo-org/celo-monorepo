@@ -826,7 +826,8 @@ contract LockedGold is
 
     (expected, real) = _getDelegatorDelegateeExpectedAndRealAmount(
       delegatorAccount,
-      delegateeAccount
+      delegateeAccount,
+      getAccountTotalLockedGold(delegatorAccount)
     );
   }
 
@@ -903,11 +904,11 @@ contract LockedGold is
       ];
       // The delegated amount was sized against the pre-unlock total, which is already reduced
       // in storage, so it is passed in rather than read back.
-      uint256 expected = FixidityLib
-        .newFixed(lockedBeforeUnlock)
-        .multiply(currentDelegateeInfo.percentage)
-        .fromFixed();
-      uint256 real = currentDelegateeInfo.currentAmount;
+      (uint256 expected, uint256 real) = _getDelegatorDelegateeExpectedAndRealAmount(
+        delegator,
+        delegatees[i],
+        lockedBeforeUnlock
+      );
       uint256 delegateeAmountToRevoke = FixidityLib
         .newFixed(amountToRevoke)
         .multiply(currentDelegateeInfo.percentage)
@@ -977,18 +978,20 @@ contract LockedGold is
    * If there is a discrepancy it can be fixed by calling `updateDelegatedAmount` function.
    * @param delegator The delegator address.
    * @param delegatee The delegatee address.
+   * @param totalLocked The delegator's total locked CELO the expected amount is sized against.
    * @return expected The expected amount.
    * @return real The real amount.
    */
   function _getDelegatorDelegateeExpectedAndRealAmount(
     address delegator,
-    address delegatee
+    address delegatee,
+    uint256 totalLocked
   ) private view returns (uint256 expected, uint256 real) {
     DelegatedInfo storage currentDelegateeInfo = delegatorInfo[delegator]
       .delegateesWithPercentagesAndAmount[delegatee];
 
     uint256 amountToDelegate = FixidityLib
-      .newFixed(getAccountTotalLockedGold(delegator))
+      .newFixed(totalLocked)
       .multiply(currentDelegateeInfo.percentage)
       .fromFixed();
 
