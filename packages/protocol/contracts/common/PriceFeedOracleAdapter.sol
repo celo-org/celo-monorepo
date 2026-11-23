@@ -6,7 +6,7 @@ import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 import "./interfaces/IOracle.sol";
 
-// Chainlink's AggregatorV3Interface, also implemented by other providers such as RedStone.
+// Chainlink's AggregatorV3Interface.
 interface IPriceFeed {
   function decimals() external view returns (uint8);
 
@@ -24,18 +24,15 @@ interface IPriceFeed {
 
 /**
  * @title PriceFeedOracleAdapter
- * @notice IOracle pricing a token against CELO from Chainlink-style feeds, with no relayer.
- * The rate is the product of the token's feeds, each optionally inverted, as token per 1 CELO
- * over 1e24 like SortedOracles.medianRate, e.g. EUR stable = [CELO/USD, EUR/USD inverted].
- * Not rescaled for token decimals. A stale or non-positive price reverts.
+ * @notice IOracle pricing a token against CELO as the product of Chainlink-style feeds.
+ * The rate is token per 1 CELO over 1e24; a stale or non-positive price reverts.
  */
 contract PriceFeedOracleAdapter is IOracle, Ownable {
   struct Feed {
     address aggregator;
-    // When true the feed contributes 1 / price instead of price.
+    // Use 1 / price.
     bool invert;
-    // Seconds a price stays valid after its last update; set above the feed's heartbeat
-    // (FX feeds stop updating while their market is closed).
+    // Seconds a price stays valid; set above the feed's heartbeat.
     uint32 maxAge;
   }
 
@@ -54,10 +51,7 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
   error StalePrice(address aggregator);
   error RateRoundsToZero();
 
-  /**
-   * @notice Replaces the feeds pricing a token; an empty list removes it.
-   * @dev The feeds must yield a rate, but may be stale so maxAge can be raised during an outage.
-   */
+  /// @notice Replaces the feeds pricing a token; an empty list removes it.
   function setFeeds(address token, Feed[] calldata newFeeds) external onlyOwner {
     if (newFeeds.length > MAX_FEEDS) revert TooManyFeeds();
 
@@ -74,17 +68,11 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
     emit FeedsSet(token, newFeeds);
   }
 
-  /**
-   * @notice Returns the feeds configured for a token.
-   */
   function getFeeds(address token) external view returns (Feed[] memory) {
     return feeds[token];
   }
 
-  /**
-   * @notice Returns the amount of token per 1 CELO as numerator / RATE_DENOMINATOR.
-   * @dev Reverts if the token is not configured or any feed is stale or non-positive.
-   */
+  /// @notice Returns token per 1 CELO as numerator / RATE_DENOMINATOR.
   function getExchangeRate(
     address token
   ) external view returns (uint256 numerator, uint256 denominator) {
