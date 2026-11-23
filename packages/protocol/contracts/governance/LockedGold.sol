@@ -217,16 +217,23 @@ contract LockedGold is
     FixidityLib.Fraction memory delegatedPercentage = delegatorInfo[msg.sender]
       .totalDelegatedCeloFraction;
 
-    if (FixidityLib.gt(delegatedPercentage, FixidityLib.newFixed(0))) {
-      revokeFromDelegatedWhenUnlocking(msg.sender, value);
-    }
-
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
     require(
       balanceRequirement == 0 || balanceRequirement <= remainingLockedGold,
       "Either account doesn't have enough locked Celo or locked Celo is being used for voting."
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
+    if (FixidityLib.gt(delegatedPercentage, FixidityLib.newFixed(0))) {
+      // Runs after the balance is reduced so clamped proposals record the new network weight;
+      // amounts to revoke are still sized against the pre-unlock total.
+      revokeFromDelegatedWhenUnlocking(msg.sender, value, totalLockedGold);
+      // Unlocking also reduces the delegator's own voting power, so bring its recorded
+      // referendum votes down to it, as is done for its delegatees above.
+      getGovernance().removeVotesWhenRevokingDelegatedVotes(
+        msg.sender,
+        getAccountTotalGovernanceVotingPower(msg.sender)
+      );
+    }
     uint256 available = (block.timestamp + unlockingPeriod);
     // CERTORA: the slot containing the length could be MAX_UINT
     account.pendingWithdrawals.push(PendingWithdrawal(value, available));
@@ -420,7 +427,12 @@ contract LockedGold is
         currentDelegateeInfo.currentAmount
       );
 
-    _decreaseDelegateeVotingPower(delegateeAccount, amountToRevoke, currentDelegateeInfo);
+    _decreaseDelegateeVotingPower(
+      delegatorAccount,
+      delegateeAccount,
+      amountToRevoke,
+      currentDelegateeInfo
+    );
 
     delegated.totalDelegatedCeloFraction = delegated.totalDelegatedCeloFraction.subtract(
       percentageToRevoke
@@ -814,7 +826,8 @@ contract LockedGold is
 
     (expected, real) = _getDelegatorDelegateeExpectedAndRealAmount(
       delegatorAccount,
-      delegateeAccount
+      delegateeAccount,
+      getAccountTotalLockedGold(delegatorAccount)
     );
   }
 
@@ -874,8 +887,13 @@ contract LockedGold is
    * @notice Revokes amount during unlocking. It will revoke votes from voted proposals if necessary.
    * @param delegator The delegator account.
    * @param amountToRevoke The amount to revoke.
+   * @param lockedBeforeUnlock The delegator's total locked CELO before this unlock.
    */
-  function revokeFromDelegatedWhenUnlocking(address delegator, uint256 amountToRevoke) private {
+  function revokeFromDelegatedWhenUnlocking(
+    address delegator,
+    uint256 amountToRevoke,
+    uint256 lockedBeforeUnlock
+  ) private {
     address[] memory delegatees = getDelegateesOfDelegator(delegator);
 
     Delegated storage delegated = delegatorInfo[delegator];
@@ -884,39 +902,53 @@ contract LockedGold is
       DelegatedInfo storage currentDelegateeInfo = delegated.delegateesWithPercentagesAndAmount[
         delegatees[i]
       ];
+      // The delegated amount was sized against the pre-unlock total, which is already reduced
+      // in storage, so it is passed in rather than read back.
       (uint256 expected, uint256 real) = _getDelegatorDelegateeExpectedAndRealAmount(
         delegator,
-        delegatees[i]
+        delegatees[i],
+        lockedBeforeUnlock
       );
       uint256 delegateeAmountToRevoke = FixidityLib
         .newFixed(amountToRevoke)
         .multiply(currentDelegateeInfo.percentage)
         .fromFixed();
       delegateeAmountToRevoke = (delegateeAmountToRevoke - (expected - real));
-      _decreaseDelegateeVotingPower(delegatees[i], delegateeAmountToRevoke, currentDelegateeInfo);
+      _decreaseDelegateeVotingPower(
+        delegator,
+        delegatees[i],
+        delegateeAmountToRevoke,
+        currentDelegateeInfo
+      );
       emit DelegatedCeloRevoked(delegator, delegatees[i], 0, delegateeAmountToRevoke);
     }
   }
 
   /**
    * @notice Decreases delegatee voting power when removing or unlocking delegated votes.
+   * @param delegator The account whose delegation is being reduced.
    * @param delegatee The delegatee.
    * @param amountToRevoke Amount to revoke.
    * @param delegateeInfo Delegatee info.
    */
   function _decreaseDelegateeVotingPower(
+    address delegator,
     address delegatee,
     uint256 amountToRevoke,
     DelegatedInfo storage delegateeInfo
   ) private {
-    uint256 delegateeTotalVotingPower = getAccountTotalGovernanceVotingPower(delegatee);
-    uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(delegatee);
-    uint256 unusedReferendumVotes = (delegateeTotalVotingPower - totalReferendumVotes);
-    if (unusedReferendumVotes < amountToRevoke) {
-      getGovernance().removeVotesWhenRevokingDelegatedVotes(
-        delegatee,
-        (delegateeTotalVotingPower - amountToRevoke)
-      );
+    // A self-delegated share takes no voting power from another account, so there are no
+    // delegatee votes to remove; `unlock` clamps the account's own votes afterwards.
+    if (delegatee != delegator) {
+      uint256 delegateeTotalVotingPower = getAccountTotalGovernanceVotingPower(delegatee);
+      uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(delegatee);
+      uint256 unusedReferendumVotes = (delegateeTotalVotingPower - totalReferendumVotes);
+      if (unusedReferendumVotes < amountToRevoke) {
+        getGovernance().removeVotesWhenRevokingDelegatedVotes(
+          delegatee,
+          (delegateeTotalVotingPower - amountToRevoke)
+        );
+      }
     }
     delegateeInfo.currentAmount = (delegateeInfo.currentAmount - amountToRevoke);
     totalDelegatedCelo[delegatee] = (totalDelegatedCelo[delegatee] - amountToRevoke);
@@ -946,18 +978,20 @@ contract LockedGold is
    * If there is a discrepancy it can be fixed by calling `updateDelegatedAmount` function.
    * @param delegator The delegator address.
    * @param delegatee The delegatee address.
+   * @param totalLocked The delegator's total locked CELO the expected amount is sized against.
    * @return expected The expected amount.
    * @return real The real amount.
    */
   function _getDelegatorDelegateeExpectedAndRealAmount(
     address delegator,
-    address delegatee
+    address delegatee,
+    uint256 totalLocked
   ) private view returns (uint256 expected, uint256 real) {
     DelegatedInfo storage currentDelegateeInfo = delegatorInfo[delegator]
       .delegateesWithPercentagesAndAmount[delegatee];
 
     uint256 amountToDelegate = FixidityLib
-      .newFixed(getAccountTotalLockedGold(delegator))
+      .newFixed(totalLocked)
       .multiply(currentDelegateeInfo.percentage)
       .fromFixed();
 

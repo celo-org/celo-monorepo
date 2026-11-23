@@ -1414,6 +1414,9 @@ contract Governance is
           noVotes,
           abstainVotes
         );
+        // Refresh the quorum denominator as revokeVotes does, so participation is not scored
+        // against a locked total from before the stake was reduced.
+        proposal.networkWeight = getLockedGold().getTotalLockedGold();
 
         voteRecord.abstainVotes = abstainVotes;
         voteRecord.yesVotes = yesVotes;
