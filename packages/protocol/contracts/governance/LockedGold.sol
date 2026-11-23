@@ -224,14 +224,11 @@ contract LockedGold is
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     if (FixidityLib.gt(delegatedPercentage, FixidityLib.newFixed(0))) {
-      // Both clamps below record the network weight of the proposals they touch, so they run
-      // only now that the locked total has been reduced. The delegated amounts to revoke are
-      // still sized against the pre-unlock total, which is what they were last derived from.
+      // Runs after the balance is reduced so clamped proposals record the new network weight;
+      // amounts to revoke are still sized against the pre-unlock total.
       revokeFromDelegatedWhenUnlocking(msg.sender, value, totalLockedGold);
-      // A delegator's own governance voting power is only the undelegated share of its locked
-      // CELO, so unlocking reduces it. Bring the delegator's own recorded referendum votes down
-      // to that reduced power, mirroring the delegatee handling above, so an account's recorded
-      // votes never exceed the stake backing them.
+      // Unlocking also reduces the delegator's own voting power, so bring its recorded
+      // referendum votes down to it, as is done for its delegatees above.
       getGovernance().removeVotesWhenRevokingDelegatedVotes(
         msg.sender,
         getAccountTotalGovernanceVotingPower(msg.sender)
@@ -904,9 +901,8 @@ contract LockedGold is
       DelegatedInfo storage currentDelegateeInfo = delegated.delegateesWithPercentagesAndAmount[
         delegatees[i]
       ];
-      // The amount currently delegated was sized against the delegator's locked total before
-      // this unlock; that total has already been reduced by the time this runs, so it is
-      // passed in rather than read back.
+      // The delegated amount was sized against the pre-unlock total, which is already reduced
+      // in storage, so it is passed in rather than read back.
       uint256 expected = FixidityLib
         .newFixed(lockedBeforeUnlock)
         .multiply(currentDelegateeInfo.percentage)
@@ -940,11 +936,8 @@ contract LockedGold is
     uint256 amountToRevoke,
     DelegatedInfo storage delegateeInfo
   ) private {
-    // A share delegated to oneself moves between the account's own undelegated and delegated
-    // power, so revoking it takes no voting power from anyone else and there are no delegatee
-    // votes to remove. While unlocking, the account's power has already dropped below its
-    // recorded votes at this point, so the subtraction below would revert; `unlock` brings the
-    // account's own votes down to its reduced power once all delegations are processed.
+    // A self-delegated share takes no voting power from another account, so there are no
+    // delegatee votes to remove; `unlock` clamps the account's own votes afterwards.
     if (delegatee != delegator) {
       uint256 delegateeTotalVotingPower = getAccountTotalGovernanceVotingPower(delegatee);
       uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(delegatee);

@@ -241,9 +241,8 @@ contract GovernanceDelegationTest is TestWithUtils08 {
   // --- Delegation accounting: a delegator's recorded votes stay in step with its
   // --- voting power when it unlocks.
 
-  // When a delegator unlocks the delegated slice after voting, its own recorded
-  // referendum votes are brought down to its reduced voting power, just like the
-  // delegatee's, so recorded votes never exceed the stake backing them.
+  // A delegator that unlocks after voting has its own recorded votes brought down to its
+  // reduced voting power, just like the delegatee's.
   function test_ShouldClampDelegatorOwnVotes_WhenUnlockingAfterVoting() public {
     uint256 half = FixidityLib.newFixedFraction(1, 2).unwrap();
     uint256 prop = _referendumProposal();
@@ -325,9 +324,8 @@ contract GovernanceDelegationTest is TestWithUtils08 {
     lockedGold.unlock(500 ether + 1);
   }
 
-  // When the unlock clamps a delegator's votes, the proposal's network weight (the quorum
-  // denominator) is refreshed to the reduced locked total, matching the revoke path; otherwise
-  // participation would be scored against a stale, larger denominator.
+  // Clamping a delegator's votes on unlock refreshes the proposal's network weight (the
+  // quorum denominator) to the reduced locked total, as the revoke path does.
   function test_ShouldRefreshNetworkWeight_WhenClampingVotesOnUnlock() public {
     uint256 half = FixidityLib.newFixedFraction(1, 2).unwrap();
     uint256 prop = _referendumProposal();
@@ -353,9 +351,8 @@ contract GovernanceDelegationTest is TestWithUtils08 {
     assertEq(nwAfter, lockedAfter, "network weight refreshed to the reduced locked total");
   }
 
-  // The same refresh applies when the unlock clamps a delegatee's votes while the delegator
-  // itself cast none: the delegatee's clamp runs as part of the unlock, so the network weight
-  // it records must be the locked total after the unlock, not before it.
+  // The same refresh applies when only the delegatee voted: its clamp must record the
+  // locked total after the unlock, not before it.
   function test_ShouldRefreshNetworkWeight_WhenClampingDelegateeVotesOnUnlock() public {
     uint256 half = FixidityLib.newFixedFraction(1, 2).unwrap();
     uint256 prop = _referendumProposal();
