@@ -109,9 +109,10 @@ contract PriceFeedOracleAdapterTest_setFeeds is PriceFeedOracleAdapterBase {
     adapter.setFeeds(token, new PriceFeedOracleAdapter.Feed[](0));
 
     assertEq(adapter.getFeeds(token).length, 0);
-    (uint256 numerator, uint256 denominator) = adapter.getExchangeRate(token);
-    assertEq(numerator, 0);
-    assertEq(denominator, 0);
+    vm.expectRevert(
+      abi.encodeWithSelector(PriceFeedOracleAdapter.TokenNotConfigured.selector, token)
+    );
+    adapter.getExchangeRate(token);
   }
 
   function test_Reverts_WhenCalledByNonOwner() public {
@@ -218,10 +219,11 @@ contract PriceFeedOracleAdapterTest_getExchangeRate is PriceFeedOracleAdapterBas
     assertEq(numerator, 0.0625e24);
   }
 
-  function test_ShouldReturnZeroOverZero_WhenTokenNotConfigured() public {
-    (uint256 numerator, uint256 denominator) = adapter.getExchangeRate(token);
-    assertEq(numerator, 0);
-    assertEq(denominator, 0);
+  function test_Reverts_WhenTokenNotConfigured() public {
+    vm.expectRevert(
+      abi.encodeWithSelector(PriceFeedOracleAdapter.TokenNotConfigured.selector, token)
+    );
+    adapter.getExchangeRate(token);
   }
 
   function test_ShouldReturnZeroRate_WhenPriceIsNegative() public {

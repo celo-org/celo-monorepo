@@ -26,7 +26,7 @@ interface IPriceFeed {
  * @title PriceFeedOracleAdapter
  * @notice IOracle pricing a token against CELO as the product of Chainlink-style feeds.
  * The rate is token per 1 CELO over 1e24. Like SortedOracles it serves the latest price
- * however old, and returns (0, 0) for an unknown token and a zero rate for a non-positive price.
+ * however old and a zero rate for a non-positive price; a token with no feeds reverts.
  */
 contract PriceFeedOracleAdapter is IOracle, Ownable {
   struct Feed {
@@ -46,6 +46,7 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
 
   error TooManyFeeds();
   error ZeroAggregator();
+  error TokenNotConfigured(address token);
   error ZeroRate();
 
   /// @notice Replaces the feeds pricing a token; an empty list removes it.
@@ -76,7 +77,7 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
     address token
   ) public view returns (uint256 numerator, uint256 denominator) {
     Feed[] memory tokenFeeds = feeds[token];
-    if (tokenFeeds.length == 0) return (0, 0);
+    if (tokenFeeds.length == 0) revert TokenNotConfigured(token);
 
     numerator = RATE_DENOMINATOR;
     for (uint256 i = 0; i < tokenFeeds.length; i++) {
