@@ -6,63 +6,17 @@ import { TestWithUtils08 } from "@test-sol/TestWithUtils08.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IAccountsTest.sol";
 import { ILockedGoldTest } from "@test-sol/unit/governance/voting/interfaces/ILockedGoldTest.sol";
+import { IGovernanceTest } from "@test-sol/unit/governance/network/interfaces/IGovernanceTest.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
 import { MockValidators08 } from "@test-sol/unit/governance/voting/mocks/MockValidators08.sol";
 import { LockedGoldCompile } from "@test-sol/unit/governance/voting/mocks/LockedGoldCompile.sol";
-
-// Minimal governance interface for GovernanceDelegation tests — avoids importing
-// Proposals.sol (^0.5.13) which would conflict with the 0.8 compiler.
-interface IGovernanceDelegationTest {
-  function initialize(
-    address registryAddress,
-    address _approver,
-    uint256 _concurrentProposals,
-    uint256 _minDeposit,
-    uint256 _queueExpiry,
-    uint256 _dequeueFrequency,
-    uint256 referendumStageDuration,
-    uint256 executionStageDuration,
-    uint256 participationBaseline,
-    uint256 participationFloor,
-    uint256 baselineUpdateFactor,
-    uint256 baselineQuorumFactor
-  ) external;
-  function addValidator(address validator) external;
-  function propose(
-    uint256[] calldata values,
-    address[] calldata destinations,
-    bytes calldata data,
-    uint256[] calldata dataLengths,
-    string calldata descriptionUrl
-  ) external payable returns (uint256);
-  function upvote(uint256 proposalId, uint256 lesser, uint256 greater) external returns (bool);
-  function approve(uint256 proposalId, uint256 index) external returns (bool);
-  function votePartially(
-    uint256 proposalId,
-    uint256 index,
-    uint256 yesVotes,
-    uint256 noVotes,
-    uint256 abstainVotes
-  ) external returns (bool);
-  function dequeueProposalsIfReady() external;
-  function getVoteTotals(uint256 proposalId) external view returns (uint256, uint256, uint256);
-  function getDequeue() external view returns (uint256[] memory);
-  function getAmountOfGoldUsedForVoting(address account) external view returns (uint256);
-  function getProposal(
-    uint256 proposalId
-  ) external view returns (address, uint256, uint256, uint256, string memory, uint256, bool);
-  function getVoteRecord(
-    address account,
-    uint256 index
-  ) external view returns (uint256, uint256, uint256, uint256, uint256, uint256);
-}
 
 contract GovernanceDelegationTest is TestWithUtils08 {
   using FixidityLib for FixidityLib.Fraction;
 
   IAccountsTest accounts;
   ILockedGoldTest lockedGold;
-  IGovernanceDelegationTest governance;
+  IGovernanceTest governance;
   MockElection election;
   MockValidators08 validators;
 
@@ -91,7 +45,7 @@ contract GovernanceDelegationTest is TestWithUtils08 {
 
     address governanceAddress = actor("Governance");
     deployCodeTo("GovernanceMock08", governanceAddress);
-    governance = IGovernanceDelegationTest(governanceAddress);
+    governance = IGovernanceTest(governanceAddress);
 
     election = new MockElection();
     validators = new MockValidators08();
@@ -837,15 +791,15 @@ contract GovernanceDelegationTest is TestWithUtils08 {
 
     uint256 delegatorVotes = governance.getAmountOfGoldUsedForVoting(delegator);
     uint256 delegateeVotes = governance.getAmountOfGoldUsedForVoting(delegatee2);
-    assertLe(
+    assertEq(
       delegatorVotes,
       lockedGold.getAccountTotalGovernanceVotingPower(delegator),
-      "delegator votes within power"
+      "delegator votes equal power"
     );
-    assertLe(
+    assertEq(
       delegateeVotes,
       lockedGold.getAccountTotalGovernanceVotingPower(delegatee2),
-      "delegatee votes within power"
+      "delegatee votes equal power"
     );
     (uint256 yes, , ) = governance.getVoteTotals(prop);
     assertEq(yes, delegatorVotes + delegateeVotes, "tally equals the recorded votes");
