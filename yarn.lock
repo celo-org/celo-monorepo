@@ -2589,9 +2589,9 @@
   integrity sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==
 
 "@tsconfig/recommended@^1.0.3":
-  version "1.0.13"
-  resolved "https://registry.yarnpkg.com/@tsconfig/recommended/-/recommended-1.0.13.tgz#269fce3ad04ca70b93269ff44cca81b950f542da"
-  integrity sha512-sySRuBfMKyKO/j2ZAhR8kSembhjuPEV4Ra3AHtmWLq51+iGaudr45crPSzNC5b7/Ctrh9dfUpBuTlYrH6rM58Q==
+  version "1.0.14"
+  resolved "https://registry.yarnpkg.com/@tsconfig/recommended/-/recommended-1.0.14.tgz#2b55d61ded2441cb1c882d6f73f05d59b8d8033c"
+  integrity sha512-iYgWhyVNgsxXiflM97anZ6sVmKTmcMSCL9x7RutV7owLOb8b+hmLPtmd6wqeKvvkaWa4Zx4eOWfn56Fc2KMHrA==
 
 "@types/abstract-leveldown@*":
   version "7.2.5"
