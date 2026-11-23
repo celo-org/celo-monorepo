@@ -25,15 +25,14 @@ interface IPriceFeed {
 /**
  * @title PriceFeedOracleAdapter
  * @notice IOracle pricing a token against CELO as the product of Chainlink-style feeds.
- * The rate is token per 1 CELO over 1e24; a stale or non-positive price reverts.
+ * The rate is token per 1 CELO over 1e24. Like SortedOracles it serves the latest price
+ * however old it is; a non-positive price reverts.
  */
 contract PriceFeedOracleAdapter is IOracle, Ownable {
   struct Feed {
     address aggregator;
     // Use 1 / price.
     bool invert;
-    // Seconds a price stays valid; set above the feed's heartbeat.
-    uint32 maxAge;
     // The aggregator's decimals, read when the feed is set; any value passed in is ignored.
     uint8 decimals;
   }
@@ -47,10 +46,8 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
 
   error TooManyFeeds();
   error ZeroAggregator();
-  error ZeroMaxAge();
   error TokenNotConfigured(address token);
   error InvalidPrice(address aggregator);
-  error StalePrice(address aggregator);
   error RateRoundsToZero();
 
   /// @notice Replaces the feeds pricing a token; an empty list removes it.
@@ -60,14 +57,13 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
     delete feeds[token];
     for (uint256 i = 0; i < newFeeds.length; i++) {
       if (newFeeds[i].aggregator == address(0)) revert ZeroAggregator();
-      if (newFeeds[i].maxAge == 0) revert ZeroMaxAge();
       Feed memory newFeed = newFeeds[i];
       newFeed.decimals = IPriceFeed(newFeed.aggregator).decimals();
       feeds[token].push(newFeed);
     }
 
     if (newFeeds.length > 0) {
-      rate(token, false);
+      getExchangeRate(token);
     }
     emit FeedsSet(token, feeds[token]);
   }
@@ -79,25 +75,15 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
   /// @notice Returns token per 1 CELO as numerator / RATE_DENOMINATOR.
   function getExchangeRate(
     address token
-  ) external view returns (uint256 numerator, uint256 denominator) {
-    return rate(token, true);
-  }
-
-  function rate(
-    address token,
-    bool requireFresh
-  ) private view returns (uint256 numerator, uint256 denominator) {
+  ) public view returns (uint256 numerator, uint256 denominator) {
     Feed[] memory tokenFeeds = feeds[token];
     if (tokenFeeds.length == 0) revert TokenNotConfigured(token);
 
     numerator = RATE_DENOMINATOR;
     for (uint256 i = 0; i < tokenFeeds.length; i++) {
       IPriceFeed aggregator = IPriceFeed(tokenFeeds[i].aggregator);
-      (, int256 answer, , uint256 updatedAt, ) = aggregator.latestRoundData();
+      (, int256 answer, , , ) = aggregator.latestRoundData();
       if (answer <= 0) revert InvalidPrice(address(aggregator));
-      if (requireFresh && updatedAt + tokenFeeds[i].maxAge < block.timestamp) {
-        revert StalePrice(address(aggregator));
-      }
 
       uint256 price = uint256(answer);
       uint256 unit = 10 ** uint256(tokenFeeds[i].decimals);

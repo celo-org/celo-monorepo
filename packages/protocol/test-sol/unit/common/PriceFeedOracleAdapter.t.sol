@@ -25,8 +25,6 @@ contract MockAggregator is IPriceFeed {
 }
 
 contract PriceFeedOracleAdapterBase is Test {
-  uint32 constant MAX_AGE = 1 hours;
-
   PriceFeedOracleAdapter adapter;
   MockAggregator celoUsd;
   MockAggregator eurUsd;
@@ -48,12 +46,7 @@ contract PriceFeedOracleAdapterBase is Test {
     bool invert
   ) internal pure returns (PriceFeedOracleAdapter.Feed memory) {
     return
-      PriceFeedOracleAdapter.Feed({
-        aggregator: address(aggregator),
-        invert: invert,
-        maxAge: MAX_AGE,
-        decimals: 0
-      });
+      PriceFeedOracleAdapter.Feed({ aggregator: address(aggregator), invert: invert, decimals: 0 });
   }
 
   function one(
@@ -83,7 +76,6 @@ contract PriceFeedOracleAdapterTest_setFeeds is PriceFeedOracleAdapterBase {
     assertEq(stored[0].invert, false);
     assertEq(stored[1].aggregator, address(eurUsd));
     assertEq(stored[1].invert, true);
-    assertEq(stored[1].maxAge, MAX_AGE);
   }
 
   function test_ShouldStoreAggregatorDecimals_IgnoringPassedValue() public {
@@ -145,35 +137,12 @@ contract PriceFeedOracleAdapterTest_setFeeds is PriceFeedOracleAdapterBase {
     adapter.setFeeds(token, feeds);
   }
 
-  function test_Reverts_WhenMaxAgeIsZero() public {
-    PriceFeedOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
-    feeds[0].maxAge = 0;
-    vm.expectRevert(PriceFeedOracleAdapter.ZeroMaxAge.selector);
-    adapter.setFeeds(token, feeds);
-  }
-
   function test_Reverts_WhenFeedDoesNotYieldRate() public {
     celoUsd.set(0, block.timestamp);
     vm.expectRevert(
       abi.encodeWithSelector(PriceFeedOracleAdapter.InvalidPrice.selector, address(celoUsd))
     );
     adapter.setFeeds(token, one(feed(celoUsd, false)));
-  }
-
-  function test_ShouldAllowRaisingMaxAge_WhenFeedIsStale() public {
-    adapter.setFeeds(token, one(feed(celoUsd, false)));
-    vm.warp(block.timestamp + MAX_AGE + 1);
-    vm.expectRevert(
-      abi.encodeWithSelector(PriceFeedOracleAdapter.StalePrice.selector, address(celoUsd))
-    );
-    adapter.getExchangeRate(token);
-
-    PriceFeedOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
-    feeds[0].maxAge = 2 * MAX_AGE;
-    adapter.setFeeds(token, feeds);
-
-    (uint256 numerator, ) = adapter.getExchangeRate(token);
-    assertEq(numerator, 0.06e24);
   }
 
   function test_Reverts_WhenAggregatorIsNotAContract() public {
@@ -219,9 +188,9 @@ contract PriceFeedOracleAdapterTest_getExchangeRate is PriceFeedOracleAdapterBas
     assertEq(denominator, 1e24);
   }
 
-  function test_ShouldReturnRate_WhenAgeEqualsMaxAge() public {
+  function test_ShouldServeLatestPrice_WhenFeedStoppedUpdating() public {
     adapter.setFeeds(token, one(feed(celoUsd, false)));
-    vm.warp(block.timestamp + MAX_AGE);
+    vm.warp(block.timestamp + 365 days);
 
     (uint256 numerator, ) = adapter.getExchangeRate(token);
     assertEq(numerator, 0.06e24);
@@ -255,17 +224,6 @@ contract PriceFeedOracleAdapterTest_getExchangeRate is PriceFeedOracleAdapterBas
   function test_Reverts_WhenTokenNotConfigured() public {
     vm.expectRevert(
       abi.encodeWithSelector(PriceFeedOracleAdapter.TokenNotConfigured.selector, token)
-    );
-    adapter.getExchangeRate(token);
-  }
-
-  function test_Reverts_WhenAnyFeedIsStale() public {
-    adapter.setFeeds(token, two(feed(celoUsd, false), feed(eurUsd, true)));
-    vm.warp(block.timestamp + MAX_AGE + 1);
-    celoUsd.set(6_000_000, block.timestamp);
-
-    vm.expectRevert(
-      abi.encodeWithSelector(PriceFeedOracleAdapter.StalePrice.selector, address(eurUsd))
     );
     adapter.getExchangeRate(token);
   }
