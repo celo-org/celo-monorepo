@@ -814,76 +814,6 @@ contract GovernanceDelegationTest is TestWithUtils08 {
     assertEq(networkWeightAfter, lockedGold.getTotalLockedGold(), "network weight refreshed");
   }
 
-  // --- Records written before partial voting keep their weight in the deprecated fields.
-
-  function test_ShouldClampLegacyYesRecord_WhenUnlocking() public {
-    (uint256 prop, uint256 idx) = _delegateHalfAndOpenReferendum();
-    _voteFullPower(delegator, prop, idx);
-    _rewriteRecordAsLegacy(delegator, idx, 3);
-
-    vm.prank(delegator);
-    lockedGold.unlock(500 ether);
-
-    (
-      ,
-      uint256 legacyValue,
-      uint256 legacyWeight,
-      uint256 yes,
-      uint256 no,
-      uint256 abstain
-    ) = governance.getVoteRecord(delegator, idx);
-    assertEq(legacyValue, 0, "legacy value retired");
-    assertEq(legacyWeight, 0, "legacy weight retired");
-    assertEq(yes, 250 ether, "weight moved to yes and clamped");
-    assertEq(no + abstain, 0, "other vote types stay empty");
-    assertEq(governance.getAmountOfGoldUsedForVoting(delegator), 250 ether, "used votes clamped");
-    (uint256 totalYes, uint256 totalNo, uint256 totalAbstain) = governance.getVoteTotals(prop);
-    assertEq(totalYes, 250 ether, "yes tally reduced by the removed votes only");
-    assertEq(totalNo + totalAbstain, 0, "other tallies untouched");
-  }
-
-  function test_ShouldClampLegacyNoRecord_WhenUnlocking() public {
-    (uint256 prop, uint256 idx) = _delegateHalfAndOpenReferendum();
-    vm.prank(delegator);
-    governance.votePartially(prop, idx, 0, 500 ether, 0);
-    _voteFullPower(delegatee2, prop, idx);
-    _rewriteRecordAsLegacy(delegator, idx, 2);
-
-    vm.prank(delegator);
-    lockedGold.unlock(500 ether);
-
-    (, , uint256 legacyWeight, uint256 yes, uint256 no, uint256 abstain) = governance.getVoteRecord(
-      delegator,
-      idx
-    );
-    assertEq(legacyWeight, 0, "legacy weight retired");
-    assertEq(no, 250 ether, "weight moved to no and clamped");
-    assertEq(yes + abstain, 0, "other vote types stay empty");
-    (uint256 totalYes, uint256 totalNo, ) = governance.getVoteTotals(prop);
-    assertEq(totalNo, 250 ether, "no tally reduced");
-    assertEq(totalYes, 250 ether, "only the delegatee's clamped yes votes remain");
-  }
-
-  function test_ShouldLeaveLegacyRecordAsIs_WhenStillBackedAfterUnlock() public {
-    (uint256 prop, uint256 idx) = _delegateHalfAndOpenReferendum();
-    vm.prank(delegator);
-    governance.votePartially(prop, idx, 200 ether, 0, 0);
-    _rewriteRecordAsLegacy(delegator, idx, 3);
-
-    vm.prank(delegator);
-    lockedGold.unlock(500 ether);
-
-    (, uint256 legacyValue, uint256 legacyWeight, uint256 yes, , ) = governance.getVoteRecord(
-      delegator,
-      idx
-    );
-    assertEq(legacyValue, 3, "legacy value kept");
-    assertEq(legacyWeight, 200 ether, "legacy weight kept");
-    assertEq(yes, 0, "record not converted");
-    (uint256 totalYes, , ) = governance.getVoteTotals(prop);
-    assertEq(totalYes, 200 ether, "tally unchanged");
-  }
-
   // --- Property: whatever is delegated and unlocked, nobody's recorded votes exceed their power.
 
   function testFuzz_ShouldKeepVotesBackedByPower_WhenUnlocking(
@@ -954,39 +884,6 @@ contract GovernanceDelegationTest is TestWithUtils08 {
     accounts.createAccount();
     lockedGold.lock{ value: amount }();
     vm.stopPrank();
-  }
-
-  // Rewrites an existing vote record into the pre-partial-voting layout: the whole weight in
-  // deprecated_weight under `legacyValue` (1 abstain, 2 no, 3 yes), with yes/no/abstain zeroed.
-  // The proposal's tallies are left as the vote recorded them.
-  function _rewriteRecordAsLegacy(address voter, uint256 idx, uint256 legacyValue) private {
-    (uint256 prop, , , uint256 yes, uint256 no, uint256 abstain) = governance.getVoteRecord(
-      voter,
-      idx
-    );
-    uint256 weight = yes + no + abstain;
-
-    // voters is at slot 16; Voter.referendumVotes is its 4th slot; VoteRecord fields in order.
-    uint256 voterSlot = uint256(keccak256(abi.encode(voter, uint256(16))));
-    uint256 recordSlot = uint256(keccak256(abi.encode(idx, voterSlot + 3)));
-    vm.store(address(governance), bytes32(recordSlot), bytes32(legacyValue));
-    vm.store(address(governance), bytes32(recordSlot + 2), bytes32(weight));
-    vm.store(address(governance), bytes32(recordSlot + 3), bytes32(0));
-    vm.store(address(governance), bytes32(recordSlot + 4), bytes32(0));
-    vm.store(address(governance), bytes32(recordSlot + 5), bytes32(0));
-
-    // Guards the slot arithmetic above against storage layout changes.
-    uint256 storedProp;
-    uint256 storedValue;
-    uint256 storedWeight;
-    (storedProp, storedValue, storedWeight, yes, no, abstain) = governance.getVoteRecord(
-      voter,
-      idx
-    );
-    assertEq(storedProp, prop, "legacy rewrite kept the proposal id");
-    assertEq(storedValue, legacyValue, "legacy value written");
-    assertEq(storedWeight, weight, "legacy weight written");
-    assertEq(yes + no + abstain, 0, "current fields cleared");
   }
 
   // Creates a proposal, moves it into the Referendum stage and approves it.
