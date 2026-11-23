@@ -6,8 +6,7 @@ import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 import "./interfaces/IOracle.sol";
 
-// The price feed interface published by Chainlink (AggregatorV3Interface), which other
-// providers such as RedStone implement as well.
+// Chainlink's AggregatorV3Interface, also implemented by other providers such as RedStone.
 interface IPriceFeed {
   function decimals() external view returns (uint8);
 
@@ -25,31 +24,18 @@ interface IPriceFeed {
 
 /**
  * @title PriceFeedOracleAdapter
- * @notice IOracle that prices a token against CELO straight from on-chain price feeds
- * (Chainlink aggregators or any feed with the same interface), with no relayer or
- * keeper in between.
- *
- * The rate for a token is the product of its configured feeds, each optionally inverted.
- * The product must come out as "token units per 1 CELO", the same meaning as
- * SortedOracles.medianRate(token), and it is returned over the same 1e24 denominator,
- * so the adapter is a drop-in oracle for FeeCurrencyDirectory and EpochManager.
- *
- * Examples:
- *   USD stable: [CELO/USD]
- *   EUR stable: [CELO/USD, EUR/USD inverted]
- *
- * Like SortedOracles, the rate is a price ratio between whole units: it is not rescaled
- * for token decimals, so tokens that are not 18-decimal go through their fee adapter.
- *
- * Unlike SortedOracles, a stale or non-positive price reverts instead of being served.
+ * @notice IOracle pricing a token against CELO from Chainlink-style feeds, with no relayer.
+ * The rate is the product of the token's feeds, each optionally inverted, as token per 1 CELO
+ * over 1e24 like SortedOracles.medianRate, e.g. EUR stable = [CELO/USD, EUR/USD inverted].
+ * Not rescaled for token decimals. A stale or non-positive price reverts.
  */
 contract PriceFeedOracleAdapter is IOracle, Ownable {
   struct Feed {
     address aggregator;
     // When true the feed contributes 1 / price instead of price.
     bool invert;
-    // Seconds after its last update during which the feed's price is accepted. Set it
-    // above the feed's heartbeat; FX feeds stop updating while their market is closed.
+    // Seconds a price stays valid after its last update; set above the feed's heartbeat
+    // (FX feeds stop updating while their market is closed).
     uint32 maxAge;
   }
 
@@ -69,12 +55,8 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
   error RateRoundsToZero();
 
   /**
-   * @notice Replaces the feeds used to price a token. An empty list removes the token.
-   * @dev Reverts unless the new feeds yield a rate, which rejects addresses that are not
-   * aggregators. Freshness is not checked here, so that a larger maxAge can still be
-   * set while a feed is stale and getExchangeRate is reverting.
-   * @param token The token to price, as passed to getExchangeRate.
-   * @param newFeeds Feeds whose product is the amount of token per 1 CELO.
+   * @notice Replaces the feeds pricing a token; an empty list removes it.
+   * @dev The feeds must yield a rate, but may be stale so maxAge can be raised during an outage.
    */
   function setFeeds(address token, Feed[] calldata newFeeds) external onlyOwner {
     if (newFeeds.length > MAX_FEEDS) revert TooManyFeeds();
@@ -100,13 +82,8 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
   }
 
   /**
-   * @notice Returns the amount of token per 1 CELO as numerator / denominator.
+   * @notice Returns the amount of token per 1 CELO as numerator / RATE_DENOMINATOR.
    * @dev Reverts if the token is not configured or any feed is stale or non-positive.
-   * Each feed is folded in at 1e24 precision with a full-width multiply, so the running
-   * rate never needs more room than the rate itself.
-   * @param token The token to price.
-   * @return numerator The rate scaled by RATE_DENOMINATOR.
-   * @return denominator Always RATE_DENOMINATOR.
    */
   function getExchangeRate(
     address token
