@@ -109,10 +109,9 @@ contract PriceFeedOracleAdapterTest_setFeeds is PriceFeedOracleAdapterBase {
     adapter.setFeeds(token, new PriceFeedOracleAdapter.Feed[](0));
 
     assertEq(adapter.getFeeds(token).length, 0);
-    vm.expectRevert(
-      abi.encodeWithSelector(PriceFeedOracleAdapter.TokenNotConfigured.selector, token)
-    );
-    adapter.getExchangeRate(token);
+    (uint256 numerator, uint256 denominator) = adapter.getExchangeRate(token);
+    assertEq(numerator, 0);
+    assertEq(denominator, 0);
   }
 
   function test_Reverts_WhenCalledByNonOwner() public {
@@ -139,9 +138,7 @@ contract PriceFeedOracleAdapterTest_setFeeds is PriceFeedOracleAdapterBase {
 
   function test_Reverts_WhenFeedDoesNotYieldRate() public {
     celoUsd.set(0, block.timestamp);
-    vm.expectRevert(
-      abi.encodeWithSelector(PriceFeedOracleAdapter.InvalidPrice.selector, address(celoUsd))
-    );
+    vm.expectRevert(PriceFeedOracleAdapter.ZeroRate.selector);
     adapter.setFeeds(token, one(feed(celoUsd, false)));
   }
 
@@ -221,31 +218,47 @@ contract PriceFeedOracleAdapterTest_getExchangeRate is PriceFeedOracleAdapterBas
     assertEq(numerator, 0.0625e24);
   }
 
-  function test_Reverts_WhenTokenNotConfigured() public {
-    vm.expectRevert(
-      abi.encodeWithSelector(PriceFeedOracleAdapter.TokenNotConfigured.selector, token)
-    );
-    adapter.getExchangeRate(token);
+  function test_ShouldReturnZeroOverZero_WhenTokenNotConfigured() public {
+    (uint256 numerator, uint256 denominator) = adapter.getExchangeRate(token);
+    assertEq(numerator, 0);
+    assertEq(denominator, 0);
   }
 
-  function test_Reverts_WhenPriceIsNegative() public {
+  function test_ShouldReturnZeroRate_WhenPriceIsNegative() public {
     adapter.setFeeds(token, one(feed(celoUsd, false)));
     celoUsd.set(-1, block.timestamp);
 
-    vm.expectRevert(
-      abi.encodeWithSelector(PriceFeedOracleAdapter.InvalidPrice.selector, address(celoUsd))
-    );
-    adapter.getExchangeRate(token);
+    (uint256 numerator, uint256 denominator) = adapter.getExchangeRate(token);
+    assertEq(numerator, 0);
+    assertEq(denominator, 1e24);
   }
 
-  function test_Reverts_WhenRateRoundsToZero() public {
-    MockAggregator huge = new MockAggregator(0, 1e30);
-    adapter.setFeeds(token, one(feed(celoUsd, false)));
-    celoUsd.set(1, block.timestamp);
-    PriceFeedOracleAdapter.Feed[] memory feeds = two(feed(celoUsd, false), feed(huge, true));
+  function test_ShouldReturnZeroRate_WhenInvertedPriceIsZero() public {
+    adapter.setFeeds(token, two(feed(celoUsd, false), feed(eurUsd, true)));
+    eurUsd.set(0, block.timestamp);
 
-    vm.expectRevert(PriceFeedOracleAdapter.RateRoundsToZero.selector);
-    adapter.setFeeds(token, feeds);
+    (uint256 numerator, uint256 denominator) = adapter.getExchangeRate(token);
+    assertEq(numerator, 0);
+    assertEq(denominator, 1e24);
+  }
+
+  function test_ShouldReturnZeroRate_WhenRateRoundsToZero() public {
+    MockAggregator huge = new MockAggregator(0, 1);
+    adapter.setFeeds(token, two(feed(celoUsd, false), feed(huge, true)));
+    celoUsd.set(1, block.timestamp);
+    huge.set(1e30, block.timestamp);
+
+    (uint256 numerator, uint256 denominator) = adapter.getExchangeRate(token);
+    assertEq(numerator, 0);
+    assertEq(denominator, 1e24);
+  }
+
+  function test_Reverts_WhenSettingFeedsThatRoundToZero() public {
+    MockAggregator huge = new MockAggregator(0, 1e30);
+    celoUsd.set(1, block.timestamp);
+
+    vm.expectRevert(PriceFeedOracleAdapter.ZeroRate.selector);
+    adapter.setFeeds(token, two(feed(celoUsd, false), feed(huge, true)));
   }
 
   function testFuzz_ShouldMatchDirectDivision(uint64 celoPrice, uint64 quotePrice) public {

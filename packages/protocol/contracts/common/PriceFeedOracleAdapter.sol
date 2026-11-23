@@ -26,7 +26,7 @@ interface IPriceFeed {
  * @title PriceFeedOracleAdapter
  * @notice IOracle pricing a token against CELO as the product of Chainlink-style feeds.
  * The rate is token per 1 CELO over 1e24. Like SortedOracles it serves the latest price
- * however old it is; a non-positive price reverts.
+ * however old, and returns (0, 0) for an unknown token and a zero rate for a non-positive price.
  */
 contract PriceFeedOracleAdapter is IOracle, Ownable {
   struct Feed {
@@ -46,9 +46,7 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
 
   error TooManyFeeds();
   error ZeroAggregator();
-  error TokenNotConfigured(address token);
-  error InvalidPrice(address aggregator);
-  error RateRoundsToZero();
+  error ZeroRate();
 
   /// @notice Replaces the feeds pricing a token; an empty list removes it.
   function setFeeds(address token, Feed[] calldata newFeeds) external onlyOwner {
@@ -63,7 +61,8 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
     }
 
     if (newFeeds.length > 0) {
-      getExchangeRate(token);
+      (uint256 numerator, ) = getExchangeRate(token);
+      if (numerator == 0) revert ZeroRate();
     }
     emit FeedsSet(token, feeds[token]);
   }
@@ -77,13 +76,12 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
     address token
   ) public view returns (uint256 numerator, uint256 denominator) {
     Feed[] memory tokenFeeds = feeds[token];
-    if (tokenFeeds.length == 0) revert TokenNotConfigured(token);
+    if (tokenFeeds.length == 0) return (0, 0);
 
     numerator = RATE_DENOMINATOR;
     for (uint256 i = 0; i < tokenFeeds.length; i++) {
-      IPriceFeed aggregator = IPriceFeed(tokenFeeds[i].aggregator);
-      (, int256 answer, , , ) = aggregator.latestRoundData();
-      if (answer <= 0) revert InvalidPrice(address(aggregator));
+      (, int256 answer, , , ) = IPriceFeed(tokenFeeds[i].aggregator).latestRoundData();
+      if (answer <= 0) return (0, RATE_DENOMINATOR);
 
       uint256 price = uint256(answer);
       uint256 unit = 10 ** uint256(tokenFeeds[i].decimals);
@@ -93,6 +91,5 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
     }
 
     denominator = RATE_DENOMINATOR;
-    if (numerator == 0) revert RateRoundsToZero();
   }
 }
