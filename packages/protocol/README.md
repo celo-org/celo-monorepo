@@ -17,7 +17,7 @@ yarn run devchain:init-network -n NETWORK
 ```
 
 This will deploy the contracts to the network specified in `truffle-config.js` and save the artifacts to `build/NETWORK`.
-If your network was deployed with `helm`, you will probably set `NETWORK` the same as your `NAME` (which sets `NAMESPACE_NAME` and `RELEASE_NAME`). For more clarity on these names, also see the [testnet helm chart README](../helm-charts/testnet/README.md)
+If your network was deployed with `helm`, you will probably set `NETWORK` the same as your `NAME` (which sets `NAMESPACE_NAME` and `RELEASE_NAME`). For more clarity on these names, also see the [testnet helm chart README](https://github.com/celo-org/charts/blob/main/charts/testnet/README.md)
 
 ### Migrations
 
@@ -191,7 +191,7 @@ If Sourcify verification succeeds but Celoscan/Blockscout fails:
 2.  Bytecode differs because of missing library addresses on CeloScan. Json file that will be manually uploaded to CeloScan needs to have libraries root element updated. Library addresses are possible to get either manually or with command which will generate libraries.json.
 
     ```bash
-    yarn release:verify-deployed -n $NETWORK -b $PREVIOUS_RELEASE -f
+    yarn release:verify-deployed:foundry -n $NETWORK -b $PREVIOUS_RELEASE -f
     ```
 
     ```javascript
