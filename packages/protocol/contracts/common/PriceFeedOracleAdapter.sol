@@ -34,6 +34,8 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
     bool invert;
     // Seconds a price stays valid; set above the feed's heartbeat.
     uint32 maxAge;
+    // The aggregator's decimals, read when the feed is set; any value passed in is ignored.
+    uint8 decimals;
   }
 
   uint256 public constant RATE_DENOMINATOR = 1e24;
@@ -59,13 +61,15 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
     for (uint256 i = 0; i < newFeeds.length; i++) {
       if (newFeeds[i].aggregator == address(0)) revert ZeroAggregator();
       if (newFeeds[i].maxAge == 0) revert ZeroMaxAge();
-      feeds[token].push(newFeeds[i]);
+      Feed memory newFeed = newFeeds[i];
+      newFeed.decimals = IPriceFeed(newFeed.aggregator).decimals();
+      feeds[token].push(newFeed);
     }
 
     if (newFeeds.length > 0) {
       rate(token, false);
     }
-    emit FeedsSet(token, newFeeds);
+    emit FeedsSet(token, feeds[token]);
   }
 
   function getFeeds(address token) external view returns (Feed[] memory) {
@@ -96,7 +100,7 @@ contract PriceFeedOracleAdapter is IOracle, Ownable {
       }
 
       uint256 price = uint256(answer);
-      uint256 unit = 10 ** uint256(aggregator.decimals());
+      uint256 unit = 10 ** uint256(tokenFeeds[i].decimals);
       numerator = tokenFeeds[i].invert
         ? Math.mulDiv(numerator, unit, price)
         : Math.mulDiv(numerator, price, unit);

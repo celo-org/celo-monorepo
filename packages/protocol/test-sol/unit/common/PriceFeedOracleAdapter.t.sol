@@ -51,7 +51,8 @@ contract PriceFeedOracleAdapterBase is Test {
       PriceFeedOracleAdapter.Feed({
         aggregator: address(aggregator),
         invert: invert,
-        maxAge: MAX_AGE
+        maxAge: MAX_AGE,
+        decimals: 0
       });
   }
 
@@ -85,10 +86,22 @@ contract PriceFeedOracleAdapterTest_setFeeds is PriceFeedOracleAdapterBase {
     assertEq(stored[1].maxAge, MAX_AGE);
   }
 
+  function test_ShouldStoreAggregatorDecimals_IgnoringPassedValue() public {
+    PriceFeedOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
+    feeds[0].decimals = 30;
+    adapter.setFeeds(token, feeds);
+
+    assertEq(adapter.getFeeds(token)[0].decimals, 8);
+    (uint256 numerator, ) = adapter.getExchangeRate(token);
+    assertEq(numerator, 0.06e24);
+  }
+
   function test_ShouldEmitFeedsSet() public {
     PriceFeedOracleAdapter.Feed[] memory feeds = one(feed(celoUsd, false));
+    PriceFeedOracleAdapter.Feed[] memory stored = one(feed(celoUsd, false));
+    stored[0].decimals = 8;
     vm.expectEmit(true, true, true, true);
-    emit FeedsSet(token, feeds);
+    emit FeedsSet(token, stored);
     adapter.setFeeds(token, feeds);
   }
 
@@ -178,6 +191,14 @@ contract PriceFeedOracleAdapterTest_getExchangeRate is PriceFeedOracleAdapterBas
     (uint256 numerator, uint256 denominator) = adapter.getExchangeRate(token);
     assertEq(numerator, 0.06e24);
     assertEq(denominator, 1e24);
+  }
+
+  function test_ShouldNotCallDecimals_WhenReadingRate() public {
+    adapter.setFeeds(token, one(feed(celoUsd, false)));
+    vm.mockCallRevert(address(celoUsd), abi.encodeWithSignature("decimals()"), "");
+
+    (uint256 numerator, ) = adapter.getExchangeRate(token);
+    assertEq(numerator, 0.06e24);
   }
 
   function test_ShouldComposeInvertedFeed() public {
