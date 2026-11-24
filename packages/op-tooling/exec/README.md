@@ -20,6 +20,8 @@ This directory contains scripts for executing OPCM upgrade transactions through 
   - `secrets/.env.signers.succinct201`
   - `secrets/.env.signers.succinct210`
   - `secrets/.env.signers.basefee`
+  - `secrets/.env.signers.eigendacertv3`
+  - `secrets/.env.signers.succinct220`
 
 ## Scripts
 
@@ -31,7 +33,7 @@ Unified runner for executing OPCM upgrade transactions through the complete mult
 
 - Unified runner for all historical and current upgrades
 - Supports positional arguments for network and version selection
-- Extensive support for Mainnet (10 versions) and Sepolia (5 versions)
+- Extensive support for Mainnet (11 versions) and Sepolia (5 versions)
 - Chaos support (`v4`, `v5`, `succ-v2`) as a single-owner Safe (threshold 1) with calldata built dynamically at runtime
 - `cgt-v2`: Celo mainnet and Sepolia are **TBD** and fail fast, pointing at CeloSuperchainOps. Chaos and Havoc run the whole migration as one atomic Safe transaction, calldata read from a JSON bundle
 - Handles both 2-tier and 3-tier nested Safe approval flows
@@ -70,6 +72,7 @@ PK=0x... RPC_URL=... ./exec-upgrade.sh <network> <version>
 | mainnet | succ-v201 | 2-tier | `0x95ffac…` | `secrets/.env.signers.succinct201` |
 | mainnet | succ-v210 | 2-tier | `0x95ffac…` | `secrets/.env.signers.succinct210` |
 | mainnet | eigenda-cert-v3 | 2-tier | `0x95ffac…` | `secrets/.env.signers.eigendacertv3` |
+| mainnet | succ-v220 | 3-tier (GC) | `0x3bec6…` | `secrets/.env.signers.succinct220` |
 | mainnet | cgt-v2 | **TBD** | — | not wired; sign via CeloSuperchainOps |
 | sepolia | v4 | 2-tier (1-of-2 children) | `0x5e60d…` | inline |
 | sepolia | v5 | 2-tier (1-of-2 children) | `0x5e60d…` | inline |
@@ -261,7 +264,7 @@ The Version Matrix names the topology for each version. What they mean:
 
 | Topology | Signing chain | Used by |
 |---|---|---|
-| 3-tier (GC) | Grand Child → Council → cLabs, then Parent executes | historical mainnet versions |
+| 3-tier (GC) | Grand Child → Council → cLabs, then Parent executes | historical mainnet versions, mainnet succ-v220 (Mento signed via the Grand Child Safe) |
 | 2-tier | Council → cLabs, then Parent executes | current mainnet, all Sepolia |
 | Safe (1-of-1) | deployer signs and executes directly, no approval chain | chaos, havoc |
 
@@ -277,7 +280,7 @@ The Version Matrix names the topology for each version. What they mean:
 - **Base Gas**: 0
 - **Gas Price**: 0
 - **Gas Token**: Zero address
-- **Refund Receiver**: Per-version (see Version Matrix). Mainnet v2/v3 use zero address; mainnet v4+ use `0x95ffac...`; Sepolia uses `0x5e60d...`; chaos uses `0xa3A3a...`. For `cgt-v2` it is the deployment key's own address, derived at runtime from `PK`
+- **Refund Receiver**: Per-version (see Version Matrix). Mainnet v2/v3 use zero address; mainnet v4+ use `0x95ffac...` except succ-v220, which uses `0x3bec6...`; Sepolia uses `0x5e60d...`; chaos uses `0xa3A3a...`. For `cgt-v2` it is the deployment key's own address, derived at runtime from `PK`
 
 ### Calldata Structure
 
