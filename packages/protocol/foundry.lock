@@ -1,0 +1,29 @@
+{
+  "lib/celo-foundry": {
+    "branch": {
+      "name": "celo-foundry-v0.5.13",
+      "rev": "18de45092475d1c0f18ee359ddb95493bf6b69d0"
+    }
+  },
+  "lib/celo-foundry-8": {
+    "rev": "1bef01f56581acc0b25501bfd4f0add1b5daecd3"
+  },
+  "lib/mento-core": {
+    "rev": "4ceb4f0ed3e24163617e9da2b5bfc4c5a2b722b8"
+  },
+  "lib/openzeppelin-contracts": {
+    "rev": "6c2ab375a9c7db0fa8c21fba1ed3b2057f75dd75"
+  },
+  "lib/openzeppelin-contracts8": {
+    "rev": "6c2ab375a9c7db0fa8c21fba1ed3b2057f75dd75"
+  },
+  "lib/solidity-bytes-utils": {
+    "rev": "fc502455bb2a7e26a743378df042612dd50d1eb9"
+  },
+  "lib/solidity-bytes-utils-8": {
+    "branch": {
+      "name": "master",
+      "rev": "fc502455bb2a7e26a743378df042612dd50d1eb9"
+    }
+  }
+}

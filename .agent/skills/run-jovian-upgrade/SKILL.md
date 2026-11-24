@@ -1443,12 +1443,11 @@ block must match declared MODE or fail.
 | Succinct impl (plant)| `0xE7bd695d6A17970A2D9dB55cfeF7F2024d630aE1` |
 | NEW ASR (post-v4)    | `0x8fE58d2168b5412Cf1Bd212cE6137f8b7300222d` (deterministic CREATE2 result) |
 
-Sepolia/chaos proxy addresses → §B.4b below + `packages/op-tooling/verify/verify-versions.sh`.
+Sepolia/chaos proxy addresses → §B.4b below; cross-check live state in X-Ray (`$XRAY_ROOT`).
 
 ### B.4b Sepolia & Chaos proxy addresses
 
-Sourced from `packages/op-tooling/exec/exec-upgrade.sh` and
-`packages/op-tooling/verify/verify-versions.sh`. Use when `NETWORK=sepolia` or `chaos`.
+Sourced from `packages/op-tooling/exec/exec-upgrade.sh`. Use when `NETWORK=sepolia` or `chaos`.
 
 **Sepolia**:
 
