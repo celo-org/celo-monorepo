@@ -11,11 +11,9 @@
     "build": "tsc",
     "gcp-build": "yarn build",
     "test": "tsc && node --test dist/*.test.js",
-    "start": "functions-framework --target=keeper",
     "keeper": "node dist/index.js"
   },
   "dependencies": {
-    "@google-cloud/functions-framework": "^5.0.5",
     "viem": "^2.58.4"
   },
   "devDependencies": {

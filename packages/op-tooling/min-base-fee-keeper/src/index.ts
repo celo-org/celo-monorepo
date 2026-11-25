@@ -5,7 +5,6 @@
 // prints the result as JSON on the last line and exits 1 on anything that needs a human.
 //
 // Usage: node dist/index.js [--dry-run]
-import { http } from '@google-cloud/functions-framework'
 import { realpathSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { loadConfig, runKeeper } from './keeper.js'
@@ -19,7 +18,14 @@ function error(message: string): void {
   console.error(JSON.stringify({ severity: 'ERROR', message }))
 }
 
-http('keeper', async (_req, res) => {
+// The part of Express's response the function uses. Cloud Run functions adds the Functions
+// Framework at deploy time, which calls the exported keeper with Express's request and response.
+interface Response {
+  json(body: unknown): void
+  status(code: number): { send(body: string): void }
+}
+
+export async function keeper(_req: unknown, res: Response): Promise<void> {
   try {
     res.json(await runKeeper(loadConfig(), info))
   } catch (e) {
@@ -27,7 +33,7 @@ http('keeper', async (_req, res) => {
     error(message)
     res.status(500).send(message)
   }
-})
+}
 
 const isMain =
   process.argv[1] !== undefined && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)
