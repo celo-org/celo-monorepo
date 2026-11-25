@@ -90,20 +90,21 @@ Truffle tests have been deprecated.
 
 ### 1. Compile with Foundry
 
-Use the appropriate profile to match Truffle compilation settings:
+The default profile is the release build for the Solidity 0.8 sources (its settings
+reproduce the historic release builds):
 ```bash
-# Solidity 0.5 contracts
-FOUNDRY_PROFILE=truffle-compat forge build contracts/.../[CONTRACT].sol
+# All contracts (Solidity 0.8)
+forge build
 
-# Solidity 0.8 contracts  
-FOUNDRY_PROFILE=truffle-compat8 forge build contracts-0.8/.../[CONTRACT].sol
+# The proxies (contracts-0.5/) are immutable on chain; build them with the solc05 profile:
+FOUNDRY_PROFILE=solc05 forge build
 ```
 
 ### 2. Verify with Foundry
 
 **Base command:**
 ```bash
-FOUNDRY_PROFILE=[truffle-compat|truffle-compat8] forge verify-contract [ADDRESS] [CONTRACT] \
+forge verify-contract [ADDRESS] [CONTRACT] \   # FOUNDRY_PROFILE=solc05 for a proxy
   --chain-id [CHAIN_ID] \
   --watch
 ```
@@ -122,7 +123,7 @@ FOUNDRY_PROFILE=truffle-compat forge verify-contract [ADDRESS] [CONTRACT] \
   --chain-id [CHAIN_ID] --etherscan-api-key=[API_KEY] --watch
 
 # Blockscout verification in Solidity 0.8
-FOUNDRY_PROFILE=truffle-compat8 forge verify-contract [ADDRESS] [CONTRACT] \
+forge verify-contract [ADDRESS] [CONTRACT] \
   --chain-id [CHAIN_ID] --verifier=blockscout --verifier-url=https://[NETWORK].blockscout.com/api/ --watch
 ```
 
@@ -148,11 +149,11 @@ FOUNDRY_PROFILE=truffle-compat forge verify-contract 0x471ece3750da237f93b8e339c
 
 ```bash
 # Celoscan verification - Solidity 0.8 (Celo Mainnet)
-FOUNDRY_PROFILE=truffle-compat8 forge verify-contract 0x9876543210987654321098765432109876543210 CeloToken \
+forge verify-contract 0x9876543210987654321098765432109876543210 CeloToken \
   --chain-id 42220 --etherscan-api-key=YourCeloscanAPIKey --watch
 
 # Celoscan verification - Solidity 0.8 (Celo Sepolia)
-FOUNDRY_PROFILE=truffle-compat8 forge verify-contract 0xfedcba0987654321fedcba0987654321fedcba09 LockedCelo \
+forge verify-contract 0xfedcba0987654321fedcba0987654321fedcba09 LockedCelo \
   --chain-id 11142220 --etherscan-api-key=YourCeloscanAPIKey --watch
 ```
 

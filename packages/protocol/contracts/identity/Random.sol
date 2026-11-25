@@ -1,13 +1,13 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.9.0;
+
+import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "./interfaces/IRandom.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/UsingPrecompiles.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
 
 /**
  * @title Provides randomness for verifier selection
@@ -20,8 +20,6 @@ contract Random is
   UsingPrecompiles,
   CalledByVm
 {
-  using SafeMath for uint256;
-
   /* Stores most recent commitment per address */
   mapping(address => bytes32) private deprecated_commitments;
 
@@ -38,7 +36,7 @@ contract Random is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -97,7 +95,7 @@ contract Random is
    * @return The associated randomness value.
    * @dev Only available on L1.
    */
-  function getBlockRandomness(uint256 blockNumber) external view onlyL1 returns (bytes32) {
+  function getBlockRandomness(uint256 blockNumber) external view virtual onlyL1 returns (bytes32) {
     return _getBlockRandomness(blockNumber, block.number);
   }
 
@@ -109,7 +107,7 @@ contract Random is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 0);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -159,7 +157,7 @@ contract Random is
     }
 
     // add entropy
-    uint256 blockNumber = block.number == 0 ? 0 : block.number.sub(1);
+    uint256 blockNumber = block.number == 0 ? 0 : (block.number - 1);
     addRandomness(block.number, keccak256(abi.encodePacked(history[blockNumber], randomness)));
 
     deprecated_commitments[proposer] = newCommitment;
@@ -186,15 +184,15 @@ contract Random is
         historySize = 1;
       } else if (historySize > deprecated_randomnessBlockRetentionWindow) {
         deleteHistoryIfNotLastEpochBlock(historyFirst);
-        deleteHistoryIfNotLastEpochBlock(historyFirst.add(1));
-        historyFirst = historyFirst.add(2);
-        historySize = historySize.sub(1);
+        deleteHistoryIfNotLastEpochBlock((historyFirst + 1));
+        historyFirst = (historyFirst + 2);
+        historySize = (historySize - 1);
       } else if (historySize == deprecated_randomnessBlockRetentionWindow) {
         deleteHistoryIfNotLastEpochBlock(historyFirst);
-        historyFirst = historyFirst.add(1);
+        historyFirst = (historyFirst + 1);
       } else {
         // historySize < deprecated_randomnessBlockRetentionWindow
-        historySize = historySize.add(1);
+        historySize = (historySize + 1);
       }
     }
   }
@@ -219,11 +217,20 @@ contract Random is
     require(blockNumber <= cur, "Cannot query randomness of future blocks");
     require(
       blockNumber == lastEpochBlock ||
-        (blockNumber > cur.sub(historySize) &&
+        (blockNumber > (cur - historySize) &&
           (deprecated_randomnessBlockRetentionWindow >= cur ||
-            blockNumber > cur.sub(deprecated_randomnessBlockRetentionWindow))),
+            blockNumber > (cur - deprecated_randomnessBlockRetentionWindow))),
       "Cannot query randomness older than the stored history"
     );
     return history[blockNumber];
+  }
+
+  /**
+   * @notice Whether the sender is the owner.
+   * @dev Kept from the Solidity 0.5 implementation: OpenZeppelin 2.5's Ownable exposed it
+   * and 4.9's does not, and the ABI behind the upgraded proxy must not lose a function.
+   */
+  function isOwner() external view returns (bool) {
+    return msg.sender == owner();
   }
 }

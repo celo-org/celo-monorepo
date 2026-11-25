@@ -12,11 +12,14 @@ These test suites are verified to work with Foundry version 1.0.0-stable.
 
 We are in the process of migrating our tests to use [Foundry](https://book.getfoundry.sh/). The tests in this folder have already been migrated from [Truffle](../test).
 
-To run tests with Foundry there's no need to `yarn` or manage any Javascript dependencies. Instead, run
+To run tests with Foundry there's no need to `yarn` or manage any Javascript dependencies. The proxy tests deploy the Solidity 0.5 proxies from the `solc05` profile's build, so build that first (once per checkout), then run
 
 ```bash
+FOUNDRY_PROFILE=solc05 forge build
 forge test
 ```
+
+`yarn test` runs both steps.
 
 This will run all tests in this folder. To run only a specific file you can use
 

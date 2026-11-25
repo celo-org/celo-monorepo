@@ -5,7 +5,15 @@ interface IGovernanceSlasher {
   function setSlasherExecuter(address _slasherExecuter) external;
   function approveSlashing(address account, uint256 penalty) external;
   function getApprovedSlashing(address account) external view returns (uint256);
+  function getSlasherExecuter() external view returns (address);
   function slash(
+    address account,
+    address group,
+    address[] calldata electionLessers,
+    address[] calldata electionGreaters,
+    uint256[] calldata electionIndices
+  ) external returns (bool);
+  function slashL2(
     address account,
     address group,
     address[] calldata electionLessers,

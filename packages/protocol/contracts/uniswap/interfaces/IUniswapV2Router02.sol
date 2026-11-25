@@ -1,4 +1,4 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.5.0;
 
 interface IUniswapV2Router02 {
   function removeLiquidityETHSupportingFeeOnTransferTokens(

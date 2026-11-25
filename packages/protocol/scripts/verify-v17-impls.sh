@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # Verify the 4 v17 implementation contracts (deployed via make-release -s) on both
 # Blockscout and Celoscan. Params mirror make-release.ts (compiler/optimizer/evm/libs/ctor).
+#
+# NOTE: the 0.5 source paths below (e.g. contracts/governance/Election.sol) exist only
+# up to the core-contracts.v17 tag — the implementations were migrated to Solidity 0.8
+# afterwards. Run this from a checkout of that tag (or any ref where the 0.5 sources
+# are present); it verifies the historical deployed bytecode, so newer sources would
+# not match anyway.
 set -u
 
 RPC=https://forno.celo-sepolia.celo-testnet.org

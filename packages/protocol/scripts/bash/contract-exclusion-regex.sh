@@ -42,4 +42,24 @@ if [ $VERSION_NUMBER -gt 11 ]
   CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|MockElection|\\bFeeHandlerSeller\\b"
 fi
 
+# SortedOracles is owned and upgraded by Mento, and AddressSortedLinkedListWithMedian is
+# the library only it links. Reports against CR17 or later (the CR18 release onwards)
+# leave both out, matching the release and verification tooling.
+if [ $VERSION_NUMBER -ge 17 ]
+  then
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|SortedOracles|AddressSortedLinkedListWithMedian"
+fi
+
+# CalledByVm and SuperBridgeETHWrapper are unversioned helpers: neither is a registry
+# contract and neither declares getVersionNumber, so neither can answer the version bump
+# that a code change asks for. Recompiling with a newer Solidity changes the code of every
+# contract, which is what first asked them for one. GasSponsoredOFTBridge, the contract
+# SuperBridgeETHWrapper sits beside, is left out above for the same reason. The number is
+# the release being compared against, as in the block above, so 17 is what the CR18
+# release reads; the snapshots committed for earlier releases compare from 16 or lower.
+if [ $VERSION_NUMBER -ge 17 ]
+  then
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|CalledByVm|SuperBridgeETHWrapper"
+fi
+
 echo "FULL CONTRACT_EXCLUSION_REGEX: $CONTRACT_EXCLUSION_REGEX"

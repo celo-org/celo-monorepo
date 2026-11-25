@@ -1,4 +1,4 @@
-const SOLC_VERSION = '0.8.19'
+const SOLC_VERSION = '0.8.36'
 
 const parent = require('./truffle-config-parent.js')
 const networks = { ...parent.networks }

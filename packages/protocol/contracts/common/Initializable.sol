@@ -25,7 +25,7 @@ contract Initializable {
    * @param testingDeployment When set to true, allows the `initialize` function
    * to be called, which is useful in testing when not setting up with a Proxy.
    */
-  constructor(bool testingDeployment) public {
+  constructor(bool testingDeployment) {
     if (!testingDeployment) {
       initialized = true;
     }
