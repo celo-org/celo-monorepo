@@ -14,7 +14,7 @@
     "keeper": "node dist/index.js"
   },
   "dependencies": {
-    "viem": "^2.58.4"
+    "viem": "^2.58.0"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",
