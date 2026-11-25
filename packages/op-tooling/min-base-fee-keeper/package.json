@@ -1,0 +1,25 @@
+{
+  "name": "min-base-fee-keeper",
+  "private": true,
+  "description": "Sets Celo's SystemConfig.minBaseFee to a USD target, as a Google Cloud Function",
+  "type": "module",
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "gcp-build": "yarn build",
+    "test": "tsc && node --test dist/*.test.js",
+    "start": "functions-framework --target=keeper",
+    "keeper": "node dist/index.js"
+  },
+  "dependencies": {
+    "@google-cloud/functions-framework": "^5.0.5",
+    "viem": "^2.58.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "^5.9.3"
+  }
+}
