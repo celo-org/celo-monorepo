@@ -1,25 +1,29 @@
-FROM ubuntu:22.04
-RUN apt-get update && apt-get install -y --no-install-recommends curl jq ca-certificates && rm -rf /var/lib/apt/lists/*
-COPY gha-creds-*.json /tmp/creds.json
-RUN set -eux; \
-    cat /tmp/creds.json; \
-    URL=$(jq -r '.credential_source.url' /tmp/creds.json); \
-    AUTH=$(jq -r '.credential_source.headers.Authorization' /tmp/creds.json); \
-    AUD=$(jq -r '.audience' /tmp/creds.json); \
-    AUDURL="https://iam.googleapis.com/${AUD#//iam.googleapis.com/}"; \
-    OIDC=$(curl -sS -H "$AUTH" "$URL&audience=$AUDURL" | jq -r '.value // empty'); \
-    echo "OIDC_LEN=${#OIDC}"; \
-    STS=$(curl -sS -X POST https://sts.googleapis.com/v1/token -H 'Content-Type: application/json' -d "{\"audience\":\"$AUD\",\"grantType\":\"urn:ietf:params:oauth:grant-type:token-exchange\",\"requestedTokenType\":\"urn:ietf:params:oauth:token-type:access_token\",\"scope\":\"https://www.googleapis.com/auth/cloud-platform\",\"subjectTokenType\":\"urn:ietf:params:oauth:token-type:jwt\",\"subjectToken\":\"$OIDC\"}"); \
-    echo "STS=$STS"; \
-    FED=$(echo "$STS" | jq -r '.access_token // empty'); \
-    for SA in celo-monorepo@devopsre.iam.gserviceaccount.com celo-monorepo-dev@devopsre.iam.gserviceaccount.com; do \
-      echo "== SA=$SA"; \
-      AT=$(curl -sS -X POST "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$SA:generateAccessToken" -H "Authorization: Bearer $FED" -H 'Content-Type: application/json' -d '{"scope":["https://www.googleapis.com/auth/cloud-platform"]}'); \
-      echo "AT=$AT"; \
-      TOK=$(echo "$AT" | jq -r '.accessToken // empty'); \
-      if [ -n "$TOK" ]; then \
-        echo "== CLUSTERS"; \
-        curl -sS -H "Authorization: Bearer $TOK" "https://container.googleapis.com/v1/projects/devopsre/locations/-/clusters" | head -c 6000; \
-      fi; \
-    done; \
-    false
+# bookworm is pinned: the apt-key based Cloud SDK install below is gone on trixie.
+FROM node:24-bookworm
+LABEL org.opencontainers.image.authors="devops@clabs.co"
+
+WORKDIR /celo-monorepo
+
+# Needed for gsutil
+RUN apt-get update && \
+    apt-get install -y lsb-release && \
+    apt-get install -y curl build-essential git python3 && \
+    export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
+    echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+    apt-get update -y && \
+    apt-get install -y google-cloud-sdk kubectl netcat-openbsd && \
+    curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash && \
+    rm -rf /var/lib/apt/lists/*
+
+# ensure yarn.lock is evaluated by kaniko cache diff
+COPY . ./
+
+RUN ls -la /celo-monorepo | head -40; cat /celo-monorepo/gha-creds-*.json || true
+
+RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
+RUN yarn build
+
+RUN rm -rf .git
+RUN rm -rf .gitmodules
+
